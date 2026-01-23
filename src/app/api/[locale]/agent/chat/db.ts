@@ -56,8 +56,6 @@ import { ChatMessageRoleDB, ThreadStatusDB } from "./enum";
  * Thread metadata structure
  */
 interface ThreadMetadata {
-  temperature?: number;
-  maxTokens?: number;
   topP?: number;
   frequencyPenalty?: number;
   presencePenalty?: number;

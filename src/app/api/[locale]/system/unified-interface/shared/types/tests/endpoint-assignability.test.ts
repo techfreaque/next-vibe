@@ -112,12 +112,12 @@ type Test3_1_LiteralCreate = CreateApiEndpoint<
         z.ZodUUID,
         { request: "urlPathParams" },
         string,
-        WidgetConfig<string>
+        WidgetConfig<string, z.ZodTypeAny>
       >;
     },
     { request: "urlPathParams"; response: true },
     string,
-    WidgetConfig<string>
+    WidgetConfig<string, z.ZodTypeAny>
   >
 >;
 
@@ -135,12 +135,12 @@ type Test3_3_ObjectFieldExtendsUnified =
         z.ZodUUID,
         { request: "urlPathParams" },
         string,
-        WidgetConfig<string>
+        WidgetConfig<string, z.ZodTypeAny>
       >;
     },
     { request: "urlPathParams"; response: true },
     string,
-    WidgetConfig<string>
+    WidgetConfig<string, z.ZodTypeAny>
   > extends UnifiedField<string, z.ZodTypeAny>
     ? "PASS"
     : "FAIL";
@@ -159,12 +159,12 @@ type Test3_4_FullCheck =
           z.ZodUUID,
           { request: "urlPathParams" },
           string,
-          WidgetConfig<string>
+          WidgetConfig<string, z.ZodTypeAny>
         >;
       },
       { request: "urlPathParams"; response: true },
       string,
-      WidgetConfig<string>
+      WidgetConfig<string, z.ZodTypeAny>
     >
   > extends CreateApiEndpointAny
     ? "PASS"
@@ -180,12 +180,12 @@ type TestObjectField = ObjectField<
       z.ZodUUID,
       { request: "urlPathParams" },
       string,
-      WidgetConfig<string>
+      WidgetConfig<string, z.ZodTypeAny>
     >;
   },
   { request: "urlPathParams"; response: true },
   string,
-  WidgetConfig<string>
+  WidgetConfig<string, z.ZodTypeAny>
 >;
 type Test3_5_SchemaCompat = {
   readonly requestSchema: InferSchemaFromField<
@@ -245,9 +245,9 @@ const test3_8: Test3_8_Direct = "PASS"; // We WANT ObjectField to extend Unified
 // Test 3.9: Test if WidgetConfig<string> is the issue
 // When used in a property position, does it break variance?
 type Test3_9_WidgetConfigProp = {
-  readonly ui: WidgetConfig<string>;
+  readonly ui: WidgetConfig<string, z.ZodTypeAny>;
 } extends {
-  readonly ui: WidgetConfig<string>;
+  readonly ui: WidgetConfig<string, z.ZodTypeAny>;
 }
   ? "PASS"
   : "FAIL";
@@ -258,7 +258,7 @@ type SimpleObjectField = ObjectField<
   Record<string, never>, // Empty children
   { request: "data" },
   string,
-  WidgetConfig<string>
+  WidgetConfig<string, z.ZodTypeAny>
 >;
 type Test3_10_SimpleObject =
   ApiEndpoint<
@@ -540,14 +540,14 @@ type Test3_25_MinimalApi =
   >
     ? "PASS"
     : "FAIL";
-const test3_25: Test3_25_MinimalApi = "FAIL"; // Without 'out' variance, interface is invariant
+const test3_25: Test3_25_MinimalApi = "PASS"; // With 'out' variance, interface is covariant
 
 // Test 3.26: Add the options property which uses TMethod in conditional
 interface ApiEndpointWithOptions<
-  TExampleKey extends string,
-  TMethod extends Methods,
-  TUserRoleValue extends readonly UserRoleValue[],
-  TFields extends UnifiedField<string, z.ZodTypeAny>,
+  out TExampleKey extends string,
+  out TMethod extends Methods,
+  out TUserRoleValue extends readonly UserRoleValue[],
+  out TFields extends UnifiedField<string, z.ZodTypeAny>,
 > extends MinimalApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields> {
   readonly options?: TMethod extends Methods.GET
     ? EndpointReadOptions<
@@ -573,7 +573,7 @@ type Test3_26_WithOptions =
   >
     ? "PASS"
     : "FAIL";
-const test3_26: Test3_26_WithOptions = "FAIL"; // Without 'out' variance, interface is invariant
+const test3_26: Test3_26_WithOptions = "PASS"; // With 'out' variance, interface is covariant
 
 // Test 3.27: Add errorTypes and successTypes which use TScopedTranslationKey with NoInfer
 interface ApiEndpointWithErrorTypes<
@@ -616,7 +616,7 @@ type Test3_27_WithErrorTypes =
   >
     ? "PASS"
     : "FAIL";
-const test3_27: Test3_27_WithErrorTypes = "FAIL"; // Without 'out' variance, interface is invariant
+const test3_27: Test3_27_WithErrorTypes = "PASS"; // With 'out' variance, interface is covariant
 
 // Test 3.28: Test if mapped type key causes variance issue
 type MappedRecord<TKey extends string, T> = {

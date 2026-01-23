@@ -8,7 +8,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   requestResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -42,17 +42,15 @@ export const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      referralCode: requestResponseField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.referral.form.fields.code.label",
-          description: "app.api.referral.form.fields.code.description",
-          placeholder: "app.api.referral.form.fields.code.placeholder",
-          columns: 12,
-        },
-        z.string().min(1),
-      ),
+      referralCode: requestResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.referral.form.fields.code.label",
+        description: "app.api.referral.form.fields.code.description",
+        placeholder: "app.api.referral.form.fields.code.placeholder",
+        columns: 12,
+        schema: z.string().min(1),
+      }),
     },
   ),
 

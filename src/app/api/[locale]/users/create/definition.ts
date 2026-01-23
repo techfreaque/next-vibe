@@ -9,10 +9,10 @@ import { leadId } from "@/app/api/[locale]/leads/types";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -70,91 +70,77 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          email: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.EMAIL,
-              label: "app.api.users.create.post.email.label" as const,
-              description:
-                "app.api.users.create.post.email.description" as const,
-              placeholder: "app.api.users.create.post.email.label" as const,
-              columns: 12,
-            },
-            z
+          email: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.EMAIL,
+            label: "app.api.users.create.post.email.label" as const,
+            description: "app.api.users.create.post.email.description" as const,
+            placeholder: "app.api.users.create.post.email.label" as const,
+            columns: 12,
+            schema: z
               .string()
               .email("usersErrors.validation.email.invalid")
               .transform((val) => val.toLowerCase().trim()),
-          ),
-          password: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.PASSWORD,
-              label: "app.api.users.create.post.password.label" as const,
-              description:
-                "app.api.users.create.post.password.description" as const,
-              helpText:
-                "app.api.users.create.post.password.description" as const,
-              columns: 12,
-            },
-            z
+          }),
+          password: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.PASSWORD,
+            label: "app.api.users.create.post.password.label" as const,
+            description:
+              "app.api.users.create.post.password.description" as const,
+            helpText: "app.api.users.create.post.password.description" as const,
+            columns: 12,
+            schema: z
               .string()
               .min(8, "usersErrors.validation.password.tooShort")
               .max(128, "usersErrors.validation.password.tooLong"),
-          ),
-          privateName: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.users.create.post.privateName.label" as const,
-              description:
-                "app.api.users.create.post.privateName.description" as const,
-              columns: 6,
-            },
-            z
+          }),
+          privateName: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.users.create.post.privateName.label" as const,
+            description:
+              "app.api.users.create.post.privateName.description" as const,
+            columns: 6,
+            schema: z
               .string()
               .min(1, "usersErrors.validation.privateName.required")
               .max(255, "usersErrors.validation.privateName.tooLong")
               .transform((val) => val.trim()),
-          ),
-          publicName: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.users.create.post.publicName.label" as const,
-              description:
-                "app.api.users.create.post.publicName.description" as const,
-              columns: 6,
-            },
-            z
+          }),
+          publicName: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.users.create.post.publicName.label" as const,
+            description:
+              "app.api.users.create.post.publicName.description" as const,
+            columns: 6,
+            schema: z
               .string()
               .min(1, "usersErrors.validation.publicName.required")
               .max(255, "usersErrors.validation.publicName.tooLong")
               .transform((val) => val.trim()),
-          ),
+          }),
 
-          country: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.users.create.post.country.label",
-              description: "app.api.users.create.post.country.description",
-              options: CountriesOptions,
-              columns: 6,
-            },
-            z.enum(Countries),
-          ),
+          country: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.users.create.post.country.label",
+            description: "app.api.users.create.post.country.description",
+            options: CountriesOptions,
+            columns: 6,
+            schema: z.enum(Countries),
+          }),
 
-          language: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.users.create.post.language.label",
-              description: "app.api.users.create.post.language.description",
-              options: LanguagesOptions,
-              columns: 6,
-            },
-            z.enum(Languages),
-          ),
+          language: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.users.create.post.language.label",
+            description: "app.api.users.create.post.language.description",
+            options: LanguagesOptions,
+            columns: 6,
+            schema: z.enum(Languages),
+          }),
         },
       ),
 
@@ -169,53 +155,44 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          roles: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.users.create.post.roles.label" as const,
-              description:
-                "app.api.users.create.post.roles.description" as const,
-              helpText: "app.api.users.create.post.roles.description" as const,
-              columns: 12,
-              options: UserRoleOptions,
-            },
-            z.array(z.enum(UserRole)).optional(),
-          ),
-          emailVerified: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.users.create.post.emailVerified.label" as const,
-              description:
-                "app.api.users.create.post.emailVerified.description" as const,
-              columns: 6,
-            },
-            z.boolean().optional(),
-          ),
-          isActive: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.users.create.post.isActive.label" as const,
-              description:
-                "app.api.users.create.post.isActive.description" as const,
-              columns: 6,
-            },
-            z.boolean().optional(),
-          ),
-          leadId: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.UUID,
-              label: "app.api.users.create.post.leadId.label" as const,
-              description:
-                "app.api.users.create.post.leadId.description" as const,
-              helpText: "app.api.users.create.post.leadId.description" as const,
-              columns: 6,
-            },
-            leadId.nullable().optional(),
-          ),
+          roles: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label: "app.api.users.create.post.roles.label" as const,
+            description: "app.api.users.create.post.roles.description" as const,
+            helpText: "app.api.users.create.post.roles.description" as const,
+            columns: 12,
+            options: UserRoleOptions,
+            schema: z.array(z.enum(UserRole)).optional(),
+          }),
+          emailVerified: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.BOOLEAN,
+            label: "app.api.users.create.post.emailVerified.label" as const,
+            description:
+              "app.api.users.create.post.emailVerified.description" as const,
+            columns: 6,
+            schema: z.boolean().optional(),
+          }),
+          isActive: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.BOOLEAN,
+            label: "app.api.users.create.post.isActive.label" as const,
+            description:
+              "app.api.users.create.post.isActive.description" as const,
+            columns: 6,
+            schema: z.boolean().optional(),
+          }),
+          leadId: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.UUID,
+            label: "app.api.users.create.post.leadId.label" as const,
+            description:
+              "app.api.users.create.post.leadId.description" as const,
+            helpText: "app.api.users.create.post.leadId.description" as const,
+            columns: 6,
+            schema: leadId.nullable().optional(),
+          }),
         },
       ),
 
@@ -230,21 +207,19 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          created: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.users.create.post.success.created.content" as const,
-            },
-            z.boolean().describe("Whether the user was successfully created"),
-          ),
-          message: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.create.post.success.message.content" as const,
-            },
-            z.string().describe("Human-readable success message"),
-          ),
+          created: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.users.create.post.success.created.content" as const,
+            schema: z
+              .boolean()
+              .describe("Whether the user was successfully created"),
+          }),
+          message: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.users.create.post.success.message.content" as const,
+            schema: z.string().describe("Human-readable success message"),
+          }),
         },
       ),
       userInfo: objectField(
@@ -258,106 +233,80 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          id: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.users.create.post.response.id.content" as const,
-            },
-            z.uuid().describe("Generated user ID"),
-          ),
-          email: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.create.post.response.email.content" as const,
-            },
-            z.email().describe("User's email address"),
-          ),
-          privateName: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.create.post.response.privateName.content" as const,
-            },
-            z.string().describe("User's private name"),
-          ),
-          publicName: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.create.post.response.publicName.content" as const,
-            },
-            z.string().describe("User's public name"),
-          ),
-          createdAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.create.post.response.createdAt.content" as const,
-            },
-            dateSchema.describe("When the user was created"),
-          ),
+          id: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.users.create.post.response.id.content" as const,
+            schema: z.uuid().describe("Generated user ID"),
+          }),
+          email: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.users.create.post.response.email.content" as const,
+            schema: z.email().describe("User's email address"),
+          }),
+          privateName: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.users.create.post.response.privateName.content" as const,
+            schema: z.string().describe("User's private name"),
+          }),
+          publicName: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.users.create.post.response.publicName.content" as const,
+            schema: z.string().describe("User's public name"),
+          }),
+          createdAt: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.users.create.post.response.createdAt.content" as const,
+            schema: dateSchema.describe("When the user was created"),
+          }),
         },
       ),
-      responseId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.users.create.post.response.id.content" as const,
-        },
-        z.uuid(),
-      ),
-      responseLeadId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.users.create.post.response.leadId.content" as const,
-        },
-        leadId.nullable(),
-      ),
-      responseEmail: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.users.create.post.response.email.content" as const,
-        },
-        z.email(),
-      ),
-      responsePrivateName: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.create.post.response.privateName.content" as const,
-        },
-        z.string(),
-      ),
-      responsePublicName: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.create.post.response.publicName.content" as const,
-        },
-        z.string(),
-      ),
-      responseEmailVerified: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.users.create.post.response.emailVerified.content" as const,
-        },
-        z.boolean(),
-      ),
-      responseIsActive: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.users.create.post.response.isActive.content" as const,
-        },
-        z.boolean(),
-      ),
-      responseStripeCustomerId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.create.post.response.stripeCustomerId.content" as const,
-        },
-        z.string().nullable(),
-      ),
+      responseId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.users.create.post.response.id.content" as const,
+        schema: z.uuid(),
+      }),
+      responseLeadId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.users.create.post.response.leadId.content" as const,
+        schema: leadId.nullable(),
+      }),
+      responseEmail: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.users.create.post.response.email.content" as const,
+        schema: z.email(),
+      }),
+      responsePrivateName: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.create.post.response.privateName.content" as const,
+        schema: z.string(),
+      }),
+      responsePublicName: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.create.post.response.publicName.content" as const,
+        schema: z.string(),
+      }),
+      responseEmailVerified: responseField({
+        type: WidgetType.BADGE,
+        text: "app.api.users.create.post.response.emailVerified.content" as const,
+        schema: z.boolean(),
+      }),
+      responseIsActive: responseField({
+        type: WidgetType.BADGE,
+        text: "app.api.users.create.post.response.isActive.content" as const,
+        schema: z.boolean(),
+      }),
+      responseStripeCustomerId: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.create.post.response.stripeCustomerId.content" as const,
+        schema: z.string().nullable(),
+      }),
       responseUserRoles: responseArrayField(
         {
           type: WidgetType.DATA_TABLE,
@@ -370,41 +319,33 @@ const { POST } = createEndpoint({
           },
           { response: true },
           {
-            id: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.users.create.post.response.userRoles.id.content" as const,
-              },
-              z.uuid(),
-            ),
-            role: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.users.create.post.response.userRoles.role.content" as const,
-              },
-              z.string(),
-            ),
+            id: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.users.create.post.response.userRoles.id.content" as const,
+              schema: z.uuid(),
+            }),
+            role: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.users.create.post.response.userRoles.role.content" as const,
+              schema: z.string(),
+            }),
           },
         ),
       ),
-      responseCreatedAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.create.post.response.createdAt.content" as const,
-        },
-        dateSchema,
-      ),
-      responseUpdatedAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.create.post.response.updatedAt.content" as const,
-        },
-        dateSchema,
-      ),
+      responseCreatedAt: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.create.post.response.createdAt.content" as const,
+        schema: dateSchema,
+      }),
+      responseUpdatedAt: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.create.post.response.updatedAt.content" as const,
+        schema: dateSchema,
+      }),
     },
   ),
 
@@ -511,7 +452,6 @@ const { POST } = createEndpoint({
         responseUpdatedAt: "2023-01-01T00:00:00.000Z",
       },
     },
-    urlPathParams: undefined,
   },
 });
 

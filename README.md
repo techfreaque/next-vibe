@@ -100,7 +100,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
@@ -124,7 +124,7 @@ const { POST } = createEndpoint({
         { type: WidgetType.CONTAINER },
         { request: "data" },
         {
-          email: requestDataField(
+          email: requestField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.EMAIL,
@@ -132,7 +132,7 @@ const { POST } = createEndpoint({
             },
             z.string().email(),
           ),
-          password: requestDataField(
+          password: requestField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PASSWORD,

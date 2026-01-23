@@ -9,10 +9,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -74,7 +74,6 @@ const { POST } = createEndpoint({
         dryRun: false,
       },
     },
-    urlPathParams: undefined,
     responses: {
       default: {
         success: true,
@@ -236,59 +235,49 @@ const { POST } = createEndpoint({
     {
       // === REQUEST FIELDS ===
 
-      force: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.reset.fields.force.title",
-          description: "app.api.system.db.reset.fields.force.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      force: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.reset.fields.force.title",
+        description: "app.api.system.db.reset.fields.force.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      skipMigrations: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.reset.fields.skipMigrations.title",
-          description:
-            "app.api.system.db.reset.fields.skipMigrations.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      skipMigrations: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.reset.fields.skipMigrations.title",
+        description:
+          "app.api.system.db.reset.fields.skipMigrations.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      skipSeeds: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.reset.fields.skipSeeds.title",
-          description: "app.api.system.db.reset.fields.skipSeeds.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      skipSeeds: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.reset.fields.skipSeeds.title",
+        description: "app.api.system.db.reset.fields.skipSeeds.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.reset.fields.dryRun.title",
-          description: "app.api.system.db.reset.fields.dryRun.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.reset.fields.dryRun.title",
+        description: "app.api.system.db.reset.fields.dryRun.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.reset.fields.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.reset.fields.success.title",
+        schema: z.boolean(),
+      }),
 
       operations: responseArrayField(
         {
@@ -303,90 +292,69 @@ const { POST } = createEndpoint({
           },
           { response: true },
           {
-            type: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.db.reset.fields.operations.type.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.enum(["truncate", "migrate", "seed"]),
-            ),
-            status: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.system.db.reset.fields.operations.status.title",
-              },
-              z.enum(["success", "skipped", "failed", "pending"]),
-            ),
-            details: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.db.reset.fields.operations.details.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string(),
-            ),
-            count: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.db.reset.fields.operations.count.title",
-                fieldType: FieldDataType.NUMBER,
-              },
-              z.coerce.number(),
-            ),
+            type: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.db.reset.fields.operations.type.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.enum(["truncate", "migrate", "seed"]),
+            }),
+            status: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.system.db.reset.fields.operations.status.title",
+              schema: z.enum(["success", "skipped", "failed", "pending"]),
+            }),
+            details: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.db.reset.fields.operations.details.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.string(),
+            }),
+            count: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.db.reset.fields.operations.count.title",
+              fieldType: FieldDataType.NUMBER,
+              schema: z.coerce.number(),
+            }),
           },
         ),
       ),
 
-      tablesAffected: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.reset.fields.tablesAffected.title",
-        },
-        z.coerce.number(),
-      ),
+      tablesAffected: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.reset.fields.tablesAffected.title",
+        schema: z.coerce.number(),
+      }),
 
-      migrationsRun: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.reset.fields.migrationsRun.title",
-        },
-        z.coerce.number(),
-      ),
+      migrationsRun: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.reset.fields.migrationsRun.title",
+        schema: z.coerce.number(),
+      }),
 
-      seedsRun: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.reset.fields.seedsRun.title",
-        },
-        z.coerce.number(),
-      ),
+      seedsRun: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.reset.fields.seedsRun.title",
+        schema: z.coerce.number(),
+      }),
 
-      isDryRun: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.reset.fields.isDryRun.title",
-        },
-        z.boolean(),
-      ),
+      isDryRun: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.reset.fields.isDryRun.title",
+        schema: z.boolean(),
+      }),
 
-      requiresForce: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.reset.fields.requiresForce.title",
-        },
-        z.boolean(),
-      ),
+      requiresForce: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.reset.fields.requiresForce.title",
+        schema: z.boolean(),
+      }),
 
-      duration: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.reset.fields.duration.title",
-        },
-        z.coerce.number(),
-      ),
+      duration: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.reset.fields.duration.title",
+        schema: z.coerce.number(),
+      }),
     },
   ),
 

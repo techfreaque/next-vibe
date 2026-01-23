@@ -15,18 +15,19 @@ import {
   success,
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { TFunction } from "@/i18n/core/static-types";
 
-import { modelOptions, modelProviders } from "../../models/models";
+import { defaultModel } from "../../models/models";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import type {
+  CharacterDeleteResponseOutput,
   CharacterGetResponseOutput,
   CharacterUpdateRequestOutput,
   CharacterUpdateResponseOutput,
 } from "./[id]/definition";
-import { DEFAULT_CHARACTERS } from "./config";
+import { DEFAULT_CHARACTERS, NO_CHARACTER, NO_CHARACTER_ID } from "./config";
 import type {
   CharacterCreateRequestOutput,
   CharacterCreateResponseOutput,
@@ -36,7 +37,6 @@ import type {
   CharacterListItem,
   CharacterListResponseOutput,
 } from "./definition";
-import type { CharacterCategoryDB } from "./enum";
 import { type CharacterCategoryValue, CharacterOwnershipType } from "./enum";
 import { CATEGORY_CONFIG } from "./enum";
 import { CharactersRepositoryClient } from "./repository-client";
@@ -46,67 +46,6 @@ import { CharactersRepositoryClient } from "./repository-client";
  * All methods return ResponseType for consistent error handling
  */
 export class CharactersRepository {
-  /**
-   * Simple character lookup for internal use (non-route handlers)
-   * Does not require full JWT payload or logger
-   */
-  static async getCharacterByIdSimple(
-    characterId: string,
-    userId?: string,
-  ): Promise<CharacterGetResponseOutput | null> {
-    // Check default characters first (these already have source field)
-    const defaultCharacter = DEFAULT_CHARACTERS.find(
-      (p) => p.id === characterId,
-    );
-    if (defaultCharacter) {
-      return {
-        ...defaultCharacter,
-        ownershipType: CharacterOwnershipType.SYSTEM,
-      };
-    }
-
-    // Check custom characters
-    // Return character if:
-    // 1. User owns it (any ownershipType)
-    // 2. It's PUBLIC (regardless of owner)
-    const [customCharacter] = await db
-      .select()
-      .from(customCharacters)
-      .where(
-        and(
-          eq(customCharacters.id, characterId),
-          userId
-            ? or(
-                eq(customCharacters.userId, userId),
-                eq(
-                  customCharacters.ownershipType,
-                  CharacterOwnershipType.PUBLIC,
-                ),
-              )
-            : eq(customCharacters.ownershipType, CharacterOwnershipType.PUBLIC),
-        ),
-      )
-      .limit(1);
-
-    if (!customCharacter) {
-      return null;
-    }
-
-    return {
-      id: customCharacter.id,
-      name: customCharacter.name,
-      description: customCharacter.description,
-      icon: customCharacter.icon,
-      systemPrompt: customCharacter.systemPrompt,
-      category: customCharacter.category,
-      tagline: customCharacter.tagline,
-      ownershipType: customCharacter.ownershipType,
-      modelSelection: customCharacter.modelSelection,
-      voice: customCharacter.voice || DEFAULT_TTS_VOICE,
-      suggestedPrompts: customCharacter.suggestedPrompts,
-    };
-  }
-
   /**
    * Get all characters for a user (default + custom)
    * Handles both authenticated and public users
@@ -119,6 +58,7 @@ export class CharactersRepository {
   static async getCharacters(
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: TFunction,
   ): Promise<ResponseType<CharacterListResponseOutput>> {
     try {
       const userId = user.id;
@@ -145,13 +85,26 @@ export class CharactersRepository {
           );
 
         // Map custom characters to card display fields
-        const customCharactersCards = customCharactersList.map(
-          CharactersRepository.mapCharacterToListItem,
-        );
+        // Transform DB type to CharacterGetResponseOutput (remove DB-only fields)
+        const customCharactersCards = customCharactersList.map((char) => {
+          const characterData: CharacterGetResponseOutput = {
+            id: char.id,
+            name: char.name,
+            description: char.description,
+            icon: char.icon,
+            systemPrompt: char.systemPrompt,
+            category: char.category,
+            tagline: char.tagline,
+            ownershipType: char.ownershipType,
+            modelSelection: char.modelSelection,
+            voice: char.voice || DEFAULT_TTS_VOICE,
+          };
+          return CharactersRepository.mapCharacterToListItem(characterData, t);
+        });
 
         // Map default characters to card display fields
-        const defaultCharactersCards = DEFAULT_CHARACTERS.map(
-          CharactersRepository.mapCharacterToListItem,
+        const defaultCharactersCards = DEFAULT_CHARACTERS.map((char) =>
+          CharactersRepository.mapCharacterToListItem(char, t),
         );
 
         // Combine all characters
@@ -170,8 +123,8 @@ export class CharactersRepository {
 
       // For public/lead users, return only default characters as card display fields
       logger.debug("Getting default characters for public user");
-      const defaultCharactersCards = DEFAULT_CHARACTERS.map(
-        CharactersRepository.mapCharacterToListItem,
+      const defaultCharactersCards = DEFAULT_CHARACTERS.map((char) =>
+        CharactersRepository.mapCharacterToListItem(char, t),
       );
 
       // Group characters by category into sections
@@ -257,7 +210,23 @@ export class CharactersRepository {
           ownershipType: CharacterOwnershipType.SYSTEM,
           modelSelection: defaultCharacter.modelSelection,
           voice: defaultCharacter.voice,
-          suggestedPrompts: defaultCharacter.suggestedPrompts,
+        };
+        return success(characterData);
+      }
+
+      // Check for NO_CHARACTER
+      if (characterId === NO_CHARACTER_ID) {
+        const characterData: CharacterGetResponseOutput = {
+          id: NO_CHARACTER_ID,
+          name: null,
+          description: null,
+          systemPrompt: null,
+          category: NO_CHARACTER.category,
+          icon: null,
+          tagline: null,
+          voice: NO_CHARACTER.voice,
+          modelSelection: NO_CHARACTER.modelSelection,
+          ownershipType: CharacterOwnershipType.SYSTEM,
         };
         return success(characterData);
       }
@@ -307,7 +276,6 @@ export class CharactersRepository {
         ownershipType: customCharacter.ownershipType,
         modelSelection: customCharacter.modelSelection,
         voice: customCharacter.voice || DEFAULT_TTS_VOICE,
-        suggestedPrompts: customCharacter.suggestedPrompts,
       });
     } catch (error) {
       logger.error("Failed to get character by ID", parseError(error));
@@ -350,7 +318,6 @@ export class CharactersRepository {
           systemPrompt: data.systemPrompt,
           category: data.category,
           voice: data.voice,
-          suggestedPrompts: data.suggestedPrompts || [],
           modelSelection: data.modelSelection,
           ownershipType: data.ownershipType,
         })
@@ -432,7 +399,6 @@ export class CharactersRepository {
             ? "app.api.agent.chat.characters.enums.ownershipType.user"
             : updated.ownershipType,
         voice: updated.voice || DEFAULT_TTS_VOICE,
-        suggestedPrompts: updated.suggestedPrompts,
         modelSelection: updated.modelSelection,
       });
     } catch (error) {
@@ -451,7 +417,7 @@ export class CharactersRepository {
     urlPathParams: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
-  ): Promise<ResponseType<{ success: boolean }>> {
+  ): Promise<ResponseType<CharacterDeleteResponseOutput>> {
     try {
       const userId = user.id;
       const { id: characterId } = urlPathParams;
@@ -484,7 +450,7 @@ export class CharactersRepository {
         });
       }
 
-      return success({ success: true });
+      return success();
     } catch (error) {
       logger.error("Failed to delete character", parseError(error));
       return fail({
@@ -493,76 +459,49 @@ export class CharactersRepository {
       });
     }
   }
-  /**
-   * Format credit cost for display (server-side version, no i18n)
-   */
-  private static formatCreditCost(cost: number): string {
-    if (cost === 0) {
-      return "Free";
-    }
-    if (cost === 1) {
-      return "1 credit";
-    }
-    return `${cost} credits`;
-  }
-
-  /**
-   * Compute display fields for a character
-   */
-  private static computeCharacterDisplayFields(character: {
-    modelSelection: CharacterGetResponseOutput["modelSelection"];
-  }): {
-    modelIcon: IconKey;
-    modelInfo: string;
-    modelProvider: string;
-    creditCost: string;
-  } {
-    const allModels = Object.values(modelOptions);
-    const resolvedModel = CharactersRepositoryClient.resolveModelForSelection(
-      character.modelSelection,
-      allModels,
-    );
-
-    return {
-      modelIcon: resolvedModel?.icon ?? ("sparkles" as IconKey),
-      modelInfo: resolvedModel?.name ?? "Default Model",
-      modelProvider: resolvedModel?.provider
-        ? (modelProviders[resolvedModel.provider]?.name ?? "Unknown")
-        : "Unknown",
-      creditCost: resolvedModel
-        ? CharactersRepository.formatCreditCost(resolvedModel.creditCost)
-        : "—",
-    };
-  }
 
   /**
    * Map a character to a list item card
+   * Uses CharactersRepositoryClient for all display field computation
    */
-  private static mapCharacterToListItem(char: {
-    id: string;
-    category: string;
-    icon: string;
-    name: string;
-    description: string;
-    tagline: string;
-    modelSelection: CharacterGetResponseOutput["modelSelection"];
-  }): CharacterListItem {
-    const displayFields =
-      CharactersRepository.computeCharacterDisplayFields(char);
+  private static mapCharacterToListItem(
+    char: CharacterGetResponseOutput,
+    t: TFunction,
+  ): CharacterListItem {
+    // Get best model from character's modelSelection
+    const bestModel = CharactersRepositoryClient.getBestModelForCharacter(
+      char.modelSelection,
+    );
+
+    // Fallback if no model found (shouldn't happen with valid modelSelection)
+    const modelId = bestModel?.id ?? defaultModel;
+    const modelRow = bestModel
+      ? {
+          modelIcon: bestModel.icon,
+          modelInfo: bestModel.name,
+          modelProvider: bestModel.provider,
+          creditCost: CharactersRepositoryClient.formatCreditCost(
+            bestModel.creditCost,
+            t,
+          ),
+        }
+      : {
+          modelIcon: "sparkles" as const,
+          modelInfo: "Unknown Model",
+          modelProvider: "unknown",
+          creditCost: "? credits",
+        };
+
     return {
       id: char.id,
-      category: char.category as (typeof CharacterCategoryDB)[number],
-      icon: char.icon as IconKey,
+      category: char.category,
+      icon: char.icon ?? "sparkles",
+      modelId,
       content: {
-        name: char.name,
-        description: char.description,
-        tagline: char.tagline,
-        modelRow: {
-          modelIcon: displayFields.modelIcon,
-          modelInfo: displayFields.modelInfo,
-          modelProvider: displayFields.modelProvider,
-          creditCost: displayFields.creditCost,
-        },
+        name: char.name ?? bestModel?.name ?? "Unknown Model",
+        description: char.description ?? "",
+        tagline: char.tagline ?? "",
+        modelRow,
       },
     };
   }

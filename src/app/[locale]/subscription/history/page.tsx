@@ -72,8 +72,8 @@ export default async function HistoryPage({
     !!userResponse.data.id;
 
   // Fetch data
-  let credits: CreditBalance | null = null;
   let history: CreditsHistoryGetResponseOutput | null = null;
+  let credits: CreditBalance;
   let subscription: SubscriptionGetResponseOutput | null = null;
 
   if (userResponse.success && userResponse.data && userResponse.data.leadId) {
@@ -82,7 +82,27 @@ export default async function HistoryPage({
       locale,
       logger,
     );
-    credits = creditsResponse.success ? creditsResponse.data : null;
+    if (!creditsResponse.success) {
+      credits = {
+        total: 0,
+        free: 0,
+        expiring: 0,
+        permanent: 0,
+        earned: 0,
+        expiresAt: null,
+      };
+    } else {
+      credits = creditsResponse.data;
+    }
+  } else {
+    credits = {
+      total: 0,
+      free: 0,
+      expiring: 0,
+      permanent: 0,
+      earned: 0,
+      expiresAt: null,
+    };
   }
 
   // Fetch transaction history

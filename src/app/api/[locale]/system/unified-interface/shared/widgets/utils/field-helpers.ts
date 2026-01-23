@@ -1,3 +1,5 @@
+import type { ZodTypeAny } from "zod";
+
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TParams } from "@/i18n/core/static-types";
 
@@ -8,7 +10,7 @@ import { WidgetType } from "../../types/enums";
  * Check if field is used for request (form input)
  */
 export function isRequestField<TKey extends string>(
-  field: UnifiedField<TKey>,
+  field: UnifiedField<TKey, ZodTypeAny>,
 ): boolean {
   if ("usage" in field && field.usage && typeof field.usage === "object") {
     return "request" in field.usage && field.usage.request !== undefined;
@@ -21,7 +23,7 @@ export function isRequestField<TKey extends string>(
  * Used to determine if a container should show auto submit buttons
  */
 export function isFormInputField<TKey extends string>(
-  field: UnifiedField<TKey>,
+  field: UnifiedField<TKey, ZodTypeAny>,
 ): boolean {
   // Must be a FORM_FIELD widget type
   if (field.ui?.type !== WidgetType.FORM_FIELD) {
@@ -35,7 +37,7 @@ export function isFormInputField<TKey extends string>(
  * Check if field is used for response (display output)
  */
 export function isResponseField<TKey extends string>(
-  field: UnifiedField<TKey>,
+  field: UnifiedField<TKey, ZodTypeAny>,
 ): boolean {
   if ("usage" in field && field.usage && typeof field.usage === "object") {
     return "response" in field.usage && field.usage.response === true;
@@ -44,10 +46,22 @@ export function isResponseField<TKey extends string>(
 }
 
 /**
+ * Check if field has request usage (either exclusively or along with response)
+ */
+export function hasRequestUsage<TKey extends string>(
+  field: UnifiedField<TKey, ZodTypeAny>,
+): boolean {
+  if ("usage" in field && field.usage && typeof field.usage === "object") {
+    return "request" in field.usage && field.usage.request !== undefined;
+  }
+  return false;
+}
+
+/**
  * Get field name for form binding
  */
 export function getFieldName<TKey extends string>(
-  field: UnifiedField<TKey>,
+  field: UnifiedField<TKey, ZodTypeAny>,
 ): string {
   if ("name" in field && typeof field.name === "string") {
     return field.name;
@@ -65,7 +79,7 @@ export function getFieldName<TKey extends string>(
  * Get field placeholder text
  */
 export function getFieldPlaceholder<TKey extends string>(
-  field: UnifiedField<TKey>,
+  field: UnifiedField<TKey, ZodTypeAny>,
 ): string | undefined {
   if (
     "ui" in field &&
@@ -83,7 +97,7 @@ export function getFieldPlaceholder<TKey extends string>(
  * Check if field is required
  */
 export function isFieldRequired<TKey extends string>(
-  field: UnifiedField<TKey>,
+  field: UnifiedField<TKey, ZodTypeAny>,
 ): boolean {
   if ("required" in field && typeof field.required === "boolean") {
     return field.required;

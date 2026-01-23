@@ -13,7 +13,7 @@ import {
   objectField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -63,13 +63,11 @@ const { GET } = createEndpoint({
     { response: true },
     {
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.translations.stats.get.success.description",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.translations.stats.get.success.description",
+        schema: z.boolean(),
+      }),
 
       stats: objectField(
         {
@@ -82,54 +80,42 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          totalKeys: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.system.translations.stats.get.success.title",
-            },
-            z.coerce.number(),
-          ),
-          usedKeys: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.system.translations.stats.get.success.title",
-            },
-            z.coerce.number(),
-          ),
-          unusedKeys: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.system.translations.stats.get.success.title",
-            },
-            z.coerce.number(),
-          ),
-          translationFiles: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.system.translations.stats.get.success.title",
-            },
-            z.coerce.number(),
-          ),
+          totalKeys: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.system.translations.stats.get.success.title",
+            schema: z.coerce.number(),
+          }),
+          usedKeys: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.system.translations.stats.get.success.title",
+            schema: z.coerce.number(),
+          }),
+          unusedKeys: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.system.translations.stats.get.success.title",
+            schema: z.coerce.number(),
+          }),
+          translationFiles: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.system.translations.stats.get.success.title",
+            schema: z.coerce.number(),
+          }),
           languages: responseArrayField(
             {
               type: WidgetType.GROUPED_LIST,
               groupBy: "type",
             },
-            responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.translations.stats.get.success.title",
-              },
-              z.string(),
-            ),
-          ),
-          lastAnalyzedAt: responseField(
-            {
+            responseField({
               type: WidgetType.TEXT,
               content: "app.api.system.translations.stats.get.success.title",
-            },
-            dateSchema,
+              schema: z.string(),
+            }),
           ),
+          lastAnalyzedAt: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.system.translations.stats.get.success.title",
+            schema: dateSchema,
+          }),
         },
       ),
     },
@@ -192,7 +178,6 @@ const { GET } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    requests: undefined,
     responses: {
       default: {
         success: true,

@@ -66,6 +66,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     ];
 
     // Create contact submissions
+    let createdCount = 0;
     for (const contact of contactSubmissions) {
       try {
         const result = await ContactRepository.create(
@@ -74,9 +75,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
           logger,
         );
         if (result.success) {
-          logger.debug("app.api.contact.seeds.dev.submission.created", {
-            email: contact.email,
-          });
+          createdCount++;
         } else {
           logger.error("app.api.contact.seeds.dev.submission.failed", {
             message: result.message,
@@ -93,7 +92,9 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       }
     }
 
-    logger.debug("app.api.contact.seeds.dev.complete");
+    logger.debug("app.api.contact.seeds.dev.complete", {
+      created: createdCount,
+    });
   } catch (error) {
     logger.error("app.api.contact.seeds.dev.error", parseError(error));
   }

@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -62,21 +62,19 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          file: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.FILE,
-              label:
-                "app.api.user.private.me.avatar.upload.fields.file.label" as const,
-              description:
-                "app.api.user.private.me.avatar.upload.fields.file.description" as const,
-              placeholder:
-                "app.api.user.private.me.avatar.upload.fields.file.placeholder" as const,
-              columns: 12,
-              helpText:
-                "app.api.user.private.me.avatar.upload.fields.file.help" as const,
-            },
-            z
+          file: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.FILE,
+            label:
+              "app.api.user.private.me.avatar.upload.fields.file.label" as const,
+            description:
+              "app.api.user.private.me.avatar.upload.fields.file.description" as const,
+            placeholder:
+              "app.api.user.private.me.avatar.upload.fields.file.placeholder" as const,
+            columns: 12,
+            helpText:
+              "app.api.user.private.me.avatar.upload.fields.file.help" as const,
+            schema: z
               .instanceof(File)
               .refine((file) => file.size <= 5 * 1024 * 1024, {
                 message:
@@ -101,7 +99,7 @@ const { POST } = createEndpoint({
                     "app.api.user.private.me.avatar.upload.fields.file.validation.unsupportedFormat",
                 },
               ),
-          ),
+          }),
         },
       ),
 
@@ -118,46 +116,36 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          success: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.avatar.upload.response.success" as const,
-            },
-            z.boolean(),
-          ),
-          message: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.avatar.upload.response.message" as const,
-            },
-            z.string(),
-          ),
-          avatarUrl: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.avatar.upload.response.avatarUrl" as const,
-            },
-            z.string().url().optional(),
-          ),
-          uploadTime: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.avatar.upload.response.uploadTime" as const,
-            },
-            z.string().optional(),
-          ),
-          nextSteps: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.avatar.upload.response.nextSteps.item" as const,
-            },
-            z.array(z.string()),
-          ),
+          success: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.private.me.avatar.upload.response.success" as const,
+            schema: z.boolean(),
+          }),
+          message: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.private.me.avatar.upload.response.message" as const,
+            schema: z.string(),
+          }),
+          avatarUrl: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.private.me.avatar.upload.response.avatarUrl" as const,
+            schema: z.string().url().optional(),
+          }),
+          uploadTime: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.private.me.avatar.upload.response.uploadTime" as const,
+            schema: z.string().optional(),
+          }),
+          nextSteps: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.private.me.avatar.upload.response.nextSteps.item" as const,
+            schema: z.array(z.string()),
+          }),
         },
       ),
     },
@@ -318,30 +306,24 @@ const { DELETE } = createEndpoint({
     },
     { response: true },
     {
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.user.private.me.avatar.delete.response.success" as const,
-        },
-        z.boolean(),
-      ),
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.user.private.me.avatar.delete.response.message" as const,
-        },
-        z.string(),
-      ),
-      nextSteps: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.user.private.me.avatar.delete.response.nextSteps.item" as const,
-        },
-        z.array(z.string()),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.user.private.me.avatar.delete.response.success" as const,
+        schema: z.boolean(),
+      }),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.user.private.me.avatar.delete.response.message" as const,
+        schema: z.string(),
+      }),
+      nextSteps: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.user.private.me.avatar.delete.response.nextSteps.item" as const,
+        schema: z.array(z.string()),
+      }),
     },
   ),
 

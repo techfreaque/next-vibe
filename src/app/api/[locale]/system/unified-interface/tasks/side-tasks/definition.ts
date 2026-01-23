@@ -9,9 +9,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -62,131 +62,117 @@ const sideTasksPostEndpoint = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      action: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionLabel",
-          description:
-            "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionDescription",
-          options: [
-            {
-              value: "list",
-              label:
-                "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionList",
-            },
-            {
-              value: "get",
-              label:
-                "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionGet",
-            },
-            {
-              value: "create",
-              label:
-                "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionCreate",
-            },
-            {
-              value: "update",
-              label:
-                "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionUpdate",
-            },
-            {
-              value: "delete",
-              label:
-                "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionDelete",
-            },
-            {
-              value: "stats",
-              label:
-                "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionStats",
-            },
-            {
-              value: "executions",
-              label:
-                "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionExecutions",
-            },
-            {
-              value: "health-check",
-              label:
-                "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionHealthCheck",
-            },
-          ],
-          columns: 3,
-        },
-        sideTaskActionSchema,
-      ),
+      action: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionLabel",
+        description:
+          "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionDescription",
+        options: [
+          {
+            value: "list",
+            label:
+              "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionList",
+          },
+          {
+            value: "get",
+            label:
+              "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionGet",
+          },
+          {
+            value: "create",
+            label:
+              "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionCreate",
+          },
+          {
+            value: "update",
+            label:
+              "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionUpdate",
+          },
+          {
+            value: "delete",
+            label:
+              "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionDelete",
+          },
+          {
+            value: "stats",
+            label:
+              "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionStats",
+          },
+          {
+            value: "executions",
+            label:
+              "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionExecutions",
+          },
+          {
+            value: "health-check",
+            label:
+              "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionHealthCheck",
+          },
+        ],
+        columns: 3,
+        schema: sideTaskActionSchema,
+      }),
 
-      id: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksIdLabel",
-          description:
-            "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksIdDescription",
-          columns: 3,
-        },
-        z.string().optional(),
-      ),
+      id: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksIdLabel",
+        description:
+          "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksIdDescription",
+        columns: 3,
+        schema: z.string().optional(),
+      }),
 
-      name: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksNameLabel",
-          description:
-            "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksNameDescription",
-          columns: 3,
-        },
-        z.string().optional(),
-      ),
+      name: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksNameLabel",
+        description:
+          "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksNameDescription",
+        columns: 3,
+        schema: z.string().optional(),
+      }),
 
-      limit: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksLimitLabel",
-          description:
-            "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksLimitDescription",
-          columns: 3,
-        },
-        z.coerce.number().optional().default(50),
-      ),
+      limit: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksLimitLabel",
+        description:
+          "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksLimitDescription",
+        columns: 3,
+        schema: z.coerce.number().optional().default(50),
+      }),
 
-      taskData: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXTAREA,
-          label:
-            "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksDataLabel",
-          description:
-            "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksDataDescription",
-          columns: 12,
-        },
-        z.record(z.string(), z.unknown()).optional(),
-      ),
+      taskData: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label:
+          "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksDataLabel",
+        description:
+          "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksDataDescription",
+        columns: 12,
+        schema: z.record(z.string(), z.unknown()).optional(),
+      }),
 
       // === RESPONSE FIELDS ===
-      data: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.sideTasks.tasks.side.response.data.title",
-        },
-        z.unknown().optional(),
-      ),
+      data: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.sideTasks.tasks.side.response.data.title",
+        schema: z.unknown().optional(),
+      }),
 
-      count: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.sideTasks.tasks.side.response.count.title",
-        },
-        z.coerce.number().optional(),
-      ),
+      count: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.sideTasks.tasks.side.response.count.title",
+        schema: z.coerce.number().optional(),
+      }),
     },
   ),
 
@@ -327,41 +313,33 @@ const sideTasksGetEndpoint = createEndpoint({
     { response: true },
     {
       // === RESPONSE FIELDS ONLY ===
-      totalTasks: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.sideTasks.get.response.totalTasks.title",
-        },
-        z.coerce.number(),
-      ),
+      totalTasks: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.sideTasks.get.response.totalTasks.title",
+        schema: z.coerce.number(),
+      }),
 
-      runningTasks: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.sideTasks.get.response.runningTasks.title",
-        },
-        z.coerce.number(),
-      ),
+      runningTasks: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.sideTasks.get.response.runningTasks.title",
+        schema: z.coerce.number(),
+      }),
 
-      healthyTasks: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.sideTasks.get.response.healthyTasks.title",
-        },
-        z.coerce.number(),
-      ),
+      healthyTasks: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.sideTasks.get.response.healthyTasks.title",
+        schema: z.coerce.number(),
+      }),
 
-      unhealthyTasks: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.sideTasks.get.response.unhealthyTasks.title",
-        },
-        z.coerce.number(),
-      ),
+      unhealthyTasks: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.sideTasks.get.response.unhealthyTasks.title",
+        schema: z.coerce.number(),
+      }),
     },
   ),
 

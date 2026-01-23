@@ -60,9 +60,14 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
   // Merge endpoint and hook options (hook takes priority)
   // Merge defaultValues separately to combine autoPrefillData and initialState
   const mergedFormOptions = useMemo(() => {
-    const merged = deepMerge<
-      ApiFormOptions<TEndpoint["types"]["RequestOutput"]>
-    >(primaryEndpoint.options?.formOptions, options.formOptions);
+    const merged = deepMerge(
+      (primaryEndpoint.options?.formOptions ?? {}) as ApiFormOptions<
+        TEndpoint["types"]["RequestOutput"]
+      >,
+      (options.formOptions ?? {}) as ApiFormOptions<
+        TEndpoint["types"]["RequestOutput"]
+      >,
+    );
 
     // Merge defaultValues priority: endpoint < hook < autoPrefill < initialState
     const mergedDefaultValues = deepMerge(
@@ -75,7 +80,7 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
     return {
       ...merged,
       defaultValues: mergedDefaultValues,
-    };
+    } as ApiFormOptions<TEndpoint["types"]["RequestOutput"]>;
   }, [
     primaryEndpoint.options,
     options.formOptions,
@@ -84,13 +89,22 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
   ]);
 
   const mergedMutationOptions = useMemo(() => {
-    return deepMerge<
-      ApiMutationOptions<
+    return deepMerge(
+      (primaryEndpoint.options?.mutationOptions ?? {}) as ApiMutationOptions<
         TEndpoint["types"]["RequestOutput"],
         TEndpoint["types"]["ResponseOutput"],
         TEndpoint["types"]["UrlVariablesOutput"]
-      >
-    >(primaryEndpoint.options?.mutationOptions, options.mutationOptions);
+      >,
+      (options.mutationOptions ?? {}) as ApiMutationOptions<
+        TEndpoint["types"]["RequestOutput"],
+        TEndpoint["types"]["ResponseOutput"],
+        TEndpoint["types"]["UrlVariablesOutput"]
+      >,
+    ) as ApiMutationOptions<
+      TEndpoint["types"]["RequestOutput"],
+      TEndpoint["types"]["ResponseOutput"],
+      TEndpoint["types"]["UrlVariablesOutput"]
+    >;
   }, [primaryEndpoint.options, options.mutationOptions]);
 
   // Use the existing mutation form hook with merged options

@@ -8,6 +8,15 @@ export const translations: typeof enTranslations = {
       title: "Charakter-Details",
       description: "Details der angeforderten Charakter",
     },
+    backButton: {
+      label: "Zurück zu Charakteren",
+    },
+    editButton: {
+      label: "Charakter bearbeiten",
+    },
+    deleteButton: {
+      label: "Charakter löschen",
+    },
     id: {
       label: "Charakter-ID",
       description: "Die eindeutige Kennung der Charakter",
@@ -24,7 +33,6 @@ export const translations: typeof enTranslations = {
         source: { content: "Quelle" },
         preferredModel: { content: "Bevorzugtes Modell" },
         voice: { content: "Stimme" },
-        suggestedPrompts: { content: "Vorgeschlagene Prompts" },
         modelSelection: { title: "Modellauswahl" },
         selectionType: { content: "Auswahltyp" },
         minIntelligence: { content: "Minimale Intelligenz" },
@@ -91,6 +99,16 @@ export const translations: typeof enTranslations = {
       title: "Charakter aktualisieren",
       description: "Eine vorhandene benutzerdefinierte Charakter ändern",
     },
+    backButton: {
+      label: "Zurück zur Charakter",
+    },
+    deleteButton: {
+      label: "Charakter löschen",
+    },
+    submitButton: {
+      label: "Charakter aktualisieren",
+      loadingText: "Charakter wird aktualisiert...",
+    },
     actions: {
       update: "Charakter aktualisieren",
       updating: "Charakter wird aktualisiert",
@@ -151,10 +169,7 @@ export const translations: typeof enTranslations = {
       label: "Bevorzugtes Modell",
       description: "Das bevorzugte KI-Modell für diese Charakter",
     },
-    suggestedPrompts: {
-      label: "Vorgeschlagene Prompts",
-      description: "Beispiel-Prompts zur Verwendung mit dieser Charakter",
-    },
+
     errors: {
       validation: {
         title: "Validierungsfehler",
@@ -209,6 +224,13 @@ export const translations: typeof enTranslations = {
     container: {
       title: "Charakter löschen",
       description: "Diesen benutzerdefinierten Charakter dauerhaft entfernen",
+    },
+    backButton: {
+      label: "Zurück zur Charakter",
+    },
+    actions: {
+      delete: "Charakter löschen",
+      deleting: "Charakter wird gelöscht",
     },
     id: {
       label: "Charakter-ID",

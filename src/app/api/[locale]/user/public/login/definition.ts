@@ -15,10 +15,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
   widgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 
 import { UserRole } from "../../user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -52,18 +52,16 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          email: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.EMAIL,
-              label: "app.api.user.public.login.fields.email.label",
-              description: "app.api.user.public.login.fields.email.description",
-              placeholder: "app.api.user.public.login.fields.email.placeholder",
-              columns: 12,
-              helpText: "app.api.user.public.login.fields.email.description",
-              order: 1,
-            },
-            z
+          email: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.EMAIL,
+            label: "app.api.user.public.login.fields.email.label",
+            description: "app.api.user.public.login.fields.email.description",
+            placeholder: "app.api.user.public.login.fields.email.placeholder",
+            columns: 12,
+            helpText: "app.api.user.public.login.fields.email.description",
+            order: 1,
+            schema: z
               .string({
                 error:
                   "app.api.user.public.login.fields.email.validation.required" satisfies TranslationKey,
@@ -77,22 +75,20 @@ const { POST } = createEndpoint({
                   "app.api.user.public.login.fields.email.validation.invalid" satisfies TranslationKey,
               })
               .transform((val) => val.toLowerCase().trim()),
-          ),
+          }),
 
-          password: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.PASSWORD,
-              label: "app.api.user.public.login.fields.password.label",
-              description:
-                "app.api.user.public.login.fields.password.description",
-              placeholder:
-                "app.api.user.public.login.fields.password.placeholder",
-              columns: 12,
-              helpText: "app.api.user.public.login.fields.password.description",
-              order: 2,
-            },
-            z
+          password: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.PASSWORD,
+            label: "app.api.user.public.login.fields.password.label",
+            description:
+              "app.api.user.public.login.fields.password.description",
+            placeholder:
+              "app.api.user.public.login.fields.password.placeholder",
+            columns: 12,
+            helpText: "app.api.user.public.login.fields.password.description",
+            order: 2,
+            schema: z
               .string({
                 error:
                   "app.api.user.public.login.fields.password.validation.required" satisfies TranslationKey,
@@ -101,20 +97,17 @@ const { POST } = createEndpoint({
                 message:
                   "app.api.user.public.login.fields.password.validation.required" satisfies TranslationKey,
               }),
-          ),
+          }),
 
-          rememberMe: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.user.public.login.fields.rememberMe.label",
-              columns: 12,
-              helpText:
-                "app.api.user.public.login.fields.rememberMe.description",
-              order: 3,
-            },
-            z.boolean().optional().default(true), // Default to true (30 days)
-          ),
+          rememberMe: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.BOOLEAN,
+            label: "app.api.user.public.login.fields.rememberMe.label",
+            columns: 12,
+            helpText: "app.api.user.public.login.fields.rememberMe.description",
+            order: 3,
+            schema: z.boolean().optional().default(true), // Default to true (30 days)
+          }),
 
           // === FORM ALERT (shows validation and API errors) ===
           formAlert: widgetField(
@@ -178,14 +171,12 @@ const { POST } = createEndpoint({
       ),
 
       // === RESPONSE ALERT (outside card) ===
-      message: responseField(
-        {
-          type: WidgetType.ALERT,
-          variant: "default",
-          order: 2,
-        },
-        z.string(),
-      ),
+      message: responseField({
+        type: WidgetType.ALERT,
+        variant: "default",
+        order: 2,
+        schema: z.string(),
+      }),
     },
   ),
 

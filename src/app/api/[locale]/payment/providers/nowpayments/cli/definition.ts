@@ -3,9 +3,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -74,7 +74,6 @@ const { POST } = createEndpoint({
           "Set this webhook URL in NOWPayments dashboard: https://abc123.ngrok.io/api/en/payment/providers/nowpayments/webhook",
       },
     },
-    urlPathParams: undefined,
   },
 
   fields: objectField(
@@ -89,129 +88,109 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      operation: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.payment.providers.nowpayments.cli.post.form.fields.operation.label" as const,
-          description:
-            "app.api.payment.providers.nowpayments.cli.post.form.fields.operation.description" as const,
-          placeholder:
-            "app.api.payment.providers.nowpayments.cli.post.form.fields.operation.placeholder" as const,
-          columns: 6,
-          options: [
-            {
-              value: "check",
-              label:
-                "app.api.payment.providers.nowpayments.cli.post.operations.check" as const,
-            },
-            {
-              value: "install",
-              label:
-                "app.api.payment.providers.nowpayments.cli.post.operations.install" as const,
-            },
-            {
-              value: "tunnel",
-              label:
-                "app.api.payment.providers.nowpayments.cli.post.operations.tunnel" as const,
-            },
-            {
-              value: "status",
-              label:
-                "app.api.payment.providers.nowpayments.cli.post.operations.status" as const,
-            },
-          ],
-        },
-        z.enum(["check", "install", "tunnel", "status"]),
-      ),
-      port: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.payment.providers.nowpayments.cli.post.form.fields.port.label" as const,
-          description:
-            "app.api.payment.providers.nowpayments.cli.post.form.fields.port.description" as const,
-          placeholder:
-            "app.api.payment.providers.nowpayments.cli.post.form.fields.port.placeholder" as const,
-          columns: 6,
-        },
-        z.coerce.number().int().positive().default(3000),
-      ),
+      operation: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.payment.providers.nowpayments.cli.post.form.fields.operation.label" as const,
+        description:
+          "app.api.payment.providers.nowpayments.cli.post.form.fields.operation.description" as const,
+        placeholder:
+          "app.api.payment.providers.nowpayments.cli.post.form.fields.operation.placeholder" as const,
+        columns: 6,
+        options: [
+          {
+            value: "check",
+            label:
+              "app.api.payment.providers.nowpayments.cli.post.operations.check" as const,
+          },
+          {
+            value: "install",
+            label:
+              "app.api.payment.providers.nowpayments.cli.post.operations.install" as const,
+          },
+          {
+            value: "tunnel",
+            label:
+              "app.api.payment.providers.nowpayments.cli.post.operations.tunnel" as const,
+          },
+          {
+            value: "status",
+            label:
+              "app.api.payment.providers.nowpayments.cli.post.operations.status" as const,
+          },
+        ],
+        schema: z.enum(["check", "install", "tunnel", "status"]),
+      }),
+      port: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.payment.providers.nowpayments.cli.post.form.fields.port.label" as const,
+        description:
+          "app.api.payment.providers.nowpayments.cli.post.form.fields.port.description" as const,
+        placeholder:
+          "app.api.payment.providers.nowpayments.cli.post.form.fields.port.placeholder" as const,
+        columns: 6,
+        schema: z.coerce.number().int().positive().default(3000),
+      }),
 
       // RESPONSE FIELDS
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.payment.providers.nowpayments.cli.post.response.fields.success" as const,
-        },
-        z.boolean().optional(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.payment.providers.nowpayments.cli.post.response.fields.success" as const,
+        schema: z.boolean().optional(),
+      }),
 
-      installed: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.payment.providers.nowpayments.cli.post.response.fields.installed" as const,
-        },
-        z.boolean().optional(),
-      ),
+      installed: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.payment.providers.nowpayments.cli.post.response.fields.installed" as const,
+        schema: z.boolean().optional(),
+      }),
 
-      version: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.payment.providers.nowpayments.cli.post.response.fields.version" as const,
-        },
-        z.string().optional(),
-      ),
+      version: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.payment.providers.nowpayments.cli.post.response.fields.version" as const,
+        schema: z.string().optional(),
+      }),
 
-      status: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.payment.providers.nowpayments.cli.post.response.fields.status" as const,
-        },
-        z.string().optional(),
-      ),
+      status: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.payment.providers.nowpayments.cli.post.response.fields.status" as const,
+        schema: z.string().optional(),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.payment.providers.nowpayments.cli.post.response.fields.output" as const,
-        },
-        z.string().optional(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.payment.providers.nowpayments.cli.post.response.fields.output" as const,
+        schema: z.string().optional(),
+      }),
 
-      instructions: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.payment.providers.nowpayments.cli.post.response.fields.instructions" as const,
-        },
-        z.string().optional(),
-      ),
+      instructions: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.payment.providers.nowpayments.cli.post.response.fields.instructions" as const,
+        schema: z.string().optional(),
+      }),
 
-      tunnelUrl: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.payment.providers.nowpayments.cli.post.response.fields.tunnelUrl" as const,
-        },
-        z.string().optional(),
-      ),
+      tunnelUrl: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.payment.providers.nowpayments.cli.post.response.fields.tunnelUrl" as const,
+        schema: z.string().optional(),
+      }),
 
-      webhookUrl: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.payment.providers.nowpayments.cli.post.response.fields.webhookUrl" as const,
-        },
-        z.string().optional(),
-      ),
+      webhookUrl: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.payment.providers.nowpayments.cli.post.response.fields.webhookUrl" as const,
+        schema: z.string().optional(),
+      }),
     },
   ),
 

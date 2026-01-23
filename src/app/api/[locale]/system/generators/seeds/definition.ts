@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -48,104 +48,83 @@ const { POST } = createEndpoint({
 
   fields: objectField(
     {
-      type: WidgetType.FORM_FIELD,
-      fieldType: FieldDataType.TEXT,
-      label: "app.api.system.db.seed.post.title",
+      type: WidgetType.CONTAINER,
+      title: "app.api.system.db.seed.post.title",
       columns: 12,
     },
     { request: "data", response: true },
     {
-      outputDir: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.db.seed.post.title",
-          description: "app.api.system.db.seed.post.description",
-          columns: 6,
-        },
-        z.string().default("src/app/api/[locale]/system/generated"),
-      ),
+      outputDir: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.db.seed.post.title",
+        description: "app.api.system.db.seed.post.description",
+        columns: 6,
+        schema: z.string().default("src/app/api/[locale]/system/generated"),
+      }),
 
-      includeTestData: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.seed.post.title",
-          description: "app.api.system.db.seed.post.description",
-          columns: 3,
-        },
-        z.boolean().default(true),
-      ),
+      includeTestData: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.seed.post.title",
+        description: "app.api.system.db.seed.post.description",
+        columns: 3,
+        schema: z.boolean().default(true),
+      }),
 
-      includeProdData: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.seed.post.title",
-          description: "app.api.system.db.seed.post.description",
-          columns: 3,
-        },
-        z.boolean().default(false),
-      ),
+      includeProdData: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.seed.post.title",
+        description: "app.api.system.db.seed.post.description",
+        columns: 3,
+        schema: z.boolean().default(false),
+      }),
 
-      verbose: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.seed.post.title",
-          description: "app.api.system.db.seed.post.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      verbose: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.seed.post.title",
+        description: "app.api.system.db.seed.post.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.seed.post.title",
-          description: "app.api.system.db.seed.post.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.seed.post.title",
+        description: "app.api.system.db.seed.post.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.seed.post.title",
-        },
-        z.boolean(),
-      ),
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.seed.post.title",
-        },
-        z.string(),
-      ),
-      seedsFound: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.seed.post.title",
-        },
-        z.coerce.number(),
-      ),
-      duration: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.seed.post.title",
-        },
-        z.coerce.number(),
-      ),
-      outputPath: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.seed.post.title",
-        },
-        z.string(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.seed.post.title",
+        schema: z.boolean(),
+      }),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.seed.post.title",
+        schema: z.string(),
+      }),
+      seedsFound: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.seed.post.title",
+        schema: z.coerce.number(),
+      }),
+      duration: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.seed.post.title",
+        schema: z.coerce.number(),
+      }),
+      outputPath: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.seed.post.title",
+        schema: z.string(),
+      }),
     },
   ),
 
@@ -168,7 +147,6 @@ const { POST } = createEndpoint({
         outputPath: "src/app/api/[locale]/system/generated",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

@@ -8,10 +8,11 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
+  responseArrayOptionalField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -55,93 +56,78 @@ const { POST } = createEndpoint({
     {
       // === REQUEST FIELDS ===
       // Default: check.config.ts vibeCheck.fix ?? false
-      fix: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.check.vibeCheck.fields.fix.label",
-          description: "app.api.system.check.vibeCheck.fields.fix.description",
-          columns: 4,
-        },
-        z.boolean().optional(),
-      ),
+      fix: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.check.vibeCheck.fields.fix.label",
+        description: "app.api.system.check.vibeCheck.fields.fix.description",
+        columns: 4,
+        schema: z.boolean().optional(),
+      }),
 
       // Default: check.config.ts vibeCheck.timeout ?? 3600
-      timeout: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.system.check.vibeCheck.fields.timeoutSeconds.label",
-          description:
-            "app.api.system.check.vibeCheck.fields.timeoutSeconds.description",
-          columns: 4,
-        },
-        z.coerce.number().min(1).max(36000).optional(),
-      ),
+      timeout: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.system.check.vibeCheck.fields.timeoutSeconds.label",
+        description:
+          "app.api.system.check.vibeCheck.fields.timeoutSeconds.description",
+        columns: 4,
+        schema: z.coerce.number().min(1).max(36000).optional(),
+      }),
 
-      paths: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TAGS,
-          label: "app.api.system.check.vibeCheck.fields.paths.label",
-          description:
-            "app.api.system.check.vibeCheck.fields.paths.description",
-          placeholder:
-            "app.api.system.check.vibeCheck.fields.paths.placeholder",
-          columns: 8,
-          options: [
-            {
-              value: "src/",
-              label: "app.api.system.check.vibeCheck.fields.paths.options.src",
-            },
-            {
-              value: "src/components",
-              label:
-                "app.api.system.check.vibeCheck.fields.paths.options.components",
-            },
-            {
-              value: "src/utils",
-              label:
-                "app.api.system.check.vibeCheck.fields.paths.options.utils",
-            },
-            {
-              value: "src/pages",
-              label:
-                "app.api.system.check.vibeCheck.fields.paths.options.pages",
-            },
-            {
-              value: "src/app",
-              label: "app.api.system.check.vibeCheck.fields.paths.options.app",
-            },
-          ],
-        },
-        z.union([z.string(), z.array(z.string())]).optional(),
-      ),
+      paths: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TAGS,
+        label: "app.api.system.check.vibeCheck.fields.paths.label",
+        description: "app.api.system.check.vibeCheck.fields.paths.description",
+        placeholder: "app.api.system.check.vibeCheck.fields.paths.placeholder",
+        columns: 8,
+        options: [
+          {
+            value: "src/",
+            label: "app.api.system.check.vibeCheck.fields.paths.options.src",
+          },
+          {
+            value: "src/components",
+            label:
+              "app.api.system.check.vibeCheck.fields.paths.options.components",
+          },
+          {
+            value: "src/utils",
+            label: "app.api.system.check.vibeCheck.fields.paths.options.utils",
+          },
+          {
+            value: "src/pages",
+            label: "app.api.system.check.vibeCheck.fields.paths.options.pages",
+          },
+          {
+            value: "src/app",
+            label: "app.api.system.check.vibeCheck.fields.paths.options.app",
+          },
+        ],
+        schema: z.union([z.string(), z.array(z.string())]).optional(),
+      }),
 
       // Default: check.config.ts vibeCheck.limit ?? 200
-      limit: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.system.check.vibeCheck.fields.limit.label",
-          description:
-            "app.api.system.check.vibeCheck.fields.limit.description",
-          columns: 4,
-        },
-        z.coerce.number().min(1).optional(),
-      ),
+      limit: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.system.check.vibeCheck.fields.limit.label",
+        description: "app.api.system.check.vibeCheck.fields.limit.description",
+        columns: 4,
+        schema: z.coerce.number().min(1).optional(),
+      }),
 
       // Default: 1 (not configurable in check.config.ts)
-      page: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.system.check.vibeCheck.fields.page.label",
-          description: "app.api.system.check.vibeCheck.fields.page.description",
-          columns: 4,
-        },
-        z.coerce.number().min(1).optional().default(1),
-      ),
+      page: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.system.check.vibeCheck.fields.page.label",
+        description: "app.api.system.check.vibeCheck.fields.page.description",
+        columns: 4,
+        schema: z.coerce.number().min(1).optional().default(1),
+      }),
 
       // === RESPONSE FIELDS ===
       issues: objectField(
@@ -175,105 +161,128 @@ const { POST } = createEndpoint({
               },
               { response: true },
               {
-                file: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.vibeCheck.response.issues.title",
-                  },
-                  z.string(),
-                ),
-                line: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.vibeCheck.response.issues.title",
-                  },
-                  z.coerce.number().optional(),
-                ),
-                column: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.vibeCheck.response.issues.title",
-                  },
-                  z.coerce.number().optional(),
-                ),
-                rule: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.vibeCheck.response.issues.title",
-                  },
-                  z.string().optional(),
-                ),
-                code: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.vibeCheck.response.issues.title",
-                  },
-                  z.string().optional(),
-                ),
-                severity: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.vibeCheck.response.issues.title",
-                  },
-                  z.enum(["error", "warning", "info"]),
-                ),
-                message: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content: "app.api.system.check.vibeCheck.response.success",
-                  },
-                  z.string(),
-                ),
-                type: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.vibeCheck.response.issues.title",
-                  },
-                  z.enum(["oxlint", "lint", "type"]),
-                ),
+                file: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.check.vibeCheck.response.issues.title",
+                  schema: z.string(),
+                }),
+                line: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.check.vibeCheck.response.issues.title",
+                  schema: z.coerce.number().optional(),
+                }),
+                column: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.check.vibeCheck.response.issues.title",
+                  schema: z.coerce.number().optional(),
+                }),
+                rule: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.check.vibeCheck.response.issues.title",
+                  schema: z.string().optional(),
+                }),
+                code: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.check.vibeCheck.response.issues.title",
+                  schema: z.string().optional(),
+                }),
+                severity: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.check.vibeCheck.response.issues.title",
+                  schema: z.enum(["error", "warning", "info"]),
+                }),
+                message: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.check.vibeCheck.response.success",
+                  schema: z.string(),
+                }),
+                type: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.check.vibeCheck.response.issues.title",
+                  schema: z.enum(["oxlint", "lint", "type"]),
+                }),
               },
             ),
           ),
 
           // === FILES LIST (optional for compact MCP responses) ===
-          files: responseField(
+          files: responseArrayOptionalField(
             {
               type: WidgetType.CODE_QUALITY_FILES,
             },
-            z
-              .array(
-                z.object({
-                  file: z.string(),
-                  errors: z.number(),
-                  warnings: z.number(),
-                  total: z.number(),
+            objectField(
+              {
+                type: WidgetType.CONTAINER,
+              },
+              { response: true },
+              {
+                file: responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.string(),
                 }),
-              )
-              .optional(),
+                errors: responseField({
+                  type: WidgetType.STAT,
+                  schema: z.number(),
+                }),
+                warnings: responseField({
+                  type: WidgetType.STAT,
+                  schema: z.number(),
+                }),
+                total: responseField({
+                  type: WidgetType.STAT,
+                  schema: z.number(),
+                }),
+              },
+            ),
           ),
 
           // === SUMMARY STATS ===
-          summary: responseField(
+          summary: objectField(
             {
               type: WidgetType.CODE_QUALITY_SUMMARY,
             },
-            z.object({
-              totalIssues: z.number(),
-              totalFiles: z.number(),
-              totalErrors: z.number(),
-              displayedIssues: z.number(),
-              displayedFiles: z.number(),
-              truncatedMessage: z.string().optional(),
-              currentPage: z.number(),
-              totalPages: z.number(),
-            }),
+            { response: true },
+            {
+              totalIssues: responseField({
+                type: WidgetType.STAT,
+                schema: z.number(),
+              }),
+              totalFiles: responseField({
+                type: WidgetType.STAT,
+                schema: z.number(),
+              }),
+              totalErrors: responseField({
+                type: WidgetType.STAT,
+                schema: z.number(),
+              }),
+              displayedIssues: responseField({
+                type: WidgetType.STAT,
+                schema: z.number(),
+              }),
+              displayedFiles: responseField({
+                type: WidgetType.STAT,
+                schema: z.number(),
+              }),
+              truncatedMessage: responseField({
+                type: WidgetType.TEXT,
+                schema: z.string().optional(),
+              }),
+              currentPage: responseField({
+                type: WidgetType.STAT,
+                schema: z.number(),
+              }),
+              totalPages: responseField({
+                type: WidgetType.STAT,
+                schema: z.number(),
+              }),
+            },
           ),
         },
       ),

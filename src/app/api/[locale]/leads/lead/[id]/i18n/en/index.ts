@@ -2,6 +2,15 @@ export const translations = {
   get: {
     title: "Get Lead Details",
     description: "Retrieve detailed information about a specific lead",
+    backButton: {
+      label: "Back to Leads",
+    },
+    editButton: {
+      label: "Edit Lead",
+    },
+    deleteButton: {
+      label: "Delete Lead",
+    },
     id: {
       label: "Lead ID",
       description: "Unique identifier for the lead",
@@ -96,9 +105,6 @@ export const translations = {
       signedUpAt: {
         content: "Signed Up At",
       },
-      consultationBookedAt: {
-        content: "Consultation Booked At",
-      },
       subscriptionConfirmedAt: {
         content: "Subscription Confirmed At",
       },
@@ -163,6 +169,16 @@ export const translations = {
   patch: {
     title: "Update Lead",
     description: "Update lead information and status",
+    backButton: {
+      label: "Back to Lead",
+    },
+    deleteButton: {
+      label: "Delete Lead",
+    },
+    submitButton: {
+      label: "Update Lead",
+      loadingText: "Updating Lead...",
+    },
     id: {
       label: "Lead ID",
       description: "Unique identifier for the lead to update",
@@ -256,11 +272,6 @@ export const translations = {
       description: "ID of the converted user account",
       placeholder: "User ID",
     },
-    consultationBookedAt: {
-      label: "Consultation Booked At",
-      description: "Date when consultation was booked",
-      placeholder: "Select date",
-    },
     subscriptionConfirmedAt: {
       label: "Subscription Confirmed At",
       description: "Date when subscription was confirmed",
@@ -351,9 +362,6 @@ export const translations = {
       },
       signedUpAt: {
         content: "Signed Up At",
-      },
-      consultationBookedAt: {
-        content: "Consultation Booked At",
       },
       subscriptionConfirmedAt: {
         content: "Subscription Confirmed At",
@@ -464,6 +472,71 @@ export const translations = {
     success: {
       title: "Success",
       description: "Operation completed successfully",
+    },
+  },
+  delete: {
+    title: "Delete Lead",
+    description: "Delete a lead from the system",
+    container: {
+      title: "Delete Lead",
+      description: "Are you sure you want to permanently delete this lead?",
+    },
+    backButton: {
+      label: "Back to Lead",
+    },
+    submitButton: {
+      label: "Delete Lead",
+      loadingText: "Deleting Lead...",
+    },
+    actions: {
+      delete: "Delete Lead",
+      deleting: "Deleting Lead...",
+    },
+    id: {
+      label: "Lead ID",
+      description: "Unique identifier for the lead to delete",
+    },
+    errors: {
+      validation: {
+        title: "Validation Error",
+        description: "The provided lead ID is invalid",
+      },
+      unauthorized: {
+        title: "Unauthorized",
+        description: "Authentication required to delete leads",
+      },
+      forbidden: {
+        title: "Access Denied",
+        description: "You don't have permission to delete this lead",
+      },
+      notFound: {
+        title: "Lead Not Found",
+        description: "No lead found with the provided ID",
+      },
+      conflict: {
+        title: "Delete Conflict",
+        description: "The lead cannot be deleted due to existing dependencies",
+      },
+      server: {
+        title: "Server Error",
+        description: "An error occurred while deleting the lead",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unexpected error occurred",
+      },
+      network: {
+        title: "Network Error",
+        description: "Unable to connect to the server",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+    },
+    success: {
+      title: "Lead Deleted",
+      description: "The lead has been successfully deleted",
     },
   },
 };

@@ -28,6 +28,8 @@ import {
  * - targetEndpoint: The endpoint to navigate to (null for back navigation)
  * - extractParams: Function to extract params from source data
  * - prefillFromGet: Whether to fetch GET data before showing form
+ * - renderInModal: If true, render in popover instead of pushing to navigation stack
+ * - popNavigationOnSuccess: How many times to pop navigation stack after success
  */
 export function NavigateButtonWidget<const TKey extends string>({
   field,
@@ -111,6 +113,7 @@ export function NavigateButtonWidget<const TKey extends string>({
     }
   }
 
+  // Forward navigation (push to stack)
   const handleClick = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
 
@@ -164,11 +167,18 @@ export function NavigateButtonWidget<const TKey extends string>({
       }
     }
 
+    // Capture click position for modal positioning
+    const clickX = e.clientX ?? 0;
+    const clickY = e.clientY ?? 0;
+
     context.navigation.push(
       metadata.targetEndpoint,
       params,
       metadata.prefillFromGet,
       effectiveGetEndpoint,
+      metadata.renderInModal,
+      metadata.popNavigationOnSuccess,
+      { x: clickX, y: clickY },
     );
   };
 

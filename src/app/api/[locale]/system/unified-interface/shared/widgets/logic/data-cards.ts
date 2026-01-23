@@ -4,6 +4,8 @@
  * Used by both React and CLI implementations
  */
 
+import type { ZodTypeAny } from "zod";
+
 import type { UnifiedField } from "../../types/endpoint";
 import { WidgetType } from "../../types/enums";
 import type { WidgetData } from "../types";
@@ -60,7 +62,7 @@ export interface ProcessedDataCards {
  * Get card configuration from field
  */
 export function getCardsConfig<TKey extends string>(
-  field: UnifiedField<TKey>,
+  field: UnifiedField<TKey, ZodTypeAny>,
 ): CardConfig {
   const defaultConfig: CardConfig = {
     layout: { columns: 2, spacing: "normal" },

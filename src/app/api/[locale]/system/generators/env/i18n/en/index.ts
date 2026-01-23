@@ -87,6 +87,7 @@ export const translations = {
   error: {
     validation_failed: "Env file validation failed",
     generation_failed: "Env generation failed",
+    noValidFiles: "No valid environment files found",
   },
   success: {
     generated: "Environment files generated successfully",

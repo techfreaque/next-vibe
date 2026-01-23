@@ -68,6 +68,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
+import type { ModelId } from "../agent/models/models";
 import { ProductIds, productsRepository } from "../products/repository-client";
 import { payoutRequests } from "../referral/db";
 import { PayoutStatus } from "../referral/enum";
@@ -129,7 +130,7 @@ export interface CreditTransactionOutput {
   amount: number;
   balanceAfter: number;
   type: CreditTransactionTypeValue;
-  modelId: string | null;
+  modelId: ModelId | null;
   messageId: string | null;
   createdAt: string;
 }
@@ -573,8 +574,11 @@ export class CreditRepository {
         );
 
       freeCreditsSpentThisPeriod = usageTransactions.reduce((sum, t) => {
-        const metadata = t.metadata as { freeCreditsUsed?: number } | null;
-        return sum + (metadata?.freeCreditsUsed || 0);
+        const metadata = t.metadata;
+        return (
+          sum +
+          ("freeCreditsUsed" in metadata ? metadata?.freeCreditsUsed || 0 : 0)
+        );
       }, 0);
     }
 
@@ -588,21 +592,9 @@ export class CreditRepository {
       ),
     );
 
-    const activePeriodId =
-      leadWallets.length > 0
-        ? leadWallets.reduce((newest, current) =>
-            current.freePeriodStart > newest.freePeriodStart ? current : newest,
-          ).freePeriodId
-        : null;
-
-    logger.debug("Pool balance calculation", {
-      totalFreeInWallets,
-      freeCreditsSpentThisPeriod,
-      freeCreditsAvailable,
-      totalPaid,
-      leadWalletCount: leadWallets.length,
-      activePeriodId,
-    });
+    logger.debug(
+      `Pool: free=${freeCreditsAvailable} paid=${totalPaid} wallets=${leadWallets.length}`,
+    );
 
     return {
       total: freeCreditsAvailable + totalPaid,
@@ -1074,6 +1066,9 @@ export class CreditRepository {
       }
 
       const pool = poolResult.data;
+      logger.debug(
+        `Got pool ${pool.poolType}: ${pool.leadWallets.length} wallets`,
+      );
 
       // Check and reset monthly free credits for entire pool if needed
       await CreditRepository.ensureMonthlyFreeCreditsForPool(pool, logger);
@@ -1095,11 +1090,11 @@ export class CreditRepository {
    */
   static async getCreditBalanceForUser(
     user: JwtPayloadType,
+    // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditBalance>> {
     try {
-      logger.debug("Getting credit balance", { userId: user.id, locale });
       let poolResult: ResponseType<CreditPool>;
       if (user.isPublic) {
         poolResult = await CreditRepository.getLeadPoolOnly(
@@ -1115,14 +1110,9 @@ export class CreditRepository {
       }
 
       const pool = poolResult.data;
-
-      logger.debug("Got pool for balance calculation", {
-        poolId: pool.poolId,
-        poolType: pool.poolType,
-        leadWalletCount: pool.leadWallets.length,
-        leadWalletIds: pool.leadWallets.map((w) => w.id),
-        userWalletId: pool.userWallet?.id,
-      });
+      logger.debug(
+        `Got pool ${pool.poolType}: ${pool.leadWallets.length} wallets`,
+      );
 
       // Check and reset monthly free credits for entire pool if needed
       await CreditRepository.ensureMonthlyFreeCreditsForPool(pool, logger);
@@ -1130,12 +1120,9 @@ export class CreditRepository {
       // Calculate balance across all wallets in pool
       const balance = await CreditRepository.calculatePoolBalance(pool, logger);
 
-      logger.debug("Calculated balance", {
-        total: balance.total,
-        free: balance.free,
-        expiring: balance.expiring,
-        permanent: balance.permanent,
-      });
+      logger.debug(
+        `Balance: total=${balance.total} free=${balance.free} expiring=${balance.expiring} permanent=${balance.permanent}`,
+      );
 
       return success(balance);
     } catch (error) {
@@ -1491,7 +1478,7 @@ export class CreditRepository {
   static async deductCredits(
     identifier: CreditIdentifier,
     amount: number,
-    modelId: string,
+    modelId: ModelId | null,
     messageId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
@@ -1655,13 +1642,13 @@ export class CreditRepository {
               amount: -deduction,
               balanceAfter: lockedWallet.balance,
               type: CreditTransactionType.USAGE,
-              modelId,
+              modelId: modelId ?? undefined,
               messageId,
               freePeriodId: lockedWallet.freePeriodId,
               metadata: {
                 feature: "credit_usage",
                 cost: amount,
-                modelId,
+                modelId: modelId ?? undefined,
                 messageId,
                 freeCreditsUsed: deduction,
                 packCreditsUsed: 0,
@@ -1733,14 +1720,14 @@ export class CreditRepository {
               amount: -deduction,
               balanceAfter: updatedWallet?.balance || 0,
               type: CreditTransactionType.USAGE,
-              modelId,
+              modelId: modelId ?? undefined,
               messageId,
               packId: pack.id,
               freePeriodId: walletInfo?.freePeriodId || null,
               metadata: {
                 feature: "credit_usage",
                 cost: amount,
-                modelId,
+                modelId: modelId ?? undefined,
                 messageId,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
@@ -1810,14 +1797,14 @@ export class CreditRepository {
               amount: -deduction,
               balanceAfter: updatedWallet?.balance || 0,
               type: CreditTransactionType.USAGE,
-              modelId,
+              modelId: modelId ?? undefined,
               messageId,
               packId: pack.id,
               freePeriodId: walletInfo?.freePeriodId || null,
               metadata: {
                 feature: "credit_usage",
                 cost: amount,
-                modelId,
+                modelId: modelId ?? undefined,
                 messageId,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
@@ -1888,14 +1875,14 @@ export class CreditRepository {
               amount: -deduction,
               balanceAfter: updatedWallet?.balance || 0,
               type: CreditTransactionType.USAGE,
-              modelId,
+              modelId: modelId ?? undefined,
               messageId,
               packId: pack.id,
               freePeriodId: walletInfo?.freePeriodId || null,
               metadata: {
                 feature: "credit_usage",
                 cost: amount,
-                modelId,
+                modelId: modelId ?? undefined,
                 messageId,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
@@ -2612,7 +2599,7 @@ export class CreditRepository {
       const result = await CreditRepository.deductCredits(
         identifier,
         cost,
-        feature,
+        null, // No specific model for feature-based credits
         creditMessageId,
         logger,
       );
@@ -2786,7 +2773,7 @@ export class CreditRepository {
   static async deductCreditsWithValidation(
     identifier: CreditIdentifier,
     amount: number,
-    modelId: string,
+    modelId: ModelId | null,
     logger: EndpointLogger,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     if (!identifier.leadId && !identifier.userId) {

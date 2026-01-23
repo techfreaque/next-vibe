@@ -6,11 +6,11 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
-  objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -53,61 +53,49 @@ const { POST } = createEndpoint({
     },
     {
       // === REQUEST FIELDS ===
-      quantity: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.INT,
-          label: "app.api.credits.purchase.post.quantity.label",
-          description: "app.api.credits.purchase.post.quantity.description",
-          placeholder: "app.api.credits.purchase.post.quantity.placeholder",
-        },
-        z.coerce.number().int().min(1).max(10),
-      ),
+      quantity: requestField({
+        schema: z.coerce.number().int().min(1).max(10),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.INT,
+        label: "app.api.credits.purchase.post.quantity.label",
+        description: "app.api.credits.purchase.post.quantity.description",
+        placeholder: "app.api.credits.purchase.post.quantity.placeholder",
+      }),
 
-      provider: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.credits.purchase.post.provider.label",
-          description: "app.api.credits.purchase.post.provider.description",
-          placeholder: "app.api.credits.purchase.post.provider.placeholder",
-          options: PaymentProviderOptions,
-        },
-        z.enum(PaymentProviderDB).default(PaymentProvider.STRIPE),
-      ),
+      provider: requestField({
+        schema: z.enum(PaymentProviderDB).default(PaymentProvider.STRIPE),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.credits.purchase.post.provider.label",
+        description: "app.api.credits.purchase.post.provider.description",
+        placeholder: "app.api.credits.purchase.post.provider.placeholder",
+        options: PaymentProviderOptions,
+      }),
 
       // === RESPONSE FIELDS ===
-      checkoutUrl: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.credits.purchase.post.checkoutUrl.content",
-        },
-        z.string().url(),
-      ),
+      checkoutUrl: responseField({
+        schema: z.string().url(),
+        type: WidgetType.TEXT,
+        content: "app.api.credits.purchase.post.checkoutUrl.content",
+      }),
 
-      sessionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.credits.purchase.post.sessionId.content",
-        },
-        z.string(),
-      ),
+      sessionId: responseField({
+        schema: z.string(),
+        type: WidgetType.TEXT,
+        content: "app.api.credits.purchase.post.sessionId.content",
+      }),
 
-      totalAmount: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.credits.purchase.post.totalAmount.content",
-        },
-        z.coerce.number().int(),
-      ),
+      totalAmount: responseField({
+        schema: z.coerce.number().int(),
+        type: WidgetType.TEXT,
+        content: "app.api.credits.purchase.post.totalAmount.content",
+      }),
 
-      totalCredits: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.credits.purchase.post.totalCredits.content",
-        },
-        z.coerce.number().int(),
-      ),
+      totalCredits: responseField({
+        schema: z.coerce.number().int(),
+        type: WidgetType.TEXT,
+        content: "app.api.credits.purchase.post.totalCredits.content",
+      }),
     },
   ),
 

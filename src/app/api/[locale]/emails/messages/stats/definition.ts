@@ -9,9 +9,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
+  responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -67,430 +68,647 @@ const { GET } = createEndpoint({
       // === REQUEST FIELDS (Filters) ===
 
       // Time-based filtering
-      timePeriod: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.emails.messages.stats.get.timePeriod.label",
-          description:
-            "app.api.emails.messages.stats.get.timePeriod.description",
-          options: TimePeriodOptions,
-          columns: 4,
-        },
-        z
+      timePeriod: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.emails.messages.stats.get.timePeriod.label",
+        description: "app.api.emails.messages.stats.get.timePeriod.description",
+        options: TimePeriodOptions,
+        columns: 4,
+        schema: z
           .enum(Object.values(TimePeriod) as [string, ...string[]])
           .default(TimePeriod.day),
-      ),
+      }),
 
-      dateRangePreset: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.emails.messages.stats.get.dateRangePreset.label",
-          description:
-            "app.api.emails.messages.stats.get.dateRangePreset.description",
-          options: DateRangePresetOptions,
-          columns: 4,
-        },
-        z
+      dateRangePreset: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.emails.messages.stats.get.dateRangePreset.label",
+        description:
+          "app.api.emails.messages.stats.get.dateRangePreset.description",
+        options: DateRangePresetOptions,
+        columns: 4,
+        schema: z
           .enum(Object.values(DateRangePreset) as [string, ...string[]])
           .default(DateRangePreset.last_30_days),
-      ),
+      }),
 
-      dateFrom: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.DATE,
-          label: "app.api.emails.messages.stats.get.dateFrom.label",
-          description: "app.api.emails.messages.stats.get.dateFrom.description",
-          columns: 6,
-        },
-        z.coerce.date().optional(),
-      ),
+      dateFrom: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "app.api.emails.messages.stats.get.dateFrom.label",
+        description: "app.api.emails.messages.stats.get.dateFrom.description",
+        columns: 6,
+        schema: z.coerce.date().optional(),
+      }),
 
-      dateTo: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.DATE,
-          label: "app.api.emails.messages.stats.get.dateTo.label",
-          description: "app.api.emails.messages.stats.get.dateTo.description",
-          columns: 6,
-        },
-        z.coerce.date().optional(),
-      ),
+      dateTo: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "app.api.emails.messages.stats.get.dateTo.label",
+        description: "app.api.emails.messages.stats.get.dateTo.description",
+        columns: 6,
+        schema: z.coerce.date().optional(),
+      }),
 
-      chartType: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.emails.messages.stats.get.chartType.label",
-          description:
-            "app.api.emails.messages.stats.get.chartType.description",
-          options: ChartTypeOptions,
-          columns: 4,
-        },
-        z
+      chartType: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.emails.messages.stats.get.chartType.label",
+        description: "app.api.emails.messages.stats.get.chartType.description",
+        options: ChartTypeOptions,
+        columns: 4,
+        schema: z
           .enum(Object.values(ChartType) as [string, ...string[]])
           .default(ChartType.line),
-      ),
+      }),
 
-      includeComparison: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.emails.messages.stats.get.includeComparison.label",
-          description:
-            "app.api.emails.messages.stats.get.includeComparison.description",
-          columns: 6,
-        },
-        z.coerce.boolean().default(false),
-      ),
+      includeComparison: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.emails.messages.stats.get.includeComparison.label",
+        description:
+          "app.api.emails.messages.stats.get.includeComparison.description",
+        columns: 6,
+        schema: z.coerce.boolean().default(false),
+      }),
 
       // Email-specific filters
-      status: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.emails.messages.stats.get.status.label",
-          description: "app.api.emails.messages.stats.get.status.description",
-          columns: 3,
-          options: EmailStatusFilterOptions,
-        },
-        z
+      status: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.emails.messages.stats.get.status.label",
+        description: "app.api.emails.messages.stats.get.status.description",
+        columns: 3,
+        options: EmailStatusFilterOptions,
+        schema: z
           .enum(Object.values(EmailStatusFilter) as [string, ...string[]])
           .default(EmailStatusFilter.ANY),
-      ),
+      }),
 
-      type: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.emails.messages.stats.get.type.label",
-          description: "app.api.emails.messages.stats.get.type.description",
-          columns: 3,
-          options: EmailTypeFilterOptions,
-        },
-        z
+      type: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.emails.messages.stats.get.type.label",
+        description: "app.api.emails.messages.stats.get.type.description",
+        columns: 3,
+        options: EmailTypeFilterOptions,
+        schema: z
           .enum(Object.values(EmailTypeFilter) as [string, ...string[]])
           .default(EmailTypeFilter.ANY),
-      ),
+      }),
 
-      search: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.emails.messages.stats.get.search.label",
-          description: "app.api.emails.messages.stats.get.search.description",
-          columns: 6,
-        },
-        z.string().optional(),
-      ),
+      search: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.emails.messages.stats.get.search.label",
+        description: "app.api.emails.messages.stats.get.search.description",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
 
       // Sorting
-      sortBy: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.emails.messages.stats.get.sortBy.label",
-          description: "app.api.emails.messages.stats.get.sortBy.description",
-          options: EmailSortFieldOptions,
-          columns: 6,
-        },
-        z
+      sortBy: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.emails.messages.stats.get.sortBy.label",
+        description: "app.api.emails.messages.stats.get.sortBy.description",
+        options: EmailSortFieldOptions,
+        columns: 6,
+        schema: z
           .enum(Object.values(EmailSortField) as [string, ...string[]])
           .default(EmailSortField.CREATED_AT),
-      ),
+      }),
 
-      sortOrder: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.emails.messages.stats.get.sortOrder.label",
-          description:
-            "app.api.emails.messages.stats.get.sortOrder.description",
-          options: SortOrderOptions,
-          columns: 6,
-        },
-        z
+      sortOrder: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.emails.messages.stats.get.sortOrder.label",
+        description: "app.api.emails.messages.stats.get.sortOrder.description",
+        options: SortOrderOptions,
+        columns: 6,
+        schema: z
           .enum(Object.values(SortOrder) as [string, ...string[]])
           .default(SortOrder.DESC),
-      ),
+      }),
 
       // === RESPONSE FIELDS ===
 
       // Current period email metrics
-      totalEmails: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.totalEmails",
-        },
-        z.coerce.number(),
-      ),
-      sentEmails: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.sentEmails",
-        },
-        z.coerce.number(),
-      ),
-      deliveredEmails: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.deliveredEmails",
-        },
-        z.coerce.number(),
-      ),
-      openedEmails: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.openedEmails",
-        },
-        z.coerce.number(),
-      ),
-      clickedEmails: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.clickedEmails",
-        },
-        z.coerce.number(),
-      ),
-      bouncedEmails: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.bouncedEmails",
-        },
-        z.coerce.number(),
-      ),
-      failedEmails: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.failedEmails",
-        },
-        z.coerce.number(),
-      ),
-      draftEmails: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.draftEmails",
-        },
-        z.coerce.number(),
-      ),
+      totalEmails: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.totalEmails",
+        schema: z.coerce.number(),
+      }),
+      sentEmails: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.sentEmails",
+        schema: z.coerce.number(),
+      }),
+      deliveredEmails: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.deliveredEmails",
+        schema: z.coerce.number(),
+      }),
+      openedEmails: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.openedEmails",
+        schema: z.coerce.number(),
+      }),
+      clickedEmails: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.clickedEmails",
+        schema: z.coerce.number(),
+      }),
+      bouncedEmails: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.bouncedEmails",
+        schema: z.coerce.number(),
+      }),
+      failedEmails: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.failedEmails",
+        schema: z.coerce.number(),
+      }),
+      draftEmails: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.draftEmails",
+        schema: z.coerce.number(),
+      }),
 
       // Engagement rates
-      deliveryRate: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.deliveryRate",
-        },
-        z.coerce.number(),
-      ),
-      openRate: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.openRate",
-        },
-        z.coerce.number(),
-      ),
-      clickRate: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.clickRate",
-        },
-        z.coerce.number(),
-      ),
-      bounceRate: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.bounceRate",
-        },
-        z.coerce.number(),
-      ),
-      failureRate: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.failureRate",
-        },
-        z.coerce.number(),
-      ),
+      deliveryRate: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.deliveryRate",
+        schema: z.coerce.number(),
+      }),
+      openRate: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.openRate",
+        schema: z.coerce.number(),
+      }),
+      clickRate: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.clickRate",
+        schema: z.coerce.number(),
+      }),
+      bounceRate: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.bounceRate",
+        schema: z.coerce.number(),
+      }),
+      failureRate: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.failureRate",
+        schema: z.coerce.number(),
+      }),
 
       // Provider/template/status/type metrics
-      emailsByProvider: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.messages.stats.get.response.emailsByProvider",
-        },
-        z.record(z.string(), z.coerce.number()),
-      ),
-      emailsByTemplate: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.messages.stats.get.response.emailsByTemplate",
-        },
-        z.record(z.string(), z.coerce.number()),
-      ),
-      emailsByStatus: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.emailsByStatus",
-        },
-        z.record(z.string(), z.coerce.number()),
-      ),
-      emailsByType: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.emailsByType",
-        },
-        z.record(z.string(), z.coerce.number()),
-      ),
+      emailsByProvider: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.emailsByProvider",
+        schema: z.record(z.string(), z.coerce.number()),
+      }),
+      emailsByTemplate: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.emailsByTemplate",
+        schema: z.record(z.string(), z.coerce.number()),
+      }),
+      emailsByStatus: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.emailsByStatus",
+        schema: z.record(z.string(), z.coerce.number()),
+      }),
+      emailsByType: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.emailsByType",
+        schema: z.record(z.string(), z.coerce.number()),
+      }),
 
       // User association metrics
-      emailsWithUserId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.messages.stats.get.response.emailsWithUserId",
-        },
-        z.coerce.number(),
-      ),
-      emailsWithoutUserId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.messages.stats.get.response.emailsWithoutUserId",
-        },
-        z.coerce.number(),
-      ),
-      emailsWithLeadId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.messages.stats.get.response.emailsWithLeadId",
-        },
-        z.coerce.number(),
-      ),
-      emailsWithoutLeadId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.messages.stats.get.response.emailsWithoutLeadId",
-        },
-        z.coerce.number(),
-      ),
+      emailsWithUserId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.emailsWithUserId",
+        schema: z.coerce.number(),
+      }),
+      emailsWithoutUserId: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.messages.stats.get.response.emailsWithoutUserId",
+        schema: z.coerce.number(),
+      }),
+      emailsWithLeadId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.emailsWithLeadId",
+        schema: z.coerce.number(),
+      }),
+      emailsWithoutLeadId: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.messages.stats.get.response.emailsWithoutLeadId",
+        schema: z.coerce.number(),
+      }),
 
       // Error metrics
-      emailsWithErrors: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.messages.stats.get.response.emailsWithErrors",
-        },
-        z.coerce.number(),
-      ),
-      emailsWithoutErrors: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.messages.stats.get.response.emailsWithoutErrors",
-        },
-        z.coerce.number(),
-      ),
-      averageRetryCount: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.messages.stats.get.response.averageRetryCount",
-        },
-        z.coerce.number(),
-      ),
-      maxRetryCount: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.maxRetryCount",
-        },
-        z.coerce.number(),
-      ),
+      emailsWithErrors: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.emailsWithErrors",
+        schema: z.coerce.number(),
+      }),
+      emailsWithoutErrors: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.messages.stats.get.response.emailsWithoutErrors",
+        schema: z.coerce.number(),
+      }),
+      averageRetryCount: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.averageRetryCount",
+        schema: z.coerce.number(),
+      }),
+      maxRetryCount: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.maxRetryCount",
+        schema: z.coerce.number(),
+      }),
 
       // Performance metrics
-      averageProcessingTime: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.messages.stats.get.response.averageProcessingTime",
-        },
-        z.coerce.number(),
-      ),
-      averageDeliveryTime: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.messages.stats.get.response.averageDeliveryTime",
-        },
-        z.coerce.number(),
-      ),
+      averageProcessingTime: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.messages.stats.get.response.averageProcessingTime",
+        schema: z.coerce.number(),
+      }),
+      averageDeliveryTime: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.messages.stats.get.response.averageDeliveryTime",
+        schema: z.coerce.number(),
+      }),
 
       // Historical data - complex nested structure
-      historicalData: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.historicalData",
-        },
-        chartDataSchema,
-      ),
+      historicalData: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.historicalData",
+        schema: chartDataSchema,
+      }),
 
       // Grouped stats - complex nested structure
-      groupedStats: responseField(
+      groupedStats: objectField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.groupedStats",
+          type: WidgetType.CONTAINER,
+          title: "app.api.emails.messages.stats.get.response.groupedStats",
         },
-        z.any(),
+        { response: true },
+        {
+          byStatus: responseArrayField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            objectField(
+              { type: WidgetType.CONTAINER },
+              { response: true },
+              {
+                status: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.stats.get.response.groupedStats.status",
+                  schema: z.string(),
+                }),
+                count: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.stats.get.response.groupedStats.count",
+                  schema: z.number(),
+                }),
+              },
+            ),
+          ),
+          byType: responseArrayField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            objectField(
+              { type: WidgetType.CONTAINER },
+              { response: true },
+              {
+                type: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.stats.get.response.groupedStats.type",
+                  schema: z.string(),
+                }),
+                count: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.stats.get.response.groupedStats.count",
+                  schema: z.number(),
+                }),
+              },
+            ),
+          ),
+          byProvider: responseArrayField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            objectField(
+              { type: WidgetType.CONTAINER },
+              { response: true },
+              {
+                provider: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.stats.get.response.groupedStats.provider",
+                  schema: z.string(),
+                }),
+                count: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.stats.get.response.groupedStats.count",
+                  schema: z.number(),
+                }),
+              },
+            ),
+          ),
+          byTemplate: responseArrayField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            objectField(
+              { type: WidgetType.CONTAINER },
+              { response: true },
+              {
+                template: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.stats.get.response.groupedStats.template",
+                  schema: z.string(),
+                }),
+                count: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.stats.get.response.groupedStats.count",
+                  schema: z.number(),
+                }),
+              },
+            ),
+          ),
+          byEngagement: responseArrayField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            objectField(
+              { type: WidgetType.CONTAINER },
+              { response: true },
+              {
+                engagement: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.stats.get.response.groupedStats.engagement",
+                  schema: z.string(),
+                }),
+                count: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.stats.get.response.groupedStats.count",
+                  schema: z.number(),
+                }),
+              },
+            ),
+          ),
+          byRetryCount: responseArrayField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            objectField(
+              { type: WidgetType.CONTAINER },
+              { response: true },
+              {
+                retryCount: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.stats.get.response.groupedStats.retryCount",
+                  schema: z.number(),
+                }),
+                count: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.stats.get.response.groupedStats.count",
+                  schema: z.number(),
+                }),
+              },
+            ),
+          ),
+          byUserAssociation: responseArrayField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            objectField(
+              { type: WidgetType.CONTAINER },
+              { response: true },
+              {
+                association: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.stats.get.response.groupedStats.association",
+                  schema: z.string(),
+                }),
+                count: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.stats.get.response.groupedStats.count",
+                  schema: z.number(),
+                }),
+              },
+            ),
+          ),
+        },
       ),
 
       // Metadata
-      generatedAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.generatedAt",
-        },
-        z.string(),
-      ),
+      generatedAt: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.messages.stats.get.response.generatedAt",
+        schema: z.string(),
+      }),
 
-      dataRange: responseField(
+      dataRange: objectField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.dataRange",
+          type: WidgetType.CONTAINER,
+          title: "app.api.emails.messages.stats.get.response.dataRange",
         },
-        z.any(),
+        { response: true },
+        {
+          from: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.messages.stats.get.response.dataRange.from",
+            schema: z.string(),
+          }),
+          to: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.stats.get.response.dataRange.to",
+            schema: z.string(),
+          }),
+        },
       ),
 
       // Recent activity
-      recentActivity: responseField(
+      recentActivity: responseArrayField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.recentActivity",
+          type: WidgetType.DATA_LIST,
         },
-        z.array(z.any()),
+        objectField(
+          { type: WidgetType.CONTAINER },
+          { response: true },
+          {
+            id: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.recentActivity.id",
+              schema: z.string(),
+            }),
+            action: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.recentActivity.action",
+              schema: z.string(),
+            }),
+            timestamp: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.recentActivity.timestamp",
+              schema: z.string(),
+            }),
+            details: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.recentActivity.details",
+              schema: z.string().optional(),
+            }),
+          },
+        ),
       ),
 
       // Top performers
-      topPerformingTemplates: responseField(
+      topPerformingTemplates: responseArrayField(
         {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.messages.stats.get.response.topPerformingTemplates",
+          type: WidgetType.DATA_LIST,
         },
-        z.array(z.any()),
+        objectField(
+          { type: WidgetType.CONTAINER },
+          { response: true },
+          {
+            template: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.topPerformingTemplates.template",
+              schema: z.string(),
+            }),
+            sent: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.topPerformingTemplates.sent",
+              schema: z.number(),
+            }),
+            delivered: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.topPerformingTemplates.delivered",
+              schema: z.number(),
+            }),
+            opened: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.topPerformingTemplates.opened",
+              schema: z.number(),
+            }),
+            clicked: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.topPerformingTemplates.clicked",
+              schema: z.number(),
+            }),
+            deliveryRate: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.topPerformingTemplates.deliveryRate",
+              schema: z.number(),
+            }),
+            openRate: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.topPerformingTemplates.openRate",
+              schema: z.number(),
+            }),
+            clickRate: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.topPerformingTemplates.clickRate",
+              schema: z.number(),
+            }),
+          },
+        ),
       ),
 
-      topPerformingProviders: responseField(
+      topPerformingProviders: responseArrayField(
         {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.messages.stats.get.response.topPerformingProviders",
+          type: WidgetType.DATA_LIST,
         },
-        z.array(z.any()),
+        objectField(
+          { type: WidgetType.CONTAINER },
+          { response: true },
+          {
+            provider: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.topPerformingProviders.provider",
+              schema: z.string(),
+            }),
+            sent: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.topPerformingProviders.sent",
+              schema: z.number(),
+            }),
+            delivered: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.topPerformingProviders.delivered",
+              schema: z.number(),
+            }),
+            opened: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.topPerformingProviders.opened",
+              schema: z.number(),
+            }),
+            clicked: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.topPerformingProviders.clicked",
+              schema: z.number(),
+            }),
+            deliveryRate: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.topPerformingProviders.deliveryRate",
+              schema: z.number(),
+            }),
+            openRate: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.topPerformingProviders.openRate",
+              schema: z.number(),
+            }),
+            clickRate: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.messages.stats.get.response.topPerformingProviders.clickRate",
+              schema: z.number(),
+            }),
+          },
+        ),
       ),
     },
   ),

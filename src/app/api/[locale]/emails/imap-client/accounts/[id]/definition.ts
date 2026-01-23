@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   requestUrlPathParamsField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -53,16 +53,13 @@ const { GET } = createEndpoint({
     { request: "urlPathParams", response: true },
     {
       // === URL PARAMETERS ===
-      id: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.emails.imapClient.accounts.id.get.id.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.get.id.description",
-        },
-        z.uuid(),
-      ),
+      id: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.emails.imapClient.accounts.id.get.id.label",
+        description: "app.api.emails.imapClient.accounts.id.get.id.description",
+        schema: z.uuid(),
+      }),
 
       // === RESPONSE FIELDS ===
       account: objectField(
@@ -77,153 +74,115 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          id: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.get.response.account.id",
-            },
-            z.uuid(),
-          ),
-          name: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.get.response.account.name",
-            },
-            z.string(),
-          ),
-          email: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.get.response.account.email",
-            },
-            z.email(),
-          ),
-          host: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.get.response.account.host",
-            },
-            z.string(),
-          ),
-          port: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.get.response.account.port",
-            },
-            z.coerce.number().int(),
-          ),
-          secure: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.emails.imapClient.accounts.id.get.response.account.secure",
-            },
-            z.boolean(),
-          ),
-          username: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.get.response.account.username",
-            },
-            z.string(),
-          ),
-          authMethod: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.emails.imapClient.accounts.id.get.response.account.authMethod",
-            },
-            z.enum(ImapAuthMethod),
-          ),
-          connectionTimeout: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.get.response.account.connectionTimeout",
-            },
-            z.coerce.number().int(),
-          ),
-          keepAlive: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.emails.imapClient.accounts.id.get.response.account.keepAlive",
-            },
-            z.boolean(),
-          ),
-          enabled: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.emails.imapClient.accounts.id.get.response.account.enabled",
-            },
-            z.boolean(),
-          ),
-          syncInterval: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.get.response.account.syncInterval",
-            },
-            z.coerce.number().int(),
-          ),
-          maxMessages: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.get.response.account.maxMessages",
-            },
-            z.coerce.number().int(),
-          ),
-          syncFolders: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.get.response.account.syncFolders",
-            },
-            z.array(z.string()),
-          ),
-          lastSyncAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.get.response.account.lastSyncAt",
-            },
-            z.string().nullable(),
-          ),
-          syncStatus: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.emails.imapClient.accounts.id.get.response.account.syncStatus",
-            },
-            z.string(),
-          ),
-          syncError: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.get.response.account.syncError",
-            },
-            z.string().nullable(),
-          ),
-          createdAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.get.response.account.createdAt",
-            },
-            z.string(),
-          ),
-          updatedAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.get.response.account.updatedAt",
-            },
-            z.string(),
-          ),
+          id: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.get.response.account.id",
+            schema: z.uuid(),
+          }),
+          name: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.get.response.account.name",
+            schema: z.string(),
+          }),
+          email: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.get.response.account.email",
+            schema: z.email(),
+          }),
+          host: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.get.response.account.host",
+            schema: z.string(),
+          }),
+          port: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.get.response.account.port",
+            schema: z.coerce.number().int(),
+          }),
+          secure: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.emails.imapClient.accounts.id.get.response.account.secure",
+            schema: z.boolean(),
+          }),
+          username: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.get.response.account.username",
+            schema: z.string(),
+          }),
+          authMethod: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.emails.imapClient.accounts.id.get.response.account.authMethod",
+            schema: z.enum(ImapAuthMethod),
+          }),
+          connectionTimeout: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.get.response.account.connectionTimeout",
+            schema: z.coerce.number().int(),
+          }),
+          keepAlive: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.emails.imapClient.accounts.id.get.response.account.keepAlive",
+            schema: z.boolean(),
+          }),
+          enabled: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.emails.imapClient.accounts.id.get.response.account.enabled",
+            schema: z.boolean(),
+          }),
+          syncInterval: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.get.response.account.syncInterval",
+            schema: z.coerce.number().int(),
+          }),
+          maxMessages: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.get.response.account.maxMessages",
+            schema: z.coerce.number().int(),
+          }),
+          syncFolders: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.get.response.account.syncFolders",
+            schema: z.array(z.string()),
+          }),
+          lastSyncAt: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.get.response.account.lastSyncAt",
+            schema: z.string().nullable(),
+          }),
+          syncStatus: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.emails.imapClient.accounts.id.get.response.account.syncStatus",
+            schema: z.string(),
+          }),
+          syncError: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.get.response.account.syncError",
+            schema: z.string().nullable(),
+          }),
+          createdAt: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.get.response.account.createdAt",
+            schema: z.string(),
+          }),
+          updatedAt: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.get.response.account.updatedAt",
+            schema: z.string(),
+          }),
         },
       ),
     },
@@ -350,184 +309,150 @@ const { PUT } = createEndpoint({
     { request: "data&urlPathParams", response: true },
     {
       // === URL PARAMETERS ===
-      id: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.emails.imapClient.accounts.id.get.id.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.get.id.description",
-        },
-        z.uuid(),
-      ),
+      id: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.emails.imapClient.accounts.id.get.id.label",
+        description: "app.api.emails.imapClient.accounts.id.get.id.description",
+        schema: z.uuid(),
+      }),
 
       // === REQUEST DATA FIELDS ===
-      name: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.emails.imapClient.accounts.id.post.form.name.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.post.form.name.description",
-        },
-        z.string().min(1).max(255),
-      ),
+      name: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.emails.imapClient.accounts.id.post.form.name.label",
+        description:
+          "app.api.emails.imapClient.accounts.id.post.form.name.description",
+        schema: z.string().min(1).max(255),
+      }),
 
-      email: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.EMAIL,
-          label: "app.api.emails.imapClient.accounts.id.post.form.email.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.post.form.email.description",
-        },
-        z.email(),
-      ),
+      email: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label: "app.api.emails.imapClient.accounts.id.post.form.email.label",
+        description:
+          "app.api.emails.imapClient.accounts.id.post.form.email.description",
+        schema: z.email(),
+      }),
 
-      host: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.emails.imapClient.accounts.id.post.form.host.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.post.form.host.description",
-        },
-        z.string().min(1),
-      ),
+      host: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.emails.imapClient.accounts.id.post.form.host.label",
+        description:
+          "app.api.emails.imapClient.accounts.id.post.form.host.description",
+        schema: z.string().min(1),
+      }),
 
-      port: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.accounts.id.post.form.port.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.post.form.port.description",
-        },
-        z.coerce.number().int().min(1).max(65535),
-      ),
+      port: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.accounts.id.post.form.port.label",
+        description:
+          "app.api.emails.imapClient.accounts.id.post.form.port.description",
+        schema: z.coerce.number().int().min(1).max(65535),
+      }),
 
-      secure: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.emails.imapClient.accounts.id.post.form.secure.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.post.form.secure.description",
-        },
-        z.boolean(),
-      ),
+      secure: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.emails.imapClient.accounts.id.post.form.secure.label",
+        description:
+          "app.api.emails.imapClient.accounts.id.post.form.secure.description",
+        schema: z.boolean(),
+      }),
 
-      username: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.emails.imapClient.accounts.id.post.form.username.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.post.form.username.description",
-        },
-        z.string().min(1),
-      ),
+      username: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.emails.imapClient.accounts.id.post.form.username.label",
+        description:
+          "app.api.emails.imapClient.accounts.id.post.form.username.description",
+        schema: z.string().min(1),
+      }),
 
-      password: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.PASSWORD,
-          label:
-            "app.api.emails.imapClient.accounts.id.post.form.password.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.post.form.password.description",
-        },
-        z.string().min(1),
-      ),
+      password: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.PASSWORD,
+        label: "app.api.emails.imapClient.accounts.id.post.form.password.label",
+        description:
+          "app.api.emails.imapClient.accounts.id.post.form.password.description",
+        schema: z.string().min(1),
+      }),
 
-      authMethod: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.emails.imapClient.accounts.id.post.form.authMethod.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.post.form.authMethod.description",
-          placeholder:
-            "app.api.emails.imapClient.accounts.id.post.form.authMethod.label",
-          options: ImapAuthMethodOptions,
-          columns: 6,
-        },
-        z.enum(ImapAuthMethod),
-      ),
+      authMethod: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.emails.imapClient.accounts.id.post.form.authMethod.label",
+        description:
+          "app.api.emails.imapClient.accounts.id.post.form.authMethod.description",
+        placeholder:
+          "app.api.emails.imapClient.accounts.id.post.form.authMethod.label",
+        options: ImapAuthMethodOptions,
+        columns: 6,
+        schema: z.enum(ImapAuthMethod),
+      }),
 
-      enabled: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.emails.imapClient.accounts.id.post.form.enabled.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.post.form.enabled.description",
-        },
-        z.boolean().optional(),
-      ),
+      enabled: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.emails.imapClient.accounts.id.post.form.enabled.label",
+        description:
+          "app.api.emails.imapClient.accounts.id.post.form.enabled.description",
+        schema: z.boolean().optional(),
+      }),
 
-      connectionTimeout: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.emails.imapClient.accounts.id.post.form.connectionTimeout.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.post.form.connectionTimeout.description",
-        },
-        z.coerce.number().min(1000).optional(),
-      ),
+      connectionTimeout: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.emails.imapClient.accounts.id.post.form.connectionTimeout.label",
+        description:
+          "app.api.emails.imapClient.accounts.id.post.form.connectionTimeout.description",
+        schema: z.coerce.number().min(1000).optional(),
+      }),
 
-      keepAlive: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.emails.imapClient.accounts.id.post.form.keepAlive.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.post.form.keepAlive.description",
-        },
-        z.boolean().optional(),
-      ),
+      keepAlive: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.emails.imapClient.accounts.id.post.form.keepAlive.label",
+        description:
+          "app.api.emails.imapClient.accounts.id.post.form.keepAlive.description",
+        schema: z.boolean().optional(),
+      }),
 
-      syncInterval: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.emails.imapClient.accounts.id.post.form.syncInterval.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.post.form.syncInterval.description",
-        },
-        z.coerce.number().min(10).optional(),
-      ),
+      syncInterval: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.emails.imapClient.accounts.id.post.form.syncInterval.label",
+        description:
+          "app.api.emails.imapClient.accounts.id.post.form.syncInterval.description",
+        schema: z.coerce.number().min(10).optional(),
+      }),
 
-      maxMessages: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.emails.imapClient.accounts.id.post.form.maxMessages.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.post.form.maxMessages.description",
-        },
-        z.coerce.number().min(1).optional(),
-      ),
+      maxMessages: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.emails.imapClient.accounts.id.post.form.maxMessages.label",
+        description:
+          "app.api.emails.imapClient.accounts.id.post.form.maxMessages.description",
+        schema: z.coerce.number().min(1).optional(),
+      }),
 
-      syncFolders: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXTAREA,
-          label:
-            "app.api.emails.imapClient.accounts.id.post.form.syncFolders.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.post.form.syncFolders.description",
-        },
-        z.array(z.string()).optional(),
-      ),
+      syncFolders: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label:
+          "app.api.emails.imapClient.accounts.id.post.form.syncFolders.label",
+        description:
+          "app.api.emails.imapClient.accounts.id.post.form.syncFolders.description",
+        schema: z.array(z.string()).optional(),
+      }),
 
       // === RESPONSE FIELDS ===
       account: objectField(
@@ -541,91 +466,69 @@ const { PUT } = createEndpoint({
         },
         { response: true },
         {
-          id: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.post.response.account.id",
-            },
-            z.uuid(),
-          ),
-          name: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.post.response.account.name",
-            },
-            z.string(),
-          ),
-          email: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.post.response.account.email",
-            },
-            z.email(),
-          ),
-          host: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.post.response.account.host",
-            },
-            z.string(),
-          ),
-          port: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.post.response.account.port",
-            },
-            z.coerce.number().int(),
-          ),
-          secure: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.emails.imapClient.accounts.id.post.response.account.secure",
-            },
-            z.boolean(),
-          ),
-          username: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.post.response.account.username",
-            },
-            z.string(),
-          ),
-          authMethod: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.emails.imapClient.accounts.id.post.response.account.authMethod",
-            },
-            z.enum(ImapAuthMethod),
-          ),
-          enabled: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.emails.imapClient.accounts.id.post.response.account.enabled",
-            },
-            z.boolean(),
-          ),
-          createdAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.post.response.account.createdAt",
-            },
-            z.string(),
-          ),
-          updatedAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.id.post.response.account.updatedAt",
-            },
-            z.string(),
-          ),
+          id: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.post.response.account.id",
+            schema: z.uuid(),
+          }),
+          name: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.post.response.account.name",
+            schema: z.string(),
+          }),
+          email: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.post.response.account.email",
+            schema: z.email(),
+          }),
+          host: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.post.response.account.host",
+            schema: z.string(),
+          }),
+          port: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.post.response.account.port",
+            schema: z.coerce.number().int(),
+          }),
+          secure: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.emails.imapClient.accounts.id.post.response.account.secure",
+            schema: z.boolean(),
+          }),
+          username: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.post.response.account.username",
+            schema: z.string(),
+          }),
+          authMethod: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.emails.imapClient.accounts.id.post.response.account.authMethod",
+            schema: z.enum(ImapAuthMethod),
+          }),
+          enabled: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.emails.imapClient.accounts.id.post.response.account.enabled",
+            schema: z.boolean(),
+          }),
+          createdAt: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.post.response.account.createdAt",
+            schema: z.string(),
+          }),
+          updatedAt: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.accounts.id.post.response.account.updatedAt",
+            schema: z.string(),
+          }),
         },
       ),
     },
@@ -754,26 +657,21 @@ const { DELETE } = createEndpoint({
     { request: "urlPathParams", response: true },
     {
       // === URL PARAMETERS ===
-      id: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.emails.imapClient.accounts.id.get.id.label",
-          description:
-            "app.api.emails.imapClient.accounts.id.get.id.description",
-        },
-        z.uuid(),
-      ),
+      id: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.emails.imapClient.accounts.id.get.id.label",
+        description: "app.api.emails.imapClient.accounts.id.get.id.description",
+        schema: z.uuid(),
+      }),
 
       // === RESPONSE FIELDS ===
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.accounts.id.delete.response.message",
-        },
-        z.string(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.accounts.id.delete.response.message",
+        schema: z.string(),
+      }),
     },
   ),
 

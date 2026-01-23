@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   FieldDataType,
   Methods,
@@ -35,75 +35,61 @@ const { POST } = createEndpoint({
 
   fields: objectField(
     {
-      type: WidgetType.FORM_FIELD,
-      fieldType: FieldDataType.TEXT,
-      label: "app.api.system.generators.taskIndex.post.container.title",
+      type: WidgetType.CONTAINER,
+      title: "app.api.system.generators.taskIndex.post.container.title",
       columns: 12,
     },
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      outputFile: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.generators.taskIndex.post.fields.outputDir.label",
-          description:
-            "app.api.system.generators.taskIndex.post.fields.outputDir.description",
-          columns: 12,
-        },
-        z
+      outputFile: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.generators.taskIndex.post.fields.outputDir.label",
+        description:
+          "app.api.system.generators.taskIndex.post.fields.outputDir.description",
+        columns: 12,
+        schema: z
           .string()
           .default("src/app/api/[locale]/system/generated/tasks-index.ts"),
-      ),
+      }),
 
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.generators.taskIndex.post.fields.verbose.label",
-          description:
-            "app.api.system.generators.taskIndex.post.fields.verbose.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(false),
-      ),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.generators.taskIndex.post.fields.verbose.label",
+        description:
+          "app.api.system.generators.taskIndex.post.fields.verbose.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.taskIndex.post.fields.success.title",
-        },
-        z.boolean(),
-      ),
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.taskIndex.post.fields.message.title",
-        },
-        z.string(),
-      ),
-      tasksFound: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.taskIndex.post.fields.tasksFound.title",
-        },
-        z.coerce.number(),
-      ),
-      duration: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.taskIndex.post.fields.duration.title",
-        },
-        z.coerce.number(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.generators.taskIndex.post.fields.success.title",
+        schema: z.boolean(),
+      }),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.generators.taskIndex.post.fields.message.title",
+        schema: z.string(),
+      }),
+      tasksFound: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.generators.taskIndex.post.fields.tasksFound.title",
+        schema: z.coerce.number(),
+      }),
+      duration: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.generators.taskIndex.post.fields.duration.title",
+        schema: z.coerce.number(),
+      }),
     },
   ),
 

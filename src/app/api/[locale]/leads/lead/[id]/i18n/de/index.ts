@@ -2,6 +2,15 @@ export const translations = {
   get: {
     title: "Get Lead Details",
     description: "Retrieve detailed information about a specific lead",
+    backButton: {
+      label: "Zurück zu Leads",
+    },
+    editButton: {
+      label: "Lead bearbeiten",
+    },
+    deleteButton: {
+      label: "Lead löschen",
+    },
     id: {
       label: "Lead ID",
       description: "Unique identifier for the lead",
@@ -96,9 +105,6 @@ export const translations = {
       signedUpAt: {
         content: "Signed Up At",
       },
-      consultationBookedAt: {
-        content: "Consultation Booked At",
-      },
       subscriptionConfirmedAt: {
         content: "Subscription Confirmed At",
       },
@@ -163,6 +169,16 @@ export const translations = {
   patch: {
     title: "Update Lead",
     description: "Update lead information and status",
+    backButton: {
+      label: "Zurück zum Lead",
+    },
+    deleteButton: {
+      label: "Lead löschen",
+    },
+    submitButton: {
+      label: "Lead aktualisieren",
+      loadingText: "Lead wird aktualisiert...",
+    },
     id: {
       label: "Lead ID",
       description: "Unique identifier for the lead to update",
@@ -256,11 +272,6 @@ export const translations = {
       description: "ID of the converted user account",
       placeholder: "User ID",
     },
-    consultationBookedAt: {
-      label: "Consultation Booked At",
-      description: "Date when consultation was booked",
-      placeholder: "Select date",
-    },
     subscriptionConfirmedAt: {
       label: "Subscription Confirmed At",
       description: "Date when subscription was confirmed",
@@ -351,9 +362,6 @@ export const translations = {
       },
       signedUpAt: {
         content: "Signed Up At",
-      },
-      consultationBookedAt: {
-        content: "Consultation Booked At",
       },
       subscriptionConfirmedAt: {
         content: "Subscription Confirmed At",
@@ -464,6 +472,73 @@ export const translations = {
     success: {
       title: "Success",
       description: "Operation completed successfully",
+    },
+  },
+  delete: {
+    title: "Lead löschen",
+    description: "Lead aus dem System löschen",
+    container: {
+      title: "Lead löschen",
+      description:
+        "Sind Sie sicher, dass Sie diesen Lead dauerhaft löschen möchten?",
+    },
+    backButton: {
+      label: "Zurück zum Lead",
+    },
+    submitButton: {
+      label: "Lead löschen",
+      loadingText: "Lead wird gelöscht...",
+    },
+    actions: {
+      delete: "Lead löschen",
+      deleting: "Lead wird gelöscht...",
+    },
+    id: {
+      label: "Lead ID",
+      description: "Eindeutige Kennung des zu löschenden Leads",
+    },
+    errors: {
+      validation: {
+        title: "Validierungsfehler",
+        description: "Die angegebene Lead-ID ist ungültig",
+      },
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Authentifizierung erforderlich zum Löschen von Leads",
+      },
+      forbidden: {
+        title: "Zugriff verweigert",
+        description: "Sie haben keine Berechtigung, diesen Lead zu löschen",
+      },
+      notFound: {
+        title: "Lead nicht gefunden",
+        description: "Kein Lead mit der angegebenen ID gefunden",
+      },
+      conflict: {
+        title: "Löschkonflikt",
+        description:
+          "Der Lead kann aufgrund bestehender Abhängigkeiten nicht gelöscht werden",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Beim Löschen des Leads ist ein Fehler aufgetreten",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Verbindung zum Server nicht möglich",
+      },
+      unsavedChanges: {
+        title: "Nicht gespeicherte Änderungen",
+        description: "Sie haben nicht gespeicherte Änderungen",
+      },
+    },
+    success: {
+      title: "Lead gelöscht",
+      description: "Der Lead wurde erfolgreich gelöscht",
     },
   },
 };

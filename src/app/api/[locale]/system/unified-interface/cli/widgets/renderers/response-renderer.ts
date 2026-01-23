@@ -4,8 +4,13 @@
  */
 
 import chalk from "chalk";
+import type { z } from "zod";
 
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import { success } from "@/app/api/[locale]/shared/types/response.schema";
+import type {
+  CreateApiEndpointAny,
+  UnifiedField,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import {
   FieldDataType,
   WidgetType,
@@ -21,6 +26,7 @@ import { defaultLocale } from "@/i18n/core/config";
 import type { TParams } from "@/i18n/core/static-types";
 
 import type { EndpointLogger } from "../../../shared/logger/endpoint";
+import { Platform } from "../../../shared/types/platform";
 import type { WidgetData } from "../../../shared/widgets/types";
 import type { WidgetRegistry } from "../core/registry";
 import { defaultWidgetRegistry } from "../core/registry";
@@ -29,11 +35,6 @@ import type {
   DataFormatter,
   WidgetRenderContext,
 } from "../core/types";
-
-/**
- * Data record type for response rendering
- */
-type DataRecord = Record<string, WidgetData>;
 
 /**
  * Modular CLI response renderer using widget system
@@ -63,8 +64,9 @@ export class ModularCLIResponseRenderer {
    * Render response data using endpoint definition metadata
    */
   render<const TKey extends string>(
-    data: DataRecord,
-    fields: Array<[string, UnifiedField<TKey>]>,
+    currentEndpoint: CreateApiEndpointAny,
+    data: WidgetData,
+    fields: Array<[string, UnifiedField<TKey, z.ZodTypeAny>]>,
     locale: CountryLanguage,
     t: (key: string, params?: TParams) => string,
     logger: EndpointLogger,
@@ -86,6 +88,22 @@ export class ModularCLIResponseRenderer {
       locale,
       isInteractive: false,
       user,
+      platform: Platform.CLI,
+      currentEndpoint,
+      endpointFields: currentEndpoint.fields,
+      disabled: false,
+      response: success(data),
+      navigation: {
+        // oxlint-disable-next-line no-empty-function
+        push: () => {},
+        // oxlint-disable-next-line no-empty-function
+        replace: () => {},
+        // oxlint-disable-next-line no-empty-function
+        pop: () => {},
+        current: null,
+        stack: [],
+        canGoBack: false,
+      },
     };
 
     return this.renderFields(data, fields, context);
@@ -95,8 +113,8 @@ export class ModularCLIResponseRenderer {
    * Render multiple fields
    */
   private renderFields<const TKey extends string>(
-    data: DataRecord,
-    fields: Array<[string, UnifiedField<TKey>]>,
+    data: WidgetData,
+    fields: Array<[string, UnifiedField<TKey, z.ZodTypeAny>]>,
     context: WidgetRenderContext,
   ): string {
     const result: string[] = [];
@@ -107,7 +125,17 @@ export class ModularCLIResponseRenderer {
     }
 
     for (const [fieldName, field] of fields) {
-      const fieldValue = data[fieldName];
+      let fieldValue: WidgetData | undefined = undefined;
+
+      if (
+        data &&
+        typeof data === "object" &&
+        !Array.isArray(data) &&
+        fieldName in data
+      ) {
+        const record = data as Record<string, WidgetData>;
+        fieldValue = record[fieldName];
+      }
 
       // Create WidgetInput for the widget renderer
       const widgetInput = { field, value: fieldValue, context };
@@ -121,10 +149,16 @@ export class ModularCLIResponseRenderer {
   /**
    * Auto-detect and render fields when no metadata is provided
    */
-  private renderAutoDetectedFields(data: DataRecord): string {
+  private renderAutoDetectedFields(data: WidgetData): string {
     const result: string[] = [];
 
-    for (const [key, value] of Object.entries(data)) {
+    // Only process if data is a plain object
+    if (!data || typeof data !== "object" || Array.isArray(data)) {
+      return "";
+    }
+
+    const record = data as Record<string, WidgetData>;
+    for (const [key, value] of Object.entries(record)) {
       // Skip null/undefined values
       if (value === null || value === undefined) {
         continue;
@@ -197,7 +231,7 @@ export class ModularCLIResponseRenderer {
    * Format field value based on type and configuration
    */
   private formatFieldValue<const TKey extends string>(
-    field: UnifiedField<TKey>,
+    field: UnifiedField<TKey, z.ZodTypeAny>,
     value: WidgetData,
   ): string {
     if (value === null || value === undefined) {

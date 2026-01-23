@@ -6,11 +6,11 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
-  objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,50 +50,48 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      networkConditions: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.browser.emulate.form.fields.networkConditions.label",
-          description:
-            "app.api.browser.emulate.form.fields.networkConditions.description",
-          placeholder:
-            "app.api.browser.emulate.form.fields.networkConditions.placeholder",
-          columns: 6,
-          options: [
-            {
-              value: "No emulation",
-              label:
-                "app.api.browser.emulate.form.fields.networkConditions.options.noEmulation",
-            },
-            {
-              value: "Offline",
-              label:
-                "app.api.browser.emulate.form.fields.networkConditions.options.offline",
-            },
-            {
-              value: "Slow 3G",
-              label:
-                "app.api.browser.emulate.form.fields.networkConditions.options.slow3g",
-            },
-            {
-              value: "Fast 3G",
-              label:
-                "app.api.browser.emulate.form.fields.networkConditions.options.fast3g",
-            },
-            {
-              value: "Slow 4G",
-              label:
-                "app.api.browser.emulate.form.fields.networkConditions.options.slow4g",
-            },
-            {
-              value: "Fast 4G",
-              label:
-                "app.api.browser.emulate.form.fields.networkConditions.options.fast4g",
-            },
-          ],
-        },
-        z
+      networkConditions: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.browser.emulate.form.fields.networkConditions.label",
+        description:
+          "app.api.browser.emulate.form.fields.networkConditions.description",
+        placeholder:
+          "app.api.browser.emulate.form.fields.networkConditions.placeholder",
+        columns: 6,
+        options: [
+          {
+            value: "No emulation",
+            label:
+              "app.api.browser.emulate.form.fields.networkConditions.options.noEmulation",
+          },
+          {
+            value: "Offline",
+            label:
+              "app.api.browser.emulate.form.fields.networkConditions.options.offline",
+          },
+          {
+            value: "Slow 3G",
+            label:
+              "app.api.browser.emulate.form.fields.networkConditions.options.slow3g",
+          },
+          {
+            value: "Fast 3G",
+            label:
+              "app.api.browser.emulate.form.fields.networkConditions.options.fast3g",
+          },
+          {
+            value: "Slow 4G",
+            label:
+              "app.api.browser.emulate.form.fields.networkConditions.options.slow4g",
+          },
+          {
+            value: "Fast 4G",
+            label:
+              "app.api.browser.emulate.form.fields.networkConditions.options.fast4g",
+          },
+        ],
+        schema: z
           .enum([
             "No emulation",
             "Offline",
@@ -106,19 +104,17 @@ const { POST } = createEndpoint({
           .describe(
             'Throttle network. Set to "No emulation" to disable. If omitted, conditions remain unchanged.',
           ),
-      ),
-      cpuThrottlingRate: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.browser.emulate.form.fields.cpuThrottlingRate.label",
-          description:
-            "app.api.browser.emulate.form.fields.cpuThrottlingRate.description",
-          placeholder:
-            "app.api.browser.emulate.form.fields.cpuThrottlingRate.placeholder",
-          columns: 6,
-        },
-        z
+      }),
+      cpuThrottlingRate: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.browser.emulate.form.fields.cpuThrottlingRate.label",
+        description:
+          "app.api.browser.emulate.form.fields.cpuThrottlingRate.description",
+        placeholder:
+          "app.api.browser.emulate.form.fields.cpuThrottlingRate.placeholder",
+        columns: 6,
+        schema: z
           .number()
           .min(1)
           .max(20)
@@ -126,22 +122,20 @@ const { POST } = createEndpoint({
           .describe(
             "Represents the CPU slowdown factor. Set the rate to 1 to disable throttling. If omitted, throttling remains unchanged.",
           ),
-      ),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.emulate.response.success",
-        },
-        z.boolean().describe("Whether the emulation operation succeeded"),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.emulate.response.result",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.emulate.response.success",
+        schema: z
+          .boolean()
+          .describe("Whether the emulation operation succeeded"),
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.emulate.response.result",
+        schema: z
           .object({
             applied: z
               .boolean()
@@ -157,21 +151,23 @@ const { POST } = createEndpoint({
           })
           .optional()
           .describe("Result of the emulation operation"),
-      ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.emulate.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.emulate.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      }),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.emulate.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.emulate.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -189,7 +185,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

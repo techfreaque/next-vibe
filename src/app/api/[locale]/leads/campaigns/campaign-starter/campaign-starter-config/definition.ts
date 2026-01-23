@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -68,30 +68,24 @@ const { GET } = createEndpoint({
         { response: true },
         {
           // Campaign settings
-          dryRun: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.dryRun" as const,
-            },
-            z.boolean(),
-          ),
-          minAgeHours: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.minAgeHours" as const,
-            },
-            z.coerce.number().min(0).max(168),
-          ),
-          enabledDays: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledDays" as const,
-            },
-            z.array(z.coerce.number().min(1).max(7)),
-          ),
+          dryRun: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.dryRun" as const,
+            schema: z.boolean(),
+          }),
+          minAgeHours: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.minAgeHours" as const,
+            schema: z.coerce.number().min(0).max(168),
+          }),
+          enabledDays: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledDays" as const,
+            schema: z.array(z.coerce.number().min(1).max(7)),
+          }),
           enabledHours: objectField(
             {
               type: WidgetType.CONTAINER,
@@ -102,83 +96,65 @@ const { GET } = createEndpoint({
             },
             { response: true },
             {
-              start: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
-                  fieldType: FieldDataType.NUMBER,
-                },
-                z.coerce.number().min(0).max(23),
-              ),
-              end: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
-                  fieldType: FieldDataType.NUMBER,
-                },
-                z.coerce.number().min(0).max(23),
-              ),
+              start: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
+                fieldType: FieldDataType.NUMBER,
+                schema: z.coerce.number().min(0).max(23),
+              }),
+              end: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
+                fieldType: FieldDataType.NUMBER,
+                schema: z.coerce.number().min(0).max(23),
+              }),
             },
           ),
-          leadsPerWeek: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.leadsPerWeek" as const,
-            },
-            z.record(z.string(), z.coerce.number().min(1)),
-          ),
+          leadsPerWeek: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.leadsPerWeek" as const,
+            schema: z.record(z.string(), z.coerce.number().min(1)),
+          }),
           // Cron settings
-          schedule: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.schedule" as const,
-            },
-            z.string().min(1),
-          ),
-          enabled: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabled" as const,
-            },
-            z.boolean().default(true),
-          ),
-          priority: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.priority" as const,
-            },
-            z.enum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
-          ),
-          timeout: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.timeout" as const,
-            },
-            z.coerce.number().min(1000).max(3600000).default(300000),
-          ),
-          retries: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.retries" as const,
-            },
-            z.coerce.number().min(0).max(10).default(3),
-          ),
-          retryDelay: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.retryDelay" as const,
-            },
-            z.coerce.number().min(1000).max(300000).default(30000),
-          ),
+          schedule: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.schedule" as const,
+            schema: z.string().min(1),
+          }),
+          enabled: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabled" as const,
+            schema: z.boolean().default(true),
+          }),
+          priority: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.priority" as const,
+            schema: z.enum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
+          }),
+          timeout: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.timeout" as const,
+            schema: z.coerce.number().min(1000).max(3600000).default(300000),
+          }),
+          retries: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.retries" as const,
+            schema: z.coerce.number().min(0).max(10).default(3),
+          }),
+          retryDelay: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.retryDelay" as const,
+            schema: z.coerce.number().min(1000).max(300000).default(30000),
+          }),
         },
       ),
     },
@@ -306,76 +282,70 @@ const { PUT } = createEndpoint({
     { request: "data", response: true },
     {
       // Request fields
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.dryRun.label" as const,
-          description:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.dryRun.description" as const,
-        },
-        z.boolean(),
-      ),
-      minAgeHours: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.minAgeHours.label" as const,
-          description:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.minAgeHours.description" as const,
-        },
-        z.coerce.number().min(0).max(168),
-      ),
-      enabledDays: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
-          label:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.label" as const,
-          description:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.description" as const,
-          options: [
-            {
-              value: "1",
-              label:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.monday" as const,
-            },
-            {
-              value: "2",
-              label:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.tuesday" as const,
-            },
-            {
-              value: "3",
-              label:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.wednesday" as const,
-            },
-            {
-              value: "4",
-              label:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.thursday" as const,
-            },
-            {
-              value: "5",
-              label:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.friday" as const,
-            },
-            {
-              value: "6",
-              label:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.saturday" as const,
-            },
-            {
-              value: "7",
-              label:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.sunday" as const,
-            },
-          ],
-        },
-        z.array(z.coerce.number().min(1).max(7)),
-      ),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.dryRun.label" as const,
+        description:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.dryRun.description" as const,
+        schema: z.boolean(),
+      }),
+      minAgeHours: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.minAgeHours.label" as const,
+        description:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.minAgeHours.description" as const,
+        schema: z.coerce.number().min(0).max(168),
+      }),
+      enabledDays: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.label" as const,
+        description:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.description" as const,
+        options: [
+          {
+            value: "1",
+            label:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.monday" as const,
+          },
+          {
+            value: "2",
+            label:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.tuesday" as const,
+          },
+          {
+            value: "3",
+            label:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.wednesday" as const,
+          },
+          {
+            value: "4",
+            label:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.thursday" as const,
+          },
+          {
+            value: "5",
+            label:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.friday" as const,
+          },
+          {
+            value: "6",
+            label:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.saturday" as const,
+          },
+          {
+            value: "7",
+            label:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.sunday" as const,
+          },
+        ],
+        schema: z.array(z.coerce.number().min(1).max(7)),
+      }),
       enabledHours: objectField(
         {
           type: WidgetType.CONTAINER,
@@ -388,108 +358,90 @@ const { PUT } = createEndpoint({
         },
         { request: "data" },
         {
-          start: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.start.label" as const,
-              description:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.start.description" as const,
-            },
-            z.coerce.number().min(0).max(23),
-          ),
-          end: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.end.label" as const,
-              description:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.end.description" as const,
-            },
-            z.coerce.number().min(0).max(23),
-          ),
+          start: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.start.label" as const,
+            description:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.start.description" as const,
+            schema: z.coerce.number().min(0).max(23),
+          }),
+          end: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.end.label" as const,
+            description:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.end.description" as const,
+            schema: z.coerce.number().min(0).max(23),
+          }),
         },
       ),
-      schedule: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.schedule.label" as const,
-          description:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.schedule.description" as const,
-        },
-        z.string().min(1),
-      ),
-      enabled: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabled.label" as const,
-          description:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabled.description" as const,
-        },
-        z.boolean().default(true),
-      ),
-      priority: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.priority.label" as const,
-          description:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.priority.description" as const,
-          options: CronTaskPriorityOptions,
-        },
-        z.enum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
-      ),
-      timeout: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.timeout.label" as const,
-          description:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.timeout.description" as const,
-        },
-        z.coerce.number().min(1000).max(3600000).default(300000),
-      ),
-      retries: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.retries.label" as const,
-          description:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.retries.description" as const,
-        },
-        z.coerce.number().min(0).max(10).default(3),
-      ),
-      retryDelay: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.retryDelay.label" as const,
-          description:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.retryDelay.description" as const,
-        },
-        z.coerce.number().min(1000).max(300000).default(30000),
-      ),
-      leadsPerWeek: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.JSON,
-          label:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.leadsPerWeek.label" as const,
-          description:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.leadsPerWeek.description" as const,
-        },
-        z.record(z.string(), z.coerce.number().min(1)),
-      ),
+      schedule: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.schedule.label" as const,
+        description:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.schedule.description" as const,
+        schema: z.string().min(1),
+      }),
+      enabled: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabled.label" as const,
+        description:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabled.description" as const,
+        schema: z.boolean().default(true),
+      }),
+      priority: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.priority.label" as const,
+        description:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.priority.description" as const,
+        options: CronTaskPriorityOptions,
+        schema: z.enum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
+      }),
+      timeout: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.timeout.label" as const,
+        description:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.timeout.description" as const,
+        schema: z.coerce.number().min(1000).max(3600000).default(300000),
+      }),
+      retries: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.retries.label" as const,
+        description:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.retries.description" as const,
+        schema: z.coerce.number().min(0).max(10).default(3),
+      }),
+      retryDelay: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.retryDelay.label" as const,
+        description:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.retryDelay.description" as const,
+        schema: z.coerce.number().min(1000).max(300000).default(30000),
+      }),
+      leadsPerWeek: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.leadsPerWeek.label" as const,
+        description:
+          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.leadsPerWeek.description" as const,
+        schema: z.record(z.string(), z.coerce.number().min(1)),
+      }),
       // Response fields (same structure as GET)
       response: objectField(
         {
@@ -502,30 +454,24 @@ const { PUT } = createEndpoint({
         },
         { response: true },
         {
-          dryRun: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.dryRun" as const,
-            },
-            z.boolean(),
-          ),
-          minAgeHours: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.minAgeHours" as const,
-            },
-            z.coerce.number().min(0).max(168),
-          ),
-          enabledDays: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledDays" as const,
-            },
-            z.array(z.coerce.number().min(1).max(7)),
-          ),
+          dryRun: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.dryRun" as const,
+            schema: z.boolean(),
+          }),
+          minAgeHours: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.minAgeHours" as const,
+            schema: z.coerce.number().min(0).max(168),
+          }),
+          enabledDays: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledDays" as const,
+            schema: z.array(z.coerce.number().min(1).max(7)),
+          }),
           enabledHours: objectField(
             {
               type: WidgetType.CONTAINER,
@@ -536,82 +482,64 @@ const { PUT } = createEndpoint({
             },
             { response: true },
             {
-              start: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
-                  fieldType: FieldDataType.NUMBER,
-                },
-                z.coerce.number().min(0).max(23),
-              ),
-              end: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
-                  fieldType: FieldDataType.NUMBER,
-                },
-                z.coerce.number().min(0).max(23),
-              ),
+              start: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
+                fieldType: FieldDataType.NUMBER,
+                schema: z.coerce.number().min(0).max(23),
+              }),
+              end: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
+                fieldType: FieldDataType.NUMBER,
+                schema: z.coerce.number().min(0).max(23),
+              }),
             },
           ),
-          leadsPerWeek: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.leadsPerWeek" as const,
-            },
-            z.record(z.string(), z.coerce.number().min(1)),
-          ),
-          schedule: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.schedule" as const,
-            },
-            z.string().min(1),
-          ),
-          enabled: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabled" as const,
-            },
-            z.boolean().default(true),
-          ),
-          priority: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.priority" as const,
-            },
-            z.enum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
-          ),
-          timeout: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.timeout" as const,
-            },
-            z.coerce.number().min(1000).max(3600000).default(300000),
-          ),
-          retries: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.retries" as const,
-            },
-            z.coerce.number().min(0).max(10).default(3),
-          ),
-          retryDelay: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.retryDelay" as const,
-            },
-            z.coerce.number().min(1000).max(300000).default(30000),
-          ),
+          leadsPerWeek: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.leadsPerWeek" as const,
+            schema: z.record(z.string(), z.coerce.number().min(1)),
+          }),
+          schedule: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.schedule" as const,
+            schema: z.string().min(1),
+          }),
+          enabled: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabled" as const,
+            schema: z.boolean().default(true),
+          }),
+          priority: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.priority" as const,
+            schema: z.enum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
+          }),
+          timeout: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.timeout" as const,
+            schema: z.coerce.number().min(1000).max(3600000).default(300000),
+          }),
+          retries: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.retries" as const,
+            schema: z.coerce.number().min(0).max(10).default(3),
+          }),
+          retryDelay: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.retryDelay" as const,
+            schema: z.coerce.number().min(1000).max(300000).default(30000),
+          }),
         },
       ),
     },

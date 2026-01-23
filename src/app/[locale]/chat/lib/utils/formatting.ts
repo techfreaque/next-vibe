@@ -4,6 +4,8 @@
  * Common formatting functions used across the chat application.
  */
 
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import type { TFunction } from "@/i18n/core/static-types";
 
 const TEXT_FORMAT = {
@@ -17,7 +19,11 @@ const TEXT_FORMAT = {
  * @param timestamp - Unix timestamp in milliseconds
  * @returns Formatted relative time string
  */
-export function formatRelativeTime(timestamp: number): string {
+export function formatRelativeTime(
+  timestamp: number,
+  locale: CountryLanguage,
+): string {
+  const { t } = simpleT(locale);
   const now = Date.now();
   const diff = now - timestamp;
   const minutes = Math.floor(diff / 60000);
@@ -25,19 +31,15 @@ export function formatRelativeTime(timestamp: number): string {
   const days = Math.floor(diff / 86400000);
 
   if (days > 0) {
-    // eslint-disable-next-line i18next/no-literal-string -- Technical time format, not user-facing
-    return `${days}d ago`;
+    return t("app.chat.timestamp.daysAgo", { count: days });
   }
   if (hours > 0) {
-    // eslint-disable-next-line i18next/no-literal-string -- Technical time format, not user-facing
-    return `${hours}h ago`;
+    return t("app.chat.timestamp.hoursAgo", { count: hours });
   }
   if (minutes > 0) {
-    // eslint-disable-next-line i18next/no-literal-string -- Technical time format, not user-facing
-    return `${minutes}m ago`;
+    return t("app.chat.timestamp.minutesAgo", { count: minutes });
   }
-  // eslint-disable-next-line i18next/no-literal-string -- Technical time format, not user-facing
-  return "just now";
+  return t("app.chat.timestamp.justNow");
 }
 
 /**

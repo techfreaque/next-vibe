@@ -20,7 +20,6 @@ import { getDirectReplies } from "@/app/[locale]/chat/lib/utils/thread-builder";
 import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/hooks/store";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { processMessageGroupForTTS } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
 import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -75,8 +74,6 @@ export function ThreadedMessage({
     retryMessage: onRetryMessage,
     answerAsAI: onAnswerAsModel,
     voteMessage: onVoteMessage,
-    handleModelChange: onModelChange,
-    setSelectedCharacter: onCharacterChange,
     ttsVoice,
     characters,
   } = useChatContext();
@@ -245,8 +242,6 @@ export function ThreadedMessage({
                     )
                   }
                   onCancel={messageActions.cancelAction}
-                  onModelChange={onModelChange}
-                  onCharacterChange={onCharacterChange}
                   locale={locale}
                   logger={logger}
                   user={user}
@@ -257,30 +252,6 @@ export function ThreadedMessage({
                 <ModelCharacterSelectorModal
                   titleKey="app.chat.threadedView.retryModal.title"
                   descriptionKey="app.chat.threadedView.retryModal.description"
-                  onModelChange={
-                    onModelChange ||
-                    ((model: ModelId): void => {
-                      logger.debug(
-                        "ThreadedMessage",
-                        "Model selection changed (no handler)",
-                        {
-                          model,
-                        },
-                      );
-                    })
-                  }
-                  onCharacterChange={
-                    onCharacterChange ||
-                    ((character: string): void => {
-                      logger.debug(
-                        "ThreadedMessage",
-                        "Character selection changed (no handler)",
-                        {
-                          character,
-                        },
-                      );
-                    })
-                  }
                   onConfirm={(): Promise<void> =>
                     messageActions.handleConfirmRetry(
                       message.id,
@@ -344,30 +315,6 @@ export function ThreadedMessage({
               <ModelCharacterSelectorModal
                 titleKey="app.chat.threadedView.answerModal.title"
                 descriptionKey="app.chat.threadedView.answerModal.description"
-                onModelChange={
-                  onModelChange ||
-                  ((model: ModelId): void => {
-                    logger.debug(
-                      "ThreadedMessage",
-                      "Model selection changed (no handler)",
-                      {
-                        model,
-                      },
-                    );
-                  })
-                }
-                onCharacterChange={
-                  onCharacterChange ||
-                  ((character: string): void => {
-                    logger.debug(
-                      "ThreadedMessage",
-                      "Character selection changed (no handler)",
-                      {
-                        character,
-                      },
-                    );
-                  })
-                }
                 showInput={true}
                 inputValue={messageActions.answerContent}
                 onInputChange={messageActions.setAnswerContent}

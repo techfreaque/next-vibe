@@ -26,7 +26,17 @@ export function buildKey<TUrlPathParams>(
 ): string {
   const baseKey = `${prefix}-${endpoint.path.join("-")}-${endpoint.method}`;
 
+  // Normalize empty objects to undefined
   if (urlPathParams === undefined || urlPathParams === null) {
+    return baseKey;
+  }
+
+  // Check if it's an empty object
+  if (
+    typeof urlPathParams === "object" &&
+    !Array.isArray(urlPathParams) &&
+    Object.keys(urlPathParams).length === 0
+  ) {
     return baseKey;
   }
 

@@ -331,11 +331,6 @@ class EmailsRepositoryImpl implements EmailsRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<{ id: string }>> {
     try {
-      logger.debug("Creating email record", {
-        subject: data.subject,
-        recipientEmail: data.recipientEmail,
-      });
-
       const [result] = await db
         .insert(emails)
         .values(data)

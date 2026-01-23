@@ -18,6 +18,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import { CharactersRepository } from "../../characters/repository";
 import { chatFavorites } from "../db";
 import type {
   FavoriteDeleteResponseOutput,
@@ -74,8 +75,68 @@ export class SingleFavoriteRepository {
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
+      const characterResult = await CharactersRepository.getCharacterById(
+        { id: favorite.characterId },
+        user,
+        logger,
+      );
 
-      return success(favorite);
+      const character = characterResult.success ? characterResult.data : null;
+
+      if (!character) {
+        logger.error("Character not found", {
+          characterId: favorite.characterId,
+          favoriteId: urlPathParams.id,
+          userId,
+        });
+      }
+      // Use favorite values, fallback to character values when null/undefined
+      const voice = favorite.voice ?? character?.voice ?? null;
+      const modelSelection =
+        favorite.modelSelection ?? character?.modelSelection;
+
+      if (!modelSelection) {
+        logger.error("No modelSelection found", {
+          favoriteId: urlPathParams.id,
+          characterId: favorite.characterId,
+          hasFavoriteModelSelection: !!favorite.modelSelection,
+          hasCharacterModelSelection: !!character?.modelSelection,
+        });
+        return fail({
+          message: "app.api.agent.chat.favorites.id.get.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+
+      return success<FavoriteGetResponseOutput>({
+        id: favorite.id,
+        characterId: favorite.characterId,
+        character: {
+          info: {
+            icon: character?.icon ?? "bot",
+            info: {
+              titleRow: {
+                name:
+                  character?.name ??
+                  ("app.api.agent.chat.characters.characters.default.name" as const),
+                tagline:
+                  character?.tagline ??
+                  ("app.api.agent.chat.characters.characters.default.tagline" as const),
+              },
+              description:
+                character?.description ??
+                ("app.api.agent.chat.characters.characters.default.description" as const),
+            },
+          },
+        },
+        customName: favorite.customName,
+        customIcon: favorite.customIcon ?? character?.icon ?? null,
+        voice,
+        modelSelection,
+        position: favorite.position,
+        color: favorite.color,
+        useCount: favorite.useCount,
+      });
     } catch (error) {
       logger.error("Failed to fetch favorite", parseError(error));
       return fail({
@@ -128,10 +189,33 @@ export class SingleFavoriteRepository {
         });
       }
 
+      // Get character to compare defaults
+      let character = null;
+      if (data.characterId ?? existing.characterId) {
+        const characterResult = await CharactersRepository.getCharacterById(
+          { id: data.characterId ?? existing.characterId },
+          user,
+          logger,
+        );
+        if (characterResult.success) {
+          character = characterResult.data;
+        }
+      }
+
+      // Only store voice if different from character default
+      const voiceToStore =
+        character && data.voice === character.voice ? null : data.voice;
+
       const [updated] = await db
         .update(chatFavorites)
         .set({
-          ...data,
+          characterId: data.characterId,
+          customName: data.customName,
+          customIcon: data.customIcon,
+          voice: voiceToStore,
+          modelSelection: data.modelSelection,
+          color: data.color,
+          position: data.position,
           updatedAt: new Date(),
         })
         .where(
@@ -201,7 +285,7 @@ export class SingleFavoriteRepository {
         });
       }
 
-      return success({ success: true });
+      return success();
     } catch (error) {
       logger.error("Failed to delete favorite", parseError(error));
       return fail({

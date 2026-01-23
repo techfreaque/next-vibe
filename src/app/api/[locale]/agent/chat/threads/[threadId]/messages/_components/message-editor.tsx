@@ -27,7 +27,6 @@ import { FileUploadButton } from "@/app/api/[locale]/agent/chat/threads/_compone
 import { useVoiceRecording } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/hooks/use-voice-recording";
 import { RecordingModal } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/recording-modal";
 import { Selector } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/selector";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -45,8 +44,6 @@ interface MessageEditorProps {
     attachments: File[] | undefined,
   ) => Promise<void>;
   onCancel: () => void;
-  onModelChange?: (model: ModelId) => void;
-  onCharacterChange?: (character: string) => void;
   locale: CountryLanguage;
   logger: EndpointLogger;
   user: JwtPayloadType;
@@ -56,8 +53,6 @@ export function MessageEditor({
   message,
   onBranch,
   onCancel,
-  onModelChange,
-  onCharacterChange,
   locale,
   logger,
   user,
@@ -168,18 +163,14 @@ export function MessageEditor({
         <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 flex-nowrap">
           {/* Left: Selector */}
           <Div className="flex flex-row items-center gap-0.5 sm:gap-1 md:gap-1.5 flex-1 min-w-0">
-            {(onModelChange || onCharacterChange) && (
-              <Selector
-                characterId={selectedCharacter}
-                modelId={selectedModel}
-                onCharacterChange={onCharacterChange ?? ((): void => undefined)}
-                onModelChange={onModelChange ?? ((): void => undefined)}
-                locale={locale}
-                logger={logger}
-                buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
-                user={user}
-              />
-            )}
+            <Selector
+              characterId={selectedCharacter}
+              modelId={selectedModel}
+              locale={locale}
+              logger={logger}
+              buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
+              user={user}
+            />
           </Div>
 
           {/* Right: Call Mode + File + Mic + Branch/Cancel */}

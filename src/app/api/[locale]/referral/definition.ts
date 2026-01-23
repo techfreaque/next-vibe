@@ -11,9 +11,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -53,84 +53,64 @@ export const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // Request fields
-      code: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.referral.form.fields.code.label",
-          description: "app.api.referral.form.fields.code.description",
-          placeholder: "app.api.referral.form.fields.code.placeholder",
-        },
-        z.string().min(3).max(50),
-      ),
-      label: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.referral.form.fields.label.label",
-          description: "app.api.referral.form.fields.label.description",
-          placeholder: "app.api.referral.form.fields.label.placeholder",
-        },
-        z.string().optional(),
-      ),
+      code: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.referral.form.fields.code.label",
+        description: "app.api.referral.form.fields.code.description",
+        placeholder: "app.api.referral.form.fields.code.placeholder",
+        schema: z.string().min(3).max(50),
+      }),
+      label: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.referral.form.fields.label.label",
+        description: "app.api.referral.form.fields.label.description",
+        placeholder: "app.api.referral.form.fields.label.placeholder",
+        schema: z.string().optional(),
+      }),
 
       // Response fields
-      id: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.contact.response.success",
-        },
-        z.string().uuid(),
-      ),
-      responseCode: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.contact.response.success",
-        },
-        z.string(),
-      ),
-      responseLabel: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.contact.response.success",
-        },
-        z.string().nullable(),
-      ),
-      ownerUserId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.contact.response.success",
-        },
-        z.string().uuid(),
-      ),
-      currentUses: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.contact.response.success",
-        },
-        z.coerce.number(),
-      ),
-      isActive: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.contact.response.success",
-        },
-        z.boolean(),
-      ),
-      createdAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.contact.response.success",
-        },
-        z.string(),
-      ),
-      updatedAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.contact.response.success",
-        },
-        z.string(),
-      ),
+      id: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.contact.response.success",
+        schema: z.string().uuid(),
+      }),
+      responseCode: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.contact.response.success",
+        schema: z.string(),
+      }),
+      responseLabel: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.contact.response.success",
+        schema: z.string().nullable(),
+      }),
+      ownerUserId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.contact.response.success",
+        schema: z.string().uuid(),
+      }),
+      currentUses: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.contact.response.success",
+        schema: z.coerce.number(),
+      }),
+      isActive: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.contact.response.success",
+        schema: z.boolean(),
+      }),
+      createdAt: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.contact.response.success",
+        schema: z.string(),
+      }),
+      updatedAt: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.contact.response.success",
+        schema: z.string(),
+      }),
     },
   ),
 

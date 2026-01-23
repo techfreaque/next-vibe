@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -51,95 +51,75 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      accountId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.emails.imapClient.folders.sync.accountId.label",
-          description:
-            "app.api.emails.imapClient.folders.sync.accountId.description",
-          placeholder:
-            "app.api.emails.imapClient.folders.sync.accountId.placeholder",
-        },
-        z.uuid(),
-      ),
+      accountId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.emails.imapClient.folders.sync.accountId.label",
+        description:
+          "app.api.emails.imapClient.folders.sync.accountId.description",
+        placeholder:
+          "app.api.emails.imapClient.folders.sync.accountId.placeholder",
+        schema: z.uuid(),
+      }),
 
-      folderId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.emails.imapClient.folders.sync.folderId.label",
-          description:
-            "app.api.emails.imapClient.folders.sync.folderId.description",
-          placeholder:
-            "app.api.emails.imapClient.folders.sync.folderId.placeholder",
-        },
-        z.uuid().optional(),
-      ),
+      folderId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.emails.imapClient.folders.sync.folderId.label",
+        description:
+          "app.api.emails.imapClient.folders.sync.folderId.description",
+        placeholder:
+          "app.api.emails.imapClient.folders.sync.folderId.placeholder",
+        schema: z.uuid().optional(),
+      }),
 
-      force: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.emails.imapClient.folders.sync.force.label",
-          description:
-            "app.api.emails.imapClient.folders.sync.force.description",
-        },
-        z.boolean().default(false),
-      ),
+      force: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.emails.imapClient.folders.sync.force.label",
+        description: "app.api.emails.imapClient.folders.sync.force.description",
+        schema: z.boolean().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      foldersProcessed: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.folders.sync.response.foldersProcessed",
-        },
-        z.coerce.number(),
-      ),
+      foldersProcessed: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.folders.sync.response.foldersProcessed",
+        schema: z.coerce.number(),
+      }),
 
-      foldersAdded: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.folders.sync.response.foldersAdded",
-        },
-        z.coerce.number(),
-      ),
+      foldersAdded: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.folders.sync.response.foldersAdded",
+        schema: z.coerce.number(),
+      }),
 
-      foldersUpdated: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.folders.sync.response.foldersUpdated",
-        },
-        z.coerce.number(),
-      ),
+      foldersUpdated: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.folders.sync.response.foldersUpdated",
+        schema: z.coerce.number(),
+      }),
 
-      foldersDeleted: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.folders.sync.response.foldersDeleted",
-        },
-        z.coerce.number(),
-      ),
+      foldersDeleted: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.folders.sync.response.foldersDeleted",
+        schema: z.coerce.number(),
+      }),
 
-      duration: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.folders.sync.response.duration",
-        },
-        z.coerce.number(),
-      ),
+      duration: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.folders.sync.response.duration",
+        schema: z.coerce.number(),
+      }),
 
-      success: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.emails.imapClient.folders.sync.response.success",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.BADGE,
+        text: "app.api.emails.imapClient.folders.sync.response.success",
+        schema: z.boolean(),
+      }),
     },
   ),
 
@@ -210,7 +190,6 @@ const { POST } = createEndpoint({
         success: true,
       },
     },
-    urlPathParams: undefined,
   },
 });
 

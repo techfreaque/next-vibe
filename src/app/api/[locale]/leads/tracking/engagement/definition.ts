@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -103,177 +103,143 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      leadId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.leads.tracking.engagement.post.leadId.label" as const,
-          description:
-            "app.api.leads.tracking.engagement.post.leadId.description" as const,
-          placeholder:
-            "app.api.leads.tracking.engagement.post.leadId.placeholder" as const,
-          helpText:
-            "app.api.leads.tracking.engagement.post.leadId.helpText" as const,
-          columns: 12,
-        },
-        z.uuid().nullable().optional(),
-      ),
-      engagementType: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.leads.tracking.engagement.post.engagementType.label" as const,
-          description:
-            "app.api.leads.tracking.engagement.post.engagementType.description" as const,
-          placeholder:
-            "app.api.leads.tracking.engagement.post.engagementType.placeholder" as const,
-          helpText:
-            "app.api.leads.tracking.engagement.post.engagementType.helpText" as const,
-          options: EngagementTypesOptions,
-          columns: 6,
-        },
-        z.enum(EngagementTypes),
-      ),
-      campaignId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label:
-            "app.api.leads.tracking.engagement.post.campaignId.label" as const,
-          description:
-            "app.api.leads.tracking.engagement.post.campaignId.description" as const,
-          placeholder:
-            "app.api.leads.tracking.engagement.post.campaignId.placeholder" as const,
-          helpText:
-            "app.api.leads.tracking.engagement.post.campaignId.helpText" as const,
-          columns: 6,
-        },
-        z.uuid().optional(),
-      ),
-      metadata: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.JSON,
-          label:
-            "app.api.leads.tracking.engagement.post.metadata.label" as const,
-          description:
-            "app.api.leads.tracking.engagement.post.metadata.description" as const,
-          placeholder:
-            "app.api.leads.tracking.engagement.post.metadata.placeholder" as const,
-          helpText:
-            "app.api.leads.tracking.engagement.post.metadata.helpText" as const,
-          columns: 12,
-        },
-        engagementMetadataSchema,
-      ),
-      userId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.leads.tracking.engagement.post.userId.label" as const,
-          description:
-            "app.api.leads.tracking.engagement.post.userId.description" as const,
-          placeholder:
-            "app.api.leads.tracking.engagement.post.userId.placeholder" as const,
-          helpText:
-            "app.api.leads.tracking.engagement.post.userId.helpText" as const,
-          columns: 12,
-        },
-        z.uuid().optional(),
-      ),
+      leadId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.leads.tracking.engagement.post.leadId.label" as const,
+        description:
+          "app.api.leads.tracking.engagement.post.leadId.description" as const,
+        placeholder:
+          "app.api.leads.tracking.engagement.post.leadId.placeholder" as const,
+        helpText:
+          "app.api.leads.tracking.engagement.post.leadId.helpText" as const,
+        columns: 12,
+        schema: z.uuid().nullable().optional(),
+      }),
+      engagementType: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.leads.tracking.engagement.post.engagementType.label" as const,
+        description:
+          "app.api.leads.tracking.engagement.post.engagementType.description" as const,
+        placeholder:
+          "app.api.leads.tracking.engagement.post.engagementType.placeholder" as const,
+        helpText:
+          "app.api.leads.tracking.engagement.post.engagementType.helpText" as const,
+        options: EngagementTypesOptions,
+        columns: 6,
+        schema: z.enum(EngagementTypes),
+      }),
+      campaignId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label:
+          "app.api.leads.tracking.engagement.post.campaignId.label" as const,
+        description:
+          "app.api.leads.tracking.engagement.post.campaignId.description" as const,
+        placeholder:
+          "app.api.leads.tracking.engagement.post.campaignId.placeholder" as const,
+        helpText:
+          "app.api.leads.tracking.engagement.post.campaignId.helpText" as const,
+        columns: 6,
+        schema: z.uuid().optional(),
+      }),
+      metadata: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label: "app.api.leads.tracking.engagement.post.metadata.label" as const,
+        description:
+          "app.api.leads.tracking.engagement.post.metadata.description" as const,
+        placeholder:
+          "app.api.leads.tracking.engagement.post.metadata.placeholder" as const,
+        helpText:
+          "app.api.leads.tracking.engagement.post.metadata.helpText" as const,
+        columns: 12,
+        schema: engagementMetadataSchema,
+      }),
+      userId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.leads.tracking.engagement.post.userId.label" as const,
+        description:
+          "app.api.leads.tracking.engagement.post.userId.description" as const,
+        placeholder:
+          "app.api.leads.tracking.engagement.post.userId.placeholder" as const,
+        helpText:
+          "app.api.leads.tracking.engagement.post.userId.helpText" as const,
+        columns: 12,
+        schema: z.uuid().optional(),
+      }),
 
       // === RESPONSE FIELDS ===
-      id: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.post.response.id" as const,
-        },
-        z.uuid(),
-      ),
-      responseLeadId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.post.response.leadId" as const,
-        },
-        z.uuid(),
-      ),
-      responseEngagementType: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.post.response.engagementType" as const,
-        },
-        z.enum(EngagementTypes),
-      ),
-      responseCampaignId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.post.response.campaignId" as const,
-        },
-        z.uuid().optional(),
-      ),
-      responseMetadata: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.post.response.metadata" as const,
-        },
-        z
+      id: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.leads.tracking.engagement.post.response.id" as const,
+        schema: z.uuid(),
+      }),
+      responseLeadId: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.post.response.leadId" as const,
+        schema: z.uuid(),
+      }),
+      responseEngagementType: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.post.response.engagementType" as const,
+        schema: z.enum(EngagementTypes),
+      }),
+      responseCampaignId: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.post.response.campaignId" as const,
+        schema: z.uuid().optional(),
+      }),
+      responseMetadata: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.post.response.metadata" as const,
+        schema: z
           .record(z.string(), z.string().or(z.coerce.number()).or(z.boolean()))
           .optional(),
-      ),
-      timestamp: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.post.response.timestamp" as const,
-        },
-        dateSchema,
-      ),
-      ipAddress: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.post.response.ipAddress" as const,
-        },
-        z.string().optional(),
-      ),
-      userAgent: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.post.response.userAgent" as const,
-        },
-        z.string().optional(),
-      ),
-      createdAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.post.response.createdAt" as const,
-        },
-        dateSchema,
-      ),
-      leadCreated: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.post.response.leadCreated" as const,
-        },
-        z.boolean().optional(),
-      ),
-      relationshipEstablished: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.post.response.relationshipEstablished" as const,
-        },
-        z.boolean().optional(),
-      ),
+      }),
+      timestamp: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.post.response.timestamp" as const,
+        schema: dateSchema,
+      }),
+      ipAddress: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.post.response.ipAddress" as const,
+        schema: z.string().optional(),
+      }),
+      userAgent: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.post.response.userAgent" as const,
+        schema: z.string().optional(),
+      }),
+      createdAt: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.post.response.createdAt" as const,
+        schema: dateSchema,
+      }),
+      leadCreated: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.post.response.leadCreated" as const,
+        schema: z.boolean().optional(),
+      }),
+      relationshipEstablished: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.post.response.relationshipEstablished" as const,
+        schema: z.boolean().optional(),
+      }),
     },
   ),
 
@@ -394,7 +360,6 @@ const { POST } = createEndpoint({
         leadCreated: true,
       },
     },
-    urlPathParams: undefined,
   },
 });
 
@@ -437,157 +402,128 @@ const { GET } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS (Query Parameters) ===
-      id: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.leads.tracking.engagement.get.id.label" as const,
-          description:
-            "app.api.leads.tracking.engagement.get.id.description" as const,
-          placeholder:
-            "app.api.leads.tracking.engagement.get.id.placeholder" as const,
-          helpText:
-            "app.api.leads.tracking.engagement.get.id.helpText" as const,
-          columns: 12,
-        },
-        z.uuid().optional(),
-      ),
-      campaignId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label:
-            "app.api.leads.tracking.engagement.post.campaignId.label" as const,
-          description:
-            "app.api.leads.tracking.engagement.post.campaignId.description" as const,
-          placeholder:
-            "app.api.leads.tracking.engagement.post.campaignId.placeholder" as const,
-          helpText:
-            "app.api.leads.tracking.engagement.post.campaignId.helpText" as const,
-          columns: 6,
-        },
-        z.uuid().optional(),
-      ),
-      stage: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.tracking.engagement.get.stage.label" as const,
-          description:
-            "app.api.leads.tracking.engagement.get.stage.description" as const,
-          placeholder:
-            "app.api.leads.tracking.engagement.get.stage.placeholder" as const,
-          helpText:
-            "app.api.leads.tracking.engagement.get.stage.helpText" as const,
-          options: EmailCampaignStageOptions,
-          columns: 6,
-        },
-        z.enum(EmailCampaignStage).optional(),
-      ),
-      source: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.tracking.engagement.get.source.label" as const,
-          description:
-            "app.api.leads.tracking.engagement.get.source.description" as const,
-          placeholder:
-            "app.api.leads.tracking.engagement.get.source.placeholder" as const,
-          helpText:
-            "app.api.leads.tracking.engagement.get.source.helpText" as const,
-          options: LeadSourceOptions,
-          columns: 6,
-        },
-        z.enum(LeadSource).default(LeadSource.EMAIL_CAMPAIGN),
-      ),
-      url: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.leads.tracking.engagement.get.url.label" as const,
-          description:
-            "app.api.leads.tracking.engagement.get.url.description" as const,
-          placeholder:
-            "app.api.leads.tracking.engagement.get.url.placeholder" as const,
-          helpText:
-            "app.api.leads.tracking.engagement.get.url.helpText" as const,
-          columns: 12,
-        },
-        z.string(),
-      ),
-      ref: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.leads.tracking.engagement.get.ref.label" as const,
-          description:
-            "app.api.leads.tracking.engagement.get.ref.description" as const,
-          placeholder:
-            "app.api.leads.tracking.engagement.get.ref.placeholder" as const,
-          helpText:
-            "app.api.leads.tracking.engagement.get.ref.helpText" as const,
-          columns: 12,
-        },
-        z.string().optional(),
-      ),
+      id: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.leads.tracking.engagement.get.id.label" as const,
+        description:
+          "app.api.leads.tracking.engagement.get.id.description" as const,
+        placeholder:
+          "app.api.leads.tracking.engagement.get.id.placeholder" as const,
+        helpText: "app.api.leads.tracking.engagement.get.id.helpText" as const,
+        columns: 12,
+        schema: z.uuid().optional(),
+      }),
+      campaignId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label:
+          "app.api.leads.tracking.engagement.post.campaignId.label" as const,
+        description:
+          "app.api.leads.tracking.engagement.post.campaignId.description" as const,
+        placeholder:
+          "app.api.leads.tracking.engagement.post.campaignId.placeholder" as const,
+        helpText:
+          "app.api.leads.tracking.engagement.post.campaignId.helpText" as const,
+        columns: 6,
+        schema: z.uuid().optional(),
+      }),
+      stage: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.tracking.engagement.get.stage.label" as const,
+        description:
+          "app.api.leads.tracking.engagement.get.stage.description" as const,
+        placeholder:
+          "app.api.leads.tracking.engagement.get.stage.placeholder" as const,
+        helpText:
+          "app.api.leads.tracking.engagement.get.stage.helpText" as const,
+        options: EmailCampaignStageOptions,
+        columns: 6,
+        schema: z.enum(EmailCampaignStage).optional(),
+      }),
+      source: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.tracking.engagement.get.source.label" as const,
+        description:
+          "app.api.leads.tracking.engagement.get.source.description" as const,
+        placeholder:
+          "app.api.leads.tracking.engagement.get.source.placeholder" as const,
+        helpText:
+          "app.api.leads.tracking.engagement.get.source.helpText" as const,
+        options: LeadSourceOptions,
+        columns: 6,
+        schema: z.enum(LeadSource).default(LeadSource.EMAIL_CAMPAIGN),
+      }),
+      url: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.leads.tracking.engagement.get.url.label" as const,
+        description:
+          "app.api.leads.tracking.engagement.get.url.description" as const,
+        placeholder:
+          "app.api.leads.tracking.engagement.get.url.placeholder" as const,
+        helpText: "app.api.leads.tracking.engagement.get.url.helpText" as const,
+        columns: 12,
+        schema: z.string(),
+      }),
+      ref: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.leads.tracking.engagement.get.ref.label" as const,
+        description:
+          "app.api.leads.tracking.engagement.get.ref.description" as const,
+        placeholder:
+          "app.api.leads.tracking.engagement.get.ref.placeholder" as const,
+        helpText: "app.api.leads.tracking.engagement.get.ref.helpText" as const,
+        columns: 12,
+        schema: z.string().optional(),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.get.response.success" as const,
-        },
-        z.boolean(),
-      ),
-      redirectUrl: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.get.response.redirectUrl" as const,
-        },
-        z.string(),
-      ),
-      responseLeadId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.get.response.leadId" as const,
-        },
-        z.string().optional(),
-      ),
-      responseCampaignId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.get.response.campaignId" as const,
-        },
-        z.uuid().optional(),
-      ),
-      engagementRecorded: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.get.response.engagementRecorded" as const,
-        },
-        z.boolean(),
-      ),
-      leadStatusUpdated: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.get.response.leadStatusUpdated" as const,
-        },
-        z.boolean(),
-      ),
-      isLoggedIn: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.tracking.engagement.get.response.isLoggedIn" as const,
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.get.response.success" as const,
+        schema: z.boolean(),
+      }),
+      redirectUrl: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.get.response.redirectUrl" as const,
+        schema: z.string(),
+      }),
+      responseLeadId: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.get.response.leadId" as const,
+        schema: z.string().optional(),
+      }),
+      responseCampaignId: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.get.response.campaignId" as const,
+        schema: z.uuid().optional(),
+      }),
+      engagementRecorded: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.get.response.engagementRecorded" as const,
+        schema: z.boolean(),
+      }),
+      leadStatusUpdated: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.get.response.leadStatusUpdated" as const,
+        schema: z.boolean(),
+      }),
+      isLoggedIn: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.tracking.engagement.get.response.isLoggedIn" as const,
+        schema: z.boolean(),
+      }),
     },
   ),
 
@@ -675,7 +611,6 @@ const { GET } = createEndpoint({
         isLoggedIn: false,
       },
     },
-    urlPathParams: undefined,
   },
 });
 

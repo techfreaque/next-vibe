@@ -4,6 +4,9 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Leads auflisten",
     description: "Abrufen einer paginierten Liste von Leads mit Filterung",
+    createButton: {
+      label: "Lead erstellen",
+    },
     form: {
       title: "Lead-Listen-Filter",
       description: "Filter für Lead-Liste konfigurieren",
@@ -98,7 +101,6 @@ export const translations: typeof enTranslations = {
         convertedUserId: "Konvertierte Benutzer-ID",
         convertedAt: "Konvertiert am",
         signedUpAt: "Angemeldet am",
-        consultationBookedAt: "Beratung gebucht am",
         subscriptionConfirmedAt: "Abonnement bestätigt am",
         currentCampaignStage: "Aktuelle Kampagnenstufe",
         emailsSent: "E-Mails gesendet",

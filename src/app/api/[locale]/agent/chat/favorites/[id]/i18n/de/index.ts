@@ -7,6 +7,12 @@ export const translations: typeof enTranslations = {
     container: {
       title: "Favoriten-Details",
     },
+    editButton: {
+      label: "Favoriten bearbeiten",
+    },
+    deleteButton: {
+      label: "Favoriten löschen",
+    },
     id: {
       label: "Favoriten-ID",
     },
@@ -16,6 +22,9 @@ export const translations: typeof enTranslations = {
       },
       customName: {
         content: "Benutzerdefinierter Name: {{value}}",
+      },
+      customIcon: {
+        content: "Benutzerdefiniertes Symbol: {{value}}",
       },
       voice: {
         content: "Stimme: {{value}}",
@@ -134,6 +143,16 @@ export const translations: typeof enTranslations = {
     container: {
       title: "Favorit bearbeiten",
     },
+    backButton: {
+      label: "Zurück zum Favoriten",
+    },
+    deleteButton: {
+      label: "Favorit löschen",
+    },
+    submitButton: {
+      label: "Änderungen speichern",
+      loadingText: "Speichern...",
+    },
     id: {
       label: "Favoriten-ID",
     },
@@ -157,6 +176,7 @@ export const translations: typeof enTranslations = {
     },
     selectionType: {
       label: "Auswahltyp",
+      characterBased: "Basierend auf Charakter",
       manual: "Bestimmtes Modell",
       filters: "Filterkriterien",
     },
@@ -284,9 +304,18 @@ export const translations: typeof enTranslations = {
     description: "Favoriten-Konfiguration entfernen",
     container: {
       title: "Favorit löschen",
+      description: "Diesen Favoriten dauerhaft entfernen",
+    },
+    backButton: {
+      label: "Abbrechen",
+    },
+    actions: {
+      delete: "Favoriten löschen",
+      deleting: "Löschen des Favoriten...",
     },
     id: {
       label: "Favoriten-ID",
+      description: "Die eindeutige Kennung des zu löschenden Favoriten",
     },
     response: {
       success: {

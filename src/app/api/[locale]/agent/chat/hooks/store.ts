@@ -3,22 +3,9 @@
  * Zustand store for managing all chat state
  */
 
-import { storage } from "next-vibe-ui/lib/storage";
 import { create } from "zustand";
 
-import {
-  defaultModel,
-  type ModelId as ModelIdType,
-} from "@/app/api/[locale]/agent/models/models";
-
-import { aliasToPathMap } from "../../../system/generated/endpoint";
-import {
-  DEFAULT_TTS_VOICE,
-  type TtsVoiceValue,
-} from "../../text-to-speech/enum";
-import { DEFAULT_TOOL_CONFIRMATION_IDS, DEFAULT_TOOL_IDS } from "../constants";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
-import { ViewMode, type ViewModeValue } from "../enum";
 import {
   saveMessage as saveIncognitoMessage,
   saveThread as saveIncognitoThread,
@@ -35,26 +22,7 @@ export interface EnabledTool {
 }
 
 /**
- * Chat settings type
- */
-export interface ChatSettings {
-  selectedModel: ModelIdType;
-  selectedCharacter: string;
-  activeFavoriteId: string | null;
-  temperature: number;
-  maxTokens: number;
-  ttsAutoplay: boolean;
-  ttsVoice: typeof TtsVoiceValue;
-  theme: "light" | "dark";
-  viewMode: typeof ViewModeValue;
-  enabledTools: EnabledTool[];
-}
-
-/**
  * Chat state
- * NOTE: Navigation state (activeThreadId, currentRootFolderId, currentSubFolderId) removed
- * These are now derived from URL and passed as props instead of stored in state
- * NOTE: rootFolderPermissions removed - now computed server-side and passed as props
  */
 interface ChatState {
   // Data
@@ -69,9 +37,6 @@ interface ChatState {
   // Branch state - tracks which branch is selected at each level for each thread
   // Key: threadId, Value: Record<parentMessageId, branchIndex>
   branchIndices: Record<string, Record<string, number>>;
-
-  // Settings (persisted to localStorage)
-  settings: ChatSettings;
 
   // Thread actions
   addThread: (thread: ChatThread) => void;
@@ -93,10 +58,6 @@ interface ChatState {
     branchIndex: number,
   ) => void;
 
-  // Settings actions
-  hydrateSettings: () => Promise<void>;
-  updateSettings: (updates: Partial<ChatSettings>) => void;
-
   // Folder actions
   addFolder: (folder: ChatFolder) => void;
   updateFolder: (folderId: string, updates: Partial<ChatFolder>) => void;
@@ -110,84 +71,6 @@ interface ChatState {
   reset: () => void;
 }
 
-// Default settings (used for both server and initial client render)
-const getDefaultSettings = (): ChatSettings => ({
-  selectedModel: defaultModel,
-  selectedCharacter: "default",
-  activeFavoriteId: null,
-  temperature: 0.7,
-  maxTokens: 2000,
-  ttsAutoplay: false,
-  ttsVoice: DEFAULT_TTS_VOICE,
-  theme: "dark",
-  viewMode: ViewMode.LINEAR,
-  enabledTools: DEFAULT_TOOL_IDS.map((id) => ({
-    id,
-    requiresConfirmation: DEFAULT_TOOL_CONFIRMATION_IDS.some(
-      (confirmId) => confirmId === id,
-    ),
-  })),
-});
-
-// Helper to load settings from localStorage (client-only, called after mount)
-const loadSettings = async (): Promise<ChatSettings> => {
-  const defaults = getDefaultSettings();
-
-  if (typeof window === "undefined") {
-    return defaults;
-  }
-
-  try {
-    const stored = await storage.getItem("chat-settings-v2");
-    if (stored) {
-      const parsed = JSON.parse(stored) as Partial<ChatSettings>;
-
-      // Validate enabled tools against aliasToPathMap
-      let enabledTools = parsed.enabledTools || defaults.enabledTools;
-      if (Array.isArray(enabledTools)) {
-        const validTools = enabledTools.filter(
-          (tool) => tool.id in aliasToPathMap,
-        );
-        if (validTools.length !== enabledTools.length) {
-          enabledTools = validTools;
-          // Save cleaned settings
-          const cleanedSettings: ChatSettings = {
-            ...defaults,
-            ...parsed,
-            enabledTools,
-          };
-          void saveSettings(cleanedSettings);
-          return cleanedSettings;
-        }
-      }
-
-      return {
-        ...defaults,
-        ...parsed,
-        enabledTools,
-      };
-    }
-    // No stored settings - return defaults (new user gets default tools)
-  } catch {
-    // Silently fail and return defaults
-  }
-
-  return defaults;
-};
-
-// Helper to save settings to storage
-const saveSettings = async (settings: ChatSettings): Promise<void> => {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  try {
-    await storage.setItem("chat-settings-v2", JSON.stringify(settings));
-  } catch {
-    // Silently fail
-  }
-};
-
 /**
  * Create chat store
  */
@@ -199,9 +82,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
   isLoading: false,
   isDataLoaded: false,
   branchIndices: {},
-
-  // Use default settings for SSR - will be hydrated from localStorage after mount
-  settings: getDefaultSettings(),
 
   // Thread actions
   addThread: (thread: ChatThread): void => {
@@ -423,24 +303,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
       };
     }),
 
-  // Settings actions
-  hydrateSettings: async (): Promise<void> => {
-    const settings = await loadSettings();
-    set({ settings });
-  },
-
-  updateSettings: (updates: Partial<ChatSettings>): void =>
-    set((state) => {
-      const newSettings = {
-        ...state.settings,
-        ...updates,
-      };
-      void saveSettings(newSettings);
-      return {
-        settings: newSettings,
-      };
-    }),
-
   // Loading state
   setLoading: (loading: boolean): void =>
     set({
@@ -454,15 +316,12 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   // Reset
   reset: (): void => {
-    const defaultSettings = getDefaultSettings();
-    void saveSettings(defaultSettings);
     set({
       threads: {},
       messages: {},
       folders: {},
       isLoading: false,
       isDataLoaded: false,
-      settings: defaultSettings,
     });
   },
 }));

@@ -67,8 +67,6 @@ export function ChatInput({
     inputRef,
     selectedCharacter,
     selectedModel,
-    handleModelChange,
-    setSelectedCharacter,
     deductCredits,
   } = chat;
 
@@ -208,10 +206,6 @@ export function ChatInput({
           <Selector
             characterId={selectedCharacter}
             modelId={selectedModel}
-            activeFavoriteId={chat.activeFavoriteId}
-            onCharacterChange={setSelectedCharacter}
-            onModelChange={handleModelChange}
-            onActiveFavoriteChange={chat.setActiveFavoriteId}
             locale={locale}
             user={user}
             logger={logger}

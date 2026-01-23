@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,85 +50,81 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      action: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.browser.handle-dialog.form.fields.action.label",
-          description:
-            "app.api.browser.handle-dialog.form.fields.action.description",
-          placeholder:
-            "app.api.browser.handle-dialog.form.fields.action.placeholder",
-          columns: 6,
-          options: [
-            {
-              label:
-                "app.api.browser.handle-dialog.form.fields.action.options.accept" as const,
-              value: "accept",
-            },
-            {
-              label:
-                "app.api.browser.handle-dialog.form.fields.action.options.dismiss" as const,
-              value: "dismiss",
-            },
-          ],
-        },
-        z
+      action: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.browser.handle-dialog.form.fields.action.label",
+        description:
+          "app.api.browser.handle-dialog.form.fields.action.description",
+        placeholder:
+          "app.api.browser.handle-dialog.form.fields.action.placeholder",
+        columns: 6,
+        options: [
+          {
+            label:
+              "app.api.browser.handle-dialog.form.fields.action.options.accept" as const,
+            value: "accept",
+          },
+          {
+            label:
+              "app.api.browser.handle-dialog.form.fields.action.options.dismiss" as const,
+            value: "dismiss",
+          },
+        ],
+        schema: z
           .enum(["accept", "dismiss"])
           .describe("Whether to dismiss or accept the dialog"),
-      ),
-      promptText: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.browser.handle-dialog.form.fields.promptText.label",
-          description:
-            "app.api.browser.handle-dialog.form.fields.promptText.description",
-          placeholder:
-            "app.api.browser.handle-dialog.form.fields.promptText.placeholder",
-          columns: 6,
-        },
-        z
+      }),
+      promptText: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.browser.handle-dialog.form.fields.promptText.label",
+        description:
+          "app.api.browser.handle-dialog.form.fields.promptText.description",
+        placeholder:
+          "app.api.browser.handle-dialog.form.fields.promptText.placeholder",
+        columns: 6,
+        schema: z
           .string()
           .optional()
           .describe("Optional prompt text to enter into the dialog"),
-      ),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.handle-dialog.response.success",
-        },
-        z.boolean().describe("Whether the dialog handling operation succeeded"),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.handle-dialog.response.result",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.handle-dialog.response.success",
+        schema: z
+          .boolean()
+          .describe("Whether the dialog handling operation succeeded"),
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.handle-dialog.response.result",
+        schema: z
           .object({
             handled: z.boolean().describe("Whether the dialog was handled"),
             action: z.string().describe("The action taken"),
           })
           .optional()
           .describe("Result of the dialog handling"),
-      ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.handle-dialog.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.handle-dialog.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      }),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.handle-dialog.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.handle-dialog.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -145,7 +141,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

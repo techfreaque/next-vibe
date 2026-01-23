@@ -4,6 +4,15 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Get Lead Details",
     description: "Retrieve detailed information about a specific lead",
+    backButton: {
+      label: "Powrót do leadów",
+    },
+    editButton: {
+      label: "Edytuj leada",
+    },
+    deleteButton: {
+      label: "Usuń leada",
+    },
     id: {
       label: "Lead ID",
       description: "Unique identifier for the lead",
@@ -98,9 +107,6 @@ export const translations: typeof enTranslations = {
       signedUpAt: {
         content: "Signed Up At",
       },
-      consultationBookedAt: {
-        content: "Consultation Booked At",
-      },
       subscriptionConfirmedAt: {
         content: "Subscription Confirmed At",
       },
@@ -165,6 +171,16 @@ export const translations: typeof enTranslations = {
   patch: {
     title: "Update Lead",
     description: "Update lead information and status",
+    backButton: {
+      label: "Powrót do leada",
+    },
+    deleteButton: {
+      label: "Usuń leada",
+    },
+    submitButton: {
+      label: "Zaktualizuj leada",
+      loadingText: "Aktualizowanie leada...",
+    },
     id: {
       label: "Lead ID",
       description: "Unique identifier for the lead to update",
@@ -258,11 +274,6 @@ export const translations: typeof enTranslations = {
       description: "ID of the converted user account",
       placeholder: "User ID",
     },
-    consultationBookedAt: {
-      label: "Consultation Booked At",
-      description: "Date when consultation was booked",
-      placeholder: "Select date",
-    },
     subscriptionConfirmedAt: {
       label: "Subscription Confirmed At",
       description: "Date when subscription was confirmed",
@@ -353,9 +364,6 @@ export const translations: typeof enTranslations = {
       },
       signedUpAt: {
         content: "Signed Up At",
-      },
-      consultationBookedAt: {
-        content: "Consultation Booked At",
       },
       subscriptionConfirmedAt: {
         content: "Subscription Confirmed At",
@@ -466,6 +474,72 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Success",
       description: "Operation completed successfully",
+    },
+  },
+  delete: {
+    title: "Usuń leada",
+    description: "Usuń leada z systemu",
+    container: {
+      title: "Usuń leada",
+      description: "Czy na pewno chcesz trwale usunąć tego leada?",
+    },
+    backButton: {
+      label: "Powrót do leada",
+    },
+    submitButton: {
+      label: "Usuń leada",
+      loadingText: "Usuwanie leada...",
+    },
+    actions: {
+      delete: "Usuń leada",
+      deleting: "Usuwanie leada...",
+    },
+    id: {
+      label: "ID leada",
+      description: "Unikalny identyfikator leada do usunięcia",
+    },
+    errors: {
+      validation: {
+        title: "Błąd walidacji",
+        description: "Podane ID leada jest nieprawidłowe",
+      },
+      unauthorized: {
+        title: "Brak autoryzacji",
+        description: "Wymagana autentykacja aby usuwać leadów",
+      },
+      forbidden: {
+        title: "Dostęp zabroniony",
+        description: "Nie masz uprawnień do usunięcia tego leada",
+      },
+      notFound: {
+        title: "Lead nie znaleziony",
+        description: "Nie znaleziono leada z podanym ID",
+      },
+      conflict: {
+        title: "Konflikt usuwania",
+        description:
+          "Lead nie może być usunięty z powodu istniejących zależności",
+      },
+      server: {
+        title: "Błąd serwera",
+        description: "Wystąpił błąd podczas usuwania leada",
+      },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieoczekiwany błąd",
+      },
+      network: {
+        title: "Błąd sieci",
+        description: "Nie można połączyć się z serwerem",
+      },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Masz niezapisane zmiany",
+      },
+    },
+    success: {
+      title: "Lead usunięty",
+      description: "Lead został pomyślnie usunięty",
     },
   },
 };

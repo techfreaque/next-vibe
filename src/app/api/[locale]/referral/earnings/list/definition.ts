@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -55,24 +55,20 @@ export const { GET } = createEndpoint({
     { request: "data", response: true },
     {
       // Request fields
-      limit: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.browser.tags.browserAutomation",
-          description: "app.api.browser.tags.browserAutomation",
-        },
-        z.coerce.number().positive().optional(),
-      ),
-      offset: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.browser.tags.browserAutomation",
-          description: "app.api.browser.tags.browserAutomation",
-        },
-        z.coerce.number().min(0).optional(),
-      ),
+      limit: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.browser.tags.browserAutomation",
+        description: "app.api.browser.tags.browserAutomation",
+        schema: z.coerce.number().positive().optional(),
+      }),
+      offset: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.browser.tags.browserAutomation",
+        description: "app.api.browser.tags.browserAutomation",
+        schema: z.coerce.number().min(0).optional(),
+      }),
 
       // Response fields
       earnings: responseArrayField(
@@ -85,88 +81,68 @@ export const { GET } = createEndpoint({
           },
           { response: true },
           {
-            id: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.id",
-              },
-              z.string(),
-            ),
-            earnerUserId: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.earnerUserId",
-              },
-              z.string(),
-            ),
-            sourceUserId: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.sourceUserId",
-              },
-              z.string(),
-            ),
-            transactionId: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.transactionId",
-              },
-              z.string(),
-            ),
-            level: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.level",
-              },
-              z.coerce.number(),
-            ),
-            amountCents: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.amountCents",
-              },
-              z.coerce.number(),
-            ),
-            currency: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.currency",
-              },
-              z.string(),
-            ),
-            status: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.status",
-              },
-              z.string(),
-            ),
-            createdAt: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.createdAt",
-              },
-              z.string(),
-            ),
+            id: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.referral.earnings.list.get.response.earnings.id",
+              schema: z.string(),
+            }),
+            earnerUserId: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.referral.earnings.list.get.response.earnings.earnerUserId",
+              schema: z.string(),
+            }),
+            sourceUserId: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.referral.earnings.list.get.response.earnings.sourceUserId",
+              schema: z.string(),
+            }),
+            transactionId: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.referral.earnings.list.get.response.earnings.transactionId",
+              schema: z.string(),
+            }),
+            level: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.referral.earnings.list.get.response.earnings.level",
+              schema: z.coerce.number(),
+            }),
+            amountCents: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.referral.earnings.list.get.response.earnings.amountCents",
+              schema: z.coerce.number(),
+            }),
+            currency: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.referral.earnings.list.get.response.earnings.currency",
+              schema: z.string(),
+            }),
+            status: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.referral.earnings.list.get.response.earnings.status",
+              schema: z.string(),
+            }),
+            createdAt: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.referral.earnings.list.get.response.earnings.createdAt",
+              schema: z.string(),
+            }),
           },
         ),
       ),
-      totalCount: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.tags.browserAutomation",
-        },
-        z.coerce.number(),
-      ),
+      totalCount: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.tags.browserAutomation",
+        schema: z.coerce.number(),
+      }),
     },
   ),
 

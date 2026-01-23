@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,50 +50,40 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      text: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.browser.wait-for.form.fields.text.label",
-          description: "app.api.browser.wait-for.form.fields.text.description",
-          placeholder: "app.api.browser.wait-for.form.fields.text.placeholder",
-          columns: 8,
-        },
-        z.string().describe("Text to appear on the page"),
-      ),
-      timeout: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.browser.wait-for.form.fields.timeout.label",
-          description:
-            "app.api.browser.wait-for.form.fields.timeout.description",
-          placeholder:
-            "app.api.browser.wait-for.form.fields.timeout.placeholder",
-          columns: 4,
-        },
-        z
+      text: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.browser.wait-for.form.fields.text.label",
+        description: "app.api.browser.wait-for.form.fields.text.description",
+        placeholder: "app.api.browser.wait-for.form.fields.text.placeholder",
+        columns: 8,
+        schema: z.string().describe("Text to appear on the page"),
+      }),
+      timeout: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.browser.wait-for.form.fields.timeout.label",
+        description: "app.api.browser.wait-for.form.fields.timeout.description",
+        placeholder: "app.api.browser.wait-for.form.fields.timeout.placeholder",
+        columns: 4,
+        schema: z
           .number()
           .optional()
           .describe(
             "Maximum wait time in milliseconds. If set to 0, the default timeout will be used.",
           ),
-      ),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.wait-for.response.success",
-        },
-        z.boolean().describe("Whether the wait operation succeeded"),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.wait-for.response.result",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.wait-for.response.success",
+        schema: z.boolean().describe("Whether the wait operation succeeded"),
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.wait-for.response.result",
+        schema: z
           .object({
             found: z.boolean().describe("Whether the text was found"),
             waitTime: z
@@ -103,21 +93,23 @@ const { POST } = createEndpoint({
           })
           .optional()
           .describe("Result of wait operation"),
-      ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.wait-for.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.wait-for.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      }),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.wait-for.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.wait-for.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -134,7 +126,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

@@ -3,6 +3,7 @@
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
+import type { z } from "zod";
 
 import type {
   CreateApiEndpointAny,
@@ -34,6 +35,7 @@ import { FormAlertWidget } from "../implementations/FormAlertWidget";
 import { FormFieldWidget } from "../implementations/FormFieldWidget";
 import { GroupedListWidget } from "../implementations/GroupedListWidget";
 import { IconWidget } from "../implementations/IconWidget";
+import { KeyValueWidget } from "../implementations/KeyValueWidget";
 import { LinkCardWidget } from "../implementations/LinkCardWidget";
 import { LinkListWidget } from "../implementations/LinkListWidget";
 import { LinkWidget } from "../implementations/LinkWidget";
@@ -67,7 +69,7 @@ export interface WidgetRendererProps<TKey extends string> {
   /** Data to render in the widget */
   data: WidgetData;
   /** Field metadata from endpoint definition */
-  field: UnifiedField<TKey>;
+  field: UnifiedField<TKey, z.ZodTypeAny>;
   /** Render context (locale, platform, permissions, etc.) */
   context: WidgetRenderContext;
   /** Optional CSS class name */
@@ -172,7 +174,7 @@ export function WidgetRenderer<const TKey extends string>({
 function renderWidget<const TKey extends string>(
   widgetType: WidgetType,
   baseProps: {
-    field: UnifiedField<TKey>;
+    field: UnifiedField<TKey, z.ZodTypeAny>;
     fieldName?: string;
     value: WidgetData;
     context: WidgetRenderContext;
@@ -208,6 +210,16 @@ function renderWidget<const TKey extends string>(
       return (
         <MetadataWidget
           {...(baseProps as ReactWidgetProps<typeof WidgetType.METADATA, TKey>)}
+        />
+      );
+
+    case WidgetType.KEY_VALUE:
+      return (
+        <KeyValueWidget
+          {...(baseProps as ReactWidgetProps<
+            typeof WidgetType.KEY_VALUE,
+            TKey
+          >)}
         />
       );
 

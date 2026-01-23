@@ -9,10 +9,10 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   objectOptionalField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -52,79 +52,70 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      includePreservedMessages: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.browser.list-console-messages.form.fields.includePreservedMessages.label",
-          description:
-            "app.api.browser.list-console-messages.form.fields.includePreservedMessages.description",
-          placeholder:
-            "app.api.browser.list-console-messages.form.fields.includePreservedMessages.placeholder",
-          columns: 4,
-        },
-        z
+      includePreservedMessages: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.browser.list-console-messages.form.fields.includePreservedMessages.label",
+        description:
+          "app.api.browser.list-console-messages.form.fields.includePreservedMessages.description",
+        placeholder:
+          "app.api.browser.list-console-messages.form.fields.includePreservedMessages.placeholder",
+        columns: 4,
+        schema: z
           .boolean()
           .optional()
           .default(false)
           .describe(
             "Set to true to return the preserved messages over the last 3 navigations.",
           ),
-      ),
-      pageIdx: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.browser.list-console-messages.form.fields.pageIdx.label",
-          description:
-            "app.api.browser.list-console-messages.form.fields.pageIdx.description",
-          placeholder:
-            "app.api.browser.list-console-messages.form.fields.pageIdx.placeholder",
-          columns: 4,
-        },
-        z
+      }),
+      pageIdx: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.browser.list-console-messages.form.fields.pageIdx.label",
+        description:
+          "app.api.browser.list-console-messages.form.fields.pageIdx.description",
+        placeholder:
+          "app.api.browser.list-console-messages.form.fields.pageIdx.placeholder",
+        columns: 4,
+        schema: z
           .number()
           .min(0)
           .optional()
           .describe(
             "Page number to return (0-based). When omitted, returns the first page.",
           ),
-      ),
-      pageSize: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.browser.list-console-messages.form.fields.pageSize.label",
-          description:
-            "app.api.browser.list-console-messages.form.fields.pageSize.description",
-          placeholder:
-            "app.api.browser.list-console-messages.form.fields.pageSize.placeholder",
-          columns: 4,
-        },
-        z
+      }),
+      pageSize: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.browser.list-console-messages.form.fields.pageSize.label",
+        description:
+          "app.api.browser.list-console-messages.form.fields.pageSize.description",
+        placeholder:
+          "app.api.browser.list-console-messages.form.fields.pageSize.placeholder",
+        columns: 4,
+        schema: z
           .number()
           .min(1)
           .optional()
           .describe(
             "Maximum number of messages to return. When omitted, returns all messages.",
           ),
-      ),
-      types: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.browser.list-console-messages.form.fields.types.label",
-          description:
-            "app.api.browser.list-console-messages.form.fields.types.description",
-          placeholder:
-            "app.api.browser.list-console-messages.form.fields.types.placeholder",
-          columns: 12,
-        },
-        z
+      }),
+      types: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.browser.list-console-messages.form.fields.types.label",
+        description:
+          "app.api.browser.list-console-messages.form.fields.types.description",
+        placeholder:
+          "app.api.browser.list-console-messages.form.fields.types.placeholder",
+        columns: 12,
+        schema: z
           .array(
             z.enum([
               "log",
@@ -153,18 +144,16 @@ const { POST } = createEndpoint({
           .describe(
             "Filter messages to only return messages of the specified types. When omitted or empty, returns all messages.",
           ),
-      ),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.list-console-messages.response.success",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.list-console-messages.response.success",
+        schema: z
           .boolean()
           .describe("Whether the console messages listing operation succeeded"),
-      ),
+      }),
       result: objectOptionalField(
         {
           type: WidgetType.CONTAINER,
@@ -187,65 +176,57 @@ const { POST } = createEndpoint({
               },
               { response: true },
               {
-                msgid: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.list-console-messages.response.result.messages.msgid",
-                  },
-                  z.coerce.number(),
-                ),
-                type: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.list-console-messages.response.result.messages.type",
-                  },
-                  z.string(),
-                ),
-                text: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.list-console-messages.response.result.messages.text",
-                  },
-                  z.string(),
-                ),
-                timestamp: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.list-console-messages.response.result.messages.timestamp",
-                  },
-                  z.string().optional(),
-                ),
+                msgid: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.browser.list-console-messages.response.result.messages.msgid",
+                  schema: z.coerce.number(),
+                }),
+                type: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.browser.list-console-messages.response.result.messages.type",
+                  schema: z.string(),
+                }),
+                text: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.browser.list-console-messages.response.result.messages.text",
+                  schema: z.string(),
+                }),
+                timestamp: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.browser.list-console-messages.response.result.messages.timestamp",
+                  schema: z.string().optional(),
+                }),
               },
             ),
           ),
-          totalCount: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.browser.list-console-messages.response.result.totalCount",
-            },
-            z.coerce.number().describe("Total number of messages"),
-          ),
+          totalCount: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.browser.list-console-messages.response.result.totalCount",
+            schema: z.coerce.number().describe("Total number of messages"),
+          }),
         },
       ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.list-console-messages.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.list-console-messages.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.list-console-messages.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.list-console-messages.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -268,7 +249,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

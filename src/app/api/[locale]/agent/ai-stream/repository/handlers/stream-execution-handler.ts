@@ -9,6 +9,8 @@ import type { ReadableStreamDefaultController } from "node:stream/web";
 import type { ModelMessage } from "ai";
 import { stepCountIs, streamText as aiStreamText } from "ai";
 
+const DEFAULT_TEMPERATURE = 0.7;
+
 import type {
   ModelId,
   ModelOption,
@@ -31,7 +33,6 @@ export class StreamExecutionHandler {
     provider: ReturnType<typeof ProviderFactory.getProviderForModel>;
     modelConfig: ModelOption;
     messages: ModelMessage[];
-    temperature: number | undefined;
     streamAbortController: AbortController;
     systemPrompt: string;
     tools: Record<string, CoreTool> | undefined;
@@ -54,7 +55,6 @@ export class StreamExecutionHandler {
       provider,
       modelConfig,
       messages,
-      temperature,
       streamAbortController,
       systemPrompt,
       tools,
@@ -77,7 +77,7 @@ export class StreamExecutionHandler {
     const streamResult = aiStreamText({
       model: provider.chat(modelConfig.openRouterModel),
       messages,
-      temperature,
+      temperature: DEFAULT_TEMPERATURE,
       abortSignal: streamAbortController.signal,
       system: systemPrompt || undefined,
       ...(tools

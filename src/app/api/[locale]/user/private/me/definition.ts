@@ -11,9 +11,9 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   objectUnionField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -68,20 +68,16 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          isPublic: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.private.me.get.response.isPublic" as const,
-            },
-            z.literal(true),
-          ),
-          leadId: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.user.private.me.get.response.leadId" as const,
-            },
-            leadId,
-          ),
+          isPublic: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.user.private.me.get.response.isPublic" as const,
+            schema: z.literal(true),
+          }),
+          leadId: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.user.private.me.get.response.leadId" as const,
+            schema: leadId,
+          }),
         },
       ),
       // Private user variant (full profile)
@@ -96,117 +92,85 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          isPublic: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.private.me.get.response.isPublic" as const,
-            },
-            z.literal(false),
-          ),
-          id: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.user.private.me.get.response.id" as const,
-            },
-            z.uuid(),
-          ),
-          leadId: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.user.private.me.get.response.leadId" as const,
-            },
-            leadId.nullable(),
-          ),
-          email: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.user.private.me.get.response.email" as const,
-            },
-            z.email({ message: "validationErrors.user.profile.email_invalid" }),
-          ),
-          privateName: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.get.response.privateName" as const,
-            },
-            z.string(),
-          ),
-          publicName: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.get.response.publicName" as const,
-            },
-            z.string(),
-          ),
-          locale: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.user.private.me.get.response.locale" as const,
-            },
-            z.string() as z.ZodType<CountryLanguage>,
-          ),
-          isActive: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.private.me.get.response.isActive" as const,
-            },
-            z.boolean().nullable(),
-          ),
-          emailVerified: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.private.me.get.response.emailVerified" as const,
-            },
-            z.boolean().nullable(),
-          ),
-          requireTwoFactor: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.private.me.get.response.requireTwoFactor" as const,
-            },
-            z.boolean(),
-          ),
-          marketingConsent: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.private.me.get.response.marketingConsent" as const,
-            },
-            z.boolean(),
-          ),
-          userRoles: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.get.response.userRoles" as const,
-            },
-            z.array(userRoleResponseSchema),
-          ),
-          createdAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.get.response.createdAt" as const,
-            },
-            dateSchema,
-          ),
-          updatedAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.get.response.updatedAt" as const,
-            },
-            dateSchema,
-          ),
-          stripeCustomerId: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.get.response.stripeCustomerId" as const,
-            },
-            z.string().nullable(),
-          ),
+          isPublic: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.user.private.me.get.response.isPublic" as const,
+            schema: z.literal(false),
+          }),
+          id: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.user.private.me.get.response.id" as const,
+            schema: z.uuid(),
+          }),
+          leadId: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.user.private.me.get.response.leadId" as const,
+            schema: leadId.nullable(),
+          }),
+          email: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.user.private.me.get.response.email" as const,
+            schema: z.email({
+              message: "validationErrors.user.profile.email_invalid",
+            }),
+          }),
+          privateName: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.private.me.get.response.privateName" as const,
+            schema: z.string(),
+          }),
+          publicName: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.user.private.me.get.response.publicName" as const,
+            schema: z.string(),
+          }),
+          locale: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.user.private.me.get.response.locale" as const,
+            schema: z.string() as z.ZodType<CountryLanguage>,
+          }),
+          isActive: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.user.private.me.get.response.isActive" as const,
+            schema: z.boolean().nullable(),
+          }),
+          emailVerified: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.user.private.me.get.response.emailVerified" as const,
+            schema: z.boolean().nullable(),
+          }),
+          requireTwoFactor: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.user.private.me.get.response.requireTwoFactor" as const,
+            schema: z.boolean(),
+          }),
+          marketingConsent: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.user.private.me.get.response.marketingConsent" as const,
+            schema: z.boolean(),
+          }),
+          userRoles: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.user.private.me.get.response.userRoles" as const,
+            schema: z.array(userRoleResponseSchema),
+          }),
+          createdAt: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.user.private.me.get.response.createdAt" as const,
+            schema: dateSchema,
+          }),
+          updatedAt: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.user.private.me.get.response.updatedAt" as const,
+            schema: dateSchema,
+          }),
+          stripeCustomerId: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.private.me.get.response.stripeCustomerId" as const,
+            schema: z.string().nullable(),
+          }),
         },
       ),
     ] as const,
@@ -336,19 +300,17 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          privateName: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.user.private.me.update.fields.privateName.label" as const,
-              description:
-                "app.api.user.private.me.update.fields.privateName.description" as const,
-              placeholder:
-                "app.api.user.private.me.update.fields.privateName.placeholder" as const,
-              columns: 6,
-            },
-            z
+          privateName: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label:
+              "app.api.user.private.me.update.fields.privateName.label" as const,
+            description:
+              "app.api.user.private.me.update.fields.privateName.description" as const,
+            placeholder:
+              "app.api.user.private.me.update.fields.privateName.placeholder" as const,
+            columns: 6,
+            schema: z
               .string()
               .min(2, {
                 message:
@@ -359,21 +321,19 @@ const { POST } = createEndpoint({
                   "app.api.user.private.me.update.fields.privateName.validation.maxLength",
               })
               .optional(),
-          ),
+          }),
 
-          publicName: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.user.private.me.update.fields.publicName.label" as const,
-              description:
-                "app.api.user.private.me.update.fields.publicName.description" as const,
-              placeholder:
-                "app.api.user.private.me.update.fields.publicName.placeholder" as const,
-              columns: 6,
-            },
-            z
+          publicName: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label:
+              "app.api.user.private.me.update.fields.publicName.label" as const,
+            description:
+              "app.api.user.private.me.update.fields.publicName.description" as const,
+            placeholder:
+              "app.api.user.private.me.update.fields.publicName.placeholder" as const,
+            columns: 6,
+            schema: z
               .string()
               .min(2, {
                 message:
@@ -384,28 +344,25 @@ const { POST } = createEndpoint({
                   "app.api.user.private.me.update.fields.publicName.validation.maxLength",
               })
               .optional(),
-          ),
+          }),
 
-          email: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.EMAIL,
-              label:
-                "app.api.user.private.me.update.fields.email.label" as const,
-              description:
-                "app.api.user.private.me.update.fields.email.description" as const,
-              placeholder:
-                "app.api.user.private.me.update.fields.email.placeholder" as const,
-              columns: 12,
-            },
-            z
+          email: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.EMAIL,
+            label: "app.api.user.private.me.update.fields.email.label" as const,
+            description:
+              "app.api.user.private.me.update.fields.email.description" as const,
+            placeholder:
+              "app.api.user.private.me.update.fields.email.placeholder" as const,
+            columns: 12,
+            schema: z
               .string()
               .email({
                 message:
                   "app.api.user.private.me.update.fields.email.validation.invalid",
               })
               .optional(),
-          ),
+          }),
         },
       ),
 
@@ -421,18 +378,16 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          marketingConsent: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label:
-                "app.api.user.private.me.update.fields.marketingConsent.label" as const,
-              description:
-                "app.api.user.private.me.update.fields.marketingConsent.description" as const,
-              columns: 12,
-            },
-            z.boolean().optional(),
-          ),
+          marketingConsent: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.BOOLEAN,
+            label:
+              "app.api.user.private.me.update.fields.marketingConsent.label" as const,
+            description:
+              "app.api.user.private.me.update.fields.marketingConsent.description" as const,
+            columns: 12,
+            schema: z.boolean().optional(),
+          }),
         },
       ),
 
@@ -447,135 +402,102 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          success: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.private.me.update.response.success" as const,
-            },
-            z.boolean().describe("Whether the profile update was successful"),
-          ),
-          message: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.update.response.message" as const,
-            },
-            z.string().describe("Human-readable update status message"),
-          ),
+          success: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.user.private.me.update.response.success" as const,
+            schema: z
+              .boolean()
+              .describe("Whether the profile update was successful"),
+          }),
+          message: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.user.private.me.update.response.message" as const,
+            schema: z.string().describe("Human-readable update status message"),
+          }),
           // === USER FIELDS (FLATTENED) ===
-          id: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.user.private.me.update.response.id" as const,
-            },
-            z.uuid(),
-          ),
-          leadId: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.update.response.leadId" as const,
-            },
-            leadId.nullable(),
-          ),
-          isPublic: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.private.me.update.response.isPublic" as const,
-            },
-            z.literal(false),
-          ),
-          email: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.user.private.me.update.response.email" as const,
-            },
-            z.email({ message: "validationErrors.user.profile.email_invalid" }),
-          ),
-          privateName: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.update.response.privateName" as const,
-            },
-            z.string(),
-          ),
-          publicName: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.update.response.publicName" as const,
-            },
-            z.string(),
-          ),
-          locale: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.update.response.locale" as const,
-            },
-            z.string() as z.ZodType<CountryLanguage>,
-          ),
-          isActive: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.private.me.update.response.isActive" as const,
-            },
-            z.boolean().nullable(),
-          ),
-          emailVerified: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.private.me.update.response.emailVerified" as const,
-            },
-            z.boolean().nullable(),
-          ),
-          requireTwoFactor: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.private.me.update.response.requireTwoFactor" as const,
-            },
-            z.boolean().optional(),
-          ),
-          marketingConsent: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.private.me.update.response.marketingConsent" as const,
-            },
-            z.boolean().optional(),
-          ),
-          userRoles: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.update.response.userRoles" as const,
-            },
-            z.array(userRoleResponseSchema),
-          ),
-          createdAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.update.response.createdAt" as const,
-            },
-            dateSchema,
-          ),
-          updatedAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.update.response.updatedAt" as const,
-            },
-            dateSchema,
-          ),
-          stripeCustomerId: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.update.response.stripeCustomerId" as const,
-            },
-            z.string().nullable(),
-          ),
+          id: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.user.private.me.update.response.id" as const,
+            schema: z.uuid(),
+          }),
+          leadId: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.user.private.me.update.response.leadId" as const,
+            schema: leadId.nullable(),
+          }),
+          isPublic: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.user.private.me.update.response.isPublic" as const,
+            schema: z.literal(false),
+          }),
+          email: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.user.private.me.update.response.email" as const,
+            schema: z.email({
+              message: "validationErrors.user.profile.email_invalid",
+            }),
+          }),
+          privateName: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.private.me.update.response.privateName" as const,
+            schema: z.string(),
+          }),
+          publicName: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.private.me.update.response.publicName" as const,
+            schema: z.string(),
+          }),
+          locale: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.user.private.me.update.response.locale" as const,
+            schema: z.string() as z.ZodType<CountryLanguage>,
+          }),
+          isActive: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.user.private.me.update.response.isActive" as const,
+            schema: z.boolean().nullable(),
+          }),
+          emailVerified: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.user.private.me.update.response.emailVerified" as const,
+            schema: z.boolean().nullable(),
+          }),
+          requireTwoFactor: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.user.private.me.update.response.requireTwoFactor" as const,
+            schema: z.boolean().optional(),
+          }),
+          marketingConsent: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.user.private.me.update.response.marketingConsent" as const,
+            schema: z.boolean().optional(),
+          }),
+          userRoles: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.private.me.update.response.userRoles" as const,
+            schema: z.array(userRoleResponseSchema),
+          }),
+          createdAt: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.private.me.update.response.createdAt" as const,
+            schema: dateSchema,
+          }),
+          updatedAt: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.private.me.update.response.updatedAt" as const,
+            schema: dateSchema,
+          }),
+          stripeCustomerId: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.private.me.update.response.stripeCustomerId" as const,
+            schema: z.string().nullable(),
+          }),
           changesSummary: objectField(
             {
               type: WidgetType.CONTAINER,
@@ -588,53 +510,47 @@ const { POST } = createEndpoint({
             },
             { response: true },
             {
-              totalChanges: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.private.me.update.response.changesSummary.totalChanges" as const,
-                },
-                z.coerce.number().describe("Number of fields updated"),
-              ),
-              changedFields: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.private.me.update.response.changesSummary.changedFields" as const,
-                },
-                z.array(z.string()).describe("List of updated field names"),
-              ),
-              verificationRequired: responseField(
-                {
-                  type: WidgetType.BADGE,
-                  text: "app.api.user.private.me.update.response.changesSummary.verificationRequired" as const,
-                },
-                z.boolean().describe("Whether email verification is needed"),
-              ),
-              lastUpdated: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.private.me.update.response.changesSummary.lastUpdated" as const,
-                },
-                z
+              totalChanges: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.user.private.me.update.response.changesSummary.totalChanges" as const,
+                schema: z.coerce.number().describe("Number of fields updated"),
+              }),
+              changedFields: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.user.private.me.update.response.changesSummary.changedFields" as const,
+                schema: z
+                  .array(z.string())
+                  .describe("List of updated field names"),
+              }),
+              verificationRequired: responseField({
+                type: WidgetType.BADGE,
+                text: "app.api.user.private.me.update.response.changesSummary.verificationRequired" as const,
+                schema: z
+                  .boolean()
+                  .describe("Whether email verification is needed"),
+              }),
+              lastUpdated: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.user.private.me.update.response.changesSummary.lastUpdated" as const,
+                schema: z
                   .string()
                   .describe(
                     "When the profile was last updated (human-readable)",
                   ),
-              ),
+              }),
             },
           ),
-          nextSteps: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.update.response.nextSteps" as const,
-            },
-            z
+          nextSteps: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.private.me.update.response.nextSteps" as const,
+            schema: z
               .array(z.string())
               .describe("Recommended actions after profile update"),
-          ),
+          }),
         },
       ),
     },
@@ -823,13 +739,11 @@ const { DELETE } = createEndpoint({
     },
     { response: true },
     {
-      exists: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.user.private.me.delete.response.title" as const,
-        },
-        z.boolean(),
-      ),
+      exists: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.user.private.me.delete.response.title" as const,
+        schema: z.boolean(),
+      }),
     },
   ),
 

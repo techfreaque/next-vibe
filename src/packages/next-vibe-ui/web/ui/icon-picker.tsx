@@ -27,6 +27,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
  * Icon Picker props interface
  */
 export interface IconPickerProps {
+  name?: string;
   /** Current selected icon key */
   value?: IconKey;
   /** Callback when icon is selected */
@@ -45,6 +46,7 @@ export function IconPicker({
   onChange,
   className,
   size = "default",
+  name,
 }: IconPickerProps): JSX.Element {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -106,6 +108,7 @@ export function IconPicker({
               value={searchQuery}
               onChange={(e): void => setSearchQuery(e.target.value)}
               className="h-9"
+              name={name}
             />
           </Div>
 

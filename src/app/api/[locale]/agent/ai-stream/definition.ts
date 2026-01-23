@@ -14,9 +14,11 @@ import {
   objectField,
   objectOptionalField,
   requestDataArrayOptionalField,
-  requestDataField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+import {
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -67,187 +69,145 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === OPERATION context ===
-      operation: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.chat.aiStream.post.operation.label",
-          description: "app.api.agent.chat.aiStream.post.operation.description",
-          columns: 3,
-          options: [
-            {
-              value: "send",
-              label:
-                "app.api.agent.chat.aiStream.post.operation.options.send" as const,
-            },
-            {
-              value: "retry",
-              label:
-                "app.api.agent.chat.aiStream.post.operation.options.retry" as const,
-            },
-            {
-              value: "edit",
-              label:
-                "app.api.agent.chat.aiStream.post.operation.options.edit" as const,
-            },
-            {
-              value: "answer-as-ai",
-              label:
-                "app.api.agent.chat.aiStream.post.operation.options.answerAsAi" as const,
-            },
-          ],
-        },
-        z.enum(["send", "retry", "edit", "answer-as-ai"]).default("send"),
-      ),
-      rootFolderId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.chat.aiStream.post.rootFolderId.label",
-          description:
-            "app.api.agent.chat.aiStream.post.rootFolderId.description",
-          columns: 3,
-          options: [
-            {
-              value: DefaultFolderId.PRIVATE,
-              label: "app.api.agent.chat.config.folders.private" as const,
-            },
-            {
-              value: DefaultFolderId.SHARED,
-              label: "app.api.agent.chat.config.folders.shared" as const,
-            },
-            {
-              value: DefaultFolderId.PUBLIC,
-              label: "app.api.agent.chat.config.folders.public" as const,
-            },
-            {
-              value: DefaultFolderId.INCOGNITO,
-              label: "app.api.agent.chat.config.folders.incognito" as const,
-            },
-          ],
-        },
-        z.enum(DefaultFolderId),
-      ),
-      subFolderId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.aiStream.post.subFolderId.label",
-          description:
-            "app.api.agent.chat.aiStream.post.subFolderId.description",
-          columns: 3,
-        },
-        z.string().nullable(),
-      ),
-      threadId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.agent.chat.aiStream.post.threadId.label",
-          description: "app.api.agent.chat.aiStream.post.threadId.description",
-          columns: 3,
-        },
-        z.uuid(),
-      ),
-      userMessageId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.agent.chat.aiStream.post.userMessageId.label",
-          description:
-            "app.api.agent.chat.aiStream.post.userMessageId.description",
-          columns: 3,
-        },
-        z.uuid().nullable(),
-      ),
-      parentMessageId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.agent.chat.aiStream.post.parentMessageId.label",
-          description:
-            "app.api.agent.chat.aiStream.post.parentMessageId.description",
-          columns: 3,
-        },
-        z.uuid().nullable(),
-      ),
+      operation: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.agent.chat.aiStream.post.operation.label",
+        description: "app.api.agent.chat.aiStream.post.operation.description",
+        columns: 3,
+        options: [
+          {
+            value: "send",
+            label:
+              "app.api.agent.chat.aiStream.post.operation.options.send" as const,
+          },
+          {
+            value: "retry",
+            label:
+              "app.api.agent.chat.aiStream.post.operation.options.retry" as const,
+          },
+          {
+            value: "edit",
+            label:
+              "app.api.agent.chat.aiStream.post.operation.options.edit" as const,
+          },
+          {
+            value: "answer-as-ai",
+            label:
+              "app.api.agent.chat.aiStream.post.operation.options.answerAsAi" as const,
+          },
+        ],
+        schema: z
+          .enum(["send", "retry", "edit", "answer-as-ai"])
+          .default("send"),
+      }),
+      rootFolderId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.agent.chat.aiStream.post.rootFolderId.label",
+        description:
+          "app.api.agent.chat.aiStream.post.rootFolderId.description",
+        columns: 3,
+        options: [
+          {
+            value: DefaultFolderId.PRIVATE,
+            label: "app.api.agent.chat.config.folders.private" as const,
+          },
+          {
+            value: DefaultFolderId.SHARED,
+            label: "app.api.agent.chat.config.folders.shared" as const,
+          },
+          {
+            value: DefaultFolderId.PUBLIC,
+            label: "app.api.agent.chat.config.folders.public" as const,
+          },
+          {
+            value: DefaultFolderId.INCOGNITO,
+            label: "app.api.agent.chat.config.folders.incognito" as const,
+          },
+        ],
+        schema: z.enum(DefaultFolderId),
+      }),
+      subFolderId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.agent.chat.aiStream.post.subFolderId.label",
+        description: "app.api.agent.chat.aiStream.post.subFolderId.description",
+        columns: 3,
+        schema: z.string().nullable(),
+      }),
+      threadId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.agent.chat.aiStream.post.threadId.label",
+        description: "app.api.agent.chat.aiStream.post.threadId.description",
+        columns: 3,
+        schema: z.uuid(),
+      }),
+      userMessageId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.agent.chat.aiStream.post.userMessageId.label",
+        description:
+          "app.api.agent.chat.aiStream.post.userMessageId.description",
+        columns: 3,
+        schema: z.uuid().nullable(),
+      }),
+      parentMessageId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.agent.chat.aiStream.post.parentMessageId.label",
+        description:
+          "app.api.agent.chat.aiStream.post.parentMessageId.description",
+        columns: 3,
+        schema: z.uuid().nullable(),
+      }),
 
       // === MESSAGE CONTENT ===
-      content: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXTAREA,
-          label: "app.api.agent.chat.aiStream.post.content.label",
-          description: "app.api.agent.chat.aiStream.post.content.description",
-          columns: 12,
-          placeholder: "app.api.agent.chat.aiStream.post.content.placeholder",
-        },
+      content: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "app.api.agent.chat.aiStream.post.content.label",
+        description: "app.api.agent.chat.aiStream.post.content.description",
+        columns: 12,
+        placeholder: "app.api.agent.chat.aiStream.post.content.placeholder",
         // Allow empty content for answer-as-ai operation (AI generates its own response)
         // For other operations, content must be at least 1 character
-        z.string().max(10000),
-      ),
-      role: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.chat.aiStream.post.role.label",
-          description: "app.api.agent.chat.aiStream.post.role.description",
-          columns: 4,
-          options: ChatMessageRoleOptions,
-        },
-        z.enum(ChatMessageRole).default(ChatMessageRole.USER),
-      ),
+        schema: z.string().max(10000),
+      }),
+      role: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.agent.chat.aiStream.post.role.label",
+        description: "app.api.agent.chat.aiStream.post.role.description",
+        columns: 4,
+        options: ChatMessageRoleOptions,
+        schema: z.enum(ChatMessageRole).default(ChatMessageRole.USER),
+      }),
 
       // === AI CONFIGURATION ===
-      model: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.chat.aiStream.post.model.label",
-          description: "app.api.agent.chat.aiStream.post.model.description",
-          options: ModelIdOptions,
-          columns: 4,
-        },
-        z.enum(ModelId),
-      ),
-      character: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.aiStream.post.character.label",
-          description: "app.api.agent.chat.aiStream.post.character.description",
-          columns: 4,
-        },
-        z.string(),
-      ),
-      temperature: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.agent.chat.aiStream.post.temperature.label",
-          description:
-            "app.api.agent.chat.aiStream.post.temperature.description",
-          columns: 2,
-        },
-        z.coerce.number().min(0).max(2).default(0.7),
-      ),
-      maxTokens: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.agent.chat.aiStream.post.maxTokens.label",
-          description: "app.api.agent.chat.aiStream.post.maxTokens.description",
-          columns: 2,
-        },
-        z.coerce.number().min(1).max(10000).default(1000),
-      ),
+      model: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.agent.chat.aiStream.post.model.label",
+        description: "app.api.agent.chat.aiStream.post.model.description",
+        options: ModelIdOptions,
+        columns: 4,
+        schema: z.enum(ModelId),
+      }),
+      character: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.agent.chat.aiStream.post.character.label",
+        description: "app.api.agent.chat.aiStream.post.character.description",
+        columns: 4,
+        schema: z.string(),
+      }),
       tools: requestDataArrayOptionalField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.aiStream.post.tools.label",
+          type: WidgetType.DATA_LIST,
+          title: "app.api.agent.chat.aiStream.post.tools.label",
           description: "app.api.agent.chat.aiStream.post.tools.description",
-          columns: 12,
         },
         objectField(
           {
@@ -257,64 +217,76 @@ const { POST } = createEndpoint({
           },
           { request: "data" },
           {
-            toolId: requestDataField(
-              {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.TEXT,
-                label: "app.api.agent.chat.aiStream.post.tools.toolId.label",
-                description:
-                  "app.api.agent.chat.aiStream.post.tools.toolId.description",
-                columns: 6,
-              },
-              z.string(),
-            ),
-            requiresConfirmation: requestDataField(
-              {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.BOOLEAN,
-                label:
-                  "app.api.agent.chat.aiStream.post.tools.requiresConfirmation.label",
-                description:
-                  "app.api.agent.chat.aiStream.post.tools.requiresConfirmation.description",
-                columns: 6,
-              },
-              z.boolean().default(false),
-            ),
+            toolId: requestField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "app.api.agent.chat.aiStream.post.tools.toolId.label",
+              description:
+                "app.api.agent.chat.aiStream.post.tools.toolId.description",
+              columns: 6,
+              schema: z.string(),
+            }),
+            requiresConfirmation: requestField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.BOOLEAN,
+              label:
+                "app.api.agent.chat.aiStream.post.tools.requiresConfirmation.label",
+              description:
+                "app.api.agent.chat.aiStream.post.tools.requiresConfirmation.description",
+              columns: 6,
+              schema: z.boolean().default(false),
+            }),
           },
         ),
       ),
       toolConfirmations: requestDataArrayOptionalField(
         {
           type: WidgetType.DATA_LIST,
-          label: "app.api.agent.chat.aiStream.post.toolConfirmations.label",
+          title: "app.api.agent.chat.aiStream.post.toolConfirmations.label",
           description:
             "app.api.agent.chat.aiStream.post.toolConfirmation.description",
-          optional: true,
         },
-        z.object({
-          messageId: z.string().uuid(),
-          confirmed: z.boolean(),
-          updatedArgs: z
-            .record(
-              z.string(),
-              z.union([z.string(), z.coerce.number(), z.boolean(), z.null()]),
-            )
-            .optional(),
-        }),
+        objectField(
+          { type: WidgetType.CONTAINER },
+          { request: "data" },
+          {
+            messageId: requestField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              schema: z.string().uuid(),
+            }),
+            confirmed: requestField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.BOOLEAN,
+              schema: z.boolean(),
+            }),
+            updatedArgs: requestField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.JSON,
+              schema: z
+                .record(
+                  z.string(),
+                  z.union([
+                    z.string(),
+                    z.coerce.number(),
+                    z.boolean(),
+                    z.null(),
+                  ]),
+                )
+                .optional(),
+            }),
+          },
+        ),
       ),
 
       // === MESSAGE HISTORY (for incognito mode) ===
-      messageHistory: requestDataField(
-        {
-          type: WidgetType.DATA_LIST,
-          fieldType: FieldDataType.JSON,
-          label:
-            "app.api.agent.chat.aiStream.post.messageHistory.label" as const,
-          description:
-            "app.api.agent.chat.aiStream.post.messageHistory.description" as const,
-          optional: true,
-        },
-        z
+      messageHistory: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label: "app.api.agent.chat.aiStream.post.messageHistory.label" as const,
+        description:
+          "app.api.agent.chat.aiStream.post.messageHistory.description" as const,
+        schema: z
           .array(
             selectChatMessageSchema.extend({
               createdAt: dateSchema,
@@ -323,33 +295,32 @@ const { POST } = createEndpoint({
           )
           .optional()
           .nullable() as z.ZodType<ChatMessage[]>,
-      ),
+      }),
 
       // === FILE ATTACHMENTS ===
       attachments: requestDataArrayOptionalField(
         {
           type: WidgetType.DATA_LIST,
-          fieldType: FieldDataType.JSON,
-          label: "app.api.agent.chat.aiStream.post.attachments.label" as const,
+          title: "app.api.agent.chat.aiStream.post.attachments.label" as const,
           description:
             "app.api.agent.chat.aiStream.post.attachments.description" as const,
-          optional: true,
         },
-        z.instanceof(File),
+        requestField({
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.FILE,
+          schema: z.instanceof(File),
+        }),
       ),
 
       // === RESUMABLE STREAM SUPPORT ===
-      resumeToken: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.aiStream.post.resumeToken.label",
-          description:
-            "app.api.agent.chat.aiStream.post.resumeToken.description",
-          columns: 6,
-        },
-        z.string().nullable().optional(),
-      ),
+      resumeToken: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.agent.chat.aiStream.post.resumeToken.label",
+        description: "app.api.agent.chat.aiStream.post.resumeToken.description",
+        columns: 6,
+        schema: z.string().nullable().optional(),
+      }),
 
       // === VOICE MODE (TTS streaming) ===
       voiceMode: objectOptionalField(
@@ -362,40 +333,35 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          enabled: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.agent.chat.aiStream.post.voiceMode.enabled.label",
-              description:
-                "app.api.agent.chat.aiStream.post.voiceMode.enabled.description",
-              columns: 6,
-            },
-            z.boolean().default(false),
-          ),
-          voice: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.agent.chat.aiStream.post.voiceMode.voice.label",
-              description:
-                "app.api.agent.chat.aiStream.post.voiceMode.voice.description",
-              options: [
-                {
-                  value: TtsVoice.MALE,
-                  label:
-                    "app.api.agent.chat.aiStream.post.voiceMode.voice.male",
-                },
-                {
-                  value: TtsVoice.FEMALE,
-                  label:
-                    "app.api.agent.chat.aiStream.post.voiceMode.voice.female",
-                },
-              ],
-              columns: 6,
-            },
-            z.enum(TtsVoice).default(DEFAULT_TTS_VOICE),
-          ),
+          enabled: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.BOOLEAN,
+            label: "app.api.agent.chat.aiStream.post.voiceMode.enabled.label",
+            description:
+              "app.api.agent.chat.aiStream.post.voiceMode.enabled.description",
+            columns: 6,
+            schema: z.boolean().default(false),
+          }),
+          voice: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.agent.chat.aiStream.post.voiceMode.voice.label",
+            description:
+              "app.api.agent.chat.aiStream.post.voiceMode.voice.description",
+            options: [
+              {
+                value: TtsVoice.MALE,
+                label: "app.api.agent.chat.aiStream.post.voiceMode.voice.male",
+              },
+              {
+                value: TtsVoice.FEMALE,
+                label:
+                  "app.api.agent.chat.aiStream.post.voiceMode.voice.female",
+              },
+            ],
+            columns: 6,
+            schema: z.enum(TtsVoice).default(DEFAULT_TTS_VOICE),
+          }),
         },
       ),
 
@@ -412,17 +378,14 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          file: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.FILE,
-              label: "app.api.agent.chat.aiStream.post.audioInput.file.label",
-              description:
-                "app.api.agent.chat.aiStream.post.audioInput.file.description",
-              columns: 12,
-              optional: true,
-            },
-            z
+          file: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.FILE,
+            label: "app.api.agent.chat.aiStream.post.audioInput.file.label",
+            description:
+              "app.api.agent.chat.aiStream.post.audioInput.file.description",
+            columns: 12,
+            schema: z
               .instanceof(File)
               .refine((file) => file.size <= 25 * 1024 * 1024, {
                 message:
@@ -442,39 +405,31 @@ const { POST } = createEndpoint({
               )
               .nullable()
               .optional(),
-          ),
+          }),
         },
       ),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.aiStream.post.response.success",
-        },
-        z.boolean(),
-      ),
-      messageId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.aiStream.post.response.messageId",
-        },
-        z.string(),
-      ),
-      totalTokens: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.aiStream.post.response.totalTokens",
-        },
-        z.coerce.number().optional(),
-      ),
-      finishReason: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.aiStream.post.response.finishReason",
-        },
-        z.string().optional(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.agent.chat.aiStream.post.response.success",
+        schema: z.boolean(),
+      }),
+      messageId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.agent.chat.aiStream.post.response.messageId",
+        schema: z.string(),
+      }),
+      totalTokens: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.agent.chat.aiStream.post.response.totalTokens",
+        schema: z.coerce.number().optional(),
+      }),
+      finishReason: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.agent.chat.aiStream.post.response.finishReason",
+        schema: z.string().optional(),
+      }),
     },
   ),
 
@@ -543,8 +498,6 @@ const { POST } = createEndpoint({
         role: ChatMessageRole.USER,
         model: ModelId.GPT_5_MINI,
         character: "default",
-        temperature: 0.7,
-        maxTokens: 1000,
         tools: null,
         toolConfirmations: null,
         messageHistory: [],
@@ -564,8 +517,6 @@ const { POST } = createEndpoint({
         role: ChatMessageRole.USER,
         model: ModelId.GPT_5,
         character: "professional",
-        temperature: 0.8,
-        maxTokens: 1500,
         tools: null,
         toolConfirmations: null,
         messageHistory: [],
@@ -585,8 +536,6 @@ const { POST } = createEndpoint({
         role: ChatMessageRole.USER,
         model: ModelId.CLAUDE_SONNET_4_5,
         character: "default",
-        temperature: 0.7,
-        maxTokens: 1200,
         tools: null,
         toolConfirmations: null,
         messageHistory: [],
@@ -616,7 +565,6 @@ const { POST } = createEndpoint({
         finishReason: "stop",
       },
     },
-    urlPathParams: undefined,
   },
 });
 

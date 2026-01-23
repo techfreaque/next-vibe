@@ -9,7 +9,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -44,35 +44,27 @@ const { POST } = createEndpoint({
     },
     { response: true },
     {
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.user.private.logout.response.success" as const,
-        },
-        z.boolean(),
-      ),
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.user.private.logout.response.message" as const,
-        },
-        z.string(),
-      ),
-      sessionsCleaned: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.user.private.logout.response.sessionsCleaned" as const,
-        },
-        z.coerce.number(),
-      ),
-      nextSteps: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.user.private.logout.response.nextSteps" as const,
-        },
-        z.array(z.string()),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.user.private.logout.response.success" as const,
+        schema: z.boolean(),
+      }),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.user.private.logout.response.message" as const,
+        schema: z.string(),
+      }),
+      sessionsCleaned: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.user.private.logout.response.sessionsCleaned" as const,
+        schema: z.coerce.number(),
+      }),
+      nextSteps: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.user.private.logout.response.nextSteps" as const,
+        schema: z.array(z.string()),
+      }),
     },
   ),
 

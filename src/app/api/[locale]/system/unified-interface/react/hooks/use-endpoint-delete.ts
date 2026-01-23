@@ -82,7 +82,12 @@ export function useEndpointDelete<TEndpoint extends CreateApiEndpointAny>(
 
   // Create form instance
   const form = useForm<TEndpoint["types"]["RequestOutput"]>({
-    resolver: zodResolver(deleteEndpoint.requestSchema) as never,
+    resolver: zodResolver<
+      TEndpoint["types"]["RequestOutput"],
+      // oxlint-disable-next-line no-explicit-any
+      any,
+      TEndpoint["types"]["RequestOutput"]
+    >(deleteEndpoint.requestSchema),
     defaultValues,
   });
 

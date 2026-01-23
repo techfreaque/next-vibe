@@ -22,6 +22,9 @@ export const translations = {
       viewList: "List View",
       viewGrid: "Grid View",
     },
+    groupedList: {
+      showMore: "Show {{count}} more",
+    },
     linkList: {
       noResults: "No results found",
     },

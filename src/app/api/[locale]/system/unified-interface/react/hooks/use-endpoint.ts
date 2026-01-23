@@ -135,6 +135,7 @@ export function useEndpoint<
 
   const localStorageRead = useLocalStorageRead<T>(
     isLocalStorageMode ? readEndpoint : null,
+    logger,
     options.storage?.callbacks?.read,
     {
       urlPathParams: readUrlPathParams,
@@ -225,6 +226,7 @@ export function useEndpoint<
         options.formOptions?.defaultValues ??
         options.defaultValues,
       autoPrefillData: autoPrefillData ?? options.create?.autoPrefillData,
+      onSuccess: localStorageRead?.refetch,
     },
   );
 
@@ -434,6 +436,7 @@ export function useEndpoint<
       urlPathParams: updateUrlPathParams,
       defaultValues: updateFormOptions.defaultValues,
       autoPrefillData: updateAutoPrefillData,
+      onSuccess: localStorageRead?.refetch,
     },
   );
 

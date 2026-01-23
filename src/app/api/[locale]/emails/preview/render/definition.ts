@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,95 +37,82 @@ const { POST } = createEndpoint({
 
   fields: objectField(
     {
-      type: WidgetType.FORM_FIELD,
-      fieldType: FieldDataType.TEXT,
-      label: "app.api.emails.preview.render.post.container.title" as const,
+      type: WidgetType.CONTAINER,
+      title: "app.api.emails.preview.render.post.container.title" as const,
       columns: 12,
     },
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      templateId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.emails.preview.render.post.fields.templateId.label" as const,
-          description:
-            "app.api.emails.preview.render.post.fields.templateId.description" as const,
-          columns: 12,
-        },
-        z.string(),
-      ),
+      templateId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.emails.preview.render.post.fields.templateId.label" as const,
+        description:
+          "app.api.emails.preview.render.post.fields.templateId.description" as const,
+        columns: 12,
+        schema: z.string(),
+      }),
 
-      language: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.emails.preview.render.post.fields.language.label" as const,
-          description:
-            "app.api.emails.preview.render.post.fields.language.description" as const,
-          columns: 6,
-          options: LanguagesOptions,
-        },
-        z.enum(LanguagesArr),
-      ),
+      language: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.emails.preview.render.post.fields.language.label" as const,
+        description:
+          "app.api.emails.preview.render.post.fields.language.description" as const,
+        columns: 6,
+        options: LanguagesOptions,
+        schema: z.enum(LanguagesArr),
+      }),
 
-      country: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.emails.preview.render.post.fields.country.label" as const,
-          description:
-            "app.api.emails.preview.render.post.fields.country.description" as const,
-          columns: 6,
-          options: CountriesOptions,
-        },
-        z.enum(CountriesArr),
-      ),
+      country: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.emails.preview.render.post.fields.country.label" as const,
+        description:
+          "app.api.emails.preview.render.post.fields.country.description" as const,
+        columns: 6,
+        options: CountriesOptions,
+        schema: z.enum(CountriesArr),
+      }),
 
-      props: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.JSON,
-          label:
-            "app.api.emails.preview.render.post.fields.props.label" as const,
-          description:
-            "app.api.emails.preview.render.post.fields.props.description" as const,
-          columns: 12,
-        },
-        z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])),
-      ),
+      props: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label: "app.api.emails.preview.render.post.fields.props.label" as const,
+        description:
+          "app.api.emails.preview.render.post.fields.props.description" as const,
+        columns: 12,
+        schema: z.record(
+          z.string(),
+          z.union([z.string(), z.number(), z.boolean()]),
+        ),
+      }),
 
       // === RESPONSE FIELDS ===
-      html: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.preview.render.post.fields.html.title" as const,
-        },
-        z.string(),
-      ),
+      html: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.preview.render.post.fields.html.title" as const,
+        schema: z.string(),
+      }),
 
-      subject: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.preview.render.post.fields.subject.title" as const,
-        },
-        z.string(),
-      ),
+      subject: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.preview.render.post.fields.subject.title" as const,
+        schema: z.string(),
+      }),
 
-      templateVersion: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.preview.render.post.fields.templateVersion.title" as const,
-        },
-        z.string(),
-      ),
+      templateVersion: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.preview.render.post.fields.templateVersion.title" as const,
+        schema: z.string(),
+      }),
     },
   ),
 

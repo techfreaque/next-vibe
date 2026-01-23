@@ -12,13 +12,15 @@ import {
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
-  objectField,
   objectUnionField,
-  requestDataField,
   requestDataRangeField,
-  responseField,
   widgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+import {
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -33,19 +35,15 @@ import { ModelUtilityDB, ModelUtilityOptions } from "../../../models/enum";
 import { TtsVoiceDB, TtsVoiceOptions } from "../../../text-to-speech/enum";
 import {
   CONTENT_DISPLAY,
-  ContentLevelFilter,
-  ContentLevelFilterDB,
+  ContentLevel,
   INTELLIGENCE_DISPLAY,
-  IntelligenceLevelFilter,
-  IntelligenceLevelFilterDB,
+  IntelligenceLevel,
   ModelSelectionType,
   PRICE_DISPLAY,
-  PriceLevelFilter,
-  PriceLevelFilterDB,
+  PriceLevel,
   SPEED_DISPLAY,
-  SpeedLevelFilter,
-  SpeedLevelFilterDB,
-} from "../../favorites/enum";
+  SpeedLevel,
+} from "../../characters/enum";
 import { CategoryOptions } from "../enum";
 import {
   CharacterCategory,
@@ -73,7 +71,7 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       layoutType: LayoutType.STACKED,
-      border: false,
+      noCard: true,
       paddingTop: "6",
       submitButton: {
         text: "app.api.agent.chat.characters.post.submitButton.text" as const,
@@ -87,99 +85,84 @@ const { POST } = createEndpoint({
       // Back button navigation
       backButton: backButton(),
       // === REQUEST ===
-      name: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.characters.post.name.label" as const,
-          description:
-            "app.api.agent.chat.characters.post.name.description" as const,
-          columns: 6,
-        },
-        z.string().min(1).max(100),
-      ),
-      description: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.agent.chat.characters.post.characterDescription.label" as const,
-          description:
-            "app.api.agent.chat.characters.post.characterDescription.description" as const,
-          columns: 6,
-        },
-        z.string().min(1).max(500),
-      ),
-      icon: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.ICON,
-          label: "app.api.agent.chat.characters.post.icon.label" as const,
-          description:
-            "app.api.agent.chat.characters.post.icon.description" as const,
-          columns: 6,
-        },
-        iconSchema,
-      ),
-      systemPrompt: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXTAREA,
-          label:
-            "app.api.agent.chat.characters.post.systemPrompt.label" as const,
-          description:
-            "app.api.agent.chat.characters.post.systemPrompt.description" as const,
-          columns: 12,
-        },
-        z.string().min(1).max(5000).optional(),
-      ),
-      category: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.chat.characters.post.category.label" as const,
-          description:
-            "app.api.agent.chat.characters.post.category.description" as const,
-          options: CategoryOptions,
-          columns: 6,
-        },
-        z.enum(CharacterCategoryDB),
-      ),
-      tagline: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.characters.post.tagline.label" as const,
-          description:
-            "app.api.agent.chat.characters.post.tagline.description" as const,
-          columns: 6,
-        },
-        z.string().min(1).max(500),
-      ),
-      ownershipType: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.agent.chat.characters.post.ownershipType.label" as const,
-          description:
-            "app.api.agent.chat.characters.post.ownershipType.description" as const,
-          options: [
-            {
-              value: CharacterOwnershipType.USER,
-              label:
-                "app.api.agent.chat.characters.enums.ownershipType.user" as const,
-            },
-            {
-              value: CharacterOwnershipType.PUBLIC,
-              label:
-                "app.api.agent.chat.characters.enums.ownershipType.public" as const,
-            },
-          ],
-          columns: 6,
-        },
-        z.enum(CharacterOwnershipTypeDB),
-      ),
+      name: requestField({
+        schema: z.string().min(1).max(100),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.agent.chat.characters.post.name.label" as const,
+        description:
+          "app.api.agent.chat.characters.post.name.description" as const,
+        columns: 6,
+      }),
+      description: requestField({
+        schema: z.string().min(1).max(500),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.agent.chat.characters.post.characterDescription.label" as const,
+        description:
+          "app.api.agent.chat.characters.post.characterDescription.description" as const,
+        columns: 6,
+      }),
+      icon: requestField({
+        schema: iconSchema,
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.ICON,
+        label: "app.api.agent.chat.characters.post.icon.label" as const,
+        description:
+          "app.api.agent.chat.characters.post.icon.description" as const,
+        columns: 6,
+      }),
+      systemPrompt: requestField({
+        schema: z.string().min(1).max(5000),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "app.api.agent.chat.characters.post.systemPrompt.label" as const,
+        description:
+          "app.api.agent.chat.characters.post.systemPrompt.description" as const,
+        columns: 12,
+      }),
+      category: requestField({
+        schema: z.enum(CharacterCategoryDB),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.agent.chat.characters.post.category.label" as const,
+        description:
+          "app.api.agent.chat.characters.post.category.description" as const,
+        options: CategoryOptions,
+        columns: 6,
+      }),
+      tagline: requestField({
+        schema: z.string().min(1).max(500),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.agent.chat.characters.post.tagline.label" as const,
+        description:
+          "app.api.agent.chat.characters.post.tagline.description" as const,
+        columns: 6,
+      }),
+      ownershipType: requestField({
+        schema: z.enum(CharacterOwnershipTypeDB),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.agent.chat.characters.post.ownershipType.label" as const,
+        description:
+          "app.api.agent.chat.characters.post.ownershipType.description" as const,
+        options: [
+          {
+            value: CharacterOwnershipType.USER,
+            label:
+              "app.api.agent.chat.characters.enums.ownershipType.user" as const,
+          },
+          {
+            value: CharacterOwnershipType.PUBLIC,
+            label:
+              "app.api.agent.chat.characters.enums.ownershipType.public" as const,
+          },
+        ],
+        columns: 6,
+      }),
       // Model Selection - discriminated union between manual and filter-based
       modelSelection: objectUnionField(
         {
@@ -203,28 +186,26 @@ const { POST } = createEndpoint({
             },
             { request: "data" },
             {
-              selectionType: requestDataField(
-                {
-                  type: WidgetType.FORM_FIELD,
-                  fieldType: FieldDataType.FILTER_PILLS,
-                  label:
-                    "app.api.agent.chat.characters.post.selectionType.label" as const,
-                  options: [
-                    {
-                      value: ModelSelectionType.MANUAL,
-                      label:
-                        "app.api.agent.chat.characters.post.selectionType.manual" as const,
-                    },
-                    {
-                      value: ModelSelectionType.FILTERS,
-                      label:
-                        "app.api.agent.chat.characters.post.selectionType.filters" as const,
-                    },
-                  ],
-                  columns: 12,
-                },
-                z.literal(ModelSelectionType.MANUAL),
-              ),
+              selectionType: requestField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.FILTER_PILLS,
+                label:
+                  "app.api.agent.chat.characters.post.selectionType.label" as const,
+                options: [
+                  {
+                    value: ModelSelectionType.MANUAL,
+                    label:
+                      "app.api.agent.chat.characters.post.selectionType.manual" as const,
+                  },
+                  {
+                    value: ModelSelectionType.FILTERS,
+                    label:
+                      "app.api.agent.chat.characters.post.selectionType.filters" as const,
+                  },
+                ],
+                columns: 12,
+                schema: z.literal(ModelSelectionType.MANUAL),
+              }),
               modelDisplay: widgetField(
                 {
                   type: WidgetType.MODEL_DISPLAY,
@@ -232,19 +213,17 @@ const { POST } = createEndpoint({
                 },
                 { request: "data" },
               ),
-              manualModelId: requestDataField(
-                {
-                  type: WidgetType.FORM_FIELD,
-                  fieldType: FieldDataType.SELECT,
-                  label:
-                    "app.api.agent.chat.characters.post.manualModelId.label" as const,
-                  description:
-                    "app.api.agent.chat.characters.post.manualModelId.description" as const,
-                  options: ModelIdOptions,
-                  columns: 12,
-                },
-                z.enum(ModelId),
-              ),
+              manualModelId: requestField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.SELECT,
+                label:
+                  "app.api.agent.chat.characters.post.manualModelId.label" as const,
+                description:
+                  "app.api.agent.chat.characters.post.manualModelId.description" as const,
+                options: ModelIdOptions,
+                columns: 12,
+                schema: z.enum(ModelId),
+              }),
             },
           ),
           // Variant 2: Filter-based selection
@@ -255,28 +234,26 @@ const { POST } = createEndpoint({
             },
             { request: "data" },
             {
-              selectionType: requestDataField(
-                {
-                  type: WidgetType.FORM_FIELD,
-                  fieldType: FieldDataType.FILTER_PILLS,
-                  label:
-                    "app.api.agent.chat.characters.post.selectionType.label" as const,
-                  options: [
-                    {
-                      value: ModelSelectionType.MANUAL,
-                      label:
-                        "app.api.agent.chat.characters.post.selectionType.manual" as const,
-                    },
-                    {
-                      value: ModelSelectionType.FILTERS,
-                      label:
-                        "app.api.agent.chat.characters.post.selectionType.filters" as const,
-                    },
-                  ],
-                  columns: 12,
-                },
-                z.literal(ModelSelectionType.FILTERS),
-              ),
+              selectionType: requestField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.FILTER_PILLS,
+                label:
+                  "app.api.agent.chat.characters.post.selectionType.label" as const,
+                options: [
+                  {
+                    value: ModelSelectionType.MANUAL,
+                    label:
+                      "app.api.agent.chat.characters.post.selectionType.manual" as const,
+                  },
+                  {
+                    value: ModelSelectionType.FILTERS,
+                    label:
+                      "app.api.agent.chat.characters.post.selectionType.filters" as const,
+                  },
+                ],
+                columns: 12,
+                schema: z.literal(ModelSelectionType.FILTERS),
+              }),
               modelDisplay: widgetField(
                 {
                   type: WidgetType.MODEL_DISPLAY,
@@ -284,161 +261,130 @@ const { POST } = createEndpoint({
                 },
                 { request: "data" },
               ),
-              intelligenceRange: requestDataRangeField(
-                {
-                  type: WidgetType.FORM_FIELD,
-                  fieldType: FieldDataType.RANGE_SLIDER,
-                  label:
-                    "app.api.agent.chat.characters.post.intelligenceRange.label" as const,
-                  description:
-                    "app.api.agent.chat.characters.post.intelligenceRange.description" as const,
-                  options: INTELLIGENCE_DISPLAY.map((tier) => ({
-                    label: tier.label,
-                    value: tier.value,
-                    icon: tier.icon,
-                    description: tier.description,
-                  })),
-                  minLabel:
-                    "app.api.agent.chat.characters.post.intelligenceRange.minLabel" as const,
-                  maxLabel:
-                    "app.api.agent.chat.characters.post.intelligenceRange.maxLabel" as const,
-                  columns: 12,
-                },
-                z.enum(IntelligenceLevelFilterDB),
-              ),
-              priceRange: requestDataRangeField(
-                {
-                  type: WidgetType.FORM_FIELD,
-                  fieldType: FieldDataType.RANGE_SLIDER,
-                  label:
-                    "app.api.agent.chat.characters.post.priceRange.label" as const,
-                  description:
-                    "app.api.agent.chat.characters.post.priceRange.description" as const,
-                  options: PRICE_DISPLAY.map((tier) => ({
-                    label: tier.label,
-                    value: tier.value,
-                    icon: tier.icon,
-                    description: tier.description,
-                  })),
-                  minLabel:
-                    "app.api.agent.chat.characters.post.priceRange.minLabel" as const,
-                  maxLabel:
-                    "app.api.agent.chat.characters.post.priceRange.maxLabel" as const,
-                  columns: 12,
-                },
-                z.enum(PriceLevelFilterDB),
-              ),
-              contentRange: requestDataRangeField(
-                {
-                  type: WidgetType.FORM_FIELD,
-                  fieldType: FieldDataType.RANGE_SLIDER,
-                  label:
-                    "app.api.agent.chat.characters.post.contentRange.label" as const,
-                  description:
-                    "app.api.agent.chat.characters.post.contentRange.description" as const,
-                  options: CONTENT_DISPLAY.map((tier) => ({
-                    label: tier.label,
-                    value: tier.value,
-                    icon: tier.icon,
-                    description: tier.description,
-                  })),
-                  minLabel:
-                    "app.api.agent.chat.characters.post.contentRange.minLabel" as const,
-                  maxLabel:
-                    "app.api.agent.chat.characters.post.contentRange.maxLabel" as const,
-                  columns: 12,
-                },
-                z.enum(ContentLevelFilterDB),
-              ),
-              speedRange: requestDataRangeField(
-                {
-                  type: WidgetType.FORM_FIELD,
-                  fieldType: FieldDataType.RANGE_SLIDER,
-                  label:
-                    "app.api.agent.chat.characters.post.speedRange.label" as const,
-                  description:
-                    "app.api.agent.chat.characters.post.speedRange.description" as const,
-                  options: SPEED_DISPLAY.map((tier) => ({
-                    label: tier.label,
-                    value: tier.value,
-                    icon: tier.icon,
-                    description: tier.description,
-                  })),
-                  minLabel:
-                    "app.api.agent.chat.characters.post.speedRange.minLabel" as const,
-                  maxLabel:
-                    "app.api.agent.chat.characters.post.speedRange.maxLabel" as const,
-                  columns: 12,
-                },
-                z.enum(SpeedLevelFilterDB),
-              ),
-              preferredStrengths: requestDataField(
-                {
-                  type: WidgetType.FORM_FIELD,
-                  fieldType: FieldDataType.MULTISELECT,
-                  label:
-                    "app.api.agent.chat.characters.post.preferredStrengths.label" as const,
-                  description:
-                    "app.api.agent.chat.characters.post.preferredStrengths.description" as const,
-                  options: ModelUtilityOptions,
-                  columns: 6,
-                },
-                z.array(z.enum(ModelUtilityDB)).nullable().optional(),
-              ),
-              ignoredWeaknesses: requestDataField(
-                {
-                  type: WidgetType.FORM_FIELD,
-                  fieldType: FieldDataType.MULTISELECT,
-                  label:
-                    "app.api.agent.chat.characters.post.ignoredWeaknesses.label" as const,
-                  description:
-                    "app.api.agent.chat.characters.post.ignoredWeaknesses.description" as const,
-                  options: ModelUtilityOptions,
-                  columns: 6,
-                },
-                z.array(z.enum(ModelUtilityDB)).nullable().optional(),
-              ),
+              intelligenceRange: requestDataRangeField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.RANGE_SLIDER,
+                label:
+                  "app.api.agent.chat.characters.post.intelligenceRange.label" as const,
+                description:
+                  "app.api.agent.chat.characters.post.intelligenceRange.description" as const,
+                options: INTELLIGENCE_DISPLAY.map((tier) => ({
+                  label: tier.label,
+                  value: tier.value,
+                  icon: tier.icon,
+                  description: tier.description,
+                })),
+                minLabel:
+                  "app.api.agent.chat.characters.post.intelligenceRange.minLabel" as const,
+                maxLabel:
+                  "app.api.agent.chat.characters.post.intelligenceRange.maxLabel" as const,
+                columns: 12,
+                schema: z.enum(IntelligenceLevel),
+              }),
+              priceRange: requestDataRangeField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.RANGE_SLIDER,
+                label:
+                  "app.api.agent.chat.characters.post.priceRange.label" as const,
+                description:
+                  "app.api.agent.chat.characters.post.priceRange.description" as const,
+                options: PRICE_DISPLAY.map((tier) => ({
+                  label: tier.label,
+                  value: tier.value,
+                  icon: tier.icon,
+                  description: tier.description,
+                })),
+                minLabel:
+                  "app.api.agent.chat.characters.post.priceRange.minLabel" as const,
+                maxLabel:
+                  "app.api.agent.chat.characters.post.priceRange.maxLabel" as const,
+                columns: 12,
+                schema: z.enum(PriceLevel),
+              }),
+              contentRange: requestDataRangeField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.RANGE_SLIDER,
+                label:
+                  "app.api.agent.chat.characters.post.contentRange.label" as const,
+                description:
+                  "app.api.agent.chat.characters.post.contentRange.description" as const,
+                options: CONTENT_DISPLAY.map((tier) => ({
+                  label: tier.label,
+                  value: tier.value,
+                  icon: tier.icon,
+                  description: tier.description,
+                })),
+                minLabel:
+                  "app.api.agent.chat.characters.post.contentRange.minLabel" as const,
+                maxLabel:
+                  "app.api.agent.chat.characters.post.contentRange.maxLabel" as const,
+                columns: 12,
+                schema: z.enum(ContentLevel),
+              }),
+              speedRange: requestDataRangeField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.RANGE_SLIDER,
+                label:
+                  "app.api.agent.chat.characters.post.speedRange.label" as const,
+                description:
+                  "app.api.agent.chat.characters.post.speedRange.description" as const,
+                options: SPEED_DISPLAY.map((tier) => ({
+                  label: tier.label,
+                  value: tier.value,
+                  icon: tier.icon,
+                  description: tier.description,
+                })),
+                minLabel:
+                  "app.api.agent.chat.characters.post.speedRange.minLabel" as const,
+                maxLabel:
+                  "app.api.agent.chat.characters.post.speedRange.maxLabel" as const,
+                columns: 12,
+                schema: z.enum(SpeedLevel),
+              }),
+              preferredStrengths: requestField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.MULTISELECT,
+                label:
+                  "app.api.agent.chat.characters.post.preferredStrengths.label" as const,
+                description:
+                  "app.api.agent.chat.characters.post.preferredStrengths.description" as const,
+                options: ModelUtilityOptions,
+                columns: 6,
+                schema: z.array(z.enum(ModelUtilityDB)).nullable().optional(),
+              }),
+              ignoredWeaknesses: requestField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.MULTISELECT,
+                label:
+                  "app.api.agent.chat.characters.post.ignoredWeaknesses.label" as const,
+                description:
+                  "app.api.agent.chat.characters.post.ignoredWeaknesses.description" as const,
+                options: ModelUtilityOptions,
+                columns: 6,
+                schema: z.array(z.enum(ModelUtilityDB)).nullable().optional(),
+              }),
             },
           ),
         ],
       ),
-      voice: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.chat.characters.post.voice.label" as const,
-          description:
-            "app.api.agent.chat.characters.post.voice.description" as const,
-          options: TtsVoiceOptions,
-          columns: 6,
-        },
-        z.enum(TtsVoiceDB).optional(),
-      ),
-      suggestedPrompts: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TAGS,
-          label:
-            "app.api.agent.chat.characters.post.suggestedPrompts.label" as const,
-          description:
-            "app.api.agent.chat.characters.post.suggestedPrompts.description" as const,
-          placeholder:
-            "app.api.agent.chat.characters.post.suggestedPrompts.placeholder" as const,
-          columns: 12,
-          maxTags: 4,
-        },
-        z.array(z.string()).max(4).optional(),
-      ),
+      voice: requestField({
+        schema: z.enum(TtsVoiceDB).optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.agent.chat.characters.post.voice.label" as const,
+        description:
+          "app.api.agent.chat.characters.post.voice.description" as const,
+        options: TtsVoiceOptions,
+        columns: 6,
+      }),
 
       // === RESPONSE ===
-      id: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.characters.post.response.id.content" as const,
-        },
-        z.string(),
-      ),
+      id: responseField({
+        schema: z.string(),
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.characters.post.response.id.content" as const,
+      }),
     },
   ),
 
@@ -519,10 +465,6 @@ const { POST } = createEndpoint({
           manualModelId: ModelId.GPT_5,
         },
         voice: undefined,
-        suggestedPrompts: [
-          "Review this code for bugs",
-          "Suggest performance improvements",
-        ],
       },
       createManual: {
         name: "Code Reviewer",
@@ -538,10 +480,6 @@ const { POST } = createEndpoint({
           manualModelId: ModelId.GPT_5,
         },
         voice: undefined,
-        suggestedPrompts: [
-          "Review this code for bugs",
-          "Suggest performance improvements",
-        ],
       },
       // Example with filter-based model selection
       createFilters: {
@@ -556,29 +494,25 @@ const { POST } = createEndpoint({
         modelSelection: {
           selectionType: ModelSelectionType.FILTERS,
           intelligenceRange: {
-            min: IntelligenceLevelFilter.BRILLIANT,
-            max: IntelligenceLevelFilter.BRILLIANT,
+            min: IntelligenceLevel.BRILLIANT,
+            max: IntelligenceLevel.BRILLIANT,
           },
           priceRange: {
-            min: PriceLevelFilter.CHEAP,
-            max: PriceLevelFilter.STANDARD,
+            min: PriceLevel.CHEAP,
+            max: PriceLevel.STANDARD,
           },
           contentRange: {
-            min: ContentLevelFilter.OPEN,
-            max: ContentLevelFilter.UNCENSORED,
+            min: ContentLevel.OPEN,
+            max: ContentLevel.UNCENSORED,
           },
           speedRange: {
-            min: SpeedLevelFilter.FAST,
-            max: SpeedLevelFilter.THOROUGH,
+            min: SpeedLevel.FAST,
+            max: SpeedLevel.THOROUGH,
           },
           preferredStrengths: null,
           ignoredWeaknesses: null,
         },
         voice: undefined,
-        suggestedPrompts: [
-          "Help me develop a character",
-          "Create a story outline",
-        ],
       },
     },
     responses: {
@@ -592,7 +526,6 @@ const { POST } = createEndpoint({
         id: "550e8400-e29b-41d4-a716-446655440002",
       },
     },
-    urlPathParams: undefined,
   },
 });
 
@@ -605,6 +538,28 @@ export type CharacterCreateResponseOutput = typeof POST.types.ResponseOutput;
 // Character field type aliases
 export type CharacterModelSelection =
   CharacterCreateRequestOutput["modelSelection"];
+
+// Type for filter-based model selection
+export type FiltersModelSelection = Extract<
+  CharacterModelSelection,
+  { selectionType: typeof ModelSelectionType.FILTERS }
+>;
+export type ManualModelSelection = Extract<
+  CharacterModelSelection,
+  { selectionType: typeof ModelSelectionType.MANUAL }
+>;
+
+export function isFiltersSelection(
+  sel: CharacterModelSelection,
+): sel is FiltersModelSelection {
+  return sel.selectionType === ModelSelectionType.FILTERS;
+}
+
+export function isManualSelection(
+  sel: CharacterModelSelection,
+): sel is ManualModelSelection {
+  return sel.selectionType === ModelSelectionType.MANUAL;
+}
 
 const definitions = { POST } as const;
 export default definitions;

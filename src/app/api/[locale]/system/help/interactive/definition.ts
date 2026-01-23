@@ -9,7 +9,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -49,13 +49,11 @@ const { POST } = createEndpoint({
     },
     { response: true },
     {
-      started: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.help.interactive.response.started",
-        },
-        z.boolean(),
-      ),
+      started: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.help.interactive.response.started",
+        schema: z.boolean(),
+      }),
     },
   ),
 

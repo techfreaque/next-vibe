@@ -17,10 +17,10 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
   scopedObjectField,
-  scopedRequestDataField,
+  scopedRequestField,
   scopedResponseArrayOptionalField,
   scopedResponseField,
-} from "../system/unified-interface/shared/field/utils";
+} from "../system/unified-interface/shared/field/utils-new";
 import {
   ContactPriority,
   ContactPriorityOptions,
@@ -72,99 +72,75 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      name: scopedRequestDataField(
-        scopedTranslation,
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "form.fields.name.label",
-          description: "form.fields.name.description",
-          placeholder: "form.fields.name.placeholder",
-          columns: 6,
-        },
-        z.string().min(2),
-      ),
-      email: scopedRequestDataField(
-        scopedTranslation,
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.EMAIL,
-          label: "form.fields.email.label",
-          description: "form.fields.email.description",
-          placeholder: "form.fields.email.placeholder",
-          columns: 6,
-        },
-        z.string().email(),
-      ),
-      company: scopedRequestDataField(
-        scopedTranslation,
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "form.fields.company.label",
-          description: "form.fields.company.description",
-          placeholder: "form.fields.company.placeholder",
-          columns: 12,
-        },
-        z.string().optional(),
-      ),
-      subject: scopedRequestDataField(
-        scopedTranslation,
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "form.fields.subject.label",
-          description: "form.fields.subject.description",
-          placeholder: "form.fields.subject.placeholder",
-          options: ContactSubjectOptions,
-          columns: 12,
-        },
-        z.enum(ContactSubject),
-      ),
-      message: scopedRequestDataField(
-        scopedTranslation,
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXTAREA,
-          label: "form.fields.message.label",
-          description: "form.fields.message.description",
-          placeholder: "form.fields.message.placeholder",
-          columns: 12,
-        },
-        z.string().min(10),
-      ),
-      priority: scopedRequestDataField(
-        scopedTranslation,
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "form.fields.priority.label",
-          description: "form.fields.priority.description",
-          placeholder: "form.fields.priority.placeholder",
-          options: ContactPriorityOptions,
-          columns: 12,
-        },
-        z.enum(ContactPriority).optional(),
-      ),
+      name: scopedRequestField(scopedTranslation, {
+        schema: z.string().min(2),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "form.fields.name.label",
+        description: "form.fields.name.description",
+        placeholder: "form.fields.name.placeholder",
+        columns: 6,
+      }),
+      email: scopedRequestField(scopedTranslation, {
+        schema: z.string().email(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label: "form.fields.email.label",
+        description: "form.fields.email.description",
+        placeholder: "form.fields.email.placeholder",
+        columns: 6,
+      }),
+      company: scopedRequestField(scopedTranslation, {
+        schema: z.string().optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "form.fields.company.label",
+        description: "form.fields.company.description",
+        placeholder: "form.fields.company.placeholder",
+        columns: 12,
+      }),
+      subject: scopedRequestField(scopedTranslation, {
+        schema: z.enum(ContactSubject),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "form.fields.subject.label",
+        description: "form.fields.subject.description",
+        placeholder: "form.fields.subject.placeholder",
+        options: ContactSubjectOptions,
+        columns: 12,
+      }),
+      message: scopedRequestField(scopedTranslation, {
+        schema: z.string().min(10),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "form.fields.message.label",
+        description: "form.fields.message.description",
+        placeholder: "form.fields.message.placeholder",
+        columns: 12,
+      }),
+      priority: scopedRequestField(scopedTranslation, {
+        schema: z.enum(ContactPriority).optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "form.fields.priority.label",
+        description: "form.fields.priority.description",
+        placeholder: "form.fields.priority.placeholder",
+        options: ContactPriorityOptions,
+        columns: 12,
+      }),
 
       // === RESPONSE FIELDS ===
       // Note: leadId comes from JWT payload (user.leadId) on server-side
-      success: scopedResponseField(
-        scopedTranslation,
-        {
-          type: WidgetType.TEXT,
-          content: "response.success",
-        },
-        z.boolean(),
-      ),
-      messageId: scopedResponseField(
-        scopedTranslation,
-        {
-          type: WidgetType.TEXT,
-          content: "response.messageId",
-        },
-        z.string().optional(),
-      ),
+      success: scopedResponseField(scopedTranslation, {
+        schema: z.boolean(),
+        type: WidgetType.TEXT,
+        content: "response.success",
+      }),
+      messageId: scopedResponseField(scopedTranslation, {
+        schema: z.string().optional(),
+        type: WidgetType.TEXT,
+        content: "response.messageId",
+      }),
       status: scopedResponseArrayOptionalField(
         scopedTranslation,
         {
@@ -172,14 +148,11 @@ const { POST } = createEndpoint({
           title: "response.status",
           description: "response.description",
         },
-        scopedResponseField(
-          scopedTranslation,
-          {
-            type: WidgetType.TEXT,
-            content: "response.status",
-          },
-          z.string(),
-        ),
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.TEXT,
+          content: "response.status",
+          schema: z.string(),
+        }),
       ),
     },
   ),
@@ -227,7 +200,6 @@ const { POST } = createEndpoint({
         status: [ContactStatus.NEW],
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

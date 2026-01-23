@@ -161,7 +161,6 @@ export class AiStreamRepository {
               provider,
               modelConfig,
               messages,
-              temperature: data.temperature,
               streamAbortController,
               systemPrompt,
               tools,

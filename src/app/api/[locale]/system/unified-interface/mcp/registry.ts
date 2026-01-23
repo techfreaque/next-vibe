@@ -18,7 +18,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
-import { routeExecutionExecutor } from "../shared/endpoints/route/executor";
+import { RouteExecutionExecutor } from "../shared/endpoints/route/executor";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint";
 import { Platform } from "../shared/types/platform";
 import type {
@@ -197,9 +197,10 @@ export class MCPRegistry implements IMCPRegistry {
         dataKeys: Object.keys(context.data),
       });
 
-      const result = await routeExecutionExecutor.executeGenericHandler({
+      const result = await RouteExecutionExecutor.executeGenericHandler({
         toolName: context.toolName,
         data: context.data,
+        urlPathParams: context.data,
         user: context.user,
         locale: context.locale,
         logger,

@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -47,66 +47,57 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      category: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.help.list.fields.category.label",
-          description: "app.api.system.help.list.fields.category.description",
-          placeholder: "app.api.system.help.list.fields.category.placeholder",
-          columns: 6,
-        },
-        z.string().optional(),
-      ),
+      category: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.help.list.fields.category.label",
+        description: "app.api.system.help.list.fields.category.description",
+        placeholder: "app.api.system.help.list.fields.category.placeholder",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
 
-      format: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.system.help.list.fields.format.label",
-          description: "app.api.system.help.list.fields.format.description",
-          columns: 6,
-          options: [
-            {
-              value: "tree",
-              label: "app.api.system.help.list.fields.format.options.tree",
-            },
-            {
-              value: "flat",
-              label: "app.api.system.help.list.fields.format.options.flat",
-            },
-            {
-              value: "json",
-              label: "app.api.system.help.list.fields.format.options.json",
-            },
-          ],
-        },
-        z.enum(["tree", "flat", "json"]).optional().default("tree"),
-      ),
+      format: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.system.help.list.fields.format.label",
+        description: "app.api.system.help.list.fields.format.description",
+        columns: 6,
+        options: [
+          {
+            value: "tree",
+            label: "app.api.system.help.list.fields.format.options.tree",
+          },
+          {
+            value: "flat",
+            label: "app.api.system.help.list.fields.format.options.flat",
+          },
+          {
+            value: "json",
+            label: "app.api.system.help.list.fields.format.options.json",
+          },
+        ],
+        schema: z.enum(["tree", "flat", "json"]).optional().default("tree"),
+      }),
 
-      showAliases: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.help.list.fields.showAliases.label",
-          description:
-            "app.api.system.help.list.fields.showAliases.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(true),
-      ),
+      showAliases: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.help.list.fields.showAliases.label",
+        description: "app.api.system.help.list.fields.showAliases.description",
+        columns: 6,
+        schema: z.boolean().optional().default(true),
+      }),
 
-      showDescriptions: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.help.list.fields.showDescriptions.label",
-          description:
-            "app.api.system.help.list.fields.showDescriptions.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(true),
-      ),
+      showDescriptions: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.help.list.fields.showDescriptions.label",
+        description:
+          "app.api.system.help.list.fields.showDescriptions.description",
+        columns: 6,
+        schema: z.boolean().optional().default(true),
+      }),
 
       // === RESPONSE FIELDS ===
       // Note: success and totalCommands are hidden internal fields
@@ -126,54 +117,41 @@ const { POST } = createEndpoint({
           },
           { response: true },
           {
-            alias: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.help.list.fields.commands.alias" as const,
-              },
-              z.string(),
-            ),
-            message: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.help.list.fields.commands.message" as const,
-              },
-              z.string(),
-            ),
-            description: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.help.list.fields.commands.description" as const,
-              },
-              z.string().optional(),
-            ),
-            category: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.help.list.fields.commands.category" as const,
-              },
-              z.string(),
-            ),
-            aliases: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.help.list.fields.commands.aliases" as const,
-              },
-              z.string().optional(),
-            ),
-            rule: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.help.list.fields.commands.rule" as const,
-              },
-              z.string(),
-            ),
+            alias: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.help.list.fields.commands.alias" as const,
+              schema: z.string(),
+            }),
+            message: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.help.list.fields.commands.message" as const,
+              schema: z.string(),
+            }),
+            description: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.help.list.fields.commands.description" as const,
+              schema: z.string().optional(),
+            }),
+            category: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.help.list.fields.commands.category" as const,
+              schema: z.string(),
+            }),
+            aliases: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.help.list.fields.commands.aliases" as const,
+              schema: z.string().optional(),
+            }),
+            rule: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.help.list.fields.commands.rule" as const,
+              schema: z.string(),
+            }),
           },
         ),
       ),
@@ -230,7 +208,6 @@ const { POST } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    urlPathParams: undefined,
     requests: {
       default: {
         format: "tree",

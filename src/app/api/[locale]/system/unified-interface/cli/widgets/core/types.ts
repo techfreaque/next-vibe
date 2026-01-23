@@ -6,12 +6,13 @@
  * Types flow from widget configs in ../../../shared/widgets/configs.ts
  */
 
+import type { z } from "zod";
+
 import type {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import type { UnifiedField } from "../../../shared/types/endpoint";
 import type {
@@ -38,9 +39,8 @@ export interface CLIRenderingOptions {
 export interface CLIWidgetRenderContext extends SharedWidgetRenderContext {
   options: CLIRenderingOptions;
   depth: number;
-  t: TFunction;
   formatValue: <const TKey extends string>(
-    field: UnifiedField<TKey>,
+    field: UnifiedField<TKey, z.ZodTypeAny>,
     value: WidgetData,
   ) => string;
   getFieldIcon: (type: FieldDataType) => string;
@@ -52,7 +52,7 @@ export interface CLIWidgetRenderContext extends SharedWidgetRenderContext {
    */
   renderWidget: <const TKey extends string>(
     widgetType: WidgetType,
-    field: UnifiedField<TKey>,
+    field: UnifiedField<TKey, z.ZodTypeAny>,
     value: WidgetData,
   ) => string;
 }

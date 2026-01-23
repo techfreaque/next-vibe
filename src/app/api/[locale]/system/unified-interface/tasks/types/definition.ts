@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   FieldDataType,
   LayoutType,
@@ -45,132 +45,120 @@ const { GET } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      operation: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.system.unifiedInterface.tasks.types.get.fields.operation.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.types.get.fields.operation.description",
-          options: [
-            {
-              value: "list",
-              label:
-                "app.api.system.unifiedInterface.tasks.types.get.operation.list",
-            },
-            {
-              value: "validate",
-              label:
-                "app.api.system.unifiedInterface.tasks.types.get.operation.validate",
-            },
-            {
-              value: "export",
-              label:
-                "app.api.system.unifiedInterface.tasks.types.get.operation.export",
-            },
-          ],
-          columns: 4,
-        },
-        z.enum(["list", "validate", "export"]),
-      ),
+      operation: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.system.unifiedInterface.tasks.types.get.fields.operation.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.types.get.fields.operation.description",
+        options: [
+          {
+            value: "list",
+            label:
+              "app.api.system.unifiedInterface.tasks.types.get.operation.list",
+          },
+          {
+            value: "validate",
+            label:
+              "app.api.system.unifiedInterface.tasks.types.get.operation.validate",
+          },
+          {
+            value: "export",
+            label:
+              "app.api.system.unifiedInterface.tasks.types.get.operation.export",
+          },
+        ],
+        columns: 4,
+        schema: z.enum(["list", "validate", "export"]),
+      }),
 
-      typeCategory: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.system.unifiedInterface.tasks.types.get.fields.category.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.types.get.fields.category.description",
-          options: [
-            {
-              value: "cron",
-              label:
-                "app.api.system.unifiedInterface.tasks.types.get.category.cron",
-            },
-            {
-              value: "side",
-              label:
-                "app.api.system.unifiedInterface.tasks.types.get.category.side",
-            },
-            {
-              value: "config",
-              label:
-                "app.api.system.unifiedInterface.tasks.types.get.category.config",
-            },
-            {
-              value: "execution",
-              label:
-                "app.api.system.unifiedInterface.tasks.types.get.category.execution",
-            },
-          ],
-          columns: 4,
-        },
-        z.enum(["cron", "side", "config", "execution"]).optional(),
-      ),
+      typeCategory: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.system.unifiedInterface.tasks.types.get.fields.category.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.types.get.fields.category.description",
+        options: [
+          {
+            value: "cron",
+            label:
+              "app.api.system.unifiedInterface.tasks.types.get.category.cron",
+          },
+          {
+            value: "side",
+            label:
+              "app.api.system.unifiedInterface.tasks.types.get.category.side",
+          },
+          {
+            value: "config",
+            label:
+              "app.api.system.unifiedInterface.tasks.types.get.category.config",
+          },
+          {
+            value: "execution",
+            label:
+              "app.api.system.unifiedInterface.tasks.types.get.category.execution",
+          },
+        ],
+        columns: 4,
+        schema: z.enum(["cron", "side", "config", "execution"]).optional(),
+      }),
 
-      format: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.system.unifiedInterface.tasks.types.get.fields.format.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.types.get.fields.format.description",
-          options: [
-            {
-              value: "json",
-              label:
-                "app.api.system.unifiedInterface.tasks.types.get.format.json",
-            },
-            {
-              value: "typescript",
-              label:
-                "app.api.system.unifiedInterface.tasks.types.get.format.typescript",
-            },
-            {
-              value: "schema",
-              label:
-                "app.api.system.unifiedInterface.tasks.types.get.format.schema",
-            },
-          ],
-          columns: 4,
-        },
-        z.enum(["json", "typescript", "schema"]).default("json"),
-      ),
+      format: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.system.unifiedInterface.tasks.types.get.fields.format.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.types.get.fields.format.description",
+        options: [
+          {
+            value: "json",
+            label:
+              "app.api.system.unifiedInterface.tasks.types.get.format.json",
+          },
+          {
+            value: "typescript",
+            label:
+              "app.api.system.unifiedInterface.tasks.types.get.format.typescript",
+          },
+          {
+            value: "schema",
+            label:
+              "app.api.system.unifiedInterface.tasks.types.get.format.schema",
+          },
+        ],
+        columns: 4,
+        schema: z.enum(["json", "typescript", "schema"]).default("json"),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.types.get.response.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.types.get.response.success.title",
+        schema: z.boolean(),
+      }),
 
-      types: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.types.get.response.types.title",
-        },
-        z.record(z.string(), z.unknown()),
-      ),
+      types: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.types.get.response.types.title",
+        schema: z.record(z.string(), z.unknown()),
+      }),
 
-      metadata: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.types.get.response.metadata.title",
-        },
-        z.object({
+      metadata: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.types.get.response.metadata.title",
+        schema: z.object({
           totalTypes: z.coerce.number(),
           categories: z.array(z.string()),
           timestamp: z.string(),
         }),
-      ),
+      }),
     },
   ),
 

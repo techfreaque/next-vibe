@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -65,20 +65,18 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      action: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.speechToText.hotkey.post.action.label" as const,
-          description:
-            "app.api.agent.speechToText.hotkey.post.action.description" as const,
-          columns: 12,
-          options: HotkeyActionOptions,
-        },
-        z.enum(HotkeyAction).optional(),
-      ),
+      action: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.agent.speechToText.hotkey.post.action.label" as const,
+        description:
+          "app.api.agent.speechToText.hotkey.post.action.description" as const,
+        columns: 12,
+        options: HotkeyActionOptions,
+        schema: z.enum(HotkeyAction).optional(),
+      }),
 
-      // provider: requestDataField(
+      // provider: requestField(
       //   {
       //     type: WidgetType.FORM_FIELD,
       //     fieldType: FieldDataType.SELECT,
@@ -92,35 +90,31 @@ const { POST } = createEndpoint({
       //   z.enum(SttProvider).default(SttProvider.OPENAI),
       // ),
 
-      insertPrefix: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.agent.speechToText.hotkey.post.insertPrefix.label" as const,
-          description:
-            "app.api.agent.speechToText.hotkey.post.insertPrefix.description" as const,
-          columns: 6,
-          placeholder:
-            "app.api.agent.speechToText.hotkey.post.insertPrefix.placeholder" as const,
-        },
-        z.string().default(""),
-      ),
+      insertPrefix: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.agent.speechToText.hotkey.post.insertPrefix.label" as const,
+        description:
+          "app.api.agent.speechToText.hotkey.post.insertPrefix.description" as const,
+        columns: 6,
+        placeholder:
+          "app.api.agent.speechToText.hotkey.post.insertPrefix.placeholder" as const,
+        schema: z.string().default(""),
+      }),
 
-      insertSuffix: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.agent.speechToText.hotkey.post.insertSuffix.label" as const,
-          description:
-            "app.api.agent.speechToText.hotkey.post.insertSuffix.description" as const,
-          columns: 6,
-          placeholder:
-            "app.api.agent.speechToText.hotkey.post.insertSuffix.placeholder" as const,
-        },
-        z.string().default(" "),
-      ),
+      insertSuffix: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.agent.speechToText.hotkey.post.insertSuffix.label" as const,
+        description:
+          "app.api.agent.speechToText.hotkey.post.insertSuffix.description" as const,
+        columns: 6,
+        placeholder:
+          "app.api.agent.speechToText.hotkey.post.insertSuffix.placeholder" as const,
+        schema: z.string().default(" "),
+      }),
 
       // === RESPONSE FIELDS ===
       response: objectField(
@@ -135,49 +129,39 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          success: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.speechToText.hotkey.post.response.success" as const,
-            },
-            z.boolean(),
-          ),
+          success: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.agent.speechToText.hotkey.post.response.success" as const,
+            schema: z.boolean(),
+          }),
 
-          status: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.agent.speechToText.hotkey.post.response.status" as const,
-            },
-            z.string(),
-          ),
+          status: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.agent.speechToText.hotkey.post.response.status" as const,
+            schema: z.string(),
+          }),
 
-          message: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.speechToText.hotkey.post.response.message" as const,
-            },
-            z.string(),
-          ),
+          message: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.agent.speechToText.hotkey.post.response.message" as const,
+            schema: z.string(),
+          }),
 
-          text: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.speechToText.hotkey.post.response.text" as const,
-            },
-            z.string().optional(),
-          ),
+          text: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.agent.speechToText.hotkey.post.response.text" as const,
+            schema: z.string().optional(),
+          }),
 
-          recordingDuration: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.speechToText.hotkey.post.response.recordingDuration" as const,
-            },
-            z.coerce.number().optional(),
-          ),
+          recordingDuration: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.agent.speechToText.hotkey.post.response.recordingDuration" as const,
+            schema: z.coerce.number().optional(),
+          }),
         },
       ),
     },
@@ -263,7 +247,6 @@ const { POST } = createEndpoint({
         },
       },
     },
-    urlPathParams: undefined,
   },
 });
 

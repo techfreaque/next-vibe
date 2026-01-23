@@ -73,11 +73,6 @@ export class ReferralRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ReferralPostResponseOutput>> {
     try {
-      logger.debug("Creating referral code", {
-        code: data.code,
-        userId,
-      });
-
       // Check if code already exists
       const [existingCode] = await db
         .select()
@@ -102,10 +97,6 @@ export class ReferralRepository {
           currentUses: 0,
         })
         .returning();
-
-      logger.debug("Referral code created successfully", {
-        codeId: newCode.id,
-      });
 
       return success({
         id: newCode.id,

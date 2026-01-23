@@ -9,7 +9,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -47,41 +47,31 @@ export const { GET } = createEndpoint({
     },
     { response: true },
     {
-      totalSignups: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.referral.stats.fields.totalSignups",
-        },
-        z.coerce.number(),
-      ),
-      totalRevenueCredits: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.referral.stats.fields.totalRevenueCredits",
-        },
-        z.coerce.number(),
-      ),
-      totalEarnedCredits: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.referral.stats.fields.totalEarnedCredits",
-        },
-        z.coerce.number(),
-      ),
-      totalPaidOutCredits: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.referral.stats.fields.totalPaidOutCredits",
-        },
-        z.coerce.number(),
-      ),
-      availableCredits: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.referral.stats.fields.availableCredits",
-        },
-        z.coerce.number(),
-      ),
+      totalSignups: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.referral.stats.fields.totalSignups",
+        schema: z.coerce.number(),
+      }),
+      totalRevenueCredits: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.referral.stats.fields.totalRevenueCredits",
+        schema: z.coerce.number(),
+      }),
+      totalEarnedCredits: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.referral.stats.fields.totalEarnedCredits",
+        schema: z.coerce.number(),
+      }),
+      totalPaidOutCredits: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.referral.stats.fields.totalPaidOutCredits",
+        schema: z.coerce.number(),
+      }),
+      availableCredits: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.referral.stats.fields.availableCredits",
+        schema: z.coerce.number(),
+      }),
     },
   ),
 

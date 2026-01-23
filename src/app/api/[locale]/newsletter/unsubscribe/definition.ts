@@ -6,11 +6,11 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
-  objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -55,35 +55,29 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      email: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.EMAIL,
-          label: "app.api.newsletter.unsubscribe.email.label" as const,
-          description:
-            "app.api.newsletter.unsubscribe.email.description" as const,
-          placeholder:
-            "app.api.newsletter.unsubscribe.email.placeholder" as const,
-          columns: 12,
-        },
-        z.string().email(),
-      ),
+      email: requestField({
+        schema: z.string().email(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label: "app.api.newsletter.unsubscribe.email.label" as const,
+        description:
+          "app.api.newsletter.unsubscribe.email.description" as const,
+        placeholder:
+          "app.api.newsletter.unsubscribe.email.placeholder" as const,
+        columns: 12,
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.newsletter.unsubscribe.response.success" as const,
-        },
-        z.boolean(),
-      ),
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.newsletter.unsubscribe.response.message" as const,
-        },
-        z.string(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.newsletter.unsubscribe.response.success" as const,
+        schema: z.boolean(),
+      }),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.newsletter.unsubscribe.response.message" as const,
+        schema: z.string(),
+      }),
     },
   ),
   errorTypes: {
@@ -160,7 +154,6 @@ const { POST } = createEndpoint({
         message: "Successfully unsubscribed from newsletter",
       },
     },
-    urlPathParams: undefined,
   },
 });
 

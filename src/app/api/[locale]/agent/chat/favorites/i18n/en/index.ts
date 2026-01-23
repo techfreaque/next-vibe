@@ -4,6 +4,7 @@ export const translations = {
   id: idTranslations,
   enums: {
     selectionType: {
+      characterBased: "Based on Character",
       manual: "Specific Model",
       filters: "Filter Criteria",
     },
@@ -42,6 +43,9 @@ export const translations = {
     container: {
       title: "Your Favorites",
       description: "Manage your favorite character and model configurations",
+    },
+    createButton: {
+      label: "Add Favorite",
     },
     response: {
       favorite: {
@@ -121,6 +125,9 @@ export const translations = {
         useCount: {
           content: "Times Used: {{value}}",
         },
+        separator: {
+          content: "•",
+        },
       },
       hasCompanion: {
         content: "Has Companion: {{value}}",
@@ -176,6 +183,13 @@ export const translations = {
       title: "New Favorite",
       description: "Save a character configuration as a favorite",
     },
+    backButton: {
+      label: "Back to Favorites",
+    },
+    submitButton: {
+      label: "Create Favorite",
+      loadingText: "Creating...",
+    },
     characterId: {
       label: "Character",
       description: "Select the character for this favorite",
@@ -183,6 +197,10 @@ export const translations = {
     customName: {
       label: "Custom Name",
       description: "Optional custom name for this favorite",
+    },
+    customIcon: {
+      label: "Custom Icon",
+      description: "Optional custom icon for this favorite",
     },
     voice: {
       label: "Voice",

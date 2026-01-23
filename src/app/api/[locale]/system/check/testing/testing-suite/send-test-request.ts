@@ -11,7 +11,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { z } from "zod";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { routeExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
+import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -23,10 +23,9 @@ import type { UserRoleValue } from "../../../../user/user-roles/enum";
 
 /**
  * Call the API handler directly via the vibe runtime executor
- * Uses routeExecutionExecutor which is the same infrastructure used by CLI, MCP, and AI tools
+ * Uses RouteExecutionExecutor which is the same infrastructure used by CLI, MCP, and AI tools
  */
 export async function sendTestRequest<
-  TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
@@ -38,21 +37,18 @@ export async function sendTestRequest<
   user,
 }: {
   endpoint: CreateApiEndpoint<
-    TExampleKey,
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
     TFields
   >;
   data: CreateApiEndpoint<
-    TExampleKey,
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
     TFields
   >["types"]["RequestOutput"];
   urlPathParams: CreateApiEndpoint<
-    TExampleKey,
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
@@ -62,7 +58,6 @@ export async function sendTestRequest<
 }): Promise<
   ResponseType<
     CreateApiEndpoint<
-      TExampleKey,
       TMethod,
       TUserRoleValue,
       TScopedTranslationKey,
@@ -94,7 +89,7 @@ export async function sendTestRequest<
 
     // Execute using the shared route execution executor
     // This is the same infrastructure used by CLI, MCP, and AI tools
-    const result = await routeExecutionExecutor.executeGenericHandler<
+    const result = await RouteExecutionExecutor.executeGenericHandler<
       typeof endpoint.types.RequestOutput,
       typeof endpoint.types.UrlVariablesOutput,
       typeof endpoint.types.ResponseOutput

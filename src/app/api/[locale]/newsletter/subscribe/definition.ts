@@ -6,11 +6,11 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
-  objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -60,87 +60,68 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      email: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.EMAIL,
-          label: "app.api.newsletter.subscribe.email.label" as const,
-          description:
-            "app.api.newsletter.subscribe.email.description" as const,
-          placeholder:
-            "app.api.newsletter.subscribe.email.placeholder" as const,
-          helpText: "app.api.newsletter.subscribe.email.helpText" as const,
-          columns: 12,
-        },
-        z.string().email(),
-      ),
-      name: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.newsletter.subscribe.name.label" as const,
-          description: "app.api.newsletter.subscribe.name.description" as const,
-          placeholder: "app.api.newsletter.subscribe.name.placeholder" as const,
-          helpText: "app.api.newsletter.subscribe.name.helpText" as const,
-          columns: 12,
-        },
-        z.string().optional(),
-      ),
-      preferences: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
-          label: "app.api.newsletter.subscribe.preferences.label" as const,
-          description:
-            "app.api.newsletter.subscribe.preferences.description" as const,
-          placeholder:
-            "app.api.newsletter.subscribe.preferences.placeholder" as const,
-          helpText:
-            "app.api.newsletter.subscribe.preferences.helpText" as const,
-          options: NewsletterPreferenceOptions,
-          columns: 12,
-        },
-        z.array(z.enum(NewsletterPreference)).optional(),
-      ),
+      email: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label: "app.api.newsletter.subscribe.email.label" as const,
+        description: "app.api.newsletter.subscribe.email.description" as const,
+        placeholder: "app.api.newsletter.subscribe.email.placeholder" as const,
+        helpText: "app.api.newsletter.subscribe.email.helpText" as const,
+        columns: 12,
+        schema: z.string().email(),
+      }),
+      name: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.newsletter.subscribe.name.label" as const,
+        description: "app.api.newsletter.subscribe.name.description" as const,
+        placeholder: "app.api.newsletter.subscribe.name.placeholder" as const,
+        helpText: "app.api.newsletter.subscribe.name.helpText" as const,
+        columns: 12,
+        schema: z.string().optional(),
+      }),
+      preferences: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "app.api.newsletter.subscribe.preferences.label" as const,
+        description:
+          "app.api.newsletter.subscribe.preferences.description" as const,
+        placeholder:
+          "app.api.newsletter.subscribe.preferences.placeholder" as const,
+        helpText: "app.api.newsletter.subscribe.preferences.helpText" as const,
+        options: NewsletterPreferenceOptions,
+        columns: 12,
+        schema: z.array(z.enum(NewsletterPreference)).optional(),
+      }),
 
       // === RESPONSE FIELDS ===
       // Note: leadId comes from JWT payload (user.leadId) on server-side
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.newsletter.subscribe.response.success" as const,
-        },
-        z.boolean(),
-      ),
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.newsletter.subscribe.response.message" as const,
-        },
-        z.string(),
-      ),
-      leadId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.newsletter.subscribe.response.leadId" as const,
-        },
-        z.string(),
-      ),
-      subscriptionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.newsletter.subscribe.response.subscriptionId" as const,
-        },
-        z.string(),
-      ),
-      userId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.newsletter.subscribe.response.userId" as const,
-        },
-        z.string().optional(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.newsletter.subscribe.response.success" as const,
+        schema: z.boolean(),
+      }),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.newsletter.subscribe.response.message" as const,
+        schema: z.string(),
+      }),
+      leadId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.newsletter.subscribe.response.leadId" as const,
+        schema: z.string(),
+      }),
+      subscriptionId: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.newsletter.subscribe.response.subscriptionId" as const,
+        schema: z.string(),
+      }),
+      userId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.newsletter.subscribe.response.userId" as const,
+        schema: z.string().optional(),
+      }),
     },
   ),
   errorTypes: {
@@ -228,7 +209,6 @@ const { POST } = createEndpoint({
         subscriptionId: "sub_123456789",
       },
     },
-    urlPathParams: undefined,
   },
 });
 

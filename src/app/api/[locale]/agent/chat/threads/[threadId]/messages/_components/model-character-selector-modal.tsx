@@ -12,7 +12,6 @@ import React, { useState } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { Selector } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/selector";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -22,8 +21,6 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 interface ModelCharacterSelectorModalProps {
   titleKey: TranslationKey;
   descriptionKey: TranslationKey;
-  onModelChange: (model: ModelId) => void;
-  onCharacterChange: (character: string) => void;
   onConfirm: () => void | Promise<void>;
   onCancel: () => void;
   confirmLabelKey?: TranslationKey;
@@ -40,8 +37,6 @@ interface ModelCharacterSelectorModalProps {
 export function ModelCharacterSelectorModal({
   titleKey,
   descriptionKey,
-  onModelChange,
-  onCharacterChange,
   onConfirm,
   onCancel,
   confirmLabelKey,
@@ -114,8 +109,6 @@ export function ModelCharacterSelectorModal({
             <Selector
               characterId={selectedCharacter}
               modelId={selectedModel}
-              onCharacterChange={onCharacterChange}
-              onModelChange={onModelChange}
               locale={locale}
               logger={logger}
               buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"

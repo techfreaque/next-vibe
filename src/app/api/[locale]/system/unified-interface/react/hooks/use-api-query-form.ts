@@ -46,30 +46,45 @@ function mergeWithDefaults<T>(saved: T, defaults: T): T {
   }
   if (Array.isArray(defaults)) {
     // For arrays, use saved if it exists
-    return saved as T;
+    return saved;
   }
 
   // For objects, recursively merge
-  const result = { ...defaults } as Record<string, unknown>;
-  for (const key of Object.keys(saved as Record<string, unknown>)) {
-    const savedValue = (saved as Record<string, unknown>)[key];
-    const defaultValue = (defaults as Record<string, unknown>)[key];
+  const result = { ...defaults };
 
-    if (savedValue !== undefined && savedValue !== null && savedValue !== "") {
-      // Saved value exists and is not empty - use it (with recursive merge for objects)
+  for (const key of Object.keys(saved)) {
+    if (key in saved && key in defaults) {
+      const savedValue = saved[key as keyof typeof saved];
+      const defaultValue = defaults[key as keyof typeof defaults];
+
       if (
-        typeof savedValue === "object" &&
-        !Array.isArray(savedValue) &&
-        savedValue !== null
+        savedValue !== undefined &&
+        savedValue !== null &&
+        savedValue !== ""
       ) {
-        result[key] = mergeWithDefaults(savedValue, defaultValue);
-      } else {
-        result[key] = savedValue;
+        // Saved value exists and is not empty - use it (with recursive merge for objects)
+        if (
+          typeof savedValue === "object" &&
+          !Array.isArray(savedValue) &&
+          savedValue !== null &&
+          typeof defaultValue === "object" &&
+          !Array.isArray(defaultValue) &&
+          defaultValue !== null
+        ) {
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          (result as Record<string, unknown>)[key] = mergeWithDefaults(
+            savedValue,
+            defaultValue,
+          );
+        } else {
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          (result as Record<string, unknown>)[key] = savedValue;
+        }
       }
     }
     // If savedValue is undefined/null/empty, we keep the default (already in result)
   }
-  return result as T;
+  return result;
 }
 
 /**
@@ -440,16 +455,37 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         const responseData = data.responseData;
         const currentFormData = formMethods.getValues();
 
-        // Merge response data into form - preserve request fields
+        // First merge current form data with response data
         const mergedData = {
           ...currentFormData,
           ...responseData,
-        } as TEndpoint["types"]["RequestOutput"];
+        };
 
-        // Update form with merged data
-        // This will trigger auto-submit watcher, but watcher filters through requestSchema
-        // so only request fields are sent back to API (preventing 431 error)
-        formMethods.reset(mergedData, { keepDirty: false, keepTouched: false });
+        // Then parse with request schema to filter out response-only fields
+        // This ensures only fields that are valid request fields stay in form
+        // Prevents response fields from overwriting request fields (like filters)
+        const requestSchemaResult =
+          endpoint.requestSchema.safeParse(mergedData);
+
+        if (requestSchemaResult.success) {
+          // Only keep fields that passed request schema validation
+          const filteredData =
+            requestSchemaResult.data as TEndpoint["types"]["RequestOutput"];
+
+          // Update form with filtered data
+          // This will trigger auto-submit watcher, but watcher filters through requestSchema
+          // so only request fields are sent back to API (preventing 431 error)
+          formMethods.reset(filteredData, {
+            keepDirty: false,
+            keepTouched: false,
+          });
+        } else {
+          // If merge failed validation, don't reset form - keep current values
+          logger.debug("Response data merge failed request schema validation", {
+            endpoint: endpoint.path.join("/"),
+            errors: requestSchemaResult.error,
+          });
+        }
 
         // Call the user's onSuccess handler if provided
         if (queryOptions.onSuccess) {

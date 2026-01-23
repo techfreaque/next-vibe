@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,47 +50,39 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      uid: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.browser.fill.form.fields.uid.label",
-          description: "app.api.browser.fill.form.fields.uid.description",
-          placeholder: "app.api.browser.fill.form.fields.uid.placeholder",
-          columns: 6,
-        },
-        z
+      uid: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.browser.fill.form.fields.uid.label",
+        description: "app.api.browser.fill.form.fields.uid.description",
+        placeholder: "app.api.browser.fill.form.fields.uid.placeholder",
+        columns: 6,
+        schema: z
           .string()
           .describe(
             "The uid of an element on the page from the page content snapshot",
           ),
-      ),
-      value: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.browser.fill.form.fields.value.label",
-          description: "app.api.browser.fill.form.fields.value.description",
-          placeholder: "app.api.browser.fill.form.fields.value.placeholder",
-          columns: 6,
-        },
-        z.string().describe("The value to fill in"),
-      ),
+      }),
+      value: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.browser.fill.form.fields.value.label",
+        description: "app.api.browser.fill.form.fields.value.description",
+        placeholder: "app.api.browser.fill.form.fields.value.placeholder",
+        columns: 6,
+        schema: z.string().describe("The value to fill in"),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.fill.response.success",
-        },
-        z.boolean().describe("Whether the fill operation succeeded"),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.fill.response.result",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.fill.response.success",
+        schema: z.boolean().describe("Whether the fill operation succeeded"),
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.fill.response.result",
+        schema: z
           .object({
             filled: z.boolean().describe("Whether the element was filled"),
             element: z.string().describe("The element uid that was filled"),
@@ -98,21 +90,23 @@ const { POST } = createEndpoint({
           })
           .optional()
           .describe("Result of the fill operation"),
-      ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.fill.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.fill.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      }),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.fill.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.fill.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -130,7 +124,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

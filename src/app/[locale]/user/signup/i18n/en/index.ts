@@ -1,4 +1,8 @@
 export const translations = {
+  errors: {
+    failedToLoadBrowserIdentity:
+      "Failed to load browser identity. Please refresh the page.",
+  },
   meta: {
     title: "Sign Up - {{appName}}",
     description:

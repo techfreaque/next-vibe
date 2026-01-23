@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -111,76 +111,62 @@ const { GET: cronStatusGetEndpoint } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      taskId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.status.common.taskName",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.status.common.taskNamesDescription",
-          columns: 6,
-        },
-        z.string().optional(),
-      ),
+      taskId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.status.common.taskName",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.status.common.taskNamesDescription",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
 
-      detailed: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.status.common.detailed",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.status.common.detailedDescription",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      detailed: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.status.common.detailed",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.status.common.detailedDescription",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.cronSystem.status.success.content",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.status.success.content",
+        schema: z.boolean(),
+      }),
 
-      systemStatus: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.unifiedInterface.tasks.pulse.health.healthy",
-        },
-        z.enum(["healthy", "warning", "critical", "unknown"]),
-      ),
+      systemStatus: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.unifiedInterface.tasks.pulse.health.healthy",
+        schema: z.enum(["healthy", "warning", "critical", "unknown"]),
+      }),
 
-      activeTasks: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.cronSystem.status.common.active",
-        },
-        z.coerce.number(),
-      ),
+      activeTasks: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.status.common.active",
+        schema: z.coerce.number(),
+      }),
 
-      totalTasks: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.cronSystem.status.common.total",
-        },
-        z.coerce.number(),
-      ),
+      totalTasks: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.status.common.total",
+        schema: z.coerce.number(),
+      }),
 
-      uptime: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.cronSystem.status.common.uptime",
-        },
-        z.string(),
-      ),
+      uptime: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.status.common.uptime",
+        schema: z.string(),
+      }),
 
       tasks: responseArrayField(
         {
@@ -218,13 +204,11 @@ const { GET: cronStatusGetEndpoint } = createEndpoint({
             },
           ],
         },
-        responseField(
-          {
-            type: WidgetType.TEXT,
-            content:
-              "app.api.system.unifiedInterface.tasks.cronSystem.status.common.taskName",
-          },
-          z.object({
+        responseField({
+          type: WidgetType.TEXT,
+          content:
+            "app.api.system.unifiedInterface.tasks.cronSystem.status.common.taskName",
+          schema: z.object({
             id: z.string(),
             name: z.string(),
             status: z.string(),
@@ -232,13 +216,12 @@ const { GET: cronStatusGetEndpoint } = createEndpoint({
             nextRun: z.string().nullable(),
             schedule: z.string(),
           }),
-        ),
+        }),
       ),
     },
   ),
 
   examples: {
-    urlPathParams: undefined,
     requests: {
       basic: {
         detailed: false,

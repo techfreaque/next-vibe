@@ -42,8 +42,6 @@ export interface MessageOperationDeps {
   settings: {
     selectedModel: ModelId;
     selectedCharacter: string;
-    temperature: number;
-    maxTokens: number;
     enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
   };
   deductCredits: (creditCost: number, feature: string) => void;
@@ -240,8 +238,6 @@ export async function createAndSendUserMessage(
         role: ChatMessageRole.USER,
         model: settings.selectedModel,
         character: settings.selectedCharacter ?? null,
-        temperature: settings.temperature,
-        maxTokens: settings.maxTokens,
         tools:
           settings.enabledTools?.map((tool) => ({
             toolId: tool.id,

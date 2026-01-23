@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -28,7 +28,7 @@ import { EmailCampaignStage, LeadSource, LeadStatus } from "../enum";
 // Inline schema to avoid deprecated schema.ts imports
 const leadResponseSchema = z.object({
   id: z.uuid(),
-  email: z.email(),
+  email: z.string().email(),
   businessName: z.string().min(1).max(255),
   phone: z
     .string()
@@ -43,7 +43,6 @@ const leadResponseSchema = z.object({
   convertedUserId: z.uuid().nullable(),
   convertedAt: dateSchema.nullable(),
   signedUpAt: dateSchema.nullable(),
-  consultationBookedAt: dateSchema.nullable(),
   subscriptionConfirmedAt: dateSchema.nullable(),
   currentCampaignStage: z.enum(EmailCampaignStage).nullable(),
   emailsSent: z.coerce.number(),
@@ -86,37 +85,31 @@ const { GET } = createEndpoint({
     { request: "data", response: true },
     {
       // === QUERY PARAMETERS ===
-      search: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.leads.search.get.search.label" as const,
-          description: "app.api.leads.search.get.search.description" as const,
-          columns: 6,
-          placeholder: "app.api.leads.search.get.search.placeholder" as const,
-        },
-        z.string().optional(),
-      ),
-      limit: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.leads.search.get.limit.label" as const,
-          description: "app.api.leads.search.get.limit.description" as const,
-          columns: 3,
-        },
-        z.coerce.number().min(1).max(50).default(10),
-      ),
-      offset: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.leads.search.get.offset.label" as const,
-          description: "app.api.leads.search.get.offset.description" as const,
-          columns: 3,
-        },
-        z.coerce.number().min(0).default(0),
-      ),
+      search: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.leads.search.get.search.label" as const,
+        description: "app.api.leads.search.get.search.description" as const,
+        columns: 6,
+        placeholder: "app.api.leads.search.get.search.placeholder" as const,
+        schema: z.string().optional(),
+      }),
+      limit: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.leads.search.get.limit.label" as const,
+        description: "app.api.leads.search.get.limit.description" as const,
+        columns: 3,
+        schema: z.coerce.number().min(1).max(50).default(10),
+      }),
+      offset: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.leads.search.get.offset.label" as const,
+        description: "app.api.leads.search.get.offset.description" as const,
+        columns: 3,
+        schema: z.coerce.number().min(0).default(0),
+      }),
 
       // === RESPONSE FIELDS ===
       response: objectField(
@@ -134,32 +127,25 @@ const { GET } = createEndpoint({
               type: WidgetType.DATA_TABLE,
               title: "app.api.leads.search.get.response.leads.title" as const,
             },
-            responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.search.get.response.leads.item" as const,
-                fieldType: FieldDataType.TEXT,
-              },
-              leadResponseSchema,
-            ),
-          ),
-          total: responseField(
-            {
+            responseField({
               type: WidgetType.TEXT,
-              content: "app.api.leads.search.get.response.total" as const,
-              fieldType: FieldDataType.NUMBER,
-            },
-            z.coerce.number(),
+              content: "app.api.leads.search.get.response.leads.item" as const,
+              fieldType: FieldDataType.TEXT,
+              schema: leadResponseSchema,
+            }),
           ),
-          hasMore: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.leads.search.get.response.hasMore" as const,
-              fieldType: FieldDataType.BOOLEAN,
-            },
-            z.boolean(),
-          ),
+          total: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.leads.search.get.response.total" as const,
+            fieldType: FieldDataType.NUMBER,
+            schema: z.coerce.number(),
+          }),
+          hasMore: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.leads.search.get.response.hasMore" as const,
+            fieldType: FieldDataType.BOOLEAN,
+            schema: z.boolean(),
+          }),
         },
       ),
     },
@@ -248,7 +234,6 @@ const { GET } = createEndpoint({
               convertedUserId: null,
               convertedAt: null,
               signedUpAt: null,
-              consultationBookedAt: null,
               subscriptionConfirmedAt: null,
               currentCampaignStage: null,
               emailsSent: 0,

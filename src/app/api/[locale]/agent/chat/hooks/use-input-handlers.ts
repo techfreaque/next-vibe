@@ -6,16 +6,9 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { useCallback } from "react";
 
-import {
-  getModelById,
-  type ModelId,
-} from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type {
-  TextareaKeyboardEvent,
-  TextareaRefObject,
-} from "@/packages/next-vibe-ui/web/ui/textarea";
+import type { TextareaKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/textarea";
 
 import { clearDraft } from "./use-input-autosave";
 
@@ -28,7 +21,6 @@ interface UseInputHandlersProps {
   input: string;
   attachments: File[];
   isLoading: boolean;
-  enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
   sendMessage: (
     params: {
       content: string;
@@ -51,12 +43,6 @@ interface UseInputHandlersProps {
     ) => void,
   ) => Promise<void>;
   setInput: (input: string) => void;
-  setSelectedModel: (modelId: ModelId) => void;
-  setSelectedCharacter: (characterId: string) => void;
-  setEnabledTools: (
-    tools: Array<{ id: string; requiresConfirmation: boolean }>,
-  ) => void;
-  inputRef: React.RefObject<TextareaRefObject | null>;
   locale: CountryLanguage;
   logger: EndpointLogger;
   draftKey: string;
@@ -70,12 +56,6 @@ interface UseInputHandlersReturn {
   submitWithAudio: (audioFile: File) => Promise<void>;
   handleSubmit: () => Promise<void>;
   handleKeyDown: (e: TextareaKeyboardEvent) => void;
-  handleModelChange: (modelId: ModelId) => void;
-  handleFillInputWithPrompt: (
-    prompt: string,
-    characterId: string,
-    modelId?: ModelId,
-  ) => void;
   handleScreenshot: () => Promise<void>;
 }
 
@@ -83,13 +63,8 @@ export function useInputHandlers({
   input,
   attachments,
   isLoading,
-  enabledTools,
   sendMessage,
   setInput,
-  setSelectedModel,
-  setSelectedCharacter,
-  setEnabledTools,
-  inputRef,
   locale,
   logger,
   draftKey,
@@ -241,46 +216,6 @@ export function useInputHandlers({
     [submitMessage],
   );
 
-  // Handler for model changes - auto-disable search tool if model doesn't support tools
-  const handleModelChange = useCallback(
-    (modelId: ModelId) => {
-      const model = getModelById(modelId);
-
-      // Auto-remove search tool if the new model doesn't support tools
-      const SEARCH_TOOL_ID = "get_v1_core_agent_brave-search";
-      if (
-        !model.supportsTools &&
-        enabledTools.some((t) => t.id === SEARCH_TOOL_ID)
-      ) {
-        setEnabledTools(enabledTools.filter((t) => t.id !== SEARCH_TOOL_ID));
-        logger.info("Auto-disabled search tool - model doesn't support tools", {
-          modelId,
-          modelName: model.name,
-        });
-      }
-
-      setSelectedModel(modelId);
-    },
-    [setSelectedModel, setEnabledTools, logger, enabledTools],
-  );
-
-  const handleFillInputWithPrompt = useCallback(
-    (prompt: string, characterId: string, modelId?: ModelId) => {
-      // Switch to the selected character
-      setSelectedCharacter(characterId);
-
-      // Switch to the character's preferred model if provided
-      if (modelId) {
-        handleModelChange(modelId);
-      }
-
-      // Fill the input with the prompt (does NOT submit)
-      setInput(prompt);
-      inputRef.current?.focus();
-    },
-    [setInput, inputRef, handleModelChange, setSelectedCharacter],
-  );
-
   const handleScreenshot = useCallback(() => {
     // Screenshot functionality to be implemented
     logger.info("Screenshot requested");
@@ -293,8 +228,6 @@ export function useInputHandlers({
     submitWithAudio,
     handleSubmit: submitMessage,
     handleKeyDown,
-    handleModelChange,
-    handleFillInputWithPrompt,
     handleScreenshot,
   };
 }

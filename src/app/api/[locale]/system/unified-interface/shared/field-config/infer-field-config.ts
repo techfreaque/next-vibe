@@ -164,7 +164,7 @@ function extractFieldConfig<TKey extends string>(
       return {
         ...baseConfig,
         type: "range_slider" as const,
-        options: widget.options,
+        options: widget.options || [],
         minLabel: widget.minLabel,
         maxLabel: widget.maxLabel,
         minDefault: widget.minDefault,

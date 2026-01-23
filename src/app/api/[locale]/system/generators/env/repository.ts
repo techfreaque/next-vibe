@@ -256,7 +256,7 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
       if (validServerModules.length === 0 && validClientModules.length === 0) {
         logger.error("No valid env files found");
         return fail({
-          message: "app.api.system.generators.env.error.no_valid_files",
+          message: "app.api.system.generators.env.error.noValidFiles",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }

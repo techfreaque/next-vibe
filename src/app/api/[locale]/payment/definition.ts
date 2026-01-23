@@ -1,19 +1,21 @@
 /**
  * Payment API Endpoint Definition
- * Defines the API endpoints for payment processing using createFormEndpoint
+ * Defines the API endpoints for payment processing
  */
 
 import { z } from "zod";
 
-import { createFormEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create-form";
+import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
-  field,
-  objectField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+  requestResponseField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
+  Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -26,308 +28,357 @@ import {
 } from "./enum";
 
 /**
- * Payment form endpoint with GET and POST methods
+ * GET endpoint for retrieving payment information
  */
-const { GET, POST } = createFormEndpoint({
-  // Shared configuration
+const { GET } = createEndpoint({
+  method: Methods.GET,
   path: ["payment"],
-  category: "app.api.payment.category",
+  title: "app.api.payment.get.title" as const,
+  description: "app.api.payment.get.description" as const,
+  icon: "credit-card",
+  category: "app.api.payment.category" as const,
+  tags: [
+    "app.api.payment.tags.payment" as const,
+    "app.api.payment.tags.stripe" as const,
+    "app.api.payment.tags.info" as const,
+  ],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
-  ],
+  ] as const,
 
-  // Method-specific configuration
-  methods: {
-    GET: {
-      title: "app.api.payment.get.title",
-      description: "app.api.payment.get.description",
-      icon: "credit-card",
-      tags: [
-        "app.api.payment.tags.payment",
-        "app.api.payment.tags.stripe",
-        "app.api.payment.tags.info",
-      ],
-    },
-    POST: {
-      title: "app.api.payment.create.title",
-      description: "app.api.payment.create.description",
-      icon: "shopping-cart",
-      tags: [
-        "app.api.payment.tags.payment",
-        "app.api.payment.tags.stripe",
-        "app.api.payment.tags.checkout",
-      ],
-    },
-  },
-
-  // Shared field definitions - configured for GET (response-only) and POST (request+response)
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.payment.form.title",
-      description: "app.api.payment.form.description",
+      title: "app.api.payment.form.title" as const,
+      description: "app.api.payment.form.description" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
+    { response: true },
     {
-      GET: { response: true },
-      POST: { request: "data", response: true },
-    },
-    {
-      // Price ID field
-      priceId: field(
-        z.string().min(1),
-        {
-          GET: { response: true },
-          POST: { request: "data", response: true },
-        },
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.payment.priceId.label",
-          description: "app.api.payment.priceId.description",
-          placeholder: "app.api.payment.priceId.placeholder",
-          columns: 12,
-        },
-      ),
-
-      // Checkout mode field
-      mode: field(
-        z.enum(CheckoutMode),
-        {
-          GET: { response: true },
-          POST: { request: "data", response: true },
-        },
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.payment.mode.label",
-          description: "app.api.payment.mode.description",
-          options: CheckoutModeOptions,
-          columns: 12,
-        },
-      ),
-
-      // Payment method types field
-      paymentMethodTypes: field(
-        z.array(z.enum(PaymentMethodType)).optional(),
-        {
-          GET: { response: true },
-          POST: { request: "data", response: true },
-        },
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
-          label: "app.api.payment.create.paymentMethodTypes.label",
-          description: "app.api.payment.create.paymentMethodTypes.description",
-          options: PaymentMethodTypeOptions,
-          columns: 12,
-        },
-      ),
-
-      // Success URL field
-      successUrl: field(
-        z.string().url().optional(),
-        {
-          GET: { response: true },
-          POST: { request: "data", response: true },
-        },
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.URL,
-          label: "app.api.payment.create.successUrl.label",
-          description: "app.api.payment.create.successUrl.description",
-          placeholder: "app.api.payment.create.successUrl.placeholder",
-          columns: 6,
-        },
-      ),
-
-      // Cancel URL field
-      cancelUrl: field(
-        z.string().url().optional(),
-        {
-          GET: { response: true },
-          POST: { request: "data", response: true },
-        },
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.URL,
-          label: "app.api.payment.create.cancelUrl.label",
-          description: "app.api.payment.create.cancelUrl.description",
-          placeholder: "app.api.payment.create.cancelUrl.placeholder",
-          columns: 6,
-        },
-      ),
-
-      // Customer email field
-      customerEmail: field(
-        z.email().optional(),
-        {
-          GET: { response: true },
-          POST: { request: "data", response: true },
-        },
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.EMAIL,
-          label: "app.api.payment.create.customerEmail.label",
-          description: "app.api.payment.create.customerEmail.description",
-          placeholder: "app.api.payment.create.customerEmail.placeholder",
-          columns: 12,
-        },
-      ),
-
-      // Session URL - response only
-      sessionUrl: field(
-        z.string().url(),
-        {
-          GET: { response: true },
-          POST: { response: true },
-        },
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.payment.get.response.sessionUrl",
-        },
-      ),
-
-      // Session ID - response only
-      sessionId: field(
-        z.string(),
-        {
-          GET: { response: true },
-          POST: { response: true },
-        },
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.payment.get.response.sessionId",
-        },
-      ),
-
-      // Response message - only for POST
-      message: field(
-        z.string(),
-        {
-          POST: { response: true },
-        },
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.payment.create.success.message",
-        },
-      ),
+      priceId: responseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.payment.priceId.label" as const,
+        description: "app.api.payment.priceId.description" as const,
+        placeholder: "app.api.payment.priceId.placeholder" as const,
+        columns: 12,
+        schema: z.string().min(1),
+      }),
+      mode: responseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.payment.mode.label" as const,
+        description: "app.api.payment.mode.description" as const,
+        options: CheckoutModeOptions,
+        columns: 12,
+        schema: z.enum(CheckoutMode),
+      }),
+      paymentMethodTypes: responseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "app.api.payment.create.paymentMethodTypes.label" as const,
+        description:
+          "app.api.payment.create.paymentMethodTypes.description" as const,
+        options: PaymentMethodTypeOptions,
+        columns: 12,
+        schema: z.array(z.enum(PaymentMethodType)).optional(),
+      }),
+      successUrl: responseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.URL,
+        label: "app.api.payment.create.successUrl.label" as const,
+        description: "app.api.payment.create.successUrl.description" as const,
+        placeholder: "app.api.payment.create.successUrl.placeholder" as const,
+        columns: 6,
+        schema: z.string().url().optional(),
+      }),
+      cancelUrl: responseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.URL,
+        label: "app.api.payment.create.cancelUrl.label" as const,
+        description: "app.api.payment.create.cancelUrl.description" as const,
+        placeholder: "app.api.payment.create.cancelUrl.placeholder" as const,
+        columns: 6,
+        schema: z.string().url().optional(),
+      }),
+      customerEmail: responseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label: "app.api.payment.create.customerEmail.label" as const,
+        description:
+          "app.api.payment.create.customerEmail.description" as const,
+        placeholder:
+          "app.api.payment.create.customerEmail.placeholder" as const,
+        columns: 12,
+        schema: z.string().email().optional(),
+      }),
+      sessionUrl: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.payment.get.response.sessionUrl" as const,
+        schema: z.string().url(),
+      }),
+      sessionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.payment.get.response.sessionId" as const,
+        schema: z.string(),
+      }),
     },
   ),
 
-  // Shared error and success configuration
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.payment.errors.validation.title",
-      description: "app.api.payment.errors.validation.description",
+      title: "app.api.payment.errors.validation.title" as const,
+      description: "app.api.payment.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.payment.errors.notFound.title",
-      description: "app.api.payment.errors.notFound.description",
+      title: "app.api.payment.errors.notFound.title" as const,
+      description: "app.api.payment.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.payment.errors.unauthorized.title",
-      description: "app.api.payment.errors.unauthorized.description",
+      title: "app.api.payment.errors.unauthorized.title" as const,
+      description: "app.api.payment.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.payment.errors.forbidden.title",
-      description: "app.api.payment.errors.forbidden.description",
+      title: "app.api.payment.errors.forbidden.title" as const,
+      description: "app.api.payment.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.payment.errors.server.title",
-      description: "app.api.payment.errors.server.description",
+      title: "app.api.payment.errors.server.title" as const,
+      description: "app.api.payment.errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.payment.errors.network.title",
-      description: "app.api.payment.errors.network.description",
+      title: "app.api.payment.errors.network.title" as const,
+      description: "app.api.payment.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.payment.errors.unknown.title",
-      description: "app.api.payment.errors.unknown.description",
+      title: "app.api.payment.errors.unknown.title" as const,
+      description: "app.api.payment.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.payment.errors.unsavedChanges.title",
-      description: "app.api.payment.errors.unsavedChanges.description",
+      title: "app.api.payment.errors.unsavedChanges.title" as const,
+      description: "app.api.payment.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.payment.errors.conflict.title",
-      description: "app.api.payment.errors.conflict.description",
+      title: "app.api.payment.errors.conflict.title" as const,
+      description: "app.api.payment.errors.conflict.description" as const,
     },
-  },
-  successTypes: {
-    title: "app.api.payment.success.title",
-    description: "app.api.payment.success.description",
   },
 
-  // Method-specific examples
+  successTypes: {
+    title: "app.api.payment.success.title" as const,
+    description: "app.api.payment.success.description" as const,
+  },
+
   examples: {
-    GET: {
-      responses: {
-        default: {
-          priceId: "price_1234567890",
-          mode: CheckoutMode.PAYMENT,
-          paymentMethodTypes: [
-            PaymentMethodType.CARD,
-            PaymentMethodType.PAYPAL,
-          ],
-          successUrl: "https://example.com/success",
-          cancelUrl: "https://example.com/cancel",
-          customerEmail: "user@example.com",
-          sessionUrl: "https://checkout.stripe.com/pay/cs_test_1234567890",
-          sessionId: "cs_test_1234567890",
-        } as const,
-        minimal: {
-          priceId: "price_1234567890",
-          mode: CheckoutMode.PAYMENT,
-          sessionUrl: "https://checkout.stripe.com/pay/cs_test_1234567890",
-          sessionId: "cs_test_1234567890",
-        } as const,
-      },
+    responses: {
+      default: {
+        priceId: "price_1234567890",
+        mode: CheckoutMode.PAYMENT,
+        paymentMethodTypes: [PaymentMethodType.CARD, PaymentMethodType.PAYPAL],
+        successUrl: "https://example.com/success",
+        cancelUrl: "https://example.com/cancel",
+        customerEmail: "user@example.com",
+        sessionUrl: "https://checkout.stripe.com/pay/cs_test_1234567890",
+        sessionId: "cs_test_1234567890",
+      } as const,
+      minimal: {
+        priceId: "price_1234567890",
+        mode: CheckoutMode.PAYMENT,
+        sessionUrl: "https://checkout.stripe.com/pay/cs_test_1234567890",
+        sessionId: "cs_test_1234567890",
+      } as const,
+    } as const,
+  },
+});
+
+/**
+ * POST endpoint for creating payment session
+ */
+const { POST } = createEndpoint({
+  method: Methods.POST,
+  path: ["payment"],
+  title: "app.api.payment.create.title" as const,
+  description: "app.api.payment.create.description" as const,
+  icon: "shopping-cart",
+  category: "app.api.payment.category" as const,
+  tags: [
+    "app.api.payment.tags.payment" as const,
+    "app.api.payment.tags.stripe" as const,
+    "app.api.payment.tags.checkout" as const,
+  ],
+  allowedRoles: [
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.PARTNER_ADMIN,
+    UserRole.PARTNER_EMPLOYEE,
+  ] as const,
+
+  fields: objectField(
+    {
+      type: WidgetType.CONTAINER,
+      title: "app.api.payment.form.title" as const,
+      description: "app.api.payment.form.description" as const,
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
-    POST: {
-      requests: {
-        default: {
-          priceId: "price_1234567890",
-          mode: CheckoutMode.PAYMENT,
-          paymentMethodTypes: [
-            PaymentMethodType.CARD,
-            PaymentMethodType.PAYPAL,
-          ],
-          successUrl: "https://example.com/success",
-          cancelUrl: "https://example.com/cancel",
-          customerEmail: "user@example.com",
-        } as const,
-        minimal: {
-          priceId: "price_1234567890",
-          mode: CheckoutMode.PAYMENT,
-        } as const,
-      },
-      responses: {
-        default: {
-          priceId: "price_1234567890",
-          mode: CheckoutMode.PAYMENT,
-          paymentMethodTypes: [
-            PaymentMethodType.CARD,
-            PaymentMethodType.PAYPAL,
-          ],
-          successUrl: "https://example.com/success",
-          cancelUrl: "https://example.com/cancel",
-          customerEmail: "user@example.com",
-          sessionUrl: "https://checkout.stripe.com/pay/cs_test_1234567890",
-          sessionId: "cs_test_1234567890",
-          message: "Payment session created successfully",
-        } as const,
-        minimal: {
-          priceId: "price_1234567890",
-          mode: CheckoutMode.PAYMENT,
-          sessionUrl: "https://checkout.stripe.com/pay/cs_test_1234567890",
-          sessionId: "cs_test_1234567890",
-          message: "Payment session created successfully",
-        },
+    { request: "data", response: true },
+    {
+      priceId: requestResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.payment.priceId.label" as const,
+        description: "app.api.payment.priceId.description" as const,
+        placeholder: "app.api.payment.priceId.placeholder" as const,
+        columns: 12,
+        schema: z.string().min(1),
+      }),
+      mode: requestResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.payment.mode.label" as const,
+        description: "app.api.payment.mode.description" as const,
+        options: CheckoutModeOptions,
+        columns: 12,
+        schema: z.enum(CheckoutMode),
+      }),
+      paymentMethodTypes: requestResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "app.api.payment.create.paymentMethodTypes.label" as const,
+        description:
+          "app.api.payment.create.paymentMethodTypes.description" as const,
+        options: PaymentMethodTypeOptions,
+        columns: 12,
+        schema: z.array(z.enum(PaymentMethodType)).optional(),
+      }),
+      successUrl: requestResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.URL,
+        label: "app.api.payment.create.successUrl.label" as const,
+        description: "app.api.payment.create.successUrl.description" as const,
+        placeholder: "app.api.payment.create.successUrl.placeholder" as const,
+        columns: 6,
+        schema: z.string().url().optional(),
+      }),
+      cancelUrl: requestResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.URL,
+        label: "app.api.payment.create.cancelUrl.label" as const,
+        description: "app.api.payment.create.cancelUrl.description" as const,
+        placeholder: "app.api.payment.create.cancelUrl.placeholder" as const,
+        columns: 6,
+        schema: z.string().url().optional(),
+      }),
+      customerEmail: requestResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label: "app.api.payment.create.customerEmail.label" as const,
+        description:
+          "app.api.payment.create.customerEmail.description" as const,
+        placeholder:
+          "app.api.payment.create.customerEmail.placeholder" as const,
+        columns: 12,
+        schema: z.string().email().optional(),
+      }),
+      sessionUrl: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.payment.get.response.sessionUrl" as const,
+        schema: z.string().url(),
+      }),
+      sessionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.payment.get.response.sessionId" as const,
+        schema: z.string(),
+      }),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.payment.create.success.message" as const,
+        schema: z.string(),
+      }),
+    },
+  ),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "app.api.payment.errors.validation.title" as const,
+      description: "app.api.payment.errors.validation.description" as const,
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "app.api.payment.errors.notFound.title" as const,
+      description: "app.api.payment.errors.notFound.description" as const,
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "app.api.payment.errors.unauthorized.title" as const,
+      description: "app.api.payment.errors.unauthorized.description" as const,
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "app.api.payment.errors.forbidden.title" as const,
+      description: "app.api.payment.errors.forbidden.description" as const,
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "app.api.payment.errors.server.title" as const,
+      description: "app.api.payment.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "app.api.payment.errors.network.title" as const,
+      description: "app.api.payment.errors.network.description" as const,
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "app.api.payment.errors.unknown.title" as const,
+      description: "app.api.payment.errors.unknown.description" as const,
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "app.api.payment.errors.unsavedChanges.title" as const,
+      description: "app.api.payment.errors.unsavedChanges.description" as const,
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "app.api.payment.errors.conflict.title" as const,
+      description: "app.api.payment.errors.conflict.description" as const,
+    },
+  },
+
+  successTypes: {
+    title: "app.api.payment.success.title" as const,
+    description: "app.api.payment.success.description" as const,
+  },
+
+  examples: {
+    requests: {
+      default: {
+        priceId: "price_1234567890",
+        mode: CheckoutMode.PAYMENT,
+        paymentMethodTypes: [PaymentMethodType.CARD, PaymentMethodType.PAYPAL],
+        successUrl: "https://example.com/success",
+        cancelUrl: "https://example.com/cancel",
+        customerEmail: "user@example.com",
+      } as const,
+      minimal: {
+        priceId: "price_1234567890",
+        mode: CheckoutMode.PAYMENT,
+      } as const,
+    },
+    responses: {
+      default: {
+        priceId: "price_1234567890",
+        mode: CheckoutMode.PAYMENT,
+        paymentMethodTypes: [PaymentMethodType.CARD, PaymentMethodType.PAYPAL],
+        successUrl: "https://example.com/success",
+        cancelUrl: "https://example.com/cancel",
+        customerEmail: "user@example.com",
+        sessionUrl: "https://checkout.stripe.com/pay/cs_test_1234567890",
+        sessionId: "cs_test_1234567890",
+        message: "Payment session created successfully",
+      } as const,
+      minimal: {
+        priceId: "price_1234567890",
+        mode: CheckoutMode.PAYMENT,
+        sessionUrl: "https://checkout.stripe.com/pay/cs_test_1234567890",
+        sessionId: "cs_test_1234567890",
+        message: "Payment session created successfully",
       },
     },
   },

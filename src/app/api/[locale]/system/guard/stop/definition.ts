@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -48,70 +48,56 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      projectPath: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.guard.stop.fields.projectPath.title",
-          description:
-            "app.api.system.guard.stop.fields.projectPath.description",
-          placeholder:
-            "app.api.system.guard.stop.fields.projectPath.placeholder",
-          columns: 6,
-        },
-        z.string().optional(),
-      ),
+      projectPath: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.guard.stop.fields.projectPath.title",
+        description: "app.api.system.guard.stop.fields.projectPath.description",
+        placeholder: "app.api.system.guard.stop.fields.projectPath.placeholder",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
 
-      guardId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.guard.stop.fields.guardId.title",
-          description: "app.api.system.guard.stop.fields.guardId.description",
-          placeholder: "app.api.system.guard.stop.fields.guardId.placeholder",
-          columns: 6,
-        },
-        z.string().optional(),
-      ),
+      guardId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.guard.stop.fields.guardId.title",
+        description: "app.api.system.guard.stop.fields.guardId.description",
+        placeholder: "app.api.system.guard.stop.fields.guardId.placeholder",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
 
-      stopAll: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.guard.stop.fields.stopAll.title",
-          description: "app.api.system.guard.stop.fields.stopAll.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(false),
-      ),
+      stopAll: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.guard.stop.fields.stopAll.title",
+        description: "app.api.system.guard.stop.fields.stopAll.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      force: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.guard.stop.fields.force.title",
-          description: "app.api.system.guard.stop.fields.force.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(false),
-      ),
+      force: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.guard.stop.fields.force.title",
+        description: "app.api.system.guard.stop.fields.force.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.guard.stop.fields.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.guard.stop.fields.success.title",
+        schema: z.boolean(),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.guard.stop.fields.output.title",
-        },
-        z.string(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.guard.stop.fields.output.title",
+        schema: z.string(),
+      }),
 
       stoppedGuards: responseArrayField(
         {
@@ -126,73 +112,57 @@ const { POST } = createEndpoint({
           },
           { response: true },
           {
-            guardId: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.guard.stop.fields.guardId.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string(),
-            ),
-            username: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.guard.stop.fields.username.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string(),
-            ),
-            projectPath: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.guard.stop.fields.projectPath.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string(),
-            ),
-            wasRunning: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.guard.stop.fields.wasRunning.title",
-                fieldType: FieldDataType.BOOLEAN,
-              },
-              z.boolean(),
-            ),
-            nowRunning: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.guard.stop.fields.nowRunning.title",
-                fieldType: FieldDataType.BOOLEAN,
-              },
-              z.boolean(),
-            ),
-            pid: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.guard.stop.fields.pid.title",
-                fieldType: FieldDataType.NUMBER,
-              },
-              z.coerce.number().optional(),
-            ),
-            forceStopped: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.guard.stop.fields.forceStopped.title",
-                fieldType: FieldDataType.BOOLEAN,
-              },
-              z.boolean().optional(),
-            ),
+            guardId: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.stop.fields.guardId.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.string(),
+            }),
+            username: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.stop.fields.username.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.string(),
+            }),
+            projectPath: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.stop.fields.projectPath.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.string(),
+            }),
+            wasRunning: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.stop.fields.wasRunning.title",
+              fieldType: FieldDataType.BOOLEAN,
+              schema: z.boolean(),
+            }),
+            nowRunning: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.stop.fields.nowRunning.title",
+              fieldType: FieldDataType.BOOLEAN,
+              schema: z.boolean(),
+            }),
+            pid: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.stop.fields.pid.title",
+              fieldType: FieldDataType.NUMBER,
+              schema: z.coerce.number().optional(),
+            }),
+            forceStopped: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.stop.fields.forceStopped.title",
+              fieldType: FieldDataType.BOOLEAN,
+              schema: z.boolean().optional(),
+            }),
           },
         ),
       ),
 
-      totalStopped: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.guard.stop.fields.totalStopped.title",
-        },
-        z.coerce.number().optional(),
-      ),
+      totalStopped: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.guard.stop.fields.totalStopped.title",
+        schema: z.coerce.number().optional(),
+      }),
     },
   ),
 

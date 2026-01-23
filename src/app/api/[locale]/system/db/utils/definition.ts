@@ -10,9 +10,9 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   objectOptionalField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -52,7 +52,6 @@ const { GET } = createEndpoint({
         checkConnections: true,
       },
     },
-    urlPathParams: undefined,
     responses: {
       default: {
         status: "healthy",
@@ -84,44 +83,36 @@ const { GET } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      includeDetails: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.utils.includeDetails.title",
-          description: "app.api.system.db.utils.includeDetails.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      includeDetails: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.utils.includeDetails.title",
+        description: "app.api.system.db.utils.includeDetails.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      checkConnections: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.utils.checkConnections.title",
-          description: "app.api.system.db.utils.checkConnections.description",
-          columns: 6,
-        },
-        z.boolean().default(true),
-      ),
+      checkConnections: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.utils.checkConnections.title",
+        description: "app.api.system.db.utils.checkConnections.description",
+        columns: 6,
+        schema: z.boolean().default(true),
+      }),
 
       // === RESPONSE FIELDS ===
-      status: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.utils.status.title",
-        },
-        z.enum(["healthy", "degraded", "unhealthy"]),
-      ),
+      status: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.utils.status.title",
+        schema: z.enum(["healthy", "degraded", "unhealthy"]),
+      }),
 
-      timestamp: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.utils.timestamp.title",
-        },
-        z.string(),
-      ),
+      timestamp: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.utils.timestamp.title",
+        schema: z.string(),
+      }),
 
       connections: objectField(
         {
@@ -132,22 +123,18 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          primary: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.system.db.utils.connections.primary",
-              fieldType: FieldDataType.BOOLEAN,
-            },
-            z.boolean(),
-          ),
-          replica: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.system.db.utils.connections.replica",
-              fieldType: FieldDataType.BOOLEAN,
-            },
-            z.boolean().optional(),
-          ),
+          primary: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.system.db.utils.connections.primary",
+            fieldType: FieldDataType.BOOLEAN,
+            schema: z.boolean(),
+          }),
+          replica: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.system.db.utils.connections.replica",
+            fieldType: FieldDataType.BOOLEAN,
+            schema: z.boolean().optional(),
+          }),
         },
       ),
 
@@ -160,38 +147,30 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          version: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.system.db.utils.details.version",
-              fieldType: FieldDataType.TEXT,
-            },
-            z.string().optional(),
-          ),
-          uptime: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.system.db.utils.details.uptime",
-              fieldType: FieldDataType.NUMBER,
-            },
-            z.coerce.number().optional(),
-          ),
-          activeConnections: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.system.db.utils.details.activeConnections",
-              fieldType: FieldDataType.NUMBER,
-            },
-            z.coerce.number().optional(),
-          ),
-          maxConnections: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.system.db.utils.details.maxConnections",
-              fieldType: FieldDataType.NUMBER,
-            },
-            z.coerce.number().optional(),
-          ),
+          version: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.system.db.utils.details.version",
+            fieldType: FieldDataType.TEXT,
+            schema: z.string().optional(),
+          }),
+          uptime: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.system.db.utils.details.uptime",
+            fieldType: FieldDataType.NUMBER,
+            schema: z.coerce.number().optional(),
+          }),
+          activeConnections: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.system.db.utils.details.activeConnections",
+            fieldType: FieldDataType.NUMBER,
+            schema: z.coerce.number().optional(),
+          }),
+          maxConnections: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.system.db.utils.details.maxConnections",
+            fieldType: FieldDataType.NUMBER,
+            schema: z.coerce.number().optional(),
+          }),
         },
       ),
     },

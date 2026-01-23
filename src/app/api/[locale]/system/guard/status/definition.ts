@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -48,62 +48,52 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      projectPath: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.guard.status.post.fields.projectPath.title",
-          description:
-            "app.api.system.guard.status.post.fields.projectPath.description",
-          placeholder:
-            "app.api.system.guard.status.post.fields.projectPath.placeholder",
-          columns: 6,
-        },
-        z.string().optional(),
-      ),
+      projectPath: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.guard.status.post.fields.projectPath.title",
+        description:
+          "app.api.system.guard.status.post.fields.projectPath.description",
+        placeholder:
+          "app.api.system.guard.status.post.fields.projectPath.placeholder",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
 
-      guardId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.guard.status.post.fields.guardId.title",
-          description:
-            "app.api.system.guard.status.post.fields.guardId.description",
-          placeholder:
-            "app.api.system.guard.status.post.fields.guardId.placeholder",
-          columns: 6,
-        },
-        z.string().optional(),
-      ),
+      guardId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.guard.status.post.fields.guardId.title",
+        description:
+          "app.api.system.guard.status.post.fields.guardId.description",
+        placeholder:
+          "app.api.system.guard.status.post.fields.guardId.placeholder",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
 
-      listAll: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.guard.status.post.fields.listAll.title",
-          description:
-            "app.api.system.guard.status.post.fields.listAll.description",
-          columns: 12,
-        },
-        z.boolean().optional().default(false),
-      ),
+      listAll: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.guard.status.post.fields.listAll.title",
+        description:
+          "app.api.system.guard.status.post.fields.listAll.description",
+        columns: 12,
+        schema: z.boolean().optional().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.guard.status.post.fields.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.guard.status.post.fields.success.title",
+        schema: z.boolean(),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.guard.status.post.fields.output.title",
-        },
-        z.string(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.guard.status.post.fields.output.title",
+        schema: z.string(),
+      }),
 
       guards: responseArrayField(
         {
@@ -118,105 +108,80 @@ const { POST } = createEndpoint({
           },
           { response: true },
           {
-            guardId: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.status.post.fields.guardId.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string(),
-            ),
-            username: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.status.post.fields.username.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string(),
-            ),
-            projectPath: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.status.post.fields.projectPath.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string(),
-            ),
-            status: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.guard.status.post.fields.status.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string(),
-            ),
-            createdAt: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.status.post.fields.createdAt.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string(),
-            ),
-            securityLevel: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.status.post.fields.securityLevel.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string(),
-            ),
-            isolationMethod: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.status.post.fields.isolationMethod.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string(),
-            ),
-            isRunning: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.status.post.fields.isRunning.title",
-                fieldType: FieldDataType.BOOLEAN,
-              },
-              z.boolean(),
-            ),
-            userHome: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.status.post.fields.userHome.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string().optional(),
-            ),
+            guardId: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.status.post.fields.guardId.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.string(),
+            }),
+            username: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.status.post.fields.username.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.string(),
+            }),
+            projectPath: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.guard.status.post.fields.projectPath.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.string(),
+            }),
+            status: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.status.post.fields.status.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.string(),
+            }),
+            createdAt: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.guard.status.post.fields.createdAt.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.string(),
+            }),
+            securityLevel: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.guard.status.post.fields.securityLevel.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.string(),
+            }),
+            isolationMethod: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.guard.status.post.fields.isolationMethod.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.string(),
+            }),
+            isRunning: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.guard.status.post.fields.isRunning.title",
+              fieldType: FieldDataType.BOOLEAN,
+              schema: z.boolean(),
+            }),
+            userHome: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.status.post.fields.userHome.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.string().optional(),
+            }),
           },
         ),
       ),
 
-      totalGuards: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.guard.status.post.fields.totalGuards.title",
-        },
-        z.coerce.number().optional(),
-      ),
+      totalGuards: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.guard.status.post.fields.totalGuards.title",
+        schema: z.coerce.number().optional(),
+      }),
 
-      activeGuards: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.guard.status.post.fields.activeGuards.title",
-        },
-        z.coerce.number().optional(),
-      ),
+      activeGuards: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.guard.status.post.fields.activeGuards.title",
+        schema: z.coerce.number().optional(),
+      }),
     },
   ),
 
@@ -362,7 +327,6 @@ const { POST } = createEndpoint({
         activeGuards: 1,
       },
     },
-    urlPathParams: undefined,
   },
 });
 

@@ -307,12 +307,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
   ): void => {
     // buildKey returns string, wrap in array for React Query
-    const stateKey = [buildKey("query", endpoint, urlPathParams, logger)];
-
-    logger.debug("Updating endpoint data in cache", {
-      endpointPath: endpoint.path.join("/"),
-      stateKey: JSON.stringify(stateKey),
-    });
+    const builtKey = buildKey("query", endpoint, urlPathParams, logger);
+    const stateKey = [builtKey];
 
     type CachedData =
       | {
@@ -489,13 +485,6 @@ export const apiClient = {
   },
 
   /**
-   * Invalidate a query to force refetch on next access
-   */
-  invalidateQueries: async (queryKey: QueryKey): Promise<void> => {
-    await queryClient.invalidateQueries({ queryKey });
-  },
-
-  /**
    * Refetch endpoint queries by invalidating all queries for this endpoint
    *
    * @example
@@ -504,14 +493,14 @@ export const apiClient = {
   refetchEndpoint: async <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
     logger: EndpointLogger,
+    ...args: TEndpoint["types"]["UrlVariablesOutput"] extends undefined
+      ? []
+      : [urlPathParams: TEndpoint["types"]["UrlVariablesOutput"]]
   ): Promise<void> => {
-    const keyPrefix = buildKey("query", endpoint, undefined, logger);
-    await queryClient.invalidateQueries({
-      predicate: (query) => {
-        const key = query.queryKey[0];
-        return typeof key === "string" && key.startsWith(keyPrefix);
-      },
-    });
+    const urlPathParams = args[0];
+    const builtKey = buildKey("query", endpoint, urlPathParams, logger);
+    const queryKey = [builtKey];
+    await queryClient.invalidateQueries({ queryKey });
   },
 
   /**

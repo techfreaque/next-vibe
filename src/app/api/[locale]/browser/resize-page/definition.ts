@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,47 +50,41 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      width: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.browser.resize-page.form.fields.width.label",
-          description:
-            "app.api.browser.resize-page.form.fields.width.description",
-          placeholder:
-            "app.api.browser.resize-page.form.fields.width.placeholder",
-          columns: 6,
-        },
-        z.coerce.number().describe("Page width"),
-      ),
-      height: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.browser.resize-page.form.fields.height.label",
-          description:
-            "app.api.browser.resize-page.form.fields.height.description",
-          placeholder:
-            "app.api.browser.resize-page.form.fields.height.placeholder",
-          columns: 6,
-        },
-        z.coerce.number().describe("Page height"),
-      ),
+      width: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.browser.resize-page.form.fields.width.label",
+        description:
+          "app.api.browser.resize-page.form.fields.width.description",
+        placeholder:
+          "app.api.browser.resize-page.form.fields.width.placeholder",
+        columns: 6,
+        schema: z.coerce.number().describe("Page width"),
+      }),
+      height: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.browser.resize-page.form.fields.height.label",
+        description:
+          "app.api.browser.resize-page.form.fields.height.description",
+        placeholder:
+          "app.api.browser.resize-page.form.fields.height.placeholder",
+        columns: 6,
+        schema: z.coerce.number().describe("Page height"),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.resize-page.response.success",
-        },
-        z.boolean().describe("Whether the page resize operation succeeded"),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.resize-page.response.result",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.resize-page.response.success",
+        schema: z
+          .boolean()
+          .describe("Whether the page resize operation succeeded"),
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.resize-page.response.result",
+        schema: z
           .object({
             resized: z.boolean().describe("Whether the page was resized"),
             width: z.coerce.number().describe("New page width"),
@@ -98,21 +92,23 @@ const { POST } = createEndpoint({
           })
           .optional()
           .describe("Result of page resize operation"),
-      ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.resize-page.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.resize-page.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      }),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.resize-page.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.resize-page.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -130,7 +126,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

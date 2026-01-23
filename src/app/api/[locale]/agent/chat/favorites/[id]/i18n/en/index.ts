@@ -5,6 +5,12 @@ export const translations = {
     container: {
       title: "Favorite Details",
     },
+    editButton: {
+      label: "Edit Favorite",
+    },
+    deleteButton: {
+      label: "Delete Favorite",
+    },
     id: {
       label: "Favorite ID",
     },
@@ -14,6 +20,9 @@ export const translations = {
       },
       customName: {
         content: "Custom Name: {{value}}",
+      },
+      customIcon: {
+        content: "Custom Icon: {{value}}",
       },
       voice: {
         content: "Voice: {{value}}",
@@ -128,6 +137,16 @@ export const translations = {
     container: {
       title: "Edit Favorite",
     },
+    backButton: {
+      label: "Back to Favorite",
+    },
+    deleteButton: {
+      label: "Delete Favorite",
+    },
+    submitButton: {
+      label: "Save Changes",
+      loadingText: "Saving...",
+    },
     id: {
       label: "Favorite ID",
     },
@@ -151,6 +170,8 @@ export const translations = {
     },
     selectionType: {
       label: "Selection Type",
+      characterBased: "Based on Character",
+
       manual: "Specific Model",
       filters: "Filter Criteria",
     },
@@ -271,9 +292,18 @@ export const translations = {
     description: "Remove a favorite configuration",
     container: {
       title: "Delete Favorite",
+      description: "Permanently remove this favorite configuration",
+    },
+    backButton: {
+      label: "Cancel",
+    },
+    actions: {
+      delete: "Delete Favorite",
+      deleting: "Deleting Favorite",
     },
     id: {
       label: "Favorite ID",
+      description: "The unique identifier of the favorite to delete",
     },
     response: {
       success: {

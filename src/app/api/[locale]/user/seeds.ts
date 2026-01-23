@@ -50,8 +50,6 @@ export async function dev(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<void> {
-  logger.debug("🌱 Seeding auth data for development environment");
-
   // Create admin user
   const adminUser = createUserSeed({
     email: "admin@example.com",
@@ -147,6 +145,7 @@ export async function dev(
 
   // Create primary leads for all users
   const { language, country } = getLanguageAndCountryFromLocale(locale);
+  const leadsCreated = [];
   for (const user of createdUsers) {
     try {
       // Check if lead already exists for this email
@@ -159,9 +158,6 @@ export async function dev(
       let leadId: string;
       if (existingLeads.length > 0) {
         leadId = existingLeads[0].id;
-        logger.debug(
-          `Lead already exists for ${user.email}, using existing lead ${leadId}`,
-        );
       } else {
         // Create lead
         const leadData = {
@@ -174,7 +170,7 @@ export async function dev(
         };
         const [newLead] = await db.insert(leads).values(leadData).returning();
         leadId = newLead.id;
-        logger.debug(`Created primary lead ${leadId} for user ${user.id}`);
+        leadsCreated.push(leadId);
       }
 
       // Check if user-lead link already exists
@@ -195,11 +191,6 @@ export async function dev(
           leadId,
           linkReason: "manual",
         });
-        logger.debug(`Linked lead ${leadId} to user ${user.id}`);
-      } else {
-        logger.debug(
-          `User-lead link already exists for user ${user.id} and lead ${leadId}`,
-        );
       }
     } catch (error) {
       const errorMsg = parseError(error).message;
@@ -211,11 +202,16 @@ export async function dev(
       }
     }
   }
+  if (leadsCreated.length > 0) {
+    logger.debug(`Created ${leadsCreated.length} primary leads for users`);
+  }
 
   // Create roles for users
   try {
     // Check if user_roles table exists
     try {
+      const rolesCreated: { userId: string; role: string }[] = [];
+
       if (createdUsers[0]) {
         // First user is admin user - assign admin and CLI_AUTH_BYPASS roles
         const adminUserId = createdUsers[0].id;
@@ -232,7 +228,7 @@ export async function dev(
               },
               logger,
             );
-            logger.debug(`Created ${role} role for admin user ${adminUserId}`);
+            rolesCreated.push({ userId: adminUserId, role });
           } catch (roleError) {
             logger.error(
               `Failed to create ${role} role for admin user`,
@@ -244,28 +240,54 @@ export async function dev(
 
       if (createdUsers[1]) {
         // Second user is demo user
-        await UserRolesRepository.addRole(
-          {
+        try {
+          await UserRolesRepository.addRole(
+            {
+              userId: createdUsers[1].id,
+              role: UserRole.CUSTOMER,
+            },
+            logger,
+          );
+          rolesCreated.push({
             userId: createdUsers[1].id,
             role: UserRole.CUSTOMER,
-          },
-          logger,
-        );
-        logger.debug(`Created customer role for user ${createdUsers[1].id}`);
+          });
+        } catch (roleError) {
+          logger.error(
+            `Failed to create customer role for user ${createdUsers[1].id}`,
+            parseError(roleError),
+          );
+        }
       }
 
       // Create roles for regular users (starting from index 2)
       for (let i = 2; i < createdUsers.length; i++) {
         if (createdUsers[i]) {
-          await UserRolesRepository.addRole(
-            {
+          try {
+            await UserRolesRepository.addRole(
+              {
+                userId: createdUsers[i].id,
+                role: UserRole.CUSTOMER,
+              },
+              logger,
+            );
+            rolesCreated.push({
               userId: createdUsers[i].id,
               role: UserRole.CUSTOMER,
-            },
-            logger,
-          );
-          logger.debug(`Created customer role for user ${createdUsers[i].id}`);
+            });
+          } catch (roleError) {
+            logger.error(
+              `Failed to create customer role for user ${createdUsers[i].id}`,
+              parseError(roleError),
+            );
+          }
         }
+      }
+
+      if (rolesCreated.length > 0) {
+        logger.debug(
+          `Created roles: ${rolesCreated.map((r) => `${r.role}`).join(", ")}`,
+        );
       }
     } catch (roleError) {
       // Type-safe checks for error message properties
@@ -306,14 +328,8 @@ export async function dev(
         logger,
       );
 
-      if (referralResult.success) {
-        logger.debug(
-          `Created referral code FRIEND2024 for admin user ${adminUserId}`,
-        );
-      } else {
-        logger.debug(
-          `Referral code FRIEND2024 already exists or failed to create`,
-        );
+      if (!referralResult.success) {
+        logger.debug(`Referral code already exists or failed`);
       }
     } catch (error) {
       logger.error("Error creating referral code", parseError(error));
@@ -324,8 +340,6 @@ export async function dev(
   if (createdUsers.length > 0 && createdUsers[0]) {
     const adminUserId = createdUsers[0].id;
     try {
-      logger.debug(`Creating CLI authentication for user ${adminUserId}`);
-
       // Create CLI token
       const cliTokenResponse = await AuthRepository.createCliToken(
         adminUserId,
@@ -333,8 +347,6 @@ export async function dev(
         logger,
       );
       if (cliTokenResponse.success) {
-        logger.debug(`✅ Created CLI token for user ${adminUserId}`);
-
         // Create a persistent session for CLI operations
         const sessionExpiresAt = new Date(
           Date.now() + 365 * 24 * 60 * 60 * 1000,
@@ -346,9 +358,7 @@ export async function dev(
           createdAt: new Date(),
         });
 
-        if (sessionResult.success) {
-          logger.debug(`✅ Created CLI session for user ${adminUserId}`);
-        } else {
+        if (!sessionResult.success) {
           logger.error("Failed to create CLI session");
         }
       } else {
@@ -360,7 +370,7 @@ export async function dev(
   }
 
   logger.debug(
-    `✅ Inserted ${createdUsers.length} development users with roles and CLI authentication`,
+    `✅ Seeded user: ${createdUsers.length} users, roles assigned, CLI auth`,
   );
 }
 
@@ -368,8 +378,6 @@ export async function dev(
  * Test seed function for auth module
  */
 export async function test(logger: EndpointLogger): Promise<void> {
-  logger.debug("🌱 Seeding auth data for test environment");
-
   // Create test users
   const testUsers = [
     createUserSeed({

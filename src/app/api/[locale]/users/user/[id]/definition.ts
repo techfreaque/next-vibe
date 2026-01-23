@@ -8,12 +8,12 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
-  requestResponseField,
+  requestField,
   requestUrlPathParamsField,
+  requestUrlPathParamsResponseField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 // // leadId schema not needed - using z.uuid() directly // TODO: Remove if not needed
 import {
   EndpointErrorTypes,
@@ -50,17 +50,15 @@ const { GET } = createEndpoint({
     { request: "urlPathParams", response: true },
     {
       // === URL PARAMS ===
-      id: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.users.user.id.id.get.id.label" as const,
-          description: "app.api.users.user.id.id.get.id.description" as const,
-          placeholder: "app.api.users.user.id.id.get.id.placeholder" as const,
-          columns: 12,
-        },
-        z.string().uuid("usersErrors.validation.id.invalid"),
-      ),
+      id: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.users.user.id.id.get.id.label" as const,
+        description: "app.api.users.user.id.id.get.id.description" as const,
+        placeholder: "app.api.users.user.id.id.get.id.placeholder" as const,
+        columns: 12,
+        schema: z.uuid("usersErrors.validation.id.invalid"),
+      }),
 
       // === USER PROFILE INFORMATION ===
       userProfile: objectField(
@@ -86,38 +84,30 @@ const { GET } = createEndpoint({
             },
             { response: true },
             {
-              id: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.users.user.id.id.get.response.userProfile.basicInfo.id.content" as const,
-                },
-                z.uuid().describe("User unique identifier"),
-              ),
-              email: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.users.user.id.id.get.response.userProfile.basicInfo.email.content" as const,
-                },
-                z.email().describe("User's email address"),
-              ),
-              privateName: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.users.user.id.id.get.response.userProfile.basicInfo.privateName.content" as const,
-                },
-                z.string().describe("User's private name"),
-              ),
-              publicName: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.users.user.id.id.get.response.userProfile.basicInfo.publicName.content" as const,
-                },
-                z.string().describe("User's public name"),
-              ),
+              id: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.users.user.id.id.get.response.userProfile.basicInfo.id.content" as const,
+                schema: z.string().uuid().describe("User unique identifier"),
+              }),
+              email: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.users.user.id.id.get.response.userProfile.basicInfo.email.content" as const,
+                schema: z.string().email().describe("User's email address"),
+              }),
+              privateName: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.users.user.id.id.get.response.userProfile.basicInfo.privateName.content" as const,
+                schema: z.string().describe("User's private name"),
+              }),
+              publicName: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.users.user.id.id.get.response.userProfile.basicInfo.publicName.content" as const,
+                schema: z.string().describe("User's public name"),
+              }),
             },
           ),
         },
@@ -136,28 +126,22 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          isActive: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.users.user.id.id.get.response.accountStatus.isActive.content" as const,
-            },
-            z.boolean().describe("Account active status"),
-          ),
-          emailVerified: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.users.user.id.id.get.response.accountStatus.emailVerified.content" as const,
-            },
-            z.boolean().describe("Email verification status"),
-          ),
-          stripeCustomerId: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.user.id.id.get.response.accountStatus.stripeCustomerId.content" as const,
-            },
-            z.string().nullable().describe("Stripe customer ID"),
-          ),
+          isActive: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.users.user.id.id.get.response.accountStatus.isActive.content" as const,
+            schema: z.boolean().describe("Account active status"),
+          }),
+          emailVerified: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.users.user.id.id.get.response.accountStatus.emailVerified.content" as const,
+            schema: z.boolean().describe("Email verification status"),
+          }),
+          stripeCustomerId: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.users.user.id.id.get.response.accountStatus.stripeCustomerId.content" as const,
+            schema: z.string().nullable().describe("Stripe customer ID"),
+          }),
           userRoles: responseArrayField(
             {
               type: WidgetType.DATA_LIST,
@@ -169,21 +153,17 @@ const { GET } = createEndpoint({
               },
               { response: true },
               {
-                id: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.users.user.id.id.get.response.accountStatus.userRoles.content" as const,
-                  },
-                  z.uuid().describe("Role ID"),
-                ),
-                role: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.users.user.id.id.get.response.accountStatus.userRoles.content" as const,
-                  },
-                  z.string().describe("Role name"),
-                ),
+                id: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.users.user.id.id.get.response.accountStatus.userRoles.content" as const,
+                  schema: z.uuid().describe("Role ID"),
+                }),
+                role: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.users.user.id.id.get.response.accountStatus.userRoles.content" as const,
+                  schema: z.string().describe("Role name"),
+                }),
               },
             ),
           ),
@@ -203,79 +183,60 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          createdAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.user.id.id.get.response.timestamps.createdAt.content" as const,
-            },
-            dateSchema.describe("Account creation date"),
-          ),
-          updatedAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.user.id.id.get.response.timestamps.updatedAt.content" as const,
-            },
-            dateSchema.describe("Last update date"),
-          ),
+          createdAt: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.users.user.id.id.get.response.timestamps.createdAt.content" as const,
+            schema: dateSchema.describe("Account creation date"),
+          }),
+          updatedAt: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.users.user.id.id.get.response.timestamps.updatedAt.content" as const,
+            schema: dateSchema.describe("Last update date"),
+          }),
         },
       ),
 
-      leadId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.get.response.leadId.content" as const,
-        },
-        z.uuid().nullable(),
-      ),
-      email: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.get.response.email.content" as const,
-        },
-        z.email(),
-      ),
-      privateName: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.get.response.privateName.content" as const,
-        },
-        z.string(),
-      ),
-      publicName: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.get.response.publicName.content" as const,
-        },
-        z.string(),
-      ),
-      emailVerified: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.users.user.id.id.get.response.emailVerified.content" as const,
-        },
-        z.boolean(),
-      ),
-      isActive: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.users.user.id.id.get.response.isActive.content" as const,
-        },
-        z.boolean(),
-      ),
-      stripeCustomerId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.get.response.stripeCustomerId.content" as const,
-        },
-        z.string().nullable(),
-      ),
+      leadId: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.user.id.id.get.response.leadId.content" as const,
+        schema: z.uuid().nullable(),
+      }),
+      email: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.users.user.id.id.get.response.email.content" as const,
+        schema: z.email(),
+      }),
+      privateName: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.user.id.id.get.response.privateName.content" as const,
+        schema: z.string(),
+      }),
+      publicName: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.user.id.id.get.response.publicName.content" as const,
+        schema: z.string(),
+      }),
+      emailVerified: responseField({
+        type: WidgetType.BADGE,
+        text: "app.api.users.user.id.id.get.response.emailVerified.content" as const,
+        schema: z.boolean(),
+      }),
+      isActive: responseField({
+        type: WidgetType.BADGE,
+        text: "app.api.users.user.id.id.get.response.isActive.content" as const,
+        schema: z.boolean(),
+      }),
+      stripeCustomerId: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.user.id.id.get.response.stripeCustomerId.content" as const,
+        schema: z.string().nullable(),
+      }),
       userRoles: responseArrayField(
         {
           type: WidgetType.DATA_LIST,
@@ -287,40 +248,32 @@ const { GET } = createEndpoint({
           },
           { response: true },
           {
-            id: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.users.user.id.id.get.response.userRoles.content" as const,
-              },
-              z.uuid(),
-            ),
-            role: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.users.user.id.id.get.response.userRoles.content" as const,
-              },
-              z.string(),
-            ),
+            id: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.users.user.id.id.get.response.userRoles.content" as const,
+              schema: z.uuid(),
+            }),
+            role: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.users.user.id.id.get.response.userRoles.content" as const,
+              schema: z.string(),
+            }),
           },
         ),
       ),
-      createdAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.get.response.createdAt.content" as const,
-        },
-        dateSchema,
-      ),
-      updatedAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.get.response.updatedAt.content" as const,
-        },
-        dateSchema,
-      ),
+      createdAt: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.user.id.id.get.response.createdAt.content" as const,
+        schema: dateSchema,
+      }),
+      updatedAt: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.user.id.id.get.response.updatedAt.content" as const,
+        schema: dateSchema,
+      }),
     },
   ),
 
@@ -453,18 +406,15 @@ const { PUT } = createEndpoint({
     { request: "data&urlPathParams", response: true },
     {
       // === URL PARAMS ===
-      id: requestResponseField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.users.user.id.id.put.id.label" as const,
-          description: "app.api.users.user.id.id.put.id.description" as const,
-          placeholder: "app.api.users.user.id.id.put.id.placeholder" as const,
-          columns: 12,
-        },
-        z.string().uuid("usersErrors.validation.id.invalid"),
-        true,
-      ),
+      id: requestUrlPathParamsResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.users.user.id.id.put.id.label" as const,
+        description: "app.api.users.user.id.id.put.id.description" as const,
+        placeholder: "app.api.users.user.id.id.put.id.placeholder" as const,
+        columns: 12,
+        schema: z.string().uuid("usersErrors.validation.id.invalid"),
+      }),
 
       // === BASIC INFORMATION ===
       basicInfo: objectField(
@@ -479,55 +429,49 @@ const { PUT } = createEndpoint({
         },
         { request: "data" },
         {
-          email: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.EMAIL,
-              label: "app.api.users.user.id.id.put.email.label" as const,
-              description:
-                "app.api.users.user.id.id.put.email.description" as const,
-              placeholder:
-                "app.api.users.user.id.id.put.email.placeholder" as const,
-              columns: 12,
-            },
-            z
+          email: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.EMAIL,
+            label: "app.api.users.user.id.id.put.email.label" as const,
+            description:
+              "app.api.users.user.id.id.put.email.description" as const,
+            placeholder:
+              "app.api.users.user.id.id.put.email.placeholder" as const,
+            columns: 12,
+            schema: z
               .string()
               .email("usersErrors.validation.email.invalid")
               .transform((val) => val.toLowerCase().trim())
               .optional(),
-          ),
-          privateName: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.users.user.id.id.put.privateName.label" as const,
-              description:
-                "app.api.users.user.id.id.put.privateName.description" as const,
-              columns: 6,
-            },
-            z
+          }),
+          privateName: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.users.user.id.id.put.privateName.label" as const,
+            description:
+              "app.api.users.user.id.id.put.privateName.description" as const,
+            columns: 6,
+            schema: z
               .string()
               .min(1, "usersErrors.validation.privateName.required")
               .max(255, "usersErrors.validation.privateName.tooLong")
               .transform((val) => val.trim())
               .optional(),
-          ),
-          publicName: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.users.user.id.id.put.publicName.label" as const,
-              description:
-                "app.api.users.user.id.id.put.publicName.description" as const,
-              columns: 6,
-            },
-            z
+          }),
+          publicName: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.users.user.id.id.put.publicName.label" as const,
+            description:
+              "app.api.users.user.id.id.put.publicName.description" as const,
+            columns: 6,
+            schema: z
               .string()
               .min(1, "usersErrors.validation.publicName.required")
               .max(255, "usersErrors.validation.publicName.tooLong")
               .transform((val) => val.trim())
               .optional(),
-          ),
+          }),
         },
       ),
 
@@ -544,98 +488,76 @@ const { PUT } = createEndpoint({
         },
         { request: "data" },
         {
-          emailVerified: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label:
-                "app.api.users.user.id.id.put.emailVerified.label" as const,
-              description:
-                "app.api.users.user.id.id.put.emailVerified.description" as const,
-              columns: 6,
-            },
-            z.boolean().optional(),
-          ),
-          isActive: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.users.user.id.id.put.isActive.label" as const,
-              description:
-                "app.api.users.user.id.id.put.isActive.description" as const,
-              columns: 6,
-            },
-            z.boolean().optional(),
-          ),
-          leadId: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.UUID,
-              label: "app.api.users.user.id.id.put.leadId.label" as const,
-              description:
-                "app.api.users.user.id.id.put.leadId.description" as const,
-              columns: 6,
-            },
-            z.uuid().nullable().optional(),
-          ),
+          emailVerified: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.BOOLEAN,
+            label: "app.api.users.user.id.id.put.emailVerified.label" as const,
+            description:
+              "app.api.users.user.id.id.put.emailVerified.description" as const,
+            columns: 6,
+            schema: z.boolean().optional(),
+          }),
+          isActive: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.BOOLEAN,
+            label: "app.api.users.user.id.id.put.isActive.label" as const,
+            description:
+              "app.api.users.user.id.id.put.isActive.description" as const,
+            columns: 6,
+            schema: z.boolean().optional(),
+          }),
+          leadId: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.UUID,
+            label: "app.api.users.user.id.id.put.leadId.label" as const,
+            description:
+              "app.api.users.user.id.id.put.leadId.description" as const,
+            columns: 6,
+            schema: z.uuid().nullable().optional(),
+          }),
         },
       ),
 
       // === RESPONSE FIELDS (same as GET) ===
-      leadId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.put.response.leadId.content" as const,
-        },
-        z.uuid().nullable(),
-      ),
-      email: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.put.response.email.content" as const,
-        },
-        z.email(),
-      ),
-      privateName: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.put.response.privateName.content" as const,
-        },
-        z.string(),
-      ),
-      publicName: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.put.response.publicName.content" as const,
-        },
-        z.string(),
-      ),
-      emailVerified: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.users.user.id.id.put.response.emailVerified.content" as const,
-        },
-        z.boolean(),
-      ),
-      isActive: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.users.user.id.id.put.response.isActive.content" as const,
-        },
-        z.boolean(),
-      ),
-      stripeCustomerId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.put.response.stripeCustomerId.content" as const,
-        },
-        z.string().nullable(),
-      ),
+      leadId: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.user.id.id.put.response.leadId.content" as const,
+        schema: z.uuid().nullable(),
+      }),
+      email: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.users.user.id.id.put.response.email.content" as const,
+        schema: z.email(),
+      }),
+      privateName: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.user.id.id.put.response.privateName.content" as const,
+        schema: z.string(),
+      }),
+      publicName: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.user.id.id.put.response.publicName.content" as const,
+        schema: z.string(),
+      }),
+      emailVerified: responseField({
+        type: WidgetType.BADGE,
+        text: "app.api.users.user.id.id.put.response.emailVerified.content" as const,
+        schema: z.boolean(),
+      }),
+      isActive: responseField({
+        type: WidgetType.BADGE,
+        text: "app.api.users.user.id.id.put.response.isActive.content" as const,
+        schema: z.boolean(),
+      }),
+      stripeCustomerId: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.user.id.id.put.response.stripeCustomerId.content" as const,
+        schema: z.string().nullable(),
+      }),
       userRoles: responseArrayField(
         {
           type: WidgetType.DATA_LIST,
@@ -647,40 +569,32 @@ const { PUT } = createEndpoint({
           },
           { response: true },
           {
-            id: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.users.user.id.id.put.response.userRoles.content" as const,
-              },
-              z.uuid(),
-            ),
-            role: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.users.user.id.id.put.response.userRoles.content" as const,
-              },
-              z.string(),
-            ),
+            id: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.users.user.id.id.put.response.userRoles.content" as const,
+              schema: z.uuid(),
+            }),
+            role: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.users.user.id.id.put.response.userRoles.content" as const,
+              schema: z.string(),
+            }),
           },
         ),
       ),
-      createdAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.put.response.createdAt.content" as const,
-        },
-        dateSchema,
-      ),
-      updatedAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.put.response.updatedAt.content" as const,
-        },
-        dateSchema,
-      ),
+      createdAt: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.user.id.id.put.response.createdAt.content" as const,
+        schema: dateSchema,
+      }),
+      updatedAt: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.user.id.id.put.response.updatedAt.content" as const,
+        schema: dateSchema,
+      }),
     },
   ),
 
@@ -801,45 +715,35 @@ const { DELETE } = createEndpoint({
     { request: "urlPathParams", response: true },
     {
       // === URL PARAMS ===
-      id: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.users.user.id.id.delete.id.label" as const,
-          description:
-            "app.api.users.user.id.id.delete.id.description" as const,
-          placeholder:
-            "app.api.users.user.id.id.delete.id.placeholder" as const,
-          helpText: "app.api.users.user.id.id.delete.id.helpText" as const,
-          columns: 12,
-        },
-        z.string().uuid("usersErrors.validation.id.invalid"),
-      ),
+      id: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.users.user.id.id.delete.id.label" as const,
+        description: "app.api.users.user.id.id.delete.id.description" as const,
+        placeholder: "app.api.users.user.id.id.delete.id.placeholder" as const,
+        helpText: "app.api.users.user.id.id.delete.id.helpText" as const,
+        columns: 12,
+        schema: z.string().uuid("usersErrors.validation.id.invalid"),
+      }),
 
       // === RESPONSE ===
-      success: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.users.user.id.id.delete.response.deletionResult.success.content" as const,
-        },
-        z.boolean().describe("Whether the deletion was successful"),
-      ),
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.delete.response.deletionResult.message.content" as const,
-        },
-        z.string().describe("Human-readable result message"),
-      ),
-      deletedAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.delete.response.deletionResult.deletedAt.content" as const,
-        },
-        dateSchema.describe("When the user was deleted"),
-      ),
+      success: responseField({
+        type: WidgetType.BADGE,
+        text: "app.api.users.user.id.id.delete.response.deletionResult.success.content" as const,
+        schema: z.boolean().describe("Whether the deletion was successful"),
+      }),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.user.id.id.delete.response.deletionResult.message.content" as const,
+        schema: z.string().describe("Human-readable result message"),
+      }),
+      deletedAt: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.users.user.id.id.delete.response.deletionResult.deletedAt.content" as const,
+        schema: dateSchema.describe("When the user was deleted"),
+      }),
     },
   ),
 

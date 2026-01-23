@@ -21,7 +21,7 @@ import { simpleT } from "@/i18n/core/shared";
 interface BuyCreditsPageClientProps {
   locale: CountryLanguage;
   isAuthenticated: boolean;
-  initialCredits: CreditBalance | null;
+  initialCredits: CreditBalance;
   initialSubscription: SubscriptionGetResponseOutput | null;
   subscriptionPrice: number;
   subscriptionCredits: number;

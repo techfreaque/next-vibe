@@ -11,7 +11,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { LanguageMiddlewareOptions } from "./language";
 import { detectLocale } from "./language";
-import { checkLeadId, createLeadId } from "./lead-id";
+import { checkLeadId, createLeadId, LeadIdCheckResult } from "./lead-id";
+import { checkSession, clearSessionToken, SessionCheckResult } from "./session";
 import { extractLocaleFromPath, shouldSkipPath } from "./utils";
 
 /**
@@ -60,19 +61,43 @@ export async function middleware(
   const locale =
     (extractLocaleFromPath(path) as CountryLanguage) || options.defaultLocale;
 
-  // Step 3: Handle leadId tracking
-  const leadIdCheck = checkLeadId(request);
+  // Step 3: Handle session validation FIRST and clear invalid tokens
+  // This must happen before leadId check so we can clear the token before any redirects
+  const sessionCheck = await checkSession(request);
 
-  // If we should skip leadId handling, continue
-  if (leadIdCheck === "skip") {
+  if (sessionCheck === SessionCheckResult.INVALID) {
+    // Session token is invalid, clear it and continue to next step
+    return clearSessionToken(request);
+  }
+
+  // Step 4: Handle leadId tracking
+  const leadIdCheck = await checkLeadId(request);
+
+  if (leadIdCheck === LeadIdCheckResult.SKIP) {
     return NextResponseClass.next();
   }
 
-  // If leadId needs to be created, create it
-  if (leadIdCheck === null) {
+  if (
+    leadIdCheck === LeadIdCheckResult.INVALID ||
+    leadIdCheck === LeadIdCheckResult.MISSING
+  ) {
+    const isApiRoute = path.startsWith("/api/");
+
+    if (isApiRoute) {
+      // For API routes with invalid or missing leadId, return auth error
+      return NextResponseClass.json(
+        {
+          error: "invalid_identity",
+          message: "Could not verify identity. Invalid or expired session.",
+        },
+        { status: 401 },
+      );
+    }
+
+    // For page routes, create a new leadId and set it in the cookie
     return await createLeadId(request, locale);
   }
 
-  // Otherwise continue
+  // Valid leadId and session, continue
   return NextResponseClass.next();
 }

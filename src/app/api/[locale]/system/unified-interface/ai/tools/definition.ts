@@ -9,7 +9,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -61,14 +61,12 @@ const { GET } = createEndpoint({
     },
     { response: true },
     {
-      tools: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.ai.tools.get.fields.tools.title" as const,
-        },
-        z.array(aiToolMetadataSchema),
-      ),
+      tools: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.ai.tools.get.fields.tools.title" as const,
+        schema: z.array(aiToolMetadataSchema),
+      }),
     },
   ),
 

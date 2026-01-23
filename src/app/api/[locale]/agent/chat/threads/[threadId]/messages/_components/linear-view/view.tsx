@@ -63,8 +63,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
     handleDeleteMessage: onDeleteMessage,
     retryMessage: onRetryMessage,
     answerAsAI: onAnswerAsModel,
-    handleModelChange: onModelChange,
-    setSelectedCharacter: onCharacterChange,
     handleSwitchBranch: onSwitchBranch,
     branchMessage,
     // Editor actions
@@ -194,8 +192,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                       message={message}
                       onBranch={branchMessage}
                       onCancel={onCancelAction}
-                      onModelChange={onModelChange}
-                      onCharacterChange={onCharacterChange}
                       locale={locale}
                       logger={logger}
                       user={user}
@@ -206,18 +202,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                     <ModelCharacterSelectorModal
                       titleKey="app.chat.linearMessageView.retryModal.title"
                       descriptionKey="app.chat.linearMessageView.retryModal.description"
-                      onModelChange={
-                        onModelChange ||
-                        ((): void => {
-                          /* no-op */
-                        })
-                      }
-                      onCharacterChange={
-                        onCharacterChange ||
-                        ((): void => {
-                          /* no-op */
-                        })
-                      }
                       onConfirm={async (): Promise<void> => {
                         if (onRetryMessage) {
                           void onRetryMessage(
@@ -321,18 +305,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                 <ModelCharacterSelectorModal
                   titleKey="app.chat.linearMessageView.answerModal.title"
                   descriptionKey="app.chat.linearMessageView.answerModal.description"
-                  onModelChange={
-                    onModelChange ||
-                    ((): void => {
-                      /* no-op */
-                    })
-                  }
-                  onCharacterChange={
-                    onCharacterChange ||
-                    ((): void => {
-                      /* no-op */
-                    })
-                  }
                   showInput={true}
                   inputValue={answerContent}
                   onInputChange={onSetAnswerContent}

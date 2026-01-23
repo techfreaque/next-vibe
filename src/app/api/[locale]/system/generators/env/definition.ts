@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -35,98 +35,78 @@ const { POST } = createEndpoint({
 
   fields: objectField(
     {
-      type: WidgetType.FORM_FIELD,
-      fieldType: FieldDataType.TEXT,
-      label: "app.api.system.generators.env.post.form.title",
+      type: WidgetType.CONTAINER,
+      title: "app.api.system.generators.env.post.form.title",
       columns: 12,
     },
     { request: "data", response: true },
     {
-      outputDir: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.generators.env.post.fields.outputDir.label",
-          description:
-            "app.api.system.generators.env.post.fields.outputDir.description",
-          columns: 12,
-        },
-        z.string().default("src/app/api/[locale]/system/generated"),
-      ),
+      outputDir: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.generators.env.post.fields.outputDir.label",
+        description:
+          "app.api.system.generators.env.post.fields.outputDir.description",
+        columns: 12,
+        schema: z.string().default("src/app/api/[locale]/system/generated"),
+      }),
 
-      verbose: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.generators.env.post.fields.verbose.label",
-          description:
-            "app.api.system.generators.env.post.fields.verbose.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      verbose: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.generators.env.post.fields.verbose.label",
+        description:
+          "app.api.system.generators.env.post.fields.verbose.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.generators.env.post.fields.dryRun.label",
-          description:
-            "app.api.system.generators.env.post.fields.dryRun.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.generators.env.post.fields.dryRun.label",
+        description:
+          "app.api.system.generators.env.post.fields.dryRun.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.generators.env.post.fields.success.label",
-        },
-        z.boolean(),
-      ),
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.generators.env.post.fields.message.label",
-        },
-        z.string(),
-      ),
-      serverEnvFiles: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.env.post.fields.serverEnvFiles.label",
-        },
-        z.coerce.number(),
-      ),
-      clientEnvFiles: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.env.post.fields.clientEnvFiles.label",
-        },
-        z.coerce.number(),
-      ),
-      duration: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.generators.env.post.fields.duration.label",
-        },
-        z.coerce.number(),
-      ),
-      outputPaths: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.env.post.fields.outputPaths.label",
-        },
-        z.object({
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.generators.env.post.fields.success.label",
+        schema: z.boolean(),
+      }),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.generators.env.post.fields.message.label",
+        schema: z.string(),
+      }),
+      serverEnvFiles: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.generators.env.post.fields.serverEnvFiles.label",
+        schema: z.coerce.number(),
+      }),
+      clientEnvFiles: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.generators.env.post.fields.clientEnvFiles.label",
+        schema: z.coerce.number(),
+      }),
+      duration: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.generators.env.post.fields.duration.label",
+        schema: z.coerce.number(),
+      }),
+      outputPaths: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.generators.env.post.fields.outputPaths.label",
+        schema: z.object({
           server: z.string().optional(),
           client: z.string().optional(),
         }),
-      ),
+      }),
     },
   ),
 
@@ -151,7 +131,6 @@ const { POST } = createEndpoint({
         },
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

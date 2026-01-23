@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -43,90 +43,72 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      query: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.db.sql.fields.query.title",
-          description: "app.api.system.db.sql.fields.query.description",
-          columns: 12,
-        },
-        z.string().min(1),
-      ),
+      query: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.db.sql.fields.query.title",
+        description: "app.api.system.db.sql.fields.query.description",
+        columns: 12,
+        schema: z.string().min(1),
+      }),
 
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.sql.fields.dryRun.title",
-          description: "app.api.system.db.sql.fields.dryRun.description",
-          columns: 4,
-        },
-        z.boolean().optional().default(false),
-      ),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.sql.fields.dryRun.title",
+        description: "app.api.system.db.sql.fields.dryRun.description",
+        columns: 4,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      verbose: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.sql.fields.verbose.title",
-          description: "app.api.system.db.sql.fields.verbose.description",
-          columns: 4,
-        },
-        z.boolean().optional().default(false),
-      ),
+      verbose: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.sql.fields.verbose.title",
+        description: "app.api.system.db.sql.fields.verbose.description",
+        columns: 4,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      limit: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.system.db.sql.fields.limit.title",
-          description: "app.api.system.db.sql.fields.limit.description",
-          columns: 4,
-        },
-        z.coerce.number().optional().default(100),
-      ),
+      limit: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.system.db.sql.fields.limit.title",
+        description: "app.api.system.db.sql.fields.limit.description",
+        columns: 4,
+        schema: z.coerce.number().optional().default(100),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.sql.fields.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.sql.fields.success.title",
+        schema: z.boolean(),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.sql.fields.output.title",
-        },
-        z.string(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.sql.fields.output.title",
+        schema: z.string(),
+      }),
 
-      results: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.sql.fields.results.title",
-        },
-        z.array(z.record(z.string(), z.any())).optional(),
-      ),
+      results: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.sql.fields.results.title",
+        schema: z.array(z.record(z.string(), z.any())).optional(),
+      }),
 
-      rowCount: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.sql.fields.rowCount.title",
-        },
-        z.coerce.number().optional(),
-      ),
+      rowCount: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.sql.fields.rowCount.title",
+        schema: z.coerce.number().optional(),
+      }),
 
-      queryType: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.sql.fields.queryType.title",
-        },
-        z.string().optional(),
-      ),
+      queryType: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.sql.fields.queryType.title",
+        schema: z.string().optional(),
+      }),
     },
   ),
 
@@ -237,7 +219,6 @@ const { POST } = createEndpoint({
         queryType: "SELECT",
       },
     },
-    urlPathParams: undefined,
   },
 });
 

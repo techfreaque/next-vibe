@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,99 +37,87 @@ const { POST } = createEndpoint({
 
   fields: objectField(
     {
-      type: WidgetType.FORM_FIELD,
-      fieldType: FieldDataType.TEXT,
-      label: "app.api.emails.preview.sendTest.post.container.title" as const,
+      type: WidgetType.CONTAINER,
+      title: "app.api.emails.preview.sendTest.post.container.title" as const,
       columns: 12,
     },
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      templateId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.emails.preview.sendTest.post.fields.templateId.label" as const,
-          description:
-            "app.api.emails.preview.sendTest.post.fields.templateId.description" as const,
-          columns: 12,
-        },
-        z.string(),
-      ),
+      templateId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.emails.preview.sendTest.post.fields.templateId.label" as const,
+        description:
+          "app.api.emails.preview.sendTest.post.fields.templateId.description" as const,
+        columns: 12,
+        schema: z.string(),
+      }),
 
-      recipientEmail: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.EMAIL,
-          label:
-            "app.api.emails.preview.sendTest.post.fields.recipientEmail.label" as const,
-          description:
-            "app.api.emails.preview.sendTest.post.fields.recipientEmail.description" as const,
-          columns: 12,
-        },
-        z.string().email(),
-      ),
+      recipientEmail: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label:
+          "app.api.emails.preview.sendTest.post.fields.recipientEmail.label" as const,
+        description:
+          "app.api.emails.preview.sendTest.post.fields.recipientEmail.description" as const,
+        columns: 12,
+        schema: z.string().email(),
+      }),
 
-      language: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.emails.preview.sendTest.post.fields.language.label" as const,
-          description:
-            "app.api.emails.preview.sendTest.post.fields.language.description" as const,
-          columns: 6,
-          options: LanguagesOptions,
-        },
-        z.enum(LanguagesArr),
-      ),
+      language: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.emails.preview.sendTest.post.fields.language.label" as const,
+        description:
+          "app.api.emails.preview.sendTest.post.fields.language.description" as const,
+        columns: 6,
+        options: LanguagesOptions,
+        schema: z.enum(LanguagesArr),
+      }),
 
-      country: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.emails.preview.sendTest.post.fields.country.label" as const,
-          description:
-            "app.api.emails.preview.sendTest.post.fields.country.description" as const,
-          columns: 6,
-          options: CountriesOptions,
-        },
-        z.enum(CountriesArr),
-      ),
+      country: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.emails.preview.sendTest.post.fields.country.label" as const,
+        description:
+          "app.api.emails.preview.sendTest.post.fields.country.description" as const,
+        columns: 6,
+        options: CountriesOptions,
+        schema: z.enum(CountriesArr),
+      }),
 
-      props: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.JSON,
-          label:
-            "app.api.emails.preview.sendTest.post.fields.props.label" as const,
-          description:
-            "app.api.emails.preview.sendTest.post.fields.props.description" as const,
-          columns: 12,
-        },
-        z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])),
-      ),
+      props: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label:
+          "app.api.emails.preview.sendTest.post.fields.props.label" as const,
+        description:
+          "app.api.emails.preview.sendTest.post.fields.props.description" as const,
+        columns: 12,
+        schema: z.record(
+          z.string(),
+          z.union([z.string(), z.number(), z.boolean()]),
+        ),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.preview.sendTest.post.fields.success.title" as const,
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.preview.sendTest.post.fields.success.title" as const,
+        schema: z.boolean(),
+      }),
 
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.preview.sendTest.post.fields.message.title" as const,
-        },
-        z.string(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.preview.sendTest.post.fields.message.title" as const,
+        schema: z.string(),
+      }),
     },
   ),
 

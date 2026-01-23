@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -54,79 +54,67 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // REQUEST FIELDS
-      transactionId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label:
-            "app.api.payment.refund.form.fields.transactionId.label" as const,
-          description:
-            "app.api.payment.refund.form.fields.transactionId.description" as const,
-          placeholder:
-            "app.api.payment.refund.form.fields.transactionId.placeholder" as const,
-          columns: 12,
-        },
-        z.uuid(),
-      ),
+      transactionId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label:
+          "app.api.payment.refund.form.fields.transactionId.label" as const,
+        description:
+          "app.api.payment.refund.form.fields.transactionId.description" as const,
+        placeholder:
+          "app.api.payment.refund.form.fields.transactionId.placeholder" as const,
+        columns: 12,
+        schema: z.uuid(),
+      }),
 
-      amount: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.payment.refund.form.fields.amount.label" as const,
-          description:
-            "app.api.payment.refund.form.fields.amount.description" as const,
-          placeholder:
-            "app.api.payment.refund.form.fields.amount.placeholder" as const,
-          columns: 12,
-        },
-        z.coerce.number().positive().optional(),
-      ),
+      amount: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.payment.refund.form.fields.amount.label" as const,
+        description:
+          "app.api.payment.refund.form.fields.amount.description" as const,
+        placeholder:
+          "app.api.payment.refund.form.fields.amount.placeholder" as const,
+        columns: 12,
+        schema: z.coerce.number().positive().optional(),
+      }),
 
-      reason: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXTAREA,
-          label: "app.api.payment.refund.form.fields.reason.label" as const,
-          description:
-            "app.api.payment.refund.form.fields.reason.description" as const,
-          placeholder:
-            "app.api.payment.refund.form.fields.reason.placeholder" as const,
-          columns: 12,
-        },
-        z.string().optional(),
-      ),
+      reason: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "app.api.payment.refund.form.fields.reason.label" as const,
+        description:
+          "app.api.payment.refund.form.fields.reason.description" as const,
+        placeholder:
+          "app.api.payment.refund.form.fields.reason.placeholder" as const,
+        columns: 12,
+        schema: z.string().optional(),
+      }),
 
-      metadata: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.JSON,
-          label: "app.api.payment.refund.form.fields.metadata.label" as const,
-          description:
-            "app.api.payment.refund.form.fields.metadata.description" as const,
-          placeholder:
-            "app.api.payment.refund.form.fields.metadata.placeholder" as const,
-          columns: 12,
-        },
-        z.record(z.string(), z.string()).optional(),
-      ),
+      metadata: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label: "app.api.payment.refund.form.fields.metadata.label" as const,
+        description:
+          "app.api.payment.refund.form.fields.metadata.description" as const,
+        placeholder:
+          "app.api.payment.refund.form.fields.metadata.placeholder" as const,
+        columns: 12,
+        schema: z.record(z.string(), z.string()).optional(),
+      }),
 
       // RESPONSE FIELDS
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.payment.refund.post.response.success" as const,
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.payment.refund.post.response.success" as const,
+        schema: z.boolean(),
+      }),
 
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.payment.refund.post.response.message" as const,
-        },
-        z.string().nullable(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.payment.refund.post.response.message" as const,
+        schema: z.string().nullable(),
+      }),
 
       refund: objectField(
         {
@@ -139,86 +127,65 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          id: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.payment.refund.post.response.refund.id" as const,
-            },
-            z.uuid(),
-          ),
-          userId: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.payment.refund.post.response.refund.userId" as const,
-            },
-            z.uuid(),
-          ),
-          transactionId: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.payment.refund.post.response.refund.transactionId" as const,
-            },
-            z.uuid(),
-          ),
-          stripeRefundId: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.payment.refund.post.response.refund.stripeRefundId" as const,
-            },
-            z.string(),
-          ),
-          amount: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.payment.refund.post.response.refund.amount" as const,
-            },
-            z.coerce.number(),
-          ),
-          currency: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.payment.refund.post.response.refund.currency" as const,
-            },
-            z.string(),
-          ),
-          status: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.payment.refund.post.response.refund.status" as const,
-            },
-            z.string(),
-          ),
-          reason: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.payment.refund.post.response.refund.reason" as const,
-            },
-            z.string(),
-          ),
-          createdAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.payment.refund.post.response.refund.createdAt" as const,
-            },
-            z.string(),
-          ),
-          updatedAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.payment.refund.post.response.refund.updatedAt" as const,
-            },
-            z.string(),
-          ),
+          id: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.payment.refund.post.response.refund.id" as const,
+            schema: z.uuid(),
+          }),
+          userId: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.payment.refund.post.response.refund.userId" as const,
+            schema: z.uuid(),
+          }),
+          transactionId: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.payment.refund.post.response.refund.transactionId" as const,
+            schema: z.uuid(),
+          }),
+          stripeRefundId: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.payment.refund.post.response.refund.stripeRefundId" as const,
+            schema: z.string(),
+          }),
+          amount: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.payment.refund.post.response.refund.amount" as const,
+            schema: z.coerce.number(),
+          }),
+          currency: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.payment.refund.post.response.refund.currency" as const,
+            schema: z.string(),
+          }),
+          status: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.payment.refund.post.response.refund.status" as const,
+            schema: z.string(),
+          }),
+          reason: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.payment.refund.post.response.refund.reason" as const,
+            schema: z.string(),
+          }),
+          createdAt: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.payment.refund.post.response.refund.createdAt" as const,
+            schema: z.string(),
+          }),
+          updatedAt: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.payment.refund.post.response.refund.updatedAt" as const,
+            schema: z.string(),
+          }),
         },
       ),
     },

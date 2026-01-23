@@ -15,6 +15,8 @@ import type {
   FieldUsageConfig,
   InferSchemaFromField,
   ObjectField,
+  ObjectUnionField,
+  UnifiedField,
 } from "../types/endpoint";
 import type {
   FieldDataType,
@@ -24,6 +26,14 @@ import type {
   WidgetType,
 } from "../types/enums";
 import type { WidgetData } from "./types";
+import type {
+  ArrayWidgetSchema,
+  BooleanWidgetSchema,
+  DateWidgetSchema,
+  EnumWidgetSchema,
+  NumberWidgetSchema,
+  StringWidgetSchema,
+} from "./utils/schema-constraints";
 
 /**
  * Layout configuration for containers and widgets
@@ -106,58 +116,72 @@ interface BaseFormFieldWidgetConfig<
 // Text input
 export interface TextFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TEXT;
+  schema: TSchema;
 }
 
 // Email input
 export interface EmailFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.EMAIL;
+  schema: TSchema;
 }
 
 // Password input
 export interface PasswordFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.PASSWORD;
+  schema: TSchema;
 }
 
 // Number input
 export interface NumberFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends NumberWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.NUMBER;
+  schema: TSchema;
 }
 
 // Boolean/Checkbox input
-export interface BooleanFieldWidgetConfig<TKey extends string> extends Omit<
-  BaseFormFieldWidgetConfig<TKey>,
-  "placeholder"
-> {
+export interface BooleanFieldWidgetConfig<
+  TKey extends string,
+  TSchema extends BooleanWidgetSchema,
+> extends Omit<BaseFormFieldWidgetConfig<TKey>, "placeholder"> {
   fieldType: FieldDataType.BOOLEAN;
+  schema: TSchema;
 }
 
 // Select dropdown
 export interface SelectFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends EnumWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.SELECT;
   options: Array<{ label: NoInfer<TKey>; value: string | number }>;
+  schema: TSchema;
 }
 
 // Multi-select
 export interface MultiSelectFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends ArrayWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.MULTISELECT;
   options: Array<{ label: NoInfer<TKey>; value: string | number }>;
+  schema: TSchema;
 }
 
 // Filter pills (like select but displayed as pills)
 export interface FilterPillsFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends EnumWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.FILTER_PILLS;
   options: Array<{
@@ -166,11 +190,20 @@ export interface FilterPillsFieldWidgetConfig<
     icon?: IconKey;
     description?: NoInfer<TKey>;
   }>;
+  schema: TSchema;
 }
 
 // Range slider (min-max selection with visual slider)
 export interface RangeSliderFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends z.ZodOptional<
+    z.ZodObject<{
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      min: z.ZodOptional<z.ZodEnum<any>>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      max: z.ZodOptional<z.ZodEnum<any>>;
+    }>
+  >,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.RANGE_SLIDER;
   options: Array<{
@@ -183,191 +216,234 @@ export interface RangeSliderFieldWidgetConfig<
   maxLabel?: NoInfer<TKey>; // Optional label for max handle (defaults to "Max")
   minDefault?: string | number; // Optional default min value
   maxDefault?: string | number; // Optional default max value
+  schema: TSchema;
 }
 
 // Textarea
 export interface TextareaFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TEXTAREA;
+  schema: TSchema;
 }
 
 // Phone input
 export interface PhoneFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.PHONE;
+  schema: TSchema;
 }
 
 // URL input
 export interface UrlFieldWidgetConfig<
   TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.URL;
+  schema: TSchema;
 }
 
 // Integer input
 export interface IntFieldWidgetConfig<
   TKey extends string,
+  TSchema extends NumberWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.INT;
+  schema: TSchema;
 }
 
 // Date input
 export interface DateFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends DateWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.DATE;
+  schema: TSchema;
 }
 
 // DateTime input
 export interface DateTimeFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends DateWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.DATETIME;
+  schema: TSchema;
 }
 
 // Time input
 export interface TimeFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends DateWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TIME;
+  schema: TSchema;
 }
 
 // File input
 export interface FileFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.FILE;
+  schema: TSchema;
 }
 
 // UUID input
 export interface UuidFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.UUID;
+  schema: TSchema;
 }
 
 // JSON input
 export interface JsonFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.JSON;
+  schema: TSchema;
 }
 
 // Date range input
-export interface DateRangeFieldWidgetConfig<TKey extends string> extends Omit<
-  BaseFormFieldWidgetConfig<TKey>,
-  "placeholder"
-> {
+export interface DateRangeFieldWidgetConfig<
+  TKey extends string,
+  TSchema extends StringWidgetSchema,
+> extends Omit<BaseFormFieldWidgetConfig<TKey>, "placeholder"> {
   fieldType: FieldDataType.DATE_RANGE;
+  schema: TSchema;
 }
 
 // Time range input
-export interface TimeRangeFieldWidgetConfig<TKey extends string> extends Omit<
-  BaseFormFieldWidgetConfig<TKey>,
-  "placeholder"
-> {
+export interface TimeRangeFieldWidgetConfig<
+  TKey extends string,
+  TSchema extends StringWidgetSchema,
+> extends Omit<BaseFormFieldWidgetConfig<TKey>, "placeholder"> {
   fieldType: FieldDataType.TIME_RANGE;
+  schema: TSchema;
 }
 
 // Timezone select
 export interface TimezoneFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TIMEZONE;
+  schema: TSchema;
 }
 
 // Currency select
 export interface CurrencySelectFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.CURRENCY_SELECT;
+  schema: TSchema;
 }
 
 // Language select
 export interface LanguageSelectFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.LANGUAGE_SELECT;
+  schema: TSchema;
 }
 
 // Country select
 export interface CountrySelectFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.COUNTRY_SELECT;
+  schema: TSchema;
 }
 
 // Color picker
-export interface ColorFieldWidgetConfig<TKey extends string> extends Omit<
-  BaseFormFieldWidgetConfig<TKey>,
-  "placeholder"
-> {
+export interface ColorFieldWidgetConfig<
+  TKey extends string,
+  TSchema extends StringWidgetSchema,
+> extends Omit<BaseFormFieldWidgetConfig<TKey>, "placeholder"> {
   fieldType: FieldDataType.COLOR;
+  schema: TSchema;
 }
 
 // Icon picker
 export interface IconFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.ICON;
+  schema: TSchema;
 }
 
 // Slider input
-export interface SliderFieldWidgetConfig<TKey extends string> extends Omit<
-  BaseFormFieldWidgetConfig<TKey>,
-  "placeholder"
-> {
+export interface SliderFieldWidgetConfig<
+  TKey extends string,
+  TSchema extends NumberWidgetSchema,
+> extends Omit<BaseFormFieldWidgetConfig<TKey>, "placeholder"> {
   fieldType: FieldDataType.SLIDER;
+  schema: TSchema;
 }
 
 // Tags input
 export interface TagsFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends ArrayWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TAGS;
+  schema: TSchema;
 }
 
 // Text array input
 export interface TextArrayFieldWidgetConfig<
   out TKey extends string,
+  TSchema extends ArrayWidgetSchema,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TEXT_ARRAY;
+  schema: TSchema;
 }
 
 // Union type for all form field widgets
-export type FormFieldWidgetConfig<TKey extends string> =
-  | TextFieldWidgetConfig<TKey>
-  | EmailFieldWidgetConfig<TKey>
-  | PasswordFieldWidgetConfig<TKey>
-  | NumberFieldWidgetConfig<TKey>
-  | BooleanFieldWidgetConfig<TKey>
-  | SelectFieldWidgetConfig<TKey>
-  | MultiSelectFieldWidgetConfig<TKey>
-  | FilterPillsFieldWidgetConfig<TKey>
-  | RangeSliderFieldWidgetConfig<TKey>
-  | TextareaFieldWidgetConfig<TKey>
-  | PhoneFieldWidgetConfig<TKey>
-  | UrlFieldWidgetConfig<TKey>
-  | IntFieldWidgetConfig<TKey>
-  | DateFieldWidgetConfig<TKey>
-  | DateTimeFieldWidgetConfig<TKey>
-  | TimeFieldWidgetConfig<TKey>
-  | FileFieldWidgetConfig<TKey>
-  | UuidFieldWidgetConfig<TKey>
-  | JsonFieldWidgetConfig<TKey>
-  | DateRangeFieldWidgetConfig<TKey>
-  | TimeRangeFieldWidgetConfig<TKey>
-  | TimezoneFieldWidgetConfig<TKey>
-  | CurrencySelectFieldWidgetConfig<TKey>
-  | LanguageSelectFieldWidgetConfig<TKey>
-  | CountrySelectFieldWidgetConfig<TKey>
-  | ColorFieldWidgetConfig<TKey>
-  | IconFieldWidgetConfig<TKey>
-  | SliderFieldWidgetConfig<TKey>
-  | TagsFieldWidgetConfig<TKey>
-  | TextArrayFieldWidgetConfig<TKey>;
+// Each widget uses its own specific schema constraint
+export type FormFieldWidgetConfig<
+  TKey extends string,
+  TSchema extends z.ZodTypeAny,
+> =
+  | TextFieldWidgetConfig<TKey, TSchema>
+  | EmailFieldWidgetConfig<TKey, TSchema>
+  | PasswordFieldWidgetConfig<TKey, TSchema>
+  | NumberFieldWidgetConfig<TKey, TSchema>
+  | BooleanFieldWidgetConfig<TKey, TSchema>
+  | SelectFieldWidgetConfig<TKey, TSchema>
+  | MultiSelectFieldWidgetConfig<TKey, TSchema>
+  | FilterPillsFieldWidgetConfig<TKey, TSchema>
+  | RangeSliderFieldWidgetConfig<TKey, TSchema>
+  | TextareaFieldWidgetConfig<TKey, TSchema>
+  | PhoneFieldWidgetConfig<TKey, TSchema>
+  | UrlFieldWidgetConfig<TKey, TSchema>
+  | IntFieldWidgetConfig<TKey, TSchema>
+  | DateFieldWidgetConfig<TKey, TSchema>
+  | DateTimeFieldWidgetConfig<TKey, TSchema>
+  | TimeFieldWidgetConfig<TKey, TSchema>
+  | FileFieldWidgetConfig<TKey, TSchema>
+  | UuidFieldWidgetConfig<TKey, TSchema>
+  | JsonFieldWidgetConfig<TKey, TSchema>
+  | DateRangeFieldWidgetConfig<TKey, TSchema>
+  | TimeRangeFieldWidgetConfig<TKey, TSchema>
+  | TimezoneFieldWidgetConfig<TKey, TSchema>
+  | CurrencySelectFieldWidgetConfig<TKey, TSchema>
+  | LanguageSelectFieldWidgetConfig<TKey, TSchema>
+  | CountrySelectFieldWidgetConfig<TKey, TSchema>
+  | ColorFieldWidgetConfig<TKey, TSchema>
+  | IconFieldWidgetConfig<TKey, TSchema>
+  | SliderFieldWidgetConfig<TKey, TSchema>
+  | TagsFieldWidgetConfig<TKey, TSchema>
+  | TextArrayFieldWidgetConfig<TKey, TSchema>;
 
 export interface FormGroupWidgetConfig<
   TKey extends string,
@@ -445,6 +521,7 @@ export interface DataTableWidgetConfig<
 
 export interface DataCardsWidgetConfig<
   TKey extends string,
+  TItemData,
 > extends BaseWidgetConfig {
   type: WidgetType.DATA_CARDS;
   title?: NoInfer<TKey>;
@@ -484,10 +561,30 @@ export interface DataCardsWidgetConfig<
   // Border radius
   cardBorderRadius?: "none" | "sm" | "base" | "lg" | "xl" | "2xl" | "full"; // Card border radius
   badgeBorderRadius?: "none" | "sm" | "base" | "lg" | "xl" | "2xl" | "full"; // Badge border radius
+  // Metadata for card interactions
+  metadata?: {
+    onCardClick?: CardClickMetadata<TItemData, CreateApiEndpointAny>;
+  };
+}
+
+/**
+ * Card click metadata configuration
+ * Infers the urlPathParams return type from the targetEndpoint
+ */
+export interface CardClickMetadata<
+  TItemData,
+  TEndpoint extends CreateApiEndpointAny,
+> {
+  targetEndpoint: TEndpoint;
+  extractParams: (item: TItemData) => {
+    urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"];
+  };
 }
 
 export interface DataListWidgetConfig<
   TKey extends string,
+  out TTargetEndpoint extends CreateApiEndpointAny | null =
+    CreateApiEndpointAny | null,
 > extends BaseWidgetConfig {
   type: WidgetType.DATA_LIST;
   title?: NoInfer<TKey>;
@@ -514,6 +611,20 @@ export interface DataListWidgetConfig<
   cardInnerGap?: SpacingSize; // Gap between fields in grid cards
   rowGap?: SpacingSize; // Gap between label and value in card rows
   buttonSpacing?: SpacingSize; // Margin for show more/less buttons
+  // Metadata for additional widget behavior
+  metadata?: {
+    onRowClick?: TTargetEndpoint extends CreateApiEndpointAny
+      ? {
+          extractParams: (item: Record<string, WidgetData>) => {
+            urlPathParams?: Partial<
+              TTargetEndpoint["types"]["UrlVariablesOutput"]
+            >;
+            data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
+          };
+          targetEndpoint: TTargetEndpoint;
+        }
+      : never;
+  };
   // Text size config
   tableHeadSize?: "xs" | "sm" | "base" | "lg"; // Table head text size
   tableCellSize?: "xs" | "sm" | "base" | "lg"; // Table cell text size
@@ -608,6 +719,14 @@ export interface MetadataCardWidgetConfig<
   description?: NoInfer<TKey>;
 }
 
+export interface KeyValueWidgetConfig<
+  TKey extends string,
+> extends BaseWidgetConfig {
+  type: WidgetType.KEY_VALUE;
+  label?: NoInfer<TKey>;
+  columns?: number;
+}
+
 // ============================================================================
 // LAYOUT WIDGETS
 // ============================================================================
@@ -617,29 +736,91 @@ export interface MetadataCardWidgetConfig<
  * Creates a minimal ObjectField-like structure for type inference
  */
 interface InferSchemasFromChildren<
-  TChildren,
+  TChildren extends
+    | Record<string, UnifiedField<string, z.ZodTypeAny>>
+    | readonly [
+        ObjectField<
+          Record<string, UnifiedField<string, z.ZodTypeAny>>,
+          FieldUsageConfig,
+          string
+        >,
+        ...ObjectField<
+          Record<string, UnifiedField<string, z.ZodTypeAny>>,
+          FieldUsageConfig,
+          string
+        >[],
+      ]
+    | UnifiedField<string, z.ZodTypeAny>,
   TUsage extends FieldUsageConfig,
   TTranslationKey extends string = string,
 > {
   request: z.output<
     InferSchemaFromField<
-      ObjectField<
-        TChildren,
-        TUsage,
-        TTranslationKey,
-        ContainerWidgetConfig<TTranslationKey>
-      >,
+      TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>
+        ? ObjectField<
+            TChildren,
+            TUsage,
+            TTranslationKey,
+            ContainerWidgetConfig<TTranslationKey, TUsage, TChildren>
+          >
+        : TChildren extends UnifiedField<string, z.ZodTypeAny>
+          ? TChildren
+          : TChildren extends readonly [
+                ObjectField<
+                  Record<string, UnifiedField<string, z.ZodTypeAny>>,
+                  FieldUsageConfig,
+                  string
+                >,
+                ...ObjectField<
+                  Record<string, UnifiedField<string, z.ZodTypeAny>>,
+                  FieldUsageConfig,
+                  string
+                >[],
+              ]
+            ? ObjectUnionField<
+                string,
+                TTranslationKey,
+                TChildren,
+                TUsage,
+                z.ZodTypeAny,
+                ContainerWidgetConfig<TTranslationKey, TUsage, TChildren>
+              >
+            : never,
       FieldUsage.RequestData
     >
   >;
   response: z.output<
     InferSchemaFromField<
-      ObjectField<
-        TChildren,
-        TUsage,
-        TTranslationKey,
-        ContainerWidgetConfig<TTranslationKey>
-      >,
+      TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>
+        ? ObjectField<
+            TChildren,
+            TUsage,
+            TTranslationKey,
+            ContainerWidgetConfig<TTranslationKey, TUsage, TChildren>
+          >
+        : TChildren extends UnifiedField<string, z.ZodTypeAny>
+          ? TChildren
+          : TChildren extends readonly [
+                ObjectField<
+                  Record<string, UnifiedField<string, z.ZodTypeAny>>,
+                  FieldUsageConfig,
+                  string
+                >,
+                ...ObjectField<
+                  Record<string, UnifiedField<string, z.ZodTypeAny>>,
+                  FieldUsageConfig,
+                  string
+                >[],
+              ]
+            ? ObjectUnionField<
+                string,
+                TTranslationKey,
+                TChildren,
+                TUsage,
+                z.ZodTypeAny,
+                ContainerWidgetConfig<TTranslationKey, TUsage, TChildren>
+              >
+            : never,
       FieldUsage.ResponseData
     >
   >;
@@ -649,8 +830,24 @@ interface InferSchemasFromChildren<
  * Base Container Widget Config - shared properties without getCount
  * Used as the base for both typed and untyped container configs
  */
-interface ContainerWidgetConfigBase<
+interface ContainerWidgetConfig<
   TKey extends string,
+  TUsage extends FieldUsageConfig,
+  TChildren extends
+    | Record<string, UnifiedField<string, z.ZodTypeAny>>
+    | readonly [
+        ObjectField<
+          Record<string, UnifiedField<string, z.ZodTypeAny>>,
+          FieldUsageConfig,
+          string
+        >,
+        ...ObjectField<
+          Record<string, UnifiedField<string, z.ZodTypeAny>>,
+          FieldUsageConfig,
+          string
+        >[],
+      ]
+    | UnifiedField<string, z.ZodTypeAny>,
 > extends BaseWidgetConfig {
   type: WidgetType.CONTAINER;
   title?: NoInfer<TKey>;
@@ -741,39 +938,7 @@ interface ContainerWidgetConfigBase<
    * @default true
    */
   showSubmitButton?: boolean;
-}
 
-/**
- * Container Widget Config - permissive version for use in WidgetConfig union
- * getCount accepts any data structure to allow proper inference in objectField
- */
-export interface ContainerWidgetConfig<
-  out TKey extends string,
-> extends ContainerWidgetConfigBase<TKey> {
-  /**
-   * Function to extract count from data for title display (e.g., "Leads (42)")
-   * Type is permissive here - proper typing happens in objectField return type
-   *
-   * @example
-   * ```typescript
-   * getCount: (data) => data.response?.paginationInfo?.total
-   * ```
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getCount?: (data: { request?: any; response?: any }) => number | undefined;
-}
-
-/**
- * Typed Container Widget Config with inferred request/response types
- * TChildren should be the record of child fields passed to objectField
- * TUsage should be the usage config passed to objectField
- * TKey allows using either global TranslationKey or scoped translation keys
- */
-export interface TypedContainerWidgetConfig<
-  out TKey extends string,
-  TChildren = Record<string, never>,
-  TUsage extends FieldUsageConfig = FieldUsageConfig,
-> extends ContainerWidgetConfigBase<TKey> {
   /**
    * Type-safe function to extract count from data for title display (e.g., "Leads (42)")
    * Types are inferred from the field children and usage
@@ -790,6 +955,7 @@ export interface TypedContainerWidgetConfig<
    */
   getCount?: (data: {
     request?: InferSchemasFromChildren<TChildren, TUsage>["request"];
+
     response?: InferSchemasFromChildren<TChildren, TUsage>["response"];
   }) => number | undefined;
 }
@@ -897,6 +1063,7 @@ export interface AccordionWidgetConfig<
 
 export interface TitleWidgetConfig<
   TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseWidgetConfig {
   type: WidgetType.TITLE;
   content?: NoInfer<TKey>;
@@ -906,13 +1073,16 @@ export interface TitleWidgetConfig<
   size?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl";
   gap?: SpacingSize;
   subtitleGap?: SpacingSize;
+  schema: TSchema;
 }
 
 export interface TextWidgetConfig<
   TKey extends string,
+  TSchema extends z.ZodTypeAny,
 > extends BaseWidgetConfig {
   type: WidgetType.TEXT;
   content?: NoInfer<TKey>;
+  columns?: number;
   fieldType?: FieldDataType;
   label?: NoInfer<TKey>;
   variant?: "default" | "error" | "info" | "success" | "warning" | "muted";
@@ -925,18 +1095,23 @@ export interface TextWidgetConfig<
   size?: "xs" | "sm" | "base" | "lg" | "xl";
   gap?: SpacingSize;
   padding?: SpacingSize;
+  schema: TSchema;
 }
 
 export interface BadgeWidgetConfig<
   TKey extends string,
+  TSchema extends z.ZodTypeAny,
 > extends BaseWidgetConfig {
   type: WidgetType.BADGE;
   text?: NoInfer<TKey>; // Static text - use when displaying a fixed label
   enumOptions?: Array<{ label: NoInfer<TKey>; value: string | number }>; // Dynamic enum mapping - use when displaying enum values
   variant?: "default" | "success" | "warning" | "error" | "info";
+  schema: TSchema;
 }
 
-export interface IconWidgetConfig extends BaseWidgetConfig {
+export interface IconWidgetConfig<
+  TSchema extends z.ZodType<IconKey>,
+> extends BaseWidgetConfig {
   type: WidgetType.ICON;
   /** Container size */
   containerSize?: "xs" | "sm" | "base" | "lg" | "xl";
@@ -948,6 +1123,7 @@ export interface IconWidgetConfig extends BaseWidgetConfig {
   noHover?: boolean;
   /** Icon horizontal alignment within container (start = left, center = centered, end = right) */
   justifyContent?: "start" | "center" | "end";
+  schema: TSchema;
 }
 
 export interface AvatarWidgetConfig<
@@ -963,24 +1139,32 @@ export interface AvatarWidgetConfig<
   fallbackSize?: "xs" | "sm" | "base" | "lg";
 }
 
-export interface DescriptionWidgetConfig extends BaseWidgetConfig {
+export interface DescriptionWidgetConfig<
+  TKey extends string,
+  TSchema extends StringWidgetSchema,
+> extends BaseWidgetConfig {
   type: WidgetType.DESCRIPTION;
+  /** optional hardcoded content instead of field value */
+  content?: NoInfer<TKey>;
   /** Text size */
   textSize?: "xs" | "sm" | "base" | "lg";
   /** Top spacing */
   spacing?: SpacingSize;
   /** Number of lines before truncation */
   lineClamp?: 1 | 2 | 3 | 4 | 5 | 6 | "none";
+  schema: TSchema;
 }
 
 export interface MarkdownWidgetConfig<
   TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseWidgetConfig {
   type: WidgetType.MARKDOWN;
   content?: NoInfer<TKey>; // Optional - only for hardcoded static content, not for field values
   columns?: number;
   label?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
+  schema: TSchema;
 }
 
 export interface MarkdownEditorWidgetConfig<
@@ -1003,15 +1187,17 @@ export interface MarkdownEditorWidgetConfig<
 
 export interface LinkWidgetConfig<
   TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseWidgetConfig {
   type: WidgetType.LINK;
-  href: Route | string; // URL path or route
+  href?: Route | string; // URL path or route
   text?: NoInfer<TKey>; // Link text to display
   label?: NoInfer<TKey>; // Accessible label (aria-label) - use if text is not descriptive
   external?: boolean; // Opens in new tab if true
   size?: "xs" | "sm" | "base" | "lg"; // Text size
   gap?: SpacingSize; // Gap between text and icon
   iconSize?: "xs" | "sm" | "base" | "lg"; // External link icon size
+  schema: TSchema;
 }
 
 export interface LinkCardWidgetConfig<
@@ -1077,32 +1263,46 @@ export interface DataCardWidgetConfig<
 // They use literal values from data rather than translation keys.
 // These are NOT fully data-driven and are specialized for specific use cases.
 
-export interface FilePathWidgetConfig extends BaseWidgetConfig {
+export interface FilePathWidgetConfig<
+  TSchema extends StringWidgetSchema,
+> extends BaseWidgetConfig {
   type: WidgetType.FILE_PATH;
   path: string; // Literal file path from data (e.g., "src/app/page.tsx")
+  schema: TSchema;
 }
 
-export interface LineNumberWidgetConfig extends BaseWidgetConfig {
+export interface LineNumberWidgetConfig<
+  TSchema extends NumberWidgetSchema,
+> extends BaseWidgetConfig {
   type: WidgetType.LINE_NUMBER;
   line: number; // Literal line number from data
+  schema: TSchema;
 }
 
-export interface ColumnNumberWidgetConfig extends BaseWidgetConfig {
+export interface ColumnNumberWidgetConfig<
+  TSchema extends NumberWidgetSchema,
+> extends BaseWidgetConfig {
   type: WidgetType.COLUMN_NUMBER;
   column: number; // Literal column number from data
+  schema: TSchema;
 }
 
-export interface CodeRuleWidgetConfig extends BaseWidgetConfig {
+export interface CodeRuleWidgetConfig<
+  TSchema extends StringWidgetSchema,
+> extends BaseWidgetConfig {
   type: WidgetType.CODE_RULE;
   rule: string; // Literal rule ID/name from data (e.g., "no-unused-vars", "typescript/no-explicit-any")
+  schema: TSchema;
 }
 
-export interface CodeOutputWidgetConfig extends BaseWidgetConfig {
+export interface CodeOutputWidgetConfig<
+  TSchema extends StringWidgetSchema,
+> extends BaseWidgetConfig {
   type: WidgetType.CODE_OUTPUT;
   code?: string; // Literal code snippet from data
   language?: string; // Programming language for syntax highlighting
-  format?: "eslint" | "generic" | "json" | "table" | string;
-  outputFormat?: "eslint" | "generic" | "json" | "table" | string;
+  format?: "eslint" | "generic" | "json" | "table";
+  outputFormat?: "eslint" | "generic" | "json" | "table";
   showSummary?: boolean;
   colorScheme?: "auto" | "light" | "dark";
   severityIcons?: Record<string, string>;
@@ -1129,18 +1329,24 @@ export interface CodeOutputWidgetConfig extends BaseWidgetConfig {
   lineNumberSpacing?: SpacingSize;
   /** Border radius */
   borderRadius?: "none" | "sm" | "base" | "lg" | "xl";
+  schema: TSchema;
 }
 
-export interface SeverityBadgeWidgetConfig extends BaseWidgetConfig {
+export interface SeverityBadgeWidgetConfig<
+  TSchema extends EnumWidgetSchema,
+> extends BaseWidgetConfig {
   type: WidgetType.SEVERITY_BADGE;
   severity: "error" | "warning" | "info"; // Literal severity level from data
+  schema: TSchema;
 }
 
 export interface MessageTextWidgetConfig<
   TKey extends string,
+  TSchema extends StringWidgetSchema,
 > extends BaseWidgetConfig {
   type: WidgetType.MESSAGE_TEXT;
-  message: NoInfer<TKey>; // Message to display
+  message?: NoInfer<TKey>; // optional hardcoded message to display
+  schema: TSchema;
 }
 
 export interface IssueCardWidgetConfig<
@@ -1227,6 +1433,7 @@ export interface NavigateButtonWidgetConfig<
     | "destructive"
     | "ghost"
     | "outline";
+  size?: "default" | "sm" | "lg" | "icon";
   metadata?: {
     targetEndpoint: TTargetEndpoint;
     extractParams?: TTargetEndpoint extends CreateApiEndpointAny
@@ -1239,6 +1446,8 @@ export interface NavigateButtonWidgetConfig<
       : never;
     prefillFromGet?: boolean;
     getEndpoint?: TGetEndpoint;
+    renderInModal?: boolean;
+    popNavigationOnSuccess?: number;
   };
   iconSize?: "xs" | "sm" | "base" | "lg";
   iconSpacing?: SpacingSize;
@@ -1287,6 +1496,7 @@ export interface ActionListWidgetConfig<
 
 export interface MetricCardWidgetConfig<
   TKey extends string,
+  TSchema extends NumberWidgetSchema,
 > extends BaseWidgetConfig {
   type: WidgetType.METRIC_CARD;
   title: NoInfer<TKey>;
@@ -1314,6 +1524,7 @@ export interface MetricCardWidgetConfig<
   unitSize?: "xs" | "sm" | "base" | "lg"; // Unit text size
   trendSize?: "xs" | "sm" | "base" | "lg"; // Trend text size
   trendIconSize?: "xs" | "sm" | "base" | "lg"; // Trend icon size
+  schema: TSchema;
 }
 
 /**
@@ -1322,6 +1533,7 @@ export interface MetricCardWidgetConfig<
  */
 export interface StatWidgetConfig<
   TKey extends string,
+  TSchema extends NumberWidgetSchema,
 > extends BaseWidgetConfig {
   type: WidgetType.STAT;
   label?: NoInfer<TKey>;
@@ -1351,6 +1563,7 @@ export interface StatWidgetConfig<
   trendSpacing?: SpacingSize;
   /** Spacing after value (before label) */
   labelSpacing?: SpacingSize;
+  schema: TSchema;
 }
 
 export interface StatsGridWidgetConfig<
@@ -1375,6 +1588,7 @@ export interface StatsGridWidgetConfig<
 
 export interface ChartWidgetConfig<
   TKey extends string,
+  TSchema extends z.ZodTypeAny,
 > extends BaseWidgetConfig {
   type: WidgetType.CHART;
   title?: NoInfer<TKey>;
@@ -1407,15 +1621,18 @@ export interface ChartWidgetConfig<
   legendTextSize?: "xs" | "sm" | "base";
   /** Legend margin top */
   legendMarginTop?: SpacingSize;
+  schema: TSchema;
 }
 
 export interface ProgressWidgetConfig<
   TKey extends string,
+  TSchema extends NumberWidgetSchema,
 > extends BaseWidgetConfig {
   type: WidgetType.PROGRESS;
   value: number;
   max?: number;
   label?: NoInfer<TKey>;
+  schema: TSchema;
 }
 
 // ============================================================================
@@ -1493,15 +1710,20 @@ export interface EmptyStateWidgetConfig<
 
 export interface StatusIndicatorWidgetConfig<
   TKey extends string,
+  TSchema extends StringWidgetSchema | EnumWidgetSchema,
 > extends BaseWidgetConfig {
   type: WidgetType.STATUS_INDICATOR;
   status: "success" | "warning" | "error" | "info" | "pending";
   label?: NoInfer<TKey>;
+  schema: TSchema;
 }
 
-export interface AlertWidgetConfig extends BaseWidgetConfig {
+export interface AlertWidgetConfig<
+  TSchema extends StringWidgetSchema,
+> extends BaseWidgetConfig {
   type: WidgetType.ALERT;
   variant?: "default" | "destructive" | "success" | "warning";
+  schema: TSchema;
 }
 
 export interface FormAlertWidgetConfig extends BaseWidgetConfig {
@@ -1580,53 +1802,165 @@ export interface CustomWidgetConfig<
 // UNION TYPE FOR ALL WIDGET CONFIGS
 // ============================================================================
 
-export type WidgetConfig<TKey extends string> =
-  // Form widgets
-  | FormFieldWidgetConfig<TKey>
-  | FormGroupWidgetConfig<TKey>
-  | FormSectionWidgetConfig<TKey>
-  // Data display widgets
-  | DataTableWidgetConfig<TKey>
-  | DataCardWidgetConfig<TKey>
-  | DataCardsWidgetConfig<TKey>
-  | DataListWidgetConfig<TKey>
-  | DataGridWidgetConfig<TKey>
-  | GroupedListWidgetConfig<TKey>
-  | CodeQualityListWidgetConfig<TKey>
-  | CodeQualityFilesWidgetConfig<TKey>
-  | CodeQualitySummaryWidgetConfig<TKey>
-  | MetadataCardWidgetConfig<TKey>
-  // Layout widgets
-  | ContainerWidgetConfig<TKey>
+/**
+ * Widget configs that work with object data (have children fields)
+ * Used in objectField to ensure type safety
+ */
+export type ObjectWidgetConfig<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+  TChildren extends
+    | Record<string, UnifiedField<string, z.ZodTypeAny>>
+    | readonly [
+        ObjectField<
+          Record<string, UnifiedField<string, z.ZodTypeAny>>,
+          FieldUsageConfig,
+          string
+        >,
+        ...ObjectField<
+          Record<string, UnifiedField<string, z.ZodTypeAny>>,
+          FieldUsageConfig,
+          string
+        >[],
+      ]
+    | UnifiedField<string, z.ZodTypeAny>,
+> =
+  | ContainerWidgetConfig<TKey, TUsage, TChildren>
   | SectionWidgetConfig<TKey>
   | TabsWidgetConfig<TKey>
   | AccordionWidgetConfig<TKey>
+  | FormGroupWidgetConfig<TKey>
+  | FormSectionWidgetConfig<TKey>
+  | DataCardWidgetConfig<TKey>
+  | MetadataCardWidgetConfig<TKey>
+  | KeyValueWidgetConfig<TKey>
+  | CodeQualitySummaryWidgetConfig<TKey>
+  | CodeQualityListWidgetConfig<TKey>
+  | DataListWidgetConfig<TKey>
+  | StatsGridWidgetConfig<TKey>
+  | IssueCardWidgetConfig<TKey>
+  | PaginationWidgetConfig
+  | ModelDisplayWidgetConfig
+  | PaginationInfoWidgetConfig
+  | CreditTransactionCardWidgetConfig;
+
+/**
+ * Widget configs that work with array data
+ * Used in arrayField to ensure type safety
+ */
+export type ArrayWidgetConfig<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+  TChildren extends
+    | Record<string, UnifiedField<string, z.ZodTypeAny>>
+    | readonly [
+        ObjectField<
+          Record<string, UnifiedField<string, z.ZodTypeAny>>,
+          FieldUsageConfig,
+          string
+        >,
+        ...ObjectField<
+          Record<string, UnifiedField<string, z.ZodTypeAny>>,
+          FieldUsageConfig,
+          string
+        >[],
+      ]
+    | UnifiedField<string, z.ZodTypeAny>,
+> =
+  | ContainerWidgetConfig<TKey, TUsage, TChildren>
+  | DataTableWidgetConfig<TKey>
+  | DataListWidgetConfig<TKey>
+  | DataGridWidgetConfig<TKey>
+  | GroupedListWidgetConfig<TKey>
+  | CodeQualityFilesWidgetConfig<TKey>
+  | CreditTransactionListWidgetConfig
+  | LinkListWidgetConfig<TKey>
+  // oxlint-disable-next-line no-explicit-any
+  | DataCardsWidgetConfig<TKey, any>;
+
+export type DisplayOnlyWidgetConfig<TKey extends string> =
   | SeparatorWidgetConfig<TKey>
-  // Content widgets
-  | TitleWidgetConfig<TKey>
-  | TextWidgetConfig<TKey>
-  | BadgeWidgetConfig<TKey>
-  | IconWidgetConfig
+  | ButtonWidgetConfig<TKey>
+  | SubmitButtonWidgetConfig<TKey>
+  | NavigateButtonWidgetConfig<
+      CreateApiEndpointAny | null,
+      CreateApiEndpointAny | undefined,
+      TKey
+    >
+  | FormAlertWidgetConfig
+  | ModelDisplayWidgetConfig
+  | PasswordStrengthWidgetConfig
+  | Omit<TitleWidgetConfig<TKey, StringWidgetSchema>, "schema">
+  | Omit<TextWidgetConfig<TKey, StringWidgetSchema>, "schema">;
+
+export type RequestResponseDisplayWidgetConfig<
+  TKey extends string,
+  TSchema extends z.ZodTypeAny,
+> =
+  | AlertWidgetConfig<TSchema>
+  | TitleWidgetConfig<TKey, TSchema>
+  | ChartWidgetConfig<TKey, TSchema>
+  | TextWidgetConfig<TKey, TSchema>
+  | IconWidgetConfig<TSchema>
+  | BadgeWidgetConfig<TKey, TSchema>
+  | LinkWidgetConfig<TKey, TSchema>
+  | StatWidgetConfig<TKey, TSchema>
+  | MarkdownWidgetConfig<TKey, TSchema>
+  | CodeOutputWidgetConfig<TSchema>
+  | StatusIndicatorWidgetConfig<TKey, TSchema>;
+
+export type ResponseWidgetConfig<
+  TKey extends string,
+  TSchema extends z.ZodTypeAny,
+> =
+  | RequestResponseDisplayWidgetConfig<TKey, TSchema>
+  | FormFieldWidgetConfig<TKey, TSchema>;
+
+export type WidgetConfig<
+  TKey extends string,
+  TSchema extends z.ZodTypeAny,
+  TUsage extends FieldUsageConfig,
+  TChildren extends
+    | Record<string, UnifiedField<string, z.ZodTypeAny>>
+    | readonly [
+        ObjectField<
+          Record<string, UnifiedField<string, z.ZodTypeAny>>,
+          FieldUsageConfig,
+          string
+        >,
+        ...ObjectField<
+          Record<string, UnifiedField<string, z.ZodTypeAny>>,
+          FieldUsageConfig,
+          string
+        >[],
+      ]
+    | UnifiedField<string, z.ZodTypeAny>,
+> =
+  | FormFieldWidgetConfig<TKey, TSchema>
+  | ObjectWidgetConfig<TKey, TUsage, TChildren>
+  | ArrayWidgetConfig<TKey, TUsage, TChildren>
+  | DisplayOnlyWidgetConfig<TKey>
+  | RequestResponseDisplayWidgetConfig<TKey, TSchema>
   | AvatarWidgetConfig<TKey>
-  | DescriptionWidgetConfig
-  | MarkdownWidgetConfig<TKey>
+  | DescriptionWidgetConfig<TKey, TSchema>
+  | MarkdownWidgetConfig<TKey, TSchema>
   | MarkdownEditorWidgetConfig<TKey>
-  | LinkWidgetConfig<TKey>
+  | LinkWidgetConfig<TKey, TSchema>
   | LinkCardWidgetConfig<TKey>
   | LinkListWidgetConfig<TKey>
   // Specialized content widgets
-  | FilePathWidgetConfig
-  | LineNumberWidgetConfig
-  | ColumnNumberWidgetConfig
-  | CodeRuleWidgetConfig
-  | CodeOutputWidgetConfig
-  | SeverityBadgeWidgetConfig
-  | MessageTextWidgetConfig<TKey>
+  | FilePathWidgetConfig<TKey, TSchema>
+  | LineNumberWidgetConfig<TKey, TSchema>
+  | ColumnNumberWidgetConfig<TKey, TSchema>
+  | CodeRuleWidgetConfig<TKey, TSchema>
+  | CodeOutputWidgetConfig<TKey, TSchema>
+  | SeverityBadgeWidgetConfig<TKey, TSchema>
+  | MessageTextWidgetConfig<TKey, TSchema>
   | IssueCardWidgetConfig<TKey>
-  | CreditTransactionCardWidgetConfig
-  | CreditTransactionListWidgetConfig
-  | PaginationWidgetConfig
-  | ModelDisplayWidgetConfig
+  | CreditTransactionCardWidgetConfig<TKey>
+  | CreditTransactionListWidgetConfig<TKey>
+  | PaginationWidgetConfig<TKey>
+  | ModelDisplayWidgetConfig<TKey>
   // Interactive widgets
   | ButtonWidgetConfig<TKey>
   | NavigateButtonWidgetConfig<
@@ -1636,23 +1970,23 @@ export type WidgetConfig<TKey extends string> =
     >
   | ButtonGroupWidgetConfig<TKey>
   | ActionBarWidgetConfig<TKey>
-  | PaginationInfoWidgetConfig
+  | PaginationInfoWidgetConfig<TKey>
   | ActionListWidgetConfig<TKey>
   // Stats widgets
-  | StatWidgetConfig<TKey>
-  | MetricCardWidgetConfig<TKey>
+  | StatWidgetConfig<TKey, TSchema>
+  | MetricCardWidgetConfig<TKey, TSchema>
   | StatsGridWidgetConfig<TKey>
   | ChartWidgetConfig<TKey>
-  | ProgressWidgetConfig<TKey>
+  | ProgressWidgetConfig<TKey, TSchema>
   // Status widgets
   | LoadingWidgetConfig<TKey>
   | ErrorWidgetConfig<TKey>
   | EmptyStateWidgetConfig<TKey>
-  | StatusIndicatorWidgetConfig<TKey>
-  | AlertWidgetConfig
-  | FormAlertWidgetConfig
+  | StatusIndicatorWidgetConfig<TKey, TSchema>
+  | AlertWidgetConfig<TKey, TSchema>
+  | FormAlertWidgetConfig<TKey, TSchema>
   | SubmitButtonWidgetConfig<TKey>
-  | PasswordStrengthWidgetConfig;
+  | PasswordStrengthWidgetConfig<TKey, TSchema>;
 
 /**
  * Extract widget config type from WidgetType enum
@@ -1660,4 +1994,12 @@ export type WidgetConfig<TKey extends string> =
 export type ExtractWidgetConfig<
   T extends WidgetType,
   TKey extends string,
-> = Extract<WidgetConfig<TKey>, { type: T }>;
+> = Extract<
+  WidgetConfig<
+    TKey,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    Record<string, UnifiedField<string, z.ZodTypeAny>>
+  >,
+  { type: T }
+>;

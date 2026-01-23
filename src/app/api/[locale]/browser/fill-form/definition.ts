@@ -10,10 +10,10 @@ import {
   objectField,
   objectOptionalField,
   requestDataArrayField,
-  requestDataField,
+  requestField,
   responseArrayOptionalField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -55,13 +55,10 @@ const { POST } = createEndpoint({
     {
       elements: requestDataArrayField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.browser.fill-form.form.fields.elements.label",
+          type: WidgetType.DATA_LIST,
+          title: "app.api.browser.fill-form.form.fields.elements.label",
           description:
             "app.api.browser.fill-form.form.fields.elements.description",
-          placeholder:
-            "app.api.browser.fill-form.form.fields.elements.placeholder",
           columns: 12,
         },
         objectField(
@@ -72,42 +69,37 @@ const { POST } = createEndpoint({
           },
           { request: "data" },
           {
-            uid: requestDataField(
-              {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.TEXT,
-                label:
-                  "app.api.browser.fill-form.form.fields.elements.uid.label",
-                description:
-                  "app.api.browser.fill-form.form.fields.elements.uid.description",
-                columns: 6,
-              },
-              z.string().describe("The uid of the element to fill out"),
-            ),
-            value: requestDataField(
-              {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.TEXT,
-                label:
-                  "app.api.browser.fill-form.form.fields.elements.value.label",
-                description:
-                  "app.api.browser.fill-form.form.fields.elements.value.description",
-                columns: 6,
-              },
-              z.string().describe("Value for the element"),
-            ),
+            uid: requestField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "app.api.browser.fill-form.form.fields.elements.uid.label",
+              description:
+                "app.api.browser.fill-form.form.fields.elements.uid.description",
+              columns: 6,
+              schema: z.string().describe("The uid of the element to fill out"),
+            }),
+            value: requestField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label:
+                "app.api.browser.fill-form.form.fields.elements.value.label",
+              description:
+                "app.api.browser.fill-form.form.fields.elements.value.description",
+              columns: 6,
+              schema: z.string().describe("Value for the element"),
+            }),
           },
         ),
       ),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.fill-form.response.success",
-        },
-        z.boolean().describe("Whether the form fill operation succeeded"),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.fill-form.response.success",
+        schema: z
+          .boolean()
+          .describe("Whether the form fill operation succeeded"),
+      }),
       result: objectOptionalField(
         {
           type: WidgetType.CONTAINER,
@@ -117,20 +109,18 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          filled: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.browser.fill-form.response.result.filled",
-            },
-            z.boolean().describe("Whether all form elements were filled"),
-          ),
-          filledCount: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.browser.fill-form.response.result.filledCount",
-            },
-            z.coerce.number().describe("Number of elements filled"),
-          ),
+          filled: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.browser.fill-form.response.result.filled",
+            schema: z
+              .boolean()
+              .describe("Whether all form elements were filled"),
+          }),
+          filledCount: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.browser.fill-form.response.result.filledCount",
+            schema: z.coerce.number().describe("Number of elements filled"),
+          }),
           elements: responseArrayOptionalField(
             {
               type: WidgetType.DATA_TABLE,
@@ -143,41 +133,39 @@ const { POST } = createEndpoint({
               },
               { response: true },
               {
-                uid: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.fill-form.response.result.elements.uid",
-                  },
-                  z.string(),
-                ),
-                filled: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.fill-form.response.result.elements.filled",
-                  },
-                  z.boolean(),
-                ),
+                uid: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.browser.fill-form.response.result.elements.uid",
+                  schema: z.string(),
+                }),
+                filled: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.browser.fill-form.response.result.elements.filled",
+                  schema: z.boolean(),
+                }),
               },
             ),
           ),
         },
       ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.fill-form.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.fill-form.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.fill-form.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.fill-form.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -195,7 +183,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

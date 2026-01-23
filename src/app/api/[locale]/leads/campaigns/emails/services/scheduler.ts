@@ -77,7 +77,6 @@ export class CampaignSchedulerService {
     > = [
       LeadStatus.UNSUBSCRIBED,
       LeadStatus.SIGNED_UP,
-      LeadStatus.CONSULTATION_BOOKED,
       LeadStatus.SUBSCRIPTION_CONFIRMED,
       LeadStatus.BOUNCED,
       LeadStatus.INVALID,
@@ -88,7 +87,6 @@ export class CampaignSchedulerService {
       !ineligibleStatuses.includes(lead.status) &&
       !lead.convertedAt &&
       !lead.signedUpAt &&
-      !lead.consultationBookedAt &&
       !lead.subscriptionConfirmedAt
     );
   }

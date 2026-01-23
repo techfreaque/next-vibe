@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -59,115 +59,95 @@ const { GET } = createEndpoint({
     { request: "data", response: true },
     {
       // === URL PARAMETERS ===
-      page: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.folders.list.page.label",
-          description:
-            "app.api.emails.imapClient.folders.list.page.description",
-          placeholder:
-            "app.api.emails.imapClient.folders.list.page.placeholder",
-        },
-        z.coerce.number().min(1).default(1),
-      ),
+      page: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.folders.list.page.label",
+        description: "app.api.emails.imapClient.folders.list.page.description",
+        placeholder: "app.api.emails.imapClient.folders.list.page.placeholder",
+        schema: z.coerce.number().min(1).default(1),
+      }),
 
-      limit: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.folders.list.limit.label",
-          description:
-            "app.api.emails.imapClient.folders.list.limit.description",
-          placeholder:
-            "app.api.emails.imapClient.folders.list.limit.placeholder",
-        },
-        z.coerce.number().min(1).max(100).default(20),
-      ),
+      limit: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.folders.list.limit.label",
+        description: "app.api.emails.imapClient.folders.list.limit.description",
+        placeholder: "app.api.emails.imapClient.folders.list.limit.placeholder",
+        schema: z.coerce.number().min(1).max(100).default(20),
+      }),
 
-      accountId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.emails.imapClient.folders.list.accountId.label",
-          description:
-            "app.api.emails.imapClient.folders.list.accountId.description",
-          placeholder:
-            "app.api.emails.imapClient.folders.list.accountId.placeholder",
-        },
-        z.uuid(),
-      ),
+      accountId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.emails.imapClient.folders.list.accountId.label",
+        description:
+          "app.api.emails.imapClient.folders.list.accountId.description",
+        placeholder:
+          "app.api.emails.imapClient.folders.list.accountId.placeholder",
+        schema: z.uuid(),
+      }),
 
-      search: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.emails.imapClient.folders.list.search.label",
-          description:
-            "app.api.emails.imapClient.folders.list.search.description",
-          placeholder:
-            "app.api.emails.imapClient.folders.list.search.placeholder",
-        },
-        z.string().optional(),
-      ),
+      search: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.emails.imapClient.folders.list.search.label",
+        description:
+          "app.api.emails.imapClient.folders.list.search.description",
+        placeholder:
+          "app.api.emails.imapClient.folders.list.search.placeholder",
+        schema: z.string().optional(),
+      }),
 
-      specialUseType: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
-          label: "app.api.emails.imapClient.folders.list.specialUseType.label",
-          description:
-            "app.api.emails.imapClient.folders.list.specialUseType.description",
-          placeholder:
-            "app.api.emails.imapClient.folders.list.specialUseType.placeholder",
-          options: ImapSpecialUseTypeOptions,
-        },
-        z.array(z.enum(ImapSpecialUseType)).optional(),
-      ),
+      specialUseType: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "app.api.emails.imapClient.folders.list.specialUseType.label",
+        description:
+          "app.api.emails.imapClient.folders.list.specialUseType.description",
+        placeholder:
+          "app.api.emails.imapClient.folders.list.specialUseType.placeholder",
+        options: ImapSpecialUseTypeOptions,
+        schema: z.array(z.enum(ImapSpecialUseType)).optional(),
+      }),
 
-      syncStatus: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
-          label: "app.api.emails.imapClient.folders.list.syncStatus.label",
-          description:
-            "app.api.emails.imapClient.folders.list.syncStatus.description",
-          placeholder:
-            "app.api.emails.imapClient.folders.list.syncStatus.placeholder",
-          options: ImapSyncStatusOptions,
-        },
-        z.array(z.enum(ImapSyncStatus)).optional(),
-      ),
+      syncStatus: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "app.api.emails.imapClient.folders.list.syncStatus.label",
+        description:
+          "app.api.emails.imapClient.folders.list.syncStatus.description",
+        placeholder:
+          "app.api.emails.imapClient.folders.list.syncStatus.placeholder",
+        options: ImapSyncStatusOptions,
+        schema: z.array(z.enum(ImapSyncStatus)).optional(),
+      }),
 
-      sortBy: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
-          label: "app.api.emails.imapClient.folders.list.sortBy.label",
-          description:
-            "app.api.emails.imapClient.folders.list.sortBy.description",
-          placeholder:
-            "app.api.emails.imapClient.folders.list.sortBy.placeholder",
-          options: ImapFolderSortFieldOptions,
-        },
-        z
+      sortBy: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "app.api.emails.imapClient.folders.list.sortBy.label",
+        description:
+          "app.api.emails.imapClient.folders.list.sortBy.description",
+        placeholder:
+          "app.api.emails.imapClient.folders.list.sortBy.placeholder",
+        options: ImapFolderSortFieldOptions,
+        schema: z
           .array(z.enum(ImapFolderSortField))
           .default([ImapFolderSortField.NAME]),
-      ),
+      }),
 
-      sortOrder: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
-          label: "app.api.emails.imapClient.folders.list.sortOrder.label",
-          description:
-            "app.api.emails.imapClient.folders.list.sortOrder.description",
-          placeholder:
-            "app.api.emails.imapClient.folders.list.sortOrder.placeholder",
-          options: SortOrderOptions,
-        },
-        z.array(z.enum(SortOrder)).default([SortOrder.ASC]),
-      ),
+      sortOrder: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "app.api.emails.imapClient.folders.list.sortOrder.label",
+        description:
+          "app.api.emails.imapClient.folders.list.sortOrder.description",
+        placeholder:
+          "app.api.emails.imapClient.folders.list.sortOrder.placeholder",
+        options: SortOrderOptions,
+        schema: z.array(z.enum(SortOrder)).default([SortOrder.ASC]),
+      }),
 
       // === RESPONSE FIELDS ===
       folders: responseArrayField(
@@ -188,90 +168,68 @@ const { GET } = createEndpoint({
           },
           { response: true },
           {
-            id: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.folders.list.response.folder.id",
-              },
-              z.uuid(),
-            ),
-            name: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.folders.list.response.folder.name",
-              },
-              z.string(),
-            ),
-            displayName: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.folders.list.response.folder.displayName",
-              },
-              z.string().nullable(),
-            ),
-            path: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.folders.list.response.folder.path",
-              },
-              z.string(),
-            ),
-            isSelectable: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.emails.imapClient.folders.list.response.folder.isSelectable",
-              },
-              z.boolean(),
-            ),
-            hasChildren: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.emails.imapClient.folders.list.response.folder.hasChildren",
-              },
-              z.boolean(),
-            ),
-            specialUseType: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.emails.imapClient.folders.list.response.folder.specialUseType",
-              },
-              z.enum(ImapSpecialUseType).nullable(),
-            ),
-            messageCount: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.folders.list.response.folder.messageCount",
-              },
-              z.coerce.number(),
-            ),
-            unseenCount: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.folders.list.response.folder.unseenCount",
-              },
-              z.coerce.number(),
-            ),
-            syncStatus: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.emails.imapClient.folders.list.response.folder.syncStatus",
-              },
-              z.enum(ImapSyncStatus),
-            ),
-            createdAt: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.folders.list.response.folder.createdAt",
-              },
-              z.string(),
-            ),
+            id: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.imapClient.folders.list.response.folder.id",
+              schema: z.uuid(),
+            }),
+            name: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.imapClient.folders.list.response.folder.name",
+              schema: z.string(),
+            }),
+            displayName: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.imapClient.folders.list.response.folder.displayName",
+              schema: z.string().nullable(),
+            }),
+            path: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.imapClient.folders.list.response.folder.path",
+              schema: z.string(),
+            }),
+            isSelectable: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.emails.imapClient.folders.list.response.folder.isSelectable",
+              schema: z.boolean(),
+            }),
+            hasChildren: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.emails.imapClient.folders.list.response.folder.hasChildren",
+              schema: z.boolean(),
+            }),
+            specialUseType: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.emails.imapClient.folders.list.response.folder.specialUseType",
+              schema: z.enum(ImapSpecialUseType).nullable(),
+            }),
+            messageCount: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.imapClient.folders.list.response.folder.messageCount",
+              schema: z.coerce.number(),
+            }),
+            unseenCount: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.imapClient.folders.list.response.folder.unseenCount",
+              schema: z.coerce.number(),
+            }),
+            syncStatus: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.emails.imapClient.folders.list.response.folder.syncStatus",
+              schema: z.enum(ImapSyncStatus),
+            }),
+            createdAt: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.imapClient.folders.list.response.folder.createdAt",
+              schema: z.string(),
+            }),
           },
         ),
       ),
@@ -288,38 +246,30 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          page: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.folders.list.response.pagination.page",
-            },
-            z.coerce.number().int(),
-          ),
-          limit: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.folders.list.response.pagination.limit",
-            },
-            z.coerce.number().int(),
-          ),
-          total: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.folders.list.response.pagination.total",
-            },
-            z.coerce.number().int(),
-          ),
-          totalPages: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.folders.list.response.pagination.totalPages",
-            },
-            z.coerce.number().int(),
-          ),
+          page: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.folders.list.response.pagination.page",
+            schema: z.coerce.number().int(),
+          }),
+          limit: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.folders.list.response.pagination.limit",
+            schema: z.coerce.number().int(),
+          }),
+          total: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.folders.list.response.pagination.total",
+            schema: z.coerce.number().int(),
+          }),
+          totalPages: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.folders.list.response.pagination.totalPages",
+            schema: z.coerce.number().int(),
+          }),
         },
       ),
     },
@@ -382,7 +332,6 @@ const { GET } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    urlPathParams: undefined,
     responses: {
       default: {
         folders: [

@@ -11,7 +11,7 @@ import {
   objectOptionalField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -51,13 +51,13 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.list-pages.response.success",
-        },
-        z.boolean().describe("Whether the pages listing operation succeeded"),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.list-pages.response.success",
+        schema: z
+          .boolean()
+          .describe("Whether the pages listing operation succeeded"),
+      }),
       result: objectOptionalField(
         {
           type: WidgetType.CONTAINER,
@@ -79,64 +79,58 @@ const { POST } = createEndpoint({
               },
               { response: true },
               {
-                idx: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.list-pages.response.result.pages.idx",
-                  },
-                  z.coerce.number().describe("Page index"),
-                ),
-                title: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.list-pages.response.result.pages.title",
-                  },
-                  z.string().describe("Page title"),
-                ),
-                url: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.list-pages.response.result.pages.url",
-                  },
-                  z.string().describe("Page URL"),
-                ),
-                active: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.list-pages.response.result.pages.active",
-                  },
-                  z.boolean().describe("Whether this is the active page"),
-                ),
+                idx: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.browser.list-pages.response.result.pages.idx",
+                  schema: z.coerce.number().describe("Page index"),
+                }),
+                title: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.browser.list-pages.response.result.pages.title",
+                  schema: z.string().describe("Page title"),
+                }),
+                url: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.browser.list-pages.response.result.pages.url",
+                  schema: z.string().describe("Page URL"),
+                }),
+                active: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.browser.list-pages.response.result.pages.active",
+                  schema: z
+                    .boolean()
+                    .describe("Whether this is the active page"),
+                }),
               },
             ),
           ),
-          totalCount: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.browser.list-pages.response.result.totalCount",
-            },
-            z.coerce.number().describe("Total number of open pages"),
-          ),
+          totalCount: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.browser.list-pages.response.result.totalCount",
+            schema: z.coerce.number().describe("Total number of open pages"),
+          }),
         },
       ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.list-pages.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.list-pages.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.list-pages.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.list-pages.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -160,7 +154,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

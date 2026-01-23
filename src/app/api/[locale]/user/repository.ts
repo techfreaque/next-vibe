@@ -130,10 +130,6 @@ export class UserRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ExtendedUserType<T>>> {
     try {
-      logger.debug(
-        `Getting user by ID (userId: ${userId}, detailLevel: ${detailLevel})`,
-      );
-
       const results = await db.select().from(users).where(eq(users.id, userId));
 
       if (results.length === 0) {
@@ -215,10 +211,6 @@ export class UserRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ExtendedUserType<T>>> {
     try {
-      logger.debug(
-        `Getting user by email (email: ${email}, detailLevel: ${detailLevel})`,
-      );
-
       const results = await db
         .select({ id: users.id })
         .from(users)
@@ -240,7 +232,8 @@ export class UserRepository {
       );
     } catch (error) {
       const errorMessage = parseError(error).message;
-      logger.error("Error getting user by email", parseError(error));
+      logger.error("Error getting user by email", "");
+      logger.debug("Error getting user by email", parseError(error));
       return fail({
         message: "app.api.user.errors.email_lookup_failed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
@@ -546,8 +539,6 @@ export class UserRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<StandardUserType>> {
     try {
-      logger.debug("Creating user with hashed password");
-
       const hashedPassword = await hashPassword(data.password);
 
       const hashedData: NewUser = {

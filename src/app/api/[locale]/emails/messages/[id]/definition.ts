@@ -10,7 +10,7 @@ import {
   objectField,
   requestUrlPathParamsField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -44,16 +44,14 @@ const { GET } = createEndpoint({
     { request: "urlPathParams", response: true },
     {
       // === URL PARAMETER ===
-      id: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.emails.messages.id.fields.id.label",
-          description: "app.api.emails.messages.id.fields.id.description",
-          columns: 12,
-        },
-        z.uuid(),
-      ),
+      id: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.emails.messages.id.fields.id.label",
+        description: "app.api.emails.messages.id.fields.id.description",
+        columns: 12,
+        schema: z.uuid(),
+      }),
 
       // === RESPONSE FIELDS ===
       email: objectField(
@@ -66,156 +64,111 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          id: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.id.response.email.id",
-            },
-            z.uuid(),
-          ),
-          subject: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.id.response.email.subject",
-            },
-            z.string(),
-          ),
-          recipientEmail: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.id.response.email.recipientEmail",
-            },
-            z.email(),
-          ),
-          recipientName: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.id.response.email.recipientName",
-            },
-            z.string().nullable(),
-          ),
-          senderEmail: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.id.response.email.senderEmail",
-            },
-            z.email(),
-          ),
-          senderName: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.id.response.email.senderName",
-            },
-            z.string().nullable(),
-          ),
-          type: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.emails.messages.id.response.email.type",
-            },
-            z.enum(EmailType),
-          ),
-          status: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.emails.messages.id.response.email.status",
-            },
-            z.enum(EmailStatus),
-          ),
-          templateName: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.id.response.email.templateName",
-            },
-            z.string().nullable(),
-          ),
-          emailProvider: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.id.response.email.emailProvider",
-            },
-            z.string().nullable(),
-          ),
-          externalId: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.id.response.email.externalId",
-            },
-            z.string().nullable(),
-          ),
-          sentAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.id.response.email.sentAt",
-            },
-            dateSchema.nullable(),
-          ),
-          deliveredAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.id.response.email.deliveredAt",
-            },
-            dateSchema.nullable(),
-          ),
-          openedAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.id.response.email.openedAt",
-            },
-            dateSchema.nullable(),
-          ),
-          clickedAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.id.response.email.clickedAt",
-            },
-            dateSchema.nullable(),
-          ),
-          retryCount: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.id.response.email.retryCount",
-            },
-            z.coerce.number().int(),
-          ),
-          error: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.id.response.email.error",
-            },
-            z.string().nullable(),
-          ),
-          userId: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.id.response.email.userId",
-            },
-            z.uuid().nullable(),
-          ),
-          leadId: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.id.response.email.leadId",
-            },
-            z.uuid().nullable(),
-          ),
-          createdAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.id.response.email.createdAt",
-            },
-            dateSchema,
-          ),
-          updatedAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.id.response.email.updatedAt",
-            },
-            dateSchema,
-          ),
+          id: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.id",
+            schema: z.uuid(),
+          }),
+          subject: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.subject",
+            schema: z.string(),
+          }),
+          recipientEmail: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.recipientEmail",
+            schema: z.email(),
+          }),
+          recipientName: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.recipientName",
+            schema: z.string().nullable(),
+          }),
+          senderEmail: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.senderEmail",
+            schema: z.email(),
+          }),
+          senderName: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.senderName",
+            schema: z.string().nullable(),
+          }),
+          type: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.emails.messages.id.response.email.type",
+            schema: z.enum(EmailType),
+          }),
+          status: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.emails.messages.id.response.email.status",
+            schema: z.enum(EmailStatus),
+          }),
+          templateName: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.templateName",
+            schema: z.string().nullable(),
+          }),
+          emailProvider: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.emailProvider",
+            schema: z.string().nullable(),
+          }),
+          externalId: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.externalId",
+            schema: z.string().nullable(),
+          }),
+          sentAt: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.sentAt",
+            schema: dateSchema.nullable(),
+          }),
+          deliveredAt: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.deliveredAt",
+            schema: dateSchema.nullable(),
+          }),
+          openedAt: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.openedAt",
+            schema: dateSchema.nullable(),
+          }),
+          clickedAt: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.clickedAt",
+            schema: dateSchema.nullable(),
+          }),
+          retryCount: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.retryCount",
+            schema: z.coerce.number().int(),
+          }),
+          error: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.error",
+            schema: z.string().nullable(),
+          }),
+          userId: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.userId",
+            schema: z.uuid().nullable(),
+          }),
+          leadId: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.leadId",
+            schema: z.uuid().nullable(),
+          }),
+          createdAt: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.createdAt",
+            schema: dateSchema,
+          }),
+          updatedAt: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.id.response.email.updatedAt",
+            schema: dateSchema,
+          }),
         },
       ),
     },

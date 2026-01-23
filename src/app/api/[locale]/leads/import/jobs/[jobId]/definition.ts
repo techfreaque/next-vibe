@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   requestUrlPathParamsField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -47,17 +47,14 @@ const { PATCH } = createEndpoint({
     { request: "data&urlPathParams", response: true },
     {
       // === URL PARAMETERS ===
-      jobId: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.leads.import.jobs.jobId.patch.jobId.label",
-          description:
-            "app.api.leads.import.jobs.jobId.patch.jobId.description",
-          columns: 12,
-        },
-        z.uuid(),
-      ),
+      jobId: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.leads.import.jobs.jobId.patch.jobId.label",
+        description: "app.api.leads.import.jobs.jobId.patch.jobId.description",
+        columns: 12,
+        schema: z.uuid(),
+      }),
 
       // === REQUEST FIELDS ===
       settings: objectField(
@@ -71,32 +68,28 @@ const { PATCH } = createEndpoint({
         },
         { request: "data" },
         {
-          batchSize: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label: "app.api.leads.import.jobs.jobId.patch.batchSize.label",
-              description:
-                "app.api.leads.import.jobs.jobId.patch.batchSize.description",
-              placeholder:
-                "app.api.leads.import.jobs.jobId.patch.batchSize.placeholder",
-              columns: 6,
-            },
-            z.coerce.number().min(10).max(1000).optional(),
-          ),
-          maxRetries: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label: "app.api.leads.import.jobs.jobId.patch.maxRetries.label",
-              description:
-                "app.api.leads.import.jobs.jobId.patch.maxRetries.description",
-              placeholder:
-                "app.api.leads.import.jobs.jobId.patch.maxRetries.placeholder",
-              columns: 6,
-            },
-            z.coerce.number().min(0).max(10).optional(),
-          ),
+          batchSize: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label: "app.api.leads.import.jobs.jobId.patch.batchSize.label",
+            description:
+              "app.api.leads.import.jobs.jobId.patch.batchSize.description",
+            placeholder:
+              "app.api.leads.import.jobs.jobId.patch.batchSize.placeholder",
+            columns: 6,
+            schema: z.coerce.number().min(10).max(1000).optional(),
+          }),
+          maxRetries: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label: "app.api.leads.import.jobs.jobId.patch.maxRetries.label",
+            description:
+              "app.api.leads.import.jobs.jobId.patch.maxRetries.description",
+            placeholder:
+              "app.api.leads.import.jobs.jobId.patch.maxRetries.placeholder",
+            columns: 6,
+            schema: z.coerce.number().min(0).max(10).optional(),
+          }),
         },
       ),
 
@@ -123,29 +116,23 @@ const { PATCH } = createEndpoint({
             },
             { response: true },
             {
-              id: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.id.content",
-                },
-                z.uuid(),
-              ),
-              fileName: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.fileName.content",
-                },
-                z.string(),
-              ),
-              status: responseField(
-                {
-                  type: WidgetType.BADGE,
-                  text: "app.api.leads.import.jobs.jobId.patch.response.status.content",
-                },
-                z.enum(CsvImportJobStatus),
-              ),
+              id: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.patch.response.id.content",
+                schema: z.uuid(),
+              }),
+              fileName: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.patch.response.fileName.content",
+                schema: z.string(),
+              }),
+              status: responseField({
+                type: WidgetType.BADGE,
+                text: "app.api.leads.import.jobs.jobId.patch.response.status.content",
+                schema: z.enum(CsvImportJobStatus),
+              }),
             },
           ),
 
@@ -161,46 +148,36 @@ const { PATCH } = createEndpoint({
             },
             { response: true },
             {
-              totalRows: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.totalRows.content",
-                },
-                z.coerce.number().nullable(),
-              ),
-              processedRows: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.processedRows.content",
-                },
-                z.coerce.number(),
-              ),
-              successfulImports: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.successfulImports.content",
-                },
-                z.coerce.number(),
-              ),
-              failedImports: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.failedImports.content",
-                },
-                z.coerce.number(),
-              ),
-              duplicateEmails: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.duplicateEmails.content",
-                },
-                z.coerce.number(),
-              ),
+              totalRows: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.patch.response.totalRows.content",
+                schema: z.coerce.number().nullable(),
+              }),
+              processedRows: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.patch.response.processedRows.content",
+                schema: z.coerce.number(),
+              }),
+              successfulImports: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.patch.response.successfulImports.content",
+                schema: z.coerce.number(),
+              }),
+              failedImports: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.patch.response.failedImports.content",
+                schema: z.coerce.number(),
+              }),
+              duplicateEmails: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.patch.response.duplicateEmails.content",
+                schema: z.coerce.number(),
+              }),
             },
           ),
 
@@ -216,46 +193,36 @@ const { PATCH } = createEndpoint({
             },
             { response: true },
             {
-              currentBatchStart: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.currentBatchStart.content",
-                },
-                z.coerce.number(),
-              ),
-              batchSize: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.batchSize.content",
-                },
-                z.coerce.number(),
-              ),
-              retryCount: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.retryCount.content",
-                },
-                z.coerce.number(),
-              ),
-              maxRetries: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.maxRetries.content",
-                },
-                z.coerce.number(),
-              ),
-              error: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.error.content",
-                },
-                z.string().nullable(),
-              ),
+              currentBatchStart: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.patch.response.currentBatchStart.content",
+                schema: z.coerce.number(),
+              }),
+              batchSize: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.patch.response.batchSize.content",
+                schema: z.coerce.number(),
+              }),
+              retryCount: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.patch.response.retryCount.content",
+                schema: z.coerce.number(),
+              }),
+              maxRetries: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.patch.response.maxRetries.content",
+                schema: z.coerce.number(),
+              }),
+              error: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.patch.response.error.content",
+                schema: z.string().nullable(),
+              }),
             },
           ),
 
@@ -271,38 +238,30 @@ const { PATCH } = createEndpoint({
             },
             { response: true },
             {
-              createdAt: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.createdAt.content",
-                },
-                z.string(),
-              ),
-              updatedAt: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.updatedAt.content",
-                },
-                z.string(),
-              ),
-              startedAt: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.startedAt.content",
-                },
-                z.string().nullable(),
-              ),
-              completedAt: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.completedAt.content",
-                },
-                z.string().nullable(),
-              ),
+              createdAt: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.patch.response.createdAt.content",
+                schema: z.string(),
+              }),
+              updatedAt: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.patch.response.updatedAt.content",
+                schema: z.string(),
+              }),
+              startedAt: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.patch.response.startedAt.content",
+                schema: z.string().nullable(),
+              }),
+              completedAt: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.patch.response.completedAt.content",
+                schema: z.string().nullable(),
+              }),
             },
           ),
         },
@@ -429,17 +388,14 @@ const { DELETE } = createEndpoint({
     { request: "urlPathParams", response: true },
     {
       // === URL PARAMETERS ===
-      jobId: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.leads.import.jobs.jobId.delete.jobId.label",
-          description:
-            "app.api.leads.import.jobs.jobId.delete.jobId.description",
-          columns: 12,
-        },
-        z.uuid(),
-      ),
+      jobId: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.leads.import.jobs.jobId.delete.jobId.label",
+        description: "app.api.leads.import.jobs.jobId.delete.jobId.description",
+        columns: 12,
+        schema: z.uuid(),
+      }),
 
       // === RESPONSE FIELDS ===
       result: objectField(
@@ -452,22 +408,18 @@ const { DELETE } = createEndpoint({
         },
         { response: true },
         {
-          success: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.import.jobs.jobId.delete.response.success.content",
-            },
-            z.boolean(),
-          ),
-          message: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.import.jobs.jobId.delete.response.message.content",
-            },
-            z.string(),
-          ),
+          success: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.import.jobs.jobId.delete.response.success.content",
+            schema: z.boolean(),
+          }),
+          message: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.import.jobs.jobId.delete.response.message.content",
+            schema: z.string(),
+          }),
         },
       ),
     },
@@ -531,7 +483,6 @@ const { DELETE } = createEndpoint({
     urlPathParams: {
       default: { jobId: "550e8400-e29b-41d4-a716-446655440000" },
     },
-    requests: undefined,
     responses: {
       default: {
         result: { success: true, message: "Job deleted successfully" },

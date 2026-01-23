@@ -29,23 +29,16 @@ const seedRegistry: Record<string, EnvironmentSeeds> = {};
  * Load all seed modules using the generated index
  */
 async function loadSeedModules(logger: EndpointLogger): Promise<void> {
-  logger.debug("🔍 Loading seed modules from generated index...");
-
   const moduleNames = getAllSeedModuleNames();
-  logger.debug(`📦 Found ${moduleNames.length} seed modules in index`);
 
   // Load each seed module dynamically
   for (const moduleName of moduleNames) {
     try {
-      logger.debug(`📥 Loading seed module: ${moduleName}`);
       const seedModule = await getSeedModule(moduleName);
 
       if (seedModule) {
         // Register the seed module
         seedRegistry[moduleName] = seedModule;
-        logger.debug(
-          `✅ Loaded: ${moduleName} (priority: ${seedModule.priority ?? 0})`,
-        );
       } else {
         logger.warn(`⚠️  Seed module ${moduleName} returned null`);
       }
@@ -57,7 +50,7 @@ async function loadSeedModules(logger: EndpointLogger): Promise<void> {
     }
   }
 
-  logger.debug(`📦 Total modules loaded: ${Object.keys(seedRegistry).length}`);
+  logger.debug(`Loaded ${Object.keys(seedRegistry).length} seed modules`);
 }
 
 /**
@@ -70,48 +63,43 @@ export async function runSeeds(
 ): Promise<void> {
   const startTime = Date.now();
 
-  // First load seed modules from generated index
-  logger.debug("🔍 Loading seed modules...");
+  // Load seed modules from generated index
   await loadSeedModules(logger);
-
-  logger.debug(
-    `📦 Seed registry has ${Object.keys(seedRegistry).length} modules`,
-  );
-  logger.debug(`🌱 Running ${environment} seeds`);
 
   // Sort modules by priority (higher priority runs first)
   const sortedModules = Object.entries(seedRegistry).toSorted(
     ([, a], [, b]) => (b.priority ?? 0) - (a.priority ?? 0),
   );
 
+  const seedResults: { success: string[]; failed: string[] } = {
+    success: [],
+    failed: [],
+  };
+
   for (const [moduleId, seeds] of sortedModules) {
     const seedFn = seeds[environment];
     if (seedFn) {
-      logger.debug(
-        `🌱 Seeding ${moduleId} (priority: ${seeds.priority ?? 0})...`,
-      );
       if (typeof seedFn === "function") {
         try {
           await seedFn(logger, locale);
-          logger.debug(`✅ Seeded ${moduleId} successfully`);
+          seedResults.success.push(moduleId);
         } catch (error) {
-          logger.error(`❌ Error seeding ${moduleId}:`, parseError(error));
+          logger.error(`Error seeding ${moduleId}:`, parseError(error));
+          seedResults.failed.push(moduleId);
           // Re-throw to propagate seeding errors to the main process
           // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Seed infrastructure needs to propagate errors
           throw error;
         }
       } else {
-        logger.debug(`⚠️  No seed function found for ${moduleId}`);
+        logger.warn(`No seed function found for ${moduleId}`);
       }
-    } else {
-      logger.debug(`⏭️  Skipping ${moduleId} (no ${environment} seed)`);
     }
   }
 
   const duration = Date.now() - startTime;
   logger.info(
     formatDatabase(
-      `${environment} seeds completed successfully in ${formatDuration(duration)}`,
+      `${environment} seeds: ${seedResults.success.length} modules in ${formatDuration(duration)}`,
       "🌱",
     ),
   );

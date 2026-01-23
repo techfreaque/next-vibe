@@ -15,7 +15,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
 import type { JSX } from "react";
-import { useEffect } from "react";
 import type {
   DefaultValues,
   FieldValues,
@@ -126,18 +125,18 @@ export interface EndpointRendererProps<
  * Handles object, object-optional, and object-union types
  */
 function extractAllFields<const TKey extends string>(
-  fields: UnifiedField<TKey>,
+  fields: UnifiedField<TKey, ZodTypeAny>,
   parentPath = "",
-): Array<[string, UnifiedField<TKey>]> {
+): Array<[string, UnifiedField<TKey, ZodTypeAny>]> {
   if (!fields || typeof fields !== "object") {
     return [];
   }
 
   const fieldsObj = fields as {
     type?: string;
-    children?: Record<string, UnifiedField<TKey>>;
+    children?: Record<string, UnifiedField<TKey, ZodTypeAny>>;
     discriminator?: string;
-    variants?: readonly UnifiedField<TKey>[];
+    variants?: readonly UnifiedField<TKey, ZodTypeAny>[];
   };
 
   // Handle object-union fields
@@ -155,16 +154,16 @@ function extractAllFields<const TKey extends string>(
     return [];
   }
 
-  const result: Array<[string, UnifiedField<TKey>]> = [];
+  const result: Array<[string, UnifiedField<TKey, ZodTypeAny>]> = [];
 
   for (const [fieldName, fieldDef] of Object.entries(fieldsObj.children)) {
     if (typeof fieldDef === "object" && fieldDef !== null) {
       // Check if this is a container with nested fields
       const fieldDefObj = fieldDef as {
         type?: string;
-        children?: Record<string, UnifiedField<TKey>>;
+        children?: Record<string, UnifiedField<TKey, ZodTypeAny>>;
         discriminator?: string;
-        variants?: readonly UnifiedField<TKey>[];
+        variants?: readonly UnifiedField<TKey, ZodTypeAny>[];
         ui?: { type?: string };
       };
 
@@ -172,7 +171,7 @@ function extractAllFields<const TKey extends string>(
       if (fieldDefObj.type === "object-union") {
         // Add the union field itself - union widget will handle variant rendering
         const fullPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
-        result.push([fullPath, fieldDef as UnifiedField<TKey>]);
+        result.push([fullPath, fieldDef as UnifiedField<TKey, ZodTypeAny>]);
       } else if (
         (fieldDefObj.type === "object" ||
           fieldDefObj.type === "object-optional") &&
@@ -182,11 +181,11 @@ function extractAllFields<const TKey extends string>(
         // Add the container itself instead of flattening its children
         // ContainerWidget will handle rendering children with proper grid layout
         const fullPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
-        result.push([fullPath, fieldDef as UnifiedField<TKey>]);
+        result.push([fullPath, fieldDef as UnifiedField<TKey, ZodTypeAny>]);
       } else {
         // Regular field, add it with full path
         const fullPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
-        result.push([fullPath, fieldDef as UnifiedField<TKey>]);
+        result.push([fullPath, fieldDef as UnifiedField<TKey, ZodTypeAny>]);
       }
     }
   }
@@ -219,13 +218,19 @@ export function EndpointRenderer<
   logger,
   user,
 }: EndpointRendererProps<TEndpoint, TFieldValues>): JSX.Element {
+  // Initialize navigation stack for cross-definition navigation
+  const navigation = useNavigationStack();
+
   // Check if endpoint.fields itself is a container or array widget (render directly)
   const isRootContainer =
     (endpoint.fields.type === "object" ||
       endpoint.fields.type === "object-optional" ||
       endpoint.fields.type === "array" ||
       endpoint.fields.type === "array-optional") &&
-    endpoint.fields.ui?.type === WidgetType.CONTAINER;
+    (endpoint.fields.ui?.type === WidgetType.CONTAINER ||
+      endpoint.fields.ui?.type === WidgetType.DATA_LIST ||
+      endpoint.fields.ui?.type === WidgetType.DATA_CARDS ||
+      endpoint.fields.ui?.type === WidgetType.DATA_TABLE);
 
   // Create internal form if none provided (for display-only mode like tool calls)
   const internalForm = useForm<TFieldValues>({
@@ -235,18 +240,8 @@ export function EndpointRenderer<
     defaultValues: (data ?? {}) as DefaultValues<TFieldValues>,
   });
 
-  // Reset form when data changes
-  useEffect(() => {
-    if (!externalForm && data) {
-      internalForm.reset(data as TFieldValues);
-    }
-  }, [data, externalForm, internalForm]);
-
   // Use external form if provided, otherwise use internal form
   const form = externalForm ?? internalForm;
-
-  // Initialize navigation stack for cross-definition navigation
-  const navigation = useNavigationStack();
 
   // Create render context with scoped translation from endpoint definition
   const context: WidgetRenderContext = {
@@ -265,8 +260,7 @@ export function EndpointRenderer<
   };
 
   // Check if there are any request fields
-  const hasRequest =
-    endpoint.fields.usage && "request" in endpoint.fields.usage;
+  const hasRequest = endpoint.fields.usage.request;
 
   /**
    * NEW APPROACH: If the root field is a container widget, render it directly.

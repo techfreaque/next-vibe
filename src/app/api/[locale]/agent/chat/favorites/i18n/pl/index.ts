@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   id: idTranslations,
   enums: {
     selectionType: {
+      characterBased: "Na podstawie postaci",
       manual: "Konkretny model",
       filters: "Kryteria filtrowania",
     },
@@ -43,6 +44,9 @@ export const translations: typeof enTranslations = {
     container: {
       title: "Twoje ulubione",
       description: "Zarządzaj ulubionymi konfiguracjami postaci i modeli",
+    },
+    createButton: {
+      label: "Dodaj ulubione",
     },
     response: {
       favorite: {
@@ -122,6 +126,9 @@ export const translations: typeof enTranslations = {
         useCount: {
           content: "Użycia: {{value}}",
         },
+        separator: {
+          content: "•",
+        },
       },
       hasCompanion: {
         content: "Ma towarzysza: {{value}}",
@@ -177,6 +184,13 @@ export const translations: typeof enTranslations = {
       title: "Nowy ulubiony",
       description: "Zapisz konfigurację postaci jako ulubioną",
     },
+    backButton: {
+      label: "Wróć do ulubionych",
+    },
+    submitButton: {
+      label: "Utwórz ulubiony",
+      loadingText: "Tworzenie...",
+    },
     characterId: {
       label: "Postać",
       description: "Wybierz postać dla tego ulubionego",
@@ -184,6 +198,10 @@ export const translations: typeof enTranslations = {
     customName: {
       label: "Nazwa niestandardowa",
       description: "Opcjonalna nazwa niestandardowa dla tego ulubionego",
+    },
+    customIcon: {
+      label: "Ikona niestandardowa",
+      description: "Opcjonalna ikona niestandardowa dla tego ulubionego",
     },
     voice: {
       label: "Głos",

@@ -256,8 +256,8 @@ export function P(props: PProps): JSX.Element {
     <p
       className={
         "className" in restProps
-          ? cn("leading-7 [&:not(:first-child)]:mt-6", restProps.className)
-          : "leading-7 [&:not(:first-child)]:mt-6"
+          ? cn("leading-7", restProps.className)
+          : "leading-7"
       }
       style={"style" in restProps ? restProps.style : undefined}
       id={restProps.id}

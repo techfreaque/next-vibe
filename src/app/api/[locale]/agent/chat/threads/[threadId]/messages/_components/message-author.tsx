@@ -102,7 +102,7 @@ export function MessageAuthorInfo({
         )}
 
         <Span className="text-xs text-muted-foreground shrink-0">
-          {formatRelativeTime(timestamp.getTime())}
+          {formatRelativeTime(timestamp.getTime(), locale)}
         </Span>
 
         {edited && (

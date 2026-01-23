@@ -70,7 +70,6 @@ export const leads = pgTable("leads", {
 
   // Event timestamps for statistics tracking
   signedUpAt: timestamp("signed_up_at"),
-  consultationBookedAt: timestamp("consultation_booked_at"),
   subscriptionConfirmedAt: timestamp("subscription_confirmed_at"),
   bouncedAt: timestamp("bounced_at"), // When lead email bounced
   invalidAt: timestamp("invalid_at"), // When lead was marked as invalid

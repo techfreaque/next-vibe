@@ -35,8 +35,6 @@ export class SessionRepository {
    */
   static async findByToken(token: string): Promise<ResponseType<Session>> {
     try {
-      // Note: Logger not available for internal session methods
-
       // First, try to find the session in the database
       // This handles both regular sessions and JWT tokens stored during login
       const results = await db

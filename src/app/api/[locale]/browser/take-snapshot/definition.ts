@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,59 +50,51 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      verbose: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.browser.take-snapshot.form.fields.verbose.label",
-          description:
-            "app.api.browser.take-snapshot.form.fields.verbose.description",
-          placeholder:
-            "app.api.browser.take-snapshot.form.fields.verbose.placeholder",
-          columns: 6,
-        },
-        z
+      verbose: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.browser.take-snapshot.form.fields.verbose.label",
+        description:
+          "app.api.browser.take-snapshot.form.fields.verbose.description",
+        placeholder:
+          "app.api.browser.take-snapshot.form.fields.verbose.placeholder",
+        columns: 6,
+        schema: z
           .boolean()
           .optional()
           .describe(
             "Whether to include all possible information available in the full a11y tree. Default is false.",
           ),
-      ),
-      filePath: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.browser.take-snapshot.form.fields.filePath.label",
-          description:
-            "app.api.browser.take-snapshot.form.fields.filePath.description",
-          placeholder:
-            "app.api.browser.take-snapshot.form.fields.filePath.placeholder",
-          columns: 6,
-        },
-        z
+      }),
+      filePath: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.browser.take-snapshot.form.fields.filePath.label",
+        description:
+          "app.api.browser.take-snapshot.form.fields.filePath.description",
+        placeholder:
+          "app.api.browser.take-snapshot.form.fields.filePath.placeholder",
+        columns: 6,
+        schema: z
           .string()
           .optional()
           .describe(
             "The absolute path, or a path relative to the current working directory, to save the snapshot to instead of attaching it to the response.",
           ),
-      ),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.take-snapshot.response.success",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.take-snapshot.response.success",
+        schema: z
           .boolean()
           .describe("Whether the snapshot capture operation succeeded"),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.take-snapshot.response.result",
-        },
-        z
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.take-snapshot.response.result",
+        schema: z
           .object({
             captured: z.boolean().describe("Whether the snapshot was captured"),
             elementCount: z
@@ -117,21 +109,23 @@ const { POST } = createEndpoint({
           })
           .optional()
           .describe("Result of snapshot capture"),
-      ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.take-snapshot.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.take-snapshot.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      }),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.take-snapshot.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.take-snapshot.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -150,7 +144,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

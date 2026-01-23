@@ -400,7 +400,6 @@ export class EmailRendererService {
       convertedUserId: null,
       convertedAt: null,
       signedUpAt: null,
-      consultationBookedAt: null,
       subscriptionConfirmedAt: null,
       currentCampaignStage: EmailCampaignStage.INITIAL,
       emailsSent: 0,

@@ -3,6 +3,7 @@
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
+import type { z } from "zod";
 
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
@@ -36,13 +37,16 @@ export function CreditTransactionCardWidget<const TKey extends string>({
   const transaction = value as Record<string, WidgetData>;
 
   // Extract child field definitions
-  let fieldDefinitions: Record<string, UnifiedField<string>> = {};
+  let fieldDefinitions: Record<string, UnifiedField<string, z.ZodTypeAny>> = {};
   if (
     "type" in field &&
     (field.type === "object" || field.type === "object-optional")
   ) {
     if ("children" in field && field.children) {
-      fieldDefinitions = field.children as Record<string, UnifiedField<string>>;
+      fieldDefinitions = field.children as Record<
+        string,
+        UnifiedField<string, z.ZodTypeAny>
+      >;
     }
   }
 
@@ -75,7 +79,7 @@ export function CreditTransactionCardWidget<const TKey extends string>({
           // Special formatting for known fields
           if (key === "type" && typeof val === "string") {
             // Transaction type is already a translation key
-            val = t(val);
+            val = context.t(val);
           } else if (key === "createdAt") {
             // Format date - handle both string and Date object
             const date = val instanceof Date ? val : new Date(String(val));

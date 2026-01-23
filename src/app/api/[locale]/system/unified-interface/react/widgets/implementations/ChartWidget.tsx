@@ -64,6 +64,7 @@ export function ChartWidget<const TKey extends string>({
   const {
     chartType = "line",
     label: labelKey,
+    title: titleKey,
     description: descriptionKey,
     xAxisLabel,
     yAxisLabel,
@@ -88,7 +89,9 @@ export function ChartWidget<const TKey extends string>({
   const legendTextSizeClass = getTextSizeClassName(legendTextSize);
   const legendMarginTopClass = getSpacingClassName("margin", legendMarginTop);
 
-  const title = labelKey ? context.t(labelKey) : undefined;
+  // Support both 'label' and 'title' for backwards compatibility (label takes precedence)
+  const chartTitleKey = labelKey || titleKey;
+  const title = chartTitleKey ? context.t(chartTitleKey) : undefined;
   const description = descriptionKey ? context.t(descriptionKey) : undefined;
 
   // Extract chart data using shared logic
@@ -135,15 +138,37 @@ export function ChartWidget<const TKey extends string>({
     if (isPie) {
       // Pie/Donut chart
       const firstSeries = chartData.data[0];
+
+      // Extract colors from data points if available
+      const dataColors: string[] = [];
+
       const pieData =
         firstSeries?.data
           .filter((d: ChartDataPoint<TKey>) => d.y > 0) // Filter out zero values for pie chart
           .map((d: ChartDataPoint<TKey>) => {
             // Translate labels - context.t() returns original string if key not found
             const rawLabel = String(d.label ?? d.x ?? "Unknown");
+            const translatedLabel = context.t(rawLabel as TranslationKey);
+
+            // Store color if available
+            if ("color" in d && typeof d.color === "string") {
+              dataColors.push(d.color);
+            }
+
+            // Calculate percentage from y value
+            const totalValue = firstSeries.data
+              .filter((item: ChartDataPoint<TKey>) => item.y > 0)
+              .reduce(
+                (sum: number, item: ChartDataPoint<TKey>) => sum + item.y,
+                0,
+              );
+
+            const percentage = totalValue > 0 ? (d.y / totalValue) * 100 : 0;
+
             return {
-              x: context.t(rawLabel as TranslationKey),
+              x: translatedLabel,
               y: d.y,
+              percentage,
             };
           }) ?? [];
 
@@ -169,35 +194,102 @@ export function ChartWidget<const TKey extends string>({
       }
 
       return (
-        <Pie
-          data={pieData}
-          colorScale={CHART_COLORS}
-          innerRadius={chartType === "donut" ? 50 : 0}
-          animate={animate}
-          labels={(datum: Record<string, string | number>) =>
-            datum.x && datum.y !== undefined ? `${datum.x}: ${datum.y}` : ""
-          }
-          style={{
-            labels: { fontSize: 10, fill: "currentColor" },
-          }}
-        />
+        <Div style={{ width: "100%", height }}>
+          <Pie
+            data={pieData}
+            colorScale={dataColors.length > 0 ? dataColors : CHART_COLORS}
+            innerRadius={chartType === "donut" ? 50 : 0}
+            padAngle={1}
+            animate={animate}
+            labels={(datum: Record<string, string | number>): string => {
+              if (!datum || !datum.x || datum.y === undefined) {
+                return "";
+              }
+
+              // Get percentage from the datum if available
+              const percentageValue =
+                typeof datum.percentage === "number" ? datum.percentage : null;
+
+              // Format: "Label\nValue\n(Percentage%)"
+              const percentageStr =
+                percentageValue !== null && percentageValue !== undefined
+                  ? `\n(${percentageValue.toFixed(1)}%)`
+                  : "";
+
+              return `${String(datum.x)}\n${String(datum.y)}${percentageStr}`;
+            }}
+            labelRadius={100}
+            style={{
+              data: {
+                fillOpacity: 0.9,
+                stroke: "hsl(var(--background))",
+                strokeWidth: 2,
+              },
+              labels: {
+                fontSize: 14,
+                fill: "hsl(var(--foreground))",
+                fontWeight: 600,
+                padding: 10,
+              },
+            }}
+          />
+        </Div>
       );
     }
 
     // Line/Bar/Area charts
-    // Collect all unique x values for categorical axis (with translation)
-    const allXValues = chartData.data.flatMap((series) =>
-      series.data.map((d) =>
-        context.t(String(d.label ?? d.x ?? "") as TranslationKey),
-      ),
+    // Check if we're dealing with time-series data (ISO dates)
+    const firstXValue = chartData.data[0]?.data[0]?.x ?? "";
+    const isTimeSeries = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(
+      String(firstXValue),
     );
-    const uniqueXValues = [...new Set(allXValues)];
+
+    // For time series, use date indices; for categorical, format labels
+    let xTickLabels: string[] = [];
+    if (isTimeSeries) {
+      // Use numeric indices for time series to avoid scaling issues
+      const allDates = chartData.data[0]?.data.map((d) => String(d.x)) ?? [];
+      xTickLabels = allDates.map((dateStr) => {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString(context.locale, {
+          month: "short",
+          day: "numeric",
+        });
+      });
+    } else {
+      // Categorical data - translate labels
+      const allXValues = chartData.data.flatMap((series) =>
+        series.data.map((d) =>
+          context.t(String(d.label ?? d.x ?? "") as TranslationKey),
+        ),
+      );
+      xTickLabels = [...new Set(allXValues)];
+    }
+
+    const uniqueXValues = xTickLabels;
+
+    // Calculate y-domain from actual data
+    const allYValues = chartData.data.flatMap((series) =>
+      series.data.map((d) => d.y),
+    );
+    const minY = Math.min(...allYValues, 0); // Include 0 in domain
+    const maxY = Math.max(...allYValues, 0);
+
+    // Add 10% padding to y-domain
+    const yPadding = (maxY - minY) * 0.1;
+    const yDomain: [number, number] = [minY - yPadding, maxY + yPadding];
+
+    // X domain for time series (numeric indices)
+    const xDomain: [number, number] | undefined = isTimeSeries
+      ? [0, (xTickLabels.length || 1) - 1]
+      : undefined;
 
     return (
       <Chart
         height={height}
-        padding={{ top: 20, bottom: 50, left: 60, right: 20 }}
+        padding={{ top: 20, bottom: 40, left: 60, right: 20 }}
         domainPadding={{ x: 20 }}
+        {...(xDomain ? { domain: { x: xDomain, y: yDomain } } : {})}
       >
         <Axis
           dependentAxis
@@ -210,8 +302,37 @@ export function ChartWidget<const TKey extends string>({
         />
         <Axis
           label={xAxisLabel}
-          tickValues={uniqueXValues}
-          tickFormat={(t: string | number) => String(t)}
+          tickValues={
+            isTimeSeries
+              ? (() => {
+                  // Show maximum 8-10 ticks to avoid overcrowding
+                  const maxTicks = 8;
+                  const dataLength = xTickLabels.length;
+                  if (dataLength <= maxTicks) {
+                    // oxlint-disable-next-line no-unused-vars
+                    return xTickLabels.map((_, idx) => idx);
+                  }
+                  // Sample tick indices to show evenly distributed labels
+                  const step = Math.ceil(dataLength / maxTicks);
+                  const ticks: number[] = [];
+                  for (let i = 0; i < dataLength; i += step) {
+                    ticks.push(i);
+                  }
+                  // Always include the last tick
+                  if (ticks[ticks.length - 1] !== dataLength - 1) {
+                    ticks.push(dataLength - 1);
+                  }
+                  return ticks;
+                })()
+              : uniqueXValues
+          }
+          tickFormat={(t: string | number) => {
+            if (isTimeSeries) {
+              const index = typeof t === "number" ? t : parseInt(String(t));
+              return xTickLabels[index] || "";
+            }
+            return String(t);
+          }}
           style={{
             axisLabel: { padding: 30, fontSize: 12, fill: "currentColor" },
             tickLabels: {
@@ -226,11 +347,13 @@ export function ChartWidget<const TKey extends string>({
 
         {chartData.data.map((series, i) => {
           const color = series.color || CHART_COLORS[i % CHART_COLORS.length];
-          // Use translated string labels for x values
-          const data = series.data.map((d) => ({
-            x: context.t(String(d.label ?? d.x ?? "") as TranslationKey),
-            y: d.y,
-          }));
+          // For time series, use numeric indices; otherwise use formatted labels
+          const data = isTimeSeries
+            ? series.data.map((d, idx) => ({ x: idx, y: d.y }))
+            : series.data.map((d) => ({
+                x: context.t(String(d.label ?? d.x ?? "") as TranslationKey),
+                y: d.y,
+              }));
 
           switch (chartType) {
             case "bar":
@@ -294,7 +417,7 @@ export function ChartWidget<const TKey extends string>({
           )}
         </CardHeader>
       )}
-      <CardContent className="pt-0">
+      <CardContent className="p-4 pt-0">
         <Div style={{ height, width: "100%" }}>{renderChart()}</Div>
 
         {/* Legend */}

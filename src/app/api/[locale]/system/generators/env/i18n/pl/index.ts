@@ -89,6 +89,7 @@ export const translations: typeof enTranslations = {
   error: {
     validation_failed: "Walidacja pliku env nie powiodla sie",
     generation_failed: "Generowanie env nie powiodlo sie",
+    noValidFiles: "Nie znaleziono żadnych ważnych plików środowiskowych",
   },
   success: {
     generated: "Pliki srodowiska wygenerowane pomyslnie",

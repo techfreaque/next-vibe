@@ -9,9 +9,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -104,84 +104,64 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      force: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.unifiedInterface.cli.setup.install.post.title",
-          description:
-            "app.api.system.unifiedInterface.cli.setup.install.post.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      force: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.unifiedInterface.cli.setup.install.post.title",
+        description:
+          "app.api.system.unifiedInterface.cli.setup.install.post.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      verbose: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.unifiedInterface.cli.setup.install.post.title",
-          description:
-            "app.api.system.unifiedInterface.cli.setup.install.post.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      verbose: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.unifiedInterface.cli.setup.install.post.title",
+        description:
+          "app.api.system.unifiedInterface.cli.setup.install.post.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.install.post.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.cli.setup.install.post.success.title",
+        schema: z.boolean(),
+      }),
 
-      installed: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.install.post.title",
-        },
-        z.boolean(),
-      ),
+      installed: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.unifiedInterface.cli.setup.install.post.title",
+        schema: z.boolean(),
+      }),
 
-      version: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.install.post.description",
-        },
-        z.string().optional(),
-      ),
+      version: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.cli.setup.install.post.description",
+        schema: z.string().optional(),
+      }),
 
-      path: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.install.post.title",
-        },
-        z.string().optional(),
-      ),
+      path: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.unifiedInterface.cli.setup.install.post.title",
+        schema: z.string().optional(),
+      }),
 
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.install.post.title",
-        },
-        z.string(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.unifiedInterface.cli.setup.install.post.title",
+        schema: z.string(),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.install.post.title",
-        },
-        z.string().optional(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.unifiedInterface.cli.setup.install.post.title",
+        schema: z.string().optional(),
+      }),
     },
   ),
 

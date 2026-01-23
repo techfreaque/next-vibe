@@ -10,10 +10,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
   responseArrayField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 
 import { UserRole } from "../../../user-roles/enum";
 import { SocialProviders } from "./enum";
@@ -51,18 +51,16 @@ const { GET } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      email: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.EMAIL,
-          label: "app.api.user.public.login.options.fields.email.label",
-          description:
-            "app.api.user.public.login.options.fields.email.description",
-          placeholder:
-            "app.api.user.public.login.options.fields.email.placeholder",
-        },
-        z.email().optional(),
-      ),
+      email: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label: "app.api.user.public.login.options.fields.email.label",
+        description:
+          "app.api.user.public.login.options.fields.email.description",
+        placeholder:
+          "app.api.user.public.login.options.fields.email.placeholder",
+        schema: z.email().optional(),
+      }),
 
       // === RESPONSE FIELDS ===
       response: objectField(
@@ -74,34 +72,28 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          success: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.public.login.options.response.success.badge",
-            },
-            z
+          success: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.user.public.login.options.response.success.badge",
+            schema: z
               .boolean()
               .describe("Whether login options were retrieved successfully"),
-          ),
-          message: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.login.options.response.message.content",
-            },
-            z.string().describe("Human-readable status message"),
-          ),
-          forUser: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.login.options.response.forUser.content",
-            },
-            z
+          }),
+          message: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.public.login.options.response.message.content",
+            schema: z.string().describe("Human-readable status message"),
+          }),
+          forUser: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.public.login.options.response.forUser.content",
+            schema: z
               .string()
               .optional()
               .describe("Email address these options are specific to"),
-          ),
+          }),
           loginMethods: objectField(
             {
               type: WidgetType.CONTAINER,
@@ -124,21 +116,19 @@ const { GET } = createEndpoint({
                 },
                 { response: true },
                 {
-                  enabled: responseField(
-                    {
-                      type: WidgetType.BADGE,
-                      text: "app.api.user.public.login.options.response.loginMethods.password.enabled.badge",
-                    },
-                    z.boolean().describe("Whether password login is allowed"),
-                  ),
-                  passwordDescription: responseField(
-                    {
-                      type: WidgetType.TEXT,
-                      content:
-                        "app.api.user.public.login.options.response.loginMethods.password.description",
-                    },
-                    z.string().describe("Human-readable description"),
-                  ),
+                  enabled: responseField({
+                    type: WidgetType.BADGE,
+                    text: "app.api.user.public.login.options.response.loginMethods.password.enabled.badge",
+                    schema: z
+                      .boolean()
+                      .describe("Whether password login is allowed"),
+                  }),
+                  passwordDescription: responseField({
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.user.public.login.options.response.loginMethods.password.description",
+                    schema: z.string().describe("Human-readable description"),
+                  }),
                 },
               ),
               social: objectField(
@@ -152,21 +142,19 @@ const { GET } = createEndpoint({
                 },
                 { response: true },
                 {
-                  enabled: responseField(
-                    {
-                      type: WidgetType.BADGE,
-                      text: "app.api.user.public.login.options.response.loginMethods.social.enabled.badge",
-                    },
-                    z.boolean().describe("Whether social login is allowed"),
-                  ),
-                  socialDescription: responseField(
-                    {
-                      type: WidgetType.TEXT,
-                      content:
-                        "app.api.user.public.login.options.response.loginMethods.social.description",
-                    },
-                    z.string().describe("Human-readable description"),
-                  ),
+                  enabled: responseField({
+                    type: WidgetType.BADGE,
+                    text: "app.api.user.public.login.options.response.loginMethods.social.enabled.badge",
+                    schema: z
+                      .boolean()
+                      .describe("Whether social login is allowed"),
+                  }),
+                  socialDescription: responseField({
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.user.public.login.options.response.loginMethods.social.description",
+                    schema: z.string().describe("Human-readable description"),
+                  }),
                   providers: responseArrayField(
                     {
                       type: WidgetType.DATA_LIST,
@@ -178,45 +166,37 @@ const { GET } = createEndpoint({
                       },
                       { response: true },
                       {
-                        name: responseField(
-                          {
-                            type: WidgetType.TEXT,
-                            content:
-                              "app.api.user.public.login.options.response.loginMethods.social.providers.name.content",
-                          },
-                          z
+                        name: responseField({
+                          type: WidgetType.TEXT,
+                          content:
+                            "app.api.user.public.login.options.response.loginMethods.social.providers.name.content",
+                          schema: z
                             .string()
                             .describe(
                               "Provider display name (e.g., 'Google', 'GitHub')",
                             ),
-                        ),
-                        id: responseField(
-                          {
-                            type: WidgetType.TEXT,
-                            content:
-                              "app.api.user.public.login.options.response.loginMethods.social.providers.id.content",
-                          },
-                          z.string().describe("Provider identifier"),
-                        ),
-                        enabled: responseField(
-                          {
-                            type: WidgetType.BADGE,
-                            text: "app.api.user.public.login.options.response.loginMethods.social.providers.enabled.badge",
-                          },
-                          z
+                        }),
+                        id: responseField({
+                          type: WidgetType.TEXT,
+                          content:
+                            "app.api.user.public.login.options.response.loginMethods.social.providers.id.content",
+                          schema: z.string().describe("Provider identifier"),
+                        }),
+                        enabled: responseField({
+                          type: WidgetType.BADGE,
+                          text: "app.api.user.public.login.options.response.loginMethods.social.providers.enabled.badge",
+                          schema: z
                             .boolean()
                             .describe("Whether this provider is available"),
-                        ),
-                        description: responseField(
-                          {
-                            type: WidgetType.TEXT,
-                            content:
-                              "app.api.user.public.login.options.response.loginMethods.social.providers.description",
-                          },
-                          z
+                        }),
+                        description: responseField({
+                          type: WidgetType.TEXT,
+                          content:
+                            "app.api.user.public.login.options.response.loginMethods.social.providers.description",
+                          schema: z
                             .string()
                             .describe("Human-readable provider description"),
-                        ),
+                        }),
                       },
                     ),
                   ),
@@ -235,42 +215,41 @@ const { GET } = createEndpoint({
             },
             { response: true },
             {
-              maxAttempts: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.public.login.options.response.security.maxAttempts.content",
-                },
-                z
+              maxAttempts: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.user.public.login.options.response.security.maxAttempts.content",
+                schema: z
                   .number()
                   .optional()
                   .describe("Maximum login attempts allowed"),
-              ),
-              requireTwoFactor: responseField(
-                {
-                  type: WidgetType.BADGE,
-                  text: "app.api.user.public.login.options.response.security.requireTwoFactor.badge",
-                },
-                z
+              }),
+              requireTwoFactor: responseField({
+                type: WidgetType.BADGE,
+                text: "app.api.user.public.login.options.response.security.requireTwoFactor.badge",
+                schema: z
                   .boolean()
                   .optional()
                   .describe("Whether 2FA is required for this user"),
-              ),
-              securityDescription: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.public.login.options.response.security.description",
-                },
-                z.string().describe("Security requirements summary"),
-              ),
+              }),
+              securityDescription: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.user.public.login.options.response.security.description",
+                schema: z.string().describe("Security requirements summary"),
+              }),
             },
           ),
           recommendations: responseArrayField(
             {
               type: WidgetType.LINK_LIST,
             },
-            z.string(),
+            responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.user.public.login.options.get.response.recommendations.item",
+              schema: z.string(),
+            }),
           ),
         },
       ),

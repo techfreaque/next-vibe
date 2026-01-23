@@ -67,7 +67,6 @@ const METRIC_TYPES = {
   NEWSLETTER_SUBSCRIBER: "newsletter_subscriber",
   CONVERTED: "converted",
   SIGNED_UP: "signed_up",
-  CONSULTATION_BOOKED: "consultation_booked",
   SUBSCRIPTION_CONFIRMED: "subscription_confirmed",
   UNSUBSCRIBED: "unsubscribed",
   BOUNCED: "bounced",
@@ -109,7 +108,6 @@ const mapLeadStatusToActivityType = (
       return ActivityType.LEAD_CREATED;
     case LeadStatus.CAMPAIGN_RUNNING:
     case LeadStatus.SIGNED_UP:
-    case LeadStatus.CONSULTATION_BOOKED:
     case LeadStatus.SUBSCRIPTION_CONFIRMED:
       return ActivityType.LEAD_CONVERTED;
     case LeadStatus.UNSUBSCRIBED:
@@ -124,7 +122,7 @@ export class LeadStatsRepository {
    * Get comprehensive leads statistics
    */
   static async getLeadsStats(
-    data: LeadsStatsRequestOutput,
+    query: LeadsStatsRequestOutput,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadsStatsResponseOutput>> {
     // Initialize date variables for error handling scope
@@ -135,13 +133,15 @@ export class LeadStatsRepository {
       logger.debug("Getting leads stats");
 
       // Get date range from preset
-      const dateRange = getDateRangeFromPreset(data.dateRangePreset);
+      const dateRange = getDateRangeFromPreset(
+        query.timeFilters.dateRangePreset,
+      );
       dateFrom = dateRange.from;
       dateTo = dateRange.to;
 
       // Build where conditions
       const whereConditions = LeadStatsRepository.buildWhereConditions(
-        data,
+        query,
         dateFrom,
         dateTo,
       );
@@ -155,13 +155,17 @@ export class LeadStatsRepository {
         topPerformingCampaigns,
         topPerformingSources,
       ] = await Promise.all([
-        LeadStatsRepository.getCurrentPeriodMetrics(whereConditions),
+        LeadStatsRepository.getCurrentPeriodMetrics(
+          whereConditions,
+          dateFrom,
+          dateTo,
+        ),
         LeadStatsRepository.generateHistoricalData(
           whereConditions,
           dateFrom,
           dateTo,
-          data.timePeriod,
-          data,
+          query.timeFilters.timePeriod,
+          query,
           logger,
         ),
         LeadStatsRepository.generateGroupedStats(whereConditions),
@@ -174,10 +178,12 @@ export class LeadStatsRepository {
         ...currentMetrics,
         historicalData,
         groupedStats,
-        generatedAt: new Date().toISOString(),
-        dataRange: {
-          from: dateFrom.toISOString(),
-          to: dateTo.toISOString(),
+        metadata: {
+          generatedAt: new Date().toISOString(),
+          dataRange: {
+            from: dateFrom.toISOString(),
+            to: dateTo.toISOString(),
+          },
         },
         recentActivity,
         topPerformingCampaigns,
@@ -217,42 +223,48 @@ export class LeadStatsRepository {
     conditions.push(lte(leads.createdAt, dateTo));
 
     // Status filter
-    if (query.status && query.status !== LeadStatusFilter.ALL) {
-      const status = mapStatusFilter(query.status);
+    if (
+      query.leadFilters.status &&
+      query.leadFilters.status !== LeadStatusFilter.ALL
+    ) {
+      const status = mapStatusFilter(query.leadFilters.status);
       if (status) {
         conditions.push(eq(leads.status, status));
       }
     }
 
     // Source filter
-    if (query.source && query.source !== LeadSourceFilter.ALL) {
-      const source = mapSourceFilter(query.source);
+    if (
+      query.leadFilters.source &&
+      query.leadFilters.source !== LeadSourceFilter.ALL
+    ) {
+      const source = mapSourceFilter(query.leadFilters.source);
       if (source) {
         conditions.push(eq(leads.source, source));
       }
     }
 
     // Country filter
-    if (query.country !== CountryFilter.ALL) {
+    if (query.leadFilters.country !== CountryFilter.ALL) {
       // Map filter to actual enum value
-      const countryValue = convertCountryFilter(query.country);
+      const countryValue = convertCountryFilter(query.leadFilters.country);
       if (countryValue) {
         conditions.push(eq(leads.country, countryValue));
       }
     }
 
     // Language filter
-    if (query.language !== LanguageFilter.ALL) {
+    if (query.leadFilters.language !== LanguageFilter.ALL) {
       // Map filter to actual enum value
-      const languageValue = convertLanguageFilter(query.language);
+      const languageValue = convertLanguageFilter(query.leadFilters.language);
       if (languageValue) {
         conditions.push(eq(leads.language, languageValue));
       }
     }
 
     // Campaign stage filter
-    if (query.campaignStage !== EmailCampaignStageFilter.ALL) {
-      const stage = mapCampaignStageFilter(query.campaignStage);
+    if (query.leadFilters.campaignStage !== EmailCampaignStageFilter.ALL) {
+      const stage = mapCampaignStageFilter(query.leadFilters.campaignStage);
       if (stage) {
         conditions.push(eq(leads.currentCampaignStage, stage));
       }
@@ -266,6 +278,8 @@ export class LeadStatsRepository {
    */
   private static async getCurrentPeriodMetrics(
     whereConditions: SQL | undefined,
+    dateFrom: Date,
+    dateTo: Date,
   ): Promise<
     Omit<
       LeadsStatsResponseOutput,
@@ -343,18 +357,6 @@ export class LeadStatsRepository {
           : eq(leads.status, LeadStatus.SIGNED_UP),
       );
 
-    const consultationBookedLeadsResult = await db
-      .select({ count: count() })
-      .from(leads)
-      .where(
-        whereConditions
-          ? and(
-              whereConditions,
-              eq(leads.status, LeadStatus.CONSULTATION_BOOKED),
-            )
-          : eq(leads.status, LeadStatus.CONSULTATION_BOOKED),
-      );
-
     const subscriptionConfirmedLeadsResult = await db
       .select({ count: count() })
       .from(leads)
@@ -424,9 +426,6 @@ export class LeadStatsRepository {
         : 0;
 
     const signedUpLeads = Number(signedUpLeadsResult[0]?.count || 0);
-    const consultationBookedLeads = Number(
-      consultationBookedLeadsResult[0]?.count || 0,
-    );
     const subscriptionConfirmedLeads = Number(
       subscriptionConfirmedLeadsResult[0]?.count || 0,
     );
@@ -445,8 +444,6 @@ export class LeadStatsRepository {
 
     const conversionRate = totalLeads > 0 ? actualConverted / totalLeads : 0;
     const signupRate = totalLeads > 0 ? signedUpLeads / totalLeads : 0;
-    const consultationBookingRate =
-      totalLeads > 0 ? consultationBookedLeads / totalLeads : 0;
     const subscriptionConfirmationRate =
       totalLeads > 0 ? subscriptionConfirmedLeads / totalLeads : 0;
 
@@ -467,124 +464,149 @@ export class LeadStatsRepository {
       totalLeads - Number(leadsWithEmailEngagement[0]?.count || 0);
 
     return {
-      totalLeads,
-      newLeads: totalLeads, // For current period stats, new leads = total leads in the filtered period
-      activeLeads: Number(activeLeadsResult[0]?.count || 0),
-      campaignRunningLeads: Number(campaignRunningLeadsResult[0]?.count || 0),
-      websiteUserLeads: Number(websiteUserLeadsResult[0]?.count || 0),
-      newsletterSubscriberLeads: Number(
-        newsletterSubscriberLeadsResult[0]?.count || 0,
-      ),
-      convertedLeads: actualConverted, // Use the corrected converted count
-      signedUpLeads,
-      consultationBookedLeads,
-      subscriptionConfirmedLeads,
-      unsubscribedLeads: Number(unsubscribedLeadsResult[0]?.count || 0),
-      bouncedLeads: Number(bouncedLeadsResult[0]?.count || 0),
-      invalidLeads: Number(invalidLeadsResult[0]?.count || 0),
-      totalEmailsSent: emailMetrics.totalEmailsSent,
-      totalEmailsOpened: emailMetrics.totalEmailsOpened,
-      totalEmailsClicked: emailMetrics.totalEmailsClicked,
-      averageEmailsPerLead:
-        Math.round((averageEmailsPerLead + Number.EPSILON) * 100) / 100,
-      averageOpenRate:
-        Math.round((averageOpenRate + Number.EPSILON) * 100) / 100,
-      averageClickRate:
-        Math.round((averageClickRate + Number.EPSILON) * 100) / 100,
-      leadsWithEmailEngagement: Number(leadsWithEmailEngagement[0]?.count || 0),
-      leadsWithoutEmailEngagement,
-      averageEmailEngagementScore:
-        emailMetrics.totalEmailsSent > 0
-          ? Math.round(
-              ((emailMetrics.totalEmailsOpened +
-                emailMetrics.totalEmailsClicked * 2) /
-                emailMetrics.totalEmailsSent +
-                Number.EPSILON) *
-                100,
-            ) / 100
-          : 0,
-      totalEmailEngagements:
-        emailMetrics.totalEmailsOpened + emailMetrics.totalEmailsClicked,
-      conversionRate,
-      signupRate,
-      consultationBookingRate,
-      subscriptionConfirmationRate,
-      leadsByCampaignStage:
-        await LeadStatsRepository.getLeadsByCampaignStage(whereConditions),
-      leadsInActiveCampaigns:
-        await LeadStatsRepository.getLeadsInActiveCampaigns(whereConditions),
-      leadsNotInCampaigns:
-        await LeadStatsRepository.getLeadsNotInCampaigns(whereConditions),
-      leadsByJourneyVariant:
-        await LeadStatsRepository.getLeadsByJourneyVariant(whereConditions),
-      leadsByCountry:
-        await LeadStatsRepository.getLeadsByCountry(whereConditions),
-      leadsByLanguage:
-        await LeadStatsRepository.getLeadsByLanguage(whereConditions),
-      leadsBySource:
-        await LeadStatsRepository.getLeadsBySource(whereConditions),
-      leadsByStatus:
-        await LeadStatsRepository.getLeadsByStatus(whereConditions),
-      leadsWithBusinessName: await LeadStatsRepository.getLeadsWithField(
-        whereConditions,
-        "businessName",
-      ),
-      leadsWithContactName: await LeadStatsRepository.getLeadsWithField(
-        whereConditions,
-        "contactName",
-      ),
-      leadsWithPhone: await LeadStatsRepository.getLeadsWithField(
-        whereConditions,
-        "phone",
-      ),
-      leadsWithWebsite: await LeadStatsRepository.getLeadsWithField(
-        whereConditions,
-        "website",
-      ),
-      leadsWithNotes: await LeadStatsRepository.getLeadsWithField(
-        whereConditions,
-        "notes",
-      ),
-      dataCompletenessRate:
-        await LeadStatsRepository.calculateDataCompletenessRate(
-          whereConditions,
+      overview: {
+        totalLeads,
+        newLeads: totalLeads, // For current period stats, new leads = total leads in the filtered period
+        activeLeads: Number(activeLeadsResult[0]?.count || 0),
+        conversionRate,
+      },
+      emailPerformance: {
+        averageOpenRate:
+          Math.round((averageOpenRate + Number.EPSILON) * 100) / 100,
+        averageClickRate:
+          Math.round((averageClickRate + Number.EPSILON) * 100) / 100,
+        campaignRunningLeads: Number(campaignRunningLeadsResult[0]?.count || 0),
+        websiteUserLeads: Number(websiteUserLeadsResult[0]?.count || 0),
+        newsletterSubscriberLeads: Number(
+          newsletterSubscriberLeadsResult[0]?.count || 0,
         ),
-      leadsCreatedToday: await LeadStatsRepository.getLeadsCreatedInPeriod(
-        whereConditions,
-        "today",
-      ),
-      leadsCreatedThisWeek: await LeadStatsRepository.getLeadsCreatedInPeriod(
-        whereConditions,
-        "week",
-      ),
-      leadsCreatedThisMonth: await LeadStatsRepository.getLeadsCreatedInPeriod(
-        whereConditions,
-        "month",
-      ),
-      leadsUpdatedToday: await LeadStatsRepository.getLeadsUpdatedInPeriod(
-        whereConditions,
-        "today",
-      ),
-      leadsUpdatedThisWeek: await LeadStatsRepository.getLeadsUpdatedInPeriod(
-        whereConditions,
-        "week",
-      ),
-      leadsUpdatedThisMonth: await LeadStatsRepository.getLeadsUpdatedInPeriod(
-        whereConditions,
-        "month",
-      ),
-      averageTimeToConversion:
-        await LeadStatsRepository.calculateAverageTimeToConversion(
-          whereConditions,
+        convertedLeads: actualConverted, // Use the corrected converted count
+        signedUpLeads,
+        subscriptionConfirmedLeads,
+        unsubscribedLeads: Number(unsubscribedLeadsResult[0]?.count || 0),
+        bouncedLeads: Number(bouncedLeadsResult[0]?.count || 0),
+        invalidLeads: Number(invalidLeadsResult[0]?.count || 0),
+        totalEmailsSent: emailMetrics.totalEmailsSent,
+        totalEmailsOpened: emailMetrics.totalEmailsOpened,
+        totalEmailsClicked: emailMetrics.totalEmailsClicked,
+        averageEmailsPerLead:
+          Math.round((averageEmailsPerLead + Number.EPSILON) * 100) / 100,
+        leadsWithEmailEngagement: Number(
+          leadsWithEmailEngagement[0]?.count || 0,
         ),
-      averageTimeToSignup:
-        await LeadStatsRepository.calculateAverageTimeToSignup(whereConditions),
-      averageTimeToConsultation:
-        await LeadStatsRepository.calculateAverageTimeToConsultation(
+        leadsWithoutEmailEngagement,
+        averageEmailEngagementScore:
+          emailMetrics.totalEmailsSent > 0
+            ? Math.round(
+                ((emailMetrics.totalEmailsOpened +
+                  emailMetrics.totalEmailsClicked * 2) /
+                  emailMetrics.totalEmailsSent +
+                  Number.EPSILON) *
+                  100,
+              ) / 100
+            : 0,
+        totalEmailEngagements:
+          emailMetrics.totalEmailsOpened + emailMetrics.totalEmailsClicked,
+      },
+      conversionRates: {
+        signupRate,
+        subscriptionConfirmationRate,
+        dataCompletenessRate:
+          await LeadStatsRepository.calculateDataCompletenessRate(
+            whereConditions,
+          ),
+      },
+      activityTimeline: {
+        leadVelocity:
+          await LeadStatsRepository.calculateCurrentLeadVelocity(
+            whereConditions,
+          ),
+        leadsCreatedToday: await LeadStatsRepository.getLeadsCreatedInPeriod(
           whereConditions,
+          "today",
         ),
-      leadVelocity:
-        await LeadStatsRepository.calculateCurrentLeadVelocity(whereConditions),
+        leadsCreatedThisWeek: await LeadStatsRepository.getLeadsCreatedInPeriod(
+          whereConditions,
+          "week",
+        ),
+        leadsCreatedThisMonth:
+          await LeadStatsRepository.getLeadsCreatedInPeriod(
+            whereConditions,
+            "month",
+          ),
+        leadsUpdatedToday: await LeadStatsRepository.getLeadsUpdatedInPeriod(
+          whereConditions,
+          "today",
+        ),
+        leadsUpdatedThisWeek: await LeadStatsRepository.getLeadsUpdatedInPeriod(
+          whereConditions,
+          "week",
+        ),
+        leadsUpdatedThisMonth:
+          await LeadStatsRepository.getLeadsUpdatedInPeriod(
+            whereConditions,
+            "month",
+          ),
+      },
+      campaignDistribution: {
+        leadsByCampaignStage:
+          await LeadStatsRepository.getLeadsByCampaignStage(whereConditions),
+        leadsInActiveCampaigns:
+          await LeadStatsRepository.getLeadsInActiveCampaigns(whereConditions),
+        leadsNotInCampaigns:
+          await LeadStatsRepository.getLeadsNotInCampaigns(whereConditions),
+        leadsByJourneyVariant:
+          await LeadStatsRepository.getLeadsByJourneyVariant(whereConditions),
+      },
+      geographicDistribution: {
+        leadsByCountry:
+          await LeadStatsRepository.getLeadsByCountry(whereConditions),
+        leadsByLanguage:
+          await LeadStatsRepository.getLeadsByLanguage(whereConditions),
+        leadsBySource:
+          await LeadStatsRepository.getLeadsBySource(whereConditions),
+        leadsByStatus:
+          await LeadStatsRepository.getLeadsByStatus(whereConditions),
+      },
+      dataQuality: {
+        leadsWithBusinessName: await LeadStatsRepository.getLeadsWithField(
+          whereConditions,
+          "businessName",
+        ),
+        leadsWithContactName: await LeadStatsRepository.getLeadsWithField(
+          whereConditions,
+          "contactName",
+        ),
+        leadsWithPhone: await LeadStatsRepository.getLeadsWithField(
+          whereConditions,
+          "phone",
+        ),
+        leadsWithWebsite: await LeadStatsRepository.getLeadsWithField(
+          whereConditions,
+          "website",
+        ),
+        leadsWithNotes: await LeadStatsRepository.getLeadsWithField(
+          whereConditions,
+          "notes",
+        ),
+      },
+      performanceMetrics: {
+        averageTimeToConversion:
+          await LeadStatsRepository.calculateAverageTimeToConversion(
+            whereConditions,
+          ),
+        averageTimeToSignup:
+          await LeadStatsRepository.calculateAverageTimeToSignup(
+            whereConditions,
+          ),
+      },
+      metadata: {
+        generatedAt: new Date().toISOString(),
+        dataRange: {
+          from: dateFrom.toISOString(),
+          to: dateTo.toISOString(),
+        },
+      },
     };
   }
 
@@ -634,7 +656,6 @@ export class LeadStatsRepository {
         newsletterSubscriberLeadsData,
         convertedLeadsData,
         signedUpLeadsData,
-        consultationBookedLeadsData,
         subscriptionConfirmedLeadsData,
         unsubscribedLeadsData,
         bouncedLeadsData,
@@ -710,14 +731,6 @@ export class LeadStatsRepository {
         LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
-          METRIC_TYPES.CONSULTATION_BOOKED,
-          timePeriod,
-          filters,
-          logger,
-        ),
-        LeadStatsRepository.getHistoricalMetric(
-          intervals,
-          whereConditions,
           METRIC_TYPES.SUBSCRIPTION_CONFIRMED,
           timePeriod,
           filters,
@@ -774,8 +787,8 @@ export class LeadStatsRepository {
       ]).then((results) => {
         // Extract successful results and provide fallbacks for failed ones
         const emptyIntervalData = intervals.map((interval) => ({
-          date: interval.label,
-          value: 0,
+          x: interval.label,
+          y: 0,
         }));
 
         return results.map((result, index) => {
@@ -791,7 +804,6 @@ export class LeadStatsRepository {
             "newsletterSubscriberLeads",
             "convertedLeads",
             "signedUpLeads",
-            "consultationBookedLeads",
             "subscriptionConfirmedLeads",
             "unsubscribedLeads",
             "bouncedLeads",
@@ -830,11 +842,6 @@ export class LeadStatsRepository {
       );
       const signupRateData = LeadStatsRepository.calculateRateData(
         signedUpLeadsData,
-        totalLeadsData,
-        logger,
-      );
-      const consultationBookingRateData = LeadStatsRepository.calculateRateData(
-        consultationBookedLeadsData,
         totalLeadsData,
         logger,
       );
@@ -893,12 +900,6 @@ export class LeadStatsRepository {
           type: "line" as ChartType,
           data: signedUpLeadsData,
           color: "#84cc16",
-        },
-        consultationBookedLeads: {
-          name: "app.api.leads.admin.stats.metrics.consultation_booked_leads" as const,
-          type: "line" as ChartType,
-          data: consultationBookedLeadsData,
-          color: "#f97316",
         },
         subscriptionConfirmedLeads: {
           name: "app.api.leads.admin.stats.metrics.subscription_confirmed_leads" as const,
@@ -966,12 +967,6 @@ export class LeadStatsRepository {
           data: signupRateData,
           color: "#f97316",
         },
-        consultationBookingRate: {
-          name: "app.api.leads.admin.stats.metrics.consultation_booking_rate" as const,
-          type: "line" as ChartType,
-          data: consultationBookingRateData,
-          color: "#ef4444",
-        },
         subscriptionConfirmationRate: {
           name: "app.api.leads.admin.stats.metrics.subscription_confirmation_rate" as const,
           type: "line" as ChartType,
@@ -1037,7 +1032,6 @@ export class LeadStatsRepository {
         newsletterSubscriberLeads: emptyData,
         convertedLeads: emptyData,
         signedUpLeads: emptyData,
-        consultationBookedLeads: emptyData,
         subscriptionConfirmedLeads: emptyData,
         unsubscribedLeads: emptyData,
         bouncedLeads: emptyData,
@@ -1049,7 +1043,6 @@ export class LeadStatsRepository {
         clickRate: emptyData,
         conversionRate: emptyData,
         signupRate: emptyData,
-        consultationBookingRate: emptyData,
         subscriptionConfirmationRate: emptyData,
         averageEmailEngagementScore: emptyData,
         leadVelocity: emptyData,
@@ -1401,7 +1394,7 @@ export class LeadStatsRepository {
     timePeriod: TimePeriod,
     filters: LeadsStatsRequestOutput,
     logger: EndpointLogger,
-  ): Promise<Array<{ date: string; value: number }>> {
+  ): Promise<Array<{ x: string; y: number }>> {
     try {
       if (intervals.length === 0) {
         logger.debug("Empty intervals provided for historical metric", {
@@ -1588,34 +1581,6 @@ export class LeadStatsRepository {
             })
             .from(leads)
             .where(and(...signedUpConditions))
-            .groupBy(sql`DATE_TRUNC(${sql.raw(dateTrunc)}, ${timestampField})`)
-            .orderBy(sql`DATE_TRUNC(${sql.raw(dateTrunc)}, ${timestampField})`);
-          break;
-        }
-
-        case "consultation_booked": {
-          // For consultation booked leads, use the actual booking timestamp when available
-          const consultationConditions: SQL[] = [
-            eq(leads.status, LeadStatus.CONSULTATION_BOOKED),
-          ];
-
-          const timestampField = sql`COALESCE(${leads.consultationBookedAt}, ${leads.createdAt})`;
-          consultationConditions.push(gte(timestampField, dateFrom));
-          consultationConditions.push(lte(timestampField, dateTo));
-
-          const nonDateConditions =
-            LeadStatsRepository.buildNonDateConditions(filters);
-          if (nonDateConditions.length > 0) {
-            consultationConditions.push(...nonDateConditions);
-          }
-
-          query = db
-            .select({
-              date: sql<string>`DATE_TRUNC(${sql.raw(dateTrunc)}, ${timestampField})::text`,
-              value: sql<number>`COUNT(*)::int`,
-            })
-            .from(leads)
-            .where(and(...consultationConditions))
             .groupBy(sql`DATE_TRUNC(${sql.raw(dateTrunc)}, ${timestampField})`)
             .orderBy(sql`DATE_TRUNC(${sql.raw(dateTrunc)}, ${timestampField})`);
           break;
@@ -1819,8 +1784,8 @@ export class LeadStatsRepository {
 
         default:
           return intervals.map((interval) => ({
-            date: interval.label,
-            value: 0,
+            x: interval.label,
+            y: 0,
           }));
       }
 
@@ -1837,8 +1802,8 @@ export class LeadStatsRepository {
 
       // Fill in missing intervals with zero values
       const data = intervals.map((interval) => ({
-        date: interval.label,
-        value: resultMap.get(interval.label) || 0,
+        x: interval.label,
+        y: resultMap.get(interval.label) || 0,
       }));
 
       return data;
@@ -1852,8 +1817,8 @@ export class LeadStatsRepository {
 
       // Return empty data for the intervals to prevent UI crashes
       return intervals.map((interval) => ({
-        date: interval.label,
-        value: 0,
+        x: interval.label,
+        y: 0,
       }));
     }
   }
@@ -1863,14 +1828,14 @@ export class LeadStatsRepository {
    * This method takes period-specific counts and converts them to running totals
    */
   private static convertToCumulativeData(
-    data: Array<{ date: string; value: number }>,
-  ): Array<{ date: string; value: number }> {
+    data: Array<{ x: string; y: number }>,
+  ): Array<{ x: string; y: number }> {
     let cumulativeTotal = 0;
     return data.map((item) => {
-      cumulativeTotal += item.value;
+      cumulativeTotal += item.y;
       return {
-        date: item.date,
-        value: cumulativeTotal,
+        x: item.x,
+        y: cumulativeTotal,
       };
     });
   }
@@ -1885,7 +1850,7 @@ export class LeadStatsRepository {
     timePeriod: TimePeriod,
     filters: LeadsStatsRequestOutput,
     logger: EndpointLogger,
-  ): Promise<Array<{ date: string; value: number }>> {
+  ): Promise<Array<{ x: string; y: number }>> {
     try {
       if (intervals.length === 0) {
         return [];
@@ -1935,8 +1900,8 @@ export class LeadStatsRepository {
         const periodValue = resultMap.get(interval.label) || 0;
         cumulativeTotal += periodValue;
         return {
-          date: interval.label,
-          value: cumulativeTotal,
+          x: interval.label,
+          y: cumulativeTotal,
         };
       });
     } catch (error) {
@@ -1970,9 +1935,13 @@ export class LeadStatsRepository {
     const conditions: SQL[] = [];
 
     // Add status filter if specified (single value, not array)
-    if (filters.status && filters.status !== LeadStatusFilter.ALL) {
+    if (
+      filters.leadFilters.status &&
+      filters.leadFilters.status !== LeadStatusFilter.ALL
+    ) {
       const mappedStatus = mapStatusFilter(
-        filters.status as (typeof LeadStatusFilter)[keyof typeof LeadStatusFilter],
+        filters.leadFilters
+          .status as (typeof LeadStatusFilter)[keyof typeof LeadStatusFilter],
       );
       if (mappedStatus) {
         conditions.push(eq(leads.status, mappedStatus));
@@ -1980,9 +1949,13 @@ export class LeadStatsRepository {
     }
 
     // Add source filter if specified (single value, not array)
-    if (filters.source && filters.source !== LeadSourceFilter.ALL) {
+    if (
+      filters.leadFilters.source &&
+      filters.leadFilters.source !== LeadSourceFilter.ALL
+    ) {
       const mappedSource = mapSourceFilter(
-        filters.source as (typeof LeadSourceFilter)[keyof typeof LeadSourceFilter],
+        filters.leadFilters
+          .source as (typeof LeadSourceFilter)[keyof typeof LeadSourceFilter],
       );
       if (mappedSource) {
         conditions.push(eq(leads.source, mappedSource));
@@ -1990,29 +1963,38 @@ export class LeadStatsRepository {
     }
 
     // Add country filter if specified (single value, not array)
-    if (filters.country && filters.country !== CountryFilter.ALL) {
+    if (
+      filters.leadFilters.country &&
+      filters.leadFilters.country !== CountryFilter.ALL
+    ) {
       // Map country filter to actual country value
-      const countryValue = filters.country as "DE" | "PL" | "GLOBAL";
+      const countryValue = filters.leadFilters.country as
+        | "DE"
+        | "PL"
+        | "GLOBAL";
       conditions.push(eq(leads.country, countryValue));
     }
 
     // Add business name filter if specified
-    if (filters.hasBusinessName === true) {
+    if (filters.dataFilters?.hasBusinessName === true) {
       conditions.push(isNotNull(leads.businessName));
-    } else if (filters.hasBusinessName === false) {
+    } else if (filters.dataFilters?.hasBusinessName === false) {
       conditions.push(sql`${leads.businessName} IS NULL`);
     }
 
     // Add contact name filter if specified
-    if (filters.hasContactName === true) {
+    if (filters.dataFilters?.hasContactName === true) {
       conditions.push(isNotNull(leads.contactName));
-    } else if (filters.hasContactName === false) {
+    } else if (filters.dataFilters?.hasContactName === false) {
       conditions.push(sql`${leads.contactName} IS NULL`);
     }
 
     // Add search filter if specified
-    if (filters.search && typeof filters.search === "string") {
-      const searchPattern = `%${filters.search}%`;
+    if (
+      filters.searchAndSort.search &&
+      typeof filters.searchAndSort.search === "string"
+    ) {
+      const searchPattern = `%${filters.searchAndSort.search}%`;
       conditions.push(
         sql`(
           ${leads.businessName} ILIKE ${searchPattern} OR
@@ -2023,20 +2005,20 @@ export class LeadStatsRepository {
     }
 
     // Add engagement filters
-    if (filters.hasEngagement === true) {
+    if (filters.engagementFilters?.hasEngagement === true) {
       conditions.push(
         sql`${leads.emailsOpened} > 0 OR ${leads.emailsClicked} > 0`,
       );
-    } else if (filters.hasEngagement === false) {
+    } else if (filters.engagementFilters?.hasEngagement === false) {
       conditions.push(
         sql`${leads.emailsOpened} = 0 AND ${leads.emailsClicked} = 0`,
       );
     }
 
     // Add conversion filters
-    if (filters.isConverted === true) {
+    if (filters.conversionFilters?.isConverted === true) {
       conditions.push(isNotNull(leads.convertedAt));
-    } else if (filters.isConverted === false) {
+    } else if (filters.conversionFilters?.isConverted === false) {
       conditions.push(sql`${leads.convertedAt} IS NULL`);
     }
 
@@ -2070,10 +2052,10 @@ export class LeadStatsRepository {
    * Ensures rates are calculated correctly for each individual TimePeriod bucket
    */
   private static calculateRateData(
-    numeratorData: Array<{ date: string; value: number }>,
-    denominatorData: Array<{ date: string; value: number }>,
+    numeratorData: Array<{ x: string; y: number }>,
+    denominatorData: Array<{ x: string; y: number }>,
     logger: EndpointLogger,
-  ): Array<{ date: string; value: number }> {
+  ): Array<{ x: string; y: number }> {
     try {
       // Validate input arrays
       if (!numeratorData || !denominatorData) {
@@ -2095,23 +2077,23 @@ export class LeadStatsRepository {
       // Create a map of denominator data for more efficient lookup
       const denominatorMap = new Map<string, number>();
       for (const item of denominatorData) {
-        denominatorMap.set(item.date, item.value);
+        denominatorMap.set(item.x, item.y);
       }
 
       return numeratorData.map((item) => {
-        const denominator = denominatorMap.get(item.date) || 0;
-        const numerator = item.value || 0;
+        const denominator = denominatorMap.get(item.x) || 0;
+        const numerator = item.y || 0;
 
         // Validate numeric values
         if (!Number.isFinite(numerator) || !Number.isFinite(denominator)) {
           logger.debug("Invalid numeric values in rate calculation", {
-            date: item.date,
+            date: item.x,
             numerator,
             denominator,
           });
           return {
-            date: item.date,
-            value: 0,
+            x: item.x,
+            y: 0,
           };
         }
 
@@ -2124,7 +2106,7 @@ export class LeadStatsRepository {
         // Log warning if rate was clamped
         if (rate !== clampedRate) {
           logger.debug("Rate value clamped to valid range", {
-            date: item.date,
+            date: item.x,
             originalRate: rate,
             clampedRate,
             numerator,
@@ -2133,8 +2115,8 @@ export class LeadStatsRepository {
         }
 
         return {
-          date: item.date,
-          value: Math.round(clampedRate * 10000) / 10000, // Round to 4 decimal places for precision
+          x: item.x,
+          y: Math.round(clampedRate * 10000) / 10000, // Round to 4 decimal places for precision
         };
       });
     } catch (error) {
@@ -2146,8 +2128,8 @@ export class LeadStatsRepository {
 
       // Return empty array with same length as numerator data
       return (numeratorData || []).map((item) => ({
-        date: item.date,
-        value: 0,
+        x: item.x,
+        y: 0,
       }));
     }
   }
@@ -2160,7 +2142,7 @@ export class LeadStatsRepository {
     whereConditions: SQL | undefined,
     status: (typeof LeadStatus)[keyof typeof LeadStatus],
     timePeriod: TimePeriod,
-  ): Promise<Array<{ date: string; value: number }>> {
+  ): Promise<Array<{ x: string; y: number }>> {
     if (intervals.length === 0) {
       return [];
     }
@@ -2201,8 +2183,8 @@ export class LeadStatsRepository {
 
     // Fill in missing intervals with zero values
     return intervals.map((interval) => ({
-      date: interval.label,
-      value: resultMap.get(interval.label) || 0,
+      x: interval.label,
+      y: resultMap.get(interval.label) || 0,
     }));
   }
 
@@ -2225,8 +2207,6 @@ export class LeadStatsRepository {
         return "#06b6d4";
       case LeadStatus.SIGNED_UP:
         return "#84cc16";
-      case LeadStatus.CONSULTATION_BOOKED:
-        return "#f97316";
       case LeadStatus.SUBSCRIPTION_CONFIRMED:
         return "#22c55e";
       case LeadStatus.UNSUBSCRIBED:
@@ -2263,12 +2243,12 @@ export class LeadStatsRepository {
       .where(whereConditions)
       .groupBy(leads.status);
 
-    // Map to schema-compliant format
+    // Return array of data points - chart name and type come from UI config
     return statusGroups.map((group) => ({
-      label: group.status,
-      value: Number(group.count),
-      percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
+      x: group.status, // Translation key for the status
+      y: Number(group.count),
       color: LeadStatsRepository.getStatusColor(group.status),
+      percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
     }));
   }
 
@@ -2295,13 +2275,14 @@ export class LeadStatsRepository {
       .where(whereConditions)
       .groupBy(leads.source);
 
+    // Return array of data points - chart name and type come from UI config
     return sourceGroups
       .filter((group) => group.source !== null)
       .map((group) => ({
-        label: group.source!,
-        value: Number(group.count),
-        percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
+        x: group.source!, // Translation key
+        y: Number(group.count),
         color: "#10b981",
+        percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
       }));
   }
 
@@ -2328,13 +2309,14 @@ export class LeadStatsRepository {
       .where(whereConditions)
       .groupBy(leads.country);
 
+    // Return array of data points - chart name and type come from UI config
     return countryGroups
       .filter((group) => group.country !== null)
       .map((group) => ({
-        label: group.country,
-        value: Number(group.count),
-        percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
+        x: group.country, // Country code (translation key)
+        y: Number(group.count),
         color: "#f59e0b",
+        percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
       }));
   }
 
@@ -2361,13 +2343,14 @@ export class LeadStatsRepository {
       .where(whereConditions)
       .groupBy(leads.language);
 
+    // Return array of data points - chart name and type come from UI config
     return languageGroups
       .filter((group) => group.language !== null)
       .map((group) => ({
-        label: group.language,
-        value: Number(group.count),
-        percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
+        x: group.language, // Language code (translation key)
+        y: Number(group.count),
         color: "#8b5cf6",
+        percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
       }));
   }
 
@@ -2394,13 +2377,14 @@ export class LeadStatsRepository {
       .where(whereConditions)
       .groupBy(leads.currentCampaignStage);
 
+    // Return array of data points - chart name and type come from UI config
     return stageGroups
       .filter((group) => group.stage !== null)
       .map((group) => ({
-        label: group.stage!,
-        value: Number(group.count),
-        percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
+        x: group.stage!, // Campaign stage (translation key)
+        y: Number(group.count),
         color: "#06b6d4",
+        percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
       }));
   }
 
@@ -2413,7 +2397,7 @@ export class LeadStatsRepository {
     timePeriod: TimePeriod,
     filters: LeadsStatsRequestOutput,
     logger: EndpointLogger,
-  ): Promise<Array<{ date: string; value: number }>> {
+  ): Promise<Array<{ x: string; y: number }>> {
     try {
       if (intervals.length === 0) {
         return [];
@@ -2472,8 +2456,8 @@ export class LeadStatsRepository {
 
       // Fill in missing intervals with zero values
       return intervals.map((interval) => ({
-        date: interval.label,
-        value: resultMap.get(interval.label) || 0,
+        x: interval.label,
+        y: resultMap.get(interval.label) || 0,
       }));
     } catch (error) {
       logger.error("Error calculating engagement score", {
@@ -2484,8 +2468,8 @@ export class LeadStatsRepository {
 
       // Return empty data for the intervals to prevent UI crashes
       return intervals.map((interval) => ({
-        date: interval.label,
-        value: 0,
+        x: interval.label,
+        y: 0,
       }));
     }
   }
@@ -2499,7 +2483,7 @@ export class LeadStatsRepository {
     timePeriod: TimePeriod,
     filters: LeadsStatsRequestOutput,
     logger: EndpointLogger,
-  ): Promise<Array<{ date: string; value: number }>> {
+  ): Promise<Array<{ x: string; y: number }>> {
     try {
       if (intervals.length === 0) {
         return [];
@@ -2515,7 +2499,6 @@ export class LeadStatsRepository {
         sql`(
           (${leads.status} = ${LeadStatus.CAMPAIGN_RUNNING} AND COALESCE(${leads.campaignStartedAt}, ${leads.updatedAt}) BETWEEN ${dateFrom} AND ${dateTo}) OR
           (${leads.status} = ${LeadStatus.SIGNED_UP} AND COALESCE(${leads.signedUpAt}, ${leads.updatedAt}) BETWEEN ${dateFrom} AND ${dateTo}) OR
-          (${leads.status} = ${LeadStatus.CONSULTATION_BOOKED} AND COALESCE(${leads.consultationBookedAt}, ${leads.updatedAt}) BETWEEN ${dateFrom} AND ${dateTo}) OR
           (${leads.status} = ${LeadStatus.SUBSCRIPTION_CONFIRMED} AND COALESCE(${leads.subscriptionConfirmedAt}, ${leads.updatedAt}) BETWEEN ${dateFrom} AND ${dateTo})
         )`,
       ];
@@ -2531,7 +2514,6 @@ export class LeadStatsRepository {
           date: sql<string>`DATE_TRUNC(${sql.raw(dateTrunc)},
             CASE
               WHEN ${leads.status} = ${LeadStatus.SIGNED_UP} THEN COALESCE(${leads.signedUpAt}, ${leads.updatedAt})
-              WHEN ${leads.status} = ${LeadStatus.CONSULTATION_BOOKED} THEN COALESCE(${leads.consultationBookedAt}, ${leads.updatedAt})
               WHEN ${leads.status} = ${LeadStatus.SUBSCRIPTION_CONFIRMED} THEN COALESCE(${leads.subscriptionConfirmedAt}, ${leads.updatedAt})
               ELSE ${leads.updatedAt}
             END
@@ -2544,20 +2526,17 @@ export class LeadStatsRepository {
           sql`DATE_TRUNC(${sql.raw(dateTrunc)},
             CASE
               WHEN ${leads.status} = ${LeadStatus.SIGNED_UP} THEN COALESCE(${leads.signedUpAt}, ${leads.updatedAt})
-              WHEN ${leads.status} = ${LeadStatus.CONSULTATION_BOOKED} THEN COALESCE(${leads.consultationBookedAt}, ${leads.updatedAt})
               WHEN ${leads.status} = ${LeadStatus.SUBSCRIPTION_CONFIRMED} THEN COALESCE(${leads.subscriptionConfirmedAt}, ${leads.updatedAt})
               ELSE ${leads.updatedAt}
             END
           )`,
           leads.status,
           leads.signedUpAt,
-          leads.consultationBookedAt,
           leads.subscriptionConfirmedAt,
           leads.updatedAt,
         ).orderBy(sql`DATE_TRUNC(${sql.raw(dateTrunc)},
           CASE
             WHEN ${leads.status} = ${LeadStatus.SIGNED_UP} THEN COALESCE(${leads.signedUpAt}, ${leads.updatedAt})
-            WHEN ${leads.status} = ${LeadStatus.CONSULTATION_BOOKED} THEN COALESCE(${leads.consultationBookedAt}, ${leads.updatedAt})
             WHEN ${leads.status} = ${LeadStatus.SUBSCRIPTION_CONFIRMED} THEN COALESCE(${leads.subscriptionConfirmedAt}, ${leads.updatedAt})
             ELSE ${leads.updatedAt}
           END
@@ -2574,8 +2553,8 @@ export class LeadStatsRepository {
 
       // Fill in missing intervals with zero values
       return intervals.map((interval) => ({
-        date: interval.label,
-        value: resultMap.get(interval.label) || 0,
+        x: interval.label,
+        y: resultMap.get(interval.label) || 0,
       }));
     } catch (error) {
       logger.error("Error calculating lead velocity", {
@@ -2586,8 +2565,8 @@ export class LeadStatsRepository {
 
       // Return empty data for the intervals to prevent UI crashes
       return intervals.map((interval) => ({
-        date: interval.label,
-        value: 0,
+        x: interval.label,
+        y: 0,
       }));
     }
   }
@@ -2601,7 +2580,7 @@ export class LeadStatsRepository {
     timePeriod: TimePeriod,
     filters: LeadsStatsRequestOutput,
     logger: EndpointLogger,
-  ): Promise<Array<{ date: string; value: number }>> {
+  ): Promise<Array<{ x: string; y: number }>> {
     try {
       if (intervals.length === 0) {
         return [];
@@ -2665,8 +2644,8 @@ export class LeadStatsRepository {
 
       // Fill in missing intervals with zero values
       return intervals.map((interval) => ({
-        date: interval.label,
-        value: resultMap.get(interval.label) || 0,
+        x: interval.label,
+        y: resultMap.get(interval.label) || 0,
       }));
     } catch (error) {
       logger.error("Error calculating data completeness", {
@@ -2677,8 +2656,8 @@ export class LeadStatsRepository {
 
       // Return empty data for the intervals to prevent UI crashes
       return intervals.map((interval) => ({
-        date: interval.label,
-        value: 0,
+        x: interval.label,
+        y: 0,
       }));
     }
   }
@@ -2818,7 +2797,6 @@ export class LeadStatsRepository {
               inArray(leads.status, [
                 LeadStatus.CAMPAIGN_RUNNING,
                 LeadStatus.SIGNED_UP,
-                LeadStatus.CONSULTATION_BOOKED,
                 LeadStatus.SUBSCRIPTION_CONFIRMED,
               ]),
             )
@@ -2827,7 +2805,6 @@ export class LeadStatsRepository {
               inArray(leads.status, [
                 LeadStatus.CAMPAIGN_RUNNING,
                 LeadStatus.SIGNED_UP,
-                LeadStatus.CONSULTATION_BOOKED,
                 LeadStatus.SUBSCRIPTION_CONFIRMED,
               ]),
             ),
@@ -3057,26 +3034,6 @@ export class LeadStatsRepository {
   }
 
   /**
-   * Calculate average time to consultation in days
-   */
-  private static async calculateAverageTimeToConsultation(
-    whereConditions: SQL | undefined,
-  ): Promise<number> {
-    const result = await db
-      .select({
-        avgDays: sql<number>`AVG(EXTRACT(EPOCH FROM (${leads.consultationBookedAt} - ${leads.createdAt})) / 86400)::float`,
-      })
-      .from(leads)
-      .where(
-        whereConditions
-          ? and(whereConditions, isNotNull(leads.consultationBookedAt))
-          : isNotNull(leads.consultationBookedAt),
-      );
-
-    return Number(result[0]?.avgDays || 0);
-  }
-
-  /**
    * Get grouped statistics by journey variant
    */
   private static async getGroupedByJourneyVariant(
@@ -3101,13 +3058,14 @@ export class LeadStatsRepository {
       .where(whereConditions)
       .groupBy(emailCampaigns.journeyVariant);
 
+    // Return array of data points - chart name and type come from UI config
     return variantGroups
       .filter((group) => group.variant !== null)
       .map((group) => ({
-        label: group.variant!,
-        value: Number(group.count),
-        percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
+        x: group.variant!, // Journey variant (translation key)
+        y: Number(group.count),
         color: "#f59e0b",
+        percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
       }));
   }
 
@@ -3148,9 +3106,17 @@ export class LeadStatsRepository {
         END
       `);
 
+    // Map engagement levels to translation keys
+    const levelToTranslationKey: Record<string, string> = {
+      high: "app.api.leads.stats.engagementLevel.high",
+      medium: "app.api.leads.stats.engagementLevel.medium",
+      low: "app.api.leads.stats.engagementLevel.low",
+      none: "app.api.leads.stats.engagementLevel.none",
+    };
+
     return engagementGroups.map((group) => ({
-      label: group.level,
-      value: Number(group.count),
+      x: levelToTranslationKey[group.level] || group.level,
+      y: Number(group.count),
       percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
       color: "#8b5cf6",
     }));
@@ -3196,13 +3162,13 @@ export class LeadStatsRepository {
       .map((status) => {
         const count = statusCounts.get(status) || 0;
         return {
-          label: status,
-          value: count,
+          x: status,
+          y: count,
           percentage: totalCount > 0 ? count / totalCount : 0,
           color: LeadStatsRepository.getStatusColor(status),
         };
       })
-      .filter((stage) => stage.value > 0); // Only return stages with actual data
+      .filter((stage) => stage.y > 0); // Only return stages with actual data
   }
 
   /**
@@ -3225,7 +3191,6 @@ export class LeadStatsRepository {
       newsletterSubscriberLeads: emptyData,
       convertedLeads: emptyData,
       signedUpLeads: emptyData,
-      consultationBookedLeads: emptyData,
       subscriptionConfirmedLeads: emptyData,
       unsubscribedLeads: emptyData,
       bouncedLeads: emptyData,
@@ -3237,7 +3202,6 @@ export class LeadStatsRepository {
       clickRate: emptyData,
       conversionRate: emptyData,
       signupRate: emptyData,
-      consultationBookingRate: emptyData,
       subscriptionConfirmationRate: emptyData,
       averageEmailEngagementScore: emptyData,
       leadVelocity: emptyData,

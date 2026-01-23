@@ -49,9 +49,6 @@ export class WebAuthHandler extends BaseAuthHandler {
     // Fall back to cookies
     const cookieStore = await cookies();
     const token = cookieStore.get(AUTH_TOKEN_COOKIE_NAME)?.value;
-    if (token) {
-      logger.debug("Found auth token in cookies");
-    }
     return token;
   }
 

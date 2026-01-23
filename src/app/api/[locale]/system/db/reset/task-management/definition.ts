@@ -10,9 +10,9 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -73,7 +73,6 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "db", "reset", "task-management"],
   examples: {
-    urlPathParams: undefined,
     requests: {
       safetyCheck: {
         operation: [TaskOperationType.RUN_SAFETY_CHECK],
@@ -169,33 +168,31 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      operation: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
-          label:
-            "app.api.system.db.reset.taskManagement.fields.operation.label",
-          description:
-            "app.api.system.db.reset.taskManagement.fields.operation.description",
-          placeholder:
-            "app.api.system.db.reset.taskManagement.fields.operation.placeholder",
-          options: TaskOperationTypeOptions,
-          columns: 12,
-        },
-        z.array(z.string()).min(1).describe("Task operations to execute"),
-      ),
-      options: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.JSON,
-          label: "app.api.system.db.reset.taskManagement.fields.options.label",
-          description:
-            "app.api.system.db.reset.taskManagement.fields.options.description",
-          placeholder:
-            "app.api.system.db.reset.taskManagement.fields.options.placeholder",
-          columns: 12,
-        },
-        z
+      operation: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "app.api.system.db.reset.taskManagement.fields.operation.label",
+        description:
+          "app.api.system.db.reset.taskManagement.fields.operation.description",
+        placeholder:
+          "app.api.system.db.reset.taskManagement.fields.operation.placeholder",
+        options: TaskOperationTypeOptions,
+        columns: 12,
+        schema: z
+          .array(z.string())
+          .min(1)
+          .describe("Task operations to execute"),
+      }),
+      options: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label: "app.api.system.db.reset.taskManagement.fields.options.label",
+        description:
+          "app.api.system.db.reset.taskManagement.fields.options.description",
+        placeholder:
+          "app.api.system.db.reset.taskManagement.fields.options.placeholder",
+        columns: 12,
+        schema: z
           .object({
             force: z
               .boolean()
@@ -211,56 +208,42 @@ const { POST } = createEndpoint({
               .describe("Operation timeout in milliseconds"),
           })
           .optional(),
-      ),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.reset.taskManagement.response.success.label",
-        },
-        z.boolean().describe("Whether the task operation was successful"),
-      ),
-      taskName: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.reset.taskManagement.response.taskName.label",
-        },
-        z.string().describe("Name of the task that was operated on"),
-      ),
-      status: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.reset.taskManagement.response.status.label",
-        },
-        z.string().describe("Current status of the task"),
-      ),
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.reset.taskManagement.response.output.label",
-        },
-        z.string().optional().describe("Task execution output"),
-      ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.reset.taskManagement.response.error.label",
-        },
-        z.string().optional().describe("Error message if task failed"),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.reset.taskManagement.response.result.label",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.db.reset.taskManagement.response.success.label",
+        schema: z
+          .boolean()
+          .describe("Whether the task operation was successful"),
+      }),
+      taskName: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.db.reset.taskManagement.response.taskName.label",
+        schema: z.string().describe("Name of the task that was operated on"),
+      }),
+      status: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.reset.taskManagement.response.status.label",
+        schema: z.string().describe("Current status of the task"),
+      }),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.reset.taskManagement.response.output.label",
+        schema: z.string().optional().describe("Task execution output"),
+      }),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.reset.taskManagement.response.error.label",
+        schema: z.string().optional().describe("Error message if task failed"),
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.reset.taskManagement.response.result.label",
+        schema: z
           .object({
             success: z.boolean(),
             message: z.string().optional(),
@@ -268,7 +251,7 @@ const { POST } = createEndpoint({
           })
           .optional()
           .describe("Detailed task result"),
-      ),
+      }),
     },
   ),
 

@@ -1,6 +1,42 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  // Top-level keys used across methods
+  empty: "",
+  linkId: {
+    label: "Link-ID",
+  },
+  label: {
+    label: "Bezeichnung",
+    description: "Optionale Bezeichnung zur Identifizierung dieses Links",
+    placeholder: "Geben Sie eine Bezeichnung für diesen Teilen-Link ein",
+  },
+  allowPosting: {
+    label: "Posten erlauben",
+    description: "Empfängern erlauben, Nachrichten in diesem Thread zu posten",
+  },
+  requireAuth: {
+    label: "Authentifizierung erforderlich",
+    description:
+      "Benutzer müssen sich anmelden, um auf diesen Link zuzugreifen",
+  },
+  shareLink: {
+    label: "Bezeichnung",
+    shareUrl: "Teilen-URL",
+    active: "Aktiv",
+    allowPosting: "Posten erlauben",
+    requireAuth: "Authentifizierung erforderlich",
+    accessCount: "Zugriffszähler",
+    lastAccessedAt: "Letzter Zugriff",
+    createdAt: "Erstellt",
+    editAction: "Bearbeiten",
+    deleteAction: "Widerrufen",
+  },
+  shareLinks: {
+    emptyTitle: "Keine Teilen-Links",
+    emptyDescription:
+      "Erstellen Sie einen Teilen-Link, um diesen Thread mit anderen zu teilen",
+  },
   get: {
     title: "Teilen-Links abrufen",
     description: "Alle Teilen-Links für einen Thread abrufen",
@@ -100,6 +136,7 @@ export const translations: typeof enTranslations = {
     label: {
       label: "Bezeichnung",
       description: "Optionale Bezeichnung zur Identifizierung dieses Links",
+      placeholder: "Geben Sie eine Bezeichnung für diesen Teilen-Link ein",
     },
     allowPosting: {
       label: "Posten erlauben",
@@ -177,6 +214,7 @@ export const translations: typeof enTranslations = {
     label: {
       label: "Bezeichnung",
       description: "Optionale Bezeichnung zur Identifizierung dieses Links",
+      placeholder: "Geben Sie eine Bezeichnung für diesen Teilen-Link ein",
     },
     allowPosting: {
       label: "Posten erlauben",

@@ -81,7 +81,7 @@ export function IconWidget<const TKey extends string>({
         borderRadiusClass,
         "bg-muted flex items-center shrink-0",
         justifyClass,
-        !noHover && "group-hover:bg-primary/10 transition-colors",
+        !noHover && "bg-primary/10 group-hover:bg-primary/20 transition-colors",
         className,
       )}
     >

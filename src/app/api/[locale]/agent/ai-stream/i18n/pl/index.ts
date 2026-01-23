@@ -97,14 +97,6 @@ export const translations: typeof enTranslations = {
       label: "Postać",
       description: "Opcjonalna postać dla AI",
     },
-    temperature: {
-      label: "Temperatura",
-      description: "Kontroluje losowość (0-2)",
-    },
-    maxTokens: {
-      label: "Maksymalna liczba tokenów",
-      description: "Maksymalna liczba tokenów do wygenerowania",
-    },
     systemPrompt: {
       label: "Prompt systemowy",
       description: "Opcjonalne instrukcje systemowe",

@@ -7,21 +7,26 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  navigateButtonField,
   objectField,
   objectOptionalField,
-  requestDataField,
+  requestField,
   requestResponseField,
   responseArrayField,
   responseField,
   widgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+  widgetObjectField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
+  SpacingSize,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import {
   Countries,
   CountriesOptions,
@@ -30,6 +35,7 @@ import {
 } from "@/i18n/core/config";
 
 import { UserRole } from "../../user/user-roles/enum";
+import createLeadDefinitions from "../create/definition";
 import {
   EmailCampaignStage,
   EmailCampaignStageFilter,
@@ -48,6 +54,7 @@ import {
   SortOrder,
   SortOrderOptions,
 } from "../enum";
+import leadSingleDefinitions from "../lead/[id]/definition";
 
 /**
  * Get Leads List Endpoint (GET)
@@ -85,6 +92,39 @@ const { GET } = createEndpoint({
     },
     { request: "data", response: true },
     {
+      // Top action buttons container
+      topActions: widgetObjectField(
+        {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.INLINE,
+          gap: "2",
+          noCard: true,
+        },
+        { request: "data", response: true },
+        {
+          backButton: backButton(),
+          createButton: navigateButtonField({
+            targetEndpoint: createLeadDefinitions.POST,
+            extractParams: () => ({}),
+            prefillFromGet: false,
+            label: "app.api.leads.list.get.createButton.label" as const,
+            icon: "plus",
+            variant: "default",
+            className: "ml-auto",
+          }),
+        },
+      ),
+
+      // Separator between buttons and content
+      separator: widgetField(
+        {
+          type: WidgetType.SEPARATOR,
+          spacingTop: SpacingSize.RELAXED,
+          spacingBottom: SpacingSize.RELAXED,
+        },
+        { response: true, request: "data" },
+      ),
+
       // === STATUS & CAMPAIGN FILTERS (with Search) ===
       statusFilters: objectOptionalField(
         {
@@ -95,59 +135,51 @@ const { GET } = createEndpoint({
           layoutType: LayoutType.GRID,
           columns: 3,
           order: 1,
+          showSubmitButton: false,
         },
         { request: "data" },
         {
-          search: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.leads.list.get.search.label" as const,
-              description: "app.api.leads.list.get.search.description" as const,
-              placeholder: "app.api.leads.list.get.search.placeholder" as const,
-              columns: 12,
-            },
-            z.string().optional(),
-          ),
-          status: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.leads.list.get.status.label" as const,
-              description: "app.api.leads.list.get.status.description" as const,
-              placeholder: "app.api.leads.list.get.status.placeholder" as const,
-              options: LeadStatusFilterOptions,
-              columns: 6,
-            },
-            z.array(z.enum(LeadStatusFilter)).optional(),
-          ),
-          currentCampaignStage: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label:
-                "app.api.leads.list.get.currentCampaignStage.label" as const,
-              description:
-                "app.api.leads.list.get.currentCampaignStage.description" as const,
-              placeholder:
-                "app.api.leads.list.get.currentCampaignStage.placeholder" as const,
-              options: EmailCampaignStageFilterOptions,
-              columns: 6,
-            },
-            z.array(z.enum(EmailCampaignStageFilter)).optional(),
-          ),
-          source: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.leads.list.get.source.label" as const,
-              description: "app.api.leads.list.get.source.description" as const,
-              placeholder: "app.api.leads.list.get.source.placeholder" as const,
-              options: LeadSourceFilterOptions,
-              columns: 12,
-            },
-            z.array(z.enum(LeadSourceFilter)).optional(),
-          ),
+          search: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.leads.list.get.search.label" as const,
+            description: "app.api.leads.list.get.search.description" as const,
+            placeholder: "app.api.leads.list.get.search.placeholder" as const,
+            columns: 12,
+            schema: z.string().optional(),
+          }),
+          status: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label: "app.api.leads.list.get.status.label" as const,
+            description: "app.api.leads.list.get.status.description" as const,
+            placeholder: "app.api.leads.list.get.status.placeholder" as const,
+            options: LeadStatusFilterOptions,
+            columns: 6,
+            schema: z.array(z.enum(LeadStatusFilter)).optional(),
+          }),
+          currentCampaignStage: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label: "app.api.leads.list.get.currentCampaignStage.label" as const,
+            description:
+              "app.api.leads.list.get.currentCampaignStage.description" as const,
+            placeholder:
+              "app.api.leads.list.get.currentCampaignStage.placeholder" as const,
+            options: EmailCampaignStageFilterOptions,
+            columns: 6,
+            schema: z.array(z.enum(EmailCampaignStageFilter)).optional(),
+          }),
+          source: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label: "app.api.leads.list.get.source.label" as const,
+            description: "app.api.leads.list.get.source.description" as const,
+            placeholder: "app.api.leads.list.get.source.placeholder" as const,
+            options: LeadSourceFilterOptions,
+            columns: 12,
+            schema: z.array(z.enum(LeadSourceFilter)).optional(),
+          }),
         },
       ),
 
@@ -160,37 +192,30 @@ const { GET } = createEndpoint({
             "app.api.leads.list.get.locationFilters.description" as const,
           layoutType: LayoutType.GRID_2_COLUMNS,
           order: 2,
+          showSubmitButton: false,
         },
         { request: "data" },
         {
-          country: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.leads.list.get.country.label" as const,
-              description:
-                "app.api.leads.list.get.country.description" as const,
-              placeholder:
-                "app.api.leads.list.get.country.placeholder" as const,
-              options: CountriesOptions,
-              columns: 6,
-            },
-            z.array(z.enum(Countries)).optional(),
-          ),
-          language: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.leads.list.get.language.label" as const,
-              description:
-                "app.api.leads.list.get.language.description" as const,
-              placeholder:
-                "app.api.leads.list.get.language.placeholder" as const,
-              options: LanguagesOptions,
-              columns: 6,
-            },
-            z.array(z.enum(Languages)).optional(),
-          ),
+          country: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label: "app.api.leads.list.get.country.label" as const,
+            description: "app.api.leads.list.get.country.description" as const,
+            placeholder: "app.api.leads.list.get.country.placeholder" as const,
+            options: CountriesOptions,
+            columns: 6,
+            schema: z.array(z.enum(Countries)).optional(),
+          }),
+          language: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label: "app.api.leads.list.get.language.label" as const,
+            description: "app.api.leads.list.get.language.description" as const,
+            placeholder: "app.api.leads.list.get.language.placeholder" as const,
+            options: LanguagesOptions,
+            columns: 6,
+            schema: z.array(z.enum(Languages)).optional(),
+          }),
         },
       ),
 
@@ -203,38 +228,35 @@ const { GET } = createEndpoint({
             "app.api.leads.list.get.sortingOptions.description" as const,
           layoutType: LayoutType.GRID_2_COLUMNS,
           order: 3,
+          showSubmitButton: false,
         },
         { request: "data" },
         {
-          sortBy: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.leads.list.get.sortBy.label" as const,
-              description: "app.api.leads.list.get.sortBy.description" as const,
-              placeholder: "app.api.leads.list.get.sortBy.placeholder" as const,
-              options: LeadSortFieldOptions,
-              columns: 6,
-            },
-            z
-              .nativeEnum(LeadSortField)
+          sortBy: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.leads.list.get.sortBy.label" as const,
+            description: "app.api.leads.list.get.sortBy.description" as const,
+            placeholder: "app.api.leads.list.get.sortBy.placeholder" as const,
+            options: LeadSortFieldOptions,
+            columns: 6,
+            schema: z
+              .enum(LeadSortField)
               .optional()
               .default(LeadSortField.CREATED_AT),
-          ),
-          sortOrder: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.leads.list.get.sortOrder.label" as const,
-              description:
-                "app.api.leads.list.get.sortOrder.description" as const,
-              placeholder:
-                "app.api.leads.list.get.sortOrder.placeholder" as const,
-              options: SortOrderOptions,
-              columns: 6,
-            },
-            z.enum(SortOrder).optional().default(SortOrder.DESC),
-          ),
+          }),
+          sortOrder: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.leads.list.get.sortOrder.label" as const,
+            description:
+              "app.api.leads.list.get.sortOrder.description" as const,
+            placeholder:
+              "app.api.leads.list.get.sortOrder.placeholder" as const,
+            options: SortOrderOptions,
+            columns: 6,
+            schema: z.enum(SortOrder).optional().default(SortOrder.DESC),
+          }),
         },
       ),
 
@@ -263,6 +285,14 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.DATA_LIST,
               columns: 12,
+              metadata: {
+                onRowClick: {
+                  targetEndpoint: leadSingleDefinitions.GET,
+                  extractParams: (lead: Record<string, WidgetData>) => ({
+                    urlPathParams: { id: lead.id as string },
+                  }),
+                },
+              },
             },
             objectField(
               {
@@ -272,222 +302,130 @@ const { GET } = createEndpoint({
               },
               { response: true },
               {
-                email: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.email" as const,
-                  },
-                  z.string().nullable(),
-                ),
-                businessName: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.businessName" as const,
-                  },
-                  z.string(),
-                ),
-                contactName: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.contactName" as const,
-                  },
-                  z.string().nullable(),
-                ),
-                country: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.leads.list.get.response.leads.country" as const,
-                    enumOptions: CountriesOptions,
-                  },
-                  z.enum(Countries),
-                ),
-                language: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.leads.list.get.response.leads.language" as const,
-                    enumOptions: LanguagesOptions,
-                  },
-                  z.enum(Languages),
-                ),
-                status: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.leads.list.get.response.leads.status" as const,
-                    enumOptions: LeadStatusOptions,
-                  },
-                  z.enum(LeadStatus),
-                ),
-                source: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.leads.list.get.response.leads.source" as const,
-                    enumOptions: LeadSourceOptions,
-                  },
-                  z.enum(LeadSource).nullable(),
-                ),
-                currentCampaignStage: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.leads.list.get.response.leads.currentCampaignStage" as const,
-                    enumOptions: EmailCampaignStageOptions,
-                  },
-                  z.enum(EmailCampaignStage).nullable(),
-                ),
-                createdAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.createdAt" as const,
-                  },
-                  z.coerce.date(),
-                ),
-                phone: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.phone" as const,
-                  },
-                  z.string().nullable(),
-                ),
-                website: responseField(
-                  {
-                    type: WidgetType.LINK,
-                    href: "app.api.leads.list.get.response.leads.website" as const,
-                  },
-                  z.string().nullable(),
-                ),
-                notes: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.notes" as const,
-                  },
-                  z.string().nullable(),
-                ),
-                convertedUserId: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.convertedUserId" as const,
-                  },
-                  z.string().nullable(),
-                ),
-                convertedAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.convertedAt" as const,
-                  },
-                  z.coerce.date().nullable(),
-                ),
-                signedUpAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.signedUpAt" as const,
-                  },
-                  z.coerce.date().nullable(),
-                ),
-                consultationBookedAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.consultationBookedAt" as const,
-                  },
-                  z.coerce.date().nullable(),
-                ),
-                subscriptionConfirmedAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.subscriptionConfirmedAt" as const,
-                  },
-                  z.coerce.date().nullable(),
-                ),
-                emailsSent: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.emailsSent" as const,
-                  },
-                  z.coerce.number(),
-                ),
-                lastEmailSentAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.lastEmailSentAt" as const,
-                  },
-                  z.coerce.date().nullable(),
-                ),
-                unsubscribedAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.unsubscribedAt" as const,
-                  },
-                  z.coerce.date().nullable(),
-                ),
-                emailsOpened: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.emailsOpened" as const,
-                  },
-                  z.coerce.number(),
-                ),
-                emailsClicked: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.emailsClicked" as const,
-                  },
-                  z.coerce.number(),
-                ),
-                lastEngagementAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.lastEngagementAt" as const,
-                  },
-                  z.coerce.date().nullable(),
-                ),
-                metadata: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.metadata" as const,
-                  },
-                  z.record(z.string(), z.any()),
-                ),
-                updatedAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.updatedAt" as const,
-                  },
-                  z.coerce.date(),
-                ),
-                id: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.id" as const,
-                  },
-                  z.string(),
-                ),
+                email: responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.string().nullable(),
+                }),
+                businessName: responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.string(),
+                }),
+                contactName: responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.string().nullable(),
+                }),
+                country: responseField({
+                  type: WidgetType.BADGE,
+                  label:
+                    "app.api.leads.list.get.response.leads.country" as const,
+                  enumOptions: CountriesOptions,
+                  schema: z.enum(Countries),
+                }),
+                language: responseField({
+                  type: WidgetType.BADGE,
+                  label:
+                    "app.api.leads.list.get.response.leads.language" as const,
+                  enumOptions: LanguagesOptions,
+                  schema: z.enum(Languages),
+                }),
+                status: responseField({
+                  type: WidgetType.BADGE,
+                  label:
+                    "app.api.leads.list.get.response.leads.status" as const,
+                  enumOptions: LeadStatusOptions,
+                  schema: z.enum(LeadStatus),
+                }),
+                source: responseField({
+                  type: WidgetType.BADGE,
+                  label:
+                    "app.api.leads.list.get.response.leads.source" as const,
+                  enumOptions: LeadSourceOptions,
+                  schema: z.enum(LeadSource).nullable(),
+                }),
+                currentCampaignStage: responseField({
+                  type: WidgetType.BADGE,
+                  label:
+                    "app.api.leads.list.get.response.leads.currentCampaignStage" as const,
+                  enumOptions: EmailCampaignStageOptions,
+                  schema: z.enum(EmailCampaignStage).nullable(),
+                }),
+                createdAt: responseField({
+                  type: WidgetType.TEXT,
+                  fieldType: FieldDataType.DATETIME,
+                  schema: z.coerce.date(),
+                }),
+                phone: responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.string().nullable(),
+                }),
+                website: responseField({
+                  type: WidgetType.LINK,
+                  schema: z.string().nullable(),
+                }),
+                notes: responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.string().nullable(),
+                }),
+                convertedUserId: responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.string().nullable(),
+                }),
+                convertedAt: responseField({
+                  type: WidgetType.TEXT,
+                  fieldType: FieldDataType.DATETIME,
+                  schema: z.coerce.date().nullable(),
+                }),
+                signedUpAt: responseField({
+                  type: WidgetType.TEXT,
+                  fieldType: FieldDataType.DATETIME,
+                  schema: z.coerce.date().nullable(),
+                }),
+                subscriptionConfirmedAt: responseField({
+                  type: WidgetType.TEXT,
+                  fieldType: FieldDataType.DATETIME,
+                  schema: z.coerce.date().nullable(),
+                }),
+                emailsSent: responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.coerce.number(),
+                }),
+                lastEmailSentAt: responseField({
+                  type: WidgetType.TEXT,
+                  fieldType: FieldDataType.DATETIME,
+                  schema: z.coerce.date().nullable(),
+                }),
+                unsubscribedAt: responseField({
+                  type: WidgetType.TEXT,
+                  fieldType: FieldDataType.DATETIME,
+                  schema: z.coerce.date().nullable(),
+                }),
+                emailsOpened: responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.coerce.number(),
+                }),
+                emailsClicked: responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.coerce.number(),
+                }),
+                lastEngagementAt: responseField({
+                  type: WidgetType.TEXT,
+                  fieldType: FieldDataType.DATETIME,
+                  schema: z.coerce.date().nullable(),
+                }),
+                metadata: responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.record(z.string(), z.any()),
+                }),
+                updatedAt: responseField({
+                  type: WidgetType.TEXT,
+                  fieldType: FieldDataType.DATETIME,
+                  schema: z.coerce.date(),
+                }),
+                id: responseField({
+                  type: WidgetType.TEXT,
+                  hidden: true,
+                  schema: z.string(),
+                }),
               },
             ),
           ),
@@ -497,50 +435,31 @@ const { GET } = createEndpoint({
       // === PAGINATION INFO (Editable controls + display in one row) ===
       paginationInfo: objectField(
         {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.HORIZONTAL,
-          noCard: true,
-          gap: "4",
+          type: WidgetType.PAGINATION,
           order: 5,
         },
         { request: "data", response: true },
         {
-          page: requestResponseField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label: "app.api.leads.list.get.page.label" as const,
-              columns: 3,
-            },
-            z.coerce.number().optional().default(1),
-          ),
-          limit: requestResponseField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label: "app.api.leads.list.get.limit.label" as const,
-              columns: 3,
-            },
-            z.coerce.number().optional().default(20),
-          ),
-          total: responseField(
-            {
-              type: WidgetType.TEXT,
-              label: "app.api.leads.list.get.response.total" as const,
-              content: "app.api.leads.list.get.response.total" as const,
-              columns: 3,
-            },
-            z.coerce.number(),
-          ),
-          totalPages: responseField(
-            {
-              type: WidgetType.TEXT,
-              label: "app.api.leads.list.get.response.totalPages" as const,
-              content: "app.api.leads.list.get.response.totalPages" as const,
-              columns: 3,
-            },
-            z.coerce.number(),
-          ),
+          page: requestResponseField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            schema: z.coerce.number().optional().default(1),
+          }),
+          limit: requestResponseField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            schema: z.coerce.number().optional().default(20),
+          }),
+          total: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.leads.list.get.response.total" as const,
+            schema: z.coerce.number(),
+          }),
+          totalPages: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.leads.list.get.response.totalPages" as const,
+            schema: z.coerce.number(),
+          }),
         },
       ),
     },
@@ -647,7 +566,6 @@ const { GET } = createEndpoint({
               convertedUserId: null,
               convertedAt: null,
               signedUpAt: null,
-              consultationBookedAt: null,
               subscriptionConfirmedAt: null,
               currentCampaignStage: null,
               emailsSent: 0,
@@ -698,7 +616,6 @@ const { GET } = createEndpoint({
               convertedUserId: "user-123",
               convertedAt: new Date("2023-06-01T00:00:00.000Z"),
               signedUpAt: new Date("2023-05-15T00:00:00.000Z"),
-              consultationBookedAt: null,
               subscriptionConfirmedAt: null,
               currentCampaignStage: EmailCampaignStage.FOLLOWUP_1,
               emailsSent: 3,

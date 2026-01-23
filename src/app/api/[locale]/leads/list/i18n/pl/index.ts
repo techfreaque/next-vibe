@@ -4,6 +4,9 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Lista leadów",
     description: "Pobierz stronicowanychą listę leadów z filtrowaniem",
+    createButton: {
+      label: "Utwórz leada",
+    },
     form: {
       title: "Filtry listy leadów",
       description: "Skonfiguruj filtry dla listy leadów",
@@ -98,7 +101,6 @@ export const translations: typeof enTranslations = {
         convertedUserId: "ID przekonwertowanego użytkownika",
         convertedAt: "Data konwersji",
         signedUpAt: "Data rejestracji",
-        consultationBookedAt: "Data rezerwacji konsultacji",
         subscriptionConfirmedAt: "Data potwierdzenia subskrypcji",
         currentCampaignStage: "Bieżący etap kampanii",
         emailsSent: "Wysłane e-maile",

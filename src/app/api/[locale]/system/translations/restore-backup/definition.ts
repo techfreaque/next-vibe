@@ -12,9 +12,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -69,63 +69,53 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      backupPath: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.translations.restoreBackup.post.fields.backupPath.title" as const,
-          description:
-            "app.api.system.translations.restoreBackup.post.fields.backupPath.description" as const,
-          columns: 12,
-        },
-        z.string().min(1, "Backup path is required"),
-      ),
+      backupPath: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.translations.restoreBackup.post.fields.backupPath.title" as const,
+        description:
+          "app.api.system.translations.restoreBackup.post.fields.backupPath.description" as const,
+        columns: 12,
+        schema: z.string().min(1, "Backup path is required"),
+      }),
 
-      validateOnly: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.translations.restoreBackup.post.fields.validateOnly.title" as const,
-          description:
-            "app.api.system.translations.restoreBackup.post.fields.validateOnly.description" as const,
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      validateOnly: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.translations.restoreBackup.post.fields.validateOnly.title" as const,
+        description:
+          "app.api.system.translations.restoreBackup.post.fields.validateOnly.description" as const,
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      createBackupBeforeRestore: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.translations.restoreBackup.post.fields.createBackupBeforeRestore.title" as const,
-          description:
-            "app.api.system.translations.restoreBackup.post.fields.createBackupBeforeRestore.description" as const,
-          columns: 6,
-        },
-        z.boolean().default(true),
-      ),
+      createBackupBeforeRestore: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.translations.restoreBackup.post.fields.createBackupBeforeRestore.title" as const,
+        description:
+          "app.api.system.translations.restoreBackup.post.fields.createBackupBeforeRestore.description" as const,
+        columns: 6,
+        schema: z.boolean().default(true),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.translations.restoreBackup.post.success.description",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.translations.restoreBackup.post.success.description",
+        schema: z.boolean(),
+      }),
 
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.translations.restoreBackup.post.response.message",
-        },
-        z.string(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.translations.restoreBackup.post.response.message",
+        schema: z.string(),
+      }),
 
       backupInfo: objectField(
         {
@@ -139,38 +129,30 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          backupPath: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.translations.restoreBackup.post.response.backupInfo.backupPath",
-            },
-            z.string(),
-          ),
-          backupDate: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.translations.restoreBackup.post.response.backupInfo.backupDate",
-            },
-            dateSchema,
-          ),
-          filesRestored: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.translations.restoreBackup.post.response.backupInfo.filesRestored",
-            },
-            z.coerce.number(),
-          ),
-          newBackupCreated: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.translations.restoreBackup.post.response.backupInfo.newBackupCreated",
-            },
-            z.string().optional(),
-          ),
+          backupPath: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.system.translations.restoreBackup.post.response.backupInfo.backupPath",
+            schema: z.string(),
+          }),
+          backupDate: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.system.translations.restoreBackup.post.response.backupInfo.backupDate",
+            schema: dateSchema,
+          }),
+          filesRestored: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.system.translations.restoreBackup.post.response.backupInfo.filesRestored",
+            schema: z.coerce.number(),
+          }),
+          newBackupCreated: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.system.translations.restoreBackup.post.response.backupInfo.newBackupCreated",
+            schema: z.string().optional(),
+          }),
         },
       ),
     },

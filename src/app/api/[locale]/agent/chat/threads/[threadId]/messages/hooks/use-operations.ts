@@ -97,8 +97,6 @@ interface MessageOperationsDeps {
   settings: {
     selectedModel: ModelId;
     selectedCharacter: string;
-    temperature: number;
-    maxTokens: number;
     enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
   };
   setInput: (input: string) => void;

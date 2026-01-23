@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -48,70 +48,55 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      fixIssues: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.schemaVerify.fields.fixIssues.title",
-          description:
-            "app.api.system.db.schemaVerify.fields.fixIssues.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(false),
-      ),
+      fixIssues: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.schemaVerify.fields.fixIssues.title",
+        description:
+          "app.api.system.db.schemaVerify.fields.fixIssues.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      silent: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.schemaVerify.fields.silent.title",
-          description:
-            "app.api.system.db.schemaVerify.fields.silent.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(false),
-      ),
+      silent: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.schemaVerify.fields.silent.title",
+        description: "app.api.system.db.schemaVerify.fields.silent.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.schemaVerify.fields.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.schemaVerify.fields.success.title",
+        schema: z.boolean(),
+      }),
 
-      valid: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.schemaVerify.fields.valid.title",
-        },
-        z.boolean(),
-      ),
+      valid: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.schemaVerify.fields.valid.title",
+        schema: z.boolean(),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.schemaVerify.fields.output.title",
-        },
-        z.string(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.schemaVerify.fields.output.title",
+        schema: z.string(),
+      }),
 
-      issues: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.schemaVerify.fields.issues.title",
-        },
-        z.array(z.string()).optional(),
-      ),
+      issues: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.schemaVerify.fields.issues.title",
+        schema: z.array(z.string()).optional(),
+      }),
 
-      fixedIssues: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.schemaVerify.fields.fixedIssues.title",
-        },
-        z.array(z.string()).optional(),
-      ),
+      fixedIssues: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.schemaVerify.fields.fixedIssues.title",
+        schema: z.array(z.string()).optional(),
+      }),
     },
   ),
 
@@ -245,7 +230,6 @@ const { POST } = createEndpoint({
         fixedIssues: ["Added missing index", "Updated constraint"],
       },
     },
-    urlPathParams: undefined,
   },
 });
 

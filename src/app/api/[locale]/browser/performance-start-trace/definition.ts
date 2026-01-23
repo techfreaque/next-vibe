@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,79 +50,74 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      reload: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.browser.performance-start-trace.form.fields.reload.label",
-          description:
-            "app.api.browser.performance-start-trace.form.fields.reload.description",
-          placeholder:
-            "app.api.browser.performance-start-trace.form.fields.reload.placeholder",
-          columns: 6,
-        },
-        z
+      reload: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.browser.performance-start-trace.form.fields.reload.label",
+        description:
+          "app.api.browser.performance-start-trace.form.fields.reload.description",
+        placeholder:
+          "app.api.browser.performance-start-trace.form.fields.reload.placeholder",
+        columns: 6,
+        schema: z
           .boolean()
           .describe(
             "Determines if, once tracing has started, the page should be automatically reloaded",
           ),
-      ),
-      autoStop: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.browser.performance-start-trace.form.fields.autoStop.label",
-          description:
-            "app.api.browser.performance-start-trace.form.fields.autoStop.description",
-          placeholder:
-            "app.api.browser.performance-start-trace.form.fields.autoStop.placeholder",
-          columns: 6,
-        },
-        z
+      }),
+      autoStop: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.browser.performance-start-trace.form.fields.autoStop.label",
+        description:
+          "app.api.browser.performance-start-trace.form.fields.autoStop.description",
+        placeholder:
+          "app.api.browser.performance-start-trace.form.fields.autoStop.placeholder",
+        columns: 6,
+        schema: z
           .boolean()
           .describe(
             "Determines if the trace recording should be automatically stopped",
           ),
-      ),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.performance-start-trace.response.success",
-        },
-        z.boolean().describe("Whether the trace start operation succeeded"),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.performance-start-trace.response.result",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.performance-start-trace.response.success",
+        schema: z
+          .boolean()
+          .describe("Whether the trace start operation succeeded"),
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.performance-start-trace.response.result",
+        schema: z
           .object({
             started: z.boolean().describe("Whether the trace was started"),
             traceId: z.string().describe("Identifier for this trace"),
           })
           .optional()
           .describe("Result of trace start operation"),
-      ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.performance-start-trace.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.browser.performance-start-trace.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      }),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.performance-start-trace.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.performance-start-trace.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -139,7 +134,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

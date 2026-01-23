@@ -21,11 +21,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import type { NewUserRole, UserRole } from "../db";
 import { insertUserRoleSchema, userRoles } from "../db";
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports -- UserRoleDB is used in typeof expressions
+import type { UserRoleDB } from "./enum";
 import {
   type UserPermissionRoleValue,
   type UserRole as UserRoleEnum,
-  UserRoleDB,
 } from "./enum";
 
 /**
@@ -42,11 +41,6 @@ export class UserRolesRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<UserRole[]>> {
     try {
-      // Safety check for logger
-      if (logger && typeof logger.debug === "function") {
-        logger.debug(`Finding user roles by user ID (userId: ${userId})`);
-      }
-
       // Handle CLI-only user without database access
       const defaultCliUser = createDefaultCliUser();
       if (userId === defaultCliUser.id) {
@@ -177,8 +171,6 @@ export class UserRolesRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<UserRole>> {
     try {
-      logger.debug("Finding user role by user ID and role", { userId, role });
-
       // Handle CLI-only user without database access
       const defaultCliUser = createDefaultCliUser();
       if (userId === defaultCliUser.id) {
@@ -234,11 +226,6 @@ export class UserRolesRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<UserRole>> {
     try {
-      logger.debug("Adding role to user", {
-        userId: data.userId,
-        role: data.role,
-      });
-
       // Check if the role already exists
       const existingRoleResult = await UserRolesRepository.findByUserIdAndRole(
         data.userId,
@@ -389,8 +376,6 @@ export class UserRolesRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<(typeof UserPermissionRoleValue)[]>> {
     try {
-      logger.debug("Getting user permission roles", { userId });
-
       const rolesResult = await UserRolesRepository.findByUserId(
         userId,
         logger,

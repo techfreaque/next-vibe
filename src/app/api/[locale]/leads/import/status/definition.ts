@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -65,40 +65,34 @@ const { GET } = createEndpoint({
         },
         { request: "data" },
         {
-          status: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.leads.import.status.get.status.label",
-              description: "app.api.leads.import.status.get.status.description",
-              placeholder: "app.api.leads.import.status.get.status.placeholder",
-              columns: 4,
-              options: CsvImportJobStatusOptions,
-            },
-            z.enum(CsvImportJobStatusDB).optional(),
-          ),
-          limit: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label: "app.api.leads.import.status.get.limit.label",
-              description: "app.api.leads.import.status.get.limit.description",
-              placeholder: "app.api.leads.import.status.get.limit.placeholder",
-              columns: 4,
-            },
-            z.coerce.number().min(1).max(100).default(50).optional(),
-          ),
-          offset: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label: "app.api.leads.import.status.get.offset.label",
-              description: "app.api.leads.import.status.get.offset.description",
-              placeholder: "app.api.leads.import.status.get.offset.placeholder",
-              columns: 4,
-            },
-            z.coerce.number().min(0).default(0).optional(),
-          ),
+          status: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.leads.import.status.get.status.label",
+            description: "app.api.leads.import.status.get.status.description",
+            placeholder: "app.api.leads.import.status.get.status.placeholder",
+            columns: 4,
+            options: CsvImportJobStatusOptions,
+            schema: z.enum(CsvImportJobStatusDB).optional(),
+          }),
+          limit: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label: "app.api.leads.import.status.get.limit.label",
+            description: "app.api.leads.import.status.get.limit.description",
+            placeholder: "app.api.leads.import.status.get.limit.placeholder",
+            columns: 4,
+            schema: z.coerce.number().min(1).max(100).default(50).optional(),
+          }),
+          offset: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label: "app.api.leads.import.status.get.offset.label",
+            description: "app.api.leads.import.status.get.offset.description",
+            placeholder: "app.api.leads.import.status.get.offset.placeholder",
+            columns: 4,
+            schema: z.coerce.number().min(0).default(0).optional(),
+          }),
         },
       ),
 
@@ -130,149 +124,115 @@ const { GET } = createEndpoint({
               { response: true },
               {
                 // Job Identity
-                id: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.uuid(),
-                ),
-                fileName: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.string(),
-                ),
-                status: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.enum(CsvImportJobStatusDB),
-                ),
+                id: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.import.status.get.response.items.title",
+                  schema: z.uuid(),
+                }),
+                fileName: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.import.status.get.response.items.title",
+                  schema: z.string(),
+                }),
+                status: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.leads.import.status.get.response.items.title",
+                  schema: z.enum(CsvImportJobStatusDB),
+                }),
 
                 // Progress Tracking
-                totalRows: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.coerce.number().nullable(),
-                ),
-                processedRows: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.coerce.number(),
-                ),
-                successfulImports: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.coerce.number(),
-                ),
-                failedImports: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.coerce.number(),
-                ),
-                duplicateEmails: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.coerce.number(),
-                ),
+                totalRows: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.import.status.get.response.items.title",
+                  schema: z.coerce.number().nullable(),
+                }),
+                processedRows: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.import.status.get.response.items.title",
+                  schema: z.coerce.number(),
+                }),
+                successfulImports: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.import.status.get.response.items.title",
+                  schema: z.coerce.number(),
+                }),
+                failedImports: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.import.status.get.response.items.title",
+                  schema: z.coerce.number(),
+                }),
+                duplicateEmails: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.import.status.get.response.items.title",
+                  schema: z.coerce.number(),
+                }),
 
                 // Batch Processing
-                currentBatchStart: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.coerce.number(),
-                ),
-                batchSize: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.coerce.number(),
-                ),
+                currentBatchStart: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.import.status.get.response.items.title",
+                  schema: z.coerce.number(),
+                }),
+                batchSize: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.import.status.get.response.items.title",
+                  schema: z.coerce.number(),
+                }),
 
                 // Error Handling
-                error: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.string().nullable(),
-                ),
-                retryCount: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.coerce.number(),
-                ),
-                maxRetries: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.coerce.number(),
-                ),
+                error: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.import.status.get.response.items.title",
+                  schema: z.string().nullable(),
+                }),
+                retryCount: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.import.status.get.response.items.title",
+                  schema: z.coerce.number(),
+                }),
+                maxRetries: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.import.status.get.response.items.title",
+                  schema: z.coerce.number(),
+                }),
 
                 // Timestamps
-                createdAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.string(),
-                ),
-                updatedAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.string(),
-                ),
-                startedAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.string().nullable(),
-                ),
-                completedAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
-                  },
-                  z.string().nullable(),
-                ),
+                createdAt: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.import.status.get.response.items.title",
+                  schema: z.string(),
+                }),
+                updatedAt: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.import.status.get.response.items.title",
+                  schema: z.string(),
+                }),
+                startedAt: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.import.status.get.response.items.title",
+                  schema: z.string().nullable(),
+                }),
+                completedAt: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.import.status.get.response.items.title",
+                  schema: z.string().nullable(),
+                }),
               },
             ),
           ),
@@ -332,13 +292,16 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    urlPathParams: undefined,
     requests: {
       default: {
         filters: {},
       },
       all: {
-        filters: {},
+        filters: {
+          status: CsvImportJobStatus.COMPLETED,
+          limit: 100,
+          offset: 0,
+        },
       },
     },
     responses: {

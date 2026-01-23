@@ -18,11 +18,7 @@ import {
   ErrorHandler,
   setupGlobalErrorHandlers,
 } from "./runtime/execution-errors";
-import {
-  parseCliArguments,
-  parseCliArgumentsSimple,
-  type ParsedCliData,
-} from "./runtime/parsing";
+import { CliInputParser, type ParsedCliData } from "./runtime/parsing";
 
 export const binaryStartTime = Date.now();
 
@@ -59,7 +55,7 @@ const CLI_VERSION = "2.0.0" as const;
 const DEFAULT_OUTPUT = "pretty" as const;
 
 import { cliEnv } from "./env";
-import { cliEntryPoint } from "./runtime/entry-point";
+import { RouteDelegationHandler } from "./runtime/route-executor";
 
 const program = new Command();
 
@@ -168,9 +164,15 @@ program
         // If no command provided, show help
         if (!command) {
           performanceMonitor.mark("routeStart");
-          const helpResult = await cliEntryPoint.executeCommand(
+          const helpResult = await RouteDelegationHandler.executeRoute(
             "help",
             {
+              data: undefined,
+              urlPathParams: undefined,
+              cliArgs: {
+                positionalArgs: [],
+                namedArgs: {},
+              },
               locale: options.locale,
               platform: cliPlatform,
               output: options.output ?? DEFAULT_OUTPUT,
@@ -179,7 +181,6 @@ program
               dryRun: options.dryRun ?? false,
             },
             logger,
-            options.locale,
           );
           performanceMonitor.mark("routeEnd");
 
@@ -202,8 +203,8 @@ program
         // If rawArgs is not available, use args directly as positional arguments
         const rawArgs = cmdWithParent.parent?.rawArgs;
         const parsedArgs = rawArgs
-          ? parseCliArguments(args || [], rawArgs, logger)
-          : parseCliArgumentsSimple(args || []);
+          ? CliInputParser.parseCliArguments(args || [], rawArgs, logger)
+          : CliInputParser.parseCliArgumentsSimple(args || []);
 
         // Execute the command with schema-driven UI
         performanceMonitor.mark("parseStart");
@@ -227,10 +228,11 @@ program
         performanceMonitor.mark("parseEnd");
 
         performanceMonitor.mark("routeStart");
-        const result = await cliEntryPoint.executeCommand(
+        const result = await RouteDelegationHandler.executeRoute(
           command,
           {
             data: parsedData,
+            urlPathParams: undefined,
             cliArgs: {
               positionalArgs: parsedArgs.positionalArgs,
               namedArgs: parsedArgs.namedArgs,
@@ -243,7 +245,6 @@ program
             dryRun: options.dryRun ?? false,
           },
           logger,
-          options.locale,
         );
         performanceMonitor.mark("routeEnd");
 

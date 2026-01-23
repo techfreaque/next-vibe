@@ -12,30 +12,34 @@ import {
   Icon,
   type IconKey,
 } from "@/app/api/[locale]/system/unified-interface/react/icons";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
 import { Span } from "./span";
 
-export interface RangeSliderOption {
-  label: TranslationKey;
+export interface RangeSliderOption<
+  TTranslationKey extends string = TranslationKey,
+> {
+  label: NoInfer<TTranslationKey>;
   value: string | number;
   icon?: IconKey;
-  description?: TranslationKey;
+  description?: NoInfer<TTranslationKey>;
 }
 
-export interface RangeSliderProps {
-  options: RangeSliderOption[];
+export interface RangeSliderProps<
+  TTranslationKey extends string = TranslationKey,
+> {
+  options: RangeSliderOption<TTranslationKey>[];
   minIndex: number;
   maxIndex: number;
   onChange: (minIndex: number, maxIndex: number) => void;
   disabled?: boolean;
   minLabel?: string;
   maxLabel?: string;
-  t: (key: TranslationKey) => string;
+  t: <K extends string>(key: K, params?: TParams) => string; // Adapted translation for definition keys (uses scopedT when available)
   className?: string;
 }
 
-export function RangeSlider({
+export function RangeSlider<TTranslationKey extends string = TranslationKey>({
   options,
   minIndex,
   maxIndex,
@@ -45,7 +49,7 @@ export function RangeSlider({
   maxLabel = "MAX",
   t,
   className,
-}: RangeSliderProps): React.JSX.Element {
+}: RangeSliderProps<TTranslationKey>): React.JSX.Element {
   const [dragging, setDragging] = React.useState<"min" | "max" | null>(null);
   const trackRef = React.useRef<HTMLDivElement>(null);
 
@@ -98,15 +102,15 @@ export function RangeSlider({
   return (
     <div
       className={cn(
-        "rounded-md border border-input bg-background shadow-sm transition-colors p-6 focus-within:outline-none focus-within:ring-1 focus-within:ring-ring hover:border-ring/50",
-        disabled && "opacity-50 cursor-not-allowed",
+        "rounded-md border border-input bg-background shadow-sm transition-colors p-6 pt-6 pb-0 focus-within:outline-none focus-within:ring-1 focus-within:ring-ring hover:border-ring/50",
+        disabled && "opacity-50",
         className,
       )}
       tabIndex={disabled ? undefined : 0}
     >
       <div className="space-y-6">
         {/* Icon labels - positioned to align with track */}
-        <div className="relative mb-8 px-12">
+        <div className="relative mb-1 px-12">
           <div className="absolute inset-x-12 flex">
             {options.map((option, i) => {
               const isInRange = i >= minIndex && i <= maxIndex;
@@ -117,7 +121,7 @@ export function RangeSlider({
                 <div
                   key={`option-${option.value}`}
                   className={cn(
-                    "absolute flex flex-col items-center gap-2 transition-all duration-300 -translate-x-1/2",
+                    "absolute flex flex-col items-center gap-0 transition-all duration-300 -translate-x-1/2",
                     isInRange
                       ? "opacity-100 scale-110 -translate-y-1"
                       : "opacity-40 scale-95",
@@ -127,10 +131,10 @@ export function RangeSlider({
                   {option.icon && (
                     <Icon
                       icon={option.icon}
-                      className="h-8 w-8 drop-shadow-lg"
+                      className="h-6 w-6 drop-shadow-lg"
                     />
                   )}
-                  <Span className="text-xs font-semibold whitespace-nowrap">
+                  <Span className="text-xs pt-1 font-semibold whitespace-nowrap">
                     {t(option.label)}
                   </Span>
                   {option.description && (
@@ -188,7 +192,7 @@ export function RangeSlider({
               dragging === "min"
                 ? "cursor-grabbing scale-125 z-20"
                 : "cursor-grab hover:scale-110 z-10",
-              disabled && "opacity-50 cursor-not-allowed",
+              disabled && "cursor-not-allowed",
               minIndex === maxIndex ? "-top-6" : "-top-3",
             )}
             style={{
@@ -224,7 +228,7 @@ export function RangeSlider({
               dragging === "max"
                 ? "cursor-grabbing scale-125 z-20"
                 : "cursor-grab hover:scale-110 z-10",
-              disabled && "opacity-50 cursor-not-allowed",
+              disabled && "cursor-not-allowed",
               minIndex === maxIndex ? "top-0" : "-top-3",
             )}
             style={{

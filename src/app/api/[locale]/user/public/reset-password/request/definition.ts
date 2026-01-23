@@ -15,9 +15,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   objectField,
-  requestDataField,
+  requestField,
+  responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 
 import { UserRole } from "../../../user-roles/enum";
 
@@ -56,27 +57,25 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          email: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.EMAIL,
-              label:
-                "app.api.user.public.resetPassword.request.fields.email.label" as const,
-              description:
-                "app.api.user.public.resetPassword.request.fields.email.description" as const,
-              placeholder:
-                "app.api.user.public.resetPassword.request.fields.email.placeholder" as const,
-              helpText:
-                "app.api.user.public.resetPassword.request.fields.email.help" as const,
-            },
-            z
+          email: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.EMAIL,
+            label:
+              "app.api.user.public.resetPassword.request.fields.email.label" as const,
+            description:
+              "app.api.user.public.resetPassword.request.fields.email.description" as const,
+            placeholder:
+              "app.api.user.public.resetPassword.request.fields.email.placeholder" as const,
+            helpText:
+              "app.api.user.public.resetPassword.request.fields.email.help" as const,
+            schema: z
               .string()
               .email({
                 message:
                   "app.api.user.public.resetPassword.request.fields.email.validation.invalid",
               })
               .transform((val) => val.toLowerCase().trim()),
-          ),
+          }),
         },
       ),
 
@@ -92,32 +91,29 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          success: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.public.resetPassword.request.success.title" as const,
-            },
-            z
+          success: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.user.public.resetPassword.request.success.title" as const,
+            schema: z
               .boolean()
               .describe("Whether the reset request was processed successfully"),
-          ),
-          message: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.resetPassword.request.response.success.message" as const,
-            },
-            z
+          }),
+          message: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.public.resetPassword.request.response.success.message" as const,
+            schema: z
               .string()
               .describe("Human-readable status message explaining the result"),
-          ),
-          nextSteps: responseField(
+          }),
+          nextSteps: responseArrayField(
             {
               type: WidgetType.LINK_LIST,
             },
-            z
-              .array(z.string())
-              .describe("Step-by-step instructions for the user to follow"),
+            responseField({
+              type: WidgetType.TEXT,
+              schema: z.string(),
+            }),
           ),
         },
       ),
@@ -208,7 +204,6 @@ const { POST } = createEndpoint({
         },
       },
     },
-    urlPathParams: undefined,
     responses: {
       default: {
         response: {

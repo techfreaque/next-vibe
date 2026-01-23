@@ -471,6 +471,8 @@ const ICON_LOADERS: Record<IconLibraryName, IconLoader> = {
   Twitter: async () =>
     await import("@/packages/next-vibe-ui/web/ui/icons/Twitter"),
   Type: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Type"),
+  UncensoredAILogo: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/UncensoredAILogo"),
   Upload: async () =>
     await import("@/packages/next-vibe-ui/web/ui/icons/Upload"),
   User: async () => await import("@/packages/next-vibe-ui/web/ui/icons/User"),
@@ -838,6 +840,7 @@ export const ICON_REGISTRY = {
   "si-google": "SiGoogle",
 
   // AI Providers
+  "uncensored-ai": "UncensoredAILogo",
   "si-anthropic": "SiAnthropic",
   "si-googlegemini": "SiGooglegemini",
   "si-mistralai": "SiMistralai",

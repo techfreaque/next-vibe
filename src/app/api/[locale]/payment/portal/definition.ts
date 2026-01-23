@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -53,45 +53,37 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // REQUEST FIELDS
-      returnUrl: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.URL,
-          label: "app.api.payment.portal.post.returnUrl.label" as const,
-          description:
-            "app.api.payment.portal.post.returnUrl.description" as const,
-          placeholder:
-            "app.api.payment.portal.post.returnUrl.placeholder" as const,
-          columns: 12,
-        },
-        z.string().url().optional(),
-      ),
+      returnUrl: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.URL,
+        label: "app.api.payment.portal.post.returnUrl.label" as const,
+        description:
+          "app.api.payment.portal.post.returnUrl.description" as const,
+        placeholder:
+          "app.api.payment.portal.post.returnUrl.placeholder" as const,
+        columns: 12,
+        schema: z.string().url().optional(),
+      }),
 
       // RESPONSE FIELDS
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.payment.portal.post.response.success" as const,
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.payment.portal.post.response.success" as const,
+        schema: z.boolean(),
+      }),
 
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.payment.portal.post.response.message" as const,
-        },
-        z.string().nullable(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.payment.portal.post.response.message" as const,
+        schema: z.string().nullable(),
+      }),
 
-      customerPortalUrl: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.payment.portal.post.response.customerPortalUrl" as const,
-        },
-        z.string().url().nullable(),
-      ),
+      customerPortalUrl: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.payment.portal.post.response.customerPortalUrl" as const,
+        schema: z.string().url().nullable(),
+      }),
     },
   ),
 

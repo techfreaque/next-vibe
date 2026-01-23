@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -75,32 +75,27 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          name: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.emails.smtpClient.create.name.label",
-              description: "app.api.emails.smtpClient.create.name.description",
-              placeholder: "app.api.emails.smtpClient.create.name.placeholder",
-              columns: 12,
-            },
-            z.string().min(1),
-          ),
+          name: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.emails.smtpClient.create.name.label",
+            description: "app.api.emails.smtpClient.create.name.description",
+            placeholder: "app.api.emails.smtpClient.create.name.placeholder",
+            columns: 12,
+            schema: z.string().min(1),
+          }),
 
-          description: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXTAREA,
-              label:
-                "app.api.emails.smtpClient.create.accountDescription.label",
-              description:
-                "app.api.emails.smtpClient.create.accountDescription.description",
-              placeholder:
-                "app.api.emails.smtpClient.create.accountDescription.placeholder",
-              columns: 12,
-            },
-            z.string().optional(),
-          ),
+          description: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXTAREA,
+            label: "app.api.emails.smtpClient.create.accountDescription.label",
+            description:
+              "app.api.emails.smtpClient.create.accountDescription.description",
+            placeholder:
+              "app.api.emails.smtpClient.create.accountDescription.placeholder",
+            columns: 12,
+            schema: z.string().optional(),
+          }),
         },
       ),
 
@@ -115,44 +110,38 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          host: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.emails.smtpClient.create.host.label",
-              description: "app.api.emails.smtpClient.create.host.description",
-              placeholder: "app.api.emails.smtpClient.create.host.placeholder",
-              columns: 12,
-            },
-            z.string().min(1),
-          ),
+          host: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.emails.smtpClient.create.host.label",
+            description: "app.api.emails.smtpClient.create.host.description",
+            placeholder: "app.api.emails.smtpClient.create.host.placeholder",
+            columns: 12,
+            schema: z.string().min(1),
+          }),
 
-          port: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label: "app.api.emails.smtpClient.create.port.label",
-              description: "app.api.emails.smtpClient.create.port.description",
-              placeholder: "app.api.emails.smtpClient.create.port.placeholder",
-              columns: 6,
-            },
-            z.coerce.number().min(1).max(65535),
-          ),
+          port: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label: "app.api.emails.smtpClient.create.port.label",
+            description: "app.api.emails.smtpClient.create.port.description",
+            placeholder: "app.api.emails.smtpClient.create.port.placeholder",
+            columns: 6,
+            schema: z.coerce.number().min(1).max(65535),
+          }),
 
-          securityType: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.emails.smtpClient.create.securityType.label",
-              description:
-                "app.api.emails.smtpClient.create.securityType.description",
-              placeholder:
-                "app.api.emails.smtpClient.create.securityType.placeholder",
-              columns: 6,
-              options: SmtpSecurityTypeOptions,
-            },
-            z.enum(SmtpSecurityType),
-          ),
+          securityType: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.emails.smtpClient.create.securityType.label",
+            description:
+              "app.api.emails.smtpClient.create.securityType.description",
+            placeholder:
+              "app.api.emails.smtpClient.create.securityType.placeholder",
+            columns: 6,
+            options: SmtpSecurityTypeOptions,
+            schema: z.enum(SmtpSecurityType),
+          }),
         },
       ),
 
@@ -167,33 +156,29 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          username: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.emails.smtpClient.create.username.label",
-              description:
-                "app.api.emails.smtpClient.create.username.description",
-              placeholder:
-                "app.api.emails.smtpClient.create.username.placeholder",
-              columns: 6,
-            },
-            z.string().min(1),
-          ),
+          username: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.emails.smtpClient.create.username.label",
+            description:
+              "app.api.emails.smtpClient.create.username.description",
+            placeholder:
+              "app.api.emails.smtpClient.create.username.placeholder",
+            columns: 6,
+            schema: z.string().min(1),
+          }),
 
-          password: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.PASSWORD,
-              label: "app.api.emails.smtpClient.create.password.label",
-              description:
-                "app.api.emails.smtpClient.create.password.description",
-              placeholder:
-                "app.api.emails.smtpClient.create.password.placeholder",
-              columns: 6,
-            },
-            z.string().min(1),
-          ),
+          password: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.PASSWORD,
+            label: "app.api.emails.smtpClient.create.password.label",
+            description:
+              "app.api.emails.smtpClient.create.password.description",
+            placeholder:
+              "app.api.emails.smtpClient.create.password.placeholder",
+            columns: 6,
+            schema: z.string().min(1),
+          }),
         },
       ),
 
@@ -208,96 +193,83 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          fromEmail: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.EMAIL,
-              label: "app.api.emails.smtpClient.create.fromEmail.label",
-              description:
-                "app.api.emails.smtpClient.create.fromEmail.description",
-              placeholder:
-                "app.api.emails.smtpClient.create.fromEmail.placeholder",
-              columns: 12,
-            },
-            z.email(),
-          ),
+          fromEmail: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.EMAIL,
+            label: "app.api.emails.smtpClient.create.fromEmail.label",
+            description:
+              "app.api.emails.smtpClient.create.fromEmail.description",
+            placeholder:
+              "app.api.emails.smtpClient.create.fromEmail.placeholder",
+            columns: 12,
+            schema: z.email(),
+          }),
 
-          campaignTypes: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.emails.smtpClient.create.campaignTypes.label",
-              description:
-                "app.api.emails.smtpClient.create.campaignTypes.description",
-              placeholder:
-                "app.api.emails.smtpClient.create.campaignTypes.placeholder",
-              columns: 6,
-              options: CampaignTypeOptions,
-            },
-            z.array(z.enum(CampaignType)).optional(),
-          ),
+          campaignTypes: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label: "app.api.emails.smtpClient.create.campaignTypes.label",
+            description:
+              "app.api.emails.smtpClient.create.campaignTypes.description",
+            placeholder:
+              "app.api.emails.smtpClient.create.campaignTypes.placeholder",
+            columns: 6,
+            options: CampaignTypeOptions,
+            schema: z.array(z.enum(CampaignType)).optional(),
+          }),
 
-          emailJourneyVariants: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label:
-                "app.api.emails.smtpClient.create.emailJourneyVariants.label",
-              description:
-                "app.api.emails.smtpClient.create.emailJourneyVariants.description",
-              placeholder:
-                "app.api.emails.smtpClient.create.emailJourneyVariants.placeholder",
-              columns: 6,
-              options: EmailJourneyVariantOptions,
-            },
-            z.array(z.enum(EmailJourneyVariant)).optional(),
-          ),
+          emailJourneyVariants: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label:
+              "app.api.emails.smtpClient.create.emailJourneyVariants.label",
+            description:
+              "app.api.emails.smtpClient.create.emailJourneyVariants.description",
+            placeholder:
+              "app.api.emails.smtpClient.create.emailJourneyVariants.placeholder",
+            columns: 6,
+            options: EmailJourneyVariantOptions,
+            schema: z.array(z.enum(EmailJourneyVariant)).optional(),
+          }),
 
-          emailCampaignStages: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label:
-                "app.api.emails.smtpClient.create.emailCampaignStages.label",
-              description:
-                "app.api.emails.smtpClient.create.emailCampaignStages.description",
-              placeholder:
-                "app.api.emails.smtpClient.create.emailCampaignStages.placeholder",
-              columns: 6,
-              options: EmailCampaignStageOptions,
-            },
-            z.array(z.enum(EmailCampaignStage)).optional(),
-          ),
+          emailCampaignStages: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label: "app.api.emails.smtpClient.create.emailCampaignStages.label",
+            description:
+              "app.api.emails.smtpClient.create.emailCampaignStages.description",
+            placeholder:
+              "app.api.emails.smtpClient.create.emailCampaignStages.placeholder",
+            columns: 6,
+            options: EmailCampaignStageOptions,
+            schema: z.array(z.enum(EmailCampaignStage)).optional(),
+          }),
 
-          countries: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.emails.smtpClient.create.countries.label",
-              description:
-                "app.api.emails.smtpClient.create.countries.description",
-              placeholder:
-                "app.api.emails.smtpClient.create.countries.placeholder",
-              columns: 6,
-              options: CountriesOptions,
-            },
-            z.array(z.enum(["GLOBAL", "DE", "PL", "US"])).optional(),
-          ),
+          countries: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label: "app.api.emails.smtpClient.create.countries.label",
+            description:
+              "app.api.emails.smtpClient.create.countries.description",
+            placeholder:
+              "app.api.emails.smtpClient.create.countries.placeholder",
+            columns: 6,
+            options: CountriesOptions,
+            schema: z.array(z.enum(["GLOBAL", "DE", "PL", "US"])).optional(),
+          }),
 
-          languages: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.emails.smtpClient.create.languages.label",
-              description:
-                "app.api.emails.smtpClient.create.languages.description",
-              placeholder:
-                "app.api.emails.smtpClient.create.languages.placeholder",
-              columns: 6,
-              options: LanguagesOptions,
-            },
-            z.array(z.enum(Languages)).optional(),
-          ),
+          languages: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label: "app.api.emails.smtpClient.create.languages.label",
+            description:
+              "app.api.emails.smtpClient.create.languages.description",
+            placeholder:
+              "app.api.emails.smtpClient.create.languages.placeholder",
+            columns: 6,
+            options: LanguagesOptions,
+            schema: z.array(z.enum(Languages)).optional(),
+          }),
         },
       ),
 
@@ -326,37 +298,28 @@ const { POST } = createEndpoint({
             },
             { response: true },
             {
-              id: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.smtpClient.create.response.account.id",
-                },
-                z.uuid(),
-              ),
-              name: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.smtpClient.create.response.account.name",
-                },
-                z.string(),
-              ),
-              description: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.smtpClient.create.response.account.accountDescription",
-                },
-                z.string().optional(),
-              ),
-              status: responseField(
-                {
-                  type: WidgetType.BADGE,
-                  text: "app.api.emails.smtpClient.create.response.account.status",
-                },
-                z.enum(SmtpAccountStatus),
-              ),
+              id: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.emails.smtpClient.create.response.account.id",
+                schema: z.uuid(),
+              }),
+              name: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.emails.smtpClient.create.response.account.name",
+                schema: z.string(),
+              }),
+              description: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.emails.smtpClient.create.response.account.accountDescription",
+                schema: z.string().optional(),
+              }),
+              status: responseField({
+                type: WidgetType.BADGE,
+                text: "app.api.emails.smtpClient.create.response.account.status",
+                schema: z.enum(SmtpAccountStatus),
+              }),
             },
           ),
 
@@ -373,92 +336,72 @@ const { POST } = createEndpoint({
             },
             { response: true },
             {
-              host: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.smtpClient.create.response.account.host",
-                },
-                z.string(),
-              ),
-              port: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.smtpClient.create.response.account.port",
-                },
-                z.coerce.number().int(),
-              ),
-              securityType: responseField(
-                {
-                  type: WidgetType.BADGE,
-                  text: "app.api.emails.smtpClient.create.response.account.securityType",
-                },
-                z.enum(SmtpSecurityType),
-              ),
-              username: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.smtpClient.create.response.account.username",
-                },
-                z.string(),
-              ),
-              fromEmail: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.smtpClient.create.response.account.fromEmail",
-                },
-                z.email(),
-              ),
-              healthCheckStatus: responseField(
-                {
-                  type: WidgetType.BADGE,
-                  text: "app.api.emails.smtpClient.create.response.account.healthCheckStatus",
-                },
-                z.enum(SmtpHealthStatus).nullable(),
-              ),
-              campaignTypes: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.smtpClient.create.response.account.campaignTypes",
-                },
-                z.array(z.enum(CampaignType)).optional(),
-              ),
-              emailJourneyVariants: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.smtpClient.create.response.account.emailJourneyVariants",
-                },
-                z.array(z.enum(EmailJourneyVariant)).optional(),
-              ),
-              emailCampaignStages: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.smtpClient.create.response.account.emailCampaignStages",
-                },
-                z.array(z.enum(EmailCampaignStage)).optional(),
-              ),
-              countries: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.smtpClient.create.response.account.countries",
-                },
-                z.array(z.enum(["GLOBAL", "DE", "PL", "US"])).optional(),
-              ),
-              languages: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.smtpClient.create.response.account.languages",
-                },
-                z.array(z.enum(["en", "de", "pl"])).optional(),
-              ),
+              host: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.emails.smtpClient.create.response.account.host",
+                schema: z.string(),
+              }),
+              port: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.emails.smtpClient.create.response.account.port",
+                schema: z.coerce.number().int(),
+              }),
+              securityType: responseField({
+                type: WidgetType.BADGE,
+                text: "app.api.emails.smtpClient.create.response.account.securityType",
+                schema: z.enum(SmtpSecurityType),
+              }),
+              username: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.emails.smtpClient.create.response.account.username",
+                schema: z.string(),
+              }),
+              fromEmail: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.emails.smtpClient.create.response.account.fromEmail",
+                schema: z.email(),
+              }),
+              healthCheckStatus: responseField({
+                type: WidgetType.BADGE,
+                text: "app.api.emails.smtpClient.create.response.account.healthCheckStatus",
+                schema: z.enum(SmtpHealthStatus).nullable(),
+              }),
+              campaignTypes: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.emails.smtpClient.create.response.account.campaignTypes",
+                schema: z.array(z.enum(CampaignType)).optional(),
+              }),
+              emailJourneyVariants: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.emails.smtpClient.create.response.account.emailJourneyVariants",
+                schema: z.array(z.enum(EmailJourneyVariant)).optional(),
+              }),
+              emailCampaignStages: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.emails.smtpClient.create.response.account.emailCampaignStages",
+                schema: z.array(z.enum(EmailCampaignStage)).optional(),
+              }),
+              countries: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.emails.smtpClient.create.response.account.countries",
+                schema: z
+                  .array(z.enum(["GLOBAL", "DE", "PL", "US"]))
+                  .optional(),
+              }),
+              languages: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.emails.smtpClient.create.response.account.languages",
+                schema: z.array(z.enum(["en", "de", "pl"])).optional(),
+              }),
             },
           ),
 
@@ -475,37 +418,29 @@ const { POST } = createEndpoint({
             },
             { response: true },
             {
-              priority: responseField(
-                {
-                  type: WidgetType.BADGE,
-                  text: "app.api.emails.smtpClient.create.response.account.priority",
-                },
-                z.coerce.number().int().optional(),
-              ),
-              totalEmailsSent: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.smtpClient.create.response.account.totalEmailsSent",
-                },
-                z.coerce.number().int(),
-              ),
-              createdAt: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.smtpClient.create.response.account.createdAt",
-                },
-                dateSchema,
-              ),
-              updatedAt: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.smtpClient.create.response.account.updatedAt",
-                },
-                dateSchema,
-              ),
+              priority: responseField({
+                type: WidgetType.BADGE,
+                text: "app.api.emails.smtpClient.create.response.account.priority",
+                schema: z.coerce.number().int().optional(),
+              }),
+              totalEmailsSent: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.emails.smtpClient.create.response.account.totalEmailsSent",
+                schema: z.coerce.number().int(),
+              }),
+              createdAt: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.emails.smtpClient.create.response.account.createdAt",
+                schema: dateSchema,
+              }),
+              updatedAt: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.emails.smtpClient.create.response.account.updatedAt",
+                schema: dateSchema,
+              }),
             },
           ),
         },

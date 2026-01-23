@@ -36,7 +36,7 @@ describe("extractSchemaDefaults", () => {
       expect(result).toBe("desc");
     });
 
-    it("extracts default value from a nativeEnum field with default", () => {
+    it("extracts default value from a enum field with default", () => {
       enum SortOrder {
         ASC = "asc",
         DESC = "desc",
@@ -202,7 +202,7 @@ describe("extractSchemaDefaults", () => {
           .optional(),
         sortingOptions: z.object({
           sortBy: z
-            .nativeEnum(LeadSortField)
+            .enum(LeadSortField)
             .optional()
             .default(LeadSortField.CREATED_AT),
           sortOrder: z.enum(SortOrder).optional().default("desc"),

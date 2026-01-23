@@ -44,8 +44,8 @@ const { POST } = createEndpoint({
     { type: WidgetType.CONTAINER },
     { request: "data", response: true },
     {
-      email: requestDataField({ type: WidgetType.TEXT }, z.string().email()),
-      name: requestDataField({ type: WidgetType.TEXT }, z.string().min(1)),
+      email: requestField({ type: WidgetType.TEXT }, z.string().email()),
+      name: requestField({ type: WidgetType.TEXT }, z.string().min(1)),
     },
   ),
 });

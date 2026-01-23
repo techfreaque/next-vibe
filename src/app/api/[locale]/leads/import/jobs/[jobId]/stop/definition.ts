@@ -10,7 +10,7 @@ import {
   objectField,
   requestUrlPathParamsField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -44,17 +44,15 @@ const { POST } = createEndpoint({
     { request: "urlPathParams", response: true },
     {
       // === URL PARAMETERS ===
-      jobId: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.leads.import.jobs.jobId.stop.post.jobId.label",
-          description:
-            "app.api.leads.import.jobs.jobId.stop.post.jobId.description",
-          columns: 12,
-        },
-        z.uuid(),
-      ),
+      jobId: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.leads.import.jobs.jobId.stop.post.jobId.label",
+        description:
+          "app.api.leads.import.jobs.jobId.stop.post.jobId.description",
+        columns: 12,
+        schema: z.uuid(),
+      }),
 
       // === RESPONSE FIELDS ===
       result: objectField(
@@ -67,22 +65,18 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          success: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.import.jobs.jobId.stop.post.response.success.content",
-            },
-            z.boolean(),
-          ),
-          message: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.import.jobs.jobId.stop.post.response.message.content",
-            },
-            z.string(),
-          ),
+          success: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.import.jobs.jobId.stop.post.response.success.content",
+            schema: z.boolean(),
+          }),
+          message: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.import.jobs.jobId.stop.post.response.message.content",
+            schema: z.string(),
+          }),
         },
       ),
     },

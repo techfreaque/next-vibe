@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,117 +50,99 @@ export const { GET } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      taskId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.taskId.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.taskId.description",
-          placeholder:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.taskId.placeholder",
-        },
-        z.string().optional(),
-      ),
-      taskName: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.taskName.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.taskName.description",
-          placeholder:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.taskName.placeholder",
-        },
-        z.string().optional(),
-      ),
-      status: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.status.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.status.description",
-          placeholder:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.status.placeholder",
-          columns: 6,
-        },
-        z.string().optional(),
-      ),
-      priority: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.priority.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.priority.description",
-          placeholder:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.priority.placeholder",
-          columns: 6,
-        },
-        z.string().optional(),
-      ),
-      startDate: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.DATE,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.startDate.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.startDate.description",
-        },
-        z.string().optional(),
-      ),
-      endDate: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.DATE,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.endDate.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.endDate.description",
-        },
-        z.string().optional(),
-      ),
-      limit: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.limit.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.limit.description",
-          placeholder:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.limit.placeholder",
-        },
-        z.string().optional(),
-      ),
-      offset: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.offset.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.offset.description",
-          placeholder:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.offset.placeholder",
-        },
-        z.string().optional(),
-      ),
+      taskId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.taskId.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.taskId.description",
+        placeholder:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.taskId.placeholder",
+        schema: z.string().optional(),
+      }),
+      taskName: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.taskName.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.taskName.description",
+        placeholder:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.taskName.placeholder",
+        schema: z.string().optional(),
+      }),
+      status: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.status.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.status.description",
+        placeholder:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.status.placeholder",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
+      priority: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.priority.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.priority.description",
+        placeholder:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.priority.placeholder",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
+      startDate: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.startDate.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.startDate.description",
+        schema: z.string().optional(),
+      }),
+      endDate: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.endDate.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.endDate.description",
+        schema: z.string().optional(),
+      }),
+      limit: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.limit.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.limit.description",
+        placeholder:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.limit.placeholder",
+        schema: z.string().optional(),
+      }),
+      offset: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.offset.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.offset.description",
+        placeholder:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.offset.placeholder",
+        schema: z.string().optional(),
+      }),
 
       // === RESPONSE FIELDS ===
-      executions: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.response.executions.title",
-        },
-        z.array(
+      executions: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.response.executions.title",
+        schema: z.array(
           z.object({
             id: z.string(),
             taskId: z.string(),
@@ -181,37 +163,31 @@ export const { GET } = createEndpoint({
             createdAt: z.string(),
           }),
         ),
-      ),
-      totalCount: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.response.totalCount.title",
-        },
-        z.coerce.number(),
-      ),
-      hasMore: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.response.hasMore.title",
-        },
-        z.boolean(),
-      ),
-      summary: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.get.response.summary.title",
-        },
-        z.object({
+      }),
+      totalCount: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.response.totalCount.title",
+        schema: z.coerce.number(),
+      }),
+      hasMore: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.response.hasMore.title",
+        schema: z.boolean(),
+      }),
+      summary: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.response.summary.title",
+        schema: z.object({
           totalExecutions: z.coerce.number(),
           successfulExecutions: z.coerce.number(),
           failedExecutions: z.coerce.number(),
           averageDuration: z.coerce.number().nullable(),
           successRate: z.coerce.number(),
         }),
-      ),
+      }),
     },
   ),
   successTypes: {

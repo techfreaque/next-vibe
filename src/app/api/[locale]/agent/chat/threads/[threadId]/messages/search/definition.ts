@@ -9,11 +9,11 @@ import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   requestUrlPathParamsField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -118,30 +118,26 @@ const { GET } = createEndpoint({
     { request: "data&urlPathParams", response: true },
     {
       // === URL PARAMS ===
-      threadId: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label:
-            "app.api.agent.chat.threads.threadId.messages.search.get.threadId.label" as const,
-          description:
-            "app.api.agent.chat.threads.threadId.messages.search.get.threadId.description" as const,
-        },
-        z.uuid(),
-      ),
+      threadId: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label:
+          "app.api.agent.chat.threads.threadId.messages.search.get.threadId.label" as const,
+        description:
+          "app.api.agent.chat.threads.threadId.messages.search.get.threadId.description" as const,
+        schema: z.uuid(),
+      }),
 
       // === REQUEST DATA ===
-      query: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.agent.chat.threads.threadId.messages.search.get.query.label" as const,
-          description:
-            "app.api.agent.chat.threads.threadId.messages.search.get.query.description" as const,
-        },
-        z.string().min(1),
-      ),
+      query: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.agent.chat.threads.threadId.messages.search.get.query.label" as const,
+        description:
+          "app.api.agent.chat.threads.threadId.messages.search.get.query.description" as const,
+        schema: z.string().min(1),
+      }),
 
       pagination: objectField(
         {
@@ -155,28 +151,24 @@ const { GET } = createEndpoint({
         },
         { request: "data" },
         {
-          page: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label:
-                "app.api.agent.chat.threads.threadId.messages.search.get.page.label" as const,
-              description:
-                "app.api.agent.chat.threads.threadId.messages.search.get.page.description" as const,
-            },
-            z.coerce.number().min(1).optional().default(1),
-          ),
-          limit: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label:
-                "app.api.agent.chat.threads.threadId.messages.search.get.limit.label" as const,
-              description:
-                "app.api.agent.chat.threads.threadId.messages.search.get.limit.description" as const,
-            },
-            z.coerce.number().min(1).max(100).optional().default(20),
-          ),
+          page: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label:
+              "app.api.agent.chat.threads.threadId.messages.search.get.page.label" as const,
+            description:
+              "app.api.agent.chat.threads.threadId.messages.search.get.page.description" as const,
+            schema: z.coerce.number().min(1).optional().default(1),
+          }),
+          limit: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label:
+              "app.api.agent.chat.threads.threadId.messages.search.get.limit.label" as const,
+            description:
+              "app.api.agent.chat.threads.threadId.messages.search.get.limit.description" as const,
+            schema: z.coerce.number().min(1).max(100).optional().default(20),
+          }),
         },
       ),
 
@@ -194,65 +186,51 @@ const { GET } = createEndpoint({
           },
           { response: true },
           {
-            id: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.threads.threadId.messages.search.get.response.results.message.id.content" as const,
-              },
-              z.uuid(),
-            ),
-            content: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.threads.threadId.messages.search.get.response.results.message.content.content" as const,
-              },
-              z.string().nullable(),
-            ),
-            role: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.agent.chat.threads.threadId.messages.search.get.response.results.message.role.content" as const,
-              },
-              z.enum(ChatMessageRole),
-            ),
-            rank: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.threads.threadId.messages.search.get.response.results.message.rank.content" as const,
-              },
-              z.coerce.number(),
-            ),
-            headline: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.threads.threadId.messages.search.get.response.results.message.headline.content" as const,
-              },
-              z.string(),
-            ),
-            createdAt: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.threads.threadId.messages.search.get.response.results.message.createdAt.content" as const,
-              },
-              dateSchema,
-            ),
+            id: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.threads.threadId.messages.search.get.response.results.message.id.content" as const,
+              schema: z.uuid(),
+            }),
+            content: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.threads.threadId.messages.search.get.response.results.message.content.content" as const,
+              schema: z.string().nullable(),
+            }),
+            role: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.agent.chat.threads.threadId.messages.search.get.response.results.message.role.content" as const,
+              schema: z.enum(ChatMessageRole),
+            }),
+            rank: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.threads.threadId.messages.search.get.response.results.message.rank.content" as const,
+              schema: z.coerce.number(),
+            }),
+            headline: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.threads.threadId.messages.search.get.response.results.message.headline.content" as const,
+              schema: z.string(),
+            }),
+            createdAt: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.threads.threadId.messages.search.get.response.results.message.createdAt.content" as const,
+              schema: dateSchema,
+            }),
           },
         ),
       ),
 
-      totalCount: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.threads.threadId.messages.search.get.response.totalCount.content" as const,
-        },
-        z.coerce.number(),
-      ),
+      totalCount: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.threads.threadId.messages.search.get.response.totalCount.content" as const,
+        schema: z.coerce.number(),
+      }),
     },
   ),
 

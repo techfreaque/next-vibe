@@ -64,7 +64,7 @@ export class LeadAuthRepository {
       locale,
       logger,
     );
-    logger.debug("Created new anonymous lead", { leadId });
+    logger.debug(`Created anonymous lead ${leadId}`);
     return { leadId, isNew: true };
   }
 
@@ -99,9 +99,7 @@ export class LeadAuthRepository {
     }
 
     const shouldUpdate = cookieLeadId !== userLeadLink.leadId;
-    logger.debug(
-      `Found lead for user (userId: ${userId}, leadId: ${userLeadLink.leadId}, shouldUpdateCookie: ${shouldUpdate})`,
-    );
+    logger.debug(`Found lead ${userLeadLink.leadId} for user ${userId}`);
     return {
       leadId: userLeadLink.leadId,
       shouldUpdateCookie: shouldUpdate,
@@ -162,6 +160,24 @@ export class LeadAuthRepository {
       return !!lead;
     } catch (error) {
       logger.error("Failed to validate leadId", parseError(error).message);
+      return false;
+    }
+  }
+
+  /**
+   * Check if a lead exists in the database
+   * Simple version without logger for middleware use
+   */
+  static async validateLeadIdExists(leadId: string): Promise<boolean> {
+    try {
+      const [lead] = await db
+        .select({ id: leads.id })
+        .from(leads)
+        .where(eq(leads.id, leadId))
+        .limit(1);
+
+      return !!lead;
+    } catch {
       return false;
     }
   }
@@ -267,8 +283,7 @@ export class LeadAuthRepository {
       })
       .returning();
 
-    logger.debug("Created new anonymous lead", { leadId: newLead.id });
-
+    logger.debug(`Created anonymous lead ${newLead.id}`);
     // Create credit wallet for new lead (triggers via getLeadBalance)
     await CreditRepository.getLeadBalance(newLead.id, logger);
 

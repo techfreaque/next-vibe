@@ -632,6 +632,21 @@ export const translations: typeof enTranslations = {
       title: "Lista postaci",
       description: "Wszystkie dostępne postaciy dla użytkownika",
     },
+    createButton: {
+      label: "Utwórz postać",
+    },
+    browser: {
+      advancedModelAccess: "Zaawansowany dostęp do modeli",
+      configureFiltersText: "Skonfiguruj filtry lub wybierz ręcznie z",
+      aiModels: "modele AI",
+      configureAiModelsTitle: "Konfiguruj modele AI bezpośrednio",
+      advancedChooseText: "Zaawansowane: Wybierz z",
+      modelsWithCustomFilters: "modeli z niestandardowymi filtrami",
+      configureButton: "Konfiguruj",
+      characterPresets: "Szablony postaci",
+      pickCharacterText:
+        "Wybierz postać z zoptymalizowanymi ustawieniami. Dostosuj w dowolnym momencie po dodaniu.",
+    },
     response: {
       characters: {
         character: {
@@ -662,6 +677,7 @@ export const translations: typeof enTranslations = {
           preferredStrengths: { content: "Preferowane mocne strony" },
           ignoredWeaknesses: { content: "Ignorowane słabe strony" },
           manualModelId: { content: "Ręczny model" },
+          separator: { content: "•" },
         },
       },
     },
@@ -756,6 +772,7 @@ export const translations: typeof enTranslations = {
     },
     selectionType: {
       label: "Typ wyboru",
+      characterBased: "Na podstawie postaci",
       manual: "Konkretny model",
       filters: "Kryteria filtrowania",
     },
@@ -829,10 +846,12 @@ export const translations: typeof enTranslations = {
     preferredStrengths: {
       label: "Preferowane mocne strony",
       description: "Możliwości i mocne strony modelu do preferowania",
+      item: "Mocna strona",
     },
     ignoredWeaknesses: {
       label: "Ignorowane słabe strony",
       description: "Słabe strony modelu do ignorowania lub akceptowania",
+      item: "Słaba strona",
     },
     manualModelId: {
       label: "Model ręczny",

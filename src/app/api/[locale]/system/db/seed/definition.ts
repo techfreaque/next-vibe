@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -49,52 +49,42 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      verbose: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.seed.fields.verbose.title",
-          description: "app.api.system.db.seed.fields.verbose.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      verbose: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.seed.fields.verbose.title",
+        description: "app.api.system.db.seed.fields.verbose.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.seed.fields.dryRun.title",
-          description: "app.api.system.db.seed.fields.dryRun.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.seed.fields.dryRun.title",
+        description: "app.api.system.db.seed.fields.dryRun.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.seed.fields.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.seed.fields.success.title",
+        schema: z.boolean(),
+      }),
 
-      isDryRun: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.seed.fields.isDryRun.title",
-        },
-        z.boolean(),
-      ),
+      isDryRun: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.seed.fields.isDryRun.title",
+        schema: z.boolean(),
+      }),
 
-      seedsExecuted: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.seed.fields.seedsExecuted.title",
-        },
-        z.coerce.number(),
-      ),
+      seedsExecuted: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.seed.fields.seedsExecuted.title",
+        schema: z.coerce.number(),
+      }),
 
       collections: responseArrayField(
         {
@@ -109,49 +99,39 @@ const { POST } = createEndpoint({
           },
           { response: true },
           {
-            name: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.db.seed.fields.collections.name.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string(),
-            ),
-            status: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.system.db.seed.fields.collections.status.title",
-              },
-              z.enum(["success", "skipped", "failed"]),
-            ),
-            recordsCreated: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.db.seed.fields.collections.recordsCreated.title",
-                fieldType: FieldDataType.NUMBER,
-              },
-              z.coerce.number(),
-            ),
+            name: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.db.seed.fields.collections.name.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.string(),
+            }),
+            status: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.system.db.seed.fields.collections.status.title",
+              schema: z.enum(["success", "skipped", "failed"]),
+            }),
+            recordsCreated: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.db.seed.fields.collections.recordsCreated.title",
+              fieldType: FieldDataType.NUMBER,
+              schema: z.coerce.number(),
+            }),
           },
         ),
       ),
 
-      totalRecords: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.seed.fields.totalRecords.title",
-        },
-        z.coerce.number(),
-      ),
+      totalRecords: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.seed.fields.totalRecords.title",
+        schema: z.coerce.number(),
+      }),
 
-      duration: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.seed.fields.duration.title",
-        },
-        z.coerce.number(),
-      ),
+      duration: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.seed.fields.duration.title",
+        schema: z.coerce.number(),
+      }),
     },
   ),
 
@@ -265,7 +245,6 @@ const { POST } = createEndpoint({
         duration: 500,
       },
     },
-    urlPathParams: undefined,
   },
 });
 

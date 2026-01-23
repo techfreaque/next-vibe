@@ -297,7 +297,7 @@ export function GroupedListWidget<const TKey extends string>({
                     )}
                   >
                     {t(
-                      "app.api.system.unifiedInterface.react.widgets.groupedList.showMore",
+                      "app.api.system.unifiedInterface.react.widgets.groupedList.showMore" as const,
                       {
                         count: remainingCount,
                       },

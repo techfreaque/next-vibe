@@ -23,7 +23,7 @@ import { simpleT } from "@/i18n/core/shared";
 interface HistoryPageClientProps {
   locale: CountryLanguage;
   isAuthenticated: boolean;
-  initialCredits: CreditBalance | null;
+  initialCredits: CreditBalance;
   initialHistory: CreditsHistoryGetResponseOutput | null;
   initialSubscription: SubscriptionGetResponseOutput | null;
   freeCredits: number;

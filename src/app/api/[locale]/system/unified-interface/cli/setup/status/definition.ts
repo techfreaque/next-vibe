@@ -10,7 +10,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -40,9 +40,15 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "setup", "status"],
   examples: {
-    requests: {},
-    urlPathParams: undefined,
-    responses: {},
+    responses: {
+      default: {
+        success: true,
+        installed: true,
+        version: "1.0.0",
+        path: "/usr/local/bin/vibe",
+        message: "Vibe CLI is installed",
+      },
+    },
   },
 
   fields: objectField(
@@ -54,53 +60,43 @@ const { POST } = createEndpoint({
       layoutType: LayoutType.GRID,
       columns: 12,
     },
-    { request: "data", response: true },
+    { response: true },
     {
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.success",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.success",
+        schema: z.boolean(),
+      }),
 
-      installed: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.installed",
-        },
-        z.boolean(),
-      ),
+      installed: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.installed",
+        schema: z.boolean(),
+      }),
 
-      version: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.version",
-        },
-        z.string().optional(),
-      ),
+      version: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.version",
+        schema: z.string().optional(),
+      }),
 
-      path: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.path",
-        },
-        z.string().optional(),
-      ),
+      path: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.path",
+        schema: z.string().optional(),
+      }),
 
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.message",
-        },
-        z.string(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.message",
+        schema: z.string(),
+      }),
     },
   ),
 

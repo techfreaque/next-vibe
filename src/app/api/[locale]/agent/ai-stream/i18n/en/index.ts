@@ -114,14 +114,6 @@ export const translations = {
       label: "Character",
       description: "Optional character to use for the AI",
     },
-    temperature: {
-      label: "Temperature",
-      description: "Controls randomness (0-2)",
-    },
-    maxTokens: {
-      label: "Max Tokens",
-      description: "Maximum tokens to generate",
-    },
     systemPrompt: {
       label: "System Prompt",
       description: "Optional system instructions",

@@ -3,6 +3,12 @@
  */
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { mcpSilentMode } from "@/config/debug";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import { binaryStartTime } from "../vibe-runtime";
+import type { RouteExecutionResult } from "./route-executor";
 
 /**
  * Internal Node.js handle type for resource monitoring
@@ -23,12 +29,6 @@ interface ProcessWithInternals {
   _getActiveHandles?: () => InternalNodeHandle[];
   _getActiveRequests?: () => never[];
 }
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { mcpSilentMode } from "@/config/debug";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import { binaryStartTime } from "../vibe-runtime";
-import type { RouteExecutionResult } from "./route-executor";
 
 /**
  * Safe handle types that should not be forcefully closed
@@ -41,7 +41,7 @@ const SAFE_HANDLE_TYPES = [WRITE_STREAM, READ_STREAM, TTY] as const;
 /**
  * Timing data structure for performance monitoring
  */
-export interface TimingData {
+interface TimingData {
   binaryStart: number;
   tsStart: number;
   initStart: number;
@@ -58,7 +58,7 @@ export interface TimingData {
 /**
  * Performance breakdown data
  */
-export interface PerformanceBreakdown {
+interface PerformanceBreakdown {
   totalDuration: number;
   binaryOverhead: number;
   initOverhead: number;
@@ -72,7 +72,7 @@ export interface PerformanceBreakdown {
 /**
  * Active handle information
  */
-export interface ActiveHandle {
+interface ActiveHandle {
   type: string;
   constructor: string;
 }
@@ -80,10 +80,8 @@ export interface ActiveHandle {
 /**
  * Resource cleanup registry
  */
-export class ResourceCleanupRegistry {
+class ResourceCleanupRegistry {
   private cleanupFunctions: Array<() => void | Promise<void>> = [];
-  private timers: Set<NodeJS.Timeout> = new Set();
-  private intervals: Set<NodeJS.Timeout> = new Set();
 
   /**
    * Register a cleanup function
@@ -93,31 +91,9 @@ export class ResourceCleanupRegistry {
   }
 
   /**
-   * Register a timer for cleanup
-   */
-  registerTimer(timer: NodeJS.Timeout): void {
-    this.timers.add(timer);
-  }
-
-  /**
-   * Register an interval for cleanup
-   */
-  registerInterval(interval: NodeJS.Timeout): void {
-    this.intervals.add(interval);
-  }
-
-  /**
    * Execute all cleanup functions
    */
   async cleanup(logger: EndpointLogger): Promise<void> {
-    // Clear all timers and intervals
-    for (const timer of this.timers) {
-      clearTimeout(timer);
-    }
-    for (const interval of this.intervals) {
-      clearInterval(interval);
-    }
-
     // Execute cleanup functions
     for (const cleanup of this.cleanupFunctions) {
       try {
@@ -138,8 +114,6 @@ export class ResourceCleanupRegistry {
 
     // Clear registries
     this.cleanupFunctions = [];
-    this.timers.clear();
-    this.intervals.clear();
   }
 }
 
@@ -165,13 +139,6 @@ export class CliPerformanceMonitor {
    */
   mark(point: keyof TimingData): void {
     this.timings[point] = Date.now();
-  }
-
-  /**
-   * Get current timings
-   */
-  getTimings(): Partial<TimingData> {
-    return { ...this.timings };
   }
 
   /**

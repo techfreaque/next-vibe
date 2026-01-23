@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,38 +50,34 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      pageIdx: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.browser.select-page.form.fields.pageIdx.label",
-          description:
-            "app.api.browser.select-page.form.fields.pageIdx.description",
-          placeholder:
-            "app.api.browser.select-page.form.fields.pageIdx.placeholder",
-          columns: 6,
-        },
-        z
+      pageIdx: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.browser.select-page.form.fields.pageIdx.label",
+        description:
+          "app.api.browser.select-page.form.fields.pageIdx.description",
+        placeholder:
+          "app.api.browser.select-page.form.fields.pageIdx.placeholder",
+        columns: 6,
+        schema: z
           .number()
           .describe(
             "The index of the page to select. Call list_pages to list pages.",
           ),
-      ),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.select-page.response.success",
-        },
-        z.boolean().describe("Whether the page selection operation succeeded"),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.select-page.response.result",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.select-page.response.success",
+        schema: z
+          .boolean()
+          .describe("Whether the page selection operation succeeded"),
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.select-page.response.result",
+        schema: z
           .object({
             selected: z.boolean().describe("Whether the page was selected"),
             pageIdx: z.coerce.number().describe("Index of the selected page"),
@@ -90,21 +86,23 @@ const { POST } = createEndpoint({
           })
           .optional()
           .describe("Result of page selection"),
-      ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.select-page.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.select-page.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      }),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.select-page.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.select-page.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -123,7 +121,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

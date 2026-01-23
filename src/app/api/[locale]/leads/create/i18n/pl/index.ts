@@ -4,6 +4,13 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Stwórz lead",
     description: "Stwórz nowy lead w systemie",
+    backButton: {
+      label: "Powrót do leadów",
+    },
+    submitButton: {
+      label: "Stwórz leada",
+      loadingText: "Tworzenie leada...",
+    },
     form: {
       title: "Formularz nowego leada",
       description: "Wprowadź informacje o leadzie aby stworzyć nowy lead",

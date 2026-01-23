@@ -18,6 +18,8 @@
  * All business logic and type guards imported from shared.
  */
 
+import type { z } from "zod";
+
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { MetricCardWidgetConfig } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
 import {
@@ -102,7 +104,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<
   private renderMetricObject<const TKey extends string>(
     value: { [key: string]: WidgetData },
     config: Pick<
-      MetricCardWidgetConfig<TKey>,
+      MetricCardWidgetConfig<TKey, z.ZodNumber>,
       "icon" | "unit" | "precision" | "threshold" | "format"
     >,
     context: WidgetRenderContext,
@@ -203,7 +205,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<
   private formatMetricValueLocal<const TKey extends string>(
     value: WidgetData,
     config: Pick<
-      MetricCardWidgetConfig<TKey>,
+      MetricCardWidgetConfig<TKey, z.ZodNumber>,
       "icon" | "unit" | "precision" | "threshold" | "format"
     >,
     context: WidgetRenderContext,
@@ -263,7 +265,10 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<
    * Returns custom icon if configured, otherwise threshold-based color icon.
    */
   private getMetricIcon<const TKey extends string>(
-    config: Pick<MetricCardWidgetConfig<TKey>, "icon" | "threshold">,
+    config: Pick<
+      MetricCardWidgetConfig<TKey, z.ZodNumber>,
+      "icon" | "threshold"
+    >,
     value: WidgetData,
     context: WidgetRenderContext,
   ): string {

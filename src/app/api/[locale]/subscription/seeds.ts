@@ -62,8 +62,6 @@ export async function dev(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<void> {
-  logger.debug("🌱 Seeding subscription data for development environment");
-
   if (!ENABLED) {
     return;
   }
@@ -453,8 +451,6 @@ export async function test(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<void> {
-  logger.debug("🌱 Seeding subscription data for test environment");
-
   try {
     // Get test users for subscription testing
     const testUser1Response = await UserRepository.getUserByEmail(

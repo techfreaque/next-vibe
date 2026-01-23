@@ -2,6 +2,13 @@ export const translations = {
   post: {
     title: "Create Lead",
     description: "Create a new lead in the system",
+    backButton: {
+      label: "Back to Leads",
+    },
+    submitButton: {
+      label: "Create Lead",
+      loadingText: "Creating Lead...",
+    },
     form: {
       title: "New Lead Form",
       description: "Enter lead information to create a new lead",

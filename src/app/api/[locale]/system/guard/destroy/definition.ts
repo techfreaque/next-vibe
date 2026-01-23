@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -48,84 +48,68 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      projectPath: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.guard.destroy.fields.projectPath.title",
-          description:
-            "app.api.system.guard.destroy.fields.projectPath.description",
-          placeholder:
-            "app.api.system.guard.destroy.fields.projectPath.placeholder",
-          columns: 8,
-        },
-        z.string().optional(),
-      ),
+      projectPath: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.guard.destroy.fields.projectPath.title",
+        description:
+          "app.api.system.guard.destroy.fields.projectPath.description",
+        placeholder:
+          "app.api.system.guard.destroy.fields.projectPath.placeholder",
+        columns: 8,
+        schema: z.string().optional(),
+      }),
 
-      guardId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.guard.destroy.fields.guardId.title",
-          description:
-            "app.api.system.guard.destroy.fields.guardId.description",
-          placeholder:
-            "app.api.system.guard.destroy.fields.guardId.placeholder",
-          columns: 4,
-        },
-        z.string().optional(),
-      ),
+      guardId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.guard.destroy.fields.guardId.title",
+        description: "app.api.system.guard.destroy.fields.guardId.description",
+        placeholder: "app.api.system.guard.destroy.fields.guardId.placeholder",
+        columns: 4,
+        schema: z.string().optional(),
+      }),
 
-      force: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.guard.destroy.fields.force.title",
-          description: "app.api.system.guard.destroy.fields.force.description",
-          columns: 4,
-        },
-        z.boolean().optional().default(false),
-      ),
+      force: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.guard.destroy.fields.force.title",
+        description: "app.api.system.guard.destroy.fields.force.description",
+        columns: 4,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      cleanupFiles: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.guard.destroy.fields.cleanupFiles.title",
-          description:
-            "app.api.system.guard.destroy.fields.cleanupFiles.description",
-          columns: 4,
-        },
-        z.boolean().optional().default(true),
-      ),
+      cleanupFiles: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.guard.destroy.fields.cleanupFiles.title",
+        description:
+          "app.api.system.guard.destroy.fields.cleanupFiles.description",
+        columns: 4,
+        schema: z.boolean().optional().default(true),
+      }),
 
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.guard.destroy.fields.dryRun.title",
-          description: "app.api.system.guard.destroy.fields.dryRun.description",
-          columns: 4,
-        },
-        z.boolean().optional().default(false),
-      ),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.guard.destroy.fields.dryRun.title",
+        description: "app.api.system.guard.destroy.fields.dryRun.description",
+        columns: 4,
+        schema: z.boolean().optional().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.guard.destroy.fields.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.guard.destroy.fields.success.title",
+        schema: z.boolean(),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.guard.destroy.fields.output.title",
-        },
-        z.string(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.guard.destroy.fields.output.title",
+        schema: z.string(),
+      }),
 
       destroyedGuards: responseArrayField(
         {
@@ -140,76 +124,57 @@ const { POST } = createEndpoint({
           },
           { response: true },
           {
-            guardId: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.guard.destroy.fields.guardId.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string(),
-            ),
-            username: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.guard.destroy.fields.username.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string(),
-            ),
-            projectPath: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.destroy.fields.projectPath.title",
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string(),
-            ),
-            wasRunning: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.guard.destroy.fields.wasRunning.title",
-                fieldType: FieldDataType.BOOLEAN,
-              },
-              z.boolean(),
-            ),
-            filesRemoved: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.destroy.fields.filesRemoved.title",
-                fieldType: FieldDataType.BOOLEAN,
-              },
-              z.boolean(),
-            ),
-            userRemoved: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.destroy.fields.userRemoved.title",
-                fieldType: FieldDataType.BOOLEAN,
-              },
-              z.boolean(),
-            ),
+            guardId: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.destroy.fields.guardId.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.string(),
+            }),
+            username: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.destroy.fields.username.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.string(),
+            }),
+            projectPath: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.destroy.fields.projectPath.title",
+              fieldType: FieldDataType.TEXT,
+              schema: z.string(),
+            }),
+            wasRunning: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.destroy.fields.wasRunning.title",
+              fieldType: FieldDataType.BOOLEAN,
+              schema: z.boolean(),
+            }),
+            filesRemoved: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.destroy.fields.filesRemoved.title",
+              fieldType: FieldDataType.BOOLEAN,
+              schema: z.boolean(),
+            }),
+            userRemoved: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.system.guard.destroy.fields.userRemoved.title",
+              fieldType: FieldDataType.BOOLEAN,
+              schema: z.boolean(),
+            }),
           },
         ),
       ),
 
-      warnings: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.guard.destroy.fields.warnings.title",
-        },
-        z.array(z.string()).optional(),
-      ),
+      warnings: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.guard.destroy.fields.warnings.title",
+        schema: z.array(z.string()).optional(),
+      }),
 
-      totalDestroyed: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.guard.destroy.fields.totalDestroyed.title",
-        },
-        z.coerce.number().optional(),
-      ),
+      totalDestroyed: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.guard.destroy.fields.totalDestroyed.title",
+        schema: z.coerce.number().optional(),
+      }),
     },
   ),
 
@@ -353,7 +318,6 @@ const { POST } = createEndpoint({
         totalDestroyed: 1,
       },
     },
-    urlPathParams: undefined,
   },
 });
 

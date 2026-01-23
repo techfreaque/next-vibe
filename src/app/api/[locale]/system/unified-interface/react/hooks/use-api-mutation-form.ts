@@ -134,21 +134,6 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
     defaultValues: mergedDefaultValues,
   };
 
-  logger.debug("Form config for useForm", {
-    endpoint: endpoint.path.join("/"),
-    defaultValues: options.defaultValues,
-    hasDefaultValues: !!options.defaultValues,
-    defaultValuesKeys: options.defaultValues
-      ? Object.keys(options.defaultValues)
-      : [],
-    requestSchemaShape:
-      endpoint.requestSchema &&
-      "shape" in endpoint.requestSchema &&
-      typeof endpoint.requestSchema.shape === "object"
-        ? Object.keys(endpoint.requestSchema.shape as Record<string, never>)
-        : "no shape",
-  });
-
   // Generate a storage key based on the endpoint if not provided
   const storageKey =
     persistenceKey || buildKey("query-form", endpoint, undefined, logger);

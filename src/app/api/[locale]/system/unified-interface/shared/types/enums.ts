@@ -59,6 +59,7 @@ export enum WidgetType {
   CODE_QUALITY_SUMMARY = "code_quality_summary",
   CODE_QUALITY_FILES = "code_quality_files",
   METADATA_CARD = "metadata_card",
+  KEY_VALUE = "key_value",
 
   // Layout widgets
   CONTAINER = "container",

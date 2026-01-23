@@ -11,7 +11,6 @@ import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
  * Options for testing an API endpoint
  */
 export interface TestEndpointOptions<
-  TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
@@ -22,13 +21,7 @@ export interface TestEndpointOptions<
    */
   customTests?: {
     [testName: string]: (
-      test: TestRunner<
-        TExampleKey,
-        TMethod,
-        TUserRoleValue,
-        TScopedTranslationKey,
-        TFields
-      >,
+      test: TestRunner<TMethod, TUserRoleValue, TScopedTranslationKey, TFields>,
     ) => Promise<void> | void;
   };
 
@@ -43,7 +36,6 @@ export interface TestEndpointOptions<
  * Test runner for executing API endpoint tests
  */
 export interface TestRunner<
-  TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
@@ -55,14 +47,12 @@ export interface TestRunner<
    */
   executeWith: (options: {
     data: CreateApiEndpoint<
-      TExampleKey,
       TMethod,
       TUserRoleValue,
       TScopedTranslationKey,
       TFields
     >["types"]["RequestOutput"];
     urlPathParams: CreateApiEndpoint<
-      TExampleKey,
       TMethod,
       TUserRoleValue,
       TScopedTranslationKey,
@@ -72,7 +62,6 @@ export interface TestRunner<
   }) => Promise<
     ResponseType<
       CreateApiEndpoint<
-        TExampleKey,
         TMethod,
         TUserRoleValue,
         TScopedTranslationKey,
@@ -85,7 +74,6 @@ export interface TestRunner<
    * The endpoint being tested
    */
   endpoint: CreateApiEndpoint<
-    TExampleKey,
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,

@@ -483,7 +483,6 @@ export const translations = {
     allCharacters: "All",
   },
   selector: {
-    loading: "Loading...",
     noResults: "No results found",
     tabs: {
       quick: "Quick",
@@ -519,6 +518,7 @@ export const translations = {
     forCharacter: "for {{character}}",
     intelligence: "Intelligence",
     contentLevel: "Content Level",
+    speed: "Speed",
     any: "Any",
     result: "Result",
     bestMatch: "Best match for your settings",
@@ -596,6 +596,22 @@ export const translations = {
     editCharacterBtn: "Edit Character",
     autoSelectedModel: "Auto-selected:",
     manualSelectedModel: "Selected:",
+    characterSelectedModel: "Character's model:",
+    selectModelBelow: "Select a model below",
+    chooseYourPath: "Choose Your Path",
+    twoWaysToChat: "Two flexible ways to start chatting",
+    directModels: "Direct Model Access",
+    directModelsDesc:
+      "Configure filters or manually select from {{count}} models. Full control over AI selection.",
+    characterPresets: "Character Presets",
+    characterPresetsDesc:
+      "Pick a character below. Each has optimized settings you can customize anytime.",
+    startWithDirectModels: "Start with Direct Models",
+    orBrowsePresets: "Or browse character presets below",
+    loading: "Loading...",
+    noModelsMatch: "No models match",
+    adjustFiltersMessage:
+      "Adjust your filter criteria to find available models",
     auto: "Auto",
     manual: "Manual",
     showLess: "Show less",
@@ -617,8 +633,10 @@ export const translations = {
     modelSelection: "Model Selection",
     autoMode: "Auto",
     manualMode: "Manual",
+    characterMode: "Character",
     autoModeDescription: "Best model is selected based on your filters",
     manualModeDescription: "Choose a specific model to use",
+    characterBasedModeDescription: "Use the character's default model settings",
     customizeSettings: "Customize settings before adding",
     useNow: "Use Now",
     browseAll: "Browse all characters",
@@ -866,6 +884,13 @@ export const translations = {
     error: "Speech recognition error",
     transcript: "Transcript: {{text}}",
   },
+  // Common
+  timestamp: {
+    justNow: "just now",
+    minutesAgo: "{{count}}m ago",
+    hoursAgo: "{{count}}h ago",
+    daysAgo: "{{count}}d ago",
+  },
   publicFeed: {
     // Header
     header: {
@@ -886,14 +911,8 @@ export const translations = {
     comments: "comments",
     bestAnswer: "Best Answer",
     rising: "Rising",
-
-    // Common
-    timestamp: {
-      justNow: "just now",
-      hoursAgo: "{{count}}h ago",
-      daysAgo: "{{count}}d ago",
-    },
   },
+
   state: {
     threadNotFound: "Thread not found",
   },

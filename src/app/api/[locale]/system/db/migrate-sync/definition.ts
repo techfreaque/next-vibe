@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -43,89 +43,70 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      force: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.migrateSync.fields.force.title",
-          description: "app.api.system.db.migrateSync.fields.force.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(false),
-      ),
+      force: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.migrateSync.fields.force.title",
+        description: "app.api.system.db.migrateSync.fields.force.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.migrateSync.fields.dryRun.title",
-          description:
-            "app.api.system.db.migrateSync.fields.dryRun.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(false),
-      ),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.migrateSync.fields.dryRun.title",
+        description: "app.api.system.db.migrateSync.fields.dryRun.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrateSync.fields.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrateSync.fields.success.title",
+        schema: z.boolean(),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrateSync.fields.output.title",
-        },
-        z.string(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrateSync.fields.output.title",
+        schema: z.string(),
+      }),
 
-      trackingCleared: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrateSync.fields.trackingCleared.title",
-        },
-        z.boolean(),
-      ),
+      trackingCleared: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrateSync.fields.trackingCleared.title",
+        schema: z.boolean(),
+      }),
 
-      trackingFilesCreated: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateSync.fields.trackingFilesCreated.title",
-        },
-        z.boolean(),
-      ),
+      trackingFilesCreated: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.db.migrateSync.fields.trackingFilesCreated.title",
+        schema: z.boolean(),
+      }),
 
-      drizzleMigrationRun: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateSync.fields.drizzleMigrationRun.title",
-        },
-        z.boolean(),
-      ),
+      drizzleMigrationRun: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.db.migrateSync.fields.drizzleMigrationRun.title",
+        schema: z.boolean(),
+      }),
 
-      originalFilesRestored: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateSync.fields.originalFilesRestored.title",
-        },
-        z.boolean(),
-      ),
+      originalFilesRestored: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.db.migrateSync.fields.originalFilesRestored.title",
+        schema: z.boolean(),
+      }),
 
-      migrationsProcessed: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateSync.fields.migrationsProcessed.title",
-        },
-        z.coerce.number(),
-      ),
+      migrationsProcessed: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.db.migrateSync.fields.migrationsProcessed.title",
+        schema: z.coerce.number(),
+      }),
     },
   ),
 
@@ -186,7 +167,6 @@ const { POST } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    urlPathParams: undefined,
     requests: {
       default: {
         force: false,

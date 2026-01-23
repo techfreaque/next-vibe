@@ -4,6 +4,8 @@
  * Used by both React and CLI implementations
  */
 
+import type { ZodTypeAny } from "zod";
+
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { UnifiedField } from "../../types/endpoint";
@@ -161,7 +163,7 @@ export function getCellValue(row: TableRow, columnKey: string): WidgetData {
  * Get table configuration from field
  */
 export function getTableConfig<TKey extends string>(
-  field: UnifiedField<TKey>,
+  field: UnifiedField<TKey, ZodTypeAny>,
 ): TableRenderConfig<TKey> {
   const defaultConfig: TableRenderConfig<TKey> = {
     columns: [],
@@ -177,7 +179,7 @@ export function getTableConfig<TKey extends string>(
   const config = field.ui;
 
   const columns: TableColumn<TKey>[] =
-    config.columns?.map((col) => ({
+    config.columns?.map((col: TableColumn<TKey>) => ({
       key: col.key,
       label: col.label,
       type: FieldDataType.TEXT,

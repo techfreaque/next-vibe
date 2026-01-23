@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   requestUrlPathParamsField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -115,84 +115,72 @@ const { POST } = createEndpoint({
     { request: "data&urlPathParams", response: true },
     {
       // === URL PARAMS ===
-      threadId: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label:
-            "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.threadId.label" as const,
-          description:
-            "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.threadId.description" as const,
-        },
-        z.uuid(),
-      ),
-      messageId: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label:
-            "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.messageId.label" as const,
-          description:
-            "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.messageId.description" as const,
-        },
-        z.uuid(),
-      ),
+      threadId: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label:
+          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.threadId.label" as const,
+        description:
+          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.threadId.description" as const,
+        schema: z.uuid(),
+      }),
+      messageId: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label:
+          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.messageId.label" as const,
+        description:
+          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.messageId.description" as const,
+        schema: z.uuid(),
+      }),
 
       // === REQUEST DATA ===
-      vote: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.vote.label" as const,
-          description:
-            "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.vote.description" as const,
-          options: [
-            {
-              label:
-                "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.vote.options.upvote" as const,
-              value: "up",
-            },
-            {
-              label:
-                "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.vote.options.downvote" as const,
-              value: "down",
-            },
-            {
-              label:
-                "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.vote.options.remove" as const,
-              value: "remove",
-            },
-          ],
-        },
-        z.enum(["up", "down", "remove"]),
-      ),
+      vote: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.vote.label" as const,
+        description:
+          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.vote.description" as const,
+        options: [
+          {
+            label:
+              "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.vote.options.upvote" as const,
+            value: "up",
+          },
+          {
+            label:
+              "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.vote.options.downvote" as const,
+            value: "down",
+          },
+          {
+            label:
+              "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.vote.options.remove" as const,
+            value: "remove",
+          },
+        ],
+        schema: z.enum(["up", "down", "remove"]),
+      }),
 
       // === RESPONSE ===
-      upvotes: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.response.upvotes.content" as const,
-        },
-        z.coerce.number(),
-      ),
-      downvotes: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.response.downvotes.content" as const,
-        },
-        z.coerce.number(),
-      ),
-      userVote: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.response.userVote.content" as const,
-        },
-        z.enum(["up", "down", "none"]),
-      ),
+      upvotes: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.response.upvotes.content" as const,
+        schema: z.coerce.number(),
+      }),
+      downvotes: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.response.downvotes.content" as const,
+        schema: z.coerce.number(),
+      }),
+      userVote: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.response.userVote.content" as const,
+        schema: z.enum(["up", "down", "none"]),
+      }),
     },
   ),
 

@@ -24,13 +24,19 @@ import type {
   PrimitiveField,
   UnifiedField,
   WidgetField,
+  WidgetObjectField,
 } from "../types/endpoint";
 import { FieldUsage, type SpacingSize, WidgetType } from "../types/enums";
 import type {
+  ArrayWidgetConfig,
+  DisplayOnlyWidgetConfig,
   NavigateButtonWidgetConfig,
+  ObjectWidgetConfig,
+  RangeSliderFieldWidgetConfig,
   SubmitButtonWidgetConfig,
   WidgetConfig,
 } from "../widgets/configs";
+import type { ArrayWidgetSchema } from "../widgets/utils/schema-constraints";
 
 // ============================================================================
 // TYPE GUARDS
@@ -300,557 +306,8 @@ export function extractSchemaDefaults<T>(
 }
 
 // ============================================================================
-// FIELD BUILDER - New Pattern
-// ============================================================================
-
-/**
- * Field builder utility for creating unified fields with type-safe translation keys
- * This provides a clean API for both scoped and non-scoped routes
- *
- * @example
- * // In createEndpoint:
- * fields: (u) => u.objectField(
- *   { type: WidgetType.CONTAINER, title: "form.label", ... },
- *   { request: "data", response: true },
- *   { name: u.requestDataField(...), email: u.requestDataField(...) }
- * )
- */
-export interface FieldBuilder<TKey extends string = TranslationKey> {
-  // Primitive fields
-  field<
-    const TUIConfig extends WidgetConfig<TKey>,
-    const TSchema extends z.ZodTypeAny,
-    const TUsage extends FieldUsageConfig,
-  >(
-    schema: TSchema,
-    usage: TUsage,
-    ui: TUIConfig,
-  ): PrimitiveField<TSchema, TUsage, TKey, TUIConfig>;
-
-  requestResponseField<
-    const TUIConfig extends WidgetConfig<TKey>,
-    TSchema extends z.ZodTypeAny,
-  >(
-    ui: TUIConfig,
-    schema: TSchema,
-
-    requestAsUrlParams?: boolean,
-  ): PrimitiveField<
-    TSchema,
-    { request: "data" | "urlPathParams"; response: true },
-    TKey,
-    TUIConfig
-  >;
-
-  requestDataField<
-    const TUIConfig extends WidgetConfig<TKey>,
-    TSchema extends z.ZodTypeAny,
-  >(
-    ui: TUIConfig,
-    schema: TSchema,
-  ): PrimitiveField<TSchema, { request: "data" }, TKey, TUIConfig>;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  requestDataRangeField<
-    const TUIConfig extends WidgetConfig<TKey>,
-    TEnum extends z.ZodEnum<any>,
-  >(
-    ui: TUIConfig,
-    enumSchema: TEnum,
-  ): PrimitiveField<z.ZodTypeAny, { request: "data" }, TKey, TUIConfig>;
-
-  requestUrlPathParamsField<
-    const TUIConfig extends WidgetConfig<TKey>,
-    TSchema extends z.ZodTypeAny,
-  >(
-    ui: TUIConfig,
-    schema: TSchema,
-  ): PrimitiveField<
-    TSchema,
-    { request: "urlPathParams"; response?: never },
-    TKey,
-    TUIConfig
-  >;
-
-  responseField<
-    TSchema extends z.ZodTypeAny,
-    const TUIConfig extends WidgetConfig<TKey>,
-  >(
-    ui: TUIConfig,
-    schema: TSchema,
-  ): PrimitiveField<TSchema, { response: true }, TKey, TUIConfig>;
-
-  // Widget fields
-  widgetField<
-    TUsage extends FieldUsageConfig,
-    const TUIConfig extends WidgetConfig<TKey>,
-  >(
-    ui: TUIConfig,
-    usage: TUsage,
-  ): WidgetField<TUsage, TKey, TUIConfig>;
-
-  // Object fields
-  objectField<
-    TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
-    TUsage extends FieldUsageConfig,
-    const TUIConfig extends WidgetConfig<TKey>,
-  >(
-    ui: TUIConfig,
-    usage: TUsage,
-    children: TChildren,
-  ): ObjectField<TChildren, TUsage, TKey, TUIConfig>;
-
-  objectOptionalField<
-    C,
-    U extends FieldUsageConfig,
-    const TUIConfig extends WidgetConfig<TKey>,
-  >(
-    ui: TUIConfig,
-    usage: U,
-    children: C,
-  ): ObjectOptionalField<C, U, TKey, TUIConfig>;
-
-  objectUnionField<
-    TDiscriminator extends string,
-    TVariants extends readonly [
-      ObjectField<
-        Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
-        FieldUsageConfig,
-        TKey,
-        WidgetConfig<TKey>
-      >,
-      ...ObjectField<
-        Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
-        FieldUsageConfig,
-        TKey,
-        WidgetConfig<TKey>
-      >[],
-    ],
-    TUsage extends FieldUsageConfig,
-    const TUIConfig extends WidgetConfig<TKey>,
-  >(
-    ui: TUIConfig,
-    usage: TUsage,
-    discriminator: TDiscriminator,
-    variants: TVariants,
-  ): ObjectUnionField<TDiscriminator, TKey, TVariants, TUsage, TUIConfig>;
-
-  // Array fields
-  arrayField<Child, const TUIConfig extends WidgetConfig<TKey>>(
-    usage: FieldUsageConfig,
-    ui: TUIConfig,
-    child: Child,
-  ): ArrayField<Child, FieldUsageConfig, TKey, TUIConfig>;
-
-  requestDataArrayField<Child, const TUIConfig extends WidgetConfig<TKey>>(
-    ui: TUIConfig,
-    child: Child,
-  ): ArrayField<Child, { request: "data" }, TKey, TUIConfig>;
-
-  responseArrayField<Child, const TUIConfig extends WidgetConfig<TKey>>(
-    ui: TUIConfig,
-    child: Child,
-  ): ArrayField<Child, { response: true }, TKey, TUIConfig>;
-
-  arrayOptionalField<Child, const TUIConfig extends WidgetConfig<TKey>>(
-    usage: FieldUsageConfig,
-    ui: TUIConfig,
-    child: Child,
-  ): ArrayOptionalField<Child, FieldUsageConfig, TKey, TUIConfig>;
-
-  requestDataArrayOptionalField<
-    Child,
-    const TUIConfig extends WidgetConfig<TKey>,
-  >(
-    ui: TUIConfig,
-    child: Child,
-  ): ArrayOptionalField<Child, { request: "data" }, TKey, TUIConfig>;
-
-  responseArrayOptionalField<Child, const TUIConfig extends WidgetConfig<TKey>>(
-    ui: TUIConfig,
-    child: Child,
-  ): ArrayOptionalField<Child, { response: true }, TKey, TUIConfig>;
-}
-
-/**
- * Create a FieldBuilder instance with proper type inference for translation keys
- * This is used internally by createEndpoint to provide the `u` parameter
- */
-export function createFieldBuilder<
-  TKey extends string = TranslationKey,
->(): FieldBuilder<TKey> {
-  return {
-    field: <
-      const TUIConfig extends WidgetConfig<TKey>,
-      const TSchema extends z.ZodTypeAny,
-      const TUsage extends FieldUsageConfig,
-    >(
-      schema: TSchema,
-      usage: TUsage,
-      ui: TUIConfig,
-    ): PrimitiveField<TSchema, TUsage, TKey, TUIConfig> => ({
-      type: "primitive" as const,
-      schema,
-      usage,
-      ui,
-    }),
-
-    requestResponseField: <
-      const TUIConfig extends WidgetConfig<TKey>,
-      TSchema extends z.ZodTypeAny,
-    >(
-      ui: TUIConfig,
-      schema: TSchema,
-
-      requestAsUrlParams?: boolean,
-    ): PrimitiveField<
-      TSchema,
-      { request: "data" | "urlPathParams"; response: true },
-      TKey,
-      TUIConfig
-    > => {
-      const requestType = requestAsUrlParams ? "urlPathParams" : "data";
-      return {
-        type: "primitive" as const,
-        schema,
-        usage: { request: requestType, response: true },
-        ui,
-      };
-    },
-
-    requestDataField: <
-      const TUIConfig extends WidgetConfig<TKey>,
-      TSchema extends z.ZodTypeAny,
-    >(
-      ui: TUIConfig,
-      schema: TSchema,
-    ): PrimitiveField<TSchema, { request: "data" }, TKey, TUIConfig> => ({
-      type: "primitive" as const,
-      schema,
-      usage: { request: "data" },
-      ui,
-    }),
-
-    requestDataRangeField: <
-      const TUIConfig extends WidgetConfig<TKey>,
-      TEnum extends z.ZodEnum<any>, // eslint-disable-line @typescript-eslint/no-explicit-any
-    >(
-      ui: TUIConfig,
-      enumSchema: TEnum,
-    ): PrimitiveField<z.ZodTypeAny, { request: "data" }, TKey, TUIConfig> => {
-      const rangeSchema = z
-        .object({
-          min: enumSchema.optional(),
-          max: enumSchema.optional(),
-        })
-        .optional();
-
-      return {
-        type: "primitive" as const,
-        schema: rangeSchema,
-        usage: { request: "data" },
-        ui,
-      };
-    },
-
-    requestUrlPathParamsField: <
-      const TUIConfig extends WidgetConfig<TKey>,
-      TSchema extends z.ZodTypeAny,
-    >(
-      ui: TUIConfig,
-      schema: TSchema,
-    ): PrimitiveField<
-      TSchema,
-      { request: "urlPathParams"; response?: never },
-      TKey,
-      TUIConfig
-    > => ({
-      type: "primitive" as const,
-      schema,
-      usage: { request: "urlPathParams" },
-      ui,
-    }),
-
-    responseField: <
-      TSchema extends z.ZodTypeAny,
-      const TUIConfig extends WidgetConfig<TKey>,
-    >(
-      ui: TUIConfig,
-      schema: TSchema,
-    ): PrimitiveField<TSchema, { response: true }, TKey, TUIConfig> => ({
-      type: "primitive" as const,
-      schema,
-      usage: { response: true },
-      ui,
-    }),
-
-    widgetField: <
-      TUsage extends FieldUsageConfig,
-      const TUIConfig extends WidgetConfig<TKey>,
-    >(
-      ui: TUIConfig,
-      usage: TUsage,
-    ): WidgetField<TUsage, TKey, TUIConfig> => ({
-      type: "widget" as const,
-      usage,
-      ui,
-    }),
-
-    objectField: <
-      TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
-      TUsage extends FieldUsageConfig,
-      const TUIConfig extends WidgetConfig<TKey>,
-    >(
-      ui: TUIConfig,
-      usage: TUsage,
-      children: TChildren,
-    ): ObjectField<TChildren, TUsage, TKey, TUIConfig> => ({
-      type: "object" as const,
-      children,
-      usage,
-      ui,
-    }),
-
-    objectOptionalField: <
-      C,
-      U extends FieldUsageConfig,
-      const TUIConfig extends WidgetConfig<TKey>,
-    >(
-      ui: TUIConfig,
-      usage: U,
-      children: C,
-    ): ObjectOptionalField<C, U, TKey, TUIConfig> => ({
-      type: "object-optional" as const,
-      children,
-      usage,
-      ui,
-    }),
-
-    objectUnionField: <
-      TDiscriminator extends string,
-      TVariants extends readonly [
-        ObjectField<
-          Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
-          FieldUsageConfig,
-          TKey,
-          WidgetConfig<TKey>
-        >,
-        ...ObjectField<
-          Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
-          FieldUsageConfig,
-          TKey,
-          WidgetConfig<TKey>
-        >[],
-      ],
-      TUsage extends FieldUsageConfig,
-      const TUIConfig extends WidgetConfig<TKey>,
-    >(
-      ui: TUIConfig,
-      usage: TUsage,
-      discriminator: TDiscriminator,
-      variants: TVariants,
-    ): ObjectUnionField<
-      TDiscriminator,
-      TKey,
-      TVariants,
-      TUsage,
-      TUIConfig
-    > => ({
-      type: "object-union" as const,
-      discriminator,
-      variants,
-      usage,
-      ui,
-    }),
-
-    arrayField: <Child, const TUIConfig extends WidgetConfig<TKey>>(
-      usage: FieldUsageConfig,
-      ui: TUIConfig,
-      child: Child,
-    ): ArrayField<Child, FieldUsageConfig, TKey, TUIConfig> => ({
-      type: "array" as const,
-      child,
-      usage,
-      ui,
-    }),
-
-    requestDataArrayField: <Child, const TUIConfig extends WidgetConfig<TKey>>(
-      ui: TUIConfig,
-      child: Child,
-    ): ArrayField<Child, { request: "data" }, TKey, TUIConfig> => ({
-      type: "array" as const,
-      child,
-      usage: { request: "data" },
-      ui,
-    }),
-
-    responseArrayField: <Child, const TUIConfig extends WidgetConfig<TKey>>(
-      ui: TUIConfig,
-      child: Child,
-    ): ArrayField<Child, { response: true }, TKey, TUIConfig> => ({
-      type: "array" as const,
-      child,
-      usage: { response: true },
-      ui,
-    }),
-
-    arrayOptionalField: <Child, const TUIConfig extends WidgetConfig<TKey>>(
-      usage: FieldUsageConfig,
-      ui: TUIConfig,
-      child: Child,
-    ): ArrayOptionalField<Child, FieldUsageConfig, TKey, TUIConfig> => ({
-      type: "array-optional" as const,
-      child,
-      usage,
-      ui,
-    }),
-
-    requestDataArrayOptionalField: <
-      Child,
-      const TUIConfig extends WidgetConfig<TKey>,
-    >(
-      ui: TUIConfig,
-      child: Child,
-    ): ArrayOptionalField<Child, { request: "data" }, TKey, TUIConfig> => ({
-      type: "array-optional" as const,
-      child,
-      usage: { request: "data" },
-      ui,
-    }),
-
-    responseArrayOptionalField: <
-      Child,
-      const TUIConfig extends WidgetConfig<TKey>,
-    >(
-      ui: TUIConfig,
-      child: Child,
-    ): ArrayOptionalField<Child, { response: true }, TKey, TUIConfig> => ({
-      type: "array-optional" as const,
-      child,
-      usage: { response: true },
-      ui,
-    }),
-  };
-}
-
-// ============================================================================
 // FIELD CREATORS - Legacy Pattern (Kept for backwards compatibility)
 // ============================================================================
-
-/**
- * Create a primitive field (string, number, boolean, etc.)
- */
-export function field<
-  TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
-  const TSchema extends z.ZodTypeAny = z.ZodTypeAny,
-  const TUsage extends FieldUsageConfig = FieldUsageConfig,
->(
-  schema: TSchema,
-  usage: TUsage,
-  ui: TUIConfig,
-): PrimitiveField<TSchema, TUsage, TKey, TUIConfig> {
-  return {
-    type: "primitive" as const,
-    schema,
-    usage,
-    ui,
-  };
-}
-
-/**
- * Create a field that can be both request and response
- */
-export function requestResponseField<
-  TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
-  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
->(
-  ui: TUIConfig,
-  schema: TSchema,
-  requestAsUrlParams?: false,
-): PrimitiveField<
-  TSchema,
-  { request: "data"; response: true },
-  TKey,
-  TUIConfig
->;
-// eslint-disable-next-line no-redeclare
-export function requestResponseField<
-  TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
-  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
->(
-  ui: TUIConfig,
-  schema: TSchema,
-  requestAsUrlParams?: true,
-): PrimitiveField<
-  TSchema,
-  { request: "urlPathParams"; response: true },
-  TKey,
-  TUIConfig
->;
-// eslint-disable-next-line no-redeclare
-export function requestResponseField<
-  TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
-  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
->(
-  ui: TUIConfig,
-  schema: TSchema,
-  requestAsUrlParams?: boolean,
-): PrimitiveField<
-  TSchema,
-  { request: "data" | "urlPathParams"; response: true },
-  TKey,
-  TUIConfig
-> {
-  const requestType = requestAsUrlParams ? "urlPathParams" : "data";
-  return {
-    type: "primitive" as const,
-    schema,
-    usage: { request: requestType, response: true },
-    ui,
-  };
-}
-
-/**
- * Create a request data field
- */
-export function requestDataField<
-  TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
-  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
->(
-  ui: TUIConfig,
-  schema: TSchema,
-): PrimitiveField<TSchema, { request: "data" }, TKey, TUIConfig> {
-  return {
-    type: "primitive" as const,
-    schema,
-    usage: { request: "data" },
-    ui,
-  };
-}
-
-/**
- * Create a response field
- */
-export function responseDataField<
-  TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
-  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
->(
-  ui: TUIConfig,
-  schema: TSchema,
-): PrimitiveField<TSchema, { response: true }, TKey, TUIConfig> {
-  return {
-    type: "primitive" as const,
-    schema,
-    usage: { response: true },
-    ui,
-  };
-}
 
 /**
  * Create a request data range field (min/max)
@@ -868,25 +325,32 @@ export function responseDataField<
  * )
  */
 export function requestDataRangeField<
-  TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TEnum extends z.ZodEnum<any> = z.ZodEnum<any>,
+  TEnum extends z.ZodEnum<any>,
 >(
-  ui: TUIConfig,
-  enumSchema: TEnum,
+  config: Omit<
+    RangeSliderFieldWidgetConfig<TranslationKey, never>,
+    "schema"
+  > & {
+    schema: TEnum;
+  },
 ): PrimitiveField<
   z.ZodOptional<
     z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
   >,
   { request: "data" },
-  TKey,
-  TUIConfig
+  TranslationKey,
+  RangeSliderFieldWidgetConfig<
+    TranslationKey,
+    z.ZodOptional<
+      z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
+    >
+  >
 > {
   const rangeSchema = z
     .object({
-      min: enumSchema.optional(),
-      max: enumSchema.optional(),
+      min: config.schema.optional(),
+      max: config.schema.optional(),
     })
     .optional();
 
@@ -894,30 +358,37 @@ export function requestDataRangeField<
     type: "primitive" as const,
     schema: rangeSchema,
     usage: { request: "data" },
-    ui,
+    ui: { ...config, schema: rangeSchema },
   };
 }
 
 export function requestResponseRangeField<
-  TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TEnum extends z.ZodEnum<any> = z.ZodEnum<any>,
+  TEnum extends z.ZodEnum<any>,
 >(
-  ui: TUIConfig,
-  enumSchema: TEnum,
+  config: Omit<
+    RangeSliderFieldWidgetConfig<TranslationKey, never>,
+    "schema"
+  > & {
+    schema: TEnum;
+  },
 ): PrimitiveField<
   z.ZodOptional<
     z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
   >,
   { request: "data"; response: true },
-  TKey,
-  TUIConfig
+  TranslationKey,
+  RangeSliderFieldWidgetConfig<
+    TranslationKey,
+    z.ZodOptional<
+      z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
+    >
+  >
 > {
   const rangeSchema = z
     .object({
-      min: enumSchema.optional(),
-      max: enumSchema.optional(),
+      min: config.schema.optional(),
+      max: config.schema.optional(),
     })
     .optional();
 
@@ -925,30 +396,37 @@ export function requestResponseRangeField<
     type: "primitive" as const,
     schema: rangeSchema,
     usage: { request: "data", response: true },
-    ui,
+    ui: { ...config, schema: rangeSchema },
   };
 }
 
 export function responseRangeField<
-  TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TEnum extends z.ZodEnum<any> = z.ZodEnum<any>,
+  TEnum extends z.ZodEnum<any>,
 >(
-  ui: TUIConfig,
-  enumSchema: TEnum,
+  config: Omit<
+    RangeSliderFieldWidgetConfig<TranslationKey, never>,
+    "schema"
+  > & {
+    schema: TEnum;
+  },
 ): PrimitiveField<
   z.ZodOptional<
     z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
   >,
   { response: true },
-  TKey,
-  TUIConfig
+  TranslationKey,
+  RangeSliderFieldWidgetConfig<
+    TranslationKey,
+    z.ZodOptional<
+      z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
+    >
+  >
 > {
   const rangeSchema = z
     .object({
-      min: enumSchema.optional(),
-      max: enumSchema.optional(),
+      min: config.schema.optional(),
+      max: config.schema.optional(),
     })
     .optional();
 
@@ -956,50 +434,7 @@ export function responseRangeField<
     type: "primitive" as const,
     schema: rangeSchema,
     usage: { response: true },
-    ui,
-  };
-}
-
-/**
- * Create a request URL params field
- */
-export function requestUrlPathParamsField<
-  TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
-  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
->(
-  ui: TUIConfig,
-  schema: TSchema,
-): PrimitiveField<
-  TSchema,
-  { request: "urlPathParams"; response?: never },
-  TKey,
-  TUIConfig
-> {
-  return {
-    type: "primitive" as const,
-    schema,
-    usage: { request: "urlPathParams" },
-    ui,
-  };
-}
-
-/**
- * Create a response field
- */
-export function responseField<
-  TKey extends string = TranslationKey,
-  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
->(
-  ui: TUIConfig,
-  schema: TSchema,
-): PrimitiveField<TSchema, { response: true }, TKey, TUIConfig> {
-  return {
-    type: "primitive" as const,
-    schema,
-    usage: { response: true },
-    ui,
+    ui: config,
   };
 }
 
@@ -1007,10 +442,13 @@ export function responseField<
  * Create a widget-only field (buttons, alerts, static content)
  */
 export function widgetField<
-  TKey extends string = TranslationKey,
-  TUsage extends FieldUsageConfig = FieldUsageConfig,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
->(ui: TUIConfig, usage: TUsage): WidgetField<TUsage, TKey, TUIConfig> {
+  TUsage extends FieldUsageConfig,
+  const TUIConfig extends DisplayOnlyWidgetConfig<string> =
+    DisplayOnlyWidgetConfig<TranslationKey>,
+>(
+  ui: TUIConfig,
+  usage: TUsage,
+): WidgetField<TUsage, TranslationKey, TUIConfig> {
   return {
     type: "widget" as const,
     usage,
@@ -1023,20 +461,17 @@ export function widgetField<
  * This is like widgetField but for grouped widgets - renders based on usage pattern, not response data
  */
 export function widgetObjectField<
-  TKey extends string = TranslationKey,
-  TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>> = Record<
-    string,
-    UnifiedField<string, z.ZodTypeAny>
-  >,
-  TUsage extends FieldUsageConfig = FieldUsageConfig,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
+  TUsage extends FieldUsageConfig,
+  const TUIConfig extends ObjectWidgetConfig<string, TUsage, TChildren> =
+    ObjectWidgetConfig<TranslationKey, TUsage, TChildren>,
 >(
   ui: TUIConfig,
   usage: TUsage,
   children: TChildren,
-): ObjectField<TChildren, TUsage, TKey, TUIConfig> {
+): WidgetObjectField<TChildren, TUsage, TranslationKey, TUIConfig> {
   return {
-    type: "object" as const,
+    type: "widget-object" as const,
     children,
     usage,
     ui,
@@ -1050,18 +485,15 @@ export function widgetObjectField<
  * For scoped translations, use scopedObjectField<ScopedKeyType> instead.
  */
 export function objectField<
-  TKey extends string = TranslationKey,
-  TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>> = Record<
-    string,
-    UnifiedField<string, z.ZodTypeAny>
-  >,
-  TUsage extends FieldUsageConfig = FieldUsageConfig,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
+  TUsage extends FieldUsageConfig,
+  const TUIConfig extends ObjectWidgetConfig<string, TUsage, TChildren> =
+    ObjectWidgetConfig<TranslationKey, TUsage, TChildren>,
 >(
   ui: TUIConfig,
   usage: TUsage,
   children: TChildren,
-): ObjectField<TChildren, TUsage, TKey, TUIConfig> {
+): ObjectField<TChildren, TUsage, TranslationKey, TUIConfig> {
   return {
     type: "object" as const,
     children,
@@ -1086,19 +518,19 @@ interface ScopedTranslationType<TKey extends string = string> {
  *   scopedTranslation,
  *   { type: WidgetType.CONTAINER, title: "form.label", ... },
  *   { request: "data", response: true },
- *   { name: scopedRequestDataField(scopedTranslation, { label: "form.name.label", ... }, z.string()) }
+ *   { name: scopedRequestField(scopedTranslation, { label: "form.name.label", ... }, z.string()) }
  * )
  */
 export function scopedObjectField<
   TScopedTranslation extends ScopedTranslationType,
-  TChildren extends Record<
-    string,
-    UnifiedField<TScopedTranslation["ScopedTranslationKey"], z.ZodTypeAny>
-  >,
+  TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
   TUsage extends FieldUsageConfig,
-  const TUIConfig extends WidgetConfig<
-    TScopedTranslation["ScopedTranslationKey"]
-  >,
+  const TUIConfig extends ObjectWidgetConfig<string, TUsage, TChildren> =
+    ObjectWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      TUsage,
+      TChildren
+    >,
 >(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
   _scopedTranslation: TScopedTranslation,
@@ -1120,79 +552,31 @@ export function scopedObjectField<
 }
 
 /**
- * Create a request data field for scoped translations with full type checking.
- */
-export function scopedRequestDataField<
-  TScopedTranslation extends ScopedTranslationType,
-  const TUIConfig extends WidgetConfig<
-    TScopedTranslation["ScopedTranslationKey"]
-  >,
-  TSchema extends z.ZodTypeAny,
->(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
-  _scopedTranslation: TScopedTranslation,
-  ui: TUIConfig,
-  schema: TSchema,
-): PrimitiveField<
-  TSchema,
-  { request: "data" },
-  TScopedTranslation["ScopedTranslationKey"],
-  TUIConfig
-> {
-  return {
-    type: "primitive" as const,
-    schema,
-    usage: { request: "data" },
-    ui,
-  };
-}
-
-/**
- * Create a response field for scoped translations with full type checking.
- */
-export function scopedResponseField<
-  TScopedTranslation extends ScopedTranslationType,
-  TSchema extends z.ZodTypeAny,
-  const TUIConfig extends WidgetConfig<
-    TScopedTranslation["ScopedTranslationKey"]
-  >,
->(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
-  _scopedTranslation: TScopedTranslation,
-  ui: TUIConfig,
-  schema: TSchema,
-): PrimitiveField<
-  TSchema,
-  { response: true },
-  TScopedTranslation["ScopedTranslationKey"],
-  TUIConfig
-> {
-  return {
-    type: "primitive" as const,
-    schema,
-    usage: { response: true },
-    ui,
-  };
-}
-
-/**
  * Create a response array optional field for scoped translations with full type checking.
  */
 export function scopedResponseArrayOptionalField<
   TScopedTranslation extends ScopedTranslationType,
-  Child,
-  const TUIConfig extends WidgetConfig<
-    TScopedTranslation["ScopedTranslationKey"]
+  TChild extends UnifiedField<string, z.ZodTypeAny>,
+  TSchema extends z.ZodTypeAny,
+  const TUIConfig extends ArrayWidgetConfig<
+    string,
+    { response: true },
+    TChild
+  > = ArrayWidgetConfig<
+    TScopedTranslation["ScopedTranslationKey"],
+    { response: true },
+    TChild
   >,
 >(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
   _scopedTranslation: TScopedTranslation,
   ui: TUIConfig,
-  child: Child,
+  child: TChild,
 ): ArrayOptionalField<
-  Child,
+  TChild,
   { response: true },
   TScopedTranslation["ScopedTranslationKey"],
+  TSchema,
   TUIConfig
 > {
   return {
@@ -1207,14 +591,16 @@ export function scopedResponseArrayOptionalField<
  * Create an array field containing repeated items
  */
 export function arrayField<
-  Child,
-  const TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  TChild extends UnifiedField<string, z.ZodTypeAny>,
+  TUsage extends FieldUsageConfig,
+  TSchema extends ArrayWidgetSchema,
+  const TUIConfig extends ArrayWidgetConfig<string, TUsage, TChild> =
+    ArrayWidgetConfig<TranslationKey, TUsage, TChild>,
 >(
-  usage: FieldUsageConfig,
+  usage: TUsage,
   ui: TUIConfig,
-  child: Child,
-): ArrayField<Child, FieldUsageConfig, TKey, TUIConfig> {
+  child: TChild,
+): ArrayField<TChild, TUsage, TranslationKey, TSchema, TUIConfig> {
   return {
     type: "array" as const,
     child,
@@ -1227,13 +613,17 @@ export function arrayField<
  * Create a request array field
  */
 export function requestDataArrayField<
-  Child,
-  const TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  TChild extends UnifiedField<string, z.ZodTypeAny>,
+  TSchema extends ArrayWidgetSchema,
+  const TUIConfig extends ArrayWidgetConfig<
+    string,
+    { request: "data" },
+    TChild
+  > = ArrayWidgetConfig<TranslationKey, { request: "data" }, TChild>,
 >(
   ui: TUIConfig,
-  child: Child,
-): ArrayField<Child, { request: "data" }, TKey, TUIConfig> {
+  child: TChild,
+): ArrayField<TChild, { request: "data" }, TranslationKey, TSchema, TUIConfig> {
   return {
     type: "array" as const,
     child,
@@ -1246,13 +636,17 @@ export function requestDataArrayField<
  * Create a response array field
  */
 export function responseArrayField<
-  Child,
-  const TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  TChild extends UnifiedField<string, z.ZodTypeAny>,
+  TSchema extends ArrayWidgetSchema,
+  const TUIConfig extends ArrayWidgetConfig<
+    string,
+    { response: true },
+    TChild
+  > = ArrayWidgetConfig<TranslationKey, { response: true }, TChild>,
 >(
   ui: TUIConfig,
-  child: Child,
-): ArrayField<Child, { response: true }, TKey, TUIConfig> {
+  child: TChild,
+): ArrayField<TChild, { response: true }, TranslationKey, TSchema, TUIConfig> {
   return {
     type: "array" as const,
     child,
@@ -1265,15 +659,25 @@ export function responseArrayField<
  * Create an optional object field
  */
 export function objectOptionalField<
-  C,
-  U extends FieldUsageConfig = FieldUsageConfig,
-  const TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  TChild extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
+  TFieldUsageConfig extends FieldUsageConfig,
+  TSchema extends z.ZodObject<z.ZodRawShape>,
+  const TUIConfig extends ObjectWidgetConfig<
+    string,
+    TFieldUsageConfig,
+    TChild
+  > = ObjectWidgetConfig<TranslationKey, TFieldUsageConfig, TChild>,
 >(
   ui: TUIConfig,
-  usage: U,
-  children: C,
-): ObjectOptionalField<C, U, TKey, TUIConfig> {
+  usage: TFieldUsageConfig,
+  children: TChild,
+): ObjectOptionalField<
+  TChild,
+  TFieldUsageConfig,
+  TranslationKey,
+  TSchema,
+  TUIConfig
+> {
   return {
     type: "object-optional" as const,
     children,
@@ -1289,27 +693,43 @@ export function objectUnionField<
   TDiscriminator extends string,
   TVariants extends readonly [
     ObjectField<
-      Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+      Record<string, UnifiedField<string, z.ZodTypeAny>>,
       FieldUsageConfig,
-      TKey,
-      WidgetConfig<TKey>
+      string,
+      ObjectWidgetConfig<
+        string,
+        FieldUsageConfig,
+        Record<string, UnifiedField<string, z.ZodTypeAny>>
+      >
     >,
     ...ObjectField<
-      Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+      Record<string, UnifiedField<string, z.ZodTypeAny>>,
       FieldUsageConfig,
-      TKey,
-      WidgetConfig<TKey>
+      string,
+      ObjectWidgetConfig<
+        string,
+        FieldUsageConfig,
+        Record<string, UnifiedField<string, z.ZodTypeAny>>
+      >
     >[],
   ],
-  TUsage extends FieldUsageConfig = FieldUsageConfig,
-  const TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  TUsage extends FieldUsageConfig,
+  TSchema extends z.ZodTypeAny,
+  const TUIConfig extends ObjectWidgetConfig<string, TUsage, TVariants> =
+    ObjectWidgetConfig<TranslationKey, TUsage, TVariants>,
 >(
   ui: TUIConfig,
   usage: TUsage,
   discriminator: TDiscriminator,
   variants: TVariants,
-): ObjectUnionField<TDiscriminator, TKey, TVariants, TUsage, TUIConfig> {
+): ObjectUnionField<
+  TDiscriminator,
+  TranslationKey,
+  TVariants,
+  TUsage,
+  TSchema,
+  TUIConfig
+> {
   return {
     type: "object-union" as const,
     discriminator,
@@ -1323,14 +743,16 @@ export function objectUnionField<
  * Create an optional array field
  */
 export function arrayOptionalField<
-  Child,
-  const TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  TChild extends UnifiedField<string, z.ZodTypeAny>,
+  TUsage extends FieldUsageConfig,
+  TSchema extends ArrayWidgetSchema,
+  const TUIConfig extends ArrayWidgetConfig<string, TUsage, TChild> =
+    ArrayWidgetConfig<TranslationKey, TUsage, TChild>,
 >(
-  usage: FieldUsageConfig,
+  usage: TUsage,
   ui: TUIConfig,
-  child: Child,
-): ArrayOptionalField<Child, FieldUsageConfig, TKey, TUIConfig> {
+  child: TChild,
+): ArrayOptionalField<TChild, TUsage, TranslationKey, TSchema, TUIConfig> {
   return {
     type: "array-optional" as const,
     child,
@@ -1343,13 +765,23 @@ export function arrayOptionalField<
  * Create an optional request array field
  */
 export function requestDataArrayOptionalField<
-  Child,
-  const TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  TChild extends UnifiedField<string, z.ZodTypeAny>,
+  TSchema extends ArrayWidgetSchema,
+  const TUIConfig extends ArrayWidgetConfig<
+    string,
+    { request: "data" },
+    TChild
+  > = ArrayWidgetConfig<TranslationKey, { request: "data" }, TChild>,
 >(
   ui: TUIConfig,
-  child: Child,
-): ArrayOptionalField<Child, { request: "data" }, TKey, TUIConfig> {
+  child: TChild,
+): ArrayOptionalField<
+  TChild,
+  { request: "data" },
+  TranslationKey,
+  TSchema,
+  TUIConfig
+> {
   return {
     type: "array-optional" as const,
     child,
@@ -1362,13 +794,23 @@ export function requestDataArrayOptionalField<
  * Create an optional response array field
  */
 export function responseArrayOptionalField<
-  Child,
-  const TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  TChild extends UnifiedField<string, z.ZodTypeAny>,
+  TSchema extends ArrayWidgetSchema,
+  const TUIConfig extends ArrayWidgetConfig<
+    string,
+    { response: true },
+    TChild
+  > = ArrayWidgetConfig<TranslationKey, { response: true }, TChild>,
 >(
   ui: TUIConfig,
-  child: Child,
-): ArrayOptionalField<Child, { response: true }, TKey, TUIConfig> {
+  child: TChild,
+): ArrayOptionalField<
+  TChild,
+  { response: true },
+  TranslationKey,
+  TSchema,
+  TUIConfig
+> {
   return {
     type: "array-optional" as const,
     child,
@@ -1463,24 +905,39 @@ type MakeOptional<T, IsOptional extends boolean> = IsOptional extends true
 export type InferUnionType<
   TTranslatedKey extends string,
   TVariants extends readonly ObjectField<
-    Record<string, UnifiedField<TTranslatedKey, z.ZodTypeAny>>,
+    Record<string, UnifiedField<string, z.ZodTypeAny>>,
     FieldUsageConfig,
-    TTranslatedKey,
-    WidgetConfig<TTranslatedKey>
+    string,
+    WidgetConfig<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      Record<string, UnifiedField<string, z.ZodTypeAny>>
+    >
   >[],
   Usage extends FieldUsage,
 > = TVariants extends readonly [infer Head, ...infer Tail]
   ? Head extends ObjectField<
-      Record<string, UnifiedField<TTranslatedKey, z.ZodTypeAny>>,
+      Record<string, UnifiedField<string, z.ZodTypeAny>>,
       FieldUsageConfig,
-      TTranslatedKey,
-      WidgetConfig<TTranslatedKey>
+      string,
+      WidgetConfig<
+        string,
+        z.ZodTypeAny,
+        FieldUsageConfig,
+        Record<string, UnifiedField<string, z.ZodTypeAny>>
+      >
     >
     ? Tail extends ObjectField<
-        Record<string, UnifiedField<TTranslatedKey, z.ZodTypeAny>>,
+        Record<string, UnifiedField<string, z.ZodTypeAny>>,
         FieldUsageConfig,
-        TTranslatedKey,
-        WidgetConfig<TTranslatedKey>
+        string,
+        WidgetConfig<
+          string,
+          z.ZodTypeAny,
+          FieldUsageConfig,
+          Record<string, UnifiedField<string, z.ZodTypeAny>>
+        >
       >[]
       ?
           | InferFieldType<Head, Usage, TTranslatedKey>
@@ -1544,10 +1001,15 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
               usage: infer U;
             }
           ? TVariants extends readonly ObjectField<
-              Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+              Record<string, UnifiedField<string, z.ZodTypeAny>>,
               FieldUsageConfig,
-              TKey,
-              WidgetConfig<TKey>
+              string,
+              WidgetConfig<
+                string,
+                z.ZodTypeAny,
+                FieldUsageConfig,
+                Record<string, UnifiedField<string, z.ZodTypeAny>>
+              >
             >[]
             ? Usage extends FieldUsage.ResponseData
               ? HasResponseUsage<U> extends true
@@ -1679,6 +1141,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     type:
       | "primitive"
       | "widget"
+      | "widget-object"
       | "object"
       | "object-optional"
       | "object-union"
@@ -1693,9 +1156,19 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       Record<string, UnifiedField<string, z.ZodTypeAny>>,
       FieldUsageConfig,
       string,
-      WidgetConfig<string>
+      WidgetConfig<
+        string,
+        z.ZodTypeAny,
+        FieldUsageConfig,
+        Record<string, UnifiedField<string, z.ZodTypeAny>>
+      >
     >[];
-    ui?: WidgetConfig<string>;
+    ui?: WidgetConfig<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      Record<string, UnifiedField<string, z.ZodTypeAny>>
+    >;
   }
 
   const typedField = field as F & FieldWithType;
@@ -2070,23 +1543,23 @@ export function generateResponseSchema<F>(
 export function navigateButtonField<
   TTargetEndpoint extends CreateApiEndpointAny,
   TGetEndpoint extends CreateApiEndpointAny | undefined = undefined,
-  TKey extends string = TranslationKey,
 >(
-  config: NavigateButtonConfig<TTargetEndpoint, TGetEndpoint, TKey>,
+  config: NavigateButtonConfig<TTargetEndpoint, TGetEndpoint, TranslationKey>,
 ): WidgetField<
   { response: true },
-  TKey,
-  NavigateButtonWidgetConfig<TTargetEndpoint, TGetEndpoint, TKey>
+  TranslationKey,
+  NavigateButtonWidgetConfig<TTargetEndpoint, TGetEndpoint, TranslationKey>
 > {
   const widgetConfig: NavigateButtonWidgetConfig<
     TTargetEndpoint,
     TGetEndpoint,
-    TKey
+    TranslationKey
   > = {
     type: WidgetType.NAVIGATE_BUTTON,
     label: config.label,
     icon: config.icon,
     variant: config.variant,
+    size: config.size,
     className: config.className,
     // Store navigation config in metadata for widget access
     metadata: {
@@ -2094,6 +1567,8 @@ export function navigateButtonField<
       extractParams: config.extractParams,
       prefillFromGet: config.prefillFromGet,
       getEndpoint: config.getEndpoint,
+      renderInModal: config.renderInModal,
+      popNavigationOnSuccess: config.popNavigationOnSuccess,
     },
   };
 
@@ -2123,50 +1598,65 @@ export function navigateButtonField<
 export function editButton<
   TTargetEndpoint extends CreateApiEndpointAny,
   TGetEndpoint extends CreateApiEndpointAny | undefined = undefined,
-  TKey extends string = TranslationKey,
 >(
-  config: NavigateButtonConfig<TTargetEndpoint, TGetEndpoint, TKey> & {
+  config: NavigateButtonConfig<
+    TTargetEndpoint,
+    TGetEndpoint,
+    TranslationKey
+  > & {
     getEndpoint?: TGetEndpoint;
   },
 ): WidgetField<
   { response: true },
-  TKey,
-  NavigateButtonWidgetConfig<TTargetEndpoint, TGetEndpoint, TKey>
+  TranslationKey,
+  NavigateButtonWidgetConfig<TTargetEndpoint, TGetEndpoint, TranslationKey>
 > {
-  return navigateButtonField<TTargetEndpoint, TGetEndpoint, TKey>({
+  return navigateButtonField<TTargetEndpoint, TGetEndpoint>({
     ...config,
     prefillFromGet: true,
   });
 }
 
 /**
- * Convenience helper for creating a delete button that navigates to a delete endpoint
+ * Convenience helper for creating a delete button that opens DELETE endpoint in a modal popover
+ * The back button closes the modal instead of navigating back
+ * On successful deletion, optionally pops the navigation stack N times
  *
- * @template TSourceData - The data available in the source context
- * @template TTargetEndpoint - The delete endpoint to navigate to
+ * @template TTargetEndpoint - The delete endpoint to use
  * @template TKey - Translation key type
  *
- * @example
+ * @example Delete from list (stays on list)
  * ```typescript
  * deleteButton: deleteButton({
  *   targetEndpoint: favoriteDeleteEndpoint,
- *   extractParams: (favorite) => ({ id: favorite.id })
+ *   extractParams: (favorite) => ({ urlPathParams: { id: favorite.id } })
+ * })
+ * ```
+ *
+ * @example Delete from details page (navigate back to list)
+ * ```typescript
+ * deleteButton: deleteButton({
+ *   targetEndpoint: favoriteDeleteEndpoint,
+ *   extractParams: (data) => ({ urlPathParams: { id: data.id } }),
+ *   popNavigationOnSuccess: 1 // Pop once to go back to list
  * })
  * ```
  */
-export function deleteButton<
-  TTargetEndpoint extends CreateApiEndpointAny,
-  TKey extends string = TranslationKey,
->(
-  config: NavigateButtonConfig<TTargetEndpoint, undefined, TKey>,
+export function deleteButton<TTargetEndpoint extends CreateApiEndpointAny>(
+  config: NavigateButtonConfig<TTargetEndpoint, undefined, TranslationKey> & {
+    popNavigationOnSuccess?: number;
+  },
 ): WidgetField<
   { response: true },
-  TKey,
-  NavigateButtonWidgetConfig<TTargetEndpoint, undefined, TKey>
+  TranslationKey,
+  NavigateButtonWidgetConfig<TTargetEndpoint, undefined, TranslationKey>
 > {
-  return navigateButtonField<TTargetEndpoint, undefined, TKey>({
+  return navigateButtonField<TTargetEndpoint, undefined>({
     ...config,
-    prefillFromGet: false,
+    renderInModal: true,
+    icon: config.icon ?? "trash",
+    variant: config.variant ?? "destructive",
+    popNavigationOnSuccess: config.popNavigationOnSuccess,
   });
 }
 
@@ -2181,15 +1671,15 @@ export function deleteButton<
  * backButton: backButton({ label: "back_to_list" })
  * ```
  */
-export function backButton<TKey extends string = TranslationKey>(
+export function backButton(
   config?: Pick<
-    NavigateButtonConfig<never, never, TKey>,
-    "label" | "icon" | "variant" | "className"
+    NavigateButtonConfig<never, never, TranslationKey>,
+    "label" | "icon" | "variant" | "size" | "className"
   >,
 ): WidgetField<
   { response: true },
-  TKey,
-  NavigateButtonWidgetConfig<null, undefined, TKey>
+  TranslationKey,
+  NavigateButtonWidgetConfig<null, undefined, TranslationKey>
 > {
   return {
     type: "widget" as const,
@@ -2199,6 +1689,7 @@ export function backButton<TKey extends string = TranslationKey>(
       label: config?.label,
       icon: config?.icon ?? "arrow-left",
       variant: config?.variant,
+      size: config?.size,
       className: config?.className,
       // targetEndpoint: null signals back navigation
       metadata: {
@@ -2225,9 +1716,9 @@ export function backButton<TKey extends string = TranslationKey>(
  * })
  * ```
  */
-export function submitButton<TKey extends string = TranslationKey>(config: {
-  label?: TKey;
-  loadingText?: TKey;
+export function submitButton(config: {
+  label?: TranslationKey;
+  loadingText?: TranslationKey;
   icon?: IconKey;
   variant?:
     | "default"
@@ -2241,7 +1732,11 @@ export function submitButton<TKey extends string = TranslationKey>(config: {
   iconSize?: "xs" | "sm" | "base" | "lg";
   iconSpacing?: SpacingSize;
   className?: string;
-}): WidgetField<{ request: "data" }, TKey, SubmitButtonWidgetConfig<TKey>> {
+}): WidgetField<
+  { request: "data" },
+  TranslationKey,
+  SubmitButtonWidgetConfig<TranslationKey>
+> {
   return {
     type: "widget" as const,
     usage: { request: "data" },

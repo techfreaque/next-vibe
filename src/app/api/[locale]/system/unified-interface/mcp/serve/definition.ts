@@ -9,7 +9,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -48,14 +48,12 @@ const { POST } = createEndpoint({
     },
     { response: true },
     {
-      status: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.mcp.serve.post.response.title",
-        },
-        z.string(),
-      ),
+      status: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.mcp.serve.post.response.title",
+        schema: z.string(),
+      }),
     },
   ),
 

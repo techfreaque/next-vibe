@@ -45,21 +45,18 @@ type ExampleEntry<T> = [string, T];
  * });
  */
 export function testEndpoint<
-  TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
   TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
 >(
   endpoint: CreateApiEndpoint<
-    TExampleKey,
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
     TFields
   >,
   options: TestEndpointOptions<
-    TExampleKey,
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
@@ -71,7 +68,6 @@ export function testEndpoint<
   describe(`API: ${endpoint.method} ${endpoint.path.join("/")}`, () => {
     // Create a test runner that can be reused
     const testRunner: TestRunner<
-      TExampleKey,
       TMethod,
       TUserRoleValue,
       TScopedTranslationKey,
@@ -80,7 +76,6 @@ export function testEndpoint<
       endpoint,
       executeWith: async ({ data, urlPathParams, user }) => {
         return await sendTestRequest<
-          TExampleKey,
           TMethod,
           TUserRoleValue,
           TScopedTranslationKey,

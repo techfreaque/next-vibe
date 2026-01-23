@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -58,263 +58,225 @@ const { GET } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      period: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.period.title",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.period.description",
-          options: [
-            {
-              value: "hour",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.period.hour",
-            },
-            {
-              value: "day",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.period.day",
-            },
-            {
-              value: "week",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.period.week",
-            },
-            {
-              value: "month",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.period.month",
-            },
-          ],
-          columns: 3,
-        },
-        statsPeriodSchema.default("day"),
-      ),
+      period: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.period.title",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.period.description",
+        options: [
+          {
+            value: "hour",
+            label:
+              "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.period.hour",
+          },
+          {
+            value: "day",
+            label:
+              "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.period.day",
+          },
+          {
+            value: "week",
+            label:
+              "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.period.week",
+          },
+          {
+            value: "month",
+            label:
+              "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.period.month",
+          },
+        ],
+        columns: 3,
+        schema: statsPeriodSchema.default("day"),
+      }),
 
-      type: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.type.title",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.type.description",
-          options: [
-            {
-              value: "overview",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.type.overview",
-            },
-            {
-              value: "performance",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.type.performance",
-            },
-            {
-              value: "errors",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.type.errors",
-            },
-            {
-              value: "trends",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.type.trends",
-            },
-          ],
-          columns: 3,
-        },
-        statsTypeSchema.default("overview"),
-      ),
+      type: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.type.title",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.type.description",
+        options: [
+          {
+            value: "overview",
+            label:
+              "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.type.overview",
+          },
+          {
+            value: "performance",
+            label:
+              "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.type.performance",
+          },
+          {
+            value: "errors",
+            label:
+              "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.type.errors",
+          },
+          {
+            value: "trends",
+            label:
+              "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.type.trends",
+          },
+        ],
+        columns: 3,
+        schema: statsTypeSchema.default("overview"),
+      }),
 
-      taskId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskId.title",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskId.description",
-          columns: 3,
-        },
-        z.string().optional(),
-      ),
+      taskId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskId.title",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskId.description",
+        columns: 3,
+        schema: z.string().optional(),
+      }),
 
-      limit: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.limit.title",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.limit.description",
-          columns: 3,
-        },
-        z.coerce.number().optional().default(100),
-      ),
+      limit: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.limit.title",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.limit.description",
+        columns: 3,
+        schema: z.coerce.number().optional().default(100),
+      }),
 
       // Additional filter fields
-      timePeriod: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.timePeriod.title",
-          columns: 3,
-        },
-        z.string().optional(),
-      ),
+      timePeriod: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.timePeriod.title",
+        columns: 3,
+        schema: z.string().optional(),
+      }),
 
-      dateRangePreset: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.dateRangePreset.title",
-          columns: 3,
-        },
-        z.string().optional(),
-      ),
+      dateRangePreset: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.dateRangePreset.title",
+        columns: 3,
+        schema: z.string().optional(),
+      }),
 
-      taskName: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskName.title",
-          columns: 3,
-        },
-        z.string().optional(),
-      ),
+      taskName: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskName.title",
+        columns: 3,
+        schema: z.string().optional(),
+      }),
 
-      taskStatus: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskStatus.title",
-          columns: 3,
-        },
-        z.string().optional(),
-      ),
+      taskStatus: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskStatus.title",
+        columns: 3,
+        schema: z.string().optional(),
+      }),
 
-      taskPriority: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskPriority.title",
-          columns: 3,
-        },
-        z.string().optional(),
-      ),
+      taskPriority: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskPriority.title",
+        columns: 3,
+        schema: z.string().optional(),
+      }),
 
-      healthStatus: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.healthStatus.title",
-          columns: 3,
-        },
-        z.string().optional(),
-      ),
+      healthStatus: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.healthStatus.title",
+        columns: 3,
+        schema: z.string().optional(),
+      }),
 
-      minDuration: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.minDuration.title",
-          columns: 3,
-        },
-        z.coerce.number().optional(),
-      ),
+      minDuration: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.minDuration.title",
+        columns: 3,
+        schema: z.coerce.number().optional(),
+      }),
 
-      maxDuration: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.maxDuration.title",
-          columns: 3,
-        },
-        z.coerce.number().optional(),
-      ),
+      maxDuration: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.maxDuration.title",
+        columns: 3,
+        schema: z.coerce.number().optional(),
+      }),
 
-      includeDisabled: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.includeDisabled.title",
-          columns: 3,
-        },
-        z.boolean().optional(),
-      ),
+      includeDisabled: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.includeDisabled.title",
+        columns: 3,
+        schema: z.boolean().optional(),
+      }),
 
-      includeSystemTasks: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.includeSystemTasks.title",
-          columns: 3,
-        },
-        z.boolean().optional(),
-      ),
+      includeSystemTasks: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.includeSystemTasks.title",
+        columns: 3,
+        schema: z.boolean().optional(),
+      }),
 
-      hasRecentFailures: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.hasRecentFailures.title",
-          columns: 3,
-        },
-        z.boolean().optional(),
-      ),
+      hasRecentFailures: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.hasRecentFailures.title",
+        columns: 3,
+        schema: z.boolean().optional(),
+      }),
 
-      hasTimeout: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.hasTimeout.title",
-          columns: 3,
-        },
-        z.boolean().optional(),
-      ),
+      hasTimeout: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.hasTimeout.title",
+        columns: 3,
+        schema: z.boolean().optional(),
+      }),
 
-      search: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.search.title",
-          columns: 12,
-        },
-        z.string().optional(),
-      ),
+      search: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.search.title",
+        columns: 12,
+        schema: z.string().optional(),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.success.title",
+        schema: z.boolean(),
+      }),
 
-      data: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.data.title",
-        },
-        z.object({
+      data: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.data.title",
+        schema: z.object({
           // Basic stats fields
           totalTasks: z.coerce.number(),
           executedTasks: z.coerce.number(),
@@ -475,7 +437,7 @@ const { GET } = createEndpoint({
             )
             .optional(),
         }),
-      ),
+      }),
     },
   ),
 

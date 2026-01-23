@@ -68,6 +68,8 @@ export type ButtonSize = VariantProps<typeof buttonVariants>["size"];
 
 export interface ButtonMouseEvent {
   stopPropagation: () => void;
+  clientX?: number;
+  clientY?: number;
 }
 
 export type ButtonProps = {
@@ -106,9 +108,21 @@ export function Button({
   asChild = false,
   suppressHydrationWarning = false,
   onClick,
+  onMouseEnter,
+  onMouseLeave,
   ...props
 }: ButtonProps): JSX.Element {
   const Comp = asChild ? Slot : "button";
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
+    if (onClick) {
+      onClick({
+        stopPropagation: () => e.stopPropagation(),
+        clientX: e.clientX,
+        clientY: e.clientY,
+      });
+    }
+  };
   return (
     <Comp
       {...(suppressHydrationWarning ? { suppressHydrationWarning: true } : {})}
@@ -117,7 +131,9 @@ export function Button({
         "cursor-pointer",
       )}
       style={style}
-      onClick={onClick}
+      {...(onClick ? { onClick: handleClick } : {})}
+      {...(onMouseEnter ? { onMouseEnter } : {})}
+      {...(onMouseLeave ? { onMouseLeave } : {})}
       {...props}
     />
   );

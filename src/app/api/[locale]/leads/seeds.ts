@@ -184,7 +184,6 @@ const SAMPLE_STATUSES = [
   LeadStatus.WEBSITE_USER,
   LeadStatus.NEWSLETTER_SUBSCRIBER,
   LeadStatus.SIGNED_UP,
-  LeadStatus.CONSULTATION_BOOKED,
   LeadStatus.SUBSCRIPTION_CONFIRMED,
   LeadStatus.UNSUBSCRIBED,
   LeadStatus.BOUNCED,
@@ -309,8 +308,6 @@ function getOpenRateByStatus(
       return 0.55;
     case LeadStatus.SIGNED_UP:
       return 0.85;
-    case LeadStatus.CONSULTATION_BOOKED:
-      return 0.9;
     case LeadStatus.SUBSCRIPTION_CONFIRMED:
       return 0.95;
     case LeadStatus.UNSUBSCRIBED:
@@ -343,8 +340,6 @@ function getClickRateByStatus(
       return 0.25;
     case LeadStatus.SIGNED_UP:
       return 0.45;
-    case LeadStatus.CONSULTATION_BOOKED:
-      return 0.5;
     case LeadStatus.SUBSCRIPTION_CONFIRMED:
       return 0.6;
     case LeadStatus.UNSUBSCRIBED:
@@ -423,15 +418,8 @@ function generateRandomLead(index: number): NewLead {
   // Status-specific timestamps
   const signedUpAt =
     status === LeadStatus.SIGNED_UP ||
-    status === LeadStatus.CONSULTATION_BOOKED ||
     status === LeadStatus.SUBSCRIPTION_CONFIRMED
       ? getRandomPastDate(60)
-      : null;
-
-  const consultationBookedAt =
-    status === LeadStatus.CONSULTATION_BOOKED ||
-    status === LeadStatus.SUBSCRIPTION_CONFIRMED
-      ? getRandomPastDate(30)
       : null;
 
   const subscriptionConfirmedAt =
@@ -464,7 +452,6 @@ function generateRandomLead(index: number): NewLead {
     lastEmailSentAt,
     unsubscribedAt,
     signedUpAt,
-    consultationBookedAt,
     subscriptionConfirmedAt,
     bouncedAt,
     invalidAt,
@@ -734,7 +721,6 @@ export async function test(logger: EndpointLogger): Promise<void> {
       emailsOpened: 7,
       emailsClicked: 5,
       signedUpAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
-      consultationBookedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
       subscriptionConfirmedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
       lastEngagementAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
       metadata: {

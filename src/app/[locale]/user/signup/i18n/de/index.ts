@@ -1,6 +1,10 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  errors: {
+    failedToLoadBrowserIdentity:
+      "Browseridentität konnte nicht geladen werden. Bitte aktualisieren Sie die Seite.",
+  },
   meta: {
     title: "Registrieren - {{appName}}",
     description:

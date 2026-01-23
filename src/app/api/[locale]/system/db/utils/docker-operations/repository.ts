@@ -318,7 +318,7 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
               error += "\n";
             } else {
               // Show this error line and capture it
-              logger.error(line);
+              process.stderr.write(line);
               error += line;
               error += "\n";
             }

@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,43 +50,37 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      reqid: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.browser.get-network-request.form.fields.reqid.label",
-          description:
-            "app.api.browser.get-network-request.form.fields.reqid.description",
-          placeholder:
-            "app.api.browser.get-network-request.form.fields.reqid.placeholder",
-          columns: 6,
-        },
-        z
+      reqid: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.browser.get-network-request.form.fields.reqid.label",
+        description:
+          "app.api.browser.get-network-request.form.fields.reqid.description",
+        placeholder:
+          "app.api.browser.get-network-request.form.fields.reqid.placeholder",
+        columns: 6,
+        schema: z
           .number()
           .optional()
           .describe(
             "The reqid of the network request. If omitted returns the currently selected request in the DevTools Network panel.",
           ),
-      ),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.get-network-request.response.success",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.get-network-request.response.success",
+        schema: z
           .boolean()
           .describe(
             "Whether the network request retrieval operation succeeded",
           ),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.get-network-request.response.result",
-        },
-        z
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.get-network-request.response.result",
+        schema: z
           .object({
             found: z.boolean().describe("Whether the request was found"),
             request: z
@@ -104,21 +98,23 @@ const { POST } = createEndpoint({
           })
           .optional()
           .describe("Result of the network request retrieval"),
-      ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.get-network-request.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.get-network-request.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      }),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.get-network-request.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.get-network-request.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -140,7 +136,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

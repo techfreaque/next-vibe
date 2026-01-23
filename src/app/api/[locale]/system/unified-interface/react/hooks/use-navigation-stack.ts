@@ -27,6 +27,9 @@ interface NavigationStackStore {
     },
     prefillFromGet?: boolean,
     getEndpoint?: CreateApiEndpointAny,
+    renderInModal?: boolean,
+    popNavigationOnSuccess?: number,
+    modalPosition?: { x: number; y: number },
   ) => void;
 
   /**
@@ -41,6 +44,9 @@ interface NavigationStackStore {
     },
     prefillFromGet?: boolean,
     getEndpoint?: CreateApiEndpointAny,
+    renderInModal?: boolean,
+    popNavigationOnSuccess?: number,
+    modalPosition?: { x: number; y: number },
   ) => void;
 
   /**
@@ -64,6 +70,9 @@ export const useNavigationStore = create<NavigationStackStore>((set) => ({
     },
     prefillFromGet = false,
     getEndpoint?: CreateApiEndpointAny,
+    renderInModal = false,
+    popNavigationOnSuccess?: number,
+    modalPosition?: { x: number; y: number },
   ): void => {
     const entry: NavigationStackEntry<TEndpoint> = {
       endpoint,
@@ -71,6 +80,9 @@ export const useNavigationStore = create<NavigationStackStore>((set) => ({
       timestamp: Date.now(),
       prefillFromGet,
       getEndpoint,
+      renderInModal,
+      popNavigationOnSuccess,
+      modalPosition,
     };
 
     set((state) => ({
@@ -98,6 +110,9 @@ export const useNavigationStore = create<NavigationStackStore>((set) => ({
     },
     prefillFromGet = false,
     getEndpoint?: CreateApiEndpointAny,
+    renderInModal = false,
+    popNavigationOnSuccess?: number,
+    modalPosition?: { x: number; y: number },
   ): void => {
     const entry: NavigationStackEntry<TEndpoint> = {
       endpoint,
@@ -105,6 +120,9 @@ export const useNavigationStore = create<NavigationStackStore>((set) => ({
       timestamp: Date.now(),
       prefillFromGet,
       getEndpoint,
+      renderInModal,
+      popNavigationOnSuccess,
+      modalPosition,
     };
 
     set((state) => {
@@ -179,6 +197,9 @@ export function useNavigationStack(): {
     },
     prefillFromGet?: boolean,
     getEndpoint?: CreateApiEndpointAny,
+    renderInModal?: boolean,
+    popNavigationOnSuccess?: number,
+    modalPosition?: { x: number; y: number },
   ) => void;
   replace: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
@@ -188,6 +209,9 @@ export function useNavigationStack(): {
     },
     prefillFromGet?: boolean,
     getEndpoint?: CreateApiEndpointAny,
+    renderInModal?: boolean,
+    popNavigationOnSuccess?: number,
+    modalPosition?: { x: number; y: number },
   ) => void;
   pop: () => void;
   stack: NavigationStackEntry[];

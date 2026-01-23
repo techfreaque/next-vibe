@@ -10,9 +10,9 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -85,51 +85,48 @@ export const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST ===
-      operations: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
-          label:
-            "app.api.system.generators.generateTrpcRouter.validation.fields.operation.label",
-          description:
-            "app.api.system.generators.generateTrpcRouter.validation.fields.operation.description",
-          placeholder:
-            "app.api.system.generators.generateTrpcRouter.validation.fields.operation.placeholder",
-          options: TRPCValidationOperationTypeOptions,
-          columns: 12,
-        },
-        z
+      operations: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label:
+          "app.api.system.generators.generateTrpcRouter.validation.fields.operation.label",
+        description:
+          "app.api.system.generators.generateTrpcRouter.validation.fields.operation.description",
+        placeholder:
+          "app.api.system.generators.generateTrpcRouter.validation.fields.operation.placeholder",
+        options: TRPCValidationOperationTypeOptions,
+        columns: 12,
+        schema: z
           .array(z.string())
           .min(1)
           .describe("TRPC validation operations to execute"),
-      ),
-      filePath: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.generators.generateTrpcRouter.validation.fields.filePath.label",
-          description:
-            "app.api.system.generators.generateTrpcRouter.validation.fields.filePath.description",
-          placeholder:
-            "app.api.system.generators.generateTrpcRouter.validation.fields.filePath.placeholder",
-          columns: 12,
-        },
-        z.string().optional().describe("Specific route file path to validate"),
-      ),
-      options: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.JSON,
-          label:
-            "app.api.system.generators.generateTrpcRouter.validation.fields.options.label",
-          description:
-            "app.api.system.generators.generateTrpcRouter.validation.fields.options.description",
-          placeholder:
-            "app.api.system.generators.generateTrpcRouter.validation.fields.options.placeholder",
-          columns: 12,
-        },
-        z
+      }),
+      filePath: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.generators.generateTrpcRouter.validation.fields.filePath.label",
+        description:
+          "app.api.system.generators.generateTrpcRouter.validation.fields.filePath.description",
+        placeholder:
+          "app.api.system.generators.generateTrpcRouter.validation.fields.filePath.placeholder",
+        columns: 12,
+        schema: z
+          .string()
+          .optional()
+          .describe("Specific route file path to validate"),
+      }),
+      options: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label:
+          "app.api.system.generators.generateTrpcRouter.validation.fields.options.label",
+        description:
+          "app.api.system.generators.generateTrpcRouter.validation.fields.options.description",
+        placeholder:
+          "app.api.system.generators.generateTrpcRouter.validation.fields.options.placeholder",
+        columns: 12,
+        schema: z
           .object({
             apiDir: z
               .string()
@@ -146,31 +143,29 @@ export const { POST } = createEndpoint({
               .describe("Generate detailed validation report"),
           })
           .optional(),
-      ),
+      }),
       // === RESPONSE ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.generateTrpcRouter.validation.response.success.label",
-        },
-        z.boolean().describe("Whether the TRPC validation was successful"),
-      ),
-      operation: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.generateTrpcRouter.validation.response.operation.label",
-        },
-        z.string().describe("The validation operation that was executed"),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.generateTrpcRouter.validation.response.result.label",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.generators.generateTrpcRouter.validation.response.success.label",
+        schema: z
+          .boolean()
+          .describe("Whether the TRPC validation was successful"),
+      }),
+      operation: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.generators.generateTrpcRouter.validation.response.operation.label",
+        schema: z
+          .string()
+          .describe("The validation operation that was executed"),
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.generators.generateTrpcRouter.validation.response.result.label",
+        schema: z
           .object({
             success: z.boolean(),
             errors: z.array(z.string()),
@@ -194,7 +189,7 @@ export const { POST } = createEndpoint({
             filesWithIssues: z.coerce.number().optional(),
           })
           .describe("Detailed TRPC validation result"),
-      ),
+      }),
     },
   ),
   examples: {

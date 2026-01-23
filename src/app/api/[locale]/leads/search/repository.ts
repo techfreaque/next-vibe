@@ -117,7 +117,6 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
       convertedUserId: lead.convertedUserId,
       convertedAt: lead.convertedAt?.toISOString() ?? null,
       signedUpAt: lead.signedUpAt?.toISOString() ?? null,
-      consultationBookedAt: lead.consultationBookedAt?.toISOString() ?? null,
       subscriptionConfirmedAt:
         lead.subscriptionConfirmedAt?.toISOString() ?? null,
       currentCampaignStage: lead.currentCampaignStage,

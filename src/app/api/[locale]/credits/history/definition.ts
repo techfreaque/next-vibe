@@ -9,10 +9,12 @@ import { CreditTransactionType } from "@/app/api/[locale]/credits/enum";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestResponseField,
   responseArrayField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+import {
+  requestResponseField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -22,6 +24,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { ModelId } from "../../agent/models/models";
 import { dateSchema } from "../../shared/types/common.schema";
 
 /**
@@ -71,59 +74,43 @@ const { GET } = createEndpoint({
           },
           { response: true },
           {
-            id: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.agent.chat.credits.history.get.id" as const,
-              },
-              z.string(),
-            ),
-            amount: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.credits.history.get.amount" as const,
-              },
-              z.coerce.number(),
-            ),
-            balanceAfter: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.subscription.subscription.history.balance" as const,
-              },
-              z.coerce.number(),
-            ),
-            type: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.agent.chat.credits.history.get.type" as const,
-              },
-              z.string().optional(),
-            ),
-            modelId: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.agent.chat.credits.history.get.modelId" as const,
-              },
-              z.string().nullable(),
-            ),
-            messageId: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.credits.history.get.messageId" as const,
-              },
-              z.string().nullable(),
-            ),
-            createdAt: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.credits.history.get.createdAt" as const,
-              },
-              dateSchema,
-            ),
+            id: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.agent.chat.credits.history.get.id" as const,
+              schema: z.string(),
+            }),
+            amount: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.agent.chat.credits.history.get.amount" as const,
+              schema: z.coerce.number(),
+            }),
+            balanceAfter: responseField({
+              type: WidgetType.TEXT,
+              content: "app.subscription.subscription.history.balance" as const,
+              schema: z.coerce.number(),
+            }),
+            type: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.agent.chat.credits.history.get.type" as const,
+              schema: z.string().optional(),
+            }),
+            modelId: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.agent.chat.credits.history.get.modelId" as const,
+              schema: z.enum(ModelId).nullable(),
+            }),
+            messageId: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.credits.history.get.messageId" as const,
+              schema: z.string().nullable(),
+            }),
+            createdAt: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.credits.history.get.createdAt" as const,
+              schema: dateSchema,
+            }),
           },
         ),
       ),
@@ -135,36 +122,28 @@ const { GET } = createEndpoint({
         },
         { request: "data", response: true },
         {
-          page: requestResponseField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-            },
-            z.coerce.number().optional().default(1),
-          ),
-          limit: requestResponseField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-            },
-            z.coerce.number().optional().default(50),
-          ),
-          total: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.credits.history.get.paginationInfo.total" as const,
-            },
-            z.coerce.number(),
-          ),
-          totalPages: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.credits.history.get.paginationInfo.totalPages" as const,
-            },
-            z.coerce.number(),
-          ),
+          page: requestResponseField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            schema: z.coerce.number().optional().default(1),
+          }),
+          limit: requestResponseField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            schema: z.coerce.number().optional().default(50),
+          }),
+          total: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.agent.chat.credits.history.get.paginationInfo.total" as const,
+            schema: z.coerce.number(),
+          }),
+          totalPages: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.agent.chat.credits.history.get.paginationInfo.totalPages" as const,
+            schema: z.coerce.number(),
+          }),
         },
       ),
     },
@@ -244,7 +223,7 @@ const { GET } = createEndpoint({
             amount: -5,
             balanceAfter: 1495,
             type: CreditTransactionType.USAGE,
-            modelId: "gpt-4",
+            modelId: ModelId.GPT_5_MINI,
             messageId: "msg-123e4567-e89b-12d3-a456-426614174000",
             createdAt: "2025-10-16T12:00:00.000Z",
           },

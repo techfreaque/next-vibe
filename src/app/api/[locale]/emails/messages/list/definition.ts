@@ -9,10 +9,10 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   objectOptionalField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -70,47 +70,39 @@ const { GET } = createEndpoint({
         },
         { request: "data" },
         {
-          search: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.emails.messages.list.fields.search.label",
-              description:
-                "app.api.emails.messages.list.fields.search.description",
-              placeholder:
-                "app.api.emails.messages.list.fields.search.placeholder",
-              helpText: "app.api.emails.messages.list.fields.search.label",
-            },
-            z.string().optional(),
-          ),
+          search: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.emails.messages.list.fields.search.label",
+            description:
+              "app.api.emails.messages.list.fields.search.description",
+            placeholder:
+              "app.api.emails.messages.list.fields.search.placeholder",
+            helpText: "app.api.emails.messages.list.fields.search.label",
+            schema: z.string().optional(),
+          }),
 
-          status: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.emails.messages.list.fields.status.label",
-              description:
-                "app.api.emails.messages.list.fields.status.description",
-              placeholder:
-                "app.api.emails.messages.list.fields.status.placeholder",
-              options: EmailStatusFilterOptions,
-            },
-            z.enum(EmailStatusFilter).default(EmailStatusFilter.ANY),
-          ),
+          status: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.emails.messages.list.fields.status.label",
+            description:
+              "app.api.emails.messages.list.fields.status.description",
+            placeholder:
+              "app.api.emails.messages.list.fields.status.placeholder",
+            options: EmailStatusFilterOptions,
+            schema: z.enum(EmailStatusFilter).default(EmailStatusFilter.ANY),
+          }),
 
-          type: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.emails.messages.list.fields.type.label",
-              description:
-                "app.api.emails.messages.list.fields.type.description",
-              placeholder:
-                "app.api.emails.messages.list.fields.type.placeholder",
-              options: EmailTypeFilterOptions,
-            },
-            z.enum(EmailTypeFilter).default(EmailTypeFilter.ANY),
-          ),
+          type: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.emails.messages.list.fields.type.label",
+            description: "app.api.emails.messages.list.fields.type.description",
+            placeholder: "app.api.emails.messages.list.fields.type.placeholder",
+            options: EmailTypeFilterOptions,
+            schema: z.enum(EmailTypeFilter).default(EmailTypeFilter.ANY),
+          }),
 
           dateRange: objectOptionalField(
             {
@@ -120,31 +112,27 @@ const { GET } = createEndpoint({
             },
             { request: "data" },
             {
-              dateFrom: requestDataField(
-                {
-                  type: WidgetType.FORM_FIELD,
-                  fieldType: FieldDataType.DATETIME,
-                  label: "app.api.emails.messages.list.fields.dateFrom.label",
-                  description:
-                    "app.api.emails.messages.list.fields.dateFrom.description",
-                  placeholder:
-                    "app.api.emails.messages.list.fields.dateFrom.placeholder",
-                },
-                dateSchema.optional(),
-              ),
+              dateFrom: requestField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.DATETIME,
+                label: "app.api.emails.messages.list.fields.dateFrom.label",
+                description:
+                  "app.api.emails.messages.list.fields.dateFrom.description",
+                placeholder:
+                  "app.api.emails.messages.list.fields.dateFrom.placeholder",
+                schema: dateSchema.optional(),
+              }),
 
-              dateTo: requestDataField(
-                {
-                  type: WidgetType.FORM_FIELD,
-                  fieldType: FieldDataType.DATETIME,
-                  label: "app.api.emails.messages.list.fields.dateTo.label",
-                  description:
-                    "app.api.emails.messages.list.fields.dateTo.description",
-                  placeholder:
-                    "app.api.emails.messages.list.fields.dateTo.placeholder",
-                },
-                dateSchema.optional(),
-              ),
+              dateTo: requestField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.DATETIME,
+                label: "app.api.emails.messages.list.fields.dateTo.label",
+                description:
+                  "app.api.emails.messages.list.fields.dateTo.description",
+                placeholder:
+                  "app.api.emails.messages.list.fields.dateTo.placeholder",
+                schema: dateSchema.optional(),
+              }),
             },
           ),
         },
@@ -160,59 +148,49 @@ const { GET } = createEndpoint({
         },
         { request: "data" },
         {
-          sortBy: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.emails.messages.list.fields.sortBy.label",
-              description:
-                "app.api.emails.messages.list.fields.sortBy.description",
-              placeholder:
-                "app.api.emails.messages.list.fields.sortBy.placeholder",
-              options: EmailSortFieldOptions,
-            },
-            z.enum(EmailSortField).default(EmailSortField.CREATED_AT),
-          ),
+          sortBy: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.emails.messages.list.fields.sortBy.label",
+            description:
+              "app.api.emails.messages.list.fields.sortBy.description",
+            placeholder:
+              "app.api.emails.messages.list.fields.sortBy.placeholder",
+            options: EmailSortFieldOptions,
+            schema: z.enum(EmailSortField).default(EmailSortField.CREATED_AT),
+          }),
 
-          sortOrder: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.emails.messages.list.fields.sortOrder.label",
-              description:
-                "app.api.emails.messages.list.fields.sortOrder.description",
-              placeholder:
-                "app.api.emails.messages.list.fields.sortOrder.placeholder",
-              options: SortOrderOptions,
-            },
-            z.enum(SortOrder).default(SortOrder.DESC),
-          ),
+          sortOrder: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.emails.messages.list.fields.sortOrder.label",
+            description:
+              "app.api.emails.messages.list.fields.sortOrder.description",
+            placeholder:
+              "app.api.emails.messages.list.fields.sortOrder.placeholder",
+            options: SortOrderOptions,
+            schema: z.enum(SortOrder).default(SortOrder.DESC),
+          }),
 
-          page: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label: "app.api.emails.messages.list.fields.page.label",
-              description:
-                "app.api.emails.messages.list.fields.page.description",
-              placeholder:
-                "app.api.emails.messages.list.fields.page.placeholder",
-            },
-            z.coerce.number().int().min(1).default(1),
-          ),
+          page: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label: "app.api.emails.messages.list.fields.page.label",
+            description: "app.api.emails.messages.list.fields.page.description",
+            placeholder: "app.api.emails.messages.list.fields.page.placeholder",
+            schema: z.coerce.number().int().min(1).default(1),
+          }),
 
-          limit: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label: "app.api.emails.messages.list.fields.limit.label",
-              description:
-                "app.api.emails.messages.list.fields.limit.description",
-              placeholder:
-                "app.api.emails.messages.list.fields.limit.placeholder",
-            },
-            z.coerce.number().int().min(1).max(100).default(20),
-          ),
+          limit: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label: "app.api.emails.messages.list.fields.limit.label",
+            description:
+              "app.api.emails.messages.list.fields.limit.description",
+            placeholder:
+              "app.api.emails.messages.list.fields.limit.placeholder",
+            schema: z.coerce.number().int().min(1).max(100).default(20),
+          }),
         },
       ),
 
@@ -240,29 +218,23 @@ const { GET } = createEndpoint({
               },
               { response: true },
               {
-                id: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.emails.messages.list.response.emails.item.id",
-                  },
-                  z.uuid(),
-                ),
-                subject: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.emails.messages.list.response.emails.item.subject",
-                  },
-                  z.string(),
-                ),
-                status: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.emails.messages.list.response.emails.item.status",
-                  },
-                  z.enum(EmailStatus),
-                ),
+                id: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.list.response.emails.item.id",
+                  schema: z.uuid(),
+                }),
+                subject: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.list.response.emails.item.subject",
+                  schema: z.string(),
+                }),
+                status: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.emails.messages.list.response.emails.item.status",
+                  schema: z.enum(EmailStatus),
+                }),
               },
             ),
 
@@ -285,22 +257,18 @@ const { GET } = createEndpoint({
                   },
                   { response: true },
                   {
-                    recipientEmail: responseField(
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.emails.messages.list.response.emails.item.recipientEmail",
-                      },
-                      z.string(),
-                    ),
-                    recipientName: responseField(
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.emails.messages.list.response.emails.item.recipientName",
-                      },
-                      z.string().nullable(),
-                    ),
+                    recipientEmail: responseField({
+                      type: WidgetType.TEXT,
+                      content:
+                        "app.api.emails.messages.list.response.emails.item.recipientEmail",
+                      schema: z.string(),
+                    }),
+                    recipientName: responseField({
+                      type: WidgetType.TEXT,
+                      content:
+                        "app.api.emails.messages.list.response.emails.item.recipientName",
+                      schema: z.string().nullable(),
+                    }),
                   },
                 ),
                 sender: objectField(
@@ -312,22 +280,18 @@ const { GET } = createEndpoint({
                   },
                   { response: true },
                   {
-                    senderEmail: responseField(
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.emails.messages.list.response.emails.item.senderEmail",
-                      },
-                      z.string(),
-                    ),
-                    senderName: responseField(
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.emails.messages.list.response.emails.item.senderName",
-                      },
-                      z.string().nullable(),
-                    ),
+                    senderEmail: responseField({
+                      type: WidgetType.TEXT,
+                      content:
+                        "app.api.emails.messages.list.response.emails.item.senderEmail",
+                      schema: z.string(),
+                    }),
+                    senderName: responseField({
+                      type: WidgetType.TEXT,
+                      content:
+                        "app.api.emails.messages.list.response.emails.item.senderName",
+                      schema: z.string().nullable(),
+                    }),
                   },
                 ),
               },
@@ -344,36 +308,28 @@ const { GET } = createEndpoint({
               },
               { response: true },
               {
-                type: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.emails.messages.list.response.emails.item.type",
-                  },
-                  z.enum(EmailType),
-                ),
-                templateName: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.emails.messages.list.response.emails.item.templateName",
-                  },
-                  z.string().nullable(),
-                ),
-                emailProvider: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.emails.messages.list.response.emails.item.emailProvider",
-                  },
-                  z.string().nullable(),
-                ),
-                externalId: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.emails.messages.list.response.emails.item.externalId",
-                  },
-                  z.string().nullable(),
-                ),
+                type: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.emails.messages.list.response.emails.item.type",
+                  schema: z.enum(EmailType),
+                }),
+                templateName: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.list.response.emails.item.templateName",
+                  schema: z.string().nullable(),
+                }),
+                emailProvider: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.emails.messages.list.response.emails.item.emailProvider",
+                  schema: z.string().nullable(),
+                }),
+                externalId: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.list.response.emails.item.externalId",
+                  schema: z.string().nullable(),
+                }),
               },
             ),
 
@@ -387,38 +343,30 @@ const { GET } = createEndpoint({
               },
               { response: true },
               {
-                sentAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.emails.messages.list.response.emails.item.sentAt",
-                  },
-                  dateSchema.nullable(),
-                ),
-                deliveredAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.emails.messages.list.response.emails.item.deliveredAt",
-                  },
-                  dateSchema.nullable(),
-                ),
-                openedAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.emails.messages.list.response.emails.item.openedAt",
-                  },
-                  dateSchema.nullable(),
-                ),
-                clickedAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.emails.messages.list.response.emails.item.clickedAt",
-                  },
-                  dateSchema.nullable(),
-                ),
+                sentAt: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.list.response.emails.item.sentAt",
+                  schema: dateSchema.nullable(),
+                }),
+                deliveredAt: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.list.response.emails.item.deliveredAt",
+                  schema: dateSchema.nullable(),
+                }),
+                openedAt: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.list.response.emails.item.openedAt",
+                  schema: dateSchema.nullable(),
+                }),
+                clickedAt: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.list.response.emails.item.clickedAt",
+                  schema: dateSchema.nullable(),
+                }),
               },
             ),
 
@@ -433,22 +381,18 @@ const { GET } = createEndpoint({
               },
               { response: true },
               {
-                retryCount: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.emails.messages.list.response.emails.item.retryCount",
-                  },
-                  z.coerce.number().int(),
-                ),
-                error: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.emails.messages.list.response.emails.item.error",
-                  },
-                  z.string().nullable(),
-                ),
+                retryCount: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.list.response.emails.item.retryCount",
+                  schema: z.coerce.number().int(),
+                }),
+                error: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.messages.list.response.emails.item.error",
+                  schema: z.string().nullable(),
+                }),
                 associatedIds: objectField(
                   {
                     type: WidgetType.CONTAINER,
@@ -458,22 +402,18 @@ const { GET } = createEndpoint({
                   },
                   { response: true },
                   {
-                    userId: responseField(
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.emails.messages.list.response.emails.item.userId",
-                      },
-                      z.string().nullable(),
-                    ),
-                    leadId: responseField(
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.emails.messages.list.response.emails.item.leadId",
-                      },
-                      z.string().nullable(),
-                    ),
+                    userId: responseField({
+                      type: WidgetType.TEXT,
+                      content:
+                        "app.api.emails.messages.list.response.emails.item.userId",
+                      schema: z.string().nullable(),
+                    }),
+                    leadId: responseField({
+                      type: WidgetType.TEXT,
+                      content:
+                        "app.api.emails.messages.list.response.emails.item.leadId",
+                      schema: z.string().nullable(),
+                    }),
                   },
                 ),
                 timestamps: objectField(
@@ -485,22 +425,18 @@ const { GET } = createEndpoint({
                   },
                   { response: true },
                   {
-                    createdAt: responseField(
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.emails.messages.list.response.emails.item.createdAt",
-                      },
-                      dateSchema,
-                    ),
-                    updatedAt: responseField(
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.emails.messages.list.response.emails.item.updatedAt",
-                      },
-                      dateSchema,
-                    ),
+                    createdAt: responseField({
+                      type: WidgetType.TEXT,
+                      content:
+                        "app.api.emails.messages.list.response.emails.item.createdAt",
+                      schema: dateSchema,
+                    }),
+                    updatedAt: responseField({
+                      type: WidgetType.TEXT,
+                      content:
+                        "app.api.emails.messages.list.response.emails.item.updatedAt",
+                      schema: dateSchema,
+                    }),
                   },
                 ),
               },
@@ -520,35 +456,27 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          page: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.list.response.pagination.page",
-            },
-            z.coerce.number().int().min(1),
-          ),
-          limit: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.list.response.pagination.limit",
-            },
-            z.coerce.number().int().min(1),
-          ),
-          total: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.emails.messages.list.response.pagination.total",
-            },
-            z.coerce.number().int().min(0),
-          ),
-          totalPages: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.list.response.pagination.totalPages",
-            },
-            z.coerce.number().int().min(0),
-          ),
+          page: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.list.response.pagination.page",
+            schema: z.coerce.number().int().min(1),
+          }),
+          limit: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.list.response.pagination.limit",
+            schema: z.coerce.number().int().min(1),
+          }),
+          total: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.messages.list.response.pagination.total",
+            schema: z.coerce.number().int().min(0),
+          }),
+          totalPages: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.messages.list.response.pagination.totalPages",
+            schema: z.coerce.number().int().min(0),
+          }),
         },
       ),
     },

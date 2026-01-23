@@ -5,32 +5,16 @@
 
 "use client";
 
-import {
-  ChartType,
-  DateRangePreset,
-  TimePeriod,
-} from "next-vibe/shared/types/stats-filtering.schema";
 import { useCallback, useMemo } from "react";
 
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import {
-  CountryFilter,
-  type CountryLanguage,
-  LanguageFilter,
-} from "@/i18n/core/config";
+import { type CountryLanguage } from "@/i18n/core/config";
 
 import type {
   EndpointReturn,
   FormAlertState,
 } from "../../system/unified-interface/react/hooks/endpoint-types";
-import {
-  EmailCampaignStageFilter,
-  LeadSortField,
-  LeadSourceFilter,
-  LeadStatusFilter,
-  SortOrder,
-} from "../enum";
 import type { LeadsStatsResponseOutput } from "./definition";
 import definitions from "./definition";
 
@@ -48,21 +32,6 @@ export function useLeadsStatsEndpoint(
         enabled: enabled !== false,
         refetchOnWindowFocus: false,
         staleTime: 30 * 1000, // 30 seconds
-      },
-      filterOptions: {
-        initialFilters: {
-          timePeriod: TimePeriod.DAY,
-          dateRangePreset: DateRangePreset.LAST_30_DAYS,
-          chartType: ChartType.LINE,
-          includeComparison: false,
-          status: LeadStatusFilter.ALL,
-          campaignStage: EmailCampaignStageFilter.ALL,
-          country: CountryFilter.ALL,
-          language: LanguageFilter.ALL,
-          source: LeadSourceFilter.ALL,
-          sortBy: LeadSortField.CREATED_AT,
-          sortOrder: SortOrder.DESC,
-        },
       },
     }),
     [enabled],

@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,155 +50,131 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      createMcpConfig: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.createMcpConfig.label",
-          description:
-            "app.api.system.check.config.create.fields.createMcpConfig.description",
-          columns: 6,
-        },
-        z.boolean().optional(),
-      ),
+      createMcpConfig: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.check.config.create.fields.createMcpConfig.label",
+        description:
+          "app.api.system.check.config.create.fields.createMcpConfig.description",
+        columns: 6,
+        schema: z.boolean().optional(),
+      }),
 
-      updateVscodeSettings: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.updateVscodeSettings.label",
-          description:
-            "app.api.system.check.config.create.fields.updateVscodeSettings.description",
-          columns: 6,
-        },
-        z.boolean().optional(),
-      ),
+      updateVscodeSettings: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.check.config.create.fields.updateVscodeSettings.label",
+        description:
+          "app.api.system.check.config.create.fields.updateVscodeSettings.description",
+        columns: 6,
+        schema: z.boolean().optional(),
+      }),
 
-      updatePackageJson: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.updatePackageJson.label",
-          description:
-            "app.api.system.check.config.create.fields.updatePackageJson.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(true),
-      ),
+      updatePackageJson: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.check.config.create.fields.updatePackageJson.label",
+        description:
+          "app.api.system.check.config.create.fields.updatePackageJson.description",
+        columns: 6,
+        schema: z.boolean().optional().default(true),
+      }),
 
-      enableEslint: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.check.config.create.fields.enableEslint.label",
-          description:
-            "app.api.system.check.config.create.fields.enableEslint.description",
-          columns: 6,
-        },
-        z.boolean().optional(),
-      ),
+      enableEslint: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.check.config.create.fields.enableEslint.label",
+        description:
+          "app.api.system.check.config.create.fields.enableEslint.description",
+        columns: 6,
+        schema: z.boolean().optional(),
+      }),
 
-      enableReactRules: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.enableReactRules.label",
-          description:
-            "app.api.system.check.config.create.fields.enableReactRules.description",
-          columns: 4,
-        },
-        z.boolean().optional(),
-      ),
+      enableReactRules: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.check.config.create.fields.enableReactRules.label",
+        description:
+          "app.api.system.check.config.create.fields.enableReactRules.description",
+        columns: 4,
+        schema: z.boolean().optional(),
+      }),
 
-      enableNextjsRules: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.enableNextjsRules.label",
-          description:
-            "app.api.system.check.config.create.fields.enableNextjsRules.description",
-          columns: 4,
-        },
-        z.boolean().optional(),
-      ),
+      enableNextjsRules: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.check.config.create.fields.enableNextjsRules.label",
+        description:
+          "app.api.system.check.config.create.fields.enableNextjsRules.description",
+        columns: 4,
+        schema: z.boolean().optional(),
+      }),
 
-      enableI18nRules: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.enableI18nRules.label",
-          description:
-            "app.api.system.check.config.create.fields.enableI18nRules.description",
-          columns: 4,
-        },
-        z.boolean().optional(),
-      ),
+      enableI18nRules: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.check.config.create.fields.enableI18nRules.label",
+        description:
+          "app.api.system.check.config.create.fields.enableI18nRules.description",
+        columns: 4,
+        schema: z.boolean().optional(),
+      }),
 
-      jsxCapitalization: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.jsxCapitalization.label",
-          description:
-            "app.api.system.check.config.create.fields.jsxCapitalization.description",
-          columns: 4,
-        },
-        z.boolean().optional(),
-      ),
+      jsxCapitalization: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.check.config.create.fields.jsxCapitalization.label",
+        description:
+          "app.api.system.check.config.create.fields.jsxCapitalization.description",
+        columns: 4,
+        schema: z.boolean().optional(),
+      }),
 
-      enablePedanticRules: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.enablePedanticRules.label",
-          description:
-            "app.api.system.check.config.create.fields.enablePedanticRules.description",
-          columns: 4,
-        },
-        z.boolean().optional(),
-      ),
+      enablePedanticRules: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.check.config.create.fields.enablePedanticRules.label",
+        description:
+          "app.api.system.check.config.create.fields.enablePedanticRules.description",
+        columns: 4,
+        schema: z.boolean().optional(),
+      }),
 
-      enableRestrictedSyntax: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.enableRestrictedSyntax.label",
-          description:
-            "app.api.system.check.config.create.fields.enableRestrictedSyntax.description",
-          columns: 4,
-        },
-        z.boolean().optional(),
-      ),
+      enableRestrictedSyntax: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.check.config.create.fields.enableRestrictedSyntax.label",
+        description:
+          "app.api.system.check.config.create.fields.enableRestrictedSyntax.description",
+        columns: 4,
+        schema: z.boolean().optional(),
+      }),
 
-      interactive: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.check.config.create.fields.interactive.label",
-          description:
-            "app.api.system.check.config.create.fields.interactive.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(true),
-      ),
+      interactive: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.check.config.create.fields.interactive.label",
+        description:
+          "app.api.system.check.config.create.fields.interactive.description",
+        columns: 6,
+        schema: z.boolean().optional().default(true),
+      }),
 
       // === RESPONSE FIELDS ===
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.check.config.create.response.message",
-        },
-        z.string(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.check.config.create.response.message",
+        schema: z.string(),
+      }),
     },
   ),
 

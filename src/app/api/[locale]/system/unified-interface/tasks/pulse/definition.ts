@@ -9,9 +9,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -103,72 +103,61 @@ const pulseExecuteEndpoint = createEndpoint({
 
   fields: objectField(
     {
-      type: WidgetType.FORM_FIELD,
-      fieldType: FieldDataType.TEXT,
-      label:
+      type: WidgetType.CONTAINER,
+      title:
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.container.title",
       columns: 12,
     },
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.dryRun.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.dryRun.description",
-          columns: 4,
-        },
-        z.boolean().optional().default(false),
-      ),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.dryRun.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.dryRun.description",
+        columns: 4,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      force: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.force.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.force.description",
-          columns: 4,
-        },
-        z.boolean().optional().default(false),
-      ),
+      force: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.force.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.force.description",
+        columns: 4,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      taskNames: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXTAREA,
-          label:
-            "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.taskNames.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.taskNames.description",
-          columns: 4,
-        },
-        z.array(z.string()).optional(),
-      ),
+      taskNames: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label:
+          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.taskNames.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.taskNames.description",
+        columns: 4,
+        schema: z.array(z.string()).optional(),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.success.title",
+        schema: z.boolean(),
+      }),
 
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.message.title",
-        },
-        z.string(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.message.title",
+        schema: z.string(),
+      }),
     },
   ),
 

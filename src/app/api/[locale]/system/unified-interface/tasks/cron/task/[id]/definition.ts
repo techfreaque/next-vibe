@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   requestUrlPathParamsField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -54,26 +54,22 @@ const { GET } = createEndpoint({
     { request: "urlPathParams", response: true },
     {
       // URL parameter
-      id: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.get.fields.id.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.get.fields.id.description",
-        },
-        z.string(),
-      ),
+      id: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.get.fields.id.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.get.fields.id.description",
+        schema: z.string(),
+      }),
 
       // Response fields
-      task: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.get.response.task.title",
-        },
-        z.object({
+      task: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.get.response.task.title",
+        schema: z.object({
           id: z.string(),
           name: z.string(),
           description: z.string().nullable(),
@@ -98,7 +94,7 @@ const { GET } = createEndpoint({
           createdAt: z.string(),
           updatedAt: z.string(),
         }),
-      ),
+      }),
     },
   ),
 
@@ -170,7 +166,6 @@ const { GET } = createEndpoint({
         id: "task-123",
       },
     },
-    requests: undefined,
     responses: {
       default: {
         task: {
@@ -229,131 +224,113 @@ const { PUT } = createEndpoint({
     { request: "data&urlPathParams", response: true },
     {
       // URL parameter
-      id: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.id.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.id.description",
-        },
-        z.string(),
-      ),
+      id: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.id.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.id.description",
+        schema: z.string(),
+      }),
 
       // Request data fields
-      name: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.description",
-          placeholder:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.placeholder",
-          columns: 12,
-        },
-        z.string().min(1),
-      ),
+      name: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.description",
+        placeholder:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.placeholder",
+        columns: 12,
+        schema: z.string().min(1),
+      }),
 
-      description: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXTAREA,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.description.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.description.description",
-          placeholder:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.description.placeholder",
-          columns: 12,
-        },
-        z.string().optional(),
-      ),
+      description: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.description.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.description.description",
+        placeholder:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.description.placeholder",
+        columns: 12,
+        schema: z.string().optional(),
+      }),
 
-      schedule: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.schedule.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.schedule.description",
-          placeholder:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.schedule.placeholder",
-          columns: 6,
-        },
-        z.string().min(1),
-      ),
+      schedule: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.schedule.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.schedule.description",
+        placeholder:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.schedule.placeholder",
+        columns: 6,
+        schema: z.string().min(1),
+      }),
 
-      enabled: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.enabled.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.enabled.description",
-          columns: 6,
-        },
-        z.boolean(),
-      ),
+      enabled: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.enabled.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.enabled.description",
+        columns: 6,
+        schema: z.boolean(),
+      }),
 
-      priority: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.priority.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.priority.description",
-          placeholder:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.priority.placeholder",
-          options: CronTaskPriorityOptions,
-          columns: 6,
-        },
-        z.enum(CronTaskPriorityDB),
-      ),
+      priority: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.priority.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.priority.description",
+        placeholder:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.priority.placeholder",
+        options: CronTaskPriorityOptions,
+        columns: 6,
+        schema: z.enum(CronTaskPriorityDB),
+      }),
 
-      timeout: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.timeout.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.timeout.description",
-          placeholder:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.timeout.placeholder",
-          columns: 6,
-        },
-        z.coerce.number().optional(),
-      ),
+      timeout: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.timeout.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.timeout.description",
+        placeholder:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.timeout.placeholder",
+        columns: 6,
+        schema: z.coerce.number().optional(),
+      }),
 
-      retries: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.retries.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.retries.description",
-          placeholder:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.retries.placeholder",
-          columns: 6,
-        },
-        z.coerce.number().optional(),
-      ),
+      retries: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.retries.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.retries.description",
+        placeholder:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.retries.placeholder",
+        columns: 6,
+        schema: z.coerce.number().optional(),
+      }),
 
       // Response fields
-      task: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.response.task.title",
-        },
-        z.object({
+      task: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.response.task.title",
+        schema: z.object({
           id: z.string(),
           name: z.string(),
           description: z.string().nullable(),
@@ -378,16 +355,14 @@ const { PUT } = createEndpoint({
           createdAt: z.string(),
           updatedAt: z.string(),
         }),
-      ),
+      }),
 
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.put.response.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.response.success.title",
+        schema: z.boolean(),
+      }),
     },
   ),
 
@@ -529,36 +504,30 @@ const { DELETE } = createEndpoint({
     { request: "urlPathParams", response: true },
     {
       // URL parameter
-      id: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.delete.fields.id.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.delete.fields.id.description",
-        },
-        z.string(),
-      ),
+      id: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.delete.fields.id.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.delete.fields.id.description",
+        schema: z.string(),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.delete.response.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.delete.response.success.title",
+        schema: z.boolean(),
+      }),
 
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.delete.response.message.title",
-        },
-        z.string(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.delete.response.message.title",
+        schema: z.string(),
+      }),
     },
   ),
 
@@ -630,7 +599,6 @@ const { DELETE } = createEndpoint({
         id: "task-123",
       },
     },
-    requests: undefined,
     responses: {
       default: {
         success: true,

@@ -4,6 +4,8 @@
  * Used by both React and CLI implementations
  */
 
+import type { ZodTypeAny } from "zod";
+
 import type { UnifiedField } from "../../types/endpoint";
 import { WidgetType } from "../../types/enums";
 import type { WidgetData } from "../types";
@@ -48,7 +50,7 @@ export interface ProcessedCodeOutput {
  * Extract code output configuration from field
  */
 export function getCodeOutputConfig<const TKey extends string>(
-  field: UnifiedField<TKey>,
+  field: UnifiedField<TKey, ZodTypeAny>,
 ): CodeOutputConfig {
   const defaultConfig: CodeOutputConfig = {
     format: "generic",

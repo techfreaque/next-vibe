@@ -8,12 +8,12 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   requestResponseField,
   responseArrayField,
   responseField,
   widgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -80,41 +80,35 @@ const { GET } = createEndpoint({
         },
         { request: "data" },
         {
-          search: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.users.list.get.search.label" as const,
-              description: "app.api.users.list.get.search.description" as const,
-              placeholder: "app.api.users.list.get.search.placeholder" as const,
-              columns: 12,
-            },
-            z.string().optional(),
-          ),
-          status: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.users.list.get.status.label" as const,
-              description: "app.api.users.list.get.status.description" as const,
-              placeholder: "app.api.users.list.get.status.placeholder" as const,
-              options: UserStatusFilterOptions,
-              columns: 6,
-            },
-            z.array(z.enum(UserStatusFilter)).optional(),
-          ),
-          role: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.users.list.get.role.label" as const,
-              description: "app.api.users.list.get.role.description" as const,
-              placeholder: "app.api.users.list.get.role.placeholder" as const,
-              options: UserRoleFilterOptions,
-              columns: 6,
-            },
-            z.array(z.enum(UserRoleFilter)).optional(),
-          ),
+          search: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.users.list.get.search.label" as const,
+            description: "app.api.users.list.get.search.description" as const,
+            placeholder: "app.api.users.list.get.search.placeholder" as const,
+            columns: 12,
+            schema: z.string().optional(),
+          }),
+          status: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label: "app.api.users.list.get.status.label" as const,
+            description: "app.api.users.list.get.status.description" as const,
+            placeholder: "app.api.users.list.get.status.placeholder" as const,
+            options: UserStatusFilterOptions,
+            columns: 6,
+            schema: z.array(z.enum(UserStatusFilter)).optional(),
+          }),
+          role: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label: "app.api.users.list.get.role.label" as const,
+            description: "app.api.users.list.get.role.description" as const,
+            placeholder: "app.api.users.list.get.role.placeholder" as const,
+            options: UserRoleFilterOptions,
+            columns: 6,
+            schema: z.array(z.enum(UserRoleFilter)).optional(),
+          }),
         },
       ),
 
@@ -130,35 +124,31 @@ const { GET } = createEndpoint({
         },
         { request: "data" },
         {
-          sortBy: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.users.list.get.sortBy.label" as const,
-              description: "app.api.users.list.get.sortBy.description" as const,
-              placeholder: "app.api.users.list.get.sortBy.placeholder" as const,
-              options: UserSortFieldOptions,
-              columns: 6,
-            },
-            z
-              .nativeEnum(UserSortField)
+          sortBy: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.users.list.get.sortBy.label" as const,
+            description: "app.api.users.list.get.sortBy.description" as const,
+            placeholder: "app.api.users.list.get.sortBy.placeholder" as const,
+            options: UserSortFieldOptions,
+            columns: 6,
+            schema: z
+              .enum(UserSortField)
               .optional()
               .default(UserSortField.CREATED_AT),
-          ),
-          sortOrder: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.users.list.get.sortOrder.label" as const,
-              description:
-                "app.api.users.list.get.sortOrder.description" as const,
-              placeholder:
-                "app.api.users.list.get.sortOrder.placeholder" as const,
-              options: SortOrderOptions,
-              columns: 6,
-            },
-            z.enum(SortOrder).optional().default(SortOrder.DESC),
-          ),
+          }),
+          sortOrder: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.users.list.get.sortOrder.label" as const,
+            description:
+              "app.api.users.list.get.sortOrder.description" as const,
+            placeholder:
+              "app.api.users.list.get.sortOrder.placeholder" as const,
+            options: SortOrderOptions,
+            columns: 6,
+            schema: z.enum(SortOrder).optional().default(SortOrder.DESC),
+          }),
         },
       ),
 
@@ -196,70 +186,53 @@ const { GET } = createEndpoint({
               },
               { response: true },
               {
-                email: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.users.list.get.response.users.email" as const,
-                  },
-                  z.string(),
-                ),
-                privateName: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.users.list.get.response.users.privateName" as const,
-                  },
-                  z.string(),
-                ),
-                publicName: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.users.list.get.response.users.publicName" as const,
-                  },
-                  z.string(),
-                ),
-                isActive: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.users.list.get.response.users.isActive" as const,
-                  },
-                  z.boolean(),
-                ),
-                emailVerified: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.users.list.get.response.users.emailVerified" as const,
-                  },
-                  z.boolean(),
-                ),
-                createdAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.users.list.get.response.users.createdAt" as const,
-                  },
-                  z.coerce.date(),
-                ),
-                updatedAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.users.list.get.response.users.updatedAt" as const,
-                  },
-                  z.coerce.date(),
-                ),
-                id: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.users.list.get.response.users.id" as const,
-                  },
-                  z.string(),
-                ),
+                email: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.users.list.get.response.users.email" as const,
+                  schema: z.string(),
+                }),
+                privateName: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.users.list.get.response.users.privateName" as const,
+                  schema: z.string(),
+                }),
+                publicName: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.users.list.get.response.users.publicName" as const,
+                  schema: z.string(),
+                }),
+                isActive: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.users.list.get.response.users.isActive" as const,
+                  schema: z.boolean(),
+                }),
+                emailVerified: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.users.list.get.response.users.emailVerified" as const,
+                  schema: z.boolean(),
+                }),
+                createdAt: responseField({
+                  type: WidgetType.TEXT,
+                  fieldType: FieldDataType.DATETIME,
+                  content:
+                    "app.api.users.list.get.response.users.createdAt" as const,
+                  schema: z.coerce.date(),
+                }),
+                updatedAt: responseField({
+                  type: WidgetType.TEXT,
+                  fieldType: FieldDataType.DATETIME,
+                  content:
+                    "app.api.users.list.get.response.users.updatedAt" as const,
+                  schema: z.coerce.date(),
+                }),
+                id: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.users.list.get.response.users.id" as const,
+                  schema: z.string(),
+                }),
               },
             ),
           ),
@@ -277,42 +250,34 @@ const { GET } = createEndpoint({
         },
         { request: "data", response: true },
         {
-          page: requestResponseField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label: "app.api.users.list.get.page.label" as const,
-              columns: 3,
-            },
-            z.coerce.number().optional().default(1),
-          ),
-          limit: requestResponseField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label: "app.api.users.list.get.limit.label" as const,
-              columns: 3,
-            },
-            z.coerce.number().optional().default(20),
-          ),
-          totalCount: responseField(
-            {
-              type: WidgetType.TEXT,
-              label: "app.api.users.list.get.response.totalCount" as const,
-              content: "app.api.users.list.get.response.totalCount" as const,
-              columns: 3,
-            },
-            z.coerce.number(),
-          ),
-          pageCount: responseField(
-            {
-              type: WidgetType.TEXT,
-              label: "app.api.users.list.get.response.pageCount" as const,
-              content: "app.api.users.list.get.response.pageCount" as const,
-              columns: 3,
-            },
-            z.coerce.number(),
-          ),
+          page: requestResponseField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label: "app.api.users.list.get.page.label" as const,
+            columns: 3,
+            schema: z.coerce.number().optional().default(1),
+          }),
+          limit: requestResponseField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label: "app.api.users.list.get.limit.label" as const,
+            columns: 3,
+            schema: z.coerce.number().optional().default(20),
+          }),
+          totalCount: responseField({
+            type: WidgetType.TEXT,
+            label: "app.api.users.list.get.response.totalCount" as const,
+            content: "app.api.users.list.get.response.totalCount" as const,
+            columns: 3,
+            schema: z.coerce.number(),
+          }),
+          pageCount: responseField({
+            type: WidgetType.TEXT,
+            label: "app.api.users.list.get.response.pageCount" as const,
+            content: "app.api.users.list.get.response.pageCount" as const,
+            columns: 3,
+            schema: z.coerce.number(),
+          }),
         },
       ),
     },

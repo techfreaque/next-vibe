@@ -77,12 +77,13 @@ export interface CLIFormConfig {
 
 /**
  * Schema-driven UI handler class
+ * Static class for parsing Zod schemas and generating CLI forms
  */
 export class SchemaUIHandler {
   /**
    * Parse Zod schema into CLI field metadata
    */
-  parseSchema(schema: z.ZodTypeAny, prefix = ""): SchemaFieldMetadata[] {
+  static parseSchema(schema: z.ZodTypeAny, prefix = ""): SchemaFieldMetadata[] {
     const fields: SchemaFieldMetadata[] = [];
 
     if (schema instanceof z.ZodObject) {
@@ -92,7 +93,10 @@ export class SchemaUIHandler {
         const fieldSchema = shape[key];
         if (fieldSchema && fieldSchema instanceof z.ZodType) {
           const fieldName = prefix ? `${prefix}.${key}` : key;
-          const fieldMeta = this.parseFieldSchema(fieldName, fieldSchema);
+          const fieldMeta = SchemaUIHandler.parseFieldSchema(
+            fieldName,
+            fieldSchema,
+          );
           fields.push(fieldMeta);
         }
       }
@@ -104,7 +108,10 @@ export class SchemaUIHandler {
       return [];
     } else {
       // Handle single field schemas
-      const fieldMeta = this.parseFieldSchema(prefix || "value", schema);
+      const fieldMeta = SchemaUIHandler.parseFieldSchema(
+        prefix || "value",
+        schema,
+      );
       fields.push(fieldMeta);
     }
 
@@ -114,7 +121,7 @@ export class SchemaUIHandler {
   /**
    * Parse individual field schema
    */
-  private parseFieldSchema(
+  private static parseFieldSchema(
     name: string,
     schema: z.ZodTypeAny,
   ): SchemaFieldMetadata {
@@ -156,8 +163,8 @@ export class SchemaUIHandler {
       required = false;
     }
 
-    const fieldType = this.getFieldType(currentSchema);
-    const choices = this.getFieldChoices(currentSchema);
+    const fieldType = SchemaUIHandler.getFieldType(currentSchema);
+    const choices = SchemaUIHandler.getFieldChoices(currentSchema);
 
     // For number fields, use coercion schema for validation
     let validationSchema: z.ZodTypeAny = currentSchema;
@@ -193,14 +200,14 @@ export class SchemaUIHandler {
       defaultValue,
       choices,
       validation: validationSchema,
-      description: this.getFieldDescription(currentSchema),
+      description: SchemaUIHandler.getFieldDescription(currentSchema),
     };
   }
 
   /**
    * Get field type for CLI rendering
    */
-  private getFieldType(schema: z.ZodTypeAny): string {
+  private static getFieldType(schema: z.ZodTypeAny): string {
     if (schema instanceof z.ZodString) {
       return "input";
     }
@@ -229,7 +236,7 @@ export class SchemaUIHandler {
   /**
    * Get field choices for enum/select fields
    */
-  private getFieldChoices(schema: z.ZodTypeAny): string[] | undefined {
+  private static getFieldChoices(schema: z.ZodTypeAny): string[] | undefined {
     if (schema instanceof z.ZodEnum) {
       const options = schema.options;
       if (Array.isArray(options)) {
@@ -243,7 +250,7 @@ export class SchemaUIHandler {
   /**
    * Get field description from schema
    */
-  private getFieldDescription(schema: z.ZodTypeAny): string | undefined {
+  private static getFieldDescription(schema: z.ZodTypeAny): string | undefined {
     // Try to get description from schema._def.description
     if (hasZodDef(schema) && "description" in schema._def) {
       const desc = schema._def.description;
@@ -258,7 +265,7 @@ export class SchemaUIHandler {
   /**
    * Generate CLI form from schema
    */
-  async generateForm(
+  static async generateForm(
     config: CLIFormConfig,
   ): Promise<Record<string, FormFieldValue>> {
     if (config.title) {
@@ -284,7 +291,7 @@ export class SchemaUIHandler {
     const answers: InquirerAnswer = {};
 
     for (const field of config.fields) {
-      const message = this.formatFieldMessage(field);
+      const message = SchemaUIHandler.formatFieldMessage(field);
       let value: FormFieldValue;
 
       // Use appropriate prompt function based on field type
@@ -326,7 +333,7 @@ export class SchemaUIHandler {
                   return "Please enter a valid number";
                 }
                 // Validate the parsed NUMBER against the schema
-                const validationResult = this.validateField(
+                const validationResult = SchemaUIHandler.validateField(
                   num,
                   field.validation!,
                 );
@@ -353,7 +360,7 @@ export class SchemaUIHandler {
           default: field.defaultValue?.toString(),
           validate: field.validation
             ? (inputStr): string | boolean =>
-                this.validateField(inputStr, field.validation!)
+                SchemaUIHandler.validateField(inputStr, field.validation!)
             : undefined,
         });
       }
@@ -363,13 +370,13 @@ export class SchemaUIHandler {
       }
     }
 
-    return this.processAnswers(answers, config.fields);
+    return SchemaUIHandler.processAnswers(answers, config.fields);
   }
 
   /**
    * Format field message for CLI prompt
    */
-  private formatFieldMessage(field: SchemaFieldMetadata): string {
+  private static formatFieldMessage(field: SchemaFieldMetadata): string {
     let message = field.name;
 
     if (field.description) {
@@ -387,7 +394,7 @@ export class SchemaUIHandler {
   /**
    * Validate field input against Zod schema
    */
-  private validateField(
+  private static validateField(
     input: FormFieldValue,
     schema: z.ZodTypeAny,
   ): boolean | string {
@@ -414,7 +421,7 @@ export class SchemaUIHandler {
   /**
    * Process form answers and convert types
    */
-  private processAnswers(
+  private static processAnswers(
     answers: Record<string, FormFieldValue>,
     fields: SchemaFieldMetadata[],
   ): Record<string, FormFieldValue> {
@@ -424,7 +431,7 @@ export class SchemaUIHandler {
       const value = answers[field.name];
 
       if (value !== undefined && value !== null && value !== "") {
-        processed[field.name] = this.convertFieldValue(value, field);
+        processed[field.name] = SchemaUIHandler.convertFieldValue(value, field);
       } else if (field.required) {
         // This shouldn't happen due to validation, but handle it by returning empty object
         // Since this is internal utility code, we'll let the caller handle validation
@@ -439,7 +446,7 @@ export class SchemaUIHandler {
   /**
    * Convert field value to appropriate type based on Zod schema
    */
-  private convertFieldValue(
+  private static convertFieldValue(
     value: FormFieldValue,
     field: SchemaFieldMetadata,
   ): FormFieldValue {
@@ -530,5 +537,3 @@ export class SchemaUIHandler {
     return undefined;
   }
 }
-
-export const schemaUIHandler = new SchemaUIHandler();

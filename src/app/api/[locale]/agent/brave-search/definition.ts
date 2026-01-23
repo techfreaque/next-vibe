@@ -9,10 +9,10 @@ import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -90,92 +90,82 @@ const { GET } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      query: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.agent.chat.tools.braveSearch.get.fields.query.title" as const,
-          description:
-            "app.api.agent.chat.tools.braveSearch.get.fields.query.description" as const,
-          placeholder:
-            "app.api.agent.chat.tools.braveSearch.get.fields.query.placeholder" as const,
-          columns: 12,
-        },
-        z.string().min(1).max(400),
-      ),
+      query: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.agent.chat.tools.braveSearch.get.fields.query.title" as const,
+        description:
+          "app.api.agent.chat.tools.braveSearch.get.fields.query.description" as const,
+        placeholder:
+          "app.api.agent.chat.tools.braveSearch.get.fields.query.placeholder" as const,
+        columns: 12,
+        schema: z.string().min(1).max(400),
+      }),
 
-      maxResults: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.agent.chat.tools.braveSearch.get.fields.maxResults.title" as const,
-          description:
-            "app.api.agent.chat.tools.braveSearch.get.fields.maxResults.description" as const,
-          columns: 4,
-        },
-        z.coerce.number().min(1).max(10).optional().default(5),
-      ),
+      maxResults: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.agent.chat.tools.braveSearch.get.fields.maxResults.title" as const,
+        description:
+          "app.api.agent.chat.tools.braveSearch.get.fields.maxResults.description" as const,
+        columns: 4,
+        schema: z.coerce.number().min(1).max(10).optional().default(5),
+      }),
 
-      includeNews: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.agent.chat.tools.braveSearch.get.fields.includeNews.title" as const,
-          description:
-            "app.api.agent.chat.tools.braveSearch.get.fields.includeNews.description" as const,
-          columns: 4,
-        },
-        z.boolean().optional().default(false),
-      ),
+      includeNews: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.agent.chat.tools.braveSearch.get.fields.includeNews.title" as const,
+        description:
+          "app.api.agent.chat.tools.braveSearch.get.fields.includeNews.description" as const,
+        columns: 4,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      freshness: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.agent.chat.tools.braveSearch.get.fields.freshness.title" as const,
-          description:
-            "app.api.agent.chat.tools.braveSearch.get.fields.freshness.description" as const,
-          options: [
-            {
-              value: "past_day",
-              label:
-                "app.api.agent.chat.tools.braveSearch.get.fields.freshness.options.day" as const,
-            },
-            {
-              value: "past_week",
-              label:
-                "app.api.agent.chat.tools.braveSearch.get.fields.freshness.options.week" as const,
-            },
-            {
-              value: "past_month",
-              label:
-                "app.api.agent.chat.tools.braveSearch.get.fields.freshness.options.month" as const,
-            },
-            {
-              value: "past_year",
-              label:
-                "app.api.agent.chat.tools.braveSearch.get.fields.freshness.options.year" as const,
-            },
-          ],
-          columns: 4,
-        },
-        z.enum(FRESHNESS_OPTIONS).optional(),
-      ),
+      freshness: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.agent.chat.tools.braveSearch.get.fields.freshness.title" as const,
+        description:
+          "app.api.agent.chat.tools.braveSearch.get.fields.freshness.description" as const,
+        options: [
+          {
+            value: "past_day",
+            label:
+              "app.api.agent.chat.tools.braveSearch.get.fields.freshness.options.day" as const,
+          },
+          {
+            value: "past_week",
+            label:
+              "app.api.agent.chat.tools.braveSearch.get.fields.freshness.options.week" as const,
+          },
+          {
+            value: "past_month",
+            label:
+              "app.api.agent.chat.tools.braveSearch.get.fields.freshness.options.month" as const,
+          },
+          {
+            value: "past_year",
+            label:
+              "app.api.agent.chat.tools.braveSearch.get.fields.freshness.options.year" as const,
+          },
+        ],
+        columns: 4,
+        schema: z.enum(FRESHNESS_OPTIONS).optional(),
+      }),
 
       // === RESPONSE FIELDS ===
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.tools.braveSearch.get.response.message.title" as const,
-          columns: 12,
-        },
-        z.string(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.tools.braveSearch.get.response.message.title" as const,
+        columns: 12,
+        schema: z.string(),
+      }),
 
       results: responseArrayField(
         {
@@ -192,47 +182,37 @@ const { GET } = createEndpoint({
           },
           { response: true },
           {
-            title: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.tools.braveSearch.get.response.results.title" as const,
-              },
-              z.string(),
-            ),
-            url: responseField(
-              {
-                type: WidgetType.LINK,
-                href: "/{url}",
-                text: "app.api.agent.chat.tools.braveSearch.get.response.results.item.url" as const,
-                external: true,
-              },
-              z.string(),
-            ),
-            snippet: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.tools.braveSearch.get.response.results.item.snippet" as const,
-              },
-              z.string(),
-            ),
-            age: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.tools.braveSearch.get.response.results.item.age" as const,
-              },
-              z.string().optional(),
-            ),
-            source: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.tools.braveSearch.get.response.results.item.source" as const,
-              },
-              z.string().optional(),
-            ),
+            title: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.tools.braveSearch.get.response.results.title" as const,
+              schema: z.string(),
+            }),
+            url: responseField({
+              type: WidgetType.LINK,
+              href: "/{url}",
+              text: "app.api.agent.chat.tools.braveSearch.get.response.results.item.url" as const,
+              external: true,
+              schema: z.string(),
+            }),
+            snippet: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.tools.braveSearch.get.response.results.item.snippet" as const,
+              schema: z.string(),
+            }),
+            age: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.tools.braveSearch.get.response.results.item.age" as const,
+              schema: z.string().optional(),
+            }),
+            source: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.tools.braveSearch.get.response.results.item.source" as const,
+              schema: z.string().optional(),
+            }),
           },
         ),
       ),

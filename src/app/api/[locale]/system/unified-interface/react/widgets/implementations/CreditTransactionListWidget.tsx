@@ -3,6 +3,7 @@
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
+import type { z } from "zod";
 
 import { simpleT } from "@/i18n/core/shared";
 
@@ -41,13 +42,13 @@ export function CreditTransactionListWidget<const TKey extends string>({
   }
 
   // Extract child field definition
-  let childField: UnifiedField<string> | null = null;
+  let childField: UnifiedField<string, z.ZodTypeAny> | null = null;
   if (
     "type" in field &&
     (field.type === "array" || field.type === "array-optional")
   ) {
     if ("child" in field && field.child) {
-      childField = field.child as UnifiedField<string>;
+      childField = field.child as UnifiedField<string, z.ZodTypeAny>;
     }
   }
 

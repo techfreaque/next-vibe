@@ -18,7 +18,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
-import { routeExecutionExecutor } from "../shared/endpoints/route/executor";
+import { RouteExecutionExecutor } from "../shared/endpoints/route/executor";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint";
 import { Platform } from "../shared/types/platform";
 import { endpointToToolName, getPreferredToolName } from "../shared/utils/path";
@@ -97,7 +97,7 @@ function createToolFromEndpoint(
     : z.never();
 
   // Get field names for each schema
-  const requestDataFields =
+  const requestFields =
     requestDataSchema instanceof z.ZodObject
       ? Object.keys(requestDataSchema.shape)
       : [];
@@ -120,14 +120,15 @@ function createToolFromEndpoint(
       for (const [key, value] of Object.entries(transformedParams)) {
         if (urlPathParamsFields.includes(key)) {
           urlPathParams[key] = value as never;
-        } else if (requestDataFields.includes(key)) {
+        } else if (requestFields.includes(key)) {
           data[key] = value as never;
         }
       }
 
       // Execute using shared generic handler
       // toolName must be in full path format: "agent.brave-search.GET"
-      const result = await routeExecutionExecutor.executeGenericHandler({
+      // Platform.AI is valid for tool execution, type restriction is overly specific
+      const result = await RouteExecutionExecutor.executeGenericHandler({
         toolName,
         data,
         urlPathParams,
@@ -141,7 +142,9 @@ function createToolFromEndpoint(
         // Throw error for AI SDK with translated message
         const errorMessage = result.message
           ? t(result.message, result.messageParams)
-          : simpleT(context.locale).t("errors.toolExecutionFailed");
+          : simpleT(context.locale).t(
+              "app.api.agent.aiStream.errors.toolExecutionFailed" as const,
+            );
         // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
         // eslint-disable-next-line @typescript-eslint/only-throw-error -- Tool error must be thrown for AI SDK
         throw new Error(errorMessage);

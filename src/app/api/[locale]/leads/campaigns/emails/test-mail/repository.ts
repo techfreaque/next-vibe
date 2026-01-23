@@ -58,7 +58,6 @@ export class TestEmailRepository {
       convertedUserId: null,
       convertedAt: null,
       signedUpAt: null,
-      consultationBookedAt: null,
       subscriptionConfirmedAt: null,
       currentCampaignStage: data.emailCampaignStage || null,
       emailsSent: 0,

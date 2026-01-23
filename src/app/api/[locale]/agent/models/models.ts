@@ -8,7 +8,7 @@ import {
   type IntelligenceLevelValue,
   SpeedLevel,
   type SpeedLevelValue,
-} from "../chat/favorites/enum";
+} from "../chat/characters/enum";
 import { ModelUtility, type ModelUtilityValue } from "./enum";
 
 /**
@@ -27,7 +27,6 @@ export interface ModelFeatures {
  * Each model has different pricing, capabilities, and context windows.
  */
 export enum ModelId {
-  CLAUDE_SONNET_4_5 = "claude-sonnet-4.5",
   GPT_5_2 = "gpt-52",
   GPT_5_2_CHAT = "gpt-52-chat",
   GPT_5_2_PRO = "gpt-52-pro",
@@ -56,6 +55,8 @@ export enum ModelId {
   GROK_4 = "grok-4",
   UNCENSORED_LM_V1_2 = "uncensored-lm-v1.2",
   CLAUDE_HAIKU_4_5 = "claude-haiku-4.5",
+  CLAUDE_SONNET_4_5 = "claude-sonnet-4.5",
+  CLAUDE_OPUS_4_5 = "claude-opus-4.5",
   GLM_4_6 = "glm-4.6",
   GLM_4_5_AIR = "glm-4.5-air",
   GLM_4_5V = "glm-4.5v",
@@ -164,7 +165,7 @@ export const modelProviders: Record<string, ModelProvider> = {
   },
   uncensoredAI: {
     name: "Uncensored.ai",
-    icon: "shield-off",
+    icon: "uncensored-ai",
   },
   anthropic: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
@@ -212,9 +213,9 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     description: "app.api.agent.chat.models.descriptions.uncensoredLmV11",
     parameterCount: undefined,
     contextWindow: 32768,
-    icon: "shield-off",
+    icon: "uncensored-ai",
     openRouterModel: "uncensored-lm",
-    creditCost: 5,
+    creditCost: 7,
     utilities: [
       ModelUtility.UNCENSORED,
       ModelUtility.CREATIVE,
@@ -262,7 +263,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 8192,
     icon: "gab-ai-logo",
     openRouterModel: "arya",
-    creditCost: 5,
+    creditCost: 7,
     utilities: [
       ModelUtility.UNCENSORED,
       ModelUtility.CREATIVE,
@@ -278,6 +279,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures },
+    weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
   },
   [ModelId.VENICE_UNCENSORED]: {
     id: ModelId.VENICE_UNCENSORED,
@@ -424,7 +426,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 200000,
     icon: "si-anthropic",
     openRouterModel: "anthropic/claude-haiku-4.5",
-    creditCost: 3,
+    creditCost: 5,
     utilities: [
       ModelUtility.CHAT,
       ModelUtility.FAST,
@@ -453,7 +455,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 1000000,
     icon: "si-anthropic",
     openRouterModel: "anthropic/claude-sonnet-4.5",
-    creditCost: 10,
+    creditCost: 15,
     utilities: [
       ModelUtility.SMART,
       ModelUtility.CODING,
@@ -464,6 +466,36 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
+    weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
+  },
+  [ModelId.CLAUDE_OPUS_4_5]: {
+    id: ModelId.CLAUDE_OPUS_4_5,
+    name: "Claude Opus 4.5",
+    provider: "anthropic",
+    apiProvider: ApiProvider.OPENROUTER,
+    description: "app.chat.models.descriptions.claudeOpus45",
+    parameterCount: undefined,
+    contextWindow: 1000000,
+    icon: "si-anthropic",
+    openRouterModel: "anthropic/claude-opus-4.5",
+    creditCost: 30,
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.CREATIVE,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    speed: SpeedLevel.THOROUGH,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,

@@ -2,13 +2,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  field,
   objectField,
-  requestDataField,
+  requestField,
   requestUrlPathParamsField,
   responseArrayOptionalField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,16 +49,14 @@ const { GET } = createEndpoint({
     { request: "urlPathParams", response: true },
     {
       // === REQUEST URL PARAMS ===
-      id: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.agent.chat.folders.id.get.id.label" as const,
-          description:
-            "app.api.agent.chat.folders.id.get.id.description" as const,
-        },
-        z.uuid(),
-      ),
+      id: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.agent.chat.folders.id.get.id.label" as const,
+        description:
+          "app.api.agent.chat.folders.id.get.id.description" as const,
+        schema: z.uuid(),
+      }),
 
       // === RESPONSE ===
       response: objectField(
@@ -82,165 +79,121 @@ const { GET } = createEndpoint({
             },
             { response: true },
             {
-              id: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.get.response.folder.id.content" as const,
-                },
-                z.uuid(),
-              ),
-              userId: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.get.response.folder.userId.content" as const,
-                },
-                z.uuid().nullable(),
-              ),
-              name: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.get.response.folder.name.content" as const,
-                },
-                z.string(),
-              ),
-              icon: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.get.response.folder.icon.content" as const,
-                },
+              id: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.get.response.folder.id.content" as const,
+                schema: z.uuid(),
+              }),
+              userId: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.get.response.folder.userId.content" as const,
+                schema: z.uuid().nullable(),
+              }),
+              name: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.get.response.folder.name.content" as const,
+                schema: z.string(),
+              }),
+              icon: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.get.response.folder.icon.content" as const,
                 // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null
-                iconSchema.nullable(),
-              ),
-              color: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.get.response.folder.color.content" as const,
-                },
-                z.string().nullable(),
-              ),
-              parentId: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.get.response.folder.parentId.content" as const,
-                },
-                z.uuid().nullable(),
-              ),
-              expanded: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.get.response.folder.expanded.content" as const,
-                },
-                z.boolean(),
-              ),
-              sortOrder: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.get.response.folder.sortOrder.content" as const,
-                },
-                z.coerce.number(),
-              ),
+                schema: iconSchema.nullable(),
+              }),
+              color: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.get.response.folder.color.content" as const,
+                schema: z.string().nullable(),
+              }),
+              parentId: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.get.response.folder.parentId.content" as const,
+                schema: z.uuid().nullable(),
+              }),
+              expanded: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.get.response.folder.expanded.content" as const,
+                schema: z.boolean(),
+              }),
+              sortOrder: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.get.response.folder.sortOrder.content" as const,
+                schema: z.coerce.number(),
+              }),
               rolesView: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
                 },
-                field(
-                  z.enum(UserRoleDB),
-                  { response: true },
-                  {
-                    type: WidgetType.BADGE,
-                    enumOptions: UserPermissionRoleOptions,
-                  },
-                ),
+                responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.enum(UserRoleDB),
+                }),
               ),
               rolesManage: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
                 },
-                field(
-                  z.enum(UserRoleDB),
-                  { response: true },
-                  {
-                    type: WidgetType.BADGE,
-                    enumOptions: UserPermissionRoleOptions,
-                  },
-                ),
+                responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.enum(UserRoleDB),
+                }),
               ),
               rolesCreateThread: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
                 },
-                field(
-                  z.enum(UserRoleDB),
-                  { response: true },
-                  {
-                    type: WidgetType.BADGE,
-                    enumOptions: UserPermissionRoleOptions,
-                  },
-                ),
+                responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.enum(UserRoleDB),
+                }),
               ),
               rolesPost: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
                 },
-                field(
-                  z.enum(UserRoleDB),
-                  { response: true },
-                  {
-                    type: WidgetType.BADGE,
-                    enumOptions: UserPermissionRoleOptions,
-                  },
-                ),
+                responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.enum(UserRoleDB),
+                }),
               ),
               rolesModerate: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
                 },
-                field(
-                  z.enum(UserRoleDB),
-                  { response: true },
-                  {
-                    type: WidgetType.BADGE,
-                    enumOptions: UserPermissionRoleOptions,
-                  },
-                ),
+                responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.enum(UserRoleDB),
+                }),
               ),
               rolesAdmin: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
                 },
-                field(
-                  z.enum(UserRoleDB),
-                  { response: true },
-                  {
-                    type: WidgetType.BADGE,
-                    enumOptions: UserPermissionRoleOptions,
-                  },
-                ),
-              ),
-              createdAt: responseField(
-                {
+                responseField({
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.get.response.folder.createdAt.content" as const,
-                },
-                dateSchema,
+                  schema: z.enum(UserRoleDB),
+                }),
               ),
-              updatedAt: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.get.response.folder.updatedAt.content" as const,
-                },
-                dateSchema,
-              ),
+              createdAt: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.get.response.folder.createdAt.content" as const,
+                schema: dateSchema,
+              }),
+              updatedAt: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.get.response.folder.updatedAt.content" as const,
+                schema: dateSchema,
+              }),
             },
           ),
         },
@@ -305,7 +258,6 @@ const { GET } = createEndpoint({
     urlPathParams: {
       default: { id: "123e4567-e89b-12d3-a456-426614174000" },
     },
-    requests: undefined,
     responses: {
       default: {
         response: {
@@ -359,16 +311,14 @@ const { PATCH } = createEndpoint({
     { request: "data&urlPathParams", response: true },
     {
       // === REQUEST URL PARAMS ===
-      id: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.agent.chat.folders.id.patch.id.label" as const,
-          description:
-            "app.api.agent.chat.folders.id.patch.id.description" as const,
-        },
-        z.uuid(),
-      ),
+      id: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.agent.chat.folders.id.patch.id.label" as const,
+        description:
+          "app.api.agent.chat.folders.id.patch.id.description" as const,
+        schema: z.uuid(),
+      }),
 
       // === REQUEST DATA ===
       updates: objectField(
@@ -383,154 +333,130 @@ const { PATCH } = createEndpoint({
         },
         { request: "data" },
         {
-          name: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.agent.chat.folders.id.patch.name.label" as const,
-              description:
-                "app.api.agent.chat.folders.id.patch.name.description" as const,
-              columns: 12,
-            },
-            z.string().min(1).max(255).optional(),
-          ),
-          icon: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.agent.chat.folders.id.patch.icon.label" as const,
-              description:
-                "app.api.agent.chat.folders.id.patch.icon.description" as const,
-              columns: 6,
-            },
+          name: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.agent.chat.folders.id.patch.name.label" as const,
+            description:
+              "app.api.agent.chat.folders.id.patch.name.description" as const,
+            columns: 12,
+            schema: z.string().min(1).max(255).optional(),
+          }),
+          icon: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.agent.chat.folders.id.patch.icon.label" as const,
+            description:
+              "app.api.agent.chat.folders.id.patch.icon.description" as const,
+            columns: 6,
             // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null | undefined
-            iconSchema.nullish(),
-          ),
-          color: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.agent.chat.folders.id.patch.color.label" as const,
-              description:
-                "app.api.agent.chat.folders.id.patch.color.description" as const,
-              columns: 6,
-            },
-            z.string().optional(),
-          ),
-          parentId: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.UUID,
-              label:
-                "app.api.agent.chat.folders.id.patch.parentId.label" as const,
-              description:
-                "app.api.agent.chat.folders.id.patch.parentId.description" as const,
-              columns: 6,
-            },
-            z.uuid().nullable().optional(),
-          ),
-          expanded: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label:
-                "app.api.agent.chat.folders.id.patch.expanded.label" as const,
-              description:
-                "app.api.agent.chat.folders.id.patch.expanded.description" as const,
-              columns: 6,
-            },
-            z.boolean().optional(),
-          ),
-          sortOrder: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label:
-                "app.api.agent.chat.folders.id.patch.sortOrder.label" as const,
-              description:
-                "app.api.agent.chat.folders.id.patch.sortOrder.description" as const,
-              columns: 6,
-            },
-            z.coerce.number().optional(),
-          ),
-          rolesView: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label:
-                "app.api.agent.chat.folders.id.patch.rolesView.label" as const,
-              description:
-                "app.api.agent.chat.folders.id.patch.rolesView.description" as const,
-              columns: 6,
-              options: UserPermissionRoleOptions,
-            },
-            z.array(z.enum(UserRoleDB)).nullable().optional(),
-          ),
-          rolesManage: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label:
-                "app.api.agent.chat.folders.id.patch.rolesManage.label" as const,
-              description:
-                "app.api.agent.chat.folders.id.patch.rolesManage.description" as const,
-              columns: 6,
-              options: UserPermissionRoleOptions,
-            },
-            z.array(z.enum(UserRoleDB)).nullable().optional(),
-          ),
-          rolesCreateThread: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label:
-                "app.api.agent.chat.folders.id.patch.rolesCreateThread.label" as const,
-              description:
-                "app.api.agent.chat.folders.id.patch.rolesCreateThread.description" as const,
-              columns: 6,
-              options: UserPermissionRoleOptions,
-            },
-            z.array(z.enum(UserRoleDB)).nullable().optional(),
-          ),
-          rolesPost: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label:
-                "app.api.agent.chat.folders.id.patch.rolesPost.label" as const,
-              description:
-                "app.api.agent.chat.folders.id.patch.rolesPost.description" as const,
-              columns: 6,
-              options: UserPermissionRoleOptions,
-            },
-            z.array(z.enum(UserRoleDB)).nullable().optional(),
-          ),
-          rolesModerate: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label:
-                "app.api.agent.chat.folders.id.patch.rolesModerate.label" as const,
-              description:
-                "app.api.agent.chat.folders.id.patch.rolesModerate.description" as const,
-              columns: 6,
-              options: UserPermissionRoleOptions,
-            },
-            z.array(z.enum(UserRoleDB)).nullable().optional(),
-          ),
-          rolesAdmin: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label:
-                "app.api.agent.chat.folders.id.patch.rolesAdmin.label" as const,
-              description:
-                "app.api.agent.chat.folders.id.patch.rolesAdmin.description" as const,
-              columns: 6,
-              options: UserPermissionRoleOptions,
-            },
-            z.array(z.enum(UserRoleDB)).nullable().optional(),
-          ),
+            schema: iconSchema.nullish(),
+          }),
+          color: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.agent.chat.folders.id.patch.color.label" as const,
+            description:
+              "app.api.agent.chat.folders.id.patch.color.description" as const,
+            columns: 6,
+            schema: z.string().optional(),
+          }),
+          parentId: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.UUID,
+            label:
+              "app.api.agent.chat.folders.id.patch.parentId.label" as const,
+            description:
+              "app.api.agent.chat.folders.id.patch.parentId.description" as const,
+            columns: 6,
+            schema: z.uuid().nullable().optional(),
+          }),
+          expanded: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.BOOLEAN,
+            label:
+              "app.api.agent.chat.folders.id.patch.expanded.label" as const,
+            description:
+              "app.api.agent.chat.folders.id.patch.expanded.description" as const,
+            columns: 6,
+            schema: z.boolean().optional(),
+          }),
+          sortOrder: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label:
+              "app.api.agent.chat.folders.id.patch.sortOrder.label" as const,
+            description:
+              "app.api.agent.chat.folders.id.patch.sortOrder.description" as const,
+            columns: 6,
+            schema: z.coerce.number().optional(),
+          }),
+          rolesView: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label:
+              "app.api.agent.chat.folders.id.patch.rolesView.label" as const,
+            description:
+              "app.api.agent.chat.folders.id.patch.rolesView.description" as const,
+            columns: 6,
+            options: UserPermissionRoleOptions,
+            schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
+          }),
+          rolesManage: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label:
+              "app.api.agent.chat.folders.id.patch.rolesManage.label" as const,
+            description:
+              "app.api.agent.chat.folders.id.patch.rolesManage.description" as const,
+            columns: 6,
+            options: UserPermissionRoleOptions,
+            schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
+          }),
+          rolesCreateThread: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label:
+              "app.api.agent.chat.folders.id.patch.rolesCreateThread.label" as const,
+            description:
+              "app.api.agent.chat.folders.id.patch.rolesCreateThread.description" as const,
+            columns: 6,
+            options: UserPermissionRoleOptions,
+            schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
+          }),
+          rolesPost: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label:
+              "app.api.agent.chat.folders.id.patch.rolesPost.label" as const,
+            description:
+              "app.api.agent.chat.folders.id.patch.rolesPost.description" as const,
+            columns: 6,
+            options: UserPermissionRoleOptions,
+            schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
+          }),
+          rolesModerate: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label:
+              "app.api.agent.chat.folders.id.patch.rolesModerate.label" as const,
+            description:
+              "app.api.agent.chat.folders.id.patch.rolesModerate.description" as const,
+            columns: 6,
+            options: UserPermissionRoleOptions,
+            schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
+          }),
+          rolesAdmin: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label:
+              "app.api.agent.chat.folders.id.patch.rolesAdmin.label" as const,
+            description:
+              "app.api.agent.chat.folders.id.patch.rolesAdmin.description" as const,
+            columns: 6,
+            options: UserPermissionRoleOptions,
+            schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
+          }),
         },
       ),
 
@@ -555,165 +481,121 @@ const { PATCH } = createEndpoint({
             },
             { response: true },
             {
-              id: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.patch.response.folder.id.content" as const,
-                },
-                z.uuid(),
-              ),
-              userId: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.patch.response.folder.userId.content" as const,
-                },
-                z.uuid().nullable(),
-              ),
-              name: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.patch.response.folder.name.content" as const,
-                },
-                z.string(),
-              ),
-              icon: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.patch.response.folder.icon.content" as const,
-                },
+              id: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.patch.response.folder.id.content" as const,
+                schema: z.uuid(),
+              }),
+              userId: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.patch.response.folder.userId.content" as const,
+                schema: z.uuid().nullable(),
+              }),
+              name: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.patch.response.folder.name.content" as const,
+                schema: z.string(),
+              }),
+              icon: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.patch.response.folder.icon.content" as const,
                 // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null
-                iconSchema.nullable(),
-              ),
-              color: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.patch.response.folder.color.content" as const,
-                },
-                z.string().nullable(),
-              ),
-              parentId: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.patch.response.folder.parentId.content" as const,
-                },
-                z.uuid().nullable(),
-              ),
-              expanded: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.patch.response.folder.expanded.content" as const,
-                },
-                z.boolean(),
-              ),
-              sortOrder: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.patch.response.folder.sortOrder.content" as const,
-                },
-                z.coerce.number(),
-              ),
+                schema: iconSchema.nullable(),
+              }),
+              color: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.patch.response.folder.color.content" as const,
+                schema: z.string().nullable(),
+              }),
+              parentId: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.patch.response.folder.parentId.content" as const,
+                schema: z.uuid().nullable(),
+              }),
+              expanded: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.patch.response.folder.expanded.content" as const,
+                schema: z.boolean(),
+              }),
+              sortOrder: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.patch.response.folder.sortOrder.content" as const,
+                schema: z.coerce.number(),
+              }),
               rolesView: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
                 },
-                field(
-                  z.enum(UserRoleDB),
-                  { response: true },
-                  {
-                    type: WidgetType.BADGE,
-                    enumOptions: UserPermissionRoleOptions,
-                  },
-                ),
+                responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.enum(UserRoleDB),
+                }),
               ),
               rolesManage: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
                 },
-                field(
-                  z.enum(UserRoleDB),
-                  { response: true },
-                  {
-                    type: WidgetType.BADGE,
-                    enumOptions: UserPermissionRoleOptions,
-                  },
-                ),
+                responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.enum(UserRoleDB),
+                }),
               ),
               rolesCreateThread: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
                 },
-                field(
-                  z.enum(UserRoleDB),
-                  { response: true },
-                  {
-                    type: WidgetType.BADGE,
-                    enumOptions: UserPermissionRoleOptions,
-                  },
-                ),
+                responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.enum(UserRoleDB),
+                }),
               ),
               rolesPost: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
                 },
-                field(
-                  z.enum(UserRoleDB),
-                  { response: true },
-                  {
-                    type: WidgetType.BADGE,
-                    enumOptions: UserPermissionRoleOptions,
-                  },
-                ),
+                responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.enum(UserRoleDB),
+                }),
               ),
               rolesModerate: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
                 },
-                field(
-                  z.enum(UserRoleDB),
-                  { response: true },
-                  {
-                    type: WidgetType.BADGE,
-                    enumOptions: UserPermissionRoleOptions,
-                  },
-                ),
+                responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.enum(UserRoleDB),
+                }),
               ),
               rolesAdmin: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
                 },
-                field(
-                  z.enum(UserRoleDB),
-                  { response: true },
-                  {
-                    type: WidgetType.BADGE,
-                    enumOptions: UserPermissionRoleOptions,
-                  },
-                ),
-              ),
-              createdAt: responseField(
-                {
+                responseField({
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.patch.response.folder.createdAt.content" as const,
-                },
-                dateSchema,
+                  schema: z.enum(UserRoleDB),
+                }),
               ),
-              updatedAt: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.folders.id.patch.response.folder.updatedAt.content" as const,
-                },
-                dateSchema,
-              ),
+              createdAt: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.patch.response.folder.createdAt.content" as const,
+                schema: dateSchema,
+              }),
+              updatedAt: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.folders.id.patch.response.folder.updatedAt.content" as const,
+                schema: dateSchema,
+              }),
             },
           ),
         },
@@ -840,16 +722,14 @@ const { DELETE } = createEndpoint({
     { request: "urlPathParams", response: true },
     {
       // === REQUEST URL PARAMS ===
-      id: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.agent.chat.folders.id.delete.id.label" as const,
-          description:
-            "app.api.agent.chat.folders.id.delete.id.description" as const,
-        },
-        z.uuid(),
-      ),
+      id: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.agent.chat.folders.id.delete.id.label" as const,
+        description:
+          "app.api.agent.chat.folders.id.delete.id.description" as const,
+        schema: z.uuid(),
+      }),
 
       // === RESPONSE ===
       response: objectField(
@@ -862,22 +742,18 @@ const { DELETE } = createEndpoint({
         },
         { response: true },
         {
-          success: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.folders.id.delete.response.success.content" as const,
-            },
-            z.boolean(),
-          ),
-          deletedFolderId: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.folders.id.delete.response.deletedFolderId.content" as const,
-            },
-            z.uuid(),
-          ),
+          success: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.agent.chat.folders.id.delete.response.success.content" as const,
+            schema: z.boolean(),
+          }),
+          deletedFolderId: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.agent.chat.folders.id.delete.response.deletedFolderId.content" as const,
+            schema: z.uuid(),
+          }),
         },
       ),
     },
@@ -940,7 +816,6 @@ const { DELETE } = createEndpoint({
     urlPathParams: {
       default: { id: "123e4567-e89b-12d3-a456-426614174000" },
     },
-    requests: undefined,
     responses: {
       default: {
         response: {

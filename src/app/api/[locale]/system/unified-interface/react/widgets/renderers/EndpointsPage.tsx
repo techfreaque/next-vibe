@@ -7,8 +7,13 @@
 
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { Div } from "next-vibe-ui/ui/div";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "next-vibe-ui/ui/popover";
 import { P } from "next-vibe-ui/ui/typography";
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils/utils";
 import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
@@ -19,7 +24,10 @@ import {
   type SubmitButtonConfig,
 } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointRenderer";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type {
+  CreateApiEndpointAny,
+  NavigationStackEntry,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -56,6 +64,8 @@ export interface EndpointsPageProps<
   _disableNavigationStack?: boolean;
   /** Force which endpoint method to render when multiple are present (e.g., both GET and PATCH) */
   forceMethod?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  /** Optional navigation overrides (e.g., to override pop behavior in modals) */
+  navigationOverride?: Partial<ReturnType<typeof useNavigationStack>>;
 }
 
 /**
@@ -110,9 +120,19 @@ export function EndpointsPage<
   user,
   _disableNavigationStack = false,
   forceMethod,
+  navigationOverride,
 }: EndpointsPageProps<T>): React.JSX.Element {
   // Check navigation stack to render stacked endpoints (only for base layer)
-  const navigation = useNavigationStack();
+  const baseNavigation = useNavigationStack();
+  // Merge with any provided overrides (e.g., for modal context)
+  // Wrap in useMemo to ensure stable reference for other hooks
+  const navigation = useMemo(
+    () =>
+      navigationOverride
+        ? { ...baseNavigation, ...navigationOverride }
+        : baseNavigation,
+    [baseNavigation, navigationOverride],
+  );
 
   // Determine which endpoint to use for base layer
   // If forceMethod is provided, use that; otherwise use default priority
@@ -190,6 +210,7 @@ export function EndpointsPage<
   }, [
     isMutationEndpoint,
     endpoint.GET,
+    endpoint.POST,
     endpointOptions?.create?.mutationOptions,
     navigation,
   ]);
@@ -243,22 +264,9 @@ export function EndpointsPage<
       const readResponse = endpointState.read.response;
       const readData =
         readResponse?.success === true ? readResponse.data : undefined;
-      console.log("EndpointsPage PATCH/PUT with GET prefill", {
-        hasRead: true,
-        isLoading: endpointState.read.isLoading,
-        readResponse,
-        readData,
-        readDataKeys: readData ? Object.keys(readData as object) : [],
-        currentResponseData: responseData,
-        mutationResponse: operation?.response,
-      });
       if (readData) {
         responseData = readData;
       }
-    } else {
-      console.log("EndpointsPage PATCH/PUT without GET", {
-        hasRead: false,
-      });
     }
   } else if (isDeleteEndpoint && endpointState.delete) {
     const deleteOp = endpointState.delete;
@@ -281,7 +289,7 @@ export function EndpointsPage<
     update: endpointState.update
       ? {
           submit: async (data: Record<string, WidgetData>): Promise<void> => {
-            await endpointState.update?.submit(data);
+            await endpointState.update?.submit(data as never);
             if (endpointState.read) {
               await endpointState.read.refetch();
             }
@@ -310,9 +318,23 @@ export function EndpointsPage<
       : undefined,
   };
 
-  // Base layer is visible when stack is empty (only applies to non-stacked instances)
+  // Modal state tracking
+  const [modalOpenState, setModalOpenState] = useState<Record<number, boolean>>(
+    {},
+  );
+
+  // Check if top entry is a modal
+  const topEntry = navigation.stack[navigation.stack.length - 1];
+  const topIsModal = topEntry?.renderInModal ?? false;
+
+  // Base layer is visible only when:
+  // - Stack is disabled, OR
+  // - Stack is empty, OR
+  // - Stack has ONLY a modal (base is the background for that modal)
   const isBaseVisible =
-    _disableNavigationStack || navigation.stack.length === 0;
+    _disableNavigationStack ||
+    navigation.stack.length === 0 ||
+    (navigation.stack.length === 1 && topIsModal);
 
   return (
     <>
@@ -399,166 +421,430 @@ export function EndpointsPage<
       {/* Stacked endpoint layers - each mounted to preserve state */}
       {/* Only render navigation stack for base layer (not for stacked instances) */}
       {!_disableNavigationStack &&
-        navigation.stack.map((entry, index) => {
-          const isVisible = index === navigation.stack.length - 1;
-          const method = entry.endpoint.method;
-
-          // Render appropriate endpoint based on method with proper type safety
-          if (method === "GET") {
-            return (
-              <Div
-                key={`nav-${entry.timestamp}-${index}`}
-                className={cn(className, !isVisible && "hidden")}
-              >
-                <EndpointsPage
-                  endpoint={{ GET: entry.endpoint }}
-                  locale={locale}
-                  endpointOptions={{
-                    read: {
-                      urlPathParams: entry.params.urlPathParams,
-                    },
-                  }}
-                  submitButton={submitButton}
-                  debug={debug}
-                  user={user}
-                  _disableNavigationStack={true}
-                />
-              </Div>
-            );
-          }
-
-          if (method === "POST") {
-            return (
-              <Div
-                key={`nav-${entry.timestamp}-${index}`}
-                className={cn(className, !isVisible && "hidden")}
-              >
-                <EndpointsPage
-                  user={user}
-                  endpoint={{ POST: entry.endpoint }}
-                  locale={locale}
-                  endpointOptions={{
-                    create: {
-                      urlPathParams: entry.params.urlPathParams,
-                      autoPrefillData: entry.params.data,
-                    },
-                  }}
-                  submitButton={submitButton}
-                  debug={debug}
-                  _disableNavigationStack={true}
-                />
-              </Div>
-            );
-          }
-
-          if (method === "PATCH") {
-            // If prefillFromGet is true and getEndpoint exists, include GET endpoint for auto-prefill
-            const endpointConfig =
-              entry.prefillFromGet && entry.getEndpoint
-                ? { GET: entry.getEndpoint, PATCH: entry.endpoint }
-                : { PATCH: entry.endpoint };
-
-            return (
-              <Div
-                key={`nav-${entry.timestamp}-${index}`}
-                className={cn(className, !isVisible && "hidden")}
-              >
-                <EndpointsPage
-                  user={user}
-                  endpoint={endpointConfig}
-                  locale={locale}
-                  forceMethod={method}
-                  endpointOptions={{
-                    // CRITICAL: Pass read options whenever prefillFromGet is true
-                    // getEndpoint might be undefined if it was auto-detected, but we still need the urlPathParams
-                    ...(entry.prefillFromGet
-                      ? {
-                          read: {
-                            urlPathParams: entry.params.urlPathParams as never,
-                          },
-                        }
-                      : {}),
-                    update: {
-                      urlPathParams: entry.params.urlPathParams,
-                      autoPrefillData: entry.params.data,
-                    },
-                  }}
-                  submitButton={submitButton}
-                  debug={debug}
-                  _disableNavigationStack={true}
-                />
-              </Div>
-            );
-          }
-
-          if (method === "DELETE") {
-            return (
-              <Div
-                key={`nav-${entry.timestamp}-${index}`}
-                className={cn(className, !isVisible && "hidden")}
-              >
-                <EndpointsPage
-                  user={user}
-                  endpoint={{ DELETE: entry.endpoint }}
-                  locale={locale}
-                  endpointOptions={{
-                    delete: {
-                      urlPathParams: entry.params.urlPathParams,
-                      autoPrefillData: entry.params.urlPathParams,
-                    },
-                  }}
-                  submitButton={submitButton}
-                  debug={debug}
-                  _disableNavigationStack={true}
-                />
-              </Div>
-            );
-          }
-
-          if (method === "PUT") {
-            // If prefillFromGet is true and getEndpoint exists, include GET endpoint for auto-prefill
-            const endpointConfig =
-              entry.prefillFromGet && entry.getEndpoint
-                ? { GET: entry.getEndpoint, PUT: entry.endpoint }
-                : { PUT: entry.endpoint };
-
-            return (
-              <Div
-                key={`nav-${entry.timestamp}-${index}`}
-                className={cn(className, !isVisible && "hidden")}
-              >
-                <EndpointsPage
-                  user={user}
-                  endpoint={endpointConfig}
-                  locale={locale}
-                  forceMethod={method}
-                  endpointOptions={{
-                    // CRITICAL: Pass read options whenever prefillFromGet is true
-                    // getEndpoint might be undefined if it was auto-detected, but we still need the urlPathParams
-                    ...(entry.prefillFromGet
-                      ? {
-                          read: {
-                            urlPathParams: entry.params.urlPathParams as never,
-                          },
-                        }
-                      : {}),
-                    create: {
-                      urlPathParams: entry.params.urlPathParams,
-                      autoPrefillData: entry.params.data,
-                    },
-                  }}
-                  submitButton={submitButton}
-                  debug={debug}
-                  _disableNavigationStack={true}
-                />
-              </Div>
-            );
-          }
-
-          return null;
-        })}
+        navigation.stack.map((entry, index) => (
+          <StackEntryLayer
+            key={`nav-${entry.timestamp}-${index}`}
+            entry={entry}
+            index={index}
+            className={className}
+            submitButton={submitButton}
+            debug={debug}
+            user={user}
+            locale={locale}
+            modalOpenState={modalOpenState}
+            setModalOpenState={setModalOpenState}
+            navigation={navigation}
+          />
+        ))}
     </>
   );
 }
 
 EndpointsPage.displayName = "EndpointsPage";
+
+/**
+ * Helper component to render content either as a hidden div or in a popover modal
+ */
+function StackEntryRenderer({
+  entry,
+  isModal,
+  isVisible,
+  className,
+  children,
+  modalOpenState,
+  setModalOpenState,
+  navigation,
+}: {
+  entry: NavigationStackEntry;
+  isModal: boolean;
+  isVisible: boolean;
+  className?: string;
+  children: React.ReactNode;
+  modalOpenState: Record<number, boolean>;
+  setModalOpenState: (
+    state:
+      | Record<number, boolean>
+      | ((prev: Record<number, boolean>) => Record<number, boolean>),
+  ) => void;
+  navigation: ReturnType<typeof useNavigationStack>;
+}): React.JSX.Element {
+  const modalIsOpen = modalOpenState[entry.timestamp] ?? true;
+  const triggerRef = useRef<HTMLDivElement>(null);
+
+  // Calculate adjusted position for modal based on click coordinates
+  const adjustedPosition = useMemo(() => {
+    if (!entry.modalPosition) {
+      return undefined;
+    }
+
+    const POPOVER_WIDTH = 500;
+    const POPOVER_HEIGHT = 500;
+    const BUTTON_WIDTH = 40;
+    const BUTTON_HEIGHT = 32;
+    const OFFSET_BELOW = 12;
+    const PADDING = 16;
+
+    const buttonMiddleX = entry.modalPosition.x + BUTTON_WIDTH / 2;
+    const buttonBottomY = entry.modalPosition.y + BUTTON_HEIGHT + OFFSET_BELOW;
+
+    // Calculate available space on left and right
+    const spaceOnLeft = buttonMiddleX;
+    const spaceOnRight = window.innerWidth - buttonMiddleX;
+
+    let finalX: number;
+
+    // Position modal so one edge aligns with button middle
+    if (spaceOnLeft > spaceOnRight) {
+      // More space on left: position modal to the left with RIGHT edge at button middle
+      finalX = Math.max(PADDING, buttonMiddleX - POPOVER_WIDTH);
+    } else {
+      // More space on right: position modal to the right with LEFT edge at button middle
+      finalX = Math.min(
+        window.innerWidth - POPOVER_WIDTH - PADDING,
+        buttonMiddleX,
+      );
+    }
+
+    // Position below button, adjust if it goes off bottom
+    let finalY = buttonBottomY;
+    if (finalY + POPOVER_HEIGHT + PADDING > window.innerHeight) {
+      finalY = Math.max(PADDING, window.innerHeight - POPOVER_HEIGHT - PADDING);
+    }
+
+    const positionStyle: React.CSSProperties = {
+      position: "fixed",
+      left: `${finalX}px`,
+      top: `${finalY}px`,
+      margin: 0,
+    };
+
+    return {
+      x: finalX,
+      y: finalY,
+      left: `${finalX}px`,
+      top: `${finalY}px`,
+      style: positionStyle,
+    };
+  }, [entry.modalPosition]);
+
+  if (!isModal) {
+    return (
+      <Div
+        key={`nav-${entry.timestamp}`}
+        className={cn(className, !isVisible && "hidden")}
+      >
+        {children}
+      </Div>
+    );
+  }
+
+  return (
+    <>
+      {/* Backdrop - dims page and handles outside clicks */}
+      {modalIsOpen && (
+        <Div
+          onClick={(e) => {
+            e.preventDefault();
+            setModalOpenState({
+              ...modalOpenState,
+              [entry.timestamp]: false,
+            });
+            navigation.pop();
+          }}
+          className="fixed inset-0 z-40 bg-black/30"
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Modal popover */}
+      <Popover
+        key={`nav-${entry.timestamp}`}
+        open={modalIsOpen}
+        onOpenChange={(open) => {
+          setModalOpenState({
+            ...modalOpenState,
+            [entry.timestamp]: open,
+          });
+          if (!open) {
+            navigation.pop();
+          }
+        }}
+      >
+        <PopoverTrigger asChild>
+          <Div ref={triggerRef} className="hidden" />
+        </PopoverTrigger>
+        <PopoverContent
+          className="p-0 w-[90vw] sm:w-[500px] max-w-[600px] relative z-50"
+          side="bottom"
+          align="start"
+          sideOffset={8}
+          alignOffset={0}
+        >
+          <Div
+            style={
+              adjustedPosition?.style
+                ? {
+                    display: "flex",
+                    flexDirection: "column",
+                    maxHeight: "min(500px,calc(100dvh-100px))",
+                    overflowY: "auto",
+                    ...adjustedPosition.style,
+                  }
+                : {
+                    display: "flex",
+                    flexDirection: "column",
+                    maxHeight: "min(500px,calc(100dvh-100px))",
+                    overflowY: "auto",
+                  }
+            }
+          >
+            {children}
+          </Div>
+        </PopoverContent>
+      </Popover>
+    </>
+  );
+}
+
+/**
+ * Component to render a single navigation stack entry
+ * Handles hook calls at proper component level (not inside map)
+ */
+function StackEntryLayer({
+  entry,
+  index,
+  className,
+  submitButton,
+  debug,
+  user,
+  locale,
+  modalOpenState,
+  setModalOpenState,
+  navigation,
+}: {
+  entry: NavigationStackEntry;
+  index: number;
+  className?: string;
+  submitButton?: SubmitButtonConfig;
+  debug?: boolean;
+  user: JwtPayloadType;
+  locale: CountryLanguage;
+  modalOpenState: Record<number, boolean>;
+  setModalOpenState: (
+    state:
+      | Record<number, boolean>
+      | ((prev: Record<number, boolean>) => Record<number, boolean>),
+  ) => void;
+  navigation: ReturnType<typeof useNavigationStack>;
+}): React.JSX.Element | null {
+  const isTopEntry = index === navigation.stack.length - 1;
+  const topEntry = navigation.stack[navigation.stack.length - 1];
+  const isBackgroundOfModal =
+    index === navigation.stack.length - 2 && (topEntry?.renderInModal ?? false);
+
+  // Show if: top entry OR background layer of a modal
+  const isVisible = isTopEntry || isBackgroundOfModal;
+  const isModal = isTopEntry && (entry.renderInModal ?? false);
+  const method = entry.endpoint.method;
+
+  // Hooks called at top level of this component (before any conditional returns)
+  const modalNavigationOverride = useMemo(() => {
+    if (!isModal) {
+      return undefined;
+    }
+    return {
+      pop: (): void => {
+        setModalOpenState(
+          (prev: Record<number, boolean>): Record<number, boolean> => ({
+            ...prev,
+            [entry.timestamp]: false,
+          }),
+        );
+        navigation.pop();
+      },
+      canGoBack: true,
+    };
+  }, [isModal, entry.timestamp, navigation, setModalOpenState]);
+
+  // Don't render if not visible
+  if (!isVisible) {
+    return null;
+  }
+
+  // Render appropriate endpoint based on method
+  if (method === "GET") {
+    return (
+      <StackEntryRenderer
+        entry={entry}
+        isModal={isModal}
+        isVisible={isVisible}
+        className={className}
+        modalOpenState={modalOpenState}
+        setModalOpenState={setModalOpenState}
+        navigation={navigation}
+      >
+        <EndpointsPage
+          endpoint={{ GET: entry.endpoint }}
+          locale={locale}
+          endpointOptions={{
+            read: {
+              urlPathParams: entry.params.urlPathParams,
+            },
+          }}
+          submitButton={submitButton}
+          debug={debug}
+          user={user}
+          _disableNavigationStack={true}
+          navigationOverride={isModal ? modalNavigationOverride : undefined}
+        />
+      </StackEntryRenderer>
+    );
+  }
+
+  if (method === "POST") {
+    return (
+      <StackEntryRenderer
+        entry={entry}
+        isModal={isModal}
+        isVisible={isVisible}
+        className={className}
+        modalOpenState={modalOpenState}
+        setModalOpenState={setModalOpenState}
+        navigation={navigation}
+      >
+        <EndpointsPage
+          user={user}
+          endpoint={{ POST: entry.endpoint }}
+          locale={locale}
+          endpointOptions={{
+            create: {
+              urlPathParams: entry.params.urlPathParams,
+              autoPrefillData: entry.params.data,
+            },
+          }}
+          submitButton={submitButton}
+          debug={debug}
+          _disableNavigationStack={true}
+          navigationOverride={isModal ? modalNavigationOverride : undefined}
+        />
+      </StackEntryRenderer>
+    );
+  }
+
+  if (method === "PATCH") {
+    const endpointConfig =
+      entry.prefillFromGet && entry.getEndpoint
+        ? { GET: entry.getEndpoint, PATCH: entry.endpoint }
+        : { PATCH: entry.endpoint };
+
+    return (
+      <StackEntryRenderer
+        entry={entry}
+        isModal={isModal}
+        isVisible={isVisible}
+        className={className}
+        modalOpenState={modalOpenState}
+        setModalOpenState={setModalOpenState}
+        navigation={navigation}
+      >
+        <EndpointsPage
+          user={user}
+          endpoint={endpointConfig}
+          locale={locale}
+          forceMethod={method}
+          endpointOptions={{
+            ...(entry.prefillFromGet
+              ? {
+                  read: {
+                    urlPathParams: entry.params.urlPathParams as never,
+                  },
+                }
+              : {}),
+            update: {
+              urlPathParams: entry.params.urlPathParams,
+              autoPrefillData: entry.params.data,
+            },
+          }}
+          submitButton={submitButton}
+          debug={debug}
+          _disableNavigationStack={true}
+          navigationOverride={isModal ? modalNavigationOverride : undefined}
+        />
+      </StackEntryRenderer>
+    );
+  }
+
+  if (method === "DELETE") {
+    return (
+      <StackEntryRenderer
+        entry={entry}
+        isModal={isModal}
+        isVisible={isVisible}
+        className={className}
+        modalOpenState={modalOpenState}
+        setModalOpenState={setModalOpenState}
+        navigation={navigation}
+      >
+        <EndpointsPage
+          user={user}
+          endpoint={{ DELETE: entry.endpoint }}
+          locale={locale}
+          endpointOptions={{
+            delete: {
+              urlPathParams: entry.params.urlPathParams,
+              autoPrefillData: entry.params.urlPathParams,
+            },
+          }}
+          debug={debug}
+          _disableNavigationStack={true}
+          navigationOverride={isModal ? modalNavigationOverride : undefined}
+        />
+      </StackEntryRenderer>
+    );
+  }
+
+  if (method === "PUT") {
+    const endpointConfig =
+      entry.prefillFromGet && entry.getEndpoint
+        ? { GET: entry.getEndpoint, PUT: entry.endpoint }
+        : { PUT: entry.endpoint };
+
+    return (
+      <StackEntryRenderer
+        entry={entry}
+        isModal={isModal}
+        isVisible={isVisible}
+        className={className}
+        modalOpenState={modalOpenState}
+        setModalOpenState={setModalOpenState}
+        navigation={navigation}
+      >
+        <EndpointsPage
+          user={user}
+          endpoint={endpointConfig}
+          locale={locale}
+          forceMethod={method}
+          endpointOptions={{
+            ...(entry.prefillFromGet
+              ? {
+                  read: {
+                    urlPathParams: entry.params.urlPathParams as never,
+                  },
+                }
+              : {}),
+            create: {
+              urlPathParams: entry.params.urlPathParams,
+              autoPrefillData: entry.params.data,
+            },
+          }}
+          submitButton={submitButton}
+          debug={debug}
+          _disableNavigationStack={true}
+          navigationOverride={isModal ? modalNavigationOverride : undefined}
+        />
+      </StackEntryRenderer>
+    );
+  }
+
+  return null;
+}

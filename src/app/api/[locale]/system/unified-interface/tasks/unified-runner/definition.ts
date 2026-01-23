@@ -9,9 +9,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -48,120 +48,106 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // Request fields
-      action: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.description",
-          options: [
-            {
-              value: "start",
-              label:
-                "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.options.start",
-            },
-            {
-              value: "stop",
-              label:
-                "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.options.stop",
-            },
-            {
-              value: "status",
-              label:
-                "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.options.status",
-            },
-            {
-              value: "restart",
-              label:
-                "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.options.restart",
-            },
-          ],
-          columns: 6,
-        },
-        z.enum(["start", "stop", "status", "restart"]),
-      ),
+      action: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.description",
+        options: [
+          {
+            value: "start",
+            label:
+              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.options.start",
+          },
+          {
+            value: "stop",
+            label:
+              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.options.stop",
+          },
+          {
+            value: "status",
+            label:
+              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.options.status",
+          },
+          {
+            value: "restart",
+            label:
+              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.options.restart",
+          },
+        ],
+        columns: 6,
+        schema: z.enum(["start", "stop", "status", "restart"]),
+      }),
 
-      taskFilter: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.description",
-          options: [
-            {
-              value: "all",
-              label:
-                "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.options.all",
-            },
-            {
-              value: "cron",
-              label:
-                "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.options.cron",
-            },
-            {
-              value: "side",
-              label:
-                "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.options.side",
-            },
-          ],
-          columns: 6,
-        },
-        z.enum(["all", "cron", "side"]).optional(),
-      ),
+      taskFilter: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.description",
+        options: [
+          {
+            value: "all",
+            label:
+              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.options.all",
+          },
+          {
+            value: "cron",
+            label:
+              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.options.cron",
+          },
+          {
+            value: "side",
+            label:
+              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.options.side",
+          },
+        ],
+        columns: 6,
+        schema: z.enum(["all", "cron", "side"]).optional(),
+      }),
 
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.dryRun.label",
-          description:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.dryRun.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.dryRun.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.dryRun.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.success",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.success",
+        schema: z.boolean(),
+      }),
 
-      actionResult: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.actionResult",
-        },
-        z.string(),
-      ),
+      actionResult: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.actionResult",
+        schema: z.string(),
+      }),
 
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
-        },
-        z.string(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
+        schema: z.string(),
+      }),
 
-      timestamp: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.timestamp",
-        },
-        z.string(),
-      ),
+      timestamp: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.timestamp",
+        schema: z.string(),
+      }),
     },
   ),
 

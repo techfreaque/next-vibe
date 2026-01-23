@@ -27,7 +27,12 @@ const test1_1: Test1_1_LiteralExtendsString = "PASS";
 
 // Test 2.1: WidgetConfig with specific TKey extends WidgetConfig<string>
 type Test2_1_WidgetConfigVariance =
-  WidgetConfig<"app.test"> extends WidgetConfig<string> ? "PASS" : "FAIL";
+  WidgetConfig<"app.test", z.ZodTypeAny> extends WidgetConfig<
+    string,
+    z.ZodTypeAny
+  >
+    ? "PASS"
+    : "FAIL";
 const test2_1: Test2_1_WidgetConfigVariance = "PASS";
 
 // ============================================================================
@@ -40,7 +45,7 @@ type Test3_1_PrimitiveFieldVariance =
     z.ZodString,
     FieldUsageConfig,
     "app.test",
-    WidgetConfig<"app.test">
+    WidgetConfig<"app.test", z.ZodTypeAny>
   > extends UnifiedField<string, z.ZodTypeAny>
     ? "PASS"
     : "FAIL";
@@ -58,12 +63,12 @@ type Test4_1_ObjectFieldVariance =
         z.ZodString,
         FieldUsageConfig,
         "app.test",
-        WidgetConfig<"app.test">
+        WidgetConfig<"app.test", z.ZodTypeAny>
       >;
     },
     FieldUsageConfig,
     "app.test",
-    WidgetConfig<"app.test">
+    WidgetConfig<"app.test", z.ZodTypeAny>
   > extends UnifiedField<string, z.ZodTypeAny>
     ? "PASS"
     : "FAIL";
@@ -73,16 +78,9 @@ const test4_1: Test4_1_ObjectFieldVariance = "PASS";
 type Test4_2_ObjectFieldGeneric =
   ObjectField<
     {
-      field1: PrimitiveField<
-        z.ZodString,
-        FieldUsageConfig,
-        string,
-        WidgetConfig<string>
-      >;
+      field1: PrimitiveField<z.ZodString, FieldUsageConfig>;
     },
-    FieldUsageConfig,
-    string,
-    WidgetConfig<string>
+    FieldUsageConfig
   > extends UnifiedField<string, z.ZodTypeAny>
     ? "PASS"
     : "FAIL";
@@ -122,7 +120,6 @@ import type { CreateApiEndpointAny } from "../endpoint";
 import type { Methods } from "../enums";
 
 type GenericEndpoint = CreateApiEndpoint<
-  string,
   Methods.POST,
   readonly UserRoleValue[],
   string,
@@ -135,7 +132,6 @@ const test6_1: Test6_1_GenericEndpointExtendsAny = "PASS";
 
 // Test 6.2: CreateApiEndpoint with specific types extends CreateApiEndpointAny
 type SpecificEndpoint = CreateApiEndpoint<
-  "default",
   Methods.POST,
   readonly [SpecificRole],
   "app.test",
@@ -145,12 +141,12 @@ type SpecificEndpoint = CreateApiEndpoint<
         z.ZodString,
         FieldUsageConfig,
         "app.test",
-        WidgetConfig<"app.test">
+        WidgetConfig<"app.test", z.ZodTypeAny>
       >;
     },
     FieldUsageConfig,
     "app.test",
-    WidgetConfig<"app.test">
+    WidgetConfig<"app.test", z.ZodTypeAny>
   >
 >;
 

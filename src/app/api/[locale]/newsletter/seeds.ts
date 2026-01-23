@@ -38,8 +38,6 @@ export async function dev(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<void> {
-  logger.debug("🌱 Seeding newsletter data for development environment");
-
   try {
     // Get existing users for newsletter subscriptions
     const demoUserResponse = await UserRepository.getUserByEmail(
@@ -92,16 +90,9 @@ export async function dev(
 
     // Note: Newsletter functionality may need repository implementation
     // For now, we'll just log the intended subscriptions
-    for (const subscription of subscriptions) {
-      logger.debug(
-        `✅ Would create newsletter subscription for ${subscription.email}`,
-        {
-          subscription,
-        },
-      );
-    }
-
-    logger.debug("✅ Newsletter subscription data ready for development");
+    logger.debug(
+      `✅ Newsletter subscription data ready: ${subscriptions.length} subscriptions (${subscriptions.map((s) => s.email).join(", ")})`,
+    );
   } catch (error) {
     logger.error("Error seeding newsletter data:", parseError(error));
   }

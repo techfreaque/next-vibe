@@ -19,7 +19,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 import { createEndpoint } from "../../endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   requestResponseField,
 } from "../../field/utils";
 import {
@@ -100,7 +100,7 @@ const globalEndpointValid = createEndpoint({
     },
     { request: "data", response: true },
     {
-      name: requestDataField(
+      name: requestField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -308,7 +308,7 @@ const globalEndpointInvalidFieldLabel = createEndpoint({
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      name: requestDataField(
+      name: requestField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -329,12 +329,12 @@ const globalEndpointInvalidFieldLabel = createEndpoint({
 });
 
 /**
- * Test 8B: Test requestDataField standalone with contextual typing
+ * Test 8B: Test requestField standalone with contextual typing
  */
-const test8b_requestDataFieldStandalone: UnifiedField<
+const test8b_requestFieldStandalone: UnifiedField<
   TranslationKey,
   z.ZodTypeAny
-> = requestDataField(
+> = requestField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXT,

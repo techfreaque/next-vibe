@@ -15,17 +15,15 @@
 import { z } from "zod";
 
 import {
-  arrayOptionalField,
-  type InferFieldType,
   objectField,
   objectOptionalField,
   requestDataArrayField,
   requestDataArrayOptionalField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseArrayOptionalField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   FieldDataType,
   type FieldUsage,
@@ -60,22 +58,18 @@ const optionalArrayField = requestDataArrayField(
     },
     { request: "data" },
     {
-      role: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "test" as TranslationKey,
-        },
-        z.string(),
-      ),
-      content: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "test" as TranslationKey,
-        },
-        z.string(),
-      ),
+      role: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "test" as TranslationKey,
+        schema: z.string(),
+      }),
+      content: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "test" as TranslationKey,
+        schema: z.string(),
+      }),
     },
   ),
 );
@@ -94,22 +88,18 @@ const testResponseArrayOptional = responseArrayOptionalField(
     },
     { response: true },
     {
-      id: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.test.id" as TranslationKey,
-          fieldType: FieldDataType.TEXT,
-        },
-        z.string(),
-      ),
-      name: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.test.name" as TranslationKey,
-          fieldType: FieldDataType.TEXT,
-        },
-        z.string(),
-      ),
+      id: responseField({
+        type: WidgetType.TEXT,
+        content: "app.test.id" as TranslationKey,
+        fieldType: FieldDataType.TEXT,
+        schema: z.string(),
+      }),
+      name: responseField({
+        type: WidgetType.TEXT,
+        content: "app.test.name" as TranslationKey,
+        fieldType: FieldDataType.TEXT,
+        schema: z.string(),
+      }),
     },
   ),
 );
@@ -130,22 +120,18 @@ const testObjectOptional = objectOptionalField(
   },
   { response: true },
   {
-    firstName: responseField(
-      {
-        type: WidgetType.TEXT,
-        content: "app.test.firstName" as TranslationKey,
-        fieldType: FieldDataType.TEXT,
-      },
-      z.string(),
-    ),
-    lastName: responseField(
-      {
-        type: WidgetType.TEXT,
-        content: "app.test.lastName" as TranslationKey,
-        fieldType: FieldDataType.TEXT,
-      },
-      z.string(),
-    ),
+    firstName: responseField({
+      type: WidgetType.TEXT,
+      content: "app.test.firstName" as TranslationKey,
+      fieldType: FieldDataType.TEXT,
+      schema: z.string(),
+    }),
+    lastName: responseField({
+      type: WidgetType.TEXT,
+      content: "app.test.lastName" as TranslationKey,
+      fieldType: FieldDataType.TEXT,
+      schema: z.string(),
+    }),
   },
 );
 

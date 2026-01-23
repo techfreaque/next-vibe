@@ -23,6 +23,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Pre } from "next-vibe-ui/ui/pre";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
+import type { z } from "zod";
 
 import type { ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
 import type {
@@ -94,7 +95,7 @@ function transformDataForWidget(
  */
 function renderResponseField<const TKey extends string>(
   fieldKey: string,
-  field: UnifiedField<TKey>,
+  field: UnifiedField<TKey, z.ZodTypeAny>,
   result: ToolCallResult | null,
   context: WidgetRenderContext,
   endpoint: CreateApiEndpointAny,
@@ -191,8 +192,10 @@ export function ResponseFieldsRenderer({
     );
   }
 
-  const responseFields: Array<{ key: string; field: UnifiedField<string> }> =
-    [];
+  const responseFields: Array<{
+    key: string;
+    field: UnifiedField<string, z.ZodTypeAny>;
+  }> = [];
   if (
     definition?.fields &&
     typeof definition.fields === "object" &&
@@ -200,7 +203,7 @@ export function ResponseFieldsRenderer({
   ) {
     const children = definition.fields.children as Record<
       string,
-      UnifiedField<string>
+      UnifiedField<string, z.ZodTypeAny>
     >;
 
     for (const [fieldKey, fieldDef] of Object.entries(children)) {

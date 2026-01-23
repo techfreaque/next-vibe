@@ -195,12 +195,6 @@ export const translations = {
           category: {
             label: "Category",
           },
-          suggestedPrompts: {
-            label: "Suggested Prompts (optional)",
-            description:
-              "Add up to 4 example prompts to help users get started",
-            placeholder: "Example prompt {{number}}",
-          },
         },
         createCategory: "Create Category",
         cancel: "Cancel",

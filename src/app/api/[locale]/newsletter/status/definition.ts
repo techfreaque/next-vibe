@@ -6,11 +6,11 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
-  objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,34 +50,28 @@ const { GET } = createEndpoint({
     { request: "data", response: true },
     {
       // REQUEST FIELDS
-      email: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.EMAIL,
-          label: "app.api.newsletter.status.email.label" as const,
-          description: "app.api.newsletter.status.email.description" as const,
-          placeholder: "app.api.newsletter.status.email.placeholder" as const,
-          helpText: "app.api.newsletter.status.email.helpText" as const,
-          columns: 12,
-          order: 1,
-        },
-        z.string().email(),
-      ),
+      email: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label: "app.api.newsletter.status.email.label" as const,
+        description: "app.api.newsletter.status.email.description" as const,
+        placeholder: "app.api.newsletter.status.email.placeholder" as const,
+        helpText: "app.api.newsletter.status.email.helpText" as const,
+        columns: 12,
+        schema: z.string().email(),
+        order: 1,
+      }),
       // RESPONSE FIELDS
-      subscribed: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.newsletter.status.response.subscribed" as const,
-        },
-        z.boolean(),
-      ),
-      status: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.newsletter.status.response.status" as const,
-        },
-        z.string(),
-      ),
+      subscribed: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.newsletter.status.response.subscribed" as const,
+        schema: z.boolean(),
+      }),
+      status: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.newsletter.status.response.status" as const,
+        schema: z.string(),
+      }),
     },
   ),
   errorTypes: {
@@ -132,7 +126,6 @@ const { GET } = createEndpoint({
     description: "app.api.newsletter.status.success.description" as const,
   },
   examples: {
-    urlPathParams: undefined,
     requests: {
       basic: {
         email: "user@example.com",

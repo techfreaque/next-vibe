@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -44,121 +44,98 @@ const { POST } = createEndpoint({
   // === FIELDS ===
   fields: objectField(
     {
-      type: WidgetType.FORM_FIELD,
-      fieldType: FieldDataType.TEXT,
-      label: "app.api.system.dev.lint.container.title",
+      type: WidgetType.CONTAINER,
+      title: "app.api.system.dev.lint.container.title",
       columns: 12,
     },
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      skipEndpoints: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.dev.typecheck.title",
-          description: "app.api.system.dev.typecheck.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      skipEndpoints: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.dev.typecheck.title",
+        description: "app.api.system.dev.typecheck.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      skipSeeds: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.dev.typecheck.title",
-          description: "app.api.system.dev.typecheck.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      skipSeeds: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.dev.typecheck.title",
+        description: "app.api.system.dev.typecheck.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      skipCronTasks: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.dev.typecheck.title",
-          description: "app.api.system.dev.typecheck.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      skipCronTasks: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.dev.typecheck.title",
+        description: "app.api.system.dev.typecheck.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      skipTRPCRouter: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.dev.typecheck.title",
-          description: "app.api.system.dev.typecheck.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      skipTRPCRouter: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.dev.typecheck.title",
+        description: "app.api.system.dev.typecheck.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      rootDir: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.dev.typecheck.title",
-          description: "app.api.system.dev.typecheck.description",
-          columns: 6,
-        },
-        z.string().optional(),
-      ),
+      rootDir: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.dev.typecheck.title",
+        description: "app.api.system.dev.typecheck.description",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
 
-      verbose: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.dev.typecheck.title",
-          description: "app.api.system.dev.typecheck.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      verbose: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.dev.typecheck.title",
+        description: "app.api.system.dev.typecheck.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.dev.typecheck.success.title",
-        },
-        z.boolean(),
-      ),
-      generatorsRun: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.dev.typecheck.success.title",
-        },
-        z.coerce.number(),
-      ),
-      generatorsSkipped: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.dev.typecheck.success.title",
-        },
-        z.coerce.number(),
-      ),
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.dev.typecheck.success.title",
-        },
-        z.array(z.string()),
-      ),
-      results: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.dev.typecheck.success.title",
-        },
-        z.object({
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.dev.typecheck.success.title",
+        schema: z.boolean(),
+      }),
+      generatorsRun: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.dev.typecheck.success.title",
+        schema: z.coerce.number(),
+      }),
+      generatorsSkipped: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.dev.typecheck.success.title",
+        schema: z.coerce.number(),
+      }),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.dev.typecheck.success.title",
+        schema: z.array(z.string()),
+      }),
+      results: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.dev.typecheck.success.title",
+        schema: z.object({
           endpoints: z.boolean(),
           seeds: z.boolean(),
           cronTasks: z.boolean(),
           trpcRouter: z.boolean(),
         }),
-      ),
+      }),
     },
   ),
 
@@ -238,7 +215,6 @@ const { POST } = createEndpoint({
         },
       },
     },
-    urlPathParams: undefined,
   },
 });
 

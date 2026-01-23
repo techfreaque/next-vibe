@@ -10,7 +10,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -49,41 +49,33 @@ const pulseStatusEndpoint = createEndpoint({
     { response: true },
     {
       // === RESPONSE FIELDS ===
-      status: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.fields.status.title",
-        },
-        z.string(),
-      ),
+      status: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.fields.status.title",
+        schema: z.string(),
+      }),
 
-      lastPulseAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.fields.lastPulseAt.title",
-        },
-        z.string().nullable(),
-      ),
+      lastPulseAt: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.fields.lastPulseAt.title",
+        schema: z.string().nullable(),
+      }),
 
-      successRate: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.fields.successRate.title",
-        },
-        z.coerce.number().nullable(),
-      ),
+      successRate: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.fields.successRate.title",
+        schema: z.coerce.number().nullable(),
+      }),
 
-      totalExecutions: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.fields.totalExecutions.title",
-        },
-        z.coerce.number(),
-      ),
+      totalExecutions: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.fields.totalExecutions.title",
+        schema: z.coerce.number(),
+      }),
     },
   ),
 

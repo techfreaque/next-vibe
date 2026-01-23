@@ -8,11 +8,11 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseArrayOptionalField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -66,83 +66,74 @@ const { PATCH } = createEndpoint({
     { request: "data", response: true },
     {
       // Filter criteria
-      search: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.leads.batch.patch.search.label" as const,
-          description: "app.api.leads.batch.patch.search.description" as const,
-          placeholder: "app.api.leads.batch.patch.search.placeholder" as const,
-        },
-        z.string().optional(),
-      ),
-      status: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.batch.patch.status.label" as const,
-          description: "app.api.leads.batch.patch.status.description" as const,
-          options: LeadStatusFilterOptions,
-        },
-        z.enum(LeadStatusFilter).optional().default(LeadStatusFilter.ALL),
-      ),
-      currentCampaignStage: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.leads.batch.patch.currentCampaignStage.label" as const,
-          description:
-            "app.api.leads.batch.patch.currentCampaignStage.description" as const,
-          options: EmailCampaignStageFilterOptions,
-        },
-        z
-          .nativeEnum(EmailCampaignStageFilter)
+      search: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.leads.batch.patch.search.label" as const,
+        description: "app.api.leads.batch.patch.search.description" as const,
+        placeholder: "app.api.leads.batch.patch.search.placeholder" as const,
+        schema: z.string().optional(),
+      }),
+      status: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.batch.patch.status.label" as const,
+        description: "app.api.leads.batch.patch.status.description" as const,
+        options: LeadStatusFilterOptions,
+        schema: z
+          .enum(LeadStatusFilter)
+          .optional()
+          .default(LeadStatusFilter.ALL),
+      }),
+      currentCampaignStage: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.batch.patch.currentCampaignStage.label" as const,
+        description:
+          "app.api.leads.batch.patch.currentCampaignStage.description" as const,
+        options: EmailCampaignStageFilterOptions,
+        schema: z
+          .enum(EmailCampaignStageFilter)
           .optional()
           .default(EmailCampaignStageFilter.ALL),
-      ),
-      source: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.batch.patch.source.label" as const,
-          description: "app.api.leads.batch.patch.source.description" as const,
-          options: LeadSourceFilterOptions,
-        },
-        z.enum(LeadSourceFilter).optional().default(LeadSourceFilter.ALL),
-      ),
-      scope: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.batch.patch.scope.label" as const,
-          description: "app.api.leads.batch.patch.scope.description" as const,
-          options: BatchOperationScopeOptions,
-        },
-        z
-          .nativeEnum(BatchOperationScope)
+      }),
+      source: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.batch.patch.source.label" as const,
+        description: "app.api.leads.batch.patch.source.description" as const,
+        options: LeadSourceFilterOptions,
+        schema: z
+          .enum(LeadSourceFilter)
+          .optional()
+          .default(LeadSourceFilter.ALL),
+      }),
+      scope: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.batch.patch.scope.label" as const,
+        description: "app.api.leads.batch.patch.scope.description" as const,
+        options: BatchOperationScopeOptions,
+        schema: z
+          .enum(BatchOperationScope)
           .optional()
           .default(BatchOperationScope.ALL_PAGES),
-      ),
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.leads.batch.patch.dryRun.label" as const,
-          description: "app.api.leads.batch.patch.dryRun.description" as const,
-        },
-        z.boolean().optional().default(false),
-      ),
-      maxRecords: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.leads.batch.patch.maxRecords.label" as const,
-          description:
-            "app.api.leads.batch.patch.maxRecords.description" as const,
-        },
-        z.coerce.number().min(1).max(10000).optional().default(1000),
-      ),
+      }),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.leads.batch.patch.dryRun.label" as const,
+        description: "app.api.leads.batch.patch.dryRun.description" as const,
+        schema: z.boolean().optional().default(false),
+      }),
+      maxRecords: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.leads.batch.patch.maxRecords.label" as const,
+        description:
+          "app.api.leads.batch.patch.maxRecords.description" as const,
+        schema: z.coerce.number().min(1).max(10000).optional().default(1000),
+      }),
       // Update data
       updates: objectField(
         {
@@ -153,50 +144,42 @@ const { PATCH } = createEndpoint({
         },
         { request: "data" },
         {
-          status: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.leads.batch.patch.updates.status.label" as const,
-              description:
-                "app.api.leads.batch.patch.updates.status.description" as const,
-              options: LeadStatusOptions,
-            },
-            z.enum(LeadStatus).optional(),
-          ),
-          currentCampaignStage: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label:
-                "app.api.leads.batch.patch.updates.currentCampaignStage.label" as const,
-              description:
-                "app.api.leads.batch.patch.updates.currentCampaignStage.description" as const,
-              options: EmailCampaignStageOptions,
-            },
-            z.enum(EmailCampaignStage).optional(),
-          ),
-          source: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.leads.batch.patch.updates.source.label" as const,
-              description:
-                "app.api.leads.batch.patch.updates.source.description" as const,
-              options: LeadSourceOptions,
-            },
-            z.enum(LeadSource).optional(),
-          ),
-          notes: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.leads.batch.patch.updates.notes.label" as const,
-              description:
-                "app.api.leads.batch.patch.updates.notes.description" as const,
-            },
-            z.string().optional(),
-          ),
+          status: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.leads.batch.patch.updates.status.label" as const,
+            description:
+              "app.api.leads.batch.patch.updates.status.description" as const,
+            options: LeadStatusOptions,
+            schema: z.enum(LeadStatus).optional(),
+          }),
+          currentCampaignStage: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label:
+              "app.api.leads.batch.patch.updates.currentCampaignStage.label" as const,
+            description:
+              "app.api.leads.batch.patch.updates.currentCampaignStage.description" as const,
+            options: EmailCampaignStageOptions,
+            schema: z.enum(EmailCampaignStage).optional(),
+          }),
+          source: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.leads.batch.patch.updates.source.label" as const,
+            description:
+              "app.api.leads.batch.patch.updates.source.description" as const,
+            options: LeadSourceOptions,
+            schema: z.enum(LeadSource).optional(),
+          }),
+          notes: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.leads.batch.patch.updates.notes.label" as const,
+            description:
+              "app.api.leads.batch.patch.updates.notes.description" as const,
+            schema: z.string().optional(),
+          }),
         },
       ),
       // Response fields
@@ -210,37 +193,27 @@ const { PATCH } = createEndpoint({
         },
         { response: true },
         {
-          success: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.leads.batch.patch.response.success" as const,
-            },
-            z.boolean(),
-          ),
-          totalMatched: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.batch.patch.response.totalMatched" as const,
-            },
-            z.coerce.number(),
-          ),
-          totalProcessed: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.batch.patch.response.totalProcessed" as const,
-            },
-            z.coerce.number(),
-          ),
-          totalUpdated: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.batch.patch.response.totalUpdated" as const,
-            },
-            z.coerce.number(),
-          ),
+          success: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.leads.batch.patch.response.success" as const,
+            schema: z.boolean(),
+          }),
+          totalMatched: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.leads.batch.patch.response.totalMatched" as const,
+            schema: z.coerce.number(),
+          }),
+          totalProcessed: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.batch.patch.response.totalProcessed" as const,
+            schema: z.coerce.number(),
+          }),
+          totalUpdated: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.leads.batch.patch.response.totalUpdated" as const,
+            schema: z.coerce.number(),
+          }),
           preview: responseArrayOptionalField(
             {
               type: WidgetType.DATA_LIST,
@@ -257,44 +230,34 @@ const { PATCH } = createEndpoint({
               },
               { response: true },
               {
-                id: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.patch.response.preview" as const,
-                  },
-                  z.string(),
-                ),
-                email: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.patch.response.preview" as const,
-                  },
-                  z.string().nullable(),
-                ),
-                businessName: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.patch.response.preview" as const,
-                  },
-                  z.string(),
-                ),
-                currentStatus: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.leads.batch.patch.response.preview" as const,
-                  },
-                  z.enum(LeadStatus),
-                ),
-                currentCampaignStage: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.leads.batch.patch.response.preview" as const,
-                  },
-                  z.enum(EmailCampaignStage).nullable(),
-                ),
+                id: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.batch.patch.response.preview" as const,
+                  schema: z.string(),
+                }),
+                email: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.batch.patch.response.preview" as const,
+                  schema: z.string().nullable(),
+                }),
+                businessName: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.batch.patch.response.preview" as const,
+                  schema: z.string(),
+                }),
+                currentStatus: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.leads.batch.patch.response.preview" as const,
+                  schema: z.enum(LeadStatus),
+                }),
+                currentCampaignStage: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.leads.batch.patch.response.preview" as const,
+                  schema: z.enum(EmailCampaignStage).nullable(),
+                }),
               },
             ),
           ),
@@ -313,22 +276,16 @@ const { PATCH } = createEndpoint({
               },
               { response: true },
               {
-                leadId: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.patch.response.errors" as const,
-                  },
-                  z.string(),
-                ),
-                error: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.patch.response.errors" as const,
-                  },
-                  z.string(),
-                ),
+                leadId: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.leads.batch.patch.response.errors" as const,
+                  schema: z.string(),
+                }),
+                error: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.leads.batch.patch.response.errors" as const,
+                  schema: z.string(),
+                }),
               },
             ),
           ),
@@ -390,7 +347,6 @@ const { PATCH } = createEndpoint({
     description: "app.api.leads.batch.patch.success.description" as const,
   },
   examples: {
-    urlPathParams: undefined,
     requests: {
       default: {
         search: "",
@@ -450,56 +406,49 @@ const { DELETE } = createEndpoint({
     { request: "data", response: true },
     {
       // Filter criteria (same as PATCH)
-      search: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.leads.batch.delete.search.label" as const,
-          description: "app.api.leads.batch.delete.search.description" as const,
-        },
-        z.string().optional(),
-      ),
-      status: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.batch.delete.status.label" as const,
-          description: "app.api.leads.batch.delete.status.description" as const,
-          options: LeadStatusFilterOptions,
-        },
-        z.enum(LeadStatusFilter).optional().default(LeadStatusFilter.ALL),
-      ),
-      confirmDelete: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.leads.batch.delete.confirmDelete.label" as const,
-          description:
-            "app.api.leads.batch.delete.confirmDelete.description" as const,
-        },
-        z.boolean().refine((val) => val === true, {
+      search: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.leads.batch.delete.search.label" as const,
+        description: "app.api.leads.batch.delete.search.description" as const,
+        schema: z.string().optional(),
+      }),
+      status: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.batch.delete.status.label" as const,
+        description: "app.api.leads.batch.delete.status.description" as const,
+        options: LeadStatusFilterOptions,
+        schema: z
+          .enum(LeadStatusFilter)
+          .optional()
+          .default(LeadStatusFilter.ALL),
+      }),
+      confirmDelete: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.leads.batch.delete.confirmDelete.label" as const,
+        description:
+          "app.api.leads.batch.delete.confirmDelete.description" as const,
+        schema: z.boolean().refine((val) => val === true, {
           message: "Delete confirmation required",
         }),
-      ),
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.leads.batch.delete.dryRun.label" as const,
-          description: "app.api.leads.batch.delete.dryRun.description" as const,
-        },
-        z.boolean().optional().default(false),
-      ),
-      maxRecords: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.leads.batch.delete.maxRecords.label" as const,
-          description:
-            "app.api.leads.batch.delete.maxRecords.description" as const,
-        },
-        z.coerce.number().min(1).max(10000).optional().default(1000),
-      ),
+      }),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.leads.batch.delete.dryRun.label" as const,
+        description: "app.api.leads.batch.delete.dryRun.description" as const,
+        schema: z.boolean().optional().default(false),
+      }),
+      maxRecords: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.leads.batch.delete.maxRecords.label" as const,
+        description:
+          "app.api.leads.batch.delete.maxRecords.description" as const,
+        schema: z.coerce.number().min(1).max(10000).optional().default(1000),
+      }),
       // Response fields
       response: objectField(
         {
@@ -511,37 +460,29 @@ const { DELETE } = createEndpoint({
         },
         { response: true },
         {
-          success: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.leads.batch.delete.response.success" as const,
-            },
-            z.boolean(),
-          ),
-          totalMatched: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.batch.delete.response.totalMatched" as const,
-            },
-            z.coerce.number(),
-          ),
-          totalProcessed: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.batch.delete.response.totalProcessed" as const,
-            },
-            z.coerce.number(),
-          ),
-          totalDeleted: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.leads.batch.delete.response.totalDeleted" as const,
-            },
-            z.coerce.number(),
-          ),
+          success: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.leads.batch.delete.response.success" as const,
+            schema: z.boolean(),
+          }),
+          totalMatched: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.batch.delete.response.totalMatched" as const,
+            schema: z.coerce.number(),
+          }),
+          totalProcessed: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.batch.delete.response.totalProcessed" as const,
+            schema: z.coerce.number(),
+          }),
+          totalDeleted: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.leads.batch.delete.response.totalDeleted" as const,
+            schema: z.coerce.number(),
+          }),
           preview: responseArrayOptionalField(
             {
               type: WidgetType.DATA_LIST,
@@ -558,44 +499,34 @@ const { DELETE } = createEndpoint({
               },
               { response: true },
               {
-                id: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.delete.response.preview" as const,
-                  },
-                  z.string(),
-                ),
-                email: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.delete.response.preview" as const,
-                  },
-                  z.string().nullable(),
-                ),
-                businessName: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.delete.response.preview" as const,
-                  },
-                  z.string(),
-                ),
-                currentStatus: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.leads.batch.delete.response.preview" as const,
-                  },
-                  z.enum(LeadStatus),
-                ),
-                currentCampaignStage: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.leads.batch.delete.response.preview" as const,
-                  },
-                  z.enum(EmailCampaignStage).nullable(),
-                ),
+                id: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.batch.delete.response.preview" as const,
+                  schema: z.string(),
+                }),
+                email: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.batch.delete.response.preview" as const,
+                  schema: z.string().nullable(),
+                }),
+                businessName: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.batch.delete.response.preview" as const,
+                  schema: z.string(),
+                }),
+                currentStatus: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.leads.batch.delete.response.preview" as const,
+                  schema: z.enum(LeadStatus),
+                }),
+                currentCampaignStage: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.leads.batch.delete.response.preview" as const,
+                  schema: z.enum(EmailCampaignStage).nullable(),
+                }),
               },
             ),
           ),
@@ -615,22 +546,18 @@ const { DELETE } = createEndpoint({
               },
               { response: true },
               {
-                leadId: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.delete.response.errors" as const,
-                  },
-                  z.string(),
-                ),
-                error: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.delete.response.errors" as const,
-                  },
-                  z.string(),
-                ),
+                leadId: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.batch.delete.response.errors" as const,
+                  schema: z.string(),
+                }),
+                error: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.leads.batch.delete.response.errors" as const,
+                  schema: z.string(),
+                }),
               },
             ),
           ),
@@ -692,7 +619,6 @@ const { DELETE } = createEndpoint({
     description: "app.api.leads.batch.delete.success.description" as const,
   },
   examples: {
-    urlPathParams: undefined,
     requests: {
       default: {
         search: "",

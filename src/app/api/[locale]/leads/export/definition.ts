@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -63,168 +63,136 @@ const { GET } = createEndpoint({
       layoutType: LayoutType.GRID,
       columns: 12,
     },
-    {
-      [Methods.GET]: { request: "data", response: true },
-    },
+    { response: true },
     {
       // === REQUEST FIELDS ===
-      format: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.export.get.format.label",
-          description: "app.api.leads.export.get.format.description",
-          options: ExportFormatOptions,
-          columns: 6,
-        },
-        z.enum(ExportFormat).default(ExportFormat.CSV),
-      ),
+      format: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.export.get.format.label",
+        description: "app.api.leads.export.get.format.description",
+        options: ExportFormatOptions,
+        columns: 6,
+        schema: z.enum(ExportFormat).default(ExportFormat.CSV),
+      }),
 
-      status: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.export.get.status.label",
-          description: "app.api.leads.export.get.status.description",
-          options: LeadStatusOptions,
-          columns: 6,
-        },
-        z.enum(LeadStatus).optional(),
-      ),
+      status: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.export.get.status.label",
+        description: "app.api.leads.export.get.status.description",
+        options: LeadStatusOptions,
+        columns: 6,
+        schema: z.enum(LeadStatus).optional(),
+      }),
 
-      country: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.export.get.country.label",
-          description: "app.api.leads.export.get.country.description",
-          options: CountriesOptions,
-          columns: 6,
-        },
-        z.enum(Countries).optional(),
-      ),
+      country: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.export.get.country.label",
+        description: "app.api.leads.export.get.country.description",
+        options: CountriesOptions,
+        columns: 6,
+        schema: z.enum(Countries).optional(),
+      }),
 
-      language: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.export.get.language.label",
-          description: "app.api.leads.export.get.language.description",
-          options: LanguagesOptions,
-          columns: 6,
-        },
-        z.enum(Languages).optional(),
-      ),
+      language: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.export.get.language.label",
+        description: "app.api.leads.export.get.language.description",
+        options: LanguagesOptions,
+        columns: 6,
+        schema: z.enum(Languages).optional(),
+      }),
 
-      source: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.export.get.source.label",
-          description: "app.api.leads.export.get.source.description",
-          options: LeadSourceOptions,
-          columns: 12,
-        },
-        z.enum(LeadSource).optional(),
-      ),
+      source: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.export.get.source.label",
+        description: "app.api.leads.export.get.source.description",
+        options: LeadSourceOptions,
+        columns: 12,
+        schema: z.enum(LeadSource).optional(),
+      }),
 
-      search: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.leads.export.get.search.label",
-          description: "app.api.leads.export.get.search.description",
-          placeholder: "app.api.leads.export.get.search.placeholder",
-          columns: 12,
-        },
-        z.string().optional(),
-      ),
+      search: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.leads.export.get.search.label",
+        description: "app.api.leads.export.get.search.description",
+        placeholder: "app.api.leads.export.get.search.placeholder",
+        columns: 12,
+        schema: z.string().optional(),
+      }),
 
-      dateFrom: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.DATE,
-          label: "app.api.leads.export.get.dateFrom.label",
-          description: "app.api.leads.export.get.dateFrom.description",
-          columns: 6,
-        },
-        z.coerce.date().optional(),
-      ),
+      dateFrom: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "app.api.leads.export.get.dateFrom.label",
+        description: "app.api.leads.export.get.dateFrom.description",
+        columns: 6,
+        schema: z.coerce.date().optional(),
+      }),
 
-      dateTo: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.DATE,
-          label: "app.api.leads.export.get.dateTo.label",
-          description: "app.api.leads.export.get.dateTo.description",
-          columns: 6,
-        },
-        z.coerce.date().optional(),
-      ),
+      dateTo: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "app.api.leads.export.get.dateTo.label",
+        description: "app.api.leads.export.get.dateTo.description",
+        columns: 6,
+        schema: z.coerce.date().optional(),
+      }),
 
-      includeMetadata: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.leads.export.get.includeMetadata.label",
-          description: "app.api.leads.export.get.includeMetadata.description",
-          columns: 6,
-        },
-        z.coerce.boolean().default(false),
-      ),
+      includeMetadata: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.leads.export.get.includeMetadata.label",
+        description: "app.api.leads.export.get.includeMetadata.description",
+        columns: 6,
+        schema: z.coerce.boolean().default(false),
+      }),
 
-      includeEngagementData: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.leads.export.get.includeEngagementData.label",
-          description:
-            "app.api.leads.export.get.includeEngagementData.description",
-          columns: 6,
-        },
-        z.coerce.boolean().default(false),
-      ),
+      includeEngagementData: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.leads.export.get.includeEngagementData.label",
+        description:
+          "app.api.leads.export.get.includeEngagementData.description",
+        columns: 6,
+        schema: z.coerce.boolean().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      fileName: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.leads.export.get.response.fileName",
-        },
-        z.string(),
-      ),
+      fileName: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.leads.export.get.response.fileName",
+        schema: z.string(),
+      }),
 
-      fileContent: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.leads.export.get.response.fileContent",
-        },
-        z.string(),
-      ),
+      fileContent: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.leads.export.get.response.fileContent",
+        schema: z.string(),
+      }),
 
-      mimeType: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.leads.export.get.response.mimeType",
-        },
-        z.enum(MimeType),
-      ),
+      mimeType: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.leads.export.get.response.mimeType",
+        schema: z.enum(MimeType),
+      }),
 
-      totalRecords: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.leads.export.get.response.totalRecords",
-        },
-        z.coerce.number(),
-      ),
+      totalRecords: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.leads.export.get.response.totalRecords",
+        schema: z.coerce.number(),
+      }),
 
-      exportedAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.leads.export.get.response.exportedAt",
-        },
-        z.coerce.date(),
-      ),
+      exportedAt: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.leads.export.get.response.exportedAt",
+        schema: z.coerce.date(),
+      }),
     },
   ),
 
@@ -273,8 +241,6 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    urlPathParams: undefined,
-    requests: undefined,
     responses: {
       default: {
         fileName: "leads_export_2023-01-01.csv",

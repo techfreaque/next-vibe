@@ -17,7 +17,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -190,14 +190,16 @@ const testResponseEndpoint = createEndpoint({
     { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
     { response: true },
     {
-      userId: responseField(
-        { type: WidgetType.TEXT, content: "test" as TranslationKey },
-        z.string(),
-      ),
-      count: responseField(
-        { type: WidgetType.TEXT, content: "test" as TranslationKey },
-        z.coerce.number(),
-      ),
+      userId: responseField({
+        type: WidgetType.TEXT,
+        content: "test" as TranslationKey,
+        schema: z.string(),
+      }),
+      count: responseField({
+        type: WidgetType.TEXT,
+        content: "test" as TranslationKey,
+        schema: z.coerce.number(),
+      }),
     },
   ),
   errorTypes: {

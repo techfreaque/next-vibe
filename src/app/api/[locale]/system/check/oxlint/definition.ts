@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -55,77 +55,65 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      path: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.check.oxlint.fields.path.label",
-          description: "app.api.system.check.oxlint.fields.path.description",
-          placeholder: "app.api.system.check.oxlint.fields.path.placeholder",
-          columns: 6,
-        },
-        z
+      path: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.check.oxlint.fields.path.label",
+        description: "app.api.system.check.oxlint.fields.path.description",
+        placeholder: "app.api.system.check.oxlint.fields.path.placeholder",
+        columns: 6,
+        schema: z
           .union([z.string(), z.array(z.string())])
           .optional()
           .default("./"),
-      ),
+      }),
 
-      fix: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.check.oxlint.fields.fix.label",
-          description: "app.api.system.check.oxlint.fields.fix.description",
-          columns: 3,
-        },
-        z.boolean().default(false),
-      ),
+      fix: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.check.oxlint.fields.fix.label",
+        description: "app.api.system.check.oxlint.fields.fix.description",
+        columns: 3,
+        schema: z.boolean().default(false),
+      }),
 
-      timeout: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.system.check.oxlint.fields.timeoutSeconds.label",
-          description:
-            "app.api.system.check.oxlint.fields.timeoutSeconds.description",
-          columns: 3,
-        },
-        z.coerce.number().min(1).max(3600).default(3600),
-      ),
+      timeout: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.system.check.oxlint.fields.timeoutSeconds.label",
+        description:
+          "app.api.system.check.oxlint.fields.timeoutSeconds.description",
+        columns: 3,
+        schema: z.coerce.number().min(1).max(3600).default(3600),
+      }),
 
-      limit: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.system.check.oxlint.fields.limit.label",
-          description: "app.api.system.check.oxlint.fields.limit.description",
-          columns: 4,
-        },
-        z.coerce.number().min(1).optional().default(200),
-      ),
+      limit: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.system.check.oxlint.fields.limit.label",
+        description: "app.api.system.check.oxlint.fields.limit.description",
+        columns: 4,
+        schema: z.coerce.number().min(1).optional().default(200),
+      }),
 
-      page: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.system.check.oxlint.fields.page.label",
-          description: "app.api.system.check.oxlint.fields.page.description",
-          columns: 4,
-        },
-        z.coerce.number().min(1).optional().default(1),
-      ),
+      page: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.system.check.oxlint.fields.page.label",
+        description: "app.api.system.check.oxlint.fields.page.description",
+        columns: 4,
+        schema: z.coerce.number().min(1).optional().default(1),
+      }),
 
-      skipSorting: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.check.oxlint.fields.skipSorting.label",
-          description:
-            "app.api.system.check.oxlint.fields.skipSorting.description",
-          columns: 3,
-        },
-        z.boolean().default(false),
-      ),
+      skipSorting: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.check.oxlint.fields.skipSorting.label",
+        description:
+          "app.api.system.check.oxlint.fields.skipSorting.description",
+        columns: 3,
+        schema: z.boolean().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
       issues: objectField(
@@ -159,101 +147,119 @@ const { POST } = createEndpoint({
               },
               { response: true },
               {
-                file: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.oxlint.response.issues.title",
-                  },
-                  z.string(),
-                ),
-                line: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.oxlint.response.issues.title",
-                  },
-                  z.coerce.number().optional(),
-                ),
-                column: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.oxlint.response.issues.title",
-                  },
-                  z.coerce.number().optional(),
-                ),
-                rule: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.oxlint.response.issues.title",
-                  },
-                  z.string().optional(),
-                ),
-                code: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.oxlint.response.issues.title",
-                  },
-                  z.string().optional(),
-                ),
-                severity: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.oxlint.response.issues.title",
-                  },
-                  z.enum(["error", "warning", "info"]),
-                ),
-                message: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content: "app.api.system.check.oxlint.response.success",
-                  },
-                  z.string(),
-                ),
-                type: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.oxlint.response.issues.title",
-                  },
-                  z.enum(["oxlint", "lint", "type"]),
-                ),
+                file: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.check.oxlint.response.issues.title",
+                  schema: z.string(),
+                }),
+                line: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.check.oxlint.response.issues.title",
+                  schema: z.coerce.number().optional(),
+                }),
+                column: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.check.oxlint.response.issues.title",
+                  schema: z.coerce.number().optional(),
+                }),
+                rule: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.check.oxlint.response.issues.title",
+                  schema: z.string().optional(),
+                }),
+                code: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.check.oxlint.response.issues.title",
+                  schema: z.string().optional(),
+                }),
+                severity: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.check.oxlint.response.issues.title",
+                  schema: z.enum(["error", "warning", "info"]),
+                }),
+                message: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.check.oxlint.response.success",
+                  schema: z.string(),
+                }),
+                type: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.check.oxlint.response.issues.title",
+                  schema: z.enum(["oxlint", "lint", "type"]),
+                }),
               },
             ),
           ),
 
-          files: responseField(
+          files: responseArrayField(
             {
               type: WidgetType.CODE_QUALITY_FILES,
             },
-            z.array(
-              z.object({
-                file: z.string(),
-                errors: z.number(),
-                warnings: z.number(),
-                total: z.number(),
-              }),
+            objectField(
+              {
+                type: WidgetType.CONTAINER,
+              },
+              { response: true },
+              {
+                file: responseField({
+                  type: WidgetType.TEXT,
+                  schema: z.string(),
+                }),
+                errors: responseField({
+                  type: WidgetType.STAT,
+                  schema: z.number(),
+                }),
+                warnings: responseField({
+                  type: WidgetType.STAT,
+                  schema: z.number(),
+                }),
+                total: responseField({
+                  type: WidgetType.STAT,
+                  schema: z.number(),
+                }),
+              },
             ),
           ),
 
-          summary: responseField(
+          summary: objectField(
             {
               type: WidgetType.CODE_QUALITY_SUMMARY,
             },
-            z.object({
-              totalIssues: z.number(),
-              totalFiles: z.number(),
-              totalErrors: z.number(),
-              displayedIssues: z.number(),
-              displayedFiles: z.number(),
-              truncatedMessage: z.string().optional(),
-              currentPage: z.number(),
-              totalPages: z.number(),
-            }),
+            { response: true },
+            {
+              totalIssues: responseField({
+                type: WidgetType.STAT,
+                schema: z.number(),
+              }),
+              totalFiles: responseField({
+                type: WidgetType.STAT,
+                schema: z.number(),
+              }),
+              totalErrors: responseField({
+                type: WidgetType.STAT,
+                schema: z.number(),
+              }),
+              displayedIssues: responseField({
+                type: WidgetType.STAT,
+                schema: z.number(),
+              }),
+              displayedFiles: responseField({
+                type: WidgetType.STAT,
+                schema: z.number(),
+              }),
+              truncatedMessage: responseField({
+                type: WidgetType.TEXT,
+                schema: z.string().optional(),
+              }),
+              currentPage: responseField({
+                type: WidgetType.STAT,
+                schema: z.number(),
+              }),
+              totalPages: responseField({
+                type: WidgetType.STAT,
+                schema: z.number(),
+              }),
+            },
           ),
         },
       ),
@@ -371,7 +377,6 @@ const { POST } = createEndpoint({
         },
       },
     },
-    urlPathParams: undefined,
   },
 });
 

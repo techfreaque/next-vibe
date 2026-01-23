@@ -85,7 +85,7 @@ vibe user:create --name="Test" --verbose          # Detailed errors
 
 **"Validation failed" (Zod errors)**
 
-1. Check schema in `definition.ts`: `email: requestDataField({}, z.string().email())`
+1. Check schema in `definition.ts`: `email: requestField({}, z.string().email())`
 2. Test with CLI: `vibe user:create --email="invalid" --name="Test"`
 3. Fix request data to match schema
 

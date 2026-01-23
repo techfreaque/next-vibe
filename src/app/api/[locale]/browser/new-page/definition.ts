@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,52 +50,42 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      url: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.browser.new-page.form.fields.url.label",
-          description: "app.api.browser.new-page.form.fields.url.description",
-          placeholder: "app.api.browser.new-page.form.fields.url.placeholder",
-          columns: 8,
-        },
-        z.string().describe("URL to load in a new page"),
-      ),
-      timeout: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.browser.new-page.form.fields.timeout.label",
-          description:
-            "app.api.browser.new-page.form.fields.timeout.description",
-          placeholder:
-            "app.api.browser.new-page.form.fields.timeout.placeholder",
-          columns: 4,
-        },
-        z
+      url: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.browser.new-page.form.fields.url.label",
+        description: "app.api.browser.new-page.form.fields.url.description",
+        placeholder: "app.api.browser.new-page.form.fields.url.placeholder",
+        columns: 8,
+        schema: z.string().describe("URL to load in a new page"),
+      }),
+      timeout: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.browser.new-page.form.fields.timeout.label",
+        description: "app.api.browser.new-page.form.fields.timeout.description",
+        placeholder: "app.api.browser.new-page.form.fields.timeout.placeholder",
+        columns: 4,
+        schema: z
           .number()
           .optional()
           .describe(
             "Maximum wait time in milliseconds. If set to 0, the default timeout will be used.",
           ),
-      ),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.new-page.response.success",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.new-page.response.success",
+        schema: z
           .boolean()
           .describe("Whether the new page creation operation succeeded"),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.new-page.response.result",
-        },
-        z
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.new-page.response.result",
+        schema: z
           .object({
             created: z.boolean().describe("Whether the new page was created"),
             pageIdx: z.coerce.number().describe("Index of the new page"),
@@ -103,21 +93,23 @@ const { POST } = createEndpoint({
           })
           .optional()
           .describe("Result of new page creation"),
-      ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.new-page.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.new-page.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      }),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.new-page.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.new-page.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -135,7 +127,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

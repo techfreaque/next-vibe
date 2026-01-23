@@ -25,7 +25,7 @@ type UnknownError = Error | CliError | Record<string, never>;
 /**
  * Base CLI error class
  */
-export abstract class CliError extends Error {
+abstract class CliError extends Error {
   abstract readonly code: string;
   abstract readonly statusCode: number;
   readonly timestamp: Date;
@@ -81,39 +81,6 @@ export abstract class CliError extends Error {
 }
 
 /**
- * Command not found error
- */
-export class CommandNotFoundError extends CliError {
-  readonly code = "COMMAND_NOT_FOUND";
-  readonly statusCode = 404;
-
-  constructor(command: string, availableCommands?: string[]) {
-    // eslint-disable-next-line i18next/no-literal-string
-    const message = `Command '${command}' not found`;
-    super(message, { command, availableCommands });
-  }
-
-  getUserMessage(): string {
-    // Type guard for availableCommands
-    const commands = this.context?.availableCommands;
-    const isStringArray =
-      Array.isArray(commands) &&
-      commands.every((cmd) => typeof cmd === "string");
-
-    /* eslint-disable i18next/no-literal-string */
-    const suggestions = isStringArray
-      ? `\n\nAvailable commands:\n${commands
-          .slice(0, 10)
-          .map((cmd) => `  - ${cmd}`)
-          .join("\n")}`
-      : "";
-
-    return `❌ ${this.message}${suggestions}`;
-    /* eslint-enable i18next/no-literal-string */
-  }
-}
-
-/**
  * Route execution error
  */
 export class RouteExecutionError extends CliError {
@@ -136,143 +103,6 @@ export class RouteExecutionError extends CliError {
     const error = this.getContextString("originalError");
     // eslint-disable-next-line i18next/no-literal-string
     return `❌ Route execution failed: ${route}\n   ${error}`;
-  }
-}
-
-/**
- * Validation error
- */
-export class ValidationError extends CliError {
-  readonly code = "VALIDATION_ERROR";
-  readonly statusCode = 400;
-
-  constructor(
-    field: string,
-    value: string | number | boolean | undefined,
-    expectedType: string,
-    details?: string,
-  ) {
-    // eslint-disable-next-line i18next/no-literal-string
-    const message = `Validation failed for field '${field}': expected ${expectedType}, got ${typeof value}`;
-    super(message, { field, value, expectedType, details });
-  }
-
-  getUserMessage(): string {
-    const field = this.getContextString("field");
-    const expectedType = this.getContextString("expectedType");
-    const detailsValue = this.getContextString("details", "");
-    // eslint-disable-next-line i18next/no-literal-string
-    const details = detailsValue ? ` (${detailsValue})` : "";
-    // eslint-disable-next-line i18next/no-literal-string
-    return `❌ Invalid input for '${field}': expected ${expectedType}${details}`;
-  }
-}
-
-/**
- * Configuration error
- */
-export class ConfigurationError extends CliError {
-  readonly code = "CONFIGURATION_ERROR";
-  readonly statusCode = 500;
-
-  constructor(configKey: string, issue: string, context?: ErrorContext) {
-    // eslint-disable-next-line i18next/no-literal-string
-    const message = `Configuration error for '${configKey}': ${issue}`;
-    super(message, { configKey, issue, ...context });
-  }
-
-  getUserMessage(): string {
-    const issue = this.getContextString("issue");
-    // eslint-disable-next-line i18next/no-literal-string
-    return `❌ Configuration error: ${issue}`;
-  }
-}
-
-/**
- * Route discovery error
- */
-export class RouteDiscoveryError extends CliError {
-  readonly code = "ROUTE_DISCOVERY_ERROR";
-  readonly statusCode = 500;
-
-  constructor(directory: string, originalError: Error) {
-    // eslint-disable-next-line i18next/no-literal-string
-    const message = `Failed to discover routes in '${directory}': ${originalError.message}`;
-    super(message, { directory, originalError: originalError.message });
-  }
-
-  getUserMessage(): string {
-    const directory = this.getContextString("directory");
-    // eslint-disable-next-line i18next/no-literal-string
-    return `❌ Failed to discover routes in: ${directory}`;
-  }
-}
-
-/**
- * Timeout error
- */
-export class TimeoutError extends CliError {
-  readonly code = "TIMEOUT_ERROR";
-  readonly statusCode = 408;
-
-  constructor(operation: string, timeout: number) {
-    // eslint-disable-next-line i18next/no-literal-string
-    const message = `Operation '${operation}' timed out after ${timeout}ms`;
-    super(message, { operation, timeout });
-  }
-
-  getUserMessage(): string {
-    const operation = this.getContextString("operation");
-    const timeout = this.getContextString("timeout");
-    // eslint-disable-next-line i18next/no-literal-string
-    return `❌ Operation timed out: ${operation} (${timeout}ms)`;
-  }
-}
-
-/**
- * Permission error
- */
-export class PermissionError extends CliError {
-  readonly code = "PERMISSION_ERROR";
-  readonly statusCode = 403;
-
-  constructor(resource: string, action: string, context?: ErrorContext) {
-    // eslint-disable-next-line i18next/no-literal-string
-    const message = `Permission denied: cannot ${action} ${resource}`;
-    super(message, { resource, action, ...context });
-  }
-
-  getUserMessage(): string {
-    const action = this.getContextString("action");
-    const resource = this.getContextString("resource");
-    // eslint-disable-next-line i18next/no-literal-string
-    return `❌ Permission denied: cannot ${action} ${resource}`;
-  }
-}
-
-/**
- * Resource not found error
- */
-export class ResourceNotFoundError extends CliError {
-  readonly code = "RESOURCE_NOT_FOUND";
-  readonly statusCode = 404;
-
-  constructor(
-    resourceType: string,
-    identifier: string,
-    context?: ErrorContext,
-  ) {
-    // eslint-disable-next-line i18next/no-literal-string
-    const message = `${resourceType} '${identifier}' not found`;
-    super(message, { resourceType, identifier, ...context });
-  }
-
-  getUserMessage(): string {
-    // eslint-disable-next-line i18next/no-literal-string
-    const resourceType = this.getContextString("resourceType", "Resource");
-    const identifier = this.getContextString("identifier");
-    // eslint-disable-next-line i18next/no-literal-string
-    return `❌ ${resourceType} not found: ${identifier}`;
   }
 }
 
@@ -378,56 +208,6 @@ export namespace ErrorHandler {
       return 3; // Server error
     }
     return 1; // General error
-  }
-
-  /**
-   * Create error from unknown value
-   */
-  export function createError(
-    error: UnknownError,
-    context?: ErrorContext,
-  ): CliError {
-    if (error instanceof CliError) {
-      return error;
-    }
-
-    if (error instanceof Error) {
-      return new RouteExecutionError("unknown", error, context);
-    }
-
-    return new RouteExecutionError(
-      "unknown",
-      new Error(errorToString(error)),
-      context,
-    );
-  }
-
-  /**
-   * Wrap async function with error handling
-   */
-  export async function withErrorHandling<T>(
-    fn: () => Promise<T>,
-    context?: ErrorContext,
-  ): Promise<T> {
-    try {
-      return await fn();
-    } catch (error) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure code requires throwing for system-level errors and initialization failures
-      throw createError(error as UnknownError, context);
-    }
-  }
-
-  /**
-   * Check if error is recoverable
-   */
-  export function isRecoverable(error: CliError): boolean {
-    const recoverableCodes = [
-      "VALIDATION_ERROR",
-      "COMMAND_NOT_FOUND",
-      "RESOURCE_NOT_FOUND",
-    ];
-
-    return recoverableCodes.includes(error.code);
   }
 }
 

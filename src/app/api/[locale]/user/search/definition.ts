@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -57,26 +57,24 @@ const { GET } = createEndpoint({
         },
         { request: "data" },
         {
-          search: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.user.search.fields.search.label" as const,
-              description:
-                "app.api.user.search.fields.search.description" as const,
-              placeholder:
-                "app.api.user.search.fields.search.placeholder" as const,
-              columns: 12,
-              helpText: "app.api.user.search.fields.search.help" as const,
-            },
-            z
+          search: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.user.search.fields.search.label" as const,
+            description:
+              "app.api.user.search.fields.search.description" as const,
+            placeholder:
+              "app.api.user.search.fields.search.placeholder" as const,
+            columns: 12,
+            helpText: "app.api.user.search.fields.search.help" as const,
+            schema: z
               .string()
               .min(2, {
                 message:
                   "app.api.user.search.fields.search.validation.minLength",
               })
               .optional(),
-          ),
+          }),
         },
       ),
 
@@ -91,37 +89,36 @@ const { GET } = createEndpoint({
         },
         { request: "data" },
         {
-          roles: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.user.search.fields.roles.label" as const,
-              description:
-                "app.api.user.search.fields.roles.description" as const,
-              placeholder:
-                "app.api.user.search.fields.roles.placeholder" as const,
-              options: UserRoleOptions,
-              columns: 12,
-              helpText: "app.api.user.search.fields.roles.help" as const,
-            },
-            z.array(z.enum(UserRoleDB)).optional(),
-          ),
+          roles: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.MULTISELECT,
+            label: "app.api.user.search.fields.roles.label" as const,
+            description:
+              "app.api.user.search.fields.roles.description" as const,
+            placeholder:
+              "app.api.user.search.fields.roles.placeholder" as const,
+            options: UserRoleOptions,
+            columns: 12,
+            helpText: "app.api.user.search.fields.roles.help" as const,
+            schema: z.array(z.enum(UserRoleDB)).optional(),
+          }),
 
-          status: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.user.search.fields.status.label" as const,
-              description:
-                "app.api.user.search.fields.status.description" as const,
-              placeholder:
-                "app.api.user.search.fields.status.placeholder" as const,
-              options: UserSearchStatusOptions,
-              columns: 12,
-              helpText: "app.api.user.search.fields.status.help" as const,
-            },
-            z.string().optional().default(UserSearchStatus.ACTIVE),
-          ),
+          status: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.user.search.fields.status.label" as const,
+            description:
+              "app.api.user.search.fields.status.description" as const,
+            placeholder:
+              "app.api.user.search.fields.status.placeholder" as const,
+            options: UserSearchStatusOptions,
+            columns: 12,
+            helpText: "app.api.user.search.fields.status.help" as const,
+            schema: z
+              .enum(UserSearchStatus)
+              .optional()
+              .default(UserSearchStatus.ACTIVE),
+          }),
         },
       ),
 
@@ -136,31 +133,27 @@ const { GET } = createEndpoint({
         },
         { request: "data" },
         {
-          limit: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label: "app.api.user.search.fields.limit.label" as const,
-              description:
-                "app.api.user.search.fields.limit.description" as const,
-              columns: 6,
-              helpText: "app.api.user.search.fields.limit.help" as const,
-            },
-            z.coerce.number().min(1).max(100).default(20),
-          ),
+          limit: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label: "app.api.user.search.fields.limit.label" as const,
+            description:
+              "app.api.user.search.fields.limit.description" as const,
+            columns: 6,
+            helpText: "app.api.user.search.fields.limit.help" as const,
+            schema: z.coerce.number().min(1).max(100).default(20),
+          }),
 
-          offset: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label: "app.api.user.search.fields.offset.label" as const,
-              description:
-                "app.api.user.search.fields.offset.description" as const,
-              columns: 6,
-              helpText: "app.api.user.search.fields.offset.help" as const,
-            },
-            z.coerce.number().min(0).default(0),
-          ),
+          offset: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label: "app.api.user.search.fields.offset.label" as const,
+            description:
+              "app.api.user.search.fields.offset.description" as const,
+            columns: 6,
+            helpText: "app.api.user.search.fields.offset.help" as const,
+            schema: z.coerce.number().min(0).default(0),
+          }),
         },
       ),
 
@@ -174,20 +167,16 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          success: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.search.response.success.badge" as const,
-            },
-            z.boolean().describe("Whether the search was successful"),
-          ),
-          message: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.user.search.response.message.content" as const,
-            },
-            z.string().describe("Human-readable search result summary"),
-          ),
+          success: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.user.search.response.success.badge" as const,
+            schema: z.boolean().describe("Whether the search was successful"),
+          }),
+          message: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.user.search.response.message.content" as const,
+            schema: z.string().describe("Human-readable search result summary"),
+          }),
           searchInfo: objectField(
             {
               type: WidgetType.CONTAINER,
@@ -199,38 +188,32 @@ const { GET } = createEndpoint({
             },
             { response: true },
             {
-              searchTerm: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.search.response.searchInfo.searchTerm" as const,
-                },
-                z.string().optional().describe("The search term used"),
-              ),
-              appliedFilters: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.search.response.searchInfo.appliedFilters" as const,
-                },
-                z.array(z.string()).describe("Active search filters"),
-              ),
-              searchTime: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.search.response.searchInfo.searchTime" as const,
-                },
-                z.string().describe("How long the search took"),
-              ),
-              totalResults: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.search.response.searchInfo.totalResults" as const,
-                },
-                z.coerce.number().describe("Total number of results found"),
-              ),
+              searchTerm: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.user.search.response.searchInfo.searchTerm" as const,
+                schema: z.string().optional().describe("The search term used"),
+              }),
+              appliedFilters: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.user.search.response.searchInfo.appliedFilters" as const,
+                schema: z.array(z.string()).describe("Active search filters"),
+              }),
+              searchTime: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.user.search.response.searchInfo.searchTime" as const,
+                schema: z.string().describe("How long the search took"),
+              }),
+              totalResults: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.user.search.response.searchInfo.totalResults" as const,
+                schema: z.coerce
+                  .number()
+                  .describe("Total number of results found"),
+              }),
             },
           ),
           users: responseArrayField(
@@ -263,80 +246,58 @@ const { GET } = createEndpoint({
               },
               { response: true },
               {
-                id: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content: "app.api.user.search.response.users.id" as const,
-                  },
-                  z.uuid(),
-                ),
-                leadId: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.user.search.response.users.leadId" as const,
-                  },
-                  z.uuid().nullable(),
-                ),
-                isPublic: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.user.search.response.users.isPublic" as const,
-                  },
-                  z.literal(false),
-                ),
-                privateName: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.user.search.response.users.privateName" as const,
-                  },
-                  z.string(),
-                ),
-                publicName: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.user.search.response.users.publicName" as const,
-                  },
-                  z.string(),
-                ),
-                email: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.user.search.response.users.email" as const,
-                  },
-                  z.email(),
-                ),
-                isActive: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.user.search.response.users.isActive" as const,
-                  },
-                  z.boolean().nullable(),
-                ),
-                emailVerified: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.user.search.response.users.emailVerified" as const,
-                  },
-                  z.boolean().nullable(),
-                ),
-                requireTwoFactor: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.user.search.response.users.requireTwoFactor" as const,
-                  },
-                  z.boolean().optional(),
-                ),
-                marketingConsent: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.user.search.response.users.marketingConsent" as const,
-                  },
-                  z.boolean().optional(),
-                ),
+                id: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.user.search.response.users.id" as const,
+                  schema: z.uuid(),
+                }),
+                leadId: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.user.search.response.users.leadId" as const,
+                  schema: z.uuid().nullable(),
+                }),
+                isPublic: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.user.search.response.users.isPublic" as const,
+                  schema: z.literal(false),
+                }),
+                privateName: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.user.search.response.users.privateName" as const,
+                  schema: z.string(),
+                }),
+                publicName: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.user.search.response.users.publicName" as const,
+                  schema: z.string(),
+                }),
+                email: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.user.search.response.users.email" as const,
+                  schema: z.email(),
+                }),
+                isActive: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.user.search.response.users.isActive" as const,
+                  schema: z.boolean().nullable(),
+                }),
+                emailVerified: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.user.search.response.users.emailVerified" as const,
+                  schema: z.boolean().nullable(),
+                }),
+                requireTwoFactor: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.user.search.response.users.requireTwoFactor" as const,
+                  schema: z.boolean().optional(),
+                }),
+                marketingConsent: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.user.search.response.users.marketingConsent" as const,
+                  schema: z.boolean().optional(),
+                }),
                 userRoles: responseArrayField(
                   {
                     type: WidgetType.GROUPED_LIST,
@@ -349,40 +310,32 @@ const { GET } = createEndpoint({
                     },
                     { response: true },
                     {
-                      id: responseField(
-                        {
-                          type: WidgetType.TEXT,
-                          content:
-                            "app.api.user.search.response.users.userRoles.id" as const,
-                        },
-                        z.string(),
-                      ),
-                      role: responseField(
-                        {
-                          type: WidgetType.BADGE,
-                          text: "app.api.user.search.response.users.userRoles.role" as const,
-                        },
-                        z.enum(UserRole),
-                      ),
+                      id: responseField({
+                        type: WidgetType.TEXT,
+                        content:
+                          "app.api.user.search.response.users.userRoles.id" as const,
+                        schema: z.string(),
+                      }),
+                      role: responseField({
+                        type: WidgetType.BADGE,
+                        text: "app.api.user.search.response.users.userRoles.role" as const,
+                        schema: z.enum(UserRole),
+                      }),
                     },
                   ),
                 ),
-                createdAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.user.search.response.users.createdAt" as const,
-                  },
-                  z.string(),
-                ),
-                updatedAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.user.search.response.users.updatedAt" as const,
-                  },
-                  z.string(),
-                ),
+                createdAt: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.user.search.response.users.createdAt" as const,
+                  schema: z.string(),
+                }),
+                updatedAt: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.user.search.response.users.updatedAt" as const,
+                  schema: z.string(),
+                }),
               },
             ),
           ),
@@ -397,52 +350,44 @@ const { GET } = createEndpoint({
             },
             { response: true },
             {
-              currentPage: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.search.response.pagination.currentPage" as const,
-                },
-                z.coerce.number().describe("Current page number (1-based)"),
-              ),
-              totalPages: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.search.response.pagination.totalPages" as const,
-                },
-                z.coerce.number().describe("Total number of pages"),
-              ),
-              itemsPerPage: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.search.response.pagination.itemsPerPage" as const,
-                },
-                z.coerce.number().describe("Number of items per page"),
-              ),
-              totalItems: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.search.response.pagination.totalItems" as const,
-                },
-                z.coerce.number().describe("Total number of items"),
-              ),
-              hasMore: responseField(
-                {
-                  type: WidgetType.BADGE,
-                  text: "app.api.user.search.response.pagination.hasMore" as const,
-                },
-                z.boolean().describe("Whether there are more pages"),
-              ),
-              hasPrevious: responseField(
-                {
-                  type: WidgetType.BADGE,
-                  text: "app.api.user.search.response.pagination.hasPrevious" as const,
-                },
-                z.boolean().describe("Whether there are previous pages"),
-              ),
+              currentPage: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.user.search.response.pagination.currentPage" as const,
+                schema: z.coerce
+                  .number()
+                  .describe("Current page number (1-based)"),
+              }),
+              totalPages: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.user.search.response.pagination.totalPages" as const,
+                schema: z.coerce.number().describe("Total number of pages"),
+              }),
+              itemsPerPage: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.user.search.response.pagination.itemsPerPage" as const,
+                schema: z.coerce.number().describe("Number of items per page"),
+              }),
+              totalItems: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.user.search.response.pagination.totalItems" as const,
+                schema: z.coerce.number().describe("Total number of items"),
+              }),
+              hasMore: responseField({
+                type: WidgetType.BADGE,
+                text: "app.api.user.search.response.pagination.hasMore" as const,
+                schema: z.boolean().describe("Whether there are more pages"),
+              }),
+              hasPrevious: responseField({
+                type: WidgetType.BADGE,
+                text: "app.api.user.search.response.pagination.hasPrevious" as const,
+                schema: z
+                  .boolean()
+                  .describe("Whether there are previous pages"),
+              }),
             },
           ),
         },
@@ -554,7 +499,6 @@ const { GET } = createEndpoint({
         },
       },
     },
-    urlPathParams: undefined,
     responses: {
       default: {
         response: {

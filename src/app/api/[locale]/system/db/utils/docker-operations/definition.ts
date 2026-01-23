@@ -9,9 +9,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -93,7 +93,6 @@ const { POST } = createEndpoint({
         error: "Docker command failed",
       },
     },
-    urlPathParams: undefined,
   },
   fields: objectField(
     {
@@ -107,33 +106,27 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      command: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.db.utils.dockerOperations.fields.command.label",
-          description:
-            "app.api.system.db.utils.dockerOperations.fields.command.description",
-          placeholder:
-            "app.api.system.db.utils.dockerOperations.fields.command.placeholder",
-          columns: 12,
-        },
-        z.string().min(1).describe("Docker command to execute"),
-      ),
-      options: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.JSON,
-          label:
-            "app.api.system.db.utils.dockerOperations.fields.options.label",
-          description:
-            "app.api.system.db.utils.dockerOperations.fields.options.description",
-          placeholder:
-            "app.api.system.db.utils.dockerOperations.fields.options.placeholder",
-          columns: 12,
-        },
-        z
+      command: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.db.utils.dockerOperations.fields.command.label",
+        description:
+          "app.api.system.db.utils.dockerOperations.fields.command.description",
+        placeholder:
+          "app.api.system.db.utils.dockerOperations.fields.command.placeholder",
+        columns: 12,
+        schema: z.string().min(1).describe("Docker command to execute"),
+      }),
+      options: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label: "app.api.system.db.utils.dockerOperations.fields.options.label",
+        description:
+          "app.api.system.db.utils.dockerOperations.fields.options.description",
+        placeholder:
+          "app.api.system.db.utils.dockerOperations.fields.options.placeholder",
+        columns: 12,
+        schema: z
           .object({
             timeout: z.coerce
               .number()
@@ -149,33 +142,32 @@ const { POST } = createEndpoint({
               .describe("Description of the operation"),
           })
           .optional(),
-      ),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.utils.dockerOperations.response.success.label",
-        },
-        z.boolean().describe("Whether the command executed successfully"),
-      ),
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.utils.dockerOperations.response.output.label",
-        },
-        z.string().describe("Command output"),
-      ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.utils.dockerOperations.response.error.label",
-        },
-        z.string().optional().describe("Error message if command failed"),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.db.utils.dockerOperations.response.success.label",
+        schema: z
+          .boolean()
+          .describe("Whether the command executed successfully"),
+      }),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.db.utils.dockerOperations.response.output.label",
+        schema: z.string().describe("Command output"),
+      }),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.db.utils.dockerOperations.response.error.label",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if command failed"),
+      }),
     },
   ),
 

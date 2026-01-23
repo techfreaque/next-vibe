@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -43,100 +43,77 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      skipSeeding: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.migrateProd.fields.skipSeeding.title",
-          description:
-            "app.api.system.db.migrateProd.fields.skipSeeding.description",
-          columns: 4,
-        },
-        z.boolean().optional().default(false),
-      ),
+      skipSeeding: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.migrateProd.fields.skipSeeding.title",
+        description:
+          "app.api.system.db.migrateProd.fields.skipSeeding.description",
+        columns: 4,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      force: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.migrateProd.fields.force.title",
-          description: "app.api.system.db.migrateProd.fields.force.description",
-          columns: 4,
-        },
-        z.boolean().optional().default(false),
-      ),
+      force: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.migrateProd.fields.force.title",
+        description: "app.api.system.db.migrateProd.fields.force.description",
+        columns: 4,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.migrateProd.fields.dryRun.title",
-          description:
-            "app.api.system.db.migrateProd.fields.dryRun.description",
-          columns: 4,
-        },
-        z.boolean().optional().default(false),
-      ),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.migrateProd.fields.dryRun.title",
+        description: "app.api.system.db.migrateProd.fields.dryRun.description",
+        columns: 4,
+        schema: z.boolean().optional().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrateProd.fields.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrateProd.fields.success.title",
+        schema: z.boolean(),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrateProd.fields.output.title",
-        },
-        z.string(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrateProd.fields.output.title",
+        schema: z.string(),
+      }),
 
-      environment: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrateProd.fields.environment.title",
-        },
-        z.string(),
-      ),
+      environment: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrateProd.fields.environment.title",
+        schema: z.string(),
+      }),
 
-      databaseUrl: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrateProd.fields.databaseUrl.title",
-        },
-        z.string(),
-      ),
+      databaseUrl: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrateProd.fields.databaseUrl.title",
+        schema: z.string(),
+      }),
 
-      migrationsGenerated: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateProd.fields.migrationsGenerated.title",
-        },
-        z.boolean(),
-      ),
+      migrationsGenerated: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.db.migrateProd.fields.migrationsGenerated.title",
+        schema: z.boolean(),
+      }),
 
-      migrationsApplied: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateProd.fields.migrationsApplied.title",
-        },
-        z.boolean(),
-      ),
+      migrationsApplied: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrateProd.fields.migrationsApplied.title",
+        schema: z.boolean(),
+      }),
 
-      seedingCompleted: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateProd.fields.seedingCompleted.title",
-        },
-        z.boolean(),
-      ),
+      seedingCompleted: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrateProd.fields.seedingCompleted.title",
+        schema: z.boolean(),
+      }),
     },
   ),
 
@@ -197,7 +174,6 @@ const { POST } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    urlPathParams: undefined,
     requests: {
       default: {
         skipSeeding: false,

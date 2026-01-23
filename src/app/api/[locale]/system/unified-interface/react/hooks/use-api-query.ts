@@ -166,8 +166,14 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     // initialData populates the cache and respects staleTime
     // This allows optimistic updates to work because data is in the cache
     initialData: initialData
-      ? (): ResponseType<TEndpoint["types"]["ResponseOutput"]> =>
-          success(initialData)
+      ? (): ResponseType<TEndpoint["types"]["ResponseOutput"]> => {
+          logger.debug("useApiQuery: Using initialData", {
+            endpointPath: endpoint.path.join("/"),
+            hasInitialData: !!initialData,
+            initialDataKeys: Object.keys(initialData ?? {}),
+          });
+          return success(initialData);
+        }
       : undefined,
   });
 

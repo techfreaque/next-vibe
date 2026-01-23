@@ -7,6 +7,12 @@ export const translations: typeof enTranslations = {
     container: {
       title: "Szczegóły ulubionego",
     },
+    editButton: {
+      label: "Edytuj ulubiony",
+    },
+    deleteButton: {
+      label: "Usuń ulubiony",
+    },
     id: {
       label: "ID ulubionego",
     },
@@ -16,6 +22,9 @@ export const translations: typeof enTranslations = {
       },
       customName: {
         content: "Nazwa niestandardowa: {{value}}",
+      },
+      customIcon: {
+        content: "Ikona niestandardowa: {{value}}",
       },
       voice: {
         content: "Głos: {{value}}",
@@ -130,6 +139,16 @@ export const translations: typeof enTranslations = {
     container: {
       title: "Edytuj ulubiony",
     },
+    backButton: {
+      label: "Wróć do ulubionego",
+    },
+    deleteButton: {
+      label: "Usuń ulubiony",
+    },
+    submitButton: {
+      label: "Zapisz zmiany",
+      loadingText: "Zapisywanie...",
+    },
     id: {
       label: "ID ulubionego",
     },
@@ -153,6 +172,7 @@ export const translations: typeof enTranslations = {
     },
     selectionType: {
       label: "Typ wyboru",
+      characterBased: "Na podstawie postaci",
       manual: "Konkretny model",
       filters: "Kryteria filtrowania",
     },
@@ -273,9 +293,18 @@ export const translations: typeof enTranslations = {
     description: "Usuń ulubioną konfigurację",
     container: {
       title: "Usuń ulubiony",
+      description: "Trwale usuń tę ulubioną konfigurację",
+    },
+    backButton: {
+      label: "Anuluj",
+    },
+    actions: {
+      delete: "Usuń ulubiony",
+      deleting: "Usuwanie ulubionego...",
     },
     id: {
       label: "ID ulubionego",
+      description: "Unikatowy identyfikator ulubionego do usunięcia",
     },
     response: {
       success: {

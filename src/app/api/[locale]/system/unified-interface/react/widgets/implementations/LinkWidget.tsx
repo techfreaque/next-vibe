@@ -47,7 +47,8 @@ export function LinkWidget<const TKey extends string>({
   context,
   className,
 }: ReactWidgetProps<typeof WidgetType.LINK, TKey>): JSX.Element {
-  const { size, gap, iconSize } = field.ui;
+  const { size, gap, iconSize, href } = field.ui;
+  const hrefValue = value || href;
 
   // Get classes from config (no hardcoding!)
   const sizeClass = getTextSizeClassName(size);
@@ -55,16 +56,16 @@ export function LinkWidget<const TKey extends string>({
   const iconSizeClass = getIconSizeClassName(iconSize);
 
   // Handle null/undefined/empty - just show dash for empty values
-  if (value === null || value === undefined || value === "") {
+  if (hrefValue === null || hrefValue === undefined || hrefValue === "") {
     return <Span className="text-muted-foreground">—</Span>;
   }
 
-  const data = extractLinkData(value);
+  const data = extractLinkData(hrefValue);
 
   // If we have a value but can't extract link data, show the translated raw value
   if (!data) {
     const displayValue =
-      typeof value === "string" ? context.t(value) : String(value);
+      typeof hrefValue === "string" ? context.t(hrefValue) : String(hrefValue);
     return <Span className={className}>{displayValue}</Span>;
   }
 

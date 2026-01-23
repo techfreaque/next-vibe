@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -57,36 +57,30 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      text: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXTAREA,
-          label: "app.api.agent.textToSpeech.post.text.label",
-          description: "app.api.agent.textToSpeech.post.text.description",
-          columns: 12,
-          placeholder: "app.api.agent.textToSpeech.post.text.placeholder",
-        },
-        z.string().min(1).max(5000),
-      ),
-      voice: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.textToSpeech.post.voice.label",
-          description: "app.api.agent.textToSpeech.post.voice.description",
-          columns: 12,
-          options: TtsVoiceOptions,
-        },
-        z.string().default(DEFAULT_TTS_VOICE),
-      ),
+      text: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "app.api.agent.textToSpeech.post.text.label",
+        description: "app.api.agent.textToSpeech.post.text.description",
+        columns: 12,
+        placeholder: "app.api.agent.textToSpeech.post.text.placeholder",
+        schema: z.string().min(1).max(5000),
+      }),
+      voice: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.agent.textToSpeech.post.voice.label",
+        description: "app.api.agent.textToSpeech.post.voice.description",
+        columns: 12,
+        options: TtsVoiceOptions,
+        schema: z.string().default(DEFAULT_TTS_VOICE),
+      }),
 
-      audioUrl: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.textToSpeech.post.response.audioUrl",
-        },
-        z.string(),
-      ),
+      audioUrl: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.agent.textToSpeech.post.response.audioUrl",
+        schema: z.string(),
+      }),
     },
   ),
 
@@ -155,7 +149,6 @@ const { POST } = createEndpoint({
         audioUrl: "https://example.com/audio.mp3",
       },
     },
-    urlPathParams: undefined,
   },
 });
 

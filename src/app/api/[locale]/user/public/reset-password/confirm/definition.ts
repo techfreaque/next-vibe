@@ -15,9 +15,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   objectField,
-  requestDataField,
+  requestField,
+  responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 
 import { UserRole } from "../../../user-roles/enum";
 
@@ -57,44 +58,40 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          token: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.user.public.resetPassword.confirm.fields.token.label" as const,
-              description:
-                "app.api.user.public.resetPassword.confirm.fields.token.description" as const,
-              placeholder:
-                "app.api.user.public.resetPassword.confirm.fields.token.placeholder" as const,
-              helpText:
-                "app.api.user.public.resetPassword.confirm.fields.token.help" as const,
-            },
-            z.string().min(1, {
+          token: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label:
+              "app.api.user.public.resetPassword.confirm.fields.token.label" as const,
+            description:
+              "app.api.user.public.resetPassword.confirm.fields.token.description" as const,
+            placeholder:
+              "app.api.user.public.resetPassword.confirm.fields.token.placeholder" as const,
+            helpText:
+              "app.api.user.public.resetPassword.confirm.fields.token.help" as const,
+            schema: z.string().min(1, {
               message:
                 "app.api.user.public.resetPassword.confirm.fields.token.validation.required",
             }),
-          ),
+          }),
 
-          email: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.EMAIL,
-              label:
-                "app.api.user.public.resetPassword.confirm.fields.email.label" as const,
-              description:
-                "app.api.user.public.resetPassword.confirm.fields.email.description" as const,
-              placeholder:
-                "app.api.user.public.resetPassword.confirm.fields.email.placeholder" as const,
-            },
-            z
+          email: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.EMAIL,
+            label:
+              "app.api.user.public.resetPassword.confirm.fields.email.label" as const,
+            description:
+              "app.api.user.public.resetPassword.confirm.fields.email.description" as const,
+            placeholder:
+              "app.api.user.public.resetPassword.confirm.fields.email.placeholder" as const,
+            schema: z
               .string()
               .email({
                 message:
                   "app.api.user.public.resetPassword.confirm.fields.email.validation.invalid",
               })
               .transform((val) => val.toLowerCase().trim()),
-          ),
+          }),
         },
       ),
 
@@ -111,41 +108,37 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          password: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.PASSWORD,
-              label:
-                "app.api.user.public.resetPassword.confirm.fields.password.label" as const,
-              description:
-                "app.api.user.public.resetPassword.confirm.fields.password.description" as const,
-              placeholder:
-                "app.api.user.public.resetPassword.confirm.fields.password.placeholder" as const,
-              helpText:
-                "app.api.user.public.resetPassword.confirm.fields.password.help" as const,
-            },
-            z.string().min(8, {
+          password: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.PASSWORD,
+            label:
+              "app.api.user.public.resetPassword.confirm.fields.password.label" as const,
+            description:
+              "app.api.user.public.resetPassword.confirm.fields.password.description" as const,
+            placeholder:
+              "app.api.user.public.resetPassword.confirm.fields.password.placeholder" as const,
+            helpText:
+              "app.api.user.public.resetPassword.confirm.fields.password.help" as const,
+            schema: z.string().min(8, {
               message:
                 "app.api.user.public.resetPassword.confirm.fields.password.validation.minLength",
             }),
-          ),
+          }),
 
-          confirmPassword: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.PASSWORD,
-              label:
-                "app.api.user.public.resetPassword.confirm.fields.confirmPassword.label" as const,
-              description:
-                "app.api.user.public.resetPassword.confirm.fields.confirmPassword.description" as const,
-              placeholder:
-                "app.api.user.public.resetPassword.confirm.fields.confirmPassword.placeholder" as const,
-            },
-            z.string().min(8, {
+          confirmPassword: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.PASSWORD,
+            label:
+              "app.api.user.public.resetPassword.confirm.fields.confirmPassword.label" as const,
+            description:
+              "app.api.user.public.resetPassword.confirm.fields.confirmPassword.description" as const,
+            placeholder:
+              "app.api.user.public.resetPassword.confirm.fields.confirmPassword.placeholder" as const,
+            schema: z.string().min(8, {
               message:
                 "app.api.user.public.resetPassword.confirm.fields.confirmPassword.validation.minLength",
             }),
-          ),
+          }),
         },
       ),
 
@@ -162,36 +155,36 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          success: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.public.resetPassword.confirm.success.title" as const,
-            },
-            z.boolean().describe("Whether the password reset was successful"),
-          ),
-          message: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.resetPassword.confirm.response.message.label" as const,
-            },
-            z.string().describe("Human-readable status message"),
-          ),
-          securityTip: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.resetPassword.confirm.response.securityTip" as const,
-            },
-            z.string().optional().describe("Optional security recommendation"),
-          ),
-          nextSteps: responseField(
+          success: responseField({
+            type: WidgetType.BADGE,
+            text: "app.api.user.public.resetPassword.confirm.success.title" as const,
+            schema: z
+              .boolean()
+              .describe("Whether the password reset was successful"),
+          }),
+          message: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.public.resetPassword.confirm.response.message.label" as const,
+            schema: z.string().describe("Human-readable status message"),
+          }),
+          securityTip: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.public.resetPassword.confirm.response.securityTip" as const,
+            schema: z
+              .string()
+              .optional()
+              .describe("Optional security recommendation"),
+          }),
+          nextSteps: responseArrayField(
             {
               type: WidgetType.LINK_LIST,
             },
-            z
-              .array(z.string())
-              .describe("Recommended actions after password reset"),
+            responseField({
+              type: WidgetType.TEXT,
+              schema: z.string(),
+            }),
           ),
         },
       ),
@@ -297,7 +290,6 @@ const { POST } = createEndpoint({
         },
       },
     },
-    urlPathParams: undefined,
     responses: {
       default: {
         response: {

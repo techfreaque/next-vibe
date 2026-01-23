@@ -10,6 +10,7 @@ import { AlertCircle, Calendar } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import { safeGetRequiredFields } from "next-vibe/shared/utils/zod-required-fields";
 import type { JSX } from "react";
+import * as React from "react";
 import type {
   Control,
   ControllerRenderProps,
@@ -18,9 +19,9 @@ import type {
 } from "react-hook-form";
 
 import {
-  getIconComponent,
+  Icon,
   type IconKey,
-} from "@/app/api/[locale]/agent/chat/model-access/icons";
+} from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type {
   FieldConfig,
   FieldStyleClassName,
@@ -53,6 +54,7 @@ import { NumberInput } from "../number-input";
 import { PhoneField } from "../phone-field";
 import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 import { RadioGroup, RadioGroupItem } from "../radio-group";
+import { RangeSlider } from "../range-slider";
 import {
   Select,
   SelectContent,
@@ -404,6 +406,7 @@ function renderFieldInput<
               : undefined
           }
           disabled={disabled || config.disabled}
+          name={field.name}
         >
           <SelectTrigger className={cn(inputClassName, "h-10")}>
             <SelectValue
@@ -438,6 +441,7 @@ function renderFieldInput<
         <div className="flex items-center space-x-3">
           <Checkbox
             id={field.name}
+            name={field.name}
             checked={Boolean(field.value)}
             onCheckedChange={(checked) => field.onChange(checked)}
             disabled={disabled || config.disabled}
@@ -459,6 +463,7 @@ function renderFieldInput<
     case "radio":
       return (
         <RadioGroup
+          name={field.name}
           onValueChange={(value) => field.onChange(value)}
           value={String(field.value || "")}
           disabled={disabled || config.disabled}
@@ -493,6 +498,7 @@ function renderFieldInput<
         <div className="flex items-center space-x-3 py-2">
           <Switch
             id={field.name}
+            name={field.name}
             checked={Boolean(field.value)}
             onCheckedChange={(checked) => field.onChange(checked)}
             disabled={disabled || config.disabled}
@@ -653,6 +659,7 @@ function renderFieldInput<
           onChange={(iconKey) => field.onChange(iconKey)}
           className={inputClassName}
           size="default"
+          name={field.name}
         />
       );
     }
@@ -661,7 +668,6 @@ function renderFieldInput<
       return (
         <div className="flex flex-wrap items-center gap-2">
           {config.options.map((option) => {
-            const Icon = option.icon ? getIconComponent(option.icon) : null;
             const isSelected = field.value === option.value;
 
             return (
@@ -681,8 +687,9 @@ function renderFieldInput<
                   !isSelected && "hover:border-primary/50 hover:bg-primary/5",
                 )}
               >
-                {Icon && (
+                {option.icon && (
                   <Icon
+                    icon={option.icon}
                     className={cn(
                       "h-4 w-4",
                       isSelected && "text-primary-foreground",
@@ -694,6 +701,41 @@ function renderFieldInput<
             );
           })}
         </div>
+      );
+    }
+
+    case "range_slider": {
+      // Calculate current indices from field values
+      const minIndex =
+        field.value?.min !== undefined
+          ? config.options.findIndex((opt) => opt.value === field.value.min)
+          : config.minDefault !== undefined
+            ? config.options.findIndex((opt) => opt.value === config.minDefault)
+            : 0;
+
+      const maxIndex =
+        field.value?.max !== undefined
+          ? config.options.findIndex((opt) => opt.value === field.value.max)
+          : config.maxDefault !== undefined
+            ? config.options.findIndex((opt) => opt.value === config.maxDefault)
+            : config.options.length - 1;
+
+      return (
+        <RangeSlider<TKey>
+          options={config.options}
+          minIndex={minIndex}
+          maxIndex={maxIndex}
+          onChange={(newMinIndex, newMaxIndex) => {
+            field.onChange({
+              min: config.options[newMinIndex].value,
+              max: config.options[newMaxIndex].value,
+            });
+          }}
+          disabled={disabled || config.disabled}
+          minLabel={config.minLabel ? t(config.minLabel) : undefined}
+          maxLabel={config.maxLabel ? t(config.maxLabel) : undefined}
+          t={t}
+        />
       );
     }
 

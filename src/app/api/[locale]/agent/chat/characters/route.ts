@@ -14,7 +14,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ user, logger }) =>
-      CharactersRepository.getCharacters(user, logger),
+    handler: ({ user, logger, t }) =>
+      CharactersRepository.getCharacters(user, logger, t),
   },
 });

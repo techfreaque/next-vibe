@@ -6,6 +6,15 @@ export const translations = {
       title: "Character Details",
       description: "Details of the requested character",
     },
+    backButton: {
+      label: "Back to Characters",
+    },
+    editButton: {
+      label: "Edit Character",
+    },
+    deleteButton: {
+      label: "Delete Character",
+    },
     id: {
       label: "Character ID",
       description: "The unique identifier of the character",
@@ -22,7 +31,6 @@ export const translations = {
         source: { content: "Source" },
         preferredModel: { content: "Preferred Model" },
         voice: { content: "Voice" },
-        suggestedPrompts: { content: "Suggested Prompts" },
         modelSelection: { title: "Model Selection" },
         selectionType: { content: "Selection Type" },
         minIntelligence: { content: "Minimum Intelligence" },
@@ -87,6 +95,16 @@ export const translations = {
       title: "Update Character",
       description: "Modify an existing custom character",
     },
+    backButton: {
+      label: "Back to Character",
+    },
+    deleteButton: {
+      label: "Delete Character",
+    },
+    submitButton: {
+      label: "Update Character",
+      loadingText: "Updating Character...",
+    },
     actions: {
       update: "Update Character",
       updating: "Updating Character",
@@ -145,10 +163,7 @@ export const translations = {
       label: "Preferred Model",
       description: "The preferred AI model for this character",
     },
-    suggestedPrompts: {
-      label: "Suggested Prompts",
-      description: "Example prompts to use with this character",
-    },
+
     errors: {
       validation: {
         title: "Validation Error",
@@ -198,6 +213,13 @@ export const translations = {
     container: {
       title: "Delete Character",
       description: "Permanently remove this custom character",
+    },
+    backButton: {
+      label: "Back to Character",
+    },
+    actions: {
+      delete: "Delete Character",
+      deleting: "Deleting Character",
     },
     id: {
       label: "Character ID",

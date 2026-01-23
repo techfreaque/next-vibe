@@ -10,7 +10,7 @@ import {
   objectField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -58,83 +58,61 @@ const { GET } = createEndpoint({
     },
     { response: true },
     {
-      name: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.manifest.response.title",
-        },
-        z.string(),
-      ),
-      short_name: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.manifest.response.title",
-        },
-        z.string(),
-      ),
-      description: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.manifest.response.description",
-        },
-        z.string(),
-      ),
-      start_url: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.manifest.response.title",
-        },
-        z.string(),
-      ),
-      display: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.manifest.response.display",
-        },
-        z.string(),
-      ),
-      background_color: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.manifest.response.title",
-        },
-        z.string(),
-      ),
-      theme_color: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.manifest.response.title",
-        },
-        z.string(),
-      ),
-      orientation: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.manifest.response.orientation",
-        },
-        z.string(),
-      ),
-      scope: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.manifest.response.title",
-        },
-        z.string(),
-      ),
-      lang: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.manifest.response.title",
-        },
-        z.string(),
-      ),
-      categories: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.manifest.response.categories",
-        },
-        z.array(z.string()),
-      ),
+      name: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.manifest.response.title",
+        schema: z.string(),
+      }),
+      short_name: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.manifest.response.title",
+        schema: z.string(),
+      }),
+      description: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.manifest.response.description",
+        schema: z.string(),
+      }),
+      start_url: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.manifest.response.title",
+        schema: z.string(),
+      }),
+      display: responseField({
+        type: WidgetType.BADGE,
+        text: "app.api.manifest.response.display",
+        schema: z.string(),
+      }),
+      background_color: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.manifest.response.title",
+        schema: z.string(),
+      }),
+      theme_color: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.manifest.response.title",
+        schema: z.string(),
+      }),
+      orientation: responseField({
+        type: WidgetType.BADGE,
+        text: "app.api.manifest.response.orientation",
+        schema: z.string(),
+      }),
+      scope: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.manifest.response.title",
+        schema: z.string(),
+      }),
+      lang: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.manifest.response.title",
+        schema: z.string(),
+      }),
+      categories: responseField({
+        type: WidgetType.BADGE,
+        text: "app.api.manifest.response.categories",
+        schema: z.array(z.string()),
+      }),
       icons: responseArrayField(
         {
           type: WidgetType.DATA_CARDS,
@@ -155,34 +133,26 @@ const { GET } = createEndpoint({
           },
           { response: true },
           {
-            src: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.manifest.response.title",
-              },
-              z.string(),
-            ),
-            sizes: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.manifest.response.title",
-              },
-              z.string(),
-            ),
-            type: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.manifest.response.title",
-              },
-              z.string(),
-            ),
-            purpose: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.manifest.response.iconPurpose",
-              },
-              z.string(),
-            ),
+            src: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.manifest.response.title",
+              schema: z.string(),
+            }),
+            sizes: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.manifest.response.title",
+              schema: z.string(),
+            }),
+            type: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.manifest.response.title",
+              schema: z.string(),
+            }),
+            purpose: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.manifest.response.iconPurpose",
+              schema: z.string(),
+            }),
           },
         ),
       ),

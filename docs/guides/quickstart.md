@@ -172,7 +172,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
@@ -191,7 +191,7 @@ const { POST } = createEndpoint({
     { type: WidgetType.CONTAINER },
     { request: "data", response: true },
     {
-      name: requestDataField(
+      name: requestField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,

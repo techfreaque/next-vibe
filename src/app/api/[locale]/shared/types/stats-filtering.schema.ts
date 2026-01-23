@@ -7,7 +7,6 @@
 import { dateSchema } from "next-vibe/shared/types/common.schema";
 import { z } from "zod";
 
-import type { Countries, Languages } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 // Re-export dateSchema for consistency
@@ -60,33 +59,10 @@ export enum ChartType {
 }
 
 /**
- * Base Stats Filter Schema
- * Common filtering options for all stats endpoints
- */
-export const baseStatsFilterSchema = z.object({
-  // Time-based filtering
-  timePeriod: z.enum(TimePeriod).default(TimePeriod.DAY),
-  dateRangePreset: z
-    .nativeEnum(DateRangePreset)
-    .default(DateRangePreset.LAST_30_DAYS),
-  dateFrom: dateSchema.optional(),
-  dateTo: dateSchema.optional(),
-
-  // Chart configuration
-  chartType: z.enum(ChartType).default(ChartType.LINE),
-
-  // Data options
-  includeComparison: z.coerce.boolean().default(false),
-  comparisonPeriod: z.enum(DateRangePreset).optional(),
-});
-
-export type BaseStatsFilterType = z.infer<typeof baseStatsFilterSchema>;
-
-/**
  * Historical Data Point Schema
  * Structure for time-series data points
  */
-export const historicalDataPointSchema = z.object({
+const historicalDataPointSchema = z.object({
   date: dateSchema,
   value: z.coerce.number(),
   label: z.string().optional() as z.ZodType<TranslationKey | undefined>,
@@ -104,7 +80,7 @@ export type HistoricalDataPointType = z.infer<typeof historicalDataPointSchema>;
  * Historical Data Series Schema
  * Structure for a complete data series
  */
-export const historicalDataSeriesSchema = z.object({
+const historicalDataSeriesSchema = z.object({
   name: z.string() as z.ZodType<TranslationKey>,
   nameParams: z
     .record(z.string(), z.union([z.string(), z.coerce.number()]))
@@ -113,10 +89,6 @@ export const historicalDataSeriesSchema = z.object({
   color: z.string().optional(),
   type: z.enum(ChartType).optional(),
 });
-
-export type HistoricalDataSeriesType = z.infer<
-  typeof historicalDataSeriesSchema
->;
 
 /**
  * Chart Data Schema
@@ -132,97 +104,6 @@ export const chartDataSchema = z.object({
 });
 
 export type ChartDataType = z.infer<typeof chartDataSchema>;
-
-/**
- * Current period stats schema for summary numbers
- */
-export const currentPeriodStatsSchema = z.object({
-  // Core metrics
-  totalCount: z.coerce.number().describe("Total count for the current period"),
-  newCount: z.coerce.number().describe("New items in the current period"),
-  activeCount: z.coerce.number().describe("Active items in the current period"),
-
-  // Engagement metrics (for emails/campaigns)
-  totalSent: z.coerce.number().optional().describe("Total emails sent"),
-  totalOpened: z.coerce.number().optional().describe("Total emails opened"),
-  totalClicked: z.coerce.number().optional().describe("Total emails clicked"),
-  totalBounced: z.coerce.number().optional().describe("Total emails bounced"),
-  totalUnsubscribed: z.coerce
-    .number()
-    .optional()
-    .describe("Total unsubscribed"),
-
-  // Conversion metrics (for leads)
-  totalSignedUp: z.coerce.number().optional().describe("Total leads signed up"),
-  totalConsultationBooked: z
-    .number()
-    .optional()
-    .describe("Total consultations booked"),
-  totalConverted: z.coerce
-    .number()
-    .optional()
-    .describe("Total converted leads"),
-
-  // Rate calculations
-  openRate: z.coerce.number().optional().describe("Email open rate (0-1)"),
-  clickRate: z.coerce.number().optional().describe("Email click rate (0-1)"),
-  bounceRate: z.coerce.number().optional().describe("Email bounce rate (0-1)"),
-  unsubscribeRate: z
-    .number()
-    .optional()
-    .describe("Email unsubscribe rate (0-1)"),
-  conversionRate: z.coerce
-    .number()
-    .optional()
-    .describe("Lead conversion rate (0-1)"),
-  signupRate: z.coerce.number().optional().describe("Lead signup rate (0-1)"),
-  consultationBookingRate: z
-    .number()
-    .optional()
-    .describe("Consultation booking rate (0-1)"),
-
-  // Distribution data
-  // Generic string keys - specific implementations should override with proper enum types
-  byType: z
-    .record(z.string(), z.coerce.number())
-    .optional()
-    .describe("Distribution by type"),
-  byStatus: z
-    .record(z.string(), z.coerce.number())
-    .optional()
-    .describe("Distribution by status"),
-  bySource: z
-    .record(z.string(), z.coerce.number())
-    .optional()
-    .describe("Distribution by source"),
-  // Proper enum types for country and language
-  byCountry: z
-    .record(z.custom<Countries>(), z.coerce.number())
-    .optional()
-    .describe("Distribution by country"),
-  byLanguage: z
-    .record(z.custom<Languages>(), z.coerce.number())
-    .optional()
-    .describe("Distribution by language"),
-
-  // Time-based metrics
-  todayCount: z.coerce.number().optional().describe("Count for today"),
-  thisWeekCount: z.coerce.number().optional().describe("Count for this week"),
-  thisMonthCount: z.coerce.number().optional().describe("Count for this month"),
-  lastMonthCount: z.coerce.number().optional().describe("Count for last month"),
-
-  // Top performers
-  topPerforming: z
-    .array(z.record(z.string(), z.unknown()))
-    .optional()
-    .describe("Top performing items"),
-  recentActivity: z
-    .array(z.record(z.string(), z.unknown()))
-    .optional()
-    .describe("Recent activity"),
-});
-
-export type CurrentPeriodStatsType = z.infer<typeof currentPeriodStatsSchema>;
 
 /**
  * Date Range Calculation Utilities
@@ -349,27 +230,5 @@ export function getDateRangeFromPreset(preset: DateRangePreset): {
         from: new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000),
         to: now,
       };
-  }
-}
-
-/**
- * Get time period format string for SQL GROUP BY
- */
-export function getTimePeriodFormat(period: TimePeriod): string {
-  switch (period) {
-    case TimePeriod.HOUR:
-      return "DATE_TRUNC('hour', created_at)";
-    case TimePeriod.DAY:
-      return "DATE(created_at)";
-    case TimePeriod.WEEK:
-      return "DATE_TRUNC('week', created_at)";
-    case TimePeriod.MONTH:
-      return "DATE_TRUNC('month', created_at)";
-    case TimePeriod.QUARTER:
-      return "DATE_TRUNC('quarter', created_at)";
-    case TimePeriod.YEAR:
-      return "DATE_TRUNC('year', created_at)";
-    default:
-      return "DATE(created_at)";
   }
 }

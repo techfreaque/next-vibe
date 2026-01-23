@@ -9,10 +9,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -73,39 +73,33 @@ const { POST: ImportCsvPost } = createEndpoint({
         },
         { request: "data" },
         {
-          file: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.FILE,
-              label: "app.api.import.csv.post.file.label",
-              description: "app.api.import.csv.post.file.description",
-              placeholder: "app.api.import.csv.post.file.placeholder",
-            },
-            z.string().min(1),
-          ),
+          file: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.FILE,
+            label: "app.api.import.csv.post.file.label",
+            description: "app.api.import.csv.post.file.description",
+            placeholder: "app.api.import.csv.post.file.placeholder",
+            schema: z.string().min(1),
+          }),
 
-          fileName: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.import.csv.post.fileName.label",
-              description: "app.api.import.csv.post.fileName.description",
-              placeholder: "app.api.import.csv.post.fileName.placeholder",
-            },
-            z.string().min(1),
-          ),
+          fileName: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.import.csv.post.fileName.label",
+            description: "app.api.import.csv.post.fileName.description",
+            placeholder: "app.api.import.csv.post.fileName.placeholder",
+            schema: z.string().min(1),
+          }),
 
-          domain: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.import.csv.post.domain.label",
-              description: "app.api.import.csv.post.domain.description",
-              placeholder: "app.api.import.csv.post.domain.placeholder",
-              options: ImportDomainOptions,
-            },
-            z.enum(ImportDomain),
-          ),
+          domain: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.import.csv.post.domain.label",
+            description: "app.api.import.csv.post.domain.description",
+            placeholder: "app.api.import.csv.post.domain.placeholder",
+            options: ImportDomainOptions,
+            schema: z.enum(ImportDomain),
+          }),
         },
       ),
 
@@ -120,47 +114,39 @@ const { POST: ImportCsvPost } = createEndpoint({
         },
         { request: "data" },
         {
-          skipDuplicates: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.import.csv.post.skipDuplicates.label",
-              description: "app.api.import.csv.post.skipDuplicates.description",
-            },
-            z.boolean().default(true),
-          ),
+          skipDuplicates: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.BOOLEAN,
+            label: "app.api.import.csv.post.skipDuplicates.label",
+            description: "app.api.import.csv.post.skipDuplicates.description",
+            schema: z.boolean().default(true),
+          }),
 
-          updateExisting: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.import.csv.post.updateExisting.label",
-              description: "app.api.import.csv.post.updateExisting.description",
-            },
-            z.boolean().default(false),
-          ),
+          updateExisting: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.BOOLEAN,
+            label: "app.api.import.csv.post.updateExisting.label",
+            description: "app.api.import.csv.post.updateExisting.description",
+            schema: z.boolean().default(false),
+          }),
 
-          useChunkedProcessing: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.import.csv.post.useChunkedProcessing.label",
-              description:
-                "app.api.import.csv.post.useChunkedProcessing.description",
-            },
-            z.boolean().default(false),
-          ),
+          useChunkedProcessing: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.BOOLEAN,
+            label: "app.api.import.csv.post.useChunkedProcessing.label",
+            description:
+              "app.api.import.csv.post.useChunkedProcessing.description",
+            schema: z.boolean().default(false),
+          }),
 
-          batchSize: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label: "app.api.import.csv.post.batchSize.label",
-              description: "app.api.import.csv.post.batchSize.description",
-              placeholder: "app.api.import.csv.post.batchSize.placeholder",
-            },
-            z.coerce.number().min(10).max(1000).default(100),
-          ),
+          batchSize: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label: "app.api.import.csv.post.batchSize.label",
+            description: "app.api.import.csv.post.batchSize.description",
+            placeholder: "app.api.import.csv.post.batchSize.placeholder",
+            schema: z.coerce.number().min(10).max(1000).default(100),
+          }),
         },
       ),
 
@@ -175,31 +161,25 @@ const { POST: ImportCsvPost } = createEndpoint({
         },
         { request: "data" },
         {
-          defaultCountry: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.import.csv.post.defaultCountry.label",
-              description: "app.api.import.csv.post.defaultCountry.description",
-              placeholder: "app.api.import.csv.post.defaultCountry.placeholder",
-              options: CountriesOptions,
-            },
-            z.enum(Countries).default(Countries.GLOBAL),
-          ),
+          defaultCountry: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.import.csv.post.defaultCountry.label",
+            description: "app.api.import.csv.post.defaultCountry.description",
+            placeholder: "app.api.import.csv.post.defaultCountry.placeholder",
+            options: CountriesOptions,
+            schema: z.enum(Countries).default(Countries.GLOBAL),
+          }),
 
-          defaultLanguage: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.import.csv.post.defaultLanguage.label",
-              description:
-                "app.api.import.csv.post.defaultLanguage.description",
-              placeholder:
-                "app.api.import.csv.post.defaultLanguage.placeholder",
-              options: LanguagesOptions,
-            },
-            z.enum(Languages).default(Languages.EN),
-          ),
+          defaultLanguage: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.import.csv.post.defaultLanguage.label",
+            description: "app.api.import.csv.post.defaultLanguage.description",
+            placeholder: "app.api.import.csv.post.defaultLanguage.placeholder",
+            options: LanguagesOptions,
+            schema: z.enum(Languages).default(Languages.EN),
+          }),
         },
       ),
 
@@ -224,35 +204,27 @@ const { POST: ImportCsvPost } = createEndpoint({
             },
             { response: true },
             {
-              batchId: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.import.csv.post.response.batchId.label",
-                },
-                z.uuid(),
-              ),
-              totalRows: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.import.csv.post.response.totalRows.label",
-                },
-                z.coerce.number(),
-              ),
-              isChunkedProcessing: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.csv.post.response.isChunkedProcessing.label",
-                },
-                z.boolean(),
-              ),
-              jobId: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.import.csv.post.response.jobId.label",
-                },
-                z.uuid().optional(),
-              ),
+              batchId: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.import.csv.post.response.batchId.label",
+                schema: z.uuid(),
+              }),
+              totalRows: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.import.csv.post.response.totalRows.label",
+                schema: z.coerce.number(),
+              }),
+              isChunkedProcessing: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.import.csv.post.response.isChunkedProcessing.label",
+                schema: z.boolean(),
+              }),
+              jobId: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.import.csv.post.response.jobId.label",
+                schema: z.uuid().optional(),
+              }),
             },
           ),
 
@@ -268,38 +240,29 @@ const { POST: ImportCsvPost } = createEndpoint({
             },
             { response: true },
             {
-              successfulImports: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.csv.post.response.successfulImports.label",
-                },
-                z.coerce.number(),
-              ),
-              failedImports: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.csv.post.response.failedImports.label",
-                },
-                z.coerce.number(),
-              ),
-              duplicateEmails: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.csv.post.response.duplicateEmails.label",
-                },
-                z.coerce.number(),
-              ),
-              processingTimeMs: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.csv.post.response.processingTimeMs.label",
-                },
-                z.coerce.number().optional(),
-              ),
+              successfulImports: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.import.csv.post.response.successfulImports.label",
+                schema: z.coerce.number(),
+              }),
+              failedImports: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.import.csv.post.response.failedImports.label",
+                schema: z.coerce.number(),
+              }),
+              duplicateEmails: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.import.csv.post.response.duplicateEmails.label",
+                schema: z.coerce.number(),
+              }),
+              processingTimeMs: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.import.csv.post.response.processingTimeMs.label",
+                schema: z.coerce.number().optional(),
+              }),
             },
           ),
 
@@ -315,29 +278,23 @@ const { POST: ImportCsvPost } = createEndpoint({
             },
             { response: true },
             {
-              newRecords: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.import.csv.post.response.newRecords.label",
-                },
-                z.coerce.number(),
-              ),
-              updatedRecords: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.csv.post.response.updatedRecords.label",
-                },
-                z.coerce.number(),
-              ),
-              skippedDuplicates: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.csv.post.response.skippedDuplicates.label",
-                },
-                z.coerce.number(),
-              ),
+              newRecords: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.import.csv.post.response.newRecords.label",
+                schema: z.coerce.number(),
+              }),
+              updatedRecords: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.import.csv.post.response.updatedRecords.label",
+                schema: z.coerce.number(),
+              }),
+              skippedDuplicates: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.import.csv.post.response.skippedDuplicates.label",
+                schema: z.coerce.number(),
+              }),
             },
           ),
 
@@ -355,30 +312,23 @@ const { POST: ImportCsvPost } = createEndpoint({
               },
               { response: true },
               {
-                row: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.csv.post.response.errors.row.label",
-                  },
-                  z.coerce.number(),
-                ),
-                email: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.csv.post.response.errors.email.label",
-                  },
-                  z.string().optional(),
-                ),
-                error: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.csv.post.response.errors.error.label",
-                  },
-                  z.string(),
-                ),
+                row: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.import.csv.post.response.errors.row.label",
+                  schema: z.coerce.number(),
+                }),
+                email: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.csv.post.response.errors.email.label",
+                  schema: z.string().optional(),
+                }),
+                error: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.csv.post.response.errors.error.label",
+                  schema: z.string(),
+                }),
               },
             ),
           ),
@@ -389,14 +339,11 @@ const { POST: ImportCsvPost } = createEndpoint({
               type: WidgetType.DATA_LIST,
               title: "app.api.import.csv.post.response.nextSteps.title",
             },
-            responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.import.csv.post.response.nextSteps.item.label",
-              },
-              z.string(),
-            ),
+            responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.import.csv.post.response.nextSteps.item.label",
+              schema: z.string(),
+            }),
           ),
         },
       ),
@@ -535,39 +482,33 @@ const { GET: ListImportJobsGet } = createEndpoint({
     { request: "data", response: true },
     {
       // === FILTER OPTIONS ===
-      status: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.import.jobs.get.status.label",
-          description: "app.api.import.jobs.get.status.description",
-          placeholder: "app.api.import.jobs.get.status.placeholder",
-          options: CsvImportJobStatusOptions,
-        },
-        z.enum(CsvImportJobStatus).optional(),
-      ),
+      status: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.import.jobs.get.status.label",
+        description: "app.api.import.jobs.get.status.description",
+        placeholder: "app.api.import.jobs.get.status.placeholder",
+        options: CsvImportJobStatusOptions,
+        schema: z.enum(CsvImportJobStatus).optional(),
+      }),
 
-      limit: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.import.jobs.get.limit.label",
-          description: "app.api.import.jobs.get.limit.description",
-          placeholder: "app.api.import.jobs.get.limit.placeholder",
-        },
-        z.coerce.number().min(1).max(100).default(20),
-      ),
+      limit: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.import.jobs.get.limit.label",
+        description: "app.api.import.jobs.get.limit.description",
+        placeholder: "app.api.import.jobs.get.limit.placeholder",
+        schema: z.coerce.number().min(1).max(100).default(20),
+      }),
 
-      offset: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.import.jobs.get.offset.label",
-          description: "app.api.import.jobs.get.offset.description",
-          placeholder: "app.api.import.jobs.get.offset.placeholder",
-        },
-        z.coerce.number().min(0).default(0),
-      ),
+      offset: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.import.jobs.get.offset.label",
+        description: "app.api.import.jobs.get.offset.description",
+        placeholder: "app.api.import.jobs.get.offset.placeholder",
+        schema: z.coerce.number().min(0).default(0),
+      }),
 
       // === RESPONSE DATA ===
       jobs: responseArrayField(
@@ -583,34 +524,26 @@ const { GET: ListImportJobsGet } = createEndpoint({
           },
           { response: true },
           {
-            id: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.import.jobs.get.response.job.id.label",
-              },
-              z.uuid(),
-            ),
-            fileName: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.import.jobs.get.response.job.fileName.label",
-              },
-              z.string(),
-            ),
-            domain: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.import.jobs.get.response.job.domain.label",
-              },
-              z.string(),
-            ),
-            status: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.import.jobs.get.response.job.status.label",
-              },
-              z.enum(CsvImportJobStatus),
-            ),
+            id: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.import.jobs.get.response.job.id.label",
+              schema: z.uuid(),
+            }),
+            fileName: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.import.jobs.get.response.job.fileName.label",
+              schema: z.string(),
+            }),
+            domain: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.import.jobs.get.response.job.domain.label",
+              schema: z.string(),
+            }),
+            status: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.import.jobs.get.response.job.status.label",
+              schema: z.enum(CsvImportJobStatus),
+            }),
 
             // === PROGRESS INFORMATION ===
             progress: objectField(
@@ -622,46 +555,36 @@ const { GET: ListImportJobsGet } = createEndpoint({
               },
               { response: true },
               {
-                totalRows: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.jobs.get.response.job.progress.totalRows.label",
-                  },
-                  z.coerce.number(),
-                ),
-                processedRows: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.jobs.get.response.job.progress.processedRows.label",
-                  },
-                  z.coerce.number(),
-                ),
-                currentBatchStart: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.jobs.get.response.job.progress.currentBatchStart.label",
-                  },
-                  z.coerce.number(),
-                ),
-                batchSize: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.jobs.get.response.job.progress.batchSize.label",
-                  },
-                  z.coerce.number(),
-                ),
-                percentComplete: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.jobs.get.response.job.progress.percentComplete.label",
-                  },
-                  z.coerce.number(),
-                ),
+                totalRows: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.jobs.get.response.job.progress.totalRows.label",
+                  schema: z.coerce.number(),
+                }),
+                processedRows: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.jobs.get.response.job.progress.processedRows.label",
+                  schema: z.coerce.number(),
+                }),
+                currentBatchStart: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.jobs.get.response.job.progress.currentBatchStart.label",
+                  schema: z.coerce.number(),
+                }),
+                batchSize: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.jobs.get.response.job.progress.batchSize.label",
+                  schema: z.coerce.number(),
+                }),
+                percentComplete: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.jobs.get.response.job.progress.percentComplete.label",
+                  schema: z.coerce.number(),
+                }),
               },
             ),
 
@@ -675,30 +598,24 @@ const { GET: ListImportJobsGet } = createEndpoint({
               },
               { response: true },
               {
-                successfulImports: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.jobs.get.response.job.results.successfulImports.label",
-                  },
-                  z.coerce.number(),
-                ),
-                failedImports: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.jobs.get.response.job.results.failedImports.label",
-                  },
-                  z.coerce.number(),
-                ),
-                duplicateEmails: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.jobs.get.response.job.results.duplicateEmails.label",
-                  },
-                  z.coerce.number(),
-                ),
+                successfulImports: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.jobs.get.response.job.results.successfulImports.label",
+                  schema: z.coerce.number(),
+                }),
+                failedImports: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.jobs.get.response.job.results.failedImports.label",
+                  schema: z.coerce.number(),
+                }),
+                duplicateEmails: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.jobs.get.response.job.results.duplicateEmails.label",
+                  schema: z.coerce.number(),
+                }),
               },
             ),
 
@@ -712,38 +629,30 @@ const { GET: ListImportJobsGet } = createEndpoint({
               },
               { response: true },
               {
-                createdAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.jobs.get.response.job.timing.createdAt.label",
-                  },
-                  z.string(),
-                ),
-                updatedAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.jobs.get.response.job.timing.updatedAt.label",
-                  },
-                  z.string(),
-                ),
-                startedAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.jobs.get.response.job.timing.startedAt.label",
-                  },
-                  z.string().nullable(),
-                ),
-                completedAt: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.jobs.get.response.job.timing.completedAt.label",
-                  },
-                  z.string().nullable(),
-                ),
+                createdAt: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.jobs.get.response.job.timing.createdAt.label",
+                  schema: z.string(),
+                }),
+                updatedAt: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.jobs.get.response.job.timing.updatedAt.label",
+                  schema: z.string(),
+                }),
+                startedAt: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.jobs.get.response.job.timing.startedAt.label",
+                  schema: z.string().nullable(),
+                }),
+                completedAt: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.jobs.get.response.job.timing.completedAt.label",
+                  schema: z.string().nullable(),
+                }),
               },
             ),
 
@@ -756,30 +665,24 @@ const { GET: ListImportJobsGet } = createEndpoint({
               },
               { response: true },
               {
-                error: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.jobs.get.response.job.errorInfo.error.label",
-                  },
-                  z.string().nullable(),
-                ),
-                retryCount: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.jobs.get.response.job.errorInfo.retryCount.label",
-                  },
-                  z.coerce.number(),
-                ),
-                maxRetries: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.import.jobs.get.response.job.errorInfo.maxRetries.label",
-                  },
-                  z.coerce.number(),
-                ),
+                error: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.jobs.get.response.job.errorInfo.error.label",
+                  schema: z.string().nullable(),
+                }),
+                retryCount: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.jobs.get.response.job.errorInfo.retryCount.label",
+                  schema: z.coerce.number(),
+                }),
+                maxRetries: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.import.jobs.get.response.job.errorInfo.maxRetries.label",
+                  schema: z.coerce.number(),
+                }),
               },
             ),
           },
@@ -833,7 +736,6 @@ const { GET: ListImportJobsGet } = createEndpoint({
   },
 
   examples: {
-    urlPathParams: undefined,
     requests: {
       default: {
         status: CsvImportJobStatus.COMPLETED,

@@ -13,13 +13,13 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { z } from "zod";
 
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { users } from "@/app/api/[locale]/user/db";
 
-import type { FavoriteModelSelection } from "./definition";
+import type { FavoriteModelSelection } from "./create/definition";
 
 /**
  * Favorites Table
@@ -45,12 +45,11 @@ export const chatFavorites = pgTable("chat_favorites", {
   // Custom icon (emoji or icon identifier)
   customIcon: text("custom_icon").$type<IconKey>(),
 
-  // Custom TTS voice (overrides character voice)
+  // Custom TTS voice (overrides character voice, null means use character default)
   voice: text("voice").$type<typeof TtsVoiceValue>(),
 
-  modelSelection: jsonb("model_selection")
-    .$type<FavoriteModelSelection>()
-    .notNull(),
+  // Model selection (stores MANUAL, FILTERS, or CHARACTER_BASED)
+  modelSelection: jsonb("model_selection").$type<FavoriteModelSelection>(),
   position: integer("position").notNull(),
   color: text("color"),
 
@@ -76,19 +75,23 @@ export const chatFavoritesRelations = relations(chatFavorites, ({ one }) => ({
 /**
  * Schema for selecting favorites
  */
-export const selectChatFavoriteSchema = createSelectSchema(chatFavorites);
+export const selectChatFavoriteSchema = createSelectSchema(chatFavorites, {
+  customIcon: iconSchema.nullable(),
+});
 
 /**
  * Schema for inserting favorites
  */
-export const insertChatFavoriteSchema = createInsertSchema(chatFavorites);
+export const insertChatFavoriteSchema = createInsertSchema(chatFavorites, {
+  customIcon: iconSchema.nullable(),
+});
 
 /**
- * Type for favorite model
+ * Type for favorite model - uses Drizzle's $inferSelect to respect .$type annotations
  */
-export type ChatFavorite = z.infer<typeof selectChatFavoriteSchema>;
+export type ChatFavorite = typeof chatFavorites.$inferSelect;
 
 /**
- * Type for new favorite model
+ * Type for new favorite model - uses Drizzle's $inferInsert to respect .$type annotations
  */
-export type NewChatFavorite = z.infer<typeof insertChatFavoriteSchema>;
+export type NewChatFavorite = typeof chatFavorites.$inferInsert;

@@ -626,6 +626,21 @@ export const translations = {
       title: "Characters List",
       description: "All available characters for the user",
     },
+    createButton: {
+      label: "Create Character",
+    },
+    browser: {
+      advancedModelAccess: "Advanced Model Access",
+      configureFiltersText: "Configure filters or manually select from",
+      aiModels: "AI models",
+      configureAiModelsTitle: "Configure AI Models Directly",
+      advancedChooseText: "Advanced: Choose from",
+      modelsWithCustomFilters: "models with custom filters",
+      configureButton: "Configure",
+      characterPresets: "Character Presets",
+      pickCharacterText:
+        "Pick a character with optimized settings. Customize anytime after adding.",
+    },
     response: {
       characters: {
         character: {
@@ -656,6 +671,7 @@ export const translations = {
           preferredStrengths: { content: "Preferred Strengths" },
           ignoredWeaknesses: { content: "Ignored Weaknesses" },
           manualModelId: { content: "Manual Model" },
+          separator: { content: "•" },
         },
       },
     },
@@ -748,6 +764,7 @@ export const translations = {
     },
     selectionType: {
       label: "Selection Type",
+      characterBased: "Based on Character",
       manual: "Specific Model",
       filters: "Filter Criteria",
     },
@@ -822,10 +839,12 @@ export const translations = {
     preferredStrengths: {
       label: "Preferred Strengths",
       description: "Model capabilities and strengths to prefer",
+      item: "Strength",
     },
     ignoredWeaknesses: {
       label: "Ignored Weaknesses",
       description: "Model weaknesses to ignore or allow",
+      item: "Weakness",
     },
     manualModelId: {
       label: "Manual Model",

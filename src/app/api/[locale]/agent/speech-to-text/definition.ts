@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -64,15 +64,13 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          file: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.FILE,
-              label: "app.api.agent.speechToText.post.audio.label",
-              description: "app.api.agent.speechToText.post.audio.description",
-              columns: 12,
-            },
-            z
+          file: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.FILE,
+            label: "app.api.agent.speechToText.post.audio.label",
+            description: "app.api.agent.speechToText.post.audio.description",
+            columns: 12,
+            schema: z
               .instanceof(File)
               .refine((file) => file.size <= 25 * 1024 * 1024, {
                 message:
@@ -90,12 +88,12 @@ const { POST } = createEndpoint({
                     "app.api.agent.speechToText.post.audio.validation.audioOnly",
                 },
               ),
-          ),
+          }),
         },
       ),
 
       // // === CONFIG FIELDS ===
-      // provider: requestDataField(
+      // provider: requestField(
       //   {
       //     type: WidgetType.FORM_FIELD,
       //     fieldType: FieldDataType.SELECT,
@@ -118,34 +116,26 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          success: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.agent.speechToText.post.response.success",
-            },
-            z.boolean(),
-          ),
-          text: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.agent.speechToText.post.response.text",
-            },
-            z.string(),
-          ),
-          provider: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.agent.speechToText.post.response.provider",
-            },
-            z.string(),
-          ),
-          confidence: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.agent.speechToText.post.response.confidence",
-            },
-            z.coerce.number().optional(),
-          ),
+          success: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.agent.speechToText.post.response.success",
+            schema: z.boolean(),
+          }),
+          text: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.agent.speechToText.post.response.text",
+            schema: z.string(),
+          }),
+          provider: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.agent.speechToText.post.response.provider",
+            schema: z.string(),
+          }),
+          confidence: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.agent.speechToText.post.response.confidence",
+            schema: z.coerce.number().optional(),
+          }),
         },
       ),
     },
@@ -216,7 +206,6 @@ const { POST } = createEndpoint({
         },
       },
     },
-    urlPathParams: undefined,
   },
 });
 

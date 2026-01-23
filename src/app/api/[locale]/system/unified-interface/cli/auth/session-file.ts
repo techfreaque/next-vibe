@@ -59,26 +59,14 @@ export async function readSessionFile(
 ): Promise<ResponseType<SessionData>> {
   try {
     const sessionPath = getSessionFilePath();
-    const projectRoot = getProjectRoot();
-    const cwd = process.cwd();
 
     // Enhanced debugging: Log current working directory and full path
-
-    logger.debug(
-      `[SESSION FILE] Reading session file (path: ${sessionPath}, projectRoot: ${projectRoot}, cwd: ${cwd})`,
-    );
 
     // Check if file exists before attempting to read
     try {
       await fs.access(sessionPath);
-
-      logger.debug(`[SESSION FILE] File exists at path: ${sessionPath}`);
     } catch (accessError) {
-      const errorMsg = parseError(accessError).message;
-
-      logger.debug(
-        `[SESSION FILE] File does not exist at path: ${sessionPath} (${errorMsg})`,
-      );
+      // File doesn't exist, will be handled below
     }
 
     const fileContent = await fs.readFile(sessionPath, "utf-8");
@@ -102,9 +90,6 @@ export async function readSessionFile(
     // Check if session is expired
     const expiresAt = new Date(sessionData.expiresAt);
     if (expiresAt < new Date()) {
-      logger.debug(
-        `[SESSION FILE] Session expired (expiresAt: ${sessionData.expiresAt})`,
-      );
       return fail({
         message:
           "app.api.system.unifiedInterface.cli.vibe.errors.sessionExpired",
@@ -112,10 +97,6 @@ export async function readSessionFile(
         messageParams: { expiresAt: sessionData.expiresAt },
       });
     }
-
-    logger.debug(
-      `[SESSION FILE] Read successfully (userId: ${sessionData.userId}, expiresAt: ${sessionData.expiresAt})`,
-    );
 
     return success(sessionData);
   } catch (error) {
@@ -126,14 +107,6 @@ export async function readSessionFile(
       parsedError.message.includes(FILE_NOT_FOUND_ERROR_PATTERNS.ENOENT) ||
       parsedError.message.includes(FILE_NOT_FOUND_ERROR_PATTERNS.NO_SUCH_FILE);
     if (isFileNotFoundError) {
-      // Enhanced debugging: Log path details when file not found
-      const searchedPath = getSessionFilePath();
-      const projectRoot = getProjectRoot();
-      const cwd = process.cwd();
-
-      logger.debug(
-        `[SESSION FILE] File not found - user not authenticated (searchedPath: ${searchedPath}, projectRoot: ${projectRoot}, cwd: ${cwd}, error: ${parsedError.message})`,
-      );
       return fail({
         message: "app.api.system.unifiedInterface.cli.vibe.errors.notFound",
         errorType: ErrorResponseTypes.NOT_FOUND,

@@ -10,9 +10,9 @@ import {
   objectField,
   objectOptionalField,
   requestDataArrayOptionalField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -52,33 +52,27 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      function: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXTAREA,
-          label: "app.api.browser.evaluate-script.form.fields.function.label",
-          description:
-            "app.api.browser.evaluate-script.form.fields.function.description",
-          placeholder:
-            "app.api.browser.evaluate-script.form.fields.function.placeholder",
-          columns: 12,
-        },
-        z
+      function: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "app.api.browser.evaluate-script.form.fields.function.label",
+        description:
+          "app.api.browser.evaluate-script.form.fields.function.description",
+        placeholder:
+          "app.api.browser.evaluate-script.form.fields.function.placeholder",
+        columns: 12,
+        schema: z
           .string()
           .describe(
             "A JavaScript function declaration to be executed by the tool in the currently selected page",
           ),
-      ),
+      }),
       args: requestDataArrayOptionalField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.browser.evaluate-script.form.fields.args.label",
+          type: WidgetType.DATA_LIST,
+          title: "app.api.browser.evaluate-script.form.fields.args.label",
           description:
             "app.api.browser.evaluate-script.form.fields.args.description",
-          placeholder:
-            "app.api.browser.evaluate-script.form.fields.args.placeholder",
-          columns: 12,
         },
         objectField(
           {
@@ -88,36 +82,32 @@ const { POST } = createEndpoint({
           },
           { request: "data" },
           {
-            uid: requestDataField(
-              {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.TEXT,
-                label:
-                  "app.api.browser.evaluate-script.form.fields.args.uid.label",
-                description:
-                  "app.api.browser.evaluate-script.form.fields.args.uid.description",
-                columns: 12,
-              },
-              z
+            uid: requestField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label:
+                "app.api.browser.evaluate-script.form.fields.args.uid.label",
+              description:
+                "app.api.browser.evaluate-script.form.fields.args.uid.description",
+              columns: 12,
+              schema: z
                 .string()
                 .describe(
                   "The uid of an element on the page from the page content snapshot",
                 ),
-            ),
+            }),
           },
         ),
       ),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.evaluate-script.response.success",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.evaluate-script.response.success",
+        schema: z
           .boolean()
           .describe("Whether the script evaluation operation succeeded"),
-      ),
+      }),
       result: objectOptionalField(
         {
           type: WidgetType.CONTAINER,
@@ -128,20 +118,15 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          executed: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.browser.evaluate-script.response.result.executed",
-            },
-            z.boolean().describe("Whether the script was executed"),
-          ),
-          result: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.browser.evaluate-script.response.result.result",
-            },
-            z
+          executed: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.browser.evaluate-script.response.result.executed",
+            schema: z.boolean().describe("Whether the script was executed"),
+          }),
+          result: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.browser.evaluate-script.response.result.result",
+            schema: z
               .union([
                 z.string(),
                 z.coerce.number(),
@@ -151,23 +136,25 @@ const { POST } = createEndpoint({
               ])
               .optional()
               .describe("The result returned by the script"),
-          ),
+          }),
         },
       ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.evaluate-script.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.evaluate-script.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.evaluate-script.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.evaluate-script.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -184,7 +171,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

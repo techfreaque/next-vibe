@@ -6,10 +6,8 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  objectField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+import { responseField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -44,58 +42,46 @@ const { GET } = createEndpoint({
     { response: true },
     {
       // Total credits available
-      total: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.credits.get.total.content",
-        },
-        z.coerce.number(),
-      ),
+      total: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.agent.chat.credits.get.total.content",
+        schema: z.coerce.number(),
+      }),
 
       // Expiring credits (from subscription)
-      expiring: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.credits.get.expiring.content",
-        },
-        z.coerce.number(),
-      ),
+      expiring: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.agent.chat.credits.get.expiring.content",
+        schema: z.coerce.number(),
+      }),
 
       // Permanent credits (from packs)
-      permanent: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.credits.get.permanent.content",
-        },
-        z.coerce.number(),
-      ),
+      permanent: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.agent.chat.credits.get.permanent.content",
+        schema: z.coerce.number(),
+      }),
 
       // Earned credits (from referrals)
-      earned: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.credits.get.earned.content",
-        },
-        z.coerce.number(),
-      ),
+      earned: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.agent.chat.credits.get.earned.content",
+        schema: z.coerce.number(),
+      }),
 
       // Free tier credits
-      free: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.credits.get.free.content",
-        },
-        z.coerce.number(),
-      ),
+      free: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.agent.chat.credits.get.free.content",
+        schema: z.coerce.number(),
+      }),
 
       // Expiration date for expiring credits
-      expiresAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.credits.get.expiresAt.content",
-        },
-        dateSchema.nullable(),
-      ),
+      expiresAt: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.agent.chat.credits.get.expiresAt.content",
+        schema: dateSchema.nullable(),
+      }),
     },
   ),
 

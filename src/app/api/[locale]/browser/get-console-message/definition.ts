@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,42 +50,36 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      msgid: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.browser.get-console-message.form.fields.msgid.label",
-          description:
-            "app.api.browser.get-console-message.form.fields.msgid.description",
-          placeholder:
-            "app.api.browser.get-console-message.form.fields.msgid.placeholder",
-          columns: 6,
-        },
-        z
+      msgid: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.browser.get-console-message.form.fields.msgid.label",
+        description:
+          "app.api.browser.get-console-message.form.fields.msgid.description",
+        placeholder:
+          "app.api.browser.get-console-message.form.fields.msgid.placeholder",
+        columns: 6,
+        schema: z
           .number()
           .describe(
             "The msgid of a console message on the page from the listed console messages",
           ),
-      ),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.get-console-message.response.success",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.get-console-message.response.success",
+        schema: z
           .boolean()
           .describe(
             "Whether the console message retrieval operation succeeded",
           ),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.get-console-message.response.result",
-        },
-        z
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.get-console-message.response.result",
+        schema: z
           .object({
             found: z.boolean().describe("Whether the message was found"),
             message: z
@@ -99,21 +93,23 @@ const { POST } = createEndpoint({
           })
           .optional()
           .describe("Result of the console message retrieval"),
-      ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.get-console-message.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.get-console-message.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      }),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.get-console-message.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.get-console-message.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -134,7 +130,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

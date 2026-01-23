@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -53,80 +53,66 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      path: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.check.testing.test.fields.path.label",
-          description:
-            "app.api.system.check.testing.test.fields.path.description",
-          placeholder:
-            "app.api.system.check.testing.test.fields.path.placeholder",
-          columns: 6,
-        },
-        z.string().optional().default("src/"),
-      ),
+      path: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.check.testing.test.fields.path.label",
+        description:
+          "app.api.system.check.testing.test.fields.path.description",
+        placeholder:
+          "app.api.system.check.testing.test.fields.path.placeholder",
+        columns: 6,
+        schema: z.string().optional().default("src/"),
+      }),
 
-      verbose: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.check.testing.test.fields.verbose.label",
-          description:
-            "app.api.system.check.testing.test.fields.verbose.description",
-          columns: 3,
-        },
-        z.boolean().default(false),
-      ),
+      verbose: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.check.testing.test.fields.verbose.label",
+        description:
+          "app.api.system.check.testing.test.fields.verbose.description",
+        columns: 3,
+        schema: z.boolean().default(false),
+      }),
 
-      watch: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.check.testing.test.fields.watch.label",
-          description:
-            "app.api.system.check.testing.test.fields.watch.description",
-          columns: 3,
-        },
-        z.boolean().default(false),
-      ),
+      watch: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.check.testing.test.fields.watch.label",
+        description:
+          "app.api.system.check.testing.test.fields.watch.description",
+        columns: 3,
+        schema: z.boolean().default(false),
+      }),
 
-      coverage: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.check.testing.test.fields.coverage.label",
-          description:
-            "app.api.system.check.testing.test.fields.coverage.description",
-          columns: 3,
-        },
-        z.boolean().default(false),
-      ),
+      coverage: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.check.testing.test.fields.coverage.label",
+        description:
+          "app.api.system.check.testing.test.fields.coverage.description",
+        columns: 3,
+        schema: z.boolean().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.check.testing.test.response.success",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.check.testing.test.response.success",
+        schema: z.boolean(),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.check.testing.test.response.output",
-        },
-        z.string(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.check.testing.test.response.output",
+        schema: z.string(),
+      }),
 
-      duration: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.check.testing.test.response.duration",
-        },
-        z.coerce.number(),
-      ),
+      duration: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.check.testing.test.response.duration",
+        schema: z.coerce.number(),
+      }),
     },
   ),
 

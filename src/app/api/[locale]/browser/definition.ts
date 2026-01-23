@@ -8,10 +8,12 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
   responseArrayOptionalField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+import {
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -60,65 +62,53 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      tool: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.browser.form.fields.tool.label",
-          description: "app.api.browser.form.fields.tool.description",
-          placeholder: "app.api.browser.form.fields.tool.placeholder",
-          options: BrowserToolOptions,
-          columns: 12,
-        },
-        z.enum(BrowserTool),
-      ),
-      arguments: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXTAREA,
-          label: "app.api.browser.form.fields.arguments.label",
-          description: "app.api.browser.form.fields.arguments.description",
-          placeholder: "app.api.browser.form.fields.arguments.placeholder",
-          columns: 12,
-        },
-        z.string().optional(),
-      ),
+      tool: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.browser.form.fields.tool.label",
+        description: "app.api.browser.form.fields.tool.description",
+        placeholder: "app.api.browser.form.fields.tool.placeholder",
+        options: BrowserToolOptions,
+        columns: 12,
+        schema: z.enum(BrowserTool),
+      }),
+      arguments: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "app.api.browser.form.fields.arguments.label",
+        description: "app.api.browser.form.fields.arguments.description",
+        placeholder: "app.api.browser.form.fields.arguments.placeholder",
+        columns: 12,
+        schema: z.string().optional(),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.response.success",
-        },
-        z.boolean(),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.response.result",
-        },
-        z.unknown().optional(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.response.success",
+        schema: z.boolean(),
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.response.result",
+        schema: z.unknown().optional(),
+      }),
       status: responseArrayOptionalField(
         {
           type: WidgetType.DATA_LIST,
           title: "app.api.browser.response.status",
         },
-        responseField(
-          {
-            type: WidgetType.BADGE,
-            text: "app.api.browser.response.statusItem",
-          },
-          z.string(),
-        ),
+        responseField({
+          type: WidgetType.BADGE,
+          text: "app.api.browser.response.statusItem",
+          schema: z.string(),
+        }),
       ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.response.executionId",
-        },
-        z.string().optional(),
-      ),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.response.executionId",
+        schema: z.string().optional(),
+      }),
     },
   ),
   examples: {
@@ -186,7 +176,6 @@ const { POST } = createEndpoint({
         executionId: "exec_202",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

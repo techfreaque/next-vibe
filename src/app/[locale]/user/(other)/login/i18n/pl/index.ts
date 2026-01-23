@@ -1,33 +1,26 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  auth: {
+    login: {
+      title: "Zaloguj się",
+      subtitle: "Powrót do społeczności",
+      signInButton: "Zaloguj się",
+    },
+  },
   meta: {
-    title: "Zaloguj się - {{appName}}",
+    title: "Logowanie - {{appName}}",
     description: "Zaloguj się do swojego konta {{appName}}",
     category: "Uwierzytelnianie",
-    imageAlt: "Logowanie {{appName}}",
-    keywords: "logowanie, zaloguj się, uwierzytelnianie, {{appName}}",
+    imageAlt: "Logowanie",
+    keywords: "logowanie, konto, {{appName}}",
     ogTitle: "Zaloguj się do {{appName}}",
     ogDescription: "Uzyskaj dostęp do swojego konta {{appName}}",
     twitterTitle: "Zaloguj się do {{appName}}",
-    twitterDescription: "Zaloguj się do swojego konta",
+    twitterDescription: "Uzyskaj dostęp do swojego konta i rozmów",
   },
-  auth: {
-    login: {
-      title: "Witamy ponownie",
-      subtitle: "Zaloguj się do swojego konta, aby kontynuować",
-      signInButton: "Zaloguj się",
-      forgotPassword: "Zapomniałeś hasła?",
-      createAccount: "Utwórz konto",
-      orContinueWith: "Lub kontynuuj z",
-      emailLabel: "Adres e-mail",
-      emailPlaceholder: "Wprowadź swój e-mail",
-      passwordLabel: "Hasło",
-      passwordPlaceholder: "Wprowadź swoje hasło",
-      rememberMe: "Zapamiętaj mnie",
-    },
-  },
-  login: {
-    dontHaveAccount: "Nie masz konta?",
+  errors: {
+    failedToLoadBrowserIdentity:
+      "Nie udało się załadować tożsamości przeglądarki. Proszę odświeżyć stronę.",
   },
 };

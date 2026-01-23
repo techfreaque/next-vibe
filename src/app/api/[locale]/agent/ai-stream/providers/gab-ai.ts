@@ -6,7 +6,6 @@
 import "server-only";
 
 import { OpenAIChatLanguageModel } from "@ai-sdk/openai/internal";
-import type { LanguageModelV2 } from "@ai-sdk/provider";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { ApiProvider, ModelId } from "@/app/api/[locale]/agent/models/models";
@@ -29,7 +28,7 @@ export function isGabAIModel(modelId: ModelId): boolean {
  * @returns Provider object with chat() method
  */
 export function createGabAI(): {
-  chat: (modelId: string) => LanguageModelV2;
+  chat: (modelId: string) => OpenAIChatLanguageModel;
 } {
   const apiKey = agentEnv.GAB_AI_API_KEY;
 

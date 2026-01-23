@@ -8,13 +8,13 @@ import { z } from "zod";
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
-  objectField,
-  requestDataField,
+  requestField,
   requestUrlPathParamsField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -25,7 +25,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { MessageMetadata } from "../../../db";
-import { selectChatMessageSchema } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
 
 /**
@@ -116,34 +115,134 @@ const { GET } = createEndpoint({
     { request: "urlPathParams", response: true },
     {
       // === URL PARAMS ===
-      threadId: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.agent.chat.threads.threadId.messages.get.threadId.label" as const,
-          description:
-            "app.api.agent.chat.threads.threadId.messages.get.threadId.description" as const,
-        },
-        z.uuid(),
-      ),
+      threadId: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.agent.chat.threads.threadId.messages.get.threadId.label" as const,
+        description:
+          "app.api.agent.chat.threads.threadId.messages.get.threadId.description" as const,
+        schema: z.uuid(),
+      }),
 
       // === RESPONSE ===
       messages: responseArrayField(
         {
           type: WidgetType.DATA_CARDS,
         },
-        responseField(
+        objectField(
           {
             type: WidgetType.DATA_CARD,
             title:
               "app.api.agent.chat.threads.threadId.messages.get.response.messages.message.title" as const,
           },
-          // Use selectChatMessageSchema directly with date transformations
-          selectChatMessageSchema.extend({
-            createdAt: dateSchema,
-            updatedAt: dateSchema,
-          }),
+          { response: true },
+          {
+            id: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string().uuid(),
+            }),
+            threadId: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string().uuid(),
+            }),
+            role: responseField({
+              type: WidgetType.BADGE,
+              schema: z.enum(ChatMessageRole),
+            }),
+            content: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string().nullable(),
+            }),
+            parentId: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string().uuid().nullable(),
+            }),
+            depth: responseField({
+              type: WidgetType.STAT,
+              schema: z.number(),
+            }),
+            sequenceId: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string().uuid().nullable(),
+            }),
+            authorId: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string().nullable(),
+            }),
+            authorName: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string().nullable(),
+            }),
+            authorAvatar: responseField({
+              type: WidgetType.ICON,
+              schema: z.string().nullable(),
+            }),
+            authorColor: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string().nullable(),
+            }),
+            isAI: responseField({
+              type: WidgetType.BADGE,
+              schema: z.boolean(),
+            }),
+            model: responseField({
+              type: WidgetType.BADGE,
+              schema: z.string().nullable(),
+            }),
+            character: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string().nullable(),
+            }),
+            errorType: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string().nullable(),
+            }),
+            errorMessage: responseField({
+              type: WidgetType.ALERT,
+              schema: z.string().nullable(),
+            }),
+            errorCode: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string().nullable(),
+            }),
+            edited: responseField({
+              type: WidgetType.BADGE,
+              schema: z.boolean(),
+            }),
+            originalId: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string().uuid().nullable(),
+            }),
+            tokens: responseField({
+              type: WidgetType.STAT,
+              schema: z.number().nullable(),
+            }),
+            metadata: responseField({
+              type: WidgetType.TEXT,
+              schema: z.custom<MessageMetadata>().nullable(),
+            }),
+            upvotes: responseField({
+              type: WidgetType.STAT,
+              schema: z.number(),
+            }),
+            downvotes: responseField({
+              type: WidgetType.STAT,
+              schema: z.number(),
+            }),
+            searchVector: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string().nullable(),
+            }),
+            createdAt: responseField({
+              type: WidgetType.TEXT,
+              schema: dateSchema,
+            }),
+            updatedAt: responseField({
+              type: WidgetType.TEXT,
+              schema: dateSchema,
+            }),
+          },
         ),
       ),
     },
@@ -159,7 +258,6 @@ const { GET } = createEndpoint({
     urlPathParams: {
       default: { threadId: "550e8400-e29b-41d4-a716-446655440000" },
     },
-    requests: undefined,
     responses: {
       default: {
         messages: [
@@ -313,15 +411,13 @@ const { POST } = createEndpoint({
     { request: "data&urlPathParams", response: true },
     {
       // === URL PARAMS ===
-      threadId: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.agent.chat.threads.threadId.messages.post.threadId.label" as const,
-        },
-        z.uuid(),
-      ),
+      threadId: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.agent.chat.threads.threadId.messages.post.threadId.label" as const,
+        schema: z.uuid(),
+      }),
 
       // === REQUEST DATA ===
       message: objectField(
@@ -335,98 +431,82 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          id: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.UUID,
-              label:
-                "app.api.agent.chat.threads.threadId.messages.post.id.label" as const,
-              description:
-                "app.api.agent.chat.threads.threadId.messages.post.id.description" as const,
-            },
-            z.uuid(),
-          ),
-          role: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label:
-                "app.api.agent.chat.threads.threadId.messages.post.role.label" as const,
-              description:
-                "app.api.agent.chat.threads.threadId.messages.post.role.description" as const,
-              options: [
-                {
-                  value: ChatMessageRole.USER,
-                  label: "app.api.agent.chat.enums.role.user" as const,
-                },
-              ],
-            },
-            z.literal(ChatMessageRole.USER),
-          ),
-          content: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXTAREA,
-              label:
-                "app.api.agent.chat.threads.threadId.messages.post.content.label" as const,
-              description:
-                "app.api.agent.chat.threads.threadId.messages.post.content.description" as const,
-            },
-            z.string().min(1),
-          ),
-          parentId: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.agent.chat.threads.threadId.messages.post.parentId.label" as const,
-              description:
-                "app.api.agent.chat.threads.threadId.messages.post.parentId.description" as const,
-            },
-            z.uuid().optional(),
-          ),
-          model: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.agent.chat.threads.threadId.messages.post.model.label" as const,
-              description:
-                "app.api.agent.chat.threads.threadId.messages.post.model.description" as const,
-            },
-            z.enum(ModelId).optional(),
-          ),
-          metadata: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.JSON,
-              label:
-                "app.api.agent.chat.threads.threadId.messages.post.metadata.label" as const,
-              description:
-                "app.api.agent.chat.threads.threadId.messages.post.metadata.description" as const,
-            },
-            z.custom<MessageMetadata>().optional(),
-          ),
+          id: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.UUID,
+            label:
+              "app.api.agent.chat.threads.threadId.messages.post.id.label" as const,
+            description:
+              "app.api.agent.chat.threads.threadId.messages.post.id.description" as const,
+            schema: z.uuid(),
+          }),
+          role: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label:
+              "app.api.agent.chat.threads.threadId.messages.post.role.label" as const,
+            description:
+              "app.api.agent.chat.threads.threadId.messages.post.role.description" as const,
+            options: [
+              {
+                value: ChatMessageRole.USER,
+                label: "app.api.agent.chat.enums.role.user" as const,
+              },
+            ],
+            schema: z.literal(ChatMessageRole.USER),
+          }),
+          content: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXTAREA,
+            label:
+              "app.api.agent.chat.threads.threadId.messages.post.content.label" as const,
+            description:
+              "app.api.agent.chat.threads.threadId.messages.post.content.description" as const,
+            schema: z.string().min(1),
+          }),
+          parentId: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label:
+              "app.api.agent.chat.threads.threadId.messages.post.parentId.label" as const,
+            description:
+              "app.api.agent.chat.threads.threadId.messages.post.parentId.description" as const,
+            schema: z.uuid().optional(),
+          }),
+          model: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label:
+              "app.api.agent.chat.threads.threadId.messages.post.model.label" as const,
+            description:
+              "app.api.agent.chat.threads.threadId.messages.post.model.description" as const,
+            schema: z.enum(ModelId).optional(),
+          }),
+          metadata: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.JSON,
+            label:
+              "app.api.agent.chat.threads.threadId.messages.post.metadata.label" as const,
+            description:
+              "app.api.agent.chat.threads.threadId.messages.post.metadata.description" as const,
+            schema: z.custom<MessageMetadata>().optional(),
+          }),
         },
       ),
 
       // === RESPONSE ===
-      id: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.threads.threadId.messages.post.response.message.id.content" as const,
-        },
-        z.uuid(),
-      ),
-      createdAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.threads.threadId.messages.post.response.message.createdAt.content" as const,
-        },
-        dateSchema,
-      ),
+      id: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.threads.threadId.messages.post.response.message.id.content" as const,
+        schema: z.uuid(),
+      }),
+      createdAt: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.threads.threadId.messages.post.response.message.createdAt.content" as const,
+        schema: dateSchema,
+      }),
     },
   ),
 

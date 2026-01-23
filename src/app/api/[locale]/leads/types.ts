@@ -42,7 +42,6 @@ export interface LeadUpdateType {
   website?: string | null;
   country?: string;
   language?: string;
-  consultationBookedAt?: Date | null;
   subscriptionConfirmedAt?: Date | null;
   metadata?: Record<string, string | number | boolean | null>;
 }

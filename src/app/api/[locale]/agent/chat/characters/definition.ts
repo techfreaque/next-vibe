@@ -9,12 +9,14 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   navigateButtonField,
+  widgetField,
+  widgetObjectField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+import {
   objectField,
   responseArrayField,
   responseField,
-  widgetField,
-  widgetObjectField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -26,6 +28,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { iconSchema } from "../../../shared/types/common.schema";
+import { ModelId } from "../../models/models";
 import characterSingleDefinitions from "./[id]/definition";
 import createCharacterDefinitions from "./create/definition";
 import { CharacterCategoryDB } from "./enum";
@@ -62,7 +65,7 @@ const { GET } = createEndpoint({
           gap: "2",
           noCard: true,
         },
-        {},
+        { response: true },
         {
           backButton: backButton(),
           createButton: navigateButtonField({
@@ -85,7 +88,7 @@ const { GET } = createEndpoint({
           spacingTop: SpacingSize.RELAXED,
           spacingBottom: SpacingSize.RELAXED,
         },
-        {},
+        { response: true },
       ),
 
       // Sections array
@@ -114,15 +117,22 @@ const { GET } = createEndpoint({
               },
               { response: true },
               {
-                icon: responseField(
-                  { type: WidgetType.ICON, iconSize: "sm", noHover: true },
-                  iconSchema,
-                ),
-                title: responseField(
-                  { type: WidgetType.TEXT, size: "lg", emphasis: "bold" },
-                  z.string() as z.ZodType<TranslationKey>,
-                ),
-                count: responseField({ type: WidgetType.BADGE }, z.number()),
+                icon: responseField({
+                  type: WidgetType.ICON,
+                  iconSize: "sm",
+                  noHover: true,
+                  schema: iconSchema,
+                }),
+                title: responseField({
+                  type: WidgetType.TEXT,
+                  size: "lg",
+                  emphasis: "bold",
+                  schema: z.string() as z.ZodType<TranslationKey>,
+                }),
+                count: responseField({
+                  type: WidgetType.BADGE,
+                  schema: z.number(),
+                }),
               },
             ),
             characters: responseArrayField(
@@ -137,8 +147,8 @@ const { GET } = createEndpoint({
                 metadata: {
                   onCardClick: {
                     targetEndpoint: characterSingleDefinitions.GET,
-                    extractParams: (character: Record<string, unknown>) => ({
-                      urlPathParams: { id: String(character.id) },
+                    extractParams: (character: { id: string }) => ({
+                      urlPathParams: { id: character.id },
                     }),
                   },
                 },
@@ -153,23 +163,28 @@ const { GET } = createEndpoint({
                 },
                 { response: true },
                 {
-                  id: responseField(
-                    { type: WidgetType.TEXT, hidden: true },
-                    z.string(),
-                  ),
-                  category: responseField(
-                    { type: WidgetType.TEXT, hidden: true },
-                    z.enum(CharacterCategoryDB),
-                  ),
-                  icon: responseField(
-                    {
-                      type: WidgetType.ICON,
-                      containerSize: "lg",
-                      iconSize: "base",
-                      borderRadius: "lg",
-                    },
-                    iconSchema,
-                  ),
+                  id: responseField({
+                    type: WidgetType.TEXT,
+                    hidden: true,
+                    schema: z.string(),
+                  }),
+                  category: responseField({
+                    type: WidgetType.TEXT,
+                    hidden: true,
+                    schema: z.enum(CharacterCategoryDB),
+                  }),
+                  icon: responseField({
+                    type: WidgetType.ICON,
+                    containerSize: "lg",
+                    iconSize: "base",
+                    borderRadius: "lg",
+                    schema: iconSchema,
+                  }),
+                  modelId: responseField({
+                    type: WidgetType.TEXT,
+                    hidden: true,
+                    schema: z.enum(ModelId),
+                  }),
                   content: objectField(
                     {
                       type: WidgetType.CONTAINER,
@@ -179,22 +194,24 @@ const { GET } = createEndpoint({
                     },
                     { response: true },
                     {
-                      name: responseField(
-                        {
-                          type: WidgetType.TEXT,
-                          size: "base",
-                          emphasis: "bold",
-                        },
-                        z.string() as z.ZodType<TranslationKey>,
-                      ),
-                      description: responseField(
-                        { type: WidgetType.TEXT, size: "xs", variant: "muted" },
-                        z.string() as z.ZodType<TranslationKey>,
-                      ),
-                      tagline: responseField(
-                        { type: WidgetType.TEXT, size: "xs", variant: "muted" },
-                        z.string() as z.ZodType<TranslationKey>,
-                      ),
+                      name: responseField({
+                        type: WidgetType.TEXT,
+                        size: "base",
+                        emphasis: "bold",
+                        schema: z.string() as z.ZodType<TranslationKey>,
+                      }),
+                      description: responseField({
+                        type: WidgetType.TEXT,
+                        size: "xs",
+                        variant: "muted",
+                        schema: z.string() as z.ZodType<TranslationKey>,
+                      }),
+                      tagline: responseField({
+                        type: WidgetType.TEXT,
+                        size: "xs",
+                        variant: "muted",
+                        schema: z.string() as z.ZodType<TranslationKey>,
+                      }),
                       modelRow: objectField(
                         {
                           type: WidgetType.CONTAINER,
@@ -204,56 +221,50 @@ const { GET } = createEndpoint({
                         },
                         { response: true },
                         {
-                          modelIcon: responseField(
-                            {
-                              type: WidgetType.ICON,
-                              iconSize: "xs",
-                              noHover: true,
-                            },
-                            iconSchema,
-                          ),
-                          modelInfo: responseField(
-                            {
-                              type: WidgetType.TEXT,
-                              size: "xs",
-                              variant: "muted",
-                            },
-                            z.string(),
-                          ),
+                          modelIcon: responseField({
+                            type: WidgetType.ICON,
+                            iconSize: "xs",
+                            noHover: true,
+                            schema: iconSchema,
+                          }),
+                          modelInfo: responseField({
+                            type: WidgetType.TEXT,
+                            size: "xs",
+                            variant: "muted",
+                            schema: z.string(),
+                          }),
                           separator1: widgetField(
                             {
                               type: WidgetType.TEXT,
                               size: "xs",
                               variant: "muted",
-                              content: "•" as const,
+                              content:
+                                "app.api.agent.chat.characters.get.response.characters.character.separator.content" as const,
                             },
                             { response: true },
                           ),
-                          modelProvider: responseField(
-                            {
-                              type: WidgetType.TEXT,
-                              size: "xs",
-                              variant: "muted",
-                            },
-                            z.string(),
-                          ),
+                          modelProvider: responseField({
+                            type: WidgetType.TEXT,
+                            size: "xs",
+                            variant: "muted",
+                            schema: z.string(),
+                          }),
                           separator2: widgetField(
                             {
                               type: WidgetType.TEXT,
                               size: "xs",
                               variant: "muted",
-                              content: "•" as const,
+                              content:
+                                "app.api.agent.chat.characters.get.response.characters.character.separator.content" as const,
                             },
                             { response: true },
                           ),
-                          creditCost: responseField(
-                            {
-                              type: WidgetType.TEXT,
-                              size: "xs",
-                              variant: "muted",
-                            },
-                            z.string(),
-                          ),
+                          creditCost: responseField({
+                            type: WidgetType.TEXT,
+                            size: "xs",
+                            variant: "muted",
+                            schema: z.string(),
+                          }),
                         },
                       ),
                     },
@@ -276,6 +287,7 @@ const { GET } = createEndpoint({
                     prefillFromGet: false,
                     icon: "trash",
                     variant: "ghost",
+                    renderInModal: true,
                   }),
                 },
               ),
@@ -345,7 +357,6 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    requests: undefined,
     responses: {
       listAll: {
         sections: [
@@ -359,6 +370,7 @@ const { GET } = createEndpoint({
               {
                 id: "default",
                 icon: "robot-face",
+                modelId: ModelId.CLAUDE_SONNET_4_5,
                 category:
                   "app.api.agent.chat.characters.enums.category.assistant",
                 content: {
@@ -386,6 +398,7 @@ const { GET } = createEndpoint({
               {
                 id: "550e8400-e29b-41d4-a716-446655440000",
                 icon: "direct-hit",
+                modelId: ModelId.GPT_5,
                 category: "app.api.agent.chat.characters.enums.category.coding",
                 content: {
                   name: "app.api.agent.chat.characters.custom.name",
@@ -405,7 +418,6 @@ const { GET } = createEndpoint({
         ],
       },
     },
-    urlPathParams: undefined,
   },
 });
 

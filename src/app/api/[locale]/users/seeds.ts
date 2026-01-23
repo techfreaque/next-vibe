@@ -36,8 +36,6 @@ export async function dev(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<void> {
-  logger.debug("🌱 Seeding users management data for development environment");
-
   try {
     // Get admin user to act as creator
     const adminUserResponse = await UserRepository.getUserByEmail(
@@ -185,8 +183,6 @@ export async function test(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<void> {
-  logger.debug("🌱 Seeding users management data for test environment");
-
   try {
     // Get admin user to act as creator
     const adminUserResponse = await UserRepository.getUserByEmail(

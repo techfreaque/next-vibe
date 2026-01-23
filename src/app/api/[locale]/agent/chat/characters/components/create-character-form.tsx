@@ -8,18 +8,26 @@ import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
+import { type JSX, useCallback } from "react";
 
 import createCharacterEndpoint from "@/app/api/[locale]/agent/chat/characters/create/definition";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/characters/enum";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointsPage";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { useFavoriteCreate } from "../../favorites/create/hooks";
+import { useChatContext } from "../../hooks/context";
+
 interface CreateCharacterFormProps {
   onBack: () => void;
-  onSave: (characterId: string) => void;
+  closeModal: () => void;
   isAuthenticated: boolean;
   locale: CountryLanguage;
+  user: JwtPayloadType;
+  logger: EndpointLogger;
 }
 
 /**
@@ -27,11 +35,53 @@ interface CreateCharacterFormProps {
  */
 export function CreateCharacterForm({
   onBack,
-  onSave,
   isAuthenticated,
   locale,
+  user,
+  logger,
+  closeModal,
 }: CreateCharacterFormProps): JSX.Element {
   const { t } = simpleT(locale);
+  const chat = useChatContext();
+  const characters = chat.characters;
+  const { addFavorite } = useFavoriteCreate({
+    user,
+    logger,
+  });
+
+  const handleCharacterCreated = useCallback(
+    async (characterId: string): Promise<void> => {
+      // Characters will update automatically via useChat - no manual refetch needed
+
+      const character = characters[characterId];
+      if (!character) {
+        logger.error("Character not found after creation", { characterId });
+        return;
+      }
+
+      // Create favorite from character
+      const favoriteData = {
+        characterId: characterId,
+        modelSelection: {
+          selectionType: ModelSelectionType.CHARACTER_BASED,
+        } as const,
+      };
+
+      const createdId = await addFavorite(favoriteData);
+
+      if (createdId) {
+        chat.setActiveFavorite(
+          createdId,
+          characterId,
+          character.modelId,
+          chat.ttsVoice,
+        );
+      }
+
+      closeModal();
+    },
+    [closeModal, characters, logger, addFavorite, chat],
+  );
 
   return (
     <Div className="flex flex-col max-h-[70vh] overflow-hidden">
@@ -80,13 +130,14 @@ export function CreateCharacterForm({
           <EndpointsPage
             endpoint={createCharacterEndpoint}
             locale={locale}
+            user={user}
             endpointOptions={{
               queryOptions: { enabled: false },
               create: {
                 mutationOptions: {
                   onSuccess: ({ responseData }) => {
-                    if (responseData && "id" in responseData) {
-                      onSave(responseData.id as string);
+                    if (responseData) {
+                      handleCharacterCreated(responseData.id);
                       onBack();
                     }
                   },

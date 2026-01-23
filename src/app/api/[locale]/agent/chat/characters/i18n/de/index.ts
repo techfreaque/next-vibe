@@ -630,6 +630,21 @@ export const translations: typeof enTranslations = {
       title: "Charaktere-Liste",
       description: "Alle verfügbaren Charaktere für den Benutzer",
     },
+    createButton: {
+      label: "Charakter erstellen",
+    },
+    browser: {
+      advancedModelAccess: "Erweiterter Modellzugriff",
+      configureFiltersText: "Filter konfigurieren oder manuell auswählen aus",
+      aiModels: "KI-Modelle",
+      configureAiModelsTitle: "KI-Modelle direkt konfigurieren",
+      advancedChooseText: "Erweitert: Wählen Sie aus",
+      modelsWithCustomFilters: "Modelle mit benutzerdefinierten Filtern",
+      configureButton: "Konfigurieren",
+      characterPresets: "Charakter-Vorlagen",
+      pickCharacterText:
+        "Wählen Sie einen Charakter mit optimierten Einstellungen. Jederzeit nach dem Hinzufügen anpassen.",
+    },
     response: {
       characters: {
         character: {
@@ -660,6 +675,7 @@ export const translations: typeof enTranslations = {
           preferredStrengths: { content: "Bevorzugte Stärken" },
           ignoredWeaknesses: { content: "Ignorierte Schwächen" },
           manualModelId: { content: "Manuelles Modell" },
+          separator: { content: "•" },
         },
       },
     },
@@ -758,6 +774,7 @@ export const translations: typeof enTranslations = {
       label: "Auswahltyp",
       manual: "Bestimmtes Modell",
       filters: "Filterkriterien",
+      characterBased: "Charakter Spezifisch",
     },
     preferredModel: {
       label: "Bevorzugtes Modell",
@@ -830,10 +847,12 @@ export const translations: typeof enTranslations = {
     preferredStrengths: {
       label: "Bevorzugte Stärken",
       description: "Modellfähigkeiten und Stärken, die bevorzugt werden",
+      item: "Stärke",
     },
     ignoredWeaknesses: {
       label: "Ignorierte Schwächen",
       description: "Modellschwächen, die ignoriert oder zugelassen werden",
+      item: "Schwäche",
     },
     manualModelId: {
       label: "Manuelles Modell",

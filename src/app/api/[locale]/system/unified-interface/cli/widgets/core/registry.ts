@@ -4,6 +4,8 @@
  * Matches React's WidgetRenderer pattern
  */
 
+import type { z } from "zod";
+
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type {
@@ -80,7 +82,7 @@ const accordionRenderer = new AccordionWidgetRenderer();
 function renderWidget<const TKey extends string>(
   widgetType: WidgetType,
   baseProps: {
-    field: UnifiedField<TKey>;
+    field: UnifiedField<TKey, z.ZodTypeAny>;
     value: WidgetData;
     context: WidgetRenderContext;
   },
@@ -280,7 +282,7 @@ export class WidgetRegistry {
    */
   renderWidget<const TKey extends string>(
     widgetType: WidgetType,
-    field: UnifiedField<TKey>,
+    field: UnifiedField<TKey, z.ZodTypeAny>,
     value: WidgetData,
     context: WidgetRenderContext,
   ): string {

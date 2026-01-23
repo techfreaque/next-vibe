@@ -72,6 +72,7 @@ export const translations = {
       unknown: "Unknown",
       never: "Never",
       notScheduled: "Not Scheduled",
+      error: "Error",
     },
   },
   executionHistory: {

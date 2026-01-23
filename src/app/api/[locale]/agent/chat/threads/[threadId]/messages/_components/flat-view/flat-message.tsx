@@ -15,7 +15,6 @@ import {
 import { formatPostNumber } from "@/app/[locale]/chat/lib/utils/post-numbers";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { getModelById } from "@/app/api/[locale]/agent/models/models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -81,8 +80,6 @@ export function FlatMessage({
     retryMessage: onRetryMessage,
     answerAsAI: onAnswerAsModel,
     handleDeleteMessage: onDeleteMessage,
-    handleModelChange: onModelChange,
-    setSelectedCharacter: onCharacterChange,
   } = useChatContext();
   const { t } = simpleT(locale);
 
@@ -307,8 +304,6 @@ export function FlatMessage({
                   }
             }
             onCancel={messageActions.cancelAction}
-            onModelChange={onModelChange}
-            onCharacterChange={onCharacterChange}
             locale={locale}
             logger={logger}
             user={user}
@@ -320,28 +315,6 @@ export function FlatMessage({
           <ModelCharacterSelectorModal
             titleKey="app.chat.flatView.retryModal.title"
             descriptionKey="app.chat.flatView.retryModal.description"
-            onModelChange={
-              onModelChange ||
-              ((model: ModelId): void => {
-                logger.debug(
-                  "FlatMessageView",
-                  "Model selection changed (no handler)",
-                  { model },
-                );
-              })
-            }
-            onCharacterChange={
-              onCharacterChange ||
-              ((character: string): void => {
-                logger.debug(
-                  "FlatMessageView",
-                  "Character selection changed (no handler)",
-                  {
-                    character,
-                  },
-                );
-              })
-            }
             onConfirm={(): Promise<void> =>
               messageActions.handleConfirmRetry(message.id, onRetryMessage)
             }
@@ -468,28 +441,6 @@ export function FlatMessage({
           <ModelCharacterSelectorModal
             titleKey="app.chat.flatView.answerModal.title"
             descriptionKey="app.chat.flatView.answerModal.description"
-            onModelChange={
-              onModelChange ||
-              ((model: ModelId): void => {
-                logger.debug(
-                  "FlatMessageView",
-                  "Model selection changed (no handler)",
-                  { model },
-                );
-              })
-            }
-            onCharacterChange={
-              onCharacterChange ||
-              ((character: string): void => {
-                logger.debug(
-                  "FlatMessageView",
-                  "Character selection changed (no handler)",
-                  {
-                    character,
-                  },
-                );
-              })
-            }
             showInput={true}
             inputValue={messageActions.answerContent}
             onInputChange={messageActions.setAnswerContent}

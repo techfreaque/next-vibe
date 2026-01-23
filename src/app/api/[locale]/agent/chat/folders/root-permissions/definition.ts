@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,36 +50,30 @@ const { GET } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST ===
-      rootFolderId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.agent.chat.folders.rootPermissions.get.rootFolderId.label" as const,
-          description:
-            "app.api.agent.chat.folders.rootPermissions.get.rootFolderId.description" as const,
-          columns: 12,
-        },
-        z.enum(DefaultFolderId),
-      ),
+      rootFolderId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.agent.chat.folders.rootPermissions.get.rootFolderId.label" as const,
+        description:
+          "app.api.agent.chat.folders.rootPermissions.get.rootFolderId.description" as const,
+        columns: 12,
+        schema: z.enum(DefaultFolderId),
+      }),
 
       // === RESPONSE ===
-      canCreateThread: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.folders.rootPermissions.get.response.canCreateThread.content" as const,
-        },
-        z.boolean(),
-      ),
-      canCreateFolder: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.folders.rootPermissions.get.response.canCreateFolder.content" as const,
-        },
-        z.boolean(),
-      ),
+      canCreateThread: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.folders.rootPermissions.get.response.canCreateThread.content" as const,
+        schema: z.boolean(),
+      }),
+      canCreateFolder: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.folders.rootPermissions.get.response.canCreateFolder.content" as const,
+        schema: z.boolean(),
+      }),
     },
   ),
 

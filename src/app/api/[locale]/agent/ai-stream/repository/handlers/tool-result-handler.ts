@@ -56,7 +56,9 @@ function isValidToolResult(value: JSONValue): value is ToolCallResult {
   }
   if (typeof value === "object") {
     // Objects are valid - recursively check values
-    return Object.values(value).every((v) => isValidToolResult(v));
+    return Object.values(value).every((v) =>
+      v !== undefined ? isValidToolResult(v) : false,
+    );
   }
   // Reject functions, symbols, etc.
   return false;

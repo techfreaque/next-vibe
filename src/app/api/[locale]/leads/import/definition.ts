@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -68,199 +68,155 @@ const { POST } = createEndpoint({
       layoutType: LayoutType.GRID,
       columns: 12,
     },
-    {
-      [Methods.POST]: { request: "data", response: true },
-    },
+    { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      file: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.leads.import.post.file.label" as const,
-          description: "app.api.leads.import.post.file.description" as const,
-          placeholder: "app.api.leads.import.post.file.placeholder" as const,
-          helpText: "app.api.leads.import.post.file.helpText" as const,
-          columns: 12,
-        },
-        z.string().min(1),
-      ),
-      fileName: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.leads.import.post.fileName.label" as const,
-          description:
-            "app.api.leads.import.post.fileName.description" as const,
-          placeholder:
-            "app.api.leads.import.post.fileName.placeholder" as const,
-          helpText: "app.api.leads.import.post.fileName.helpText" as const,
-          columns: 12,
-        },
-        z.string().min(1),
-      ),
-      skipDuplicates: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.leads.import.post.skipDuplicates.label" as const,
-          description:
-            "app.api.leads.import.post.skipDuplicates.description" as const,
-          helpText:
-            "app.api.leads.import.post.skipDuplicates.helpText" as const,
-          columns: 6,
-        },
-        z.boolean().default(true),
-      ),
-      updateExisting: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.leads.import.post.updateExisting.label" as const,
-          description:
-            "app.api.leads.import.post.updateExisting.description" as const,
-          helpText:
-            "app.api.leads.import.post.updateExisting.helpText" as const,
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
-      defaultCountry: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.import.post.defaultCountry.label" as const,
-          description:
-            "app.api.leads.import.post.defaultCountry.description" as const,
-          helpText:
-            "app.api.leads.import.post.defaultCountry.helpText" as const,
-          columns: 6,
-          options: CountriesOptions,
-        },
-        z.enum(Countries),
-      ),
-      defaultLanguage: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.import.post.defaultLanguage.label" as const,
-          description:
-            "app.api.leads.import.post.defaultLanguage.description" as const,
-          helpText:
-            "app.api.leads.import.post.defaultLanguage.helpText" as const,
-          columns: 6,
-          options: LanguagesOptions,
-        },
-        z.enum(Languages),
-      ),
-      defaultStatus: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.import.post.defaultStatus.label" as const,
-          description:
-            "app.api.leads.import.post.defaultStatus.description" as const,
-          helpText: "app.api.leads.import.post.defaultStatus.helpText" as const,
-          columns: 6,
-          options: LeadStatusOptions,
-        },
-        z.enum(LeadStatus).default(LeadStatus.NEW),
-      ),
-      defaultCampaignStage: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.leads.import.post.defaultCampaignStage.label" as const,
-          description:
-            "app.api.leads.import.post.defaultCampaignStage.description" as const,
-          helpText:
-            "app.api.leads.import.post.defaultCampaignStage.helpText" as const,
-          columns: 6,
-          options: EmailCampaignStageOptions,
-        },
-        z
-          .nativeEnum(EmailCampaignStage)
+      file: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.leads.import.post.file.label" as const,
+        description: "app.api.leads.import.post.file.description" as const,
+        placeholder: "app.api.leads.import.post.file.placeholder" as const,
+        helpText: "app.api.leads.import.post.file.helpText" as const,
+        columns: 12,
+        schema: z.string().min(1),
+      }),
+      fileName: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.leads.import.post.fileName.label" as const,
+        description: "app.api.leads.import.post.fileName.description" as const,
+        placeholder: "app.api.leads.import.post.fileName.placeholder" as const,
+        helpText: "app.api.leads.import.post.fileName.helpText" as const,
+        columns: 12,
+        schema: z.string().min(1),
+      }),
+      skipDuplicates: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.leads.import.post.skipDuplicates.label" as const,
+        description:
+          "app.api.leads.import.post.skipDuplicates.description" as const,
+        helpText: "app.api.leads.import.post.skipDuplicates.helpText" as const,
+        columns: 6,
+        schema: z.boolean().default(true),
+      }),
+      updateExisting: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.leads.import.post.updateExisting.label" as const,
+        description:
+          "app.api.leads.import.post.updateExisting.description" as const,
+        helpText: "app.api.leads.import.post.updateExisting.helpText" as const,
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
+      defaultCountry: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.import.post.defaultCountry.label" as const,
+        description:
+          "app.api.leads.import.post.defaultCountry.description" as const,
+        helpText: "app.api.leads.import.post.defaultCountry.helpText" as const,
+        columns: 6,
+        options: CountriesOptions,
+        schema: z.enum(Countries),
+      }),
+      defaultLanguage: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.import.post.defaultLanguage.label" as const,
+        description:
+          "app.api.leads.import.post.defaultLanguage.description" as const,
+        helpText: "app.api.leads.import.post.defaultLanguage.helpText" as const,
+        columns: 6,
+        options: LanguagesOptions,
+        schema: z.enum(Languages),
+      }),
+      defaultStatus: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.import.post.defaultStatus.label" as const,
+        description:
+          "app.api.leads.import.post.defaultStatus.description" as const,
+        helpText: "app.api.leads.import.post.defaultStatus.helpText" as const,
+        columns: 6,
+        options: LeadStatusOptions,
+        schema: z.enum(LeadStatus).default(LeadStatus.NEW),
+      }),
+      defaultCampaignStage: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.import.post.defaultCampaignStage.label" as const,
+        description:
+          "app.api.leads.import.post.defaultCampaignStage.description" as const,
+        helpText:
+          "app.api.leads.import.post.defaultCampaignStage.helpText" as const,
+        columns: 6,
+        options: EmailCampaignStageOptions,
+        schema: z
+          .enum(EmailCampaignStage)
           .default(EmailCampaignStage.NOT_STARTED),
-      ),
-      defaultSource: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.import.post.defaultSource.label" as const,
-          description:
-            "app.api.leads.import.post.defaultSource.description" as const,
-          helpText: "app.api.leads.import.post.defaultSource.helpText" as const,
-          columns: 6,
-          options: LeadSourceOptions,
-        },
-        z.enum(LeadSource).default(LeadSource.CSV_IMPORT),
-      ),
-      useChunkedProcessing: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.leads.import.post.useChunkedProcessing.label" as const,
-          description:
-            "app.api.leads.import.post.useChunkedProcessing.description" as const,
-          helpText:
-            "app.api.leads.import.post.useChunkedProcessing.helpText" as const,
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
-      batchSize: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.leads.import.post.batchSize.label" as const,
-          description:
-            "app.api.leads.import.post.batchSize.description" as const,
-          helpText: "app.api.leads.import.post.batchSize.helpText" as const,
-          columns: 6,
-        },
-        z.coerce.number().min(10).max(1000).default(2000),
-      ),
+      }),
+      defaultSource: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.leads.import.post.defaultSource.label" as const,
+        description:
+          "app.api.leads.import.post.defaultSource.description" as const,
+        helpText: "app.api.leads.import.post.defaultSource.helpText" as const,
+        columns: 6,
+        options: LeadSourceOptions,
+        schema: z.enum(LeadSource).default(LeadSource.CSV_IMPORT),
+      }),
+      useChunkedProcessing: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.leads.import.post.useChunkedProcessing.label" as const,
+        description:
+          "app.api.leads.import.post.useChunkedProcessing.description" as const,
+        helpText:
+          "app.api.leads.import.post.useChunkedProcessing.helpText" as const,
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
+      batchSize: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.leads.import.post.batchSize.label" as const,
+        description: "app.api.leads.import.post.batchSize.description" as const,
+        helpText: "app.api.leads.import.post.batchSize.helpText" as const,
+        columns: 6,
+        schema: z.coerce.number().min(10).max(1000).default(2000),
+      }),
 
       // === RESPONSE FIELDS ===
-      batchId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.leads.import.post.response.batchId" as const,
-        },
-        z.uuid(),
-      ),
-      totalRows: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.leads.import.post.response.totalRows" as const,
-        },
-        z.coerce.number(),
-      ),
-      successfulImports: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.import.post.response.successfulImports" as const,
-        },
-        z.coerce.number(),
-      ),
-      failedImports: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.leads.import.post.response.failedImports" as const,
-        },
-        z.coerce.number(),
-      ),
-      duplicateEmails: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.import.post.response.duplicateEmails" as const,
-        },
-        z.coerce.number(),
-      ),
+      batchId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.leads.import.post.response.batchId" as const,
+        schema: z.uuid(),
+      }),
+      totalRows: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.leads.import.post.response.totalRows" as const,
+        schema: z.coerce.number(),
+      }),
+      successfulImports: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.import.post.response.successfulImports" as const,
+        schema: z.coerce.number(),
+      }),
+      failedImports: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.leads.import.post.response.failedImports" as const,
+        schema: z.coerce.number(),
+      }),
+      duplicateEmails: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.leads.import.post.response.duplicateEmails" as const,
+        schema: z.coerce.number(),
+      }),
       errors: responseArrayField(
         {
           type: WidgetType.DATA_TABLE,
@@ -274,30 +230,24 @@ const { POST } = createEndpoint({
           },
           { response: true },
           {
-            row: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.leads.import.post.response.errors" as const,
-                fieldType: FieldDataType.NUMBER,
-              },
-              z.coerce.number(),
-            ),
-            email: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.leads.import.post.response.errors" as const,
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string().optional(),
-            ),
-            error: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.leads.import.post.response.errors" as const,
-                fieldType: FieldDataType.TEXT,
-              },
-              z.string(),
-            ),
+            row: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.leads.import.post.response.errors" as const,
+              fieldType: FieldDataType.NUMBER,
+              schema: z.coerce.number(),
+            }),
+            email: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.leads.import.post.response.errors" as const,
+              fieldType: FieldDataType.TEXT,
+              schema: z.string().optional(),
+            }),
+            error: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.leads.import.post.response.errors" as const,
+              fieldType: FieldDataType.TEXT,
+              schema: z.string(),
+            }),
           },
         ),
       ),
@@ -310,47 +260,37 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          newLeads: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.leads.import.post.response.summary" as const,
-              fieldType: FieldDataType.NUMBER,
-            },
-            z.coerce.number(),
-          ),
-          updatedLeads: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.leads.import.post.response.summary" as const,
-              fieldType: FieldDataType.NUMBER,
-            },
-            z.coerce.number(),
-          ),
-          skippedDuplicates: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.leads.import.post.response.summary" as const,
-              fieldType: FieldDataType.NUMBER,
-            },
-            z.coerce.number(),
-          ),
+          newLeads: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.leads.import.post.response.summary" as const,
+            fieldType: FieldDataType.NUMBER,
+            schema: z.coerce.number(),
+          }),
+          updatedLeads: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.leads.import.post.response.summary" as const,
+            fieldType: FieldDataType.NUMBER,
+            schema: z.coerce.number(),
+          }),
+          skippedDuplicates: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.leads.import.post.response.summary" as const,
+            fieldType: FieldDataType.NUMBER,
+            schema: z.coerce.number(),
+          }),
         },
       ),
-      isChunkedProcessing: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.leads.import.post.response.isChunkedProcessing" as const,
-        },
-        z.boolean().default(false),
-      ),
-      jobId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.leads.import.post.response.jobId" as const,
-        },
-        z.uuid().optional(),
-      ),
+      isChunkedProcessing: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.leads.import.post.response.isChunkedProcessing" as const,
+        schema: z.boolean().default(false),
+      }),
+      jobId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.leads.import.post.response.jobId" as const,
+        schema: z.uuid().optional(),
+      }),
     },
   ),
 
@@ -493,7 +433,6 @@ const { POST } = createEndpoint({
         isChunkedProcessing: false,
       },
     },
-    urlPathParams: undefined,
   },
 });
 

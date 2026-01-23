@@ -254,8 +254,8 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
             } else if (Array.isArray(value)) {
               // Handle arrays
               if (value.length === 0) {
-                // Empty array - add placeholder
-                searchParams.append(`${fullKey}._placeholder`, "");
+                // Empty array - skip it entirely
+                continue;
               } else {
                 value.forEach((item, index) => {
                   if (isJsonObject(item)) {
@@ -273,8 +273,8 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
               );
 
               if (!hasNonNullValues) {
-                // Empty object (all values are undefined/null) - add placeholder
-                searchParams.append(`${fullKey}._placeholder`, "");
+                // Empty object (all values are undefined/null) - skip it entirely
+                continue;
               } else {
                 // Recursively flatten non-empty object
                 flattenObject(value, fullKey);

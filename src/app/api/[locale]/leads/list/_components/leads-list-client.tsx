@@ -7,7 +7,6 @@
 
 import type React from "react";
 
-import { LeadSortField, SortOrder } from "@/app/api/[locale]/leads/enum";
 import leadsListEndpoints from "@/app/api/[locale]/leads/list/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -32,18 +31,6 @@ export function LeadsListClient({
           enabled: true,
           refetchOnWindowFocus: false,
           staleTime: 1 * 60 * 1000, // 1 minute
-        },
-        filterOptions: {
-          initialFilters: {
-            sortingOptions: {
-              sortBy: LeadSortField.CREATED_AT,
-              sortOrder: SortOrder.DESC,
-            },
-            paginationInfo: {
-              page: 1,
-              limit: 20,
-            },
-          },
         },
       }}
     />

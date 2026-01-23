@@ -13,10 +13,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -67,70 +67,60 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      removeUnused: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.translations.reorganize.post.fields.removeUnused.title" as const,
-          description:
-            "app.api.system.translations.reorganize.post.fields.removeUnused.description" as const,
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      removeUnused: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.translations.reorganize.post.fields.removeUnused.title" as const,
+        description:
+          "app.api.system.translations.reorganize.post.fields.removeUnused.description" as const,
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.translations.reorganize.post.fields.dryRun.title" as const,
-          description:
-            "app.api.system.translations.reorganize.post.fields.dryRun.description" as const,
-          columns: 6,
-        },
-        z.boolean().default(true),
-      ),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.translations.reorganize.post.fields.dryRun.title" as const,
+        description:
+          "app.api.system.translations.reorganize.post.fields.dryRun.description" as const,
+        columns: 6,
+        schema: z.boolean().default(true),
+      }),
 
-      backup: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.translations.reorganize.post.fields.backup.title" as const,
-          description:
-            "app.api.system.translations.reorganize.post.fields.backup.description" as const,
-          columns: 6,
-        },
-        z.boolean().default(true),
-      ),
+      backup: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.translations.reorganize.post.fields.backup.title" as const,
+        description:
+          "app.api.system.translations.reorganize.post.fields.backup.description" as const,
+        columns: 6,
+        schema: z.boolean().default(true),
+      }),
 
-      regenerateStructure: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.translations.reorganize.post.fields.regenerateStructure.title" as const,
-          description:
-            "app.api.system.translations.reorganize.post.fields.regenerateStructure.description" as const,
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      regenerateStructure: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.translations.reorganize.post.fields.regenerateStructure.title" as const,
+        description:
+          "app.api.system.translations.reorganize.post.fields.regenerateStructure.description" as const,
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      regenerateKeys: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.translations.reorganize.post.fields.regenerateKeys.title" as const,
-          description:
-            "app.api.system.translations.reorganize.post.fields.regenerateKeys.description" as const,
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      regenerateKeys: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.translations.reorganize.post.fields.regenerateKeys.title" as const,
+        description:
+          "app.api.system.translations.reorganize.post.fields.regenerateKeys.description" as const,
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
       response: objectField(
@@ -145,14 +135,12 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          success: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.translations.reorganize.post.fields.success.title",
-            },
-            z.boolean(),
-          ),
+          success: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.system.translations.reorganize.post.fields.success.title",
+            schema: z.boolean(),
+          }),
 
           summary: objectField(
             {
@@ -166,91 +154,71 @@ const { POST } = createEndpoint({
             },
             { response: true },
             {
-              totalKeys: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.system.translations.reorganize.post.messages.foundKeys",
-                },
-                z.coerce.number(),
-              ),
-              usedKeys: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.system.translations.reorganize.post.messages.foundKeys",
-                },
-                z.coerce.number(),
-              ),
-              unusedKeys: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.system.translations.reorganize.post.messages.foundKeys",
-                },
-                z.coerce.number(),
-              ),
-              keysRemoved: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.system.translations.reorganize.post.messages.removingKeys",
-                },
-                z.coerce.number(),
-              ),
-              filesUpdated: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.system.translations.reorganize.post.messages.regeneratedStructure",
-                },
-                z.coerce.number(),
-              ),
-              filesCreated: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.system.translations.reorganize.post.messages.regeneratedStructure",
-                },
-                z.coerce.number(),
-              ),
-              backupCreated: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.system.translations.reorganize.post.messages.backupCreated",
-                },
-                z.boolean(),
-              ),
+              totalKeys: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.translations.reorganize.post.messages.foundKeys",
+                schema: z.coerce.number(),
+              }),
+              usedKeys: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.translations.reorganize.post.messages.foundKeys",
+                schema: z.coerce.number(),
+              }),
+              unusedKeys: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.translations.reorganize.post.messages.foundKeys",
+                schema: z.coerce.number(),
+              }),
+              keysRemoved: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.translations.reorganize.post.messages.removingKeys",
+                schema: z.coerce.number(),
+              }),
+              filesUpdated: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.translations.reorganize.post.messages.regeneratedStructure",
+                schema: z.coerce.number(),
+              }),
+              filesCreated: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.translations.reorganize.post.messages.regeneratedStructure",
+                schema: z.coerce.number(),
+              }),
+              backupCreated: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.translations.reorganize.post.messages.backupCreated",
+                schema: z.boolean(),
+              }),
             },
           ),
 
-          output: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.translations.reorganize.post.fields.output.title",
-            },
-            z.string(),
-          ),
+          output: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.system.translations.reorganize.post.fields.output.title",
+            schema: z.string(),
+          }),
 
-          duration: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.translations.reorganize.post.fields.duration.title",
-            },
-            z.coerce.number(),
-          ),
+          duration: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.system.translations.reorganize.post.fields.duration.title",
+            schema: z.coerce.number(),
+          }),
 
-          backupPath: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.translations.reorganize.post.fields.backupPath.title",
-            },
-            z.string().optional(),
-          ),
+          backupPath: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.system.translations.reorganize.post.fields.backupPath.title",
+            schema: z.string().optional(),
+          }),
 
           changes: responseArrayField(
             {
@@ -269,30 +237,29 @@ const { POST } = createEndpoint({
               },
               { response: true },
               {
-                type: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.translations.reorganize.post.fields.changes.title",
-                  },
-                  z.enum(["removed", "updated", "created", "regenerated"]),
-                ),
-                path: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.translations.reorganize.post.fields.changes.title",
-                  },
-                  z.string(),
-                ),
-                description: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.translations.reorganize.post.description",
-                  },
-                  z.string(),
-                ),
+                type: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.translations.reorganize.post.fields.changes.title",
+                  schema: z.enum([
+                    "removed",
+                    "updated",
+                    "created",
+                    "regenerated",
+                  ]),
+                }),
+                path: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.translations.reorganize.post.fields.changes.title",
+                  schema: z.string(),
+                }),
+                description: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.translations.reorganize.post.description",
+                  schema: z.string(),
+                }),
               },
             ),
           ),

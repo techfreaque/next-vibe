@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -48,90 +48,72 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      generate: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.migrate.fields.generate.title",
-          description: "app.api.system.db.migrate.fields.generate.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      generate: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.migrate.fields.generate.title",
+        description: "app.api.system.db.migrate.fields.generate.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      redo: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.migrate.fields.redo.title",
-          description: "app.api.system.db.migrate.fields.redo.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      redo: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.migrate.fields.redo.title",
+        description: "app.api.system.db.migrate.fields.redo.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
-      schema: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.db.migrate.fields.schema.title",
-          description: "app.api.system.db.migrate.fields.schema.description",
-          columns: 12,
-        },
-        z.string().default("public"),
-      ),
+      schema: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.db.migrate.fields.schema.title",
+        description: "app.api.system.db.migrate.fields.schema.description",
+        columns: 12,
+        schema: z.string().default("public"),
+      }),
 
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.migrate.fields.dryRun.title",
-          description: "app.api.system.db.migrate.fields.dryRun.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.migrate.fields.dryRun.title",
+        description: "app.api.system.db.migrate.fields.dryRun.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrate.fields.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrate.fields.success.title",
+        schema: z.boolean(),
+      }),
 
-      migrationsRun: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrate.fields.migrationsRun.title",
-        },
-        z.coerce.number(),
-      ),
+      migrationsRun: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrate.fields.migrationsRun.title",
+        schema: z.coerce.number(),
+      }),
 
-      migrationsGenerated: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrate.fields.migrationsGenerated.title",
-        },
-        z.coerce.number(),
-      ),
+      migrationsGenerated: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrate.fields.migrationsGenerated.title",
+        schema: z.coerce.number(),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrate.fields.output.title",
-        },
-        z.string(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrate.fields.output.title",
+        schema: z.string(),
+      }),
 
-      duration: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrate.fields.duration.title",
-        },
-        z.coerce.number(),
-      ),
+      duration: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrate.fields.duration.title",
+        schema: z.coerce.number(),
+      }),
     },
   ),
 
@@ -186,7 +168,6 @@ const { POST } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    urlPathParams: undefined,
     requests: {
       default: {
         generate: false,

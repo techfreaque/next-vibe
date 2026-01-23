@@ -4,6 +4,7 @@
  */
 
 import chalk from "chalk";
+import type { z } from "zod";
 
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -98,7 +99,7 @@ export abstract class BaseWidgetRenderer<
   }
 
   protected formatLabel<const TKey extends string>(
-    field: UnifiedField<TKey>,
+    field: UnifiedField<TKey, z.ZodTypeAny>,
     context: WidgetRenderContext,
   ): string {
     // Check if ui config has a label property
@@ -191,7 +192,7 @@ export abstract class BaseWidgetRenderer<
    * @returns Array of rendered child strings
    */
   protected renderChildren<const TKey extends string>(
-    field: UnifiedField<TKey>,
+    field: UnifiedField<TKey, z.ZodTypeAny>,
     value: { [key: string]: WidgetData },
     context: WidgetRenderContext,
     options?: {

@@ -15,6 +15,7 @@ import {
 import { Title } from "next-vibe-ui/ui/title";
 import type { JSX } from "react";
 import { useState } from "react";
+import type { z } from "zod";
 
 import { simpleT } from "@/i18n/core/shared";
 
@@ -49,6 +50,7 @@ import { WidgetRenderer } from "../renderers/WidgetRenderer";
  * - Dark mode support
  * - Hover effects on rows and cards
  * - Simple value array support (inline badges)
+ * - Row click navigation support
  *
  * View Modes:
  * - List: Table with headers and rows, optimal for many fields
@@ -135,6 +137,9 @@ export function DataListWidget<const TKey extends string>({
 
   const data = extractDataListData(value);
 
+  // Get row click handler from metadata
+  const onRowClick = field.ui.metadata?.onRowClick;
+
   if (!data) {
     return (
       <Div className={cn("text-muted-foreground italic", className)}>
@@ -147,8 +152,8 @@ export function DataListWidget<const TKey extends string>({
 
   const { items, title, maxItems } = data;
 
-  let fieldDefinitions: Record<string, UnifiedField<string>> = {};
-  let childField: UnifiedField<string> | null = null;
+  let fieldDefinitions: Record<string, UnifiedField<string, z.ZodTypeAny>> = {};
+  let childField: UnifiedField<string, z.ZodTypeAny> | null = null;
   let isSimpleValueArray = false;
 
   if (
@@ -156,7 +161,7 @@ export function DataListWidget<const TKey extends string>({
     (field.type === "array" || field.type === "array-optional")
   ) {
     if ("child" in field && field.child) {
-      childField = field.child as UnifiedField<string>;
+      childField = field.child as UnifiedField<string, z.ZodTypeAny>;
       if (
         "type" in childField &&
         (childField.type === "object" || childField.type === "object-optional")
@@ -164,7 +169,7 @@ export function DataListWidget<const TKey extends string>({
         if ("children" in childField && childField.children) {
           fieldDefinitions = childField.children as Record<
             string,
-            UnifiedField<string>
+            UnifiedField<string, z.ZodTypeAny>
           >;
         }
       } else {
@@ -218,6 +223,7 @@ export function DataListWidget<const TKey extends string>({
           )}
         >
           <Button
+            type="button"
             variant={viewMode === "list" ? "default" : "ghost"}
             size="sm"
             onClick={() => setViewMode("list")}
@@ -228,6 +234,7 @@ export function DataListWidget<const TKey extends string>({
             )}
           </Button>
           <Button
+            type="button"
             variant={viewMode === "grid" ? "default" : "ghost"}
             size="sm"
             onClick={() => setViewMode("grid")}
@@ -295,10 +302,32 @@ export function DataListWidget<const TKey extends string>({
                   return null;
                 }
 
+                const handleRowClick = onRowClick
+                  ? (): void => {
+                      if (!context.navigation) {
+                        return;
+                      }
+                      const params = onRowClick.extractParams(item);
+                      context.logger.debug("DataListWidget: extracted params", {
+                        params,
+                      });
+                      context.navigation.push(
+                        onRowClick.targetEndpoint,
+                        params,
+                        false,
+                        undefined,
+                      );
+                    }
+                  : undefined;
+
                 return (
                   <TableRow
                     key={index}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                    className={cn(
+                      "hover:bg-gray-50 dark:hover:bg-gray-800",
+                      onRowClick && "cursor-pointer",
+                    )}
+                    onClick={handleRowClick}
                   >
                     {Object.entries(fieldDefinitions).map(([key, fieldDef]) => {
                       const cellValue = key in item ? item[key] : null;
@@ -343,80 +372,107 @@ export function DataListWidget<const TKey extends string>({
             gridGapClass || "gap-4",
           )}
         >
-          {displayItems.map((card, index: number) => (
-            <Div
-              key={index}
-              className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
-            >
-              <Div className={cn(cardPaddingClass || "p-4")}>
-                <Div
-                  className={cn("flex flex-col", cardInnerGapClass || "gap-2")}
-                >
-                  {card &&
-                    typeof card === "object" &&
-                    Object.entries(card).map(([key, cardValue]) => {
-                      const fieldDef = fieldDefinitions[key];
-                      const fieldUi = fieldDef?.ui;
-                      // Check for label first, then fallback to content/text/href, then key
-                      let label = key;
-                      if (fieldUi) {
-                        if (
-                          "label" in fieldUi &&
-                          typeof fieldUi.label === "string"
-                        ) {
-                          label = context.t(fieldUi.label);
-                        } else if (
-                          "content" in fieldUi &&
-                          typeof fieldUi.content === "string"
-                        ) {
-                          label = context.t(fieldUi.content);
-                        } else if (
-                          "text" in fieldUi &&
-                          typeof fieldUi.text === "string"
-                        ) {
-                          label = context.t(fieldUi.text);
-                        } else if (
-                          "href" in fieldUi &&
-                          typeof fieldUi.href === "string"
-                        ) {
-                          label = fieldUi.href;
-                        }
-                      }
+          {displayItems.map((card, index: number) => {
+            const handleCardClick = onRowClick
+              ? (): void => {
+                  if (!context.navigation) {
+                    return;
+                  }
+                  const params = onRowClick.extractParams(card);
+                  context.logger.debug("DataListWidget: extracted params", {
+                    params,
+                  });
+                  context.navigation.push(
+                    onRowClick.targetEndpoint,
+                    params,
+                    false,
+                    undefined,
+                  );
+                }
+              : undefined;
 
-                      return (
-                        <Div
-                          key={key}
-                          className={cn(
-                            "flex justify-between",
-                            rowGapClass || "gap-4",
-                            cardRowSizeClass || "text-sm",
-                          )}
-                        >
-                          <Span className="font-medium text-gray-700 dark:text-gray-300">
-                            {label}:
-                          </Span>
-                          <Div className="text-right">
-                            {fieldDef ? (
-                              <WidgetRenderer
-                                widgetType={fieldDef.ui.type}
-                                data={cardValue}
-                                field={fieldDef}
-                                context={context}
-                                endpoint={endpoint}
-                              />
-                            ) : (
-                              <Span className="text-gray-600 dark:text-gray-400">
-                                {String(cardValue ?? "—")}
-                              </Span>
+            return (
+              <Div
+                key={index}
+                className={cn(
+                  "overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800",
+                  onRowClick && "cursor-pointer",
+                )}
+                onClick={handleCardClick}
+              >
+                <Div className={cn(cardPaddingClass || "p-4")}>
+                  <Div
+                    className={cn(
+                      "flex flex-col",
+                      cardInnerGapClass || "gap-2",
+                    )}
+                  >
+                    {card &&
+                      typeof card === "object" &&
+                      Object.entries(card).map(([key, cardValue]) => {
+                        const fieldDef = fieldDefinitions[key];
+                        const fieldUi = fieldDef?.ui;
+                        // Check for label first, then fallback to content/text/href, then key
+                        let label = key;
+                        if (fieldUi) {
+                          if (
+                            "label" in fieldUi &&
+                            typeof fieldUi.label === "string"
+                          ) {
+                            label = context.t(fieldUi.label);
+                          } else if (
+                            "content" in fieldUi &&
+                            typeof fieldUi.content === "string"
+                          ) {
+                            label = context.t(fieldUi.content);
+                          } else if (
+                            "text" in fieldUi &&
+                            typeof fieldUi.text === "string"
+                          ) {
+                            label = context.t(fieldUi.text);
+                          } else if (
+                            "href" in fieldUi &&
+                            typeof fieldUi.href === "string"
+                          ) {
+                            label = fieldUi.href;
+                          }
+                        }
+
+                        return (
+                          <Div
+                            key={key}
+                            className={cn(
+                              "flex justify-between",
+                              rowGapClass || "gap-4",
+                              cardRowSizeClass || "text-sm",
                             )}
+                          >
+                            <Span className="font-medium text-gray-700 dark:text-gray-300">
+                              {label}:
+                            </Span>
+                            <Div className="text-right">
+                              {fieldDef ? (
+                                <WidgetRenderer
+                                  widgetType={fieldDef.ui.type}
+                                  data={cardValue}
+                                  field={fieldDef}
+                                  context={context}
+                                  endpoint={endpoint}
+                                />
+                              ) : (
+                                <Span className="text-gray-600 dark:text-gray-400">
+                                  {String(cardValue ?? "—")}
+                                </Span>
+                              )}
+                            </Div>
                           </Div>
-                        </Div>
-                      );
-                    })}
+                        );
+                      })}
+                  </Div>
                 </Div>
               </Div>
-            </Div>
-          ))}
+            );
+          })}
         </Div>
       )}
 

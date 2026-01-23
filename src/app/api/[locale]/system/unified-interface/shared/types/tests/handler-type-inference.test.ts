@@ -12,7 +12,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,

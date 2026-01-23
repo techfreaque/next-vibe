@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -56,29 +56,25 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          to: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.EMAIL,
-              label: "app.api.emails.send.to.label",
-              description: "app.api.emails.send.to.description",
-              placeholder: "app.api.emails.send.to.placeholder",
-              columns: 12,
-            },
-            z.email(),
-          ),
+          to: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.EMAIL,
+            label: "app.api.emails.send.to.label",
+            description: "app.api.emails.send.to.description",
+            placeholder: "app.api.emails.send.to.placeholder",
+            columns: 12,
+            schema: z.email(),
+          }),
 
-          toName: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.emails.send.toName.label",
-              description: "app.api.emails.send.toName.description",
-              placeholder: "app.api.emails.send.toName.placeholder",
-              columns: 12,
-            },
-            z.string().optional(),
-          ),
+          toName: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.emails.send.toName.label",
+            description: "app.api.emails.send.toName.description",
+            placeholder: "app.api.emails.send.toName.placeholder",
+            columns: 12,
+            schema: z.string().optional(),
+          }),
         },
       ),
 
@@ -92,41 +88,35 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          subject: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.emails.send.subject.label",
-              description: "app.api.emails.send.subject.description",
-              placeholder: "app.api.emails.send.subject.placeholder",
-              columns: 12,
-            },
-            z.string().min(1),
-          ),
+          subject: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.emails.send.subject.label",
+            description: "app.api.emails.send.subject.description",
+            placeholder: "app.api.emails.send.subject.placeholder",
+            columns: 12,
+            schema: z.string().min(1),
+          }),
 
-          html: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXTAREA,
-              label: "app.api.emails.send.html.label",
-              description: "app.api.emails.send.html.description",
-              placeholder: "app.api.emails.send.html.placeholder",
-              columns: 12,
-            },
-            z.string().min(1),
-          ),
+          html: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXTAREA,
+            label: "app.api.emails.send.html.label",
+            description: "app.api.emails.send.html.description",
+            placeholder: "app.api.emails.send.html.placeholder",
+            columns: 12,
+            schema: z.string().min(1),
+          }),
 
-          text: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXTAREA,
-              label: "app.api.emails.send.text.label",
-              description: "app.api.emails.send.text.description",
-              placeholder: "app.api.emails.send.text.placeholder",
-              columns: 12,
-            },
-            z.string().optional(),
-          ),
+          text: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXTAREA,
+            label: "app.api.emails.send.text.label",
+            description: "app.api.emails.send.text.description",
+            placeholder: "app.api.emails.send.text.placeholder",
+            columns: 12,
+            schema: z.string().optional(),
+          }),
         },
       ),
 
@@ -140,29 +130,25 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          senderName: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.emails.send.senderName.label",
-              description: "app.api.emails.send.senderName.description",
-              placeholder: "app.api.emails.send.senderName.placeholder",
-              columns: 6,
-            },
-            z.string().min(1),
-          ),
+          senderName: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.emails.send.senderName.label",
+            description: "app.api.emails.send.senderName.description",
+            placeholder: "app.api.emails.send.senderName.placeholder",
+            columns: 6,
+            schema: z.string().min(1),
+          }),
 
-          replyTo: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.EMAIL,
-              label: "app.api.emails.send.replyTo.label",
-              description: "app.api.emails.send.replyTo.description",
-              placeholder: "app.api.emails.send.replyTo.placeholder",
-              columns: 6,
-            },
-            z.email().optional(),
-          ),
+          replyTo: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.EMAIL,
+            label: "app.api.emails.send.replyTo.label",
+            description: "app.api.emails.send.replyTo.description",
+            placeholder: "app.api.emails.send.replyTo.placeholder",
+            columns: 6,
+            schema: z.email().optional(),
+          }),
         },
       ),
 
@@ -177,30 +163,26 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          campaignType: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.emails.send.campaignType.label",
-              description: "app.api.emails.send.campaignType.description",
-              placeholder: "app.api.emails.send.campaignType.placeholder",
-              columns: 6,
-              options: CampaignTypeOptions,
-            },
-            z.enum(CampaignType).optional(),
-          ),
+          campaignType: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.emails.send.campaignType.label",
+            description: "app.api.emails.send.campaignType.description",
+            placeholder: "app.api.emails.send.campaignType.placeholder",
+            columns: 6,
+            options: CampaignTypeOptions,
+            schema: z.enum(CampaignType).optional(),
+          }),
 
-          leadId: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.emails.send.leadId.label",
-              description: "app.api.emails.send.leadId.description",
-              placeholder: "app.api.emails.send.leadId.placeholder",
-              columns: 6,
-            },
-            z.string().optional(),
-          ),
+          leadId: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.emails.send.leadId.label",
+            description: "app.api.emails.send.leadId.description",
+            placeholder: "app.api.emails.send.leadId.placeholder",
+            columns: 6,
+            schema: z.string().optional(),
+          }),
         },
       ),
 
@@ -215,41 +197,34 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          sendSmsNotification: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.emails.send.sendSmsNotification.label",
-              description:
-                "app.api.emails.send.sendSmsNotification.description",
-              columns: 12,
-            },
-            z.boolean().default(false),
-          ),
+          sendSmsNotification: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.BOOLEAN,
+            label: "app.api.emails.send.sendSmsNotification.label",
+            description: "app.api.emails.send.sendSmsNotification.description",
+            columns: 12,
+            schema: z.boolean().default(false),
+          }),
 
-          smsPhoneNumber: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.PHONE,
-              label: "app.api.emails.send.smsPhoneNumber.label",
-              description: "app.api.emails.send.smsPhoneNumber.description",
-              placeholder: "app.api.emails.send.smsPhoneNumber.placeholder",
-              columns: 12,
-            },
-            z.string().optional(),
-          ),
+          smsPhoneNumber: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.PHONE,
+            label: "app.api.emails.send.smsPhoneNumber.label",
+            description: "app.api.emails.send.smsPhoneNumber.description",
+            placeholder: "app.api.emails.send.smsPhoneNumber.placeholder",
+            columns: 12,
+            schema: z.string().optional(),
+          }),
 
-          smsMessage: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXTAREA,
-              label: "app.api.emails.send.smsMessage.label",
-              description: "app.api.emails.send.smsMessage.description",
-              placeholder: "app.api.emails.send.smsMessage.placeholder",
-              columns: 12,
-            },
-            z.string().max(160).optional(),
-          ),
+          smsMessage: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXTAREA,
+            label: "app.api.emails.send.smsMessage.label",
+            description: "app.api.emails.send.smsMessage.description",
+            placeholder: "app.api.emails.send.smsMessage.placeholder",
+            columns: 12,
+            schema: z.string().max(160).optional(),
+          }),
         },
       ),
 
@@ -272,34 +247,26 @@ const { POST } = createEndpoint({
             },
             { response: true },
             {
-              success: responseField(
-                {
-                  type: WidgetType.BADGE,
-                  text: "app.api.emails.send.response.success.label",
-                },
-                z.boolean(),
-              ),
-              messageId: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.emails.send.response.messageId.label",
-                },
-                z.string(),
-              ),
-              sentAt: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.emails.send.response.sentAt.label",
-                },
-                z.string(),
-              ),
-              response: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.emails.send.response.response.label",
-                },
-                z.string(),
-              ),
+              success: responseField({
+                type: WidgetType.BADGE,
+                text: "app.api.emails.send.response.success.label",
+                schema: z.boolean(),
+              }),
+              messageId: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.emails.send.response.messageId.label",
+                schema: z.string(),
+              }),
+              sentAt: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.emails.send.response.sentAt.label",
+                schema: z.string(),
+              }),
+              response: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.emails.send.response.response.label",
+                schema: z.string(),
+              }),
             },
           ),
 
@@ -312,20 +279,16 @@ const { POST } = createEndpoint({
             },
             { response: true },
             {
-              accountId: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.emails.send.response.accountId.label",
-                },
-                z.string(),
-              ),
-              accountName: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.emails.send.response.accountName.label",
-                },
-                z.string(),
-              ),
+              accountId: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.emails.send.response.accountId.label",
+                schema: z.string(),
+              }),
+              accountName: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.emails.send.response.accountName.label",
+                schema: z.string(),
+              }),
             },
           ),
 
@@ -338,20 +301,16 @@ const { POST } = createEndpoint({
             },
             { response: true },
             {
-              accepted: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.emails.send.response.accepted.label",
-                },
-                z.array(z.string()),
-              ),
-              rejected: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.emails.send.response.rejected.label",
-                },
-                z.array(z.string()),
-              ),
+              accepted: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.emails.send.response.accepted.label",
+                schema: z.array(z.string()),
+              }),
+              rejected: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.emails.send.response.rejected.label",
+                schema: z.array(z.string()),
+              }),
             },
           ),
 
@@ -365,43 +324,32 @@ const { POST } = createEndpoint({
             },
             { response: true },
             {
-              success: responseField(
-                {
-                  type: WidgetType.BADGE,
-                  text: "app.api.emails.send.response.smsResult.success",
-                },
-                z.boolean(),
-              ),
-              messageId: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.send.response.smsResult.messageId.label",
-                },
-                z.string().optional(),
-              ),
-              sentAt: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.send.response.smsResult.sentAt.label",
-                },
-                z.string().optional(),
-              ),
-              provider: responseField(
-                {
-                  type: WidgetType.BADGE,
-                  text: "app.api.emails.send.response.smsResult.provider",
-                },
-                z.string().optional(),
-              ),
-              error: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.emails.send.response.smsResult.error.label",
-                },
-                z.string().optional(),
-              ),
+              success: responseField({
+                type: WidgetType.BADGE,
+                text: "app.api.emails.send.response.smsResult.success",
+                schema: z.boolean(),
+              }),
+              messageId: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.emails.send.response.smsResult.messageId.label",
+                schema: z.string().optional(),
+              }),
+              sentAt: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.emails.send.response.smsResult.sentAt.label",
+                schema: z.string().optional(),
+              }),
+              provider: responseField({
+                type: WidgetType.BADGE,
+                text: "app.api.emails.send.response.smsResult.provider",
+                schema: z.string().optional(),
+              }),
+              error: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.emails.send.response.smsResult.error.label",
+                schema: z.string().optional(),
+              }),
             },
           ),
         },

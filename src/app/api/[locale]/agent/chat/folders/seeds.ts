@@ -265,20 +265,12 @@ async function createOrUpdateCategory(
           updatedAt: new Date(),
         })
         .where(eq(chatFolders.id, category.id));
-
-      logger.debug(
-        `✅ Updated category folder "${category.name}" (${category.id})`,
-      );
     } else {
       // Create new category folder with fixed ID
       await db.insert(chatFolders).values({
         id: category.id,
         ...folderData,
       });
-
-      logger.debug(
-        `✅ Created category folder "${category.name}" (${category.id})`,
-      );
     }
   } catch (error) {
     logger.error(`Failed to create/update category "${category.name}"`, {
@@ -290,42 +282,31 @@ async function createOrUpdateCategory(
 /**
  * Shared seed logic for all environments
  */
-async function seedCategories(
-  logger: EndpointLogger,
-  environment: string,
-): Promise<void> {
-  logger.debug(
-    `🌱 Seeding chat folder categories for ${environment} environment`,
-  );
-
+async function seedCategories(logger: EndpointLogger): Promise<void> {
   for (const category of FORUM_CATEGORIES) {
     await createOrUpdateCategory(category, logger);
   }
-
-  logger.debug(
-    `✅ Finished seeding ${FORUM_CATEGORIES.length} forum categories`,
-  );
 }
 
 /**
  * Development seed function for chat folders
  */
 export async function dev(logger: EndpointLogger): Promise<void> {
-  await seedCategories(logger, "development");
+  await seedCategories(logger);
 }
 
 /**
  * Test seed function for chat folders
  */
 export async function test(logger: EndpointLogger): Promise<void> {
-  await seedCategories(logger, "test");
+  await seedCategories(logger);
 }
 
 /**
  * Production seed function for chat folders
  */
 export async function prod(logger: EndpointLogger): Promise<void> {
-  await seedCategories(logger, "production");
+  await seedCategories(logger);
 }
 
 // Export priority for seed manager

@@ -22,6 +22,7 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
+import type { ModelId } from "../agent/models/models";
 import { leads } from "../leads/db";
 import { users } from "../user/db";
 import { CreditPackTypeDB, CreditTransactionTypeDB } from "./enum";
@@ -286,7 +287,7 @@ export const creditTransactions = pgTable(
     }).notNull(),
 
     // Context for usage transactions
-    modelId: text("model_id"),
+    modelId: text("model_id").$type<ModelId>(),
     messageId: uuid("message_id"),
 
     // Reference to credit pack (for pack-specific transactions)

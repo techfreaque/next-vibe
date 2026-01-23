@@ -367,7 +367,6 @@ export const translations: typeof enTranslations = {
     user_details: "Szczegóły użytkownika",
     basic_information: "Podstawowe informacje",
     signup_type: "Typ rejestracji",
-    consultation_first: "Najpierw konsultacja",
     direct_signup: "Bezpośrednia rejestracja",
     newsletter: "Newsletter",
     subscribed: "Subskrybowany",
@@ -376,7 +375,6 @@ export const translations: typeof enTranslations = {
     signup_date: "Data rejestracji",
     user_id: "ID użytkownika",
     recommended_next_steps: "Zalecane następne kroki",
-    consultation_recommendation: "Zaplanuj rozmowę konsultacyjną",
     direct_recommendation:
       "Przejrzyj profil użytkownika i konfigurację płatności",
     contact_user: "Skontaktuj się z użytkownikiem",

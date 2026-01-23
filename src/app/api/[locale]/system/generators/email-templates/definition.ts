@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -38,74 +38,63 @@ const { POST } = createEndpoint({
 
   fields: objectField(
     {
-      type: WidgetType.FORM_FIELD,
-      fieldType: FieldDataType.TEXT,
-      label:
+      type: WidgetType.CONTAINER,
+      title:
         "app.api.system.generators.emailTemplates.post.container.title" as const,
       columns: 12,
     },
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      outputFile: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.generators.emailTemplates.post.fields.outputFile.label" as const,
-          description:
-            "app.api.system.generators.emailTemplates.post.fields.outputFile.description" as const,
-          columns: 12,
-        },
-        z.string().default("src/app/api/[locale]/emails/registry/generated.ts"),
-      ),
+      outputFile: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.generators.emailTemplates.post.fields.outputFile.label" as const,
+        description:
+          "app.api.system.generators.emailTemplates.post.fields.outputFile.description" as const,
+        columns: 12,
+        schema: z
+          .string()
+          .default("src/app/api/[locale]/emails/registry/generated.ts"),
+      }),
 
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.generators.emailTemplates.post.fields.dryRun.label" as const,
-          description:
-            "app.api.system.generators.emailTemplates.post.fields.dryRun.description" as const,
-          columns: 6,
-        },
-        z.boolean().optional().default(false),
-      ),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.generators.emailTemplates.post.fields.dryRun.label" as const,
+        description:
+          "app.api.system.generators.emailTemplates.post.fields.dryRun.description" as const,
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.emailTemplates.post.fields.success.title" as const,
-        },
-        z.boolean(),
-      ),
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.emailTemplates.post.fields.message.title" as const,
-        },
-        z.string(),
-      ),
-      templatesFound: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.emailTemplates.post.fields.templatesFound.title" as const,
-        },
-        z.coerce.number(),
-      ),
-      duration: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.emailTemplates.post.fields.duration.title" as const,
-        },
-        z.coerce.number(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.generators.emailTemplates.post.fields.success.title" as const,
+        schema: z.boolean(),
+      }),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.generators.emailTemplates.post.fields.message.title" as const,
+        schema: z.string(),
+      }),
+      templatesFound: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.generators.emailTemplates.post.fields.templatesFound.title" as const,
+        schema: z.coerce.number(),
+      }),
+      duration: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.generators.emailTemplates.post.fields.duration.title" as const,
+        schema: z.coerce.number(),
+      }),
     },
   ),
 

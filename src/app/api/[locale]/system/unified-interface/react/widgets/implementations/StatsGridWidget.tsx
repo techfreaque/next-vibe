@@ -3,6 +3,7 @@
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
+import { z } from "zod";
 
 import { WidgetType } from "../../../shared/types/enums";
 import type { MetricCardWidgetConfig } from "../../../shared/widgets/configs";
@@ -98,10 +99,11 @@ export function StatsGridWidget<const TKey extends string>({
         };
 
         // Create a mock field for MetricCardWidget with default config
-        const metricField: MetricCardWidgetConfig<TKey> = {
+        const metricField: MetricCardWidgetConfig<TKey, z.ZodNumber> = {
           type: WidgetType.METRIC_CARD,
           title: stat.label as TKey,
           value: stat.value,
+          schema: z.number(),
         };
 
         return (
@@ -109,7 +111,7 @@ export function StatsGridWidget<const TKey extends string>({
             key={stat.label ?? index}
             widgetType={WidgetType.METRIC_CARD}
             value={widgetData}
-            field={{ ui: metricField } as never}
+            field={{ ui: metricField }}
             context={context}
             endpoint={endpoint}
           />

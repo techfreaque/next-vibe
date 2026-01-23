@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -43,108 +43,83 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      force: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.migrateRepair.fields.force.title",
-          description:
-            "app.api.system.db.migrateRepair.fields.force.description",
-          columns: 4,
-        },
-        z.boolean().optional().default(false),
-      ),
+      force: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.migrateRepair.fields.force.title",
+        description: "app.api.system.db.migrateRepair.fields.force.description",
+        columns: 4,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      dryRun: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.migrateRepair.fields.dryRun.title",
-          description:
-            "app.api.system.db.migrateRepair.fields.dryRun.description",
-          columns: 4,
-        },
-        z.boolean().optional().default(false),
-      ),
+      dryRun: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.migrateRepair.fields.dryRun.title",
+        description:
+          "app.api.system.db.migrateRepair.fields.dryRun.description",
+        columns: 4,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      reset: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.migrateRepair.fields.reset.title",
-          description:
-            "app.api.system.db.migrateRepair.fields.reset.description",
-          columns: 4,
-        },
-        z.boolean().optional().default(false),
-      ),
+      reset: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.migrateRepair.fields.reset.title",
+        description: "app.api.system.db.migrateRepair.fields.reset.description",
+        columns: 4,
+        schema: z.boolean().optional().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrateRepair.fields.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrateRepair.fields.success.title",
+        schema: z.boolean(),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrateRepair.fields.output.title",
-        },
-        z.string(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrateRepair.fields.output.title",
+        schema: z.string(),
+      }),
 
-      hasTable: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrateRepair.fields.hasTable.title",
-        },
-        z.boolean(),
-      ),
+      hasTable: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrateRepair.fields.hasTable.title",
+        schema: z.boolean(),
+      }),
 
-      schema: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrateRepair.fields.schema.title",
-        },
-        z.string(),
-      ),
+      schema: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrateRepair.fields.schema.title",
+        schema: z.string(),
+      }),
 
-      tableName: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrateRepair.fields.tableName.title",
-        },
-        z.string(),
-      ),
+      tableName: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrateRepair.fields.tableName.title",
+        schema: z.string(),
+      }),
 
-      trackedMigrations: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateRepair.fields.trackedMigrations.title",
-        },
-        z.coerce.number(),
-      ),
+      trackedMigrations: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.db.migrateRepair.fields.trackedMigrations.title",
+        schema: z.coerce.number(),
+      }),
 
-      migrationFiles: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateRepair.fields.migrationFiles.title",
-        },
-        z.coerce.number(),
-      ),
+      migrationFiles: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrateRepair.fields.migrationFiles.title",
+        schema: z.coerce.number(),
+      }),
 
-      repaired: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.migrateRepair.fields.repaired.title",
-        },
-        z.coerce.number(),
-      ),
+      repaired: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.migrateRepair.fields.repaired.title",
+        schema: z.coerce.number(),
+      }),
     },
   ),
 
@@ -205,7 +180,6 @@ const { POST } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    urlPathParams: undefined,
     requests: {
       default: {
         force: false,

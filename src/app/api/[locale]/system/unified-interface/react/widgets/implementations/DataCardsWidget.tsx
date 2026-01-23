@@ -7,6 +7,7 @@ import { ChevronDown } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useState } from "react";
+import type { z } from "zod";
 
 import type { UnifiedField } from "../../../shared/types/endpoint";
 import type { WidgetType } from "../../../shared/types/enums";
@@ -113,7 +114,7 @@ export const DataCardsWidget = <const TKey extends string>({
   // Type-narrow field.child for safe access in WidgetRenderer
   // ArrayField/ArrayOptionalField.child can be UnifiedField | ZodTypeAny
   // Check if it's a UnifiedField (has ui property) to distinguish from ZodTypeAny
-  let childField: UnifiedField<string> | null = null;
+  let childField: UnifiedField<string, z.ZodTypeAny> | null = null;
   if (field.type === "array" || field.type === "array-optional") {
     const child = field.child;
     if (
@@ -122,7 +123,7 @@ export const DataCardsWidget = <const TKey extends string>({
       "ui" in child &&
       "type" in child
     ) {
-      childField = child as UnifiedField<string>;
+      childField = child as UnifiedField<string, z.ZodTypeAny>;
     }
   }
 

@@ -28,8 +28,8 @@ import type {
   CliCompatiblePlatform,
   RouteExecutionContext,
 } from "../../unified-interface/cli/runtime/route-executor";
-import { routeDelegationHandler } from "../../unified-interface/cli/runtime/route-executor";
-import { schemaUIHandler } from "../../unified-interface/cli/widgets/renderers/schema-handler";
+import { RouteDelegationHandler } from "../../unified-interface/cli/runtime/route-executor";
+import { SchemaUIHandler } from "../../unified-interface/cli/widgets/renderers/schema-handler";
 import { definitionsRegistry } from "../../unified-interface/shared/endpoints/definitions/registry";
 import type { CreateApiEndpointAny } from "../../unified-interface/shared/types/endpoint";
 import { Platform } from "../../unified-interface/shared/types/platform";
@@ -47,7 +47,7 @@ interface InteractiveSession {
   platform: CliCompatiblePlatform;
   options?: {
     verbose?: boolean;
-    output?: "json" | "table" | "pretty";
+    output?: "json" | "pretty";
   };
 }
 
@@ -845,13 +845,13 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     logger: EndpointLogger,
   ): Promise<Record<string, string | number | boolean>> {
     try {
-      const fields = schemaUIHandler.parseSchema(schema);
+      const fields = SchemaUIHandler.parseSchema(schema);
       const config = {
         title,
         fields,
       };
 
-      const result = await schemaUIHandler.generateForm(config);
+      const result = await SchemaUIHandler.generateForm(config);
       return result as Record<string, string | number | boolean>;
     } catch (error) {
       logger.warn(`Failed to generate form for ${title}`, {
@@ -912,8 +912,8 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
 
   private async executeRouteWithData(
     route: CreateApiEndpointAny,
-    requestData: Record<string, string | number | boolean>,
-    urlPathParams: Record<string, string | number | boolean>,
+    requestData: Record<string, string | number | boolean | null | undefined>,
+    urlPathParams: Record<string, string | number | boolean | null | undefined>,
     logger: EndpointLogger,
   ): Promise<void> {
     const session = this.getSession();
@@ -933,26 +933,22 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     };
 
     try {
-      const result = await routeDelegationHandler.executeRoute(
+      const result = await RouteDelegationHandler.executeRoute(
         resolvedCommand,
-        context,
+        {
+          data: context.data,
+          urlPathParams: context.urlPathParams,
+          cliArgs: { positionalArgs: [], namedArgs: {} },
+          locale: context.locale,
+          platform: context.platform,
+          dryRun: undefined,
+          interactive: true,
+          verbose: context.options?.verbose,
+          output: session.options?.output,
+        },
         logger,
-        session.locale,
       );
-
-      const endpointDefinition = await this.getCreateApiEndpoint(route, logger);
-
-      const formattedResult = routeDelegationHandler.formatResult(
-        result,
-        session.options?.output || "pretty",
-        endpointDefinition,
-        session.locale,
-        session.options?.verbose || false,
-        logger,
-        context,
-      );
-
-      logger.info(formattedResult);
+      process.stdout.write(`${result.formattedOutput}\n`);
     } catch (error) {
       const { t } = simpleT(session.locale);
       const executionFailedText = t(
@@ -982,26 +978,23 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     };
 
     try {
-      const result = await routeDelegationHandler.executeRoute(
+      const result = await RouteDelegationHandler.executeRoute(
         resolvedCommand,
-        context,
+        {
+          data: context.data,
+          urlPathParams: undefined,
+          cliArgs: { positionalArgs: [], namedArgs: {} },
+          locale: context.locale,
+          platform: context.platform,
+          dryRun: undefined,
+          interactive: true,
+          verbose: context.options?.verbose,
+          output: session.options?.output,
+        },
         logger,
-        session.locale,
       );
 
-      const endpointDefinition = await this.getCreateApiEndpoint(route, logger);
-
-      const formattedResult = routeDelegationHandler.formatResult(
-        result,
-        session.options?.output || "pretty",
-        endpointDefinition,
-        session.locale,
-        session.options?.verbose || false,
-        logger,
-        context,
-      );
-
-      logger.info(formattedResult);
+      process.stdout.write(`${result.formattedOutput}\n`);
     } catch (error) {
       const { t } = simpleT(session.locale);
       const executionFailedText = t(

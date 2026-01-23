@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -49,69 +49,54 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      port: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.system.db.studio.fields.port.title",
-          description: "app.api.system.db.studio.fields.port.description",
-          columns: 6,
-        },
-        z.coerce.number().optional().default(5555),
-      ),
+      port: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.system.db.studio.fields.port.title",
+        description: "app.api.system.db.studio.fields.port.description",
+        columns: 6,
+        schema: z.coerce.number().optional().default(5555),
+      }),
 
-      openBrowser: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.studio.fields.openBrowser.title",
-          description:
-            "app.api.system.db.studio.fields.openBrowser.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(true),
-      ),
+      openBrowser: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.studio.fields.openBrowser.title",
+        description: "app.api.system.db.studio.fields.openBrowser.description",
+        columns: 6,
+        schema: z.boolean().optional().default(true),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.studio.fields.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.studio.fields.success.title",
+        schema: z.boolean(),
+      }),
 
-      url: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.studio.fields.url.title",
-        },
-        z.string(),
-      ),
+      url: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.studio.fields.url.title",
+        schema: z.string(),
+      }),
 
-      portUsed: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.studio.fields.portUsed.title",
-        },
-        z.coerce.number(),
-      ),
+      portUsed: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.studio.fields.portUsed.title",
+        schema: z.coerce.number(),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.studio.fields.output.title",
-        },
-        z.string(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.studio.fields.output.title",
+        schema: z.string(),
+      }),
 
-      duration: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.studio.fields.duration.title",
-        },
-        z.coerce.number(),
-      ),
+      duration: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.studio.fields.duration.title",
+        schema: z.coerce.number(),
+      }),
     },
   ),
 
@@ -165,7 +150,6 @@ const { POST } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    urlPathParams: undefined,
     requests: {
       default: {
         port: "5555",

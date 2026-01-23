@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -48,64 +48,52 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      skipPre: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.start.post.fields.skipPre.title",
-          description:
-            "app.api.system.server.start.post.fields.skipPre.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(false),
-      ),
+      skipPre: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.start.post.fields.skipPre.title",
+        description:
+          "app.api.system.server.start.post.fields.skipPre.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      skipNextCommand: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.server.start.post.fields.skipNextCommand.title",
-          description:
-            "app.api.system.server.start.post.fields.skipNextCommand.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(false),
-      ),
+      skipNextCommand: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.start.post.fields.skipNextCommand.title",
+        description:
+          "app.api.system.server.start.post.fields.skipNextCommand.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      port: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.system.server.start.post.fields.port.title",
-          description:
-            "app.api.system.server.start.post.fields.port.description",
-          columns: 12,
-        },
-        z.union([z.coerce.number(), z.string()]).optional(),
-      ),
+      port: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.system.server.start.post.fields.port.title",
+        description: "app.api.system.server.start.post.fields.port.description",
+        columns: 12,
+        schema: z.union([z.coerce.number(), z.string()]).optional(),
+      }),
 
-      skipTaskRunner: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.start.post.fields.skipTaskRunner.title",
-          description:
-            "app.api.system.server.start.post.fields.skipTaskRunner.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(false),
-      ),
+      skipTaskRunner: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.start.post.fields.skipTaskRunner.title",
+        description:
+          "app.api.system.server.start.post.fields.skipTaskRunner.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
 
-      responseMessage: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.server.start.post.fields.output.title",
-        },
-        z.string() as z.ZodType<TranslationKey>,
-      ),
+      responseMessage: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.server.start.post.fields.output.title",
+        schema: z.string() as z.ZodType<TranslationKey>,
+      }),
     },
   ),
 

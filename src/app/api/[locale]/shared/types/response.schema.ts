@@ -80,18 +80,20 @@ export interface SuccessResponseOptions {
  * @param options - Optional settings for the response
  * @returns A standardized success response
  */
-export function success(): ResponseType<void>;
 export function success<TResponse>(
   data: TResponse,
   options?: SuccessResponseOptions,
 ): ResponseType<TResponse>;
+export function success<TResponse extends never>(
+  data?: TResponse,
+): ResponseType<TResponse>;
 export function success<TResponse>(
   data?: TResponse,
   options?: SuccessResponseOptions,
-): ResponseType<TResponse | void> {
+): ResponseType<TResponse> {
   return {
     success: true,
-    data,
+    data: data as TResponse,
     ...(options?.isErrorResponse && { isErrorResponse: true }),
     ...(options?.headers && { headers: options.headers }),
     ...(options?.performance && { performance: options.performance }),

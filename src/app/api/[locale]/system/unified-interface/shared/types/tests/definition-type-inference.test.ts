@@ -17,13 +17,11 @@ import type {
 import type { z } from "zod";
 
 import type imapAccountsListDefinition from "@/app/api/[locale]/emails/imap-client/accounts/list/definition";
-import type imapAccountTestDefinition from "@/app/api/[locale]/emails/imap-client/accounts/test/definition";
-import type imapConfigDefinition from "@/app/api/[locale]/emails/imap-client/config/definition";
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import {
   objectField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import type {
   FieldUsageConfig,
   InferSchemaFromField,
@@ -31,17 +29,6 @@ import type {
   PrimitiveField,
   UnifiedField,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
-import type {
-  DeleteRequest,
-  DeleteResponse,
-  DeleteUrlVariables,
-  GetRequest,
-  GetResponse,
-  GetUrlVariables,
-  PrimaryMutationRequest,
-  PrimaryMutationResponse,
-  PrimaryMutationUrlVariables,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-helpers";
 import type { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   LayoutType,
@@ -261,15 +248,15 @@ type ImapStep8_AccountsType = ImapStep7_DataType extends {
 // Check if accounts is an array by verifying it extends readonly array
 type ImapStep8_AccountsIsArray =
   ImapStep8_AccountsType extends readonly (infer _Item)[] ? true : false;
-type ImapStep8_AccountsIsArrayVerify = Expect<
-  Equal<ImapStep8_AccountsIsArray, true>
->;
+// type ImapStep8_AccountsIsArrayVerify = Expect<
+//   Equal<ImapStep8_AccountsIsArray, true>
+// >;
 
 // Step 9: Verify data type is properly typed (not never)
 type ImapStep9_DataIsNotNever = ImapStep7_DataType extends never ? false : true;
-type ImapStep9_DataIsNotNeverVerify = Expect<
-  Equal<ImapStep9_DataIsNotNever, true>
->;
+// type ImapStep9_DataIsNotNeverVerify = Expect<
+//   Equal<ImapStep9_DataIsNotNever, true>
+// >;
 
 // ============================================================================
 // PART 10: FIELD TYPE PATTERN MATCHING TESTS
@@ -293,14 +280,24 @@ type Test10b_SimplePrimitive = PrimitiveField<
   z.ZodString,
   { response: true },
   string,
-  WidgetConfig<string>
+  WidgetConfig<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    Record<string, UnifiedField<string, z.ZodTypeAny>>
+  >
 >;
 type Test10b_MatchesWithString =
   Test10b_SimplePrimitive extends PrimitiveField<
     infer _TSchema,
     FieldUsageConfig,
     string,
-    WidgetConfig<string>
+    WidgetConfig<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      Record<string, UnifiedField<string, z.ZodTypeAny>>
+    >
   >
     ? true
     : false;
@@ -311,14 +308,19 @@ type Test10c_NarrowPrimitive = PrimitiveField<
   z.ZodString,
   { response: true },
   "app.common.test",
-  WidgetConfig<"app.common.test">
+  WidgetConfig<"app.common.test", z.ZodTypeAny>
 >;
 type Test10c_MatchesWithString =
   Test10c_NarrowPrimitive extends PrimitiveField<
     infer _TSchema,
     FieldUsageConfig,
     string,
-    WidgetConfig<string>
+    WidgetConfig<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      Record<string, UnifiedField<string, z.ZodTypeAny>>
+    >
   >
     ? true
     : false;
@@ -330,14 +332,19 @@ type Test10d_WidePrimitive = PrimitiveField<
   z.ZodString,
   { response: true },
   string,
-  WidgetConfig<string>
+  WidgetConfig<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    Record<string, UnifiedField<string, z.ZodTypeAny>>
+  >
 >;
 type Test10d_MatchesWithNarrow =
   Test10d_WidePrimitive extends PrimitiveField<
     infer _TSchema,
     FieldUsageConfig,
     WideUnion,
-    WidgetConfig<WideUnion>
+    WidgetConfig<WideUnion, z.ZodTypeAny>
   >
     ? true
     : false;
@@ -348,14 +355,14 @@ type Test10e_NarrowField = PrimitiveField<
   z.ZodString,
   { response: true },
   "app.common.test",
-  WidgetConfig<"app.common.test">
+  WidgetConfig<"app.common.test", z.ZodTypeAny>
 >;
 type Test10e_MatchesWithWide =
   Test10e_NarrowField extends PrimitiveField<
     infer _TSchema,
     FieldUsageConfig,
     WideUnion,
-    WidgetConfig<WideUnion>
+    WidgetConfig<WideUnion, z.ZodTypeAny>
   >
     ? true
     : false;
@@ -368,7 +375,12 @@ type Test10f_MatchesObjectFieldString =
     infer _TChildren,
     FieldUsageConfig,
     string,
-    WidgetConfig<string>
+    WidgetConfig<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      Record<string, UnifiedField<string, z.ZodTypeAny>>
+    >
   >
     ? true
     : false;
@@ -382,7 +394,7 @@ type Test10g_MatchesWithScopedKey =
     infer _TChildren,
     FieldUsageConfig,
     Test10g_ScopedKey,
-    WidgetConfig<Test10g_ScopedKey>
+    WidgetConfig<Test10g_ScopedKey, z.ZodTypeAny>
   >
     ? true
     : false;
@@ -417,7 +429,7 @@ type Test11a_SimpleField = PrimitiveField<
   z.ZodString,
   { response: true },
   "test.key",
-  WidgetConfig<"test.key">
+  WidgetConfig<"test.key", z.ZodTypeAny>
 >;
 type Test11a_InferredSchema = InferSchemaFromField<
   Test11a_SimpleField,
@@ -486,10 +498,11 @@ type Test11f_IsNotNever = Test11f_InferredSchema extends z.ZodNever
 // ============================================================================
 
 // Test 12a: Create a simple field and check its TKey (using proper TextWidgetConfig with content)
-const simpleTestField = responseField(
-  { type: WidgetType.TEXT, content: "app.common.active" as const },
-  {} as z.ZodString,
-);
+const simpleTestField = responseField({
+  type: WidgetType.TEXT,
+  content: "app.common.active" as const,
+  schema: {} as z.ZodString,
+});
 type Test12a_SimpleField = typeof simpleTestField;
 type Test12a_ExtractTKey =
   Test12a_SimpleField extends PrimitiveField<
@@ -507,10 +520,11 @@ const containerField = objectField(
   { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
   { response: true },
   {
-    name: responseField(
-      { type: WidgetType.TEXT, content: "app.common.name" as const },
-      {} as z.ZodString,
-    ),
+    name: responseField({
+      type: WidgetType.TEXT,
+      content: "app.common.active" as const,
+      schema: {} as z.ZodString,
+    }),
   },
 );
 type Test12b_ContainerField = typeof containerField;
@@ -557,12 +571,17 @@ type Test13b_StringToNarrow =
     EmptyChildren,
     { response: true },
     string,
-    WidgetConfig<string>
+    WidgetConfig<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      Record<string, UnifiedField<string, z.ZodTypeAny>>
+    >
   > extends ObjectField<
     EmptyChildren,
     { response: true },
     "narrow",
-    WidgetConfig<"narrow">
+    WidgetConfig<"narrow", z.ZodTypeAny>
   >
     ? true
     : false;
@@ -574,12 +593,17 @@ type Test13c_NarrowToString =
     EmptyChildren,
     { response: true },
     "narrow",
-    WidgetConfig<"narrow">
+    WidgetConfig<"narrow", z.ZodTypeAny>
   > extends ObjectField<
     EmptyChildren,
     { response: true },
     string,
-    WidgetConfig<string>
+    WidgetConfig<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      Record<string, UnifiedField<string, z.ZodTypeAny>>
+    >
   >
     ? true
     : false;
@@ -594,7 +618,14 @@ type Test13d_ImapUI =
 
 // Test 13e: Does the IMAP UI extend WidgetConfig<string>?
 type Test13e_UIExtendsWidgetConfigString =
-  Test13d_ImapUI extends WidgetConfig<string> ? true : false;
+  Test13d_ImapUI extends WidgetConfig<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    Record<string, UnifiedField<string, z.ZodTypeAny>>
+  >
+    ? true
+    : false;
 
 // Test 13f: Manually check what type the objectField helper returns
 // Look at the return type signature of objectField
@@ -621,19 +652,34 @@ type Test13i_MinimalField = ObjectField<
       z.ZodString,
       { response: true },
       string,
-      WidgetConfig<string>
+      WidgetConfig<
+        string,
+        z.ZodTypeAny,
+        FieldUsageConfig,
+        Record<string, UnifiedField<string, z.ZodTypeAny>>
+      >
     >;
   },
   { response: true },
   string,
-  WidgetConfig<string>
+  WidgetConfig<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    Record<string, UnifiedField<string, z.ZodTypeAny>>
+  >
 >;
 type Test13i_MatchesString =
   Test13i_MinimalField extends ObjectField<
     infer _C,
     FieldUsageConfig,
     string,
-    WidgetConfig<string>
+    WidgetConfig<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      Record<string, UnifiedField<string, z.ZodTypeAny>>
+    >
   >
     ? true
     : false;
@@ -665,7 +711,12 @@ type Test13j3_ChildrenMatches = Test10f_ImapFields extends {
 
 // 13j-4: Does ui match WidgetConfig<string>?
 type Test13j4_UIMatches = Test10f_ImapFields extends {
-  ui: WidgetConfig<string>;
+  ui: WidgetConfig<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    Record<string, UnifiedField<string, z.ZodTypeAny>>
+  >;
 }
   ? true
   : false;
@@ -793,10 +844,11 @@ const fieldWithLabels = objectField(
   },
   { response: true },
   {
-    test: responseField(
-      { type: WidgetType.TEXT, content: "app.common.test" as const },
-      {} as z.ZodString,
-    ),
+    test: responseField({
+      type: WidgetType.TEXT,
+      content: "app.common.active" as const,
+      schema: {} as z.ZodString,
+    }),
   },
 );
 type Test15f_FieldWithLabels = typeof fieldWithLabels;

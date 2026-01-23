@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,105 +50,98 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      type: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.browser.navigate-page.form.fields.type.label",
-          description:
-            "app.api.browser.navigate-page.form.fields.type.description",
-          placeholder:
-            "app.api.browser.navigate-page.form.fields.type.placeholder",
-          columns: 6,
-          options: [
-            {
-              label:
-                "app.api.browser.navigate-page.form.fields.type.options.url" as const,
-              value: "url",
-            },
-            {
-              label:
-                "app.api.browser.navigate-page.form.fields.type.options.back" as const,
-              value: "back",
-            },
-            {
-              label:
-                "app.api.browser.navigate-page.form.fields.type.options.forward" as const,
-              value: "forward",
-            },
-            {
-              label:
-                "app.api.browser.navigate-page.form.fields.type.options.reload" as const,
-              value: "reload",
-            },
-          ],
-        },
-        z
+      type: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.browser.navigate-page.form.fields.type.label",
+        description:
+          "app.api.browser.navigate-page.form.fields.type.description",
+        placeholder:
+          "app.api.browser.navigate-page.form.fields.type.placeholder",
+        columns: 6,
+        options: [
+          {
+            label:
+              "app.api.browser.navigate-page.form.fields.type.options.url" as const,
+            value: "url",
+          },
+          {
+            label:
+              "app.api.browser.navigate-page.form.fields.type.options.back" as const,
+            value: "back",
+          },
+          {
+            label:
+              "app.api.browser.navigate-page.form.fields.type.options.forward" as const,
+            value: "forward",
+          },
+          {
+            label:
+              "app.api.browser.navigate-page.form.fields.type.options.reload" as const,
+            value: "reload",
+          },
+        ],
+        schema: z
           .enum(["url", "back", "forward", "reload"])
           .optional()
           .describe(
             "Navigate the page by URL, back or forward in history, or reload.",
           ),
-      ),
-      url: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.browser.navigate-page.form.fields.url.label",
-          description:
-            "app.api.browser.navigate-page.form.fields.url.description",
-          placeholder:
-            "app.api.browser.navigate-page.form.fields.url.placeholder",
-          columns: 6,
-        },
-        z.string().optional().describe("Target URL (only type=url)"),
-      ),
-      ignoreCache: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.browser.navigate-page.form.fields.ignoreCache.label",
-          description:
-            "app.api.browser.navigate-page.form.fields.ignoreCache.description",
-          placeholder:
-            "app.api.browser.navigate-page.form.fields.ignoreCache.placeholder",
-          columns: 6,
-        },
-        z.boolean().optional().describe("Whether to ignore cache on reload."),
-      ),
-      timeout: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.browser.navigate-page.form.fields.timeout.label",
-          description:
-            "app.api.browser.navigate-page.form.fields.timeout.description",
-          placeholder:
-            "app.api.browser.navigate-page.form.fields.timeout.placeholder",
-          columns: 6,
-        },
-        z
+      }),
+      url: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.browser.navigate-page.form.fields.url.label",
+        description:
+          "app.api.browser.navigate-page.form.fields.url.description",
+        placeholder:
+          "app.api.browser.navigate-page.form.fields.url.placeholder",
+        columns: 6,
+        schema: z.string().optional().describe("Target URL (only type=url)"),
+      }),
+      ignoreCache: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.browser.navigate-page.form.fields.ignoreCache.label",
+        description:
+          "app.api.browser.navigate-page.form.fields.ignoreCache.description",
+        placeholder:
+          "app.api.browser.navigate-page.form.fields.ignoreCache.placeholder",
+        columns: 6,
+        schema: z
+          .boolean()
+          .optional()
+          .describe("Whether to ignore cache on reload."),
+      }),
+      timeout: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.browser.navigate-page.form.fields.timeout.label",
+        description:
+          "app.api.browser.navigate-page.form.fields.timeout.description",
+        placeholder:
+          "app.api.browser.navigate-page.form.fields.timeout.placeholder",
+        columns: 6,
+        schema: z
           .number()
           .optional()
           .describe(
             "Maximum wait time in milliseconds. If set to 0, the default timeout will be used.",
           ),
-      ),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.navigate-page.response.success",
-        },
-        z.boolean().describe("Whether the navigation operation succeeded"),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.navigate-page.response.result",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.navigate-page.response.success",
+        schema: z
+          .boolean()
+          .describe("Whether the navigation operation succeeded"),
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.navigate-page.response.result",
+        schema: z
           .object({
             navigated: z.boolean().describe("Whether the page was navigated"),
             url: z
@@ -162,21 +155,23 @@ const { POST } = createEndpoint({
           })
           .optional()
           .describe("Result of the navigation"),
-      ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.navigate-page.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.navigate-page.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      }),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.navigate-page.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.navigate-page.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -194,7 +189,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

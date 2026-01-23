@@ -1,4 +1,38 @@
 export const translations = {
+  // Top-level keys used across methods
+  empty: "", // For hidden/internal fields
+  linkId: {
+    label: "Link ID",
+  },
+  label: {
+    label: "Label",
+    description: "Optional label to identify this link",
+    placeholder: "Enter a label for this share link",
+  },
+  allowPosting: {
+    label: "Allow Posting",
+    description: "Allow recipients to post messages in this thread",
+  },
+  requireAuth: {
+    label: "Require Authentication",
+    description: "Require users to sign in to access this link",
+  },
+  shareLink: {
+    label: "Label",
+    shareUrl: "Share URL",
+    active: "Active",
+    allowPosting: "Allow Posting",
+    requireAuth: "Require Auth",
+    accessCount: "Access Count",
+    lastAccessedAt: "Last Accessed",
+    createdAt: "Created",
+    editAction: "Edit",
+    deleteAction: "Revoke",
+  },
+  shareLinks: {
+    emptyTitle: "No Share Links",
+    emptyDescription: "Create a share link to share this thread with others",
+  },
   get: {
     title: "Get Share Links",
     description: "Retrieve all share links for a thread",
@@ -97,6 +131,7 @@ export const translations = {
     label: {
       label: "Label",
       description: "Optional label to identify this link",
+      placeholder: "Enter a label for this share link",
     },
     allowPosting: {
       label: "Allow Posting",
@@ -172,6 +207,7 @@ export const translations = {
     label: {
       label: "Label",
       description: "Optional label to identify this link",
+      placeholder: "Enter a label for this share link",
     },
     allowPosting: {
       label: "Allow Posting",

@@ -10,7 +10,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -34,9 +34,15 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "react-native", "generate"],
   examples: {
-    requests: {},
-    urlPathParams: undefined,
-    responses: {},
+    responses: {
+      default: {
+        success: true,
+        created: ["src/app/api/[locale]/system/generated/expo-index.ts"],
+        skipped: [],
+        errors: [],
+        message: "Expo index generated successfully",
+      },
+    },
   },
 
   fields: objectField(
@@ -48,58 +54,48 @@ const { POST } = createEndpoint({
       layoutType: LayoutType.GRID,
       columns: 12,
     },
-    { request: "data", response: true },
+    { response: true },
     {
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.reactNative.generate.post.response.fields.success",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.reactNative.generate.post.response.fields.success",
+        schema: z.boolean(),
+      }),
 
-      created: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.reactNative.generate.post.response.fields.created",
-        },
-        z.array(z.string()),
-      ),
+      created: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.reactNative.generate.post.response.fields.created",
+        schema: z.array(z.string()),
+      }),
 
-      skipped: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.reactNative.generate.post.response.fields.skipped",
-        },
-        z.array(z.string()),
-      ),
+      skipped: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.reactNative.generate.post.response.fields.skipped",
+        schema: z.array(z.string()),
+      }),
 
-      errors: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.reactNative.generate.post.response.fields.errors",
-        },
-        z.array(
+      errors: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.reactNative.generate.post.response.fields.errors",
+        schema: z.array(
           z.object({
             file: z.string(),
             error: z.string(),
           }),
         ),
-      ),
+      }),
 
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.reactNative.generate.post.response.fields.message",
-        },
-        z.string(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.reactNative.generate.post.response.fields.message",
+        schema: z.string(),
+      }),
     },
   ),
 

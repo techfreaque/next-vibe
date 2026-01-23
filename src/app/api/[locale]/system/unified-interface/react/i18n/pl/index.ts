@@ -23,6 +23,9 @@ export const translations: typeof enTranslations = {
       viewList: "Widok listy",
       viewGrid: "Widok siatki",
     },
+    groupedList: {
+      showMore: "Pokaż {{count}} więcej",
+    },
     linkList: {
       noResults: "Nie znaleziono wyników",
     },

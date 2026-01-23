@@ -35,7 +35,6 @@ export const {
     "app.api.leads.enums.leadStatus.newsletterSubscriber" as const, // For website users who subscribed to newsletter
   IN_CONTACT: "app.api.leads.enums.leadStatus.inContact", // For leads who have contacted us and are in the process of being contacted but not yet converted
   SIGNED_UP: "app.api.leads.enums.leadStatus.signedUp", // User created account (what CONVERTED currently means)
-  CONSULTATION_BOOKED: "app.api.leads.enums.leadStatus.consultationBooked", // User booked consultation call
   SUBSCRIPTION_CONFIRMED:
     "app.api.leads.enums.leadStatus.subscriptionConfirmed", // True conversion - subscription confirmed
   UNSUBSCRIBED: "app.api.leads.enums.leadStatus.unsubscribed",
@@ -236,8 +235,6 @@ export const {
     "app.api.leads.enums.leadStatusFilter.newsletterSubscriber" as const,
   IN_CONTACT: "app.api.leads.enums.leadStatusFilter.inContact",
   SIGNED_UP: "app.api.leads.enums.leadStatusFilter.signedUp",
-  CONSULTATION_BOOKED:
-    "app.api.leads.enums.leadStatusFilter.consultationBooked",
   SUBSCRIPTION_CONFIRMED:
     "app.api.leads.enums.leadStatusFilter.subscriptionConfirmed",
   UNSUBSCRIBED: "app.api.leads.enums.leadStatusFilter.unsubscribed",
@@ -316,8 +313,6 @@ export function mapStatusFilter(
       return LeadStatus.IN_CONTACT;
     case LeadStatusFilter.SIGNED_UP:
       return LeadStatus.SIGNED_UP;
-    case LeadStatusFilter.CONSULTATION_BOOKED:
-      return LeadStatus.CONSULTATION_BOOKED;
     case LeadStatusFilter.SUBSCRIPTION_CONFIRMED:
       return LeadStatus.SUBSCRIPTION_CONFIRMED;
     case LeadStatusFilter.UNSUBSCRIBED:
@@ -407,7 +402,6 @@ export function isStatusTransitionAllowed(
   const finalStatuses: (typeof LeadStatus)[keyof typeof LeadStatus][] = [
     LeadStatus.IN_CONTACT,
     LeadStatus.SIGNED_UP,
-    LeadStatus.CONSULTATION_BOOKED,
     LeadStatus.SUBSCRIPTION_CONFIRMED,
     LeadStatus.UNSUBSCRIBED,
     LeadStatus.BOUNCED,
@@ -459,7 +453,6 @@ export function isStatusTransitionAllowed(
     }
 
     case LeadStatus.SIGNED_UP:
-    case LeadStatus.CONSULTATION_BOOKED:
     case LeadStatus.SUBSCRIPTION_CONFIRMED:
     case LeadStatus.UNSUBSCRIBED:
     case LeadStatus.BOUNCED:
@@ -469,7 +462,6 @@ export function isStatusTransitionAllowed(
         [
           LeadStatus.IN_CONTACT,
           LeadStatus.SIGNED_UP,
-          LeadStatus.CONSULTATION_BOOKED,
           LeadStatus.SUBSCRIPTION_CONFIRMED,
           LeadStatus.UNSUBSCRIBED,
           LeadStatus.BOUNCED,
@@ -496,7 +488,6 @@ export function getContactFormStatus(
   const finalContactStatuses: (typeof LeadStatus)[keyof typeof LeadStatus][] = [
     LeadStatus.IN_CONTACT,
     LeadStatus.SIGNED_UP,
-    LeadStatus.CONSULTATION_BOOKED,
     LeadStatus.SUBSCRIPTION_CONFIRMED,
     LeadStatus.UNSUBSCRIBED,
     LeadStatus.BOUNCED,
@@ -525,7 +516,6 @@ export function getNewsletterSubscriptionStatus(
     [
       LeadStatus.IN_CONTACT,
       LeadStatus.SIGNED_UP,
-      LeadStatus.CONSULTATION_BOOKED,
       LeadStatus.SUBSCRIPTION_CONFIRMED,
       LeadStatus.UNSUBSCRIBED,
       LeadStatus.BOUNCED,
@@ -588,7 +578,6 @@ export const LeadStatusDB = [
   LeadStatus.NEWSLETTER_SUBSCRIBER,
   LeadStatus.IN_CONTACT,
   LeadStatus.SIGNED_UP,
-  LeadStatus.CONSULTATION_BOOKED,
   LeadStatus.SUBSCRIPTION_CONFIRMED,
   LeadStatus.UNSUBSCRIBED,
   LeadStatus.BOUNCED,

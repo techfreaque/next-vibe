@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -43,90 +43,73 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      silent: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.ping.fields.silent.title",
-          description: "app.api.system.db.ping.fields.silent.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(false),
-      ),
+      silent: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.ping.fields.silent.title",
+        description: "app.api.system.db.ping.fields.silent.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      keepConnectionOpen: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.db.ping.fields.keepConnectionOpen.title",
-          description:
-            "app.api.system.db.ping.fields.keepConnectionOpen.description",
-          columns: 6,
-        },
-        z.boolean().optional().default(false),
-      ),
+      keepConnectionOpen: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.db.ping.fields.keepConnectionOpen.title",
+        description:
+          "app.api.system.db.ping.fields.keepConnectionOpen.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.ping.fields.success.content" as const,
-          label: "app.api.system.db.ping.fields.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.ping.fields.success.content" as const,
+        label: "app.api.system.db.ping.fields.success.title",
+        schema: z.boolean(),
+      }),
 
-      isAccessible: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.ping.fields.isAccessible.content" as const,
-          label: "app.api.system.db.ping.fields.isAccessible.title",
-        },
-        z.boolean(),
-      ),
+      isAccessible: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.ping.fields.isAccessible.content" as const,
+        label: "app.api.system.db.ping.fields.isAccessible.title",
+        schema: z.boolean(),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.db.ping.fields.output.content" as const,
-          label: "app.api.system.db.ping.fields.output.title",
-        },
-        z.string(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.db.ping.fields.output.content" as const,
+        label: "app.api.system.db.ping.fields.output.title",
+        schema: z.string(),
+      }),
 
-      totalConnections: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.ping.fields.connectionInfo.totalConnections.content" as const,
-          label:
-            "app.api.system.db.ping.fields.connectionInfo.totalConnections.content",
-        },
-        z.coerce.number(),
-      ),
+      totalConnections: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.db.ping.fields.connectionInfo.totalConnections.content" as const,
+        label:
+          "app.api.system.db.ping.fields.connectionInfo.totalConnections.content",
+        schema: z.coerce.number(),
+      }),
 
-      idleConnections: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.ping.fields.connectionInfo.idleConnections.content" as const,
-          label:
-            "app.api.system.db.ping.fields.connectionInfo.idleConnections.content",
-        },
-        z.coerce.number(),
-      ),
+      idleConnections: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.db.ping.fields.connectionInfo.idleConnections.content" as const,
+        label:
+          "app.api.system.db.ping.fields.connectionInfo.idleConnections.content",
+        schema: z.coerce.number(),
+      }),
 
-      waitingClients: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.ping.fields.connectionInfo.waitingClients.content" as const,
-          label:
-            "app.api.system.db.ping.fields.connectionInfo.waitingClients.content",
-        },
-        z.coerce.number(),
-      ),
+      waitingClients: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.db.ping.fields.connectionInfo.waitingClients.content" as const,
+        label:
+          "app.api.system.db.ping.fields.connectionInfo.waitingClients.content",
+        schema: z.coerce.number(),
+      }),
     },
   ),
 
@@ -179,7 +162,6 @@ const { POST } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    urlPathParams: undefined,
     requests: {
       default: {
         silent: false,

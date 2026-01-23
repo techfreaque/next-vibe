@@ -121,9 +121,8 @@ export function createEndpointLogger(
         };
         void writeToFile(`[ERROR] ${formatMessage(message)}`, metadataObj);
       } else {
-        const typedError = error ? parseError(error) : undefined;
         // oxlint-disable-next-line no-console
-        console.error(formatMessage(message), typedError, ...metadata);
+        console.error(formatMessage(message), error, ...metadata);
       }
     },
 

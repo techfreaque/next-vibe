@@ -9,10 +9,10 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   objectOptionalField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -52,79 +52,71 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      includePreservedRequests: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.browser.list-network-requests.form.fields.includePreservedRequests.label",
-          description:
-            "app.api.browser.list-network-requests.form.fields.includePreservedRequests.description",
-          placeholder:
-            "app.api.browser.list-network-requests.form.fields.includePreservedRequests.placeholder",
-          columns: 4,
-        },
-        z
+      includePreservedRequests: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.browser.list-network-requests.form.fields.includePreservedRequests.label",
+        description:
+          "app.api.browser.list-network-requests.form.fields.includePreservedRequests.description",
+        placeholder:
+          "app.api.browser.list-network-requests.form.fields.includePreservedRequests.placeholder",
+        columns: 4,
+        schema: z
           .boolean()
           .optional()
           .default(false)
           .describe(
             "Set to true to return the preserved requests over the last 3 navigations.",
           ),
-      ),
-      pageIdx: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.browser.list-network-requests.form.fields.pageIdx.label",
-          description:
-            "app.api.browser.list-network-requests.form.fields.pageIdx.description",
-          placeholder:
-            "app.api.browser.list-network-requests.form.fields.pageIdx.placeholder",
-          columns: 4,
-        },
-        z
+      }),
+      pageIdx: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.browser.list-network-requests.form.fields.pageIdx.label",
+        description:
+          "app.api.browser.list-network-requests.form.fields.pageIdx.description",
+        placeholder:
+          "app.api.browser.list-network-requests.form.fields.pageIdx.placeholder",
+        columns: 4,
+        schema: z
           .number()
           .min(0)
           .optional()
           .describe(
             "Page number to return (0-based). When omitted, returns the first page.",
           ),
-      ),
-      pageSize: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.browser.list-network-requests.form.fields.pageSize.label",
-          description:
-            "app.api.browser.list-network-requests.form.fields.pageSize.description",
-          placeholder:
-            "app.api.browser.list-network-requests.form.fields.pageSize.placeholder",
-          columns: 4,
-        },
-        z
+      }),
+      pageSize: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.browser.list-network-requests.form.fields.pageSize.label",
+        description:
+          "app.api.browser.list-network-requests.form.fields.pageSize.description",
+        placeholder:
+          "app.api.browser.list-network-requests.form.fields.pageSize.placeholder",
+        columns: 4,
+        schema: z
           .number()
           .min(1)
           .optional()
           .describe(
             "Maximum number of requests to return. When omitted, returns all requests.",
           ),
-      ),
-      resourceTypes: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.browser.list-network-requests.form.fields.resourceTypes.label",
-          description:
-            "app.api.browser.list-network-requests.form.fields.resourceTypes.description",
-          placeholder:
-            "app.api.browser.list-network-requests.form.fields.resourceTypes.placeholder",
-          columns: 12,
-        },
-        z
+      }),
+      resourceTypes: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.browser.list-network-requests.form.fields.resourceTypes.label",
+        description:
+          "app.api.browser.list-network-requests.form.fields.resourceTypes.description",
+        placeholder:
+          "app.api.browser.list-network-requests.form.fields.resourceTypes.placeholder",
+        columns: 12,
+        schema: z
           .array(
             z.enum([
               "document",
@@ -152,18 +144,16 @@ const { POST } = createEndpoint({
           .describe(
             "Filter requests to only return requests of the specified resource types. When omitted or empty, returns all requests.",
           ),
-      ),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.list-network-requests.response.success",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.list-network-requests.response.success",
+        schema: z
           .boolean()
           .describe("Whether the network requests listing operation succeeded"),
-      ),
+      }),
       result: objectOptionalField(
         {
           type: WidgetType.CONTAINER,
@@ -186,73 +176,63 @@ const { POST } = createEndpoint({
               },
               { response: true },
               {
-                reqid: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.list-network-requests.response.result.requests.reqid",
-                  },
-                  z.coerce.number(),
-                ),
-                url: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.list-network-requests.response.result.requests.url",
-                  },
-                  z.string(),
-                ),
-                method: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.list-network-requests.response.result.requests.method",
-                  },
-                  z.string(),
-                ),
-                status: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.list-network-requests.response.result.requests.status",
-                  },
-                  z.coerce.number().optional(),
-                ),
-                type: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.list-network-requests.response.result.requests.type",
-                  },
-                  z.string(),
-                ),
+                reqid: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.browser.list-network-requests.response.result.requests.reqid",
+                  schema: z.coerce.number(),
+                }),
+                url: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.browser.list-network-requests.response.result.requests.url",
+                  schema: z.string(),
+                }),
+                method: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.browser.list-network-requests.response.result.requests.method",
+                  schema: z.string(),
+                }),
+                status: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.browser.list-network-requests.response.result.requests.status",
+                  schema: z.coerce.number().optional(),
+                }),
+                type: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.browser.list-network-requests.response.result.requests.type",
+                  schema: z.string(),
+                }),
               },
             ),
           ),
-          totalCount: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.browser.list-network-requests.response.result.totalCount",
-            },
-            z.coerce.number().describe("Total number of requests"),
-          ),
+          totalCount: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.browser.list-network-requests.response.result.totalCount",
+            schema: z.coerce.number().describe("Total number of requests"),
+          }),
         },
       ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.list-network-requests.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.list-network-requests.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.list-network-requests.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.list-network-requests.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -277,7 +257,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

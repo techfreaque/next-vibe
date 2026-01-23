@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -48,42 +48,36 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      projectPath: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.guard.start.fields.projectPath.title",
-          description:
-            "app.api.system.guard.start.fields.projectPath.description",
-          placeholder:
-            "app.api.system.guard.start.fields.projectPath.placeholder",
-          columns: 6,
-        },
-        z.string().optional(),
-      ),
+      projectPath: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.guard.start.fields.projectPath.title",
+        description:
+          "app.api.system.guard.start.fields.projectPath.description",
+        placeholder:
+          "app.api.system.guard.start.fields.projectPath.placeholder",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
 
-      startAll: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.guard.start.fields.startAll.title",
-          description: "app.api.system.guard.start.fields.startAll.description",
-          columns: 12,
-        },
-        z.boolean().optional().default(false),
-      ),
+      startAll: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.guard.start.fields.startAll.title",
+        description: "app.api.system.guard.start.fields.startAll.description",
+        columns: 12,
+        schema: z.boolean().optional().default(false),
+      }),
 
-      guardIdInput: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.guard.start.fields.guardId.title",
-          description: "app.api.system.guard.start.fields.guardId.description",
-          placeholder: "app.api.system.guard.start.fields.guardId.placeholder",
-          columns: 6,
-        },
-        z.string().optional(),
-      ),
+      guardIdInput: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.guard.start.fields.guardId.title",
+        description: "app.api.system.guard.start.fields.guardId.description",
+        placeholder: "app.api.system.guard.start.fields.guardId.placeholder",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
 
       // === RESPONSE FIELDS ===
       summary: objectField(
@@ -95,74 +89,58 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          totalStarted: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.system.guard.start.fields.totalStarted.title",
-              fieldType: FieldDataType.NUMBER,
-            },
-            z.coerce.number(),
-          ),
-          status: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.system.guard.start.fields.status.title",
-              fieldType: FieldDataType.TEXT,
-            },
-            z.string(),
-          ),
-          hasIssues: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.system.guard.start.fields.hasIssues.title",
-              fieldType: FieldDataType.BOOLEAN,
-            },
-            z.boolean(),
-          ),
+          totalStarted: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.system.guard.start.fields.totalStarted.title",
+            fieldType: FieldDataType.NUMBER,
+            schema: z.coerce.number(),
+          }),
+          status: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.system.guard.start.fields.status.title",
+            fieldType: FieldDataType.TEXT,
+            schema: z.string(),
+          }),
+          hasIssues: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.system.guard.start.fields.hasIssues.title",
+            fieldType: FieldDataType.BOOLEAN,
+            schema: z.boolean(),
+          }),
         },
       ),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.guard.start.fields.output.title",
-        },
-        z.string(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.guard.start.fields.output.title",
+        schema: z.string(),
+      }),
 
-      guardId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.guard.start.fields.guardId.title",
-        },
-        z.string(),
-      ),
+      guardId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.guard.start.fields.guardId.title",
+        schema: z.string(),
+      }),
 
-      username: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.guard.start.fields.startedGuards.columns.username",
-        },
-        z.string(),
-      ),
+      username: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.guard.start.fields.startedGuards.columns.username",
+        schema: z.string(),
+      }),
 
-      guardProjectPath: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.guard.start.fields.startedGuards.columns.projectPath",
-        },
-        z.string(),
-      ),
+      guardProjectPath: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.guard.start.fields.startedGuards.columns.projectPath",
+        schema: z.string(),
+      }),
 
-      scriptPath: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.guard.start.fields.output.title",
-        },
-        z.string(),
-      ),
+      scriptPath: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.guard.start.fields.output.title",
+        schema: z.string(),
+      }),
     },
   ),
 
@@ -263,7 +241,6 @@ const { POST } = createEndpoint({
         scriptPath: "/home/user/projects/my-project/.vscode/.guard.sh",
       },
     },
-    urlPathParams: undefined,
   },
 });
 

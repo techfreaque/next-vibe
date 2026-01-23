@@ -1,43 +1,60 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import type {
   ErrorResponseType,
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
 import { useCallback, useState } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
+import type { z } from "zod";
 
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
 
+import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 import type {
-  DeleteEndpointTypes,
-  GetEndpointTypes,
-  PatchEndpointTypes,
-  PrimaryMutationTypes,
-} from "./endpoint-types";
+  DeleteRequest,
+  DeleteResponse,
+  DeleteUrlVariables,
+  GetRequest,
+  GetResponse,
+  GetUrlVariables,
+  PatchRequest,
+  PatchResponse,
+  PatchUrlVariables,
+  PrimaryMutationRequest,
+  PrimaryMutationResponse,
+  PrimaryMutationUrlVariables,
+} from "../../shared/types/endpoint-helpers";
+import { buildKey } from "./query-key-builder";
 
 /**
- * localStorage read hook - mimics useEndpointRead but uses callbacks
+ * localStorage read hook - uses React Query with localStorage callbacks
  */
 export function useLocalStorageRead<T>(
   endpoint: CreateApiEndpointAny | null,
+  logger: EndpointLogger,
   callback:
     | ((params: {
-        urlPathParams?: GetEndpointTypes<T>["urlPathParams"];
-        requestData?: GetEndpointTypes<T>["request"];
-      }) => Promise<ResponseType<GetEndpointTypes<T>["response"]>>)
+        urlPathParams?: GetUrlVariables<T>;
+        requestData?: GetRequest<T>;
+      }) => Promise<ResponseType<GetResponse<T>>>)
     | undefined,
   options: {
-    urlPathParams?: GetEndpointTypes<T>["urlPathParams"];
-    initialState?: Partial<GetEndpointTypes<T>["request"]>;
+    urlPathParams?: GetUrlVariables<T>;
+    initialState?: Partial<GetRequest<T>>;
     enabled?: boolean;
   } = {},
 ): {
-  form: UseFormReturn<GetEndpointTypes<T>["request"]>;
-  response: ResponseType<GetEndpointTypes<T>["response"]> | undefined;
-  data: GetEndpointTypes<T>["response"] | undefined;
+  form: UseFormReturn<GetRequest<T>>;
+  response: ResponseType<GetResponse<T>> | undefined;
+  data: GetResponse<T> | undefined;
   isError: boolean;
   error: ErrorResponseType | null;
   isSuccess: boolean;
@@ -52,37 +69,47 @@ export function useLocalStorageRead<T>(
   isFetching: boolean;
   status: "loading" | "success" | "error" | "idle";
 } | null {
-  type RequestType = GetEndpointTypes<T>["request"];
-  type ResponseDataType = GetEndpointTypes<T>["response"];
-
-  const [response, setResponse] = useState<
-    ResponseType<ResponseDataType> | undefined
-  >(undefined);
-  const [isLoading, setIsLoading] = useState(false);
+  type RequestType = GetRequest<T>;
+  type ResponseDataType = GetResponse<T>;
 
   const form = useForm<RequestType>({
     resolver: endpoint?.requestSchema
-      ? zodResolver(endpoint.requestSchema)
+      ? zodResolver<RequestType, z.ZodTypeAny, RequestType>(
+          endpoint.requestSchema,
+        )
       : undefined,
     defaultValues: (options.initialState ?? {}) as RequestType,
   });
 
-  const refetch = useCallback(async () => {
-    if (!callback) {
-      return;
-    }
+  // Build query key for React Query
+  const queryKey = endpoint
+    ? [buildKey("query", endpoint, options.urlPathParams, logger)]
+    : [];
 
-    setIsLoading(true);
-    try {
+  // Use React Query for data fetching
+  const query = useQuery({
+    queryKey,
+    queryFn: async (): Promise<ResponseType<GetResponse<T>>> => {
+      if (!callback) {
+        return fail({
+          message:
+            "app.api.system.unifiedInterface.react.hooks.localstorage.noCallback",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
       const result = await callback({
         urlPathParams: options.urlPathParams,
-        requestData: form.getValues() as GetEndpointTypes<T>["request"],
+        requestData: form.getValues() as GetRequest<T>,
       });
-      setResponse(result as ResponseType<ResponseDataType>);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [callback, options.urlPathParams, form]);
+      return result;
+    },
+    enabled: endpoint !== null && options.enabled !== false && !!callback,
+    staleTime: 60 * 1000, // 1 minute
+  });
+
+  const refetch = useCallback(async () => {
+    await query.refetch();
+  }, [query]);
 
   const submitForm = useCallback(async () => {
     await refetch();
@@ -92,27 +119,29 @@ export function useLocalStorageRead<T>(
     return null;
   }
 
+  const response = query.data;
+
   return {
     form: form as UseFormReturn<RequestType>,
     response,
     data: response?.success ? (response.data as ResponseDataType) : undefined,
-    isError: response?.success === false,
+    isError: response?.success === false || query.isError,
     error: response?.success === false ? response : null,
     isSuccess: response?.success === true,
     isSubmitSuccessful: response?.success === true,
     submitError: response?.success === false ? response : undefined,
-    isLoading,
+    isLoading: query.isPending,
     refetch,
     submitForm,
-    isSubmitting: isLoading,
+    isSubmitting: query.isFetching,
     clearSavedForm: (): void => {
       // No-op for localStorage implementation
     },
     setErrorType: (): void => {
       // No-op for localStorage implementation
     },
-    isFetching: isLoading,
-    status: (isLoading
+    isFetching: query.isFetching,
+    status: (query.isPending
       ? "loading"
       : response?.success === true
         ? "success"
@@ -129,55 +158,50 @@ export function useLocalStorageCreate<T>(
   endpoint: CreateApiEndpointAny | null,
   callback:
     | ((params: {
-        requestData:
-          | PrimaryMutationTypes<T>["request"]
-          | PatchEndpointTypes<T>["request"];
-        urlPathParams?:
-          | PrimaryMutationTypes<T>["urlPathParams"]
-          | PatchEndpointTypes<T>["urlPathParams"];
+        requestData: PrimaryMutationRequest<T> | PatchRequest<T>;
+        urlPathParams?: PrimaryMutationUrlVariables<T> | PatchUrlVariables<T>;
       }) => Promise<
-        ResponseType<
-          | PrimaryMutationTypes<T>["response"]
-          | PatchEndpointTypes<T>["response"]
-        >
+        ResponseType<PrimaryMutationResponse<T> | PatchResponse<T>>
       >)
     | undefined,
   options: {
-    urlPathParams?:
-      | PrimaryMutationTypes<T>["urlPathParams"]
-      | PatchEndpointTypes<T>["urlPathParams"];
-    defaultValues?: DeepPartial<
-      PrimaryMutationTypes<T>["request"] | PatchEndpointTypes<T>["request"]
-    >;
-    autoPrefillData?: DeepPartial<
-      PrimaryMutationTypes<T>["request"] | PatchEndpointTypes<T>["request"]
-    >;
+    urlPathParams?: PrimaryMutationUrlVariables<T> | PatchUrlVariables<T>;
+    defaultValues?: DeepPartial<PrimaryMutationRequest<T> | PatchRequest<T>>;
+    autoPrefillData?: DeepPartial<PrimaryMutationRequest<T> | PatchRequest<T>>;
+    onSuccess?: () => Promise<void> | void;
   } = {},
 ): {
-  form: UseFormReturn<
-    PrimaryMutationTypes<T>["request"] | PatchEndpointTypes<T>["request"]
-  >;
+  form: UseFormReturn<PrimaryMutationRequest<T> | PatchRequest<T>>;
   response:
-    | ResponseType<
-        PrimaryMutationTypes<T>["response"] | PatchEndpointTypes<T>["response"]
-      >
+    | ResponseType<PrimaryMutationResponse<T> | PatchResponse<T>>
     | undefined;
   isSubmitSuccessful: boolean;
   submitError: ErrorResponseType | null;
   isSubmitting: boolean;
   submitForm: (submitOptions?: {
-    onSuccess?: () => void;
-    onError?: (params: { error: ErrorResponseType | Error }) => void;
+    urlParamVariables?: PrimaryMutationUrlVariables<T> | PatchUrlVariables<T>;
+    onSuccess?: (data: {
+      requestData: PrimaryMutationRequest<T> | PatchRequest<T>;
+      pathParams:
+        | PrimaryMutationUrlVariables<T>
+        | PatchUrlVariables<T>
+        | undefined;
+      responseData: PrimaryMutationResponse<T> | PatchResponse<T>;
+    }) => ErrorResponseType | void;
+    onError?: (data: {
+      error: ErrorResponseType;
+      requestData: PrimaryMutationRequest<T> | PatchRequest<T>;
+      pathParams:
+        | PrimaryMutationUrlVariables<T>
+        | PatchUrlVariables<T>
+        | undefined;
+    }) => void;
   }) => Promise<void>;
   clearSavedForm: () => void;
   setErrorType: () => void;
 } | null {
-  type RequestType =
-    | PrimaryMutationTypes<T>["request"]
-    | PatchEndpointTypes<T>["request"];
-  type ResponseDataType =
-    | PrimaryMutationTypes<T>["response"]
-    | PatchEndpointTypes<T>["response"];
+  type RequestType = PrimaryMutationRequest<T> | PatchRequest<T>;
+  type ResponseDataType = PrimaryMutationResponse<T> | PatchResponse<T>;
 
   const [response, setResponse] = useState<
     ResponseType<ResponseDataType> | undefined
@@ -186,17 +210,36 @@ export function useLocalStorageCreate<T>(
 
   const form = useForm<RequestType>({
     resolver: endpoint?.requestSchema
-      ? zodResolver(endpoint.requestSchema)
+      ? zodResolver<RequestType, z.ZodTypeAny, RequestType>(
+          endpoint.requestSchema,
+        )
       : undefined,
     defaultValues: (options.autoPrefillData ??
       options.defaultValues ??
       {}) as RequestType,
   });
+  const _onSuccess = options.onSuccess;
+  const _urlPathParams = options.urlPathParams;
 
   const submitForm = useCallback(
     async (submitOptions?: {
-      onSuccess?: () => void;
-      onError?: (params: { error: ErrorResponseType | Error }) => void;
+      urlParamVariables?: PrimaryMutationUrlVariables<T> | PatchUrlVariables<T>;
+      onSuccess?: (data: {
+        requestData: RequestType;
+        pathParams:
+          | PrimaryMutationUrlVariables<T>
+          | PatchUrlVariables<T>
+          | undefined;
+        responseData: ResponseDataType;
+      }) => ErrorResponseType | void;
+      onError?: (data: {
+        error: ErrorResponseType;
+        requestData: RequestType;
+        pathParams:
+          | PrimaryMutationUrlVariables<T>
+          | PatchUrlVariables<T>
+          | undefined;
+      }) => void;
     }) => {
       if (!callback) {
         return;
@@ -204,27 +247,70 @@ export function useLocalStorageCreate<T>(
 
       setIsSubmitting(true);
       try {
+        const requestData = form.getValues() as RequestType;
+        const urlPathParams =
+          submitOptions?.urlParamVariables ?? _urlPathParams;
+
         const result = await callback({
-          requestData: form.getValues() as RequestType,
-          urlPathParams: options.urlPathParams,
+          requestData,
+          urlPathParams,
         });
         setResponse(result as ResponseType<ResponseDataType>);
-        if (result.success && submitOptions?.onSuccess) {
-          submitOptions.onSuccess();
+
+        if (result.success) {
+          // Call the provided onSuccess callback to trigger read refetch
+          if (_onSuccess) {
+            await _onSuccess();
+          }
+          // Call submitOptions onSuccess with proper signature matching API mode
+          if (submitOptions?.onSuccess) {
+            const onSuccessResult = submitOptions.onSuccess({
+              responseData: result.data as ResponseDataType,
+              pathParams: urlPathParams,
+              requestData,
+            });
+            // If onSuccess returns an error, treat it as an error
+            if (onSuccessResult) {
+              setResponse(onSuccessResult as ResponseType<ResponseDataType>);
+              submitOptions.onError?.({
+                error: onSuccessResult,
+                requestData,
+                pathParams: urlPathParams,
+              });
+            }
+          }
         } else if (!result.success && submitOptions?.onError) {
-          submitOptions.onError({ error: result });
+          submitOptions.onError({
+            error: result,
+            requestData,
+            pathParams: urlPathParams,
+          });
         }
       } catch (error) {
+        const requestData = form.getValues() as RequestType;
+        const urlPathParams =
+          submitOptions?.urlParamVariables ?? _urlPathParams;
         if (submitOptions?.onError) {
           submitOptions.onError({
-            error: error instanceof Error ? error : new Error(String(error)),
+            error:
+              error instanceof Error
+                ? ({
+                    success: false,
+                    message: error.message,
+                  } as ErrorResponseType)
+                : ({
+                    success: false,
+                    message: String(error),
+                  } as ErrorResponseType),
+            requestData,
+            pathParams: urlPathParams,
           });
         }
       } finally {
         setIsSubmitting(false);
       }
     },
-    [callback, form, options.urlPathParams],
+    [callback, form, _onSuccess, _urlPathParams],
   );
 
   if (!endpoint) {
@@ -254,26 +340,26 @@ export function useLocalStorageDelete<T>(
   endpoint: CreateApiEndpointAny | null,
   callback:
     | ((params: {
-        requestData?: DeleteEndpointTypes<T>["request"];
-        urlPathParams?: DeleteEndpointTypes<T>["urlPathParams"];
-      }) => Promise<ResponseType<DeleteEndpointTypes<T>["response"]>>)
+        requestData?: DeleteRequest<T>;
+        urlPathParams?: DeleteUrlVariables<T>;
+      }) => Promise<ResponseType<DeleteResponse<T>>>)
     | undefined,
   options: {
-    urlPathParams?: DeleteEndpointTypes<T>["urlPathParams"];
+    urlPathParams?: DeleteUrlVariables<T>;
   } = {},
 ): {
-  form: UseFormReturn<DeleteEndpointTypes<T>["request"]>;
-  response: ResponseType<DeleteEndpointTypes<T>["response"]> | undefined;
+  form: UseFormReturn<DeleteRequest<T>>;
+  response: ResponseType<DeleteResponse<T>> | undefined;
   submitError: ErrorResponseType | null;
   isSubmitSuccessful: boolean;
   isSuccess: boolean;
   error: ErrorResponseType | null;
-  submit: (requestData?: DeleteEndpointTypes<T>["request"]) => Promise<void>;
+  submit: (requestData?: DeleteRequest<T>) => Promise<void>;
   submitForm: () => Promise<void>;
   isSubmitting: boolean;
 } | null {
-  type RequestType = DeleteEndpointTypes<T>["request"];
-  type ResponseDataType = DeleteEndpointTypes<T>["response"];
+  type RequestType = DeleteRequest<T>;
+  type ResponseDataType = DeleteResponse<T>;
 
   const [response, setResponse] = useState<
     ResponseType<ResponseDataType> | undefined
@@ -283,7 +369,9 @@ export function useLocalStorageDelete<T>(
   // Create form instance for localStorage mode (similar to API mode)
   const form = useForm<RequestType>({
     resolver: endpoint
-      ? (zodResolver(endpoint.requestSchema) as never)
+      ? zodResolver<RequestType, z.ZodTypeAny, RequestType>(
+          endpoint.requestSchema,
+        )
       : undefined,
     defaultValues: {} as RequestType,
   });

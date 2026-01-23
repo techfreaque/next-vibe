@@ -8,6 +8,15 @@ export const translations: typeof enTranslations = {
       title: "Szczegóły postaciy",
       description: "Szczegóły żądanej postaciy",
     },
+    backButton: {
+      label: "Powrót do postaci",
+    },
+    editButton: {
+      label: "Edytuj postać",
+    },
+    deleteButton: {
+      label: "Usuń postać",
+    },
     id: {
       label: "ID postaciy",
       description: "Unikalny identyfikator postaciy",
@@ -24,7 +33,6 @@ export const translations: typeof enTranslations = {
         source: { content: "Źródło" },
         preferredModel: { content: "Preferowany model" },
         voice: { content: "Głos" },
-        suggestedPrompts: { content: "Sugerowane prompty" },
         modelSelection: { title: "Wybór modelu" },
         selectionType: { content: "Typ wyboru" },
         minIntelligence: { content: "Minimalna inteligencja" },
@@ -89,6 +97,16 @@ export const translations: typeof enTranslations = {
       title: "Aktualizuj postacię",
       description: "Modyfikuj istniejącą niestandardową postacię",
     },
+    backButton: {
+      label: "Powrót do postaci",
+    },
+    deleteButton: {
+      label: "Usuń postać",
+    },
+    submitButton: {
+      label: "Aktualizuj postacię",
+      loadingText: "Aktualizowanie postaci...",
+    },
     actions: {
       update: "Aktualizuj postacię",
       updating: "Aktualizowanie postaciy",
@@ -148,10 +166,7 @@ export const translations: typeof enTranslations = {
       label: "Preferowany model",
       description: "Preferowany model AI dla tej postaciy",
     },
-    suggestedPrompts: {
-      label: "Sugerowane prompty",
-      description: "Przykładowe prompty do użycia z tą postacią",
-    },
+
     errors: {
       validation: {
         title: "Błąd walidacji",
@@ -202,6 +217,13 @@ export const translations: typeof enTranslations = {
     container: {
       title: "Usuń postać",
       description: "Trwale usuń tę niestandardową postać",
+    },
+    backButton: {
+      label: "Powrót do postaci",
+    },
+    actions: {
+      delete: "Usuń postać",
+      deleting: "Usuwanie postaci",
     },
     id: {
       label: "ID postaci",

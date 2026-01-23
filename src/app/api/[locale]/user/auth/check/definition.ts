@@ -8,7 +8,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -43,20 +43,16 @@ const { GET } = createEndpoint({
     },
     { response: true },
     {
-      authenticated: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.user.auth.check.get.response.authenticated" as const,
-        },
-        z.boolean(),
-      ),
-      tokenValid: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.user.auth.check.get.response.tokenValid" as const,
-        },
-        z.boolean(),
-      ),
+      authenticated: responseField({
+        type: WidgetType.BADGE,
+        text: "app.api.user.auth.check.get.response.authenticated" as const,
+        schema: z.boolean(),
+      }),
+      tokenValid: responseField({
+        type: WidgetType.BADGE,
+        text: "app.api.user.auth.check.get.response.tokenValid" as const,
+        schema: z.boolean(),
+      }),
     },
   ),
   errorTypes: {

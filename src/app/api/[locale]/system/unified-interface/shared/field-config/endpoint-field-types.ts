@@ -42,8 +42,14 @@ export interface EndpointFieldStructure<TKey extends string> {
       labelParams?: Record<string, string | number>;
       disabled?: boolean;
       icon?: IconKey;
+      description?: TKey;
     }>;
     maxTags?: number;
+    // Range slider specific
+    minLabel?: TKey;
+    maxLabel?: TKey;
+    minDefault?: string | number;
+    maxDefault?: string | number;
     // Readonly and prefill display options
     readonly?: boolean;
     prefillDisplay?: PrefillDisplayConfig<TKey>;

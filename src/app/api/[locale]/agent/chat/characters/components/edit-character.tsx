@@ -9,30 +9,91 @@ import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
+import { useCallback, useMemo } from "react";
 
 import updateCharacterEndpoint from "@/app/api/[locale]/agent/chat/characters/[id]/definition";
-import type { Character } from "@/app/api/[locale]/agent/chat/characters/definition";
+import { useCharacter } from "@/app/api/[locale]/agent/chat/characters/[id]/hooks";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointsPage";
+import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { useFavorite } from "../../favorites/[id]/hooks";
+
 interface EditCharacterModalProps {
   onBack: () => void;
-  onCharacterCreated: (characterId: string) => void;
-  // Pre-fill data from existing character
-  initialData: Character;
+  onCharacterEdited: () => void;
+  // Character ID to fetch and edit
+  characterId: string;
+  editingFavoriteId: string | null;
   isAuthenticated: boolean;
   locale: CountryLanguage;
+  logger: EndpointLogger;
+  user: JwtPayloadType;
 }
 
-export function EditCharacterModal({
+export function EditCharacter({
   onBack,
-  onCharacterCreated,
-  initialData,
+  characterId,
   isAuthenticated,
   locale,
+  logger,
+  user,
+  editingFavoriteId,
+  onCharacterEdited,
 }: EditCharacterModalProps): JSX.Element {
   const { t } = simpleT(locale);
+
+  // Fetch favorite data only when editing an existing favorite (not when creating new)
+  const favoriteEndpoint = useFavorite(editingFavoriteId, user, logger);
+  const favoriteData = useMemo(
+    () => favoriteEndpoint.read?.data ?? null,
+    [favoriteEndpoint.read?.data],
+  );
+
+  const handleCharacterEdited = useCallback(
+    async (newCharacterId: string) => {
+      if (editingFavoriteId && favoriteData) {
+        await favoriteEndpoint.updateFavorite({
+          characterId: newCharacterId,
+          modelSelection: favoriteData.modelSelection,
+        });
+      }
+      onCharacterEdited();
+    },
+    [editingFavoriteId, favoriteData, favoriteEndpoint, onCharacterEdited],
+  );
+
+  // Fetch full character data using domain hook
+  const characterEndpoint = useCharacter(characterId, logger);
+  const characterData = useMemo(() => {
+    return characterEndpoint.read?.data;
+  }, [characterEndpoint.read?.data]);
+
+  const isLoading = characterEndpoint.read?.isLoading ?? false;
+
+  // Transform ownershipType and nullable fields for form compatibility
+  // PATCH form only accepts "user" | "public", not "system"
+  // PATCH form doesn't accept null values, convert to undefined
+  const formDefaults = useMemo(() => {
+    if (!characterData) {
+      return undefined;
+    }
+
+    return {
+      ...characterData,
+      name: characterData.name ?? undefined,
+      description: characterData.description ?? undefined,
+      tagline: characterData.tagline ?? undefined,
+      icon: characterData.icon ?? undefined,
+      ownershipType:
+        characterData.ownershipType ===
+        "app.api.agent.chat.characters.enums.ownershipType.system"
+          ? undefined
+          : characterData.ownershipType,
+    };
+  }, [characterData]);
 
   return (
     <Div className="flex flex-col max-h-[70vh] overflow-hidden">
@@ -77,19 +138,26 @@ export function EditCharacterModal({
               </Button>
             </Div>
           </Div>
+        ) : isLoading || !characterData ? (
+          <Div className="flex items-center justify-center p-8">
+            <Span className="text-muted-foreground">
+              {t("app.chat.selector.loading")}
+            </Span>
+          </Div>
         ) : (
           <EndpointsPage
             endpoint={updateCharacterEndpoint}
             locale={locale}
+            user={user}
             endpointOptions={{
-              urlPathParams: { id: initialData.id },
+              urlPathParams: { id: characterId },
               create: {
                 formOptions: {
-                  defaultValues: initialData,
+                  defaultValues: formDefaults,
                 },
                 mutationOptions: {
                   onSuccess: () => {
-                    onCharacterCreated(initialData.id);
+                    handleCharacterEdited(characterId);
                     onBack();
                   },
                 },

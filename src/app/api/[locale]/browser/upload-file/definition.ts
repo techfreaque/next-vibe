@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,51 +50,43 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      uid: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.browser.upload-file.form.fields.uid.label",
-          description:
-            "app.api.browser.upload-file.form.fields.uid.description",
-          placeholder:
-            "app.api.browser.upload-file.form.fields.uid.placeholder",
-          columns: 6,
-        },
-        z
+      uid: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.browser.upload-file.form.fields.uid.label",
+        description: "app.api.browser.upload-file.form.fields.uid.description",
+        placeholder: "app.api.browser.upload-file.form.fields.uid.placeholder",
+        columns: 6,
+        schema: z
           .string()
           .describe(
             "The uid of the file input element or an element that will open file chooser on the page from the page content snapshot",
           ),
-      ),
-      filePath: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.browser.upload-file.form.fields.filePath.label",
-          description:
-            "app.api.browser.upload-file.form.fields.filePath.description",
-          placeholder:
-            "app.api.browser.upload-file.form.fields.filePath.placeholder",
-          columns: 6,
-        },
-        z.string().describe("The local path of the file to upload"),
-      ),
+      }),
+      filePath: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.browser.upload-file.form.fields.filePath.label",
+        description:
+          "app.api.browser.upload-file.form.fields.filePath.description",
+        placeholder:
+          "app.api.browser.upload-file.form.fields.filePath.placeholder",
+        columns: 6,
+        schema: z.string().describe("The local path of the file to upload"),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.upload-file.response.success",
-        },
-        z.boolean().describe("Whether the file upload operation succeeded"),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.upload-file.response.result",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.upload-file.response.success",
+        schema: z
+          .boolean()
+          .describe("Whether the file upload operation succeeded"),
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.upload-file.response.result",
+        schema: z
           .object({
             uploaded: z.boolean().describe("Whether the file was uploaded"),
             fileName: z
@@ -104,21 +96,23 @@ const { POST } = createEndpoint({
           })
           .optional()
           .describe("Result of file upload operation"),
-      ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.upload-file.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.upload-file.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      }),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.upload-file.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.upload-file.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -138,7 +132,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

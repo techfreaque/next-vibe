@@ -31,7 +31,7 @@ export type WidgetData =
   | { [key: string]: WidgetData };
 
 export interface WidgetInput<TKey extends string> {
-  field: UnifiedField<TKey>;
+  field: UnifiedField<TKey, ZodTypeAny>;
   value: WidgetData;
   context: WidgetRenderContext;
 }
@@ -131,7 +131,7 @@ export interface WidgetComponentProps<
   TKey extends string,
   TFieldValues extends FieldValues = FieldValues,
 > {
-  field: UnifiedField<TKey>;
+  field: UnifiedField<TKey, ZodTypeAny>;
   fieldName?: string;
   value: WidgetData;
   context: WidgetRenderContext;
@@ -144,10 +144,10 @@ export interface WidgetComponentProps<
 /**
  * Field type with narrowed widget config based on WidgetType discriminator.
  */
-type NarrowedField<
-  TKey extends string,
-  T extends WidgetType,
-> = UnifiedField<TKey> & {
+type NarrowedField<TKey extends string, T extends WidgetType> = UnifiedField<
+  TKey,
+  ZodTypeAny
+> & {
   ui: ExtractWidgetConfig<T, TKey>;
 };
 

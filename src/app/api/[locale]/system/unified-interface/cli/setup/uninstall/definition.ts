@@ -9,9 +9,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -42,9 +42,28 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "setup", "uninstall"],
   examples: {
-    requests: {},
-    urlPathParams: undefined,
-    responses: {},
+    requests: {
+      default: {
+        verbose: false,
+      },
+      verbose: {
+        verbose: true,
+      },
+    },
+    responses: {
+      default: {
+        success: true,
+        installed: true,
+        message: "Vibe CLI uninstalled successfully",
+        output: "Vibe CLI uninstalled successfully",
+      },
+      verbose: {
+        success: true,
+        installed: true,
+        message: "Vibe CLI uninstalled successfully",
+        output: "Vibe CLI uninstalled successfully",
+      },
+    },
   },
 
   fields: objectField(
@@ -59,55 +78,44 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      verbose: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.unifiedInterface.cli.setup.uninstall.post.title",
-          description:
-            "app.api.system.unifiedInterface.cli.setup.uninstall.post.description",
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      verbose: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.unifiedInterface.cli.setup.uninstall.post.title",
+        description:
+          "app.api.system.unifiedInterface.cli.setup.uninstall.post.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.uninstall.post.success.title",
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.cli.setup.uninstall.post.success.title",
+        schema: z.boolean(),
+      }),
 
-      installed: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.uninstall.post.title",
-        },
-        z.boolean(),
-      ),
+      installed: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.cli.setup.uninstall.post.title",
+        schema: z.boolean(),
+      }),
 
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.uninstall.post.success.description",
-        },
-        z.string(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.cli.setup.uninstall.post.success.description",
+        schema: z.string(),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.uninstall.post.title",
-        },
-        z.string().optional(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.cli.setup.uninstall.post.title",
+        schema: z.string().optional(),
+      }),
     },
   ),
 

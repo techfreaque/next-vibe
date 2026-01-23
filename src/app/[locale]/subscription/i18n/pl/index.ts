@@ -1,6 +1,8 @@
+import { translations as historyTranslations } from "../../history/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  history: historyTranslations,
   subscription: {
     title: "Kredyty i Subskrypcja",
     description: "Zarządzaj swoimi kredytami i miesięczną subskrypcją",

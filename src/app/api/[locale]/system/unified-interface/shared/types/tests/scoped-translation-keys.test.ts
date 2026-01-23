@@ -28,9 +28,9 @@ import type { ExtractScopedKeyType, TParams } from "@/i18n/core/static-types";
 import { createEndpoint } from "../../endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   scopedObjectField,
-  scopedRequestDataField,
+  scopedRequestField,
 } from "../../field/utils";
 import type {
   ObjectField,
@@ -588,7 +588,7 @@ const globalEndpointWithAllErrorTypes = createEndpoint({
     },
     { request: "data", response: true },
     {
-      name: requestDataField(
+      name: requestField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -666,7 +666,7 @@ const globalEndpointInvalidWidgetLabel = createEndpoint({
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      name: requestDataField(
+      name: requestField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -750,7 +750,7 @@ const scopedEndpointCorrect = createEndpoint({
     },
     { request: "data", response: true },
     {
-      name: scopedRequestDataField(
+      name: scopedRequestField(
         scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
@@ -761,7 +761,7 @@ const scopedEndpointCorrect = createEndpoint({
         },
         z.string(),
       ),
-      email: scopedRequestDataField(
+      email: scopedRequestField(
         scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
@@ -1056,7 +1056,7 @@ const scopedEndpointInvalidTextFieldLabel = createEndpoint({
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      name: requestDataField(
+      name: requestField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -1090,7 +1090,7 @@ const scopedEndpointInvalidTextFieldLabelWithType = createEndpoint({
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      name: requestDataField(
+      name: requestField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -1112,7 +1112,7 @@ const scopedEndpointInvalidTextFieldLabelWithType = createEndpoint({
 
 // Invalid TEXT field placeholder key
 // Note: With scoped field utilities, field-level key validation is NOT done at compile time.
-// Use scopedObjectField and scopedRequestDataField for scoped contexts.
+// Use scopedObjectField and scopedRequestField for scoped contexts.
 const scopedEndpointInvalidTextFieldPlaceholder = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1128,7 +1128,7 @@ const scopedEndpointInvalidTextFieldPlaceholder = createEndpoint({
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      name: scopedRequestDataField(
+      name: scopedRequestField(
         scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
@@ -1167,7 +1167,7 @@ const scopedEndpointInvalidEmailFieldLabel = createEndpoint({
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      email: scopedRequestDataField(
+      email: scopedRequestField(
         scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
@@ -1208,7 +1208,7 @@ const scopedEndpointInvalidTextareaFieldDescription = createEndpoint({
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      message: scopedRequestDataField(
+      message: scopedRequestField(
         scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
@@ -1250,7 +1250,7 @@ const scopedEndpointInvalidPasswordFieldHelpText = createEndpoint({
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      password: scopedRequestDataField(
+      password: scopedRequestField(
         scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
@@ -1292,7 +1292,7 @@ const scopedEndpointInvalidSelectFieldOptionLabel = createEndpoint({
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      status: scopedRequestDataField(
+      status: scopedRequestField(
         scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
@@ -1342,7 +1342,7 @@ const scopedEndpointInvalidContainerTitle = createEndpoint({
     },
     { request: "data", response: true },
     {
-      name: scopedRequestDataField(
+      name: scopedRequestField(
         scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
@@ -1386,7 +1386,7 @@ const scopedEndpointInvalidContainerDescription = createEndpoint({
     },
     { request: "data", response: true },
     {
-      name: scopedRequestDataField(
+      name: scopedRequestField(
         scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
@@ -1423,7 +1423,7 @@ const scopedEndpointInvalidNumberFieldLabel = createEndpoint({
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      amount: scopedRequestDataField(
+      amount: scopedRequestField(
         scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
@@ -1461,7 +1461,7 @@ const scopedEndpointInvalidBooleanFieldLabel = createEndpoint({
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      active: scopedRequestDataField(
+      active: scopedRequestField(
         scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
@@ -1500,7 +1500,7 @@ const scopedEndpointInvalidDateFieldLabel = createEndpoint({
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      date: requestDataField(
+      date: requestField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.DATE,
@@ -1539,7 +1539,7 @@ const scopedEndpointInvalidMultiselectFieldOptionLabel = createEndpoint({
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      roles: scopedRequestDataField(
+      roles: scopedRequestField(
         scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
@@ -1574,7 +1574,7 @@ const scopedEndpointInvalidMultiselectFieldOptionLabel = createEndpoint({
  * ROOT CAUSE: Field helper functions don't know what TKey type to validate against!
  *
  * Current flow:
- * 1. requestDataField accepts WidgetConfig<string> - any string is valid
+ * 1. requestField accepts WidgetConfig<string> - any string is valid
  * 2. It infers TKey from the widget config's keys
  * 3. Returns PrimitiveField<..., TKey, ...>
  * 4. When passed to createEndpoint, it validates TKey extends TScopedTranslationKey
@@ -1591,7 +1591,7 @@ const scopedEndpointInvalidMultiselectFieldOptionLabel = createEndpoint({
 // Test 6A: Scoped field helpers validate against scopedTranslation.ScopedTranslationKey
 // Pass scopedTranslation as first arg to enable validation
 // ---------------------------------------------------------------------------
-const test6A_validField = scopedRequestDataField(
+const test6A_validField = scopedRequestField(
   scopedTranslation,
   {
     type: WidgetType.FORM_FIELD,
@@ -1602,7 +1602,7 @@ const test6A_validField = scopedRequestDataField(
   z.string(),
 );
 
-const test6A_invalidField = scopedRequestDataField(
+const test6A_invalidField = scopedRequestField(
   scopedTranslation,
   {
     type: WidgetType.FORM_FIELD,
@@ -1620,7 +1620,7 @@ const test6A_invalidField = scopedRequestDataField(
 // TypeScript validates that the field's TKey matches ContactTranslationKey
 // ---------------------------------------------------------------------------
 const test6B_validField: UnifiedField<ContactTranslationKey, z.ZodString> =
-  requestDataField(
+  requestField(
     {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
@@ -1635,7 +1635,7 @@ const test6B_assignToUnified: UnifiedField<ContactTranslationKey, z.ZodString> =
   test6B_validField;
 
 const test6B_invalidField: UnifiedField<ContactTranslationKey, z.ZodString> =
-  requestDataField(
+  requestField(
     {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
@@ -1661,7 +1661,7 @@ const test6C_validObject: UnifiedField<ContactTranslationKey, z.ZodTypeAny> =
     },
     { request: "data", response: true },
     {
-      name: requestDataField(
+      name: requestField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -1684,7 +1684,7 @@ const test6C_invalidObject: UnifiedField<ContactTranslationKey, z.ZodTypeAny> =
     },
     { request: "data", response: true },
     {
-      name: requestDataField(
+      name: requestField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,

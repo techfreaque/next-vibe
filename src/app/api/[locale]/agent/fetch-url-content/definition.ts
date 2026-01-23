@@ -9,9 +9,9 @@ import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -71,74 +71,62 @@ const { GET } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      url: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.agent.chat.tools.fetchUrl.get.fields.url.title" as const,
-          description:
-            "app.api.agent.chat.tools.fetchUrl.get.fields.url.description" as const,
-          placeholder:
-            "app.api.agent.chat.tools.fetchUrl.get.fields.url.placeholder" as const,
-          columns: 12,
-        },
-        z.string().url().min(1),
-      ),
+      url: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.agent.chat.tools.fetchUrl.get.fields.url.title" as const,
+        description:
+          "app.api.agent.chat.tools.fetchUrl.get.fields.url.description" as const,
+        placeholder:
+          "app.api.agent.chat.tools.fetchUrl.get.fields.url.placeholder" as const,
+        columns: 12,
+        schema: z.string().url().min(1),
+      }),
 
       // === RESPONSE FIELDS ===
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.tools.fetchUrl.get.response.message.title" as const,
-          columns: 12,
-        },
-        z.string(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.tools.fetchUrl.get.response.message.title" as const,
+        columns: 12,
+        schema: z.string(),
+      }),
 
-      fetchedUrl: responseField(
-        {
-          type: WidgetType.LINK,
-          href: "/{fetchedUrl}",
-          text: "app.api.agent.chat.tools.fetchUrl.get.response.url.title" as const,
-          external: true,
-          columns: 12,
-        },
-        z.string(),
-      ),
+      fetchedUrl: responseField({
+        type: WidgetType.LINK,
+        href: "/{fetchedUrl}",
+        text: "app.api.agent.chat.tools.fetchUrl.get.response.url.title" as const,
+        external: true,
+        columns: 12,
+        schema: z.string(),
+      }),
 
-      content: responseField(
-        {
-          type: WidgetType.MARKDOWN,
-          label:
-            "app.api.agent.chat.tools.fetchUrl.get.response.content.title" as const,
-          description:
-            "app.api.agent.chat.tools.fetchUrl.get.response.content.description" as const,
-          columns: 12,
-        },
-        z.string(),
-      ),
+      content: responseField({
+        type: WidgetType.MARKDOWN,
+        label:
+          "app.api.agent.chat.tools.fetchUrl.get.response.content.title" as const,
+        description:
+          "app.api.agent.chat.tools.fetchUrl.get.response.content.description" as const,
+        columns: 12,
+        schema: z.string(),
+      }),
 
-      statusCode: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.tools.fetchUrl.get.response.statusCode.title" as const,
-          columns: 6,
-        },
-        z.number().optional(),
-      ),
+      statusCode: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.tools.fetchUrl.get.response.statusCode.title" as const,
+        columns: 6,
+        schema: z.number().optional(),
+      }),
 
-      timeElapsed: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.tools.fetchUrl.get.response.timeElapsed.title" as const,
-          columns: 6,
-        },
-        z.number().optional(),
-      ),
+      timeElapsed: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.tools.fetchUrl.get.response.timeElapsed.title" as const,
+        columns: 6,
+        schema: z.number().optional(),
+      }),
     },
   ),
 

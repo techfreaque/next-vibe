@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -49,18 +49,16 @@ const { GET } = createEndpoint({
     { request: "data", response: true },
     {
       // === SEARCH QUERY ===
-      query: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.threads.search.get.query.label" as const,
-          description:
-            "app.api.agent.chat.threads.search.get.query.description" as const,
-          placeholder:
-            "app.api.agent.chat.threads.search.get.query.placeholder" as const,
-        },
-        z.string().min(1).max(500),
-      ),
+      query: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.agent.chat.threads.search.get.query.label" as const,
+        description:
+          "app.api.agent.chat.threads.search.get.query.description" as const,
+        placeholder:
+          "app.api.agent.chat.threads.search.get.query.placeholder" as const,
+        schema: z.string().min(1).max(500),
+      }),
 
       // === PAGINATION ===
       pagination: objectField(
@@ -75,69 +73,59 @@ const { GET } = createEndpoint({
         },
         { request: "data" },
         {
-          page: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label:
-                "app.api.agent.chat.threads.search.get.page.label" as const,
-              description:
-                "app.api.agent.chat.threads.search.get.page.description" as const,
-              columns: 6,
-            },
-            z.coerce.number().min(1).optional().default(1),
-          ),
-          limit: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label:
-                "app.api.agent.chat.threads.search.get.limit.label" as const,
-              description:
-                "app.api.agent.chat.threads.search.get.limit.description" as const,
-              columns: 6,
-            },
-            z.coerce.number().min(1).max(100).optional().default(20),
-          ),
+          page: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label: "app.api.agent.chat.threads.search.get.page.label" as const,
+            description:
+              "app.api.agent.chat.threads.search.get.page.description" as const,
+            columns: 6,
+            schema: z.coerce.number().min(1).optional().default(1),
+          }),
+          limit: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label: "app.api.agent.chat.threads.search.get.limit.label" as const,
+            description:
+              "app.api.agent.chat.threads.search.get.limit.description" as const,
+            columns: 6,
+            schema: z.coerce.number().min(1).max(100).optional().default(20),
+          }),
         },
       ),
 
       // === SORT OPTIONS ===
-      sortBy: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.chat.threads.search.get.sortBy.label" as const,
-          description:
-            "app.api.agent.chat.threads.search.get.sortBy.description" as const,
-          options: [
-            {
-              value: "relevance",
-              label:
-                "app.api.agent.chat.threads.search.get.sortBy.options.relevance" as const,
-            },
-            {
-              value: "date",
-              label:
-                "app.api.agent.chat.threads.search.get.sortBy.options.date" as const,
-            },
-          ],
-        },
-        z.enum(["relevance", "date"]).optional().default("relevance"),
-      ),
+      sortBy: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.agent.chat.threads.search.get.sortBy.label" as const,
+        description:
+          "app.api.agent.chat.threads.search.get.sortBy.description" as const,
+        options: [
+          {
+            value: "relevance",
+            label:
+              "app.api.agent.chat.threads.search.get.sortBy.options.relevance" as const,
+          },
+          {
+            value: "date",
+            label:
+              "app.api.agent.chat.threads.search.get.sortBy.options.date" as const,
+          },
+        ],
+        schema: z.enum(["relevance", "date"]).optional().default("relevance"),
+      }),
 
       // === FILTERS ===
-      includeArchived: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.agent.chat.threads.search.get.includeArchived.label" as const,
-          description:
-            "app.api.agent.chat.threads.search.get.includeArchived.description" as const,
-        },
-        z.boolean().optional().default(false),
-      ),
+      includeArchived: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.agent.chat.threads.search.get.includeArchived.label" as const,
+        description:
+          "app.api.agent.chat.threads.search.get.includeArchived.description" as const,
+        schema: z.boolean().optional().default(false),
+      }),
 
       // === RESPONSE ===
       results: responseArrayField(
@@ -151,98 +139,80 @@ const { GET } = createEndpoint({
           },
           { response: true },
           {
-            id: responseField(
-              {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.UUID,
-                label:
-                  "app.api.agent.chat.threads.search.get.response.results.thread.id.label" as const,
-              },
-              z.uuid(),
-            ),
-            threadTitle: responseField(
-              {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.TEXT,
-                label:
-                  "app.api.agent.chat.threads.search.get.response.results.thread.title.label" as const,
-              },
-              z.string(),
-            ),
-            preview: responseField(
-              {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.TEXTAREA,
-                label:
-                  "app.api.agent.chat.threads.search.get.response.results.thread.preview.label" as const,
-              },
-              z.string().nullable(),
-            ),
-            rank: responseField(
-              {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.NUMBER,
-                label:
-                  "app.api.agent.chat.threads.search.get.response.results.thread.rank.label" as const,
-                description:
-                  "app.api.agent.chat.threads.search.get.response.results.thread.rank.description" as const,
-              },
-              z.coerce.number(),
-            ),
-            headline: responseField(
-              {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.TEXTAREA,
-                label:
-                  "app.api.agent.chat.threads.search.get.response.results.thread.headline.label" as const,
-                description:
-                  "app.api.agent.chat.threads.search.get.response.results.thread.headline.description" as const,
-              },
-              z.string(),
-            ),
-            status: responseField(
-              {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.SELECT,
-                label:
-                  "app.api.agent.chat.threads.search.get.response.results.thread.status.label" as const,
-                options: ThreadStatusOptions,
-              },
-              z.enum(ThreadStatus),
-            ),
-            createdAt: responseField(
-              {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.TEXT,
-                label:
-                  "app.api.agent.chat.threads.search.get.response.results.thread.createdAt.label" as const,
-              },
-              z.string(),
-            ),
-            updatedAt: responseField(
-              {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.TEXT,
-                label:
-                  "app.api.agent.chat.threads.search.get.response.results.thread.updatedAt.label" as const,
-              },
-              z.string(),
-            ),
+            id: responseField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.UUID,
+              label:
+                "app.api.agent.chat.threads.search.get.response.results.thread.id.label" as const,
+              schema: z.uuid(),
+            }),
+            threadTitle: responseField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label:
+                "app.api.agent.chat.threads.search.get.response.results.thread.title.label" as const,
+              schema: z.string(),
+            }),
+            preview: responseField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXTAREA,
+              label:
+                "app.api.agent.chat.threads.search.get.response.results.thread.preview.label" as const,
+              schema: z.string().nullable(),
+            }),
+            rank: responseField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.NUMBER,
+              label:
+                "app.api.agent.chat.threads.search.get.response.results.thread.rank.label" as const,
+              description:
+                "app.api.agent.chat.threads.search.get.response.results.thread.rank.description" as const,
+              schema: z.coerce.number(),
+            }),
+            headline: responseField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXTAREA,
+              label:
+                "app.api.agent.chat.threads.search.get.response.results.thread.headline.label" as const,
+              description:
+                "app.api.agent.chat.threads.search.get.response.results.thread.headline.description" as const,
+              schema: z.string(),
+            }),
+            status: responseField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label:
+                "app.api.agent.chat.threads.search.get.response.results.thread.status.label" as const,
+              options: ThreadStatusOptions,
+              schema: z.enum(ThreadStatus),
+            }),
+            createdAt: responseField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label:
+                "app.api.agent.chat.threads.search.get.response.results.thread.createdAt.label" as const,
+              schema: z.string(),
+            }),
+            updatedAt: responseField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label:
+                "app.api.agent.chat.threads.search.get.response.results.thread.updatedAt.label" as const,
+              schema: z.string(),
+            }),
           },
         ),
       ),
 
-      totalResults: responseField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.agent.chat.threads.search.get.response.totalResults.label" as const,
-          description:
-            "app.api.agent.chat.threads.search.get.response.totalResults.description" as const,
-        },
-        z.coerce.number(),
-      ),
+      totalResults: responseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.agent.chat.threads.search.get.response.totalResults.label" as const,
+        description:
+          "app.api.agent.chat.threads.search.get.response.totalResults.description" as const,
+        schema: z.coerce.number(),
+      }),
     },
   ),
 

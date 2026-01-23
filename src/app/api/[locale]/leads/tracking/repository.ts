@@ -165,13 +165,9 @@ export class LeadTrackingRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadEngagementResponseOutput>> {
     try {
-      logger.debug("app.api.leads.tracking.engagement.record.start", {
-        leadId: data.leadId,
-        engagementType: data.engagementType,
-        campaignId: data.campaignId,
-        userAgent: clientInfo?.userAgent,
-        referer: clientInfo?.referer,
-      });
+      logger.debug(
+        `Engagement: ${data.engagementType} for lead ${data.leadId}${data.campaignId ? ` campaign ${data.campaignId}` : ""}`,
+      );
 
       const result = await LeadsRepository.recordEngagementInternal(
         {
@@ -198,11 +194,7 @@ export class LeadTrackingRepository {
       // Type guard: result is now success response with data
       const engagementData = result.data;
 
-      logger.debug("app.api.leads.tracking.engagement.record.success", {
-        leadId: data.leadId,
-        engagementType: data.engagementType,
-        engagementId: engagementData.id,
-      });
+      logger.debug(`Engagement recorded: ${engagementData.id}`);
 
       // Also update the email engagement in the emails table if campaign is present
       if (data.campaignId) {
@@ -286,10 +278,7 @@ export class LeadTrackingRepository {
         .limit(1);
 
       if (!emailRecord) {
-        logger.debug("app.api.leads.tracking.email.record.not.found", {
-          campaignId,
-          engagementType,
-        });
+        logger.debug(`Email record not found for campaign ${campaignId}`);
         return;
       }
 
@@ -319,13 +308,9 @@ export class LeadTrackingRepository {
           })
           .where(eq(emails.id, emailRecord.id));
 
-        logger.debug("app.api.leads.tracking.email.engagement.updated", {
-          emailId: emailRecord.id,
-          campaignId,
-          engagementType,
-          openedAt: engagement.openedAt?.toISOString(),
-          clickedAt: engagement.clickedAt?.toISOString(),
-        });
+        logger.debug(
+          `Email engagement ${engagementType} for campaign ${campaignId}`,
+        );
       }
     } catch (error) {
       logger.error(
@@ -337,47 +322,6 @@ export class LeadTrackingRepository {
   }
 
   /**
-   * Track consultation booking
-   */
-  static async trackConsultationBooking(
-    leadId: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<{ leadStatusUpdated: boolean }>> {
-    try {
-      logger.debug("app.api.leads.tracking.consultation.booking", {
-        leadId,
-      });
-
-      // Update lead status to CONSULTATION_BOOKED and set timestamp
-      await LeadsRepository.updateLeadInternal(
-        leadId,
-        {
-          status: LeadStatus.CONSULTATION_BOOKED,
-          consultationBookedAt: new Date(),
-        },
-        logger,
-      );
-
-      logger.debug("app.api.leads.tracking.consultation.updated", {
-        leadId,
-      });
-
-      return success({
-        leadStatusUpdated: true,
-      });
-    } catch (error) {
-      logger.error(
-        "app.api.leads.tracking.consultation.failed",
-        parseError(error).message,
-      );
-      return fail({
-        message: "app.api.leads.tracking.errors.default",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-  }
-
-  /**
    * Track subscription confirmation (true conversion)
    */
   static async trackSubscriptionConfirmation(
@@ -385,10 +329,7 @@ export class LeadTrackingRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<{ leadStatusUpdated: boolean }>> {
     try {
-      logger.debug("app.api.leads.tracking.subscription.confirmation", {
-        leadId,
-      });
-
+      logger.debug(`Subscription confirmed for lead ${leadId}`);
       // Update lead status to SUBSCRIPTION_CONFIRMED and set timestamp
       await LeadsRepository.updateLeadInternal(
         leadId,
@@ -398,10 +339,6 @@ export class LeadTrackingRepository {
         },
         logger,
       );
-
-      logger.debug("app.api.leads.tracking.subscription.updated", {
-        leadId,
-      });
 
       return success({
         leadStatusUpdated: true,
@@ -452,10 +389,7 @@ export class LeadTrackingRepository {
         .limit(1);
 
       if (existingLead.length > 0) {
-        logger.debug("app.api.leads.tracking.anonymous.existing", {
-          leadId: existingLead[0].id,
-          createdAt: existingLead[0].createdAt.toISOString(),
-        });
+        logger.debug(`Reusing anonymous lead ${existingLead[0].id}`);
         return success({ leadId: existingLead[0].id });
       }
 
@@ -500,11 +434,7 @@ export class LeadTrackingRepository {
         });
       }
 
-      logger.debug("app.api.leads.tracking.anonymous.created", {
-        leadId: createdLead.id,
-        email: createdLead.email,
-        source: createdLead.source,
-      });
+      logger.debug(`Created anonymous lead ${createdLead.id}`);
 
       return success({
         leadId: createdLead.id,

@@ -6,318 +6,133 @@
 
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 
-import { STORAGE_KEYS } from "@/app/api/[locale]/agent/chat/constants";
-import {
-  ContentLevelFilter,
-  IntelligenceLevelFilter,
-  ModelSelectionType,
-  PriceLevelFilter,
-} from "@/app/api/[locale]/agent/chat/favorites/enum";
+import type { CharacterListItem } from "@/app/api/[locale]/agent/chat/characters/definition";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import favoriteByIdDefinition, {
-  type FavoriteUpdateRequestOutput,
-} from "./[id]/definition";
-import type { FavoriteItem } from "./components/favorites-bar";
-import favoritesDefinition from "./definition";
-
-/**
- * Load favorites from localStorage
- */
-function loadLocalFavorites(): FavoriteItem[] {
-  if (typeof window === "undefined") {
-    return [];
-  }
-
-  const stored = localStorage.getItem(STORAGE_KEYS.FAVORITE_CHARACTERS);
-  if (!stored) {
-    return [];
-  }
-
-  try {
-    const parsed = JSON.parse(stored);
-    // Handle legacy format (array of character IDs)
-    if (Array.isArray(parsed) && typeof parsed[0] === "string") {
-      return parsed.map((characterId: string, index: number) => ({
-        id: `local-${characterId}`,
-        characterId,
-        modelSettings: {
-          mode: ModelSelectionMode.AUTO,
-          filters: {
-            intelligence: IntelligenceLevelFilter.SMART,
-            maxPrice: PriceLevelFilter.STANDARD,
-            content: ContentLevelFilter.OPEN,
-          },
-        },
-        isActive: index === 0,
-      }));
-    }
-    // New format
-    return parsed as FavoriteItem[];
-  } catch {
-    return [];
-  }
-}
-
-/**
- * Save favorites to localStorage
- */
-function saveLocalFavorites(favorites: FavoriteItem[]): void {
-  if (typeof window === "undefined") {
-    return;
-  }
-  localStorage.setItem(
-    STORAGE_KEYS.FAVORITE_CHARACTERS,
-    JSON.stringify(favorites),
-  );
-}
+import type { UseEndpointOptions } from "../../../system/unified-interface/react/hooks/endpoint-types";
+import type { FavoriteCreateRequestOutput } from "./create/definition";
+import favoritesCreateDefinition from "./create/definition";
+import favoritesDefinition, { type FavoriteCard } from "./definition";
+import { FavoritesRepositoryClient } from "./repository-client";
 
 interface UseChatFavoritesOptions {
   user: JwtPayloadType | undefined;
   logger: EndpointLogger;
+  characters: Record<string, CharacterListItem>;
 }
 
-interface UseChatFavoritesReturn {
-  favorites: FavoriteItem[];
+export interface UseChatFavoritesReturn {
+  favorites: FavoriteCard[];
+  activeFavoriteId: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  setFavorites: (favorites: FavoriteItem[]) => void;
-  addFavorite: (favorite: Omit<FavoriteItem, "id">) => Promise<FavoriteItem>;
-  updateFavorite: (
-    id: string,
-    updates: FavoriteUpdateRequestOutput,
-  ) => Promise<void>;
-  deleteFavorite: (id: string) => Promise<void>;
-  refetch: () => void;
+  endpoint: ReturnType<typeof useEndpoint<typeof favoritesDefinition>>;
+  addFavorite: (data: FavoriteCreateRequestOutput) => Promise<string | null>;
 }
 
 /**
  * Hook for managing chat favorites
- * - Authenticated users: server storage only
- * - Non-authenticated users: localStorage only
+ * - Authenticated users: server storage via API
+ * - Non-authenticated users: localStorage via callbacks
  */
 export function useChatFavorites({
   user,
   logger,
+  characters,
 }: UseChatFavoritesOptions): UseChatFavoritesReturn {
+  const { activeFavoriteId } = useChatContext();
   const isAuthenticated = useMemo(
     () => user !== undefined && !user.isPublic,
     [user],
   );
 
-  // Use server storage only for authenticated users
-  const useServerStorage = isAuthenticated;
+  // Only enable query when characters are loaded (needed for localStorage mode)
+  const hasCharacters = Object.keys(characters).length > 0;
 
-  // Local state for favorites
-  const [favorites, setFavoritesState] = useState<FavoriteItem[]>(() =>
-    useServerStorage ? [] : loadLocalFavorites(),
+  const endpointOptions: UseEndpointOptions<typeof favoritesDefinition> =
+    useMemo(
+      () =>
+        ({
+          read: {
+            queryOptions: {
+              enabled: hasCharacters,
+              refetchOnWindowFocus: true,
+              staleTime: 60 * 1000,
+            },
+          },
+          storage: isAuthenticated
+            ? undefined
+            : {
+                mode: "localStorage" as const,
+                callbacks: FavoritesRepositoryClient.localStorageListCallbacks,
+              },
+        }) satisfies UseEndpointOptions<typeof favoritesDefinition>,
+      [hasCharacters, isAuthenticated],
+    );
+
+  const endpoint = useEndpoint(favoritesDefinition, endpointOptions, logger);
+
+  // Create endpoint for adding favorites
+  const createEndpointOptions: UseEndpointOptions<
+    typeof favoritesCreateDefinition
+  > = useMemo(
+    () => ({
+      storage: isAuthenticated
+        ? undefined
+        : {
+            mode: "localStorage" as const,
+            callbacks: FavoritesRepositoryClient.localStorageCreateCallbacks,
+          },
+    }),
+    [isAuthenticated],
   );
-  const [isLoading, setIsLoading] = useState(useServerStorage);
 
-  // Server endpoint - always call useEndpoint (rules of hooks)
-  const endpoint = useEndpoint(
-    favoritesDefinition,
-    {
-      queryOptions: {
-        enabled: useServerStorage,
-        refetchOnWindowFocus: true,
-        staleTime: 60 * 1000,
-      },
-    },
+  const createEndpoint = useEndpoint(
+    favoritesCreateDefinition,
+    createEndpointOptions,
     logger,
   );
 
-  // Mutations for individual favorite operations (PATCH/DELETE)
-  const patchMutation = useApiMutation(favoriteByIdDefinition.PATCH, logger);
-  const deleteMutation = useApiMutation(favoriteByIdDefinition.DELETE, logger);
+  // Extract favorites from flat array
+  const favorites = useMemo(() => {
+    return endpoint.read?.data?.favoritesList ?? [];
+  }, [endpoint.read?.data]);
 
-  // Sync server data to local state when using server storage
-  useEffect(() => {
-    if (useServerStorage) {
-      if (
-        endpoint.read?.response &&
-        "success" in endpoint.read.response &&
-        endpoint.read.response.success === true &&
-        "data" in endpoint.read.response &&
-        endpoint.read.response.data &&
-        "favorites" in endpoint.read.response.data
-      ) {
-        const serverFavorites = endpoint.read.response.data.favorites;
-        setFavoritesState(serverFavorites);
-        setIsLoading(false);
-      } else if (endpoint.read?.status === "error") {
-        // Server error - keep empty state, don't fallback to local
-        setIsLoading(false);
-      }
-    } else {
-      // For non-authenticated users, load from localStorage
-      setFavoritesState(loadLocalFavorites());
-      setIsLoading(false);
-    }
-  }, [useServerStorage, endpoint.read?.response, endpoint.read?.status]);
-
-  // Set favorites - saves to appropriate storage
-  const setFavorites = useCallback(
-    (newFavorites: FavoriteItem[]) => {
-      setFavoritesState(newFavorites);
-      if (!useServerStorage) {
-        saveLocalFavorites(newFavorites);
-      }
-    },
-    [useServerStorage],
-  );
-
-  // Add a new favorite
+  // Add favorite with cache invalidation
   const addFavorite = useCallback(
-    async (favorite: Omit<FavoriteItem, "id">): Promise<FavoriteItem> => {
-      if (useServerStorage && endpoint.create) {
-        // Set form values for server creation
-        endpoint.create.form.setValue(
-          "characterId",
-          favorite.characterId ?? "",
-        );
-        if (favorite.customName) {
-          endpoint.create.form.setValue("customName", favorite.customName);
-        }
-        if (favorite.voice) {
-          endpoint.create.form.setValue("voice", favorite.voice);
-        }
-        // Set model selection
-        endpoint.create.form.setValue(
-          "modelSelection",
-          favorite.modelSelection,
-        );
+    async (data: FavoriteCreateRequestOutput): Promise<string | null> => {
+      createEndpoint.create.form.reset(data);
 
-        // Use submitForm with onSuccess callback to get the response
-        return new Promise<FavoriteItem>((resolve, reject) => {
-          endpoint.create?.submitForm({
-            onSuccess: ({ responseData }) => {
-              if (responseData && "id" in responseData) {
-                const newFavorite: FavoriteItem = {
-                  ...favorite,
-                  id: responseData.id as string,
-                };
-                endpoint.read?.refetch?.();
-                resolve(newFavorite);
-              } else {
-                reject(new Error("Invalid server response"));
-              }
-            },
-            onError: ({ error }) => {
-              reject(error);
-            },
-          });
+      const result = await new Promise<string | null>((resolve, reject) => {
+        createEndpoint.create.submitForm({
+          onSuccess: ({ responseData }) => {
+            resolve(responseData.id);
+          },
+          onError: ({ error }): void => reject(error),
         });
-      }
-
-      // Local storage for non-authenticated users
-      const localFavorite: FavoriteItem = {
-        ...favorite,
-        id: `local-${Date.now()}`,
-      };
-      const newFavorites = [...favorites, localFavorite];
-      setFavoritesState(newFavorites);
-      saveLocalFavorites(newFavorites);
-      return localFavorite;
-    },
-    [useServerStorage, endpoint, favorites],
-  );
-
-  // Update a favorite
-  const updateFavorite = useCallback(
-    async (id: string, updates: FavoriteUpdateRequestOutput): Promise<void> => {
-      if (useServerStorage && !id.startsWith("local-")) {
-        const response = await patchMutation.mutateAsync({
-          requestData: updates,
-          urlPathParams: { id },
-        });
-
-        if (response.success) {
-          endpoint.read?.refetch?.();
-        }
-      } else {
-        // Local storage for non-authenticated users
-        const current = loadLocalFavorites();
-        const updated = current.map((f) =>
-          f.id === id
-            ? {
-                ...f,
-                ...updates,
-              }
-            : f,
-        );
-        setFavoritesState(updated);
-        saveLocalFavorites(updated);
-      }
-    },
-    [favorites, useServerStorage, endpoint.read, patchMutation],
-  );
-
-  // Delete a favorite
-  const deleteFavorite = useCallback(
-    async (id: string): Promise<void> => {
-      logger.debug("deleteFavorite called", {
-        id,
-        useServerStorage,
-        favoritesCount: favorites.length,
       });
 
-      // Update local state immediately
-      const newFavorites = favorites.filter((f) => f.id !== id);
-      setFavoritesState(newFavorites);
-
-      logger.debug("deleteFavorite: state updated", {
-        newCount: newFavorites.length,
-      });
-
-      if (useServerStorage && !id.startsWith("local-")) {
-        // Server storage for authenticated users
-        logger.debug("deleteFavorite: using server storage");
-        const response = await deleteMutation.mutateAsync({
-          urlPathParams: { id },
-        });
-
-        if (response.success) {
-          endpoint.read?.refetch?.();
-          logger.debug("deleteFavorite: server delete successful");
-        } else {
-          logger.error("deleteFavorite: server delete failed", { response });
-        }
-      } else {
-        // Local storage for non-authenticated users
-        logger.debug("deleteFavorite: using local storage", {
-          newCount: newFavorites.length,
-        });
-        saveLocalFavorites(newFavorites);
-        logger.debug("deleteFavorite: saved to localStorage");
+      if (result) {
+        await apiClient.refetchEndpoint(favoritesDefinition.GET, logger);
       }
-    },
-    [favorites, useServerStorage, endpoint.read, deleteMutation, logger],
-  );
 
-  // Refetch from server/local storage
-  const refetch = useCallback(() => {
-    if (useServerStorage && endpoint.read?.refetch) {
-      endpoint.read.refetch();
-    } else {
-      setFavoritesState(loadLocalFavorites());
-    }
-  }, [useServerStorage, endpoint.read]);
+      return result;
+    },
+    [createEndpoint, logger],
+  );
 
   return {
     favorites,
-    isLoading,
+    activeFavoriteId,
+    isLoading: endpoint.read?.isLoading ?? false,
     isAuthenticated,
-    setFavorites,
+    endpoint,
     addFavorite,
-    updateFavorite,
-    deleteFavorite,
-    refetch,
   };
 }

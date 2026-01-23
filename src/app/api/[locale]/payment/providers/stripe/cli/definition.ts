@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -58,180 +58,156 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // REQUEST FIELDS
-      operation: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.stripe.form.fields.operation.label" as const,
-          description:
-            "app.api.stripe.form.fields.operation.description" as const,
-          placeholder:
-            "app.api.stripe.form.fields.operation.placeholder" as const,
-          columns: 6,
-          options: [
-            {
-              value: "check",
-              label: "app.api.stripe.operations.check" as const,
-            },
-            {
-              value: "install",
-              label: "app.api.stripe.operations.install" as const,
-            },
-            {
-              value: "listen",
-              label: "app.api.stripe.operations.listen" as const,
-            },
-            {
-              value: "login",
-              label: "app.api.stripe.operations.login" as const,
-            },
-            {
-              value: "status",
-              label: "app.api.stripe.operations.status" as const,
-            },
-          ],
-        },
-        z.enum(["check", "install", "listen", "login", "status"]),
-      ),
+      operation: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.stripe.form.fields.operation.label" as const,
+        description:
+          "app.api.stripe.form.fields.operation.description" as const,
+        placeholder:
+          "app.api.stripe.form.fields.operation.placeholder" as const,
+        columns: 6,
+        options: [
+          {
+            value: "check",
+            label: "app.api.stripe.operations.check" as const,
+          },
+          {
+            value: "install",
+            label: "app.api.stripe.operations.install" as const,
+          },
+          {
+            value: "listen",
+            label: "app.api.stripe.operations.listen" as const,
+          },
+          {
+            value: "login",
+            label: "app.api.stripe.operations.login" as const,
+          },
+          {
+            value: "status",
+            label: "app.api.stripe.operations.status" as const,
+          },
+        ],
+        schema: z.enum(["check", "install", "listen", "login", "status"]),
+      }),
 
-      port: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.stripe.form.fields.port.label" as const,
-          description: "app.api.stripe.form.fields.port.description" as const,
-          placeholder: "app.api.stripe.form.fields.port.placeholder" as const,
-          columns: 6,
-        },
-        z.coerce.number().optional(),
-      ),
+      port: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.stripe.form.fields.port.label" as const,
+        description: "app.api.stripe.form.fields.port.description" as const,
+        placeholder: "app.api.stripe.form.fields.port.placeholder" as const,
+        columns: 6,
+        schema: z.coerce.number().optional(),
+      }),
 
-      events: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
-          label: "app.api.stripe.form.fields.events.label" as const,
-          description: "app.api.stripe.form.fields.events.description" as const,
-          placeholder: "app.api.stripe.form.fields.events.placeholder" as const,
-          columns: 12,
-          options: [
-            {
-              value: "payment_intent.succeeded",
-              label:
-                "app.api.stripe.form.fields.events.paymentIntentSucceeded" as const,
-            },
-            {
-              value: "payment_intent.payment_failed",
-              label:
-                "app.api.stripe.form.fields.events.paymentIntentFailed" as const,
-            },
-            {
-              value: "customer.subscription.created",
-              label:
-                "app.api.stripe.form.fields.events.subscriptionCreated" as const,
-            },
-            {
-              value: "customer.subscription.updated",
-              label:
-                "app.api.stripe.form.fields.events.subscriptionUpdated" as const,
-            },
-            {
-              value: "invoice.payment_succeeded",
-              label:
-                "app.api.stripe.form.fields.events.invoicePaymentSucceeded" as const,
-            },
-            {
-              value: "invoice.payment_failed",
-              label:
-                "app.api.stripe.form.fields.events.invoicePaymentFailed" as const,
-            },
-          ],
-        },
-        z.array(z.string()).optional(),
-      ),
+      events: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "app.api.stripe.form.fields.events.label" as const,
+        description: "app.api.stripe.form.fields.events.description" as const,
+        placeholder: "app.api.stripe.form.fields.events.placeholder" as const,
+        columns: 12,
+        options: [
+          {
+            value: "payment_intent.succeeded",
+            label:
+              "app.api.stripe.form.fields.events.paymentIntentSucceeded" as const,
+          },
+          {
+            value: "payment_intent.payment_failed",
+            label:
+              "app.api.stripe.form.fields.events.paymentIntentFailed" as const,
+          },
+          {
+            value: "customer.subscription.created",
+            label:
+              "app.api.stripe.form.fields.events.subscriptionCreated" as const,
+          },
+          {
+            value: "customer.subscription.updated",
+            label:
+              "app.api.stripe.form.fields.events.subscriptionUpdated" as const,
+          },
+          {
+            value: "invoice.payment_succeeded",
+            label:
+              "app.api.stripe.form.fields.events.invoicePaymentSucceeded" as const,
+          },
+          {
+            value: "invoice.payment_failed",
+            label:
+              "app.api.stripe.form.fields.events.invoicePaymentFailed" as const,
+          },
+        ],
+        schema: z.array(z.string()).optional(),
+      }),
 
-      forwardTo: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.stripe.form.fields.forwardTo.label" as const,
-          description:
-            "app.api.stripe.form.fields.forwardTo.description" as const,
-          placeholder:
-            "app.api.stripe.form.fields.forwardTo.placeholder" as const,
-          columns: 6,
-        },
-        z.string().optional(),
-      ),
+      forwardTo: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.stripe.form.fields.forwardTo.label" as const,
+        description:
+          "app.api.stripe.form.fields.forwardTo.description" as const,
+        placeholder:
+          "app.api.stripe.form.fields.forwardTo.placeholder" as const,
+        columns: 6,
+        schema: z.string().optional(),
+      }),
 
-      skipSslVerify: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.stripe.form.fields.skipSslVerify.label" as const,
-          description:
-            "app.api.stripe.form.fields.skipSslVerify.description" as const,
-          columns: 6,
-        },
-        z.boolean().default(false),
-      ),
+      skipSslVerify: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.stripe.form.fields.skipSslVerify.label" as const,
+        description:
+          "app.api.stripe.form.fields.skipSslVerify.description" as const,
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
 
       // RESPONSE FIELDS
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.stripe.response.success" as const,
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.stripe.response.success" as const,
+        schema: z.boolean(),
+      }),
 
-      installed: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.stripe.response.installed" as const,
-        },
-        z.boolean().optional(),
-      ),
+      installed: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.stripe.response.installed" as const,
+        schema: z.boolean().optional(),
+      }),
 
-      version: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.stripe.response.version" as const,
-        },
-        z.string().optional(),
-      ),
+      version: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.stripe.response.version" as const,
+        schema: z.string().optional(),
+      }),
 
-      status: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.stripe.response.status" as const,
-        },
-        z.string().optional(),
-      ),
+      status: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.stripe.response.status" as const,
+        schema: z.string().optional(),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.stripe.response.output" as const,
-        },
-        z.string().optional(),
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.stripe.response.output" as const,
+        schema: z.string().optional(),
+      }),
 
-      instructions: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.stripe.response.instructions" as const,
-        },
-        z.string().optional(),
-      ),
+      instructions: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.stripe.response.instructions" as const,
+        schema: z.string().optional(),
+      }),
 
-      webhookEndpoint: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.stripe.response.webhookEndpoint" as const,
-        },
-        z.string().optional(),
-      ),
+      webhookEndpoint: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.stripe.response.webhookEndpoint" as const,
+        schema: z.string().optional(),
+      }),
     },
   ),
 
@@ -274,7 +250,6 @@ const { POST } = createEndpoint({
         webhookEndpoint: "https://webhook.stripe.com/listen",
       },
     },
-    urlPathParams: undefined,
   },
 
   errorTypes: {

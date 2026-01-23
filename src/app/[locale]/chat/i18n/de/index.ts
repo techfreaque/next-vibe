@@ -487,7 +487,6 @@ export const translations: typeof enTranslations = {
     allCharacters: "Alle",
   },
   selector: {
-    loading: "Laden...",
     noResults: "Keine Ergebnisse gefunden",
     tabs: {
       quick: "Schnell",
@@ -524,6 +523,7 @@ export const translations: typeof enTranslations = {
     forCharacter: "für {{character}}",
     intelligence: "Intelligenz",
     contentLevel: "Inhaltsstufe",
+    speed: "Geschwindigkeit",
     any: "Beliebig",
     result: "Ergebnis",
     bestMatch: "Beste Übereinstimmung für deine Einstellungen",
@@ -601,6 +601,22 @@ export const translations: typeof enTranslations = {
     editCharacterBtn: "Charakter bearbeiten",
     autoSelectedModel: "Auto-ausgewählt:",
     manualSelectedModel: "Ausgewählt:",
+    characterSelectedModel: "Charakter-Modell:",
+    selectModelBelow: "Wählen Sie unten ein Modell aus",
+    chooseYourPath: "Wählen Sie Ihren Weg",
+    twoWaysToChat: "Zwei flexible Möglichkeiten zum Chatten",
+    directModels: "Direkter Modell-Zugriff",
+    directModelsDesc:
+      "Konfigurieren Sie Filter oder wählen Sie manuell aus {{count}} Modellen. Volle Kontrolle über die KI-Auswahl.",
+    characterPresets: "Charakter-Voreinstellungen",
+    characterPresetsDesc:
+      "Wählen Sie unten einen Charakter. Jeder hat optimierte Einstellungen, die Sie jederzeit anpassen können.",
+    startWithDirectModels: "Mit direkten Modellen starten",
+    orBrowsePresets: "Oder Charakter-Voreinstellungen durchsuchen",
+    loading: "Laden...",
+    noModelsMatch: "Keine Modelle gefunden",
+    adjustFiltersMessage:
+      "Passen Sie Ihre Filterkriterien an, um verfügbare Modelle zu finden",
     auto: "Auto",
     manual: "Manuell",
     showLess: "Weniger anzeigen",
@@ -622,9 +638,12 @@ export const translations: typeof enTranslations = {
     modelSelection: "Modellauswahl",
     autoMode: "Auto",
     manualMode: "Manuell",
+    characterMode: "Charakter",
     autoModeDescription:
       "Das beste Modell wird basierend auf deinen Filtern ausgewählt",
     manualModeDescription: "Wähle ein bestimmtes Modell aus",
+    characterBasedModeDescription:
+      "Verwende die Standard-Modelleinstellungen des Charakters",
     customizeSettings: "Einstellungen vor dem Hinzufügen anpassen",
     useNow: "Jetzt verwenden",
     browseAll: "Alle Charaktere durchsuchen",
@@ -878,6 +897,13 @@ export const translations: typeof enTranslations = {
     error: "Spracherkennungsfehler",
     transcript: "Transkript: {{text}}",
   },
+  // Common
+  timestamp: {
+    justNow: "gerade eben",
+    minutesAgo: "vor {{count}}m",
+    hoursAgo: "vor {{count}}h",
+    daysAgo: "vor {{count}}d",
+  },
   publicFeed: {
     // Header
     header: {
@@ -898,13 +924,6 @@ export const translations: typeof enTranslations = {
     comments: "Kommentare",
     bestAnswer: "Beste Antwort",
     rising: "Aufsteigend",
-
-    // Common
-    timestamp: {
-      justNow: "gerade eben",
-      hoursAgo: "vor {{count}}h",
-      daysAgo: "vor {{count}}d",
-    },
   },
   state: {
     threadNotFound: "Thread nicht gefunden",

@@ -15,12 +15,12 @@ type SpecificObjectField = ObjectField<
       z.ZodString,
       FieldUsageConfig,
       "app.test",
-      WidgetConfig<"app.test">
+      WidgetConfig<"app.test", z.ZodTypeAny>
     >;
   },
   FieldUsageConfig,
   "app.test",
-  WidgetConfig<"app.test">
+  WidgetConfig<"app.test", z.ZodTypeAny>
 >;
 
 type GenericUnifiedField = UnifiedField<string, z.ZodTypeAny>;

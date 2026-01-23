@@ -1,3 +1,4 @@
+import { translations as aiStreamTranslations } from "../../ai-stream/i18n/de";
 import { translations as chatTranslations } from "../../chat/i18n/de";
 import { translations as speechToTextTranslations } from "../../speech-to-text/i18n/de";
 import { translations as textToSpeechTranslations } from "../../text-to-speech/i18n/de";
@@ -124,6 +125,7 @@ export const translations: typeof enTranslations = {
       reject: "Ablehnen",
     },
   },
+  aiStream: aiStreamTranslations,
   chat: chatTranslations,
   speechToText: speechToTextTranslations,
   textToSpeech: textToSpeechTranslations,

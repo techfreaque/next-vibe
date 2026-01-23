@@ -73,6 +73,7 @@ export const translations: typeof enTranslations = {
       unknown: "Nieznany",
       never: "Nigdy",
       notScheduled: "Niezaplanowane",
+      error: "Błąd",
     },
   },
   executionHistory: {

@@ -1,3 +1,5 @@
+"use client";
+
 import NextLink from "next/link";
 import * as React from "react";
 
@@ -32,7 +34,7 @@ export function Link({
       href={href}
       target={target}
       rel={rel}
-      onClick={onClick}
+      {...(onClick ? { onClick } : {})}
       download={download}
       title={title}
     >

@@ -9,7 +9,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -50,53 +50,41 @@ const { GET } = createEndpoint({
     { request: undefined, response: true },
     {
       // === RESPONSE FIELDS ===
-      accountsHealthy: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.health.health.get.response.data.accountsHealthy",
-        },
-        z.coerce.number().int(),
-      ),
-      accountsTotal: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.health.health.get.response.data.accountsTotal",
-        },
-        z.coerce.number().int(),
-      ),
-      connectionsActive: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.health.health.get.response.data.connectionsActive",
-        },
-        z.coerce.number().int(),
-      ),
-      connectionErrors: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.health.health.get.response.data.connectionErrors",
-        },
-        z.coerce.number().int(),
-      ),
-      lastSyncAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.health.health.get.response.data.lastSyncAt",
-        },
-        z.string().nullable(),
-      ),
-      status: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.emails.imapClient.health.health.get.response.data.status",
-        },
-        z.enum(ImapHealthStatus),
-      ),
+      accountsHealthy: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.health.health.get.response.data.accountsHealthy",
+        schema: z.coerce.number().int(),
+      }),
+      accountsTotal: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.health.health.get.response.data.accountsTotal",
+        schema: z.coerce.number().int(),
+      }),
+      connectionsActive: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.health.health.get.response.data.connectionsActive",
+        schema: z.coerce.number().int(),
+      }),
+      connectionErrors: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.health.health.get.response.data.connectionErrors",
+        schema: z.coerce.number().int(),
+      }),
+      lastSyncAt: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.health.health.get.response.data.lastSyncAt",
+        schema: z.string().nullable(),
+      }),
+      status: responseField({
+        type: WidgetType.BADGE,
+        text: "app.api.emails.imapClient.health.health.get.response.data.status",
+        schema: z.enum(ImapHealthStatus),
+      }),
       syncStats: objectField(
         {
           type: WidgetType.CONTAINER,
@@ -109,71 +97,55 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          totalSyncs: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.health.health.get.response.data.syncStats.totalSyncs",
-            },
-            z.coerce.number().int(),
-          ),
-          lastSyncTime: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.health.health.get.response.data.syncStats.lastSyncTime",
-            },
-            z.string().nullable(),
-          ),
+          totalSyncs: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.health.health.get.response.data.syncStats.totalSyncs",
+            schema: z.coerce.number().int(),
+          }),
+          lastSyncTime: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.imapClient.health.health.get.response.data.syncStats.lastSyncTime",
+            schema: z.string().nullable(),
+          }),
         },
       ),
-      serverStatus: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.emails.imapClient.health.health.get.response.data.serverStatus",
-        },
-        z.string(),
-      ),
-      uptime: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.health.health.get.response.data.uptime",
-        },
-        z.string(),
-      ),
-      syncedAccounts: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.health.health.get.response.data.syncedAccounts",
-        },
-        z.coerce.number().int(),
-      ),
-      totalAccounts: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.health.health.get.response.data.totalAccounts",
-        },
-        z.coerce.number().int(),
-      ),
-      activeConnections: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.health.health.get.response.data.activeConnections",
-        },
-        z.coerce.number().int(),
-      ),
-      avgResponseTime: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.health.health.get.response.data.performanceMetrics.avgResponseTime",
-        },
-        z.coerce.number(),
-      ),
+      serverStatus: responseField({
+        type: WidgetType.BADGE,
+        text: "app.api.emails.imapClient.health.health.get.response.data.serverStatus",
+        schema: z.string(),
+      }),
+      uptime: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.health.health.get.response.data.uptime",
+        schema: z.string(),
+      }),
+      syncedAccounts: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.health.health.get.response.data.syncedAccounts",
+        schema: z.coerce.number().int(),
+      }),
+      totalAccounts: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.health.health.get.response.data.totalAccounts",
+        schema: z.coerce.number().int(),
+      }),
+      activeConnections: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.health.health.get.response.data.activeConnections",
+        schema: z.coerce.number().int(),
+      }),
+      avgResponseTime: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.health.health.get.response.data.performanceMetrics.avgResponseTime",
+        schema: z.coerce.number(),
+      }),
     },
   ),
 
@@ -258,7 +230,6 @@ const { GET } = createEndpoint({
         avgResponseTime: 150.5,
       },
     },
-    urlPathParams: undefined,
   },
 });
 

@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,90 +50,82 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      uid: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.browser.take-screenshot.form.fields.uid.label",
-          description:
-            "app.api.browser.take-screenshot.form.fields.uid.description",
-          placeholder:
-            "app.api.browser.take-screenshot.form.fields.uid.placeholder",
-          columns: 4,
-        },
-        z
+      uid: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.browser.take-screenshot.form.fields.uid.label",
+        description:
+          "app.api.browser.take-screenshot.form.fields.uid.description",
+        placeholder:
+          "app.api.browser.take-screenshot.form.fields.uid.placeholder",
+        columns: 4,
+        schema: z
           .string()
           .optional()
           .describe(
             "The uid of an element on the page from the page content snapshot. If omitted takes a pages screenshot.",
           ),
-      ),
-      fullPage: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.browser.take-screenshot.form.fields.fullPage.label",
-          description:
-            "app.api.browser.take-screenshot.form.fields.fullPage.description",
-          placeholder:
-            "app.api.browser.take-screenshot.form.fields.fullPage.placeholder",
-          columns: 4,
-        },
-        z
+      }),
+      fullPage: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.browser.take-screenshot.form.fields.fullPage.label",
+        description:
+          "app.api.browser.take-screenshot.form.fields.fullPage.description",
+        placeholder:
+          "app.api.browser.take-screenshot.form.fields.fullPage.placeholder",
+        columns: 4,
+        schema: z
           .boolean()
           .optional()
           .describe(
             "If set to true takes a screenshot of the full page instead of the currently visible viewport. Incompatible with uid.",
           ),
-      ),
-      format: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.browser.take-screenshot.form.fields.format.label",
-          description:
-            "app.api.browser.take-screenshot.form.fields.format.description",
-          placeholder:
-            "app.api.browser.take-screenshot.form.fields.format.placeholder",
-          columns: 4,
-          options: [
-            {
-              value: "png",
-              label:
-                "app.api.browser.take-screenshot.form.fields.format.options.png" as const,
-            },
-            {
-              value: "jpeg",
-              label:
-                "app.api.browser.take-screenshot.form.fields.format.options.jpeg" as const,
-            },
-            {
-              value: "webp",
-              label:
-                "app.api.browser.take-screenshot.form.fields.format.options.webp" as const,
-            },
-          ],
-        },
-        z
+      }),
+      format: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.browser.take-screenshot.form.fields.format.label",
+        description:
+          "app.api.browser.take-screenshot.form.fields.format.description",
+        placeholder:
+          "app.api.browser.take-screenshot.form.fields.format.placeholder",
+        columns: 4,
+        options: [
+          {
+            value: "png",
+            label:
+              "app.api.browser.take-screenshot.form.fields.format.options.png" as const,
+          },
+          {
+            value: "jpeg",
+            label:
+              "app.api.browser.take-screenshot.form.fields.format.options.jpeg" as const,
+          },
+          {
+            value: "webp",
+            label:
+              "app.api.browser.take-screenshot.form.fields.format.options.webp" as const,
+          },
+        ],
+        schema: z
           .enum(["png", "jpeg", "webp"])
           .optional()
           .default("png")
           .describe(
             'Type of format to save the screenshot as. Default is "png"',
           ),
-      ),
-      quality: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.browser.take-screenshot.form.fields.quality.label",
-          description:
-            "app.api.browser.take-screenshot.form.fields.quality.description",
-          placeholder:
-            "app.api.browser.take-screenshot.form.fields.quality.placeholder",
-          columns: 4,
-        },
-        z
+      }),
+      quality: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.browser.take-screenshot.form.fields.quality.label",
+        description:
+          "app.api.browser.take-screenshot.form.fields.quality.description",
+        placeholder:
+          "app.api.browser.take-screenshot.form.fields.quality.placeholder",
+        columns: 4,
+        schema: z
           .number()
           .min(0)
           .max(100)
@@ -141,42 +133,36 @@ const { POST } = createEndpoint({
           .describe(
             "Compression quality for JPEG and WebP formats (0-100). Higher values mean better quality but larger file sizes. Ignored for PNG format.",
           ),
-      ),
-      filePath: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.browser.take-screenshot.form.fields.filePath.label",
-          description:
-            "app.api.browser.take-screenshot.form.fields.filePath.description",
-          placeholder:
-            "app.api.browser.take-screenshot.form.fields.filePath.placeholder",
-          columns: 8,
-        },
-        z
+      }),
+      filePath: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.browser.take-screenshot.form.fields.filePath.label",
+        description:
+          "app.api.browser.take-screenshot.form.fields.filePath.description",
+        placeholder:
+          "app.api.browser.take-screenshot.form.fields.filePath.placeholder",
+        columns: 8,
+        schema: z
           .string()
           .optional()
           .describe(
             "The absolute path, or a path relative to the current working directory, to save the screenshot to instead of attaching it to the response.",
           ),
-      ),
+      }),
 
       // Response fields
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.take-screenshot.response.success",
-        },
-        z
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.take-screenshot.response.success",
+        schema: z
           .boolean()
           .describe("Whether the screenshot capture operation succeeded"),
-      ),
-      result: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.take-screenshot.response.result",
-        },
-        z
+      }),
+      result: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.take-screenshot.response.result",
+        schema: z
           .object({
             captured: z
               .boolean()
@@ -193,21 +179,23 @@ const { POST } = createEndpoint({
           })
           .optional()
           .describe("Result of screenshot capture"),
-      ),
-      error: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.take-screenshot.response.error",
-        },
-        z.string().optional().describe("Error message if the operation failed"),
-      ),
-      executionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.take-screenshot.response.executionId",
-        },
-        z.string().optional().describe("Unique identifier for this execution"),
-      ),
+      }),
+      error: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.take-screenshot.response.error",
+        schema: z
+          .string()
+          .optional()
+          .describe("Error message if the operation failed"),
+      }),
+      executionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.browser.take-screenshot.response.executionId",
+        schema: z
+          .string()
+          .optional()
+          .describe("Unique identifier for this execution"),
+      }),
     },
   ),
   examples: {
@@ -225,7 +213,6 @@ const { POST } = createEndpoint({
         executionId: "exec_123",
       },
     },
-    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

@@ -716,19 +716,12 @@ export class AuthRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<string>> {
     try {
-      logger.debug("app.api.user.auth.debug.signingJwt", {
-        userId: payload.id,
-      });
-
       const token = await new SignJWT(payload)
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
         .setExpirationTime(`${AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS}s`)
         .sign(SECRET_KEY);
 
-      logger.debug("app.api.user.auth.debug.jwtSignedSuccessfully", {
-        userId: payload.id,
-      });
       return success(token);
     } catch (error) {
       logger.error(
@@ -752,8 +745,6 @@ export class AuthRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<JwtPrivatePayloadType>> {
     try {
-      logger.debug("app.api.user.auth.debug.verifyingJwt");
-
       // Verify the token
       const { payload } = await jwtVerify<JwtPrivatePayloadType>(
         token,
@@ -786,8 +777,6 @@ export class AuthRepository {
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
-
-      logger.debug("app.api.user.auth.debug.jwtVerifiedSuccessfully");
 
       return success({
         isPublic: false,
@@ -899,10 +888,10 @@ export class AuthRepository {
         );
         if (!sessionValid) {
           logger.debug(
-            "Session validation failed - returning public user without clearing cookies",
+            "Session validation failed - returning public user (invalid token cleared by middleware)",
           );
-          // NEVER clear cookies on session validation failure
-          // Let tokens expire naturally to prevent losing sessions on DB resets
+          // Invalid sessions are cleared by middleware, so treat user as public
+          // This allows seamless recovery after DB resets
           const { leadId, shouldUpdateCookie } =
             await AuthRepository.getLeadIdFromDb(
               undefined,
@@ -981,16 +970,14 @@ export class AuthRepository {
 
       const session = sessionResult.data;
       if (session.userId !== userId) {
-        logger.error("Session user ID mismatch", {
-          sessionUserId: session.userId,
-          expectedUserId: userId,
-        });
+        // Session user ID mismatch - middleware already cleared this token cookie
+        // Don't log anything, just silently fail
         return false;
       }
 
       // Check if session is expired
       if (session.expiresAt < new Date()) {
-        logger.debug("Session expired", { expiresAt: session.expiresAt });
+        logger.debug(`Session expired`);
         return false;
       }
 
@@ -1329,10 +1316,6 @@ export class AuthRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<string>> {
     try {
-      logger.debug("app.api.user.auth.debug.creatingCliToken", {
-        userId,
-      });
-
       const leadIdResult = await LeadAuthRepository.getAuthenticatedUserLeadId(
         userId,
         undefined,

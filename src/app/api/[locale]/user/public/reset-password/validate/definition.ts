@@ -15,9 +15,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 
 import { UserRole } from "../../../user-roles/enum";
 
@@ -58,25 +58,23 @@ const { GET } = createEndpoint({
         },
         { request: "data" },
         {
-          token: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.user.public.resetPassword.validate.fields.token.label" as const,
-              description:
-                "app.api.user.public.resetPassword.validate.fields.token.description" as const,
-              placeholder:
-                "app.api.user.public.resetPassword.validate.fields.token.placeholder" as const,
-              columns: 12,
-              helpText:
-                "app.api.user.public.resetPassword.validate.fields.token.help" as const,
-            },
-            z.string().min(1, {
+          token: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label:
+              "app.api.user.public.resetPassword.validate.fields.token.label" as const,
+            description:
+              "app.api.user.public.resetPassword.validate.fields.token.description" as const,
+            placeholder:
+              "app.api.user.public.resetPassword.validate.fields.token.placeholder" as const,
+            columns: 12,
+            helpText:
+              "app.api.user.public.resetPassword.validate.fields.token.help" as const,
+            schema: z.string().min(1, {
               message:
                 "app.api.user.public.resetPassword.validate.fields.token.validation.required",
             }),
-          ),
+          }),
         },
       ),
 
@@ -93,46 +91,36 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          valid: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.resetPassword.validate.response.valid" as const,
-            },
-            z.boolean(),
-          ),
-          message: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.resetPassword.validate.response.message" as const,
-            },
-            z.string(),
-          ),
-          userId: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.resetPassword.validate.response.userId" as const,
-            },
-            z.uuid().optional(),
-          ),
-          expiresAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.resetPassword.validate.response.expiresAt" as const,
-            },
-            z.string().optional(),
-          ),
-          nextSteps: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.resetPassword.validate.response.nextSteps.item" as const,
-            },
-            z.array(z.string()),
-          ),
+          valid: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.public.resetPassword.validate.response.valid" as const,
+            schema: z.boolean(),
+          }),
+          message: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.public.resetPassword.validate.response.message" as const,
+            schema: z.string(),
+          }),
+          userId: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.public.resetPassword.validate.response.userId" as const,
+            schema: z.uuid().optional(),
+          }),
+          expiresAt: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.public.resetPassword.validate.response.expiresAt" as const,
+            schema: z.string().optional(),
+          }),
+          nextSteps: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.user.public.resetPassword.validate.response.nextSteps.item" as const,
+            schema: z.array(z.string()),
+          }),
         },
       ),
     },
@@ -222,7 +210,6 @@ const { GET } = createEndpoint({
         },
       },
     },
-    urlPathParams: undefined,
     responses: {
       default: {
         response: {

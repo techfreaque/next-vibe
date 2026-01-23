@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -53,136 +53,112 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      skipDbSetup: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.dev.post.fields.skipDbSetup.title",
-          description:
-            "app.api.system.server.dev.post.fields.skipDbSetup.description",
-        },
-        z.boolean().default(false),
-      ),
+      skipDbSetup: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.dev.post.fields.skipDbSetup.title",
+        description:
+          "app.api.system.server.dev.post.fields.skipDbSetup.description",
+        schema: z.boolean().default(false),
+      }),
 
-      skipNextCommand: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.dev.post.fields.skipNextCommand.title",
-          description:
-            "app.api.system.server.dev.post.fields.skipNextCommand.description",
-        },
-        z.boolean().default(false),
-      ),
+      skipNextCommand: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.dev.post.fields.skipNextCommand.title",
+        description:
+          "app.api.system.server.dev.post.fields.skipNextCommand.description",
+        schema: z.boolean().default(false),
+      }),
 
-      dbReset: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.dev.post.fields.skipDbReset.title",
-          description:
-            "app.api.system.server.dev.post.fields.skipDbReset.description",
-        },
-        z.boolean().default(false),
-      ),
+      dbReset: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.dev.post.fields.skipDbReset.title",
+        description:
+          "app.api.system.server.dev.post.fields.skipDbReset.description",
+        schema: z.boolean().default(false),
+      }),
       // shortcut for dbReset
-      r: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.dev.post.fields.skipDbReset.title",
-          description:
-            "app.api.system.server.dev.post.fields.skipDbReset.description",
-        },
-        z.boolean().default(false),
-      ),
+      r: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.dev.post.fields.skipDbReset.title",
+        description:
+          "app.api.system.server.dev.post.fields.skipDbReset.description",
+        schema: z.boolean().default(false),
+      }),
 
-      port: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.system.server.dev.post.fields.port.title",
-          description: "app.api.system.server.dev.post.fields.port.description",
-        },
-        z.union([z.coerce.number(), z.string()]).default(3000),
-      ),
+      port: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.system.server.dev.post.fields.port.title",
+        description: "app.api.system.server.dev.post.fields.port.description",
+        schema: z.union([z.coerce.number(), z.string()]).default(3000),
+      }),
 
-      skipGeneratorWatcher: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.server.dev.post.fields.skipGeneratorWatcher.title",
-          description:
-            "app.api.system.server.dev.post.fields.skipGeneratorWatcher.description",
-        },
-        z.boolean().default(false),
-      ),
+      skipGeneratorWatcher: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.server.dev.post.fields.skipGeneratorWatcher.title",
+        description:
+          "app.api.system.server.dev.post.fields.skipGeneratorWatcher.description",
+        schema: z.boolean().default(false),
+      }),
 
-      generatorWatcherInterval: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.system.server.dev.post.fields.generatorWatcherInterval.title",
-          description:
-            "app.api.system.server.dev.post.fields.generatorWatcherInterval.description",
-        },
-        z.coerce.number().default(5000),
-      ),
+      generatorWatcherInterval: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.system.server.dev.post.fields.generatorWatcherInterval.title",
+        description:
+          "app.api.system.server.dev.post.fields.generatorWatcherInterval.description",
+        schema: z.coerce.number().default(5000),
+      }),
 
-      skipTaskRunner: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.dev.post.fields.skipTaskRunner.title",
-          description:
-            "app.api.system.server.dev.post.fields.skipTaskRunner.description",
-        },
-        z.boolean().default(false),
-      ),
+      skipTaskRunner: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.dev.post.fields.skipTaskRunner.title",
+        description:
+          "app.api.system.server.dev.post.fields.skipTaskRunner.description",
+        schema: z.boolean().default(false),
+      }),
 
-      skipMigrations: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.dev.post.fields.skipMigrations.title",
-          description:
-            "app.api.system.server.dev.post.fields.skipMigrations.description",
-        },
-        z.boolean().default(false),
-      ),
+      skipMigrations: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.dev.post.fields.skipMigrations.title",
+        description:
+          "app.api.system.server.dev.post.fields.skipMigrations.description",
+        schema: z.boolean().default(false),
+      }),
 
-      skipMigrationGeneration: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.server.dev.post.fields.skipMigrationGeneration.title",
-          description:
-            "app.api.system.server.dev.post.fields.skipMigrationGeneration.description",
-        },
-        z.boolean().default(false),
-      ),
+      skipMigrationGeneration: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.server.dev.post.fields.skipMigrationGeneration.title",
+        description:
+          "app.api.system.server.dev.post.fields.skipMigrationGeneration.description",
+        schema: z.boolean().default(false),
+      }),
 
-      skipSeeding: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.dev.post.fields.skipSeeding.title",
-          description:
-            "app.api.system.server.dev.post.fields.skipSeeding.description",
-        },
-        z.boolean().default(false),
-      ),
+      skipSeeding: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.dev.post.fields.skipSeeding.title",
+        description:
+          "app.api.system.server.dev.post.fields.skipSeeding.description",
+        schema: z.boolean().default(false),
+      }),
 
-      output: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.server.dev.post.fields.output.title",
-        },
-        z.string() as z.ZodType<TranslationKey>,
-      ),
+      output: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.server.dev.post.fields.output.title",
+        schema: z.string() as z.ZodType<TranslationKey>,
+      }),
     },
   ),
 

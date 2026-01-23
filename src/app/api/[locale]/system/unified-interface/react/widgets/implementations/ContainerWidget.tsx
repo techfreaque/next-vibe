@@ -17,6 +17,7 @@ import {
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useWatch } from "react-hook-form";
+import type { z } from "zod";
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
@@ -33,6 +34,7 @@ import type {
   WidgetData,
 } from "../../../shared/widgets/types";
 import {
+  hasRequestUsage,
   isFormInputField,
   isResponseField,
 } from "../../../shared/widgets/utils/field-helpers";
@@ -245,7 +247,9 @@ export function ContainerWidget<const TKey extends string>({
   if (isArrayField && Array.isArray(value)) {
     // Get child field definition
     const childField =
-      "child" in field ? (field.child as UnifiedField<string>) : null;
+      "child" in field
+        ? (field.child as UnifiedField<string, z.ZodTypeAny>)
+        : null;
 
     if (!childField) {
       if (noCard) {
@@ -349,7 +353,7 @@ export function ContainerWidget<const TKey extends string>({
   }
 
   // Handle union fields - select variant based on discriminator value
-  let children: Array<[string, UnifiedField<string>]> = [];
+  let children: Array<[string, UnifiedField<string, z.ZodTypeAny>]> = [];
 
   if (isUnionField) {
     // Union field - need to select the correct variant
@@ -413,11 +417,16 @@ export function ContainerWidget<const TKey extends string>({
       // For primitive fields with literals, check the schema value
       if (isPrimitiveField(variantDiscriminator)) {
         const schema = variantDiscriminator.schema;
-        // Zod's z.literal() stores the value in _def.value (string) or _def.values (array with single element)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const literalValue =
-          (schema as any)._def?.value ?? (schema as any)._def?.values?.[0];
-        return literalValue === discriminatorValue;
+        // Zod stores literal values in schema._def.values array
+        if (
+          schema._def &&
+          "values" in schema._def &&
+          Array.isArray(schema._def.values)
+        ) {
+          const literalValue = schema._def.values[0];
+          return literalValue === discriminatorValue;
+        }
+        return false;
       }
 
       return false;
@@ -565,7 +574,7 @@ export function ContainerWidget<const TKey extends string>({
     const result: (JSX.Element | null)[] = [];
     let inlineGroup: Array<{
       name: string;
-      field: UnifiedField<string>;
+      field: UnifiedField<string, z.ZodTypeAny>;
       data: WidgetData;
     }> = [];
 
@@ -579,11 +588,9 @@ export function ContainerWidget<const TKey extends string>({
         const { name, field, data } = inlineGroup[0];
         const childFieldName = fieldName ? `${fieldName}.${name}` : name;
         const childUi = field.ui;
-        const isChildContainer = childUi.type === WidgetType.CONTAINER;
-        const childColumns =
-          isChildContainer || !("columns" in childUi)
-            ? undefined
-            : (childUi.columns as number);
+        const childColumns = !("columns" in childUi)
+          ? undefined
+          : (childUi.columns as number);
         const effectiveSpan =
           layoutType === "grid"
             ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12)
@@ -673,16 +680,6 @@ export function ContainerWidget<const TKey extends string>({
         continue;
       }
 
-      // Skip backButton only at root level - it's rendered with submit button
-      // In nested containers (like topActions), backButton should render normally
-      // fieldName is empty/undefined at root level, has a value in nested containers
-      if (childName === "backButton" && !fieldName) {
-        context.logger.debug(
-          `ContainerWidget: Skipping backButton at root level`,
-        );
-        continue;
-      }
-
       const childData = getChildData(childName);
 
       // Check if this is a widget field or widget-only object container
@@ -697,24 +694,30 @@ export function ContainerWidget<const TKey extends string>({
           (child) => "type" in child && child.type === "widget",
         );
 
-      // Skip response fields that don't have data (but not widget fields or widget-only objects - they render from UI config)
+      // Skip response-only fields that don't have data (but not widget fields, widget-only objects, or request fields - they render from UI config and form)
+      // hasRequestUsage includes fields that are requestResponseField (have both request and response)
+      const hasRequest = hasRequestUsage(childField);
       if (
         !isWidgetField &&
         !isWidgetOnlyObject &&
         isResponseField(childField) &&
+        !hasRequest &&
         (childData === null || childData === undefined)
       ) {
         context.logger.debug(
-          `ContainerWidget: Skipping response field without data "${childName}"`,
+          `ContainerWidget: Skipping response-only field without data "${childName}"`,
           {
             isWidgetField,
             isWidgetOnlyObject,
             isResponseField: isResponseField(childField),
             childData,
+            hasRequest,
           },
         );
         continue;
       }
+
+      // Render all request fields and widget fields, even without data (they're form inputs)
 
       context.logger.debug(`ContainerWidget: Rendering child "${childName}"`, {
         widgetType: childField.ui?.type,
@@ -743,10 +746,9 @@ export function ContainerWidget<const TKey extends string>({
           : childName;
         const childUi = childField.ui;
         const isChildContainer = childUi.type === WidgetType.CONTAINER;
-        const childColumns =
-          isChildContainer || !("columns" in childUi)
-            ? undefined
-            : (childUi.columns as number);
+        const childColumns = !("columns" in childUi)
+          ? undefined
+          : (childUi.columns as number);
         const effectiveSpan =
           layoutType === "grid"
             ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12)
@@ -866,10 +868,8 @@ export function ContainerWidget<const TKey extends string>({
             <Button
               type="button"
               onClick={(): void => {
-                if (form && onSubmit) {
-                  void form.handleSubmit(() => {
-                    onSubmit();
-                  })();
+                if (onSubmit) {
+                  onSubmit();
                 }
               }}
               disabled={isSubmitting}
@@ -916,10 +916,8 @@ export function ContainerWidget<const TKey extends string>({
             <Button
               type="button"
               onClick={(): void => {
-                if (form && onSubmit) {
-                  void form.handleSubmit(() => {
-                    onSubmit();
-                  })();
+                if (onSubmit) {
+                  onSubmit();
                 }
               }}
               disabled={isSubmitting}
@@ -1017,10 +1015,8 @@ export function ContainerWidget<const TKey extends string>({
             <Button
               type="button"
               onClick={(): void => {
-                if (form && onSubmit) {
-                  void form.handleSubmit(() => {
-                    onSubmit();
-                  })();
+                if (onSubmit) {
+                  onSubmit();
                 }
               }}
               disabled={isSubmitting}
@@ -1066,10 +1062,8 @@ export function ContainerWidget<const TKey extends string>({
             <Button
               type="button"
               onClick={(): void => {
-                if (form && onSubmit) {
-                  void form.handleSubmit(() => {
-                    onSubmit();
-                  })();
+                if (onSubmit) {
+                  onSubmit();
                 }
               }}
               disabled={isSubmitting}

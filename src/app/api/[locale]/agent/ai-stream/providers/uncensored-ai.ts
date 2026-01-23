@@ -10,7 +10,6 @@
 import "server-only";
 
 import { OpenAIChatLanguageModel } from "@ai-sdk/openai/internal";
-import type { LanguageModelV2 } from "@ai-sdk/provider";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
@@ -25,7 +24,7 @@ import type { EndpointLogger } from "../../../system/unified-interface/shared/lo
  * @returns Provider object with chat() method
  */
 export function createUncensoredAI(logger: EndpointLogger): {
-  chat: (modelId: string) => LanguageModelV2;
+  chat: (modelId: string) => OpenAIChatLanguageModel;
 } {
   const apiKey = agentEnv.UNCENSORED_AI_API_KEY;
   const provider = "uncensored-ai" as const;

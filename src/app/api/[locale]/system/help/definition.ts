@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -49,17 +49,15 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      command: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.help.fields.command.label",
-          description: "app.api.system.help.fields.command.description",
-          placeholder: "app.api.system.help.fields.command.placeholder",
-          columns: 12,
-        },
-        z.string().optional(),
-      ),
+      command: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.help.fields.command.label",
+        description: "app.api.system.help.fields.command.description",
+        placeholder: "app.api.system.help.fields.command.placeholder",
+        columns: 12,
+        schema: z.string().optional(),
+      }),
 
       // === RESPONSE FIELDS ===
       // Header section
@@ -70,20 +68,16 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          title: responseField(
-            {
-              type: WidgetType.TITLE,
-              content: "app.api.system.help.fields.header.title" as const,
-            },
-            z.string(),
-          ),
-          description: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.system.help.fields.header.description" as const,
-            },
-            z.string().optional(),
-          ),
+          title: responseField({
+            type: WidgetType.TITLE,
+            content: "app.api.system.help.fields.header.title" as const,
+            schema: z.string(),
+          }),
+          description: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.system.help.fields.header.description" as const,
+            schema: z.string().optional(),
+          }),
         },
       ),
 
@@ -100,14 +94,12 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.DATA_LIST,
             },
-            responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.help.fields.usage.patterns.item" as const,
-              },
-              z.string(),
-            ),
+            responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.help.fields.usage.patterns.item" as const,
+              schema: z.string(),
+            }),
           ),
         },
       ),
@@ -132,21 +124,17 @@ const { POST } = createEndpoint({
               },
               { response: true },
               {
-                flag: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content: "app.api.system.help.fields.options.flag" as const,
-                  },
-                  z.string(),
-                ),
-                description: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.help.fields.options.description" as const,
-                  },
-                  z.string(),
-                ),
+                flag: responseField({
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.help.fields.options.flag" as const,
+                  schema: z.string(),
+                }),
+                description: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.help.fields.options.description" as const,
+                  schema: z.string(),
+                }),
               },
             ),
           ),
@@ -173,22 +161,18 @@ const { POST } = createEndpoint({
               },
               { response: true },
               {
-                command: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.help.fields.examples.command" as const,
-                  },
-                  z.string(),
-                ),
-                description: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.help.fields.examples.description" as const,
-                  },
-                  z.string().optional(),
-                ),
+                command: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.help.fields.examples.command" as const,
+                  schema: z.string(),
+                }),
+                description: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.help.fields.examples.description" as const,
+                  schema: z.string().optional(),
+                }),
               },
             ),
           ),
@@ -215,22 +199,18 @@ const { POST } = createEndpoint({
               },
               { response: true },
               {
-                command: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.help.fields.examples.command" as const,
-                  },
-                  z.string(),
-                ),
-                description: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.help.fields.options.description" as const,
-                  },
-                  z.string(),
-                ),
+                command: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.help.fields.examples.command" as const,
+                  schema: z.string(),
+                }),
+                description: responseField({
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.help.fields.options.description" as const,
+                  schema: z.string(),
+                }),
               },
             ),
           ),
@@ -246,42 +226,33 @@ const { POST } = createEndpoint({
         },
         { response: true },
         {
-          category: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.help.fields.details.category.content" as const,
-              label: "app.api.system.help.fields.details.category.content",
-            },
-            z.string().optional(),
-          ),
-          path: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.help.fields.details.path.content" as const,
-              label: "app.api.system.help.fields.details.path.content",
-            },
-            z.string().optional(),
-          ),
-          method: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.help.fields.details.method.content" as const,
-              label: "app.api.system.help.fields.details.method.content",
-            },
-            z.string().optional(),
-          ),
-          aliases: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.help.fields.details.aliases.content" as const,
-              label: "app.api.system.help.fields.details.aliases.content",
-            },
-            z.string().optional(),
-          ),
+          category: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.system.help.fields.details.category.content" as const,
+            label: "app.api.system.help.fields.details.category.content",
+            schema: z.string().optional(),
+          }),
+          path: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.system.help.fields.details.path.content" as const,
+            label: "app.api.system.help.fields.details.path.content",
+            schema: z.string().optional(),
+          }),
+          method: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.system.help.fields.details.method.content" as const,
+            label: "app.api.system.help.fields.details.method.content",
+            schema: z.string().optional(),
+          }),
+          aliases: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.system.help.fields.details.aliases.content" as const,
+            label: "app.api.system.help.fields.details.aliases.content",
+            schema: z.string().optional(),
+          }),
         },
       ),
     },
@@ -335,7 +306,6 @@ const { POST } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    urlPathParams: undefined,
     requests: {
       default: {
         command: undefined,

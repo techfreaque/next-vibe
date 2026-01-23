@@ -15,20 +15,21 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import {
-  type Character,
-  DEFAULT_CHARACTERS,
-  getCharactersByCategory,
-} from "@/app/api/[locale]/agent/chat/characters/config";
+import { NO_CHARACTER } from "@/app/api/[locale]/agent/chat/characters/config";
+import type { CharacterListItem as CharacterListItemType } from "@/app/api/[locale]/agent/chat/characters/definition";
 import type { FavoriteCard } from "@/app/api/[locale]/agent/chat/favorites/definition";
-import { modelOptions } from "@/app/api/[locale]/agent/models/models";
+import {
+  modelOptions,
+  modelProviders,
+} from "@/app/api/[locale]/agent/models/models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useIsMobile } from "@/hooks/use-media-query";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { CATEGORY_CONFIG, CharacterCategory } from "../enum";
-import { CharactersRepositoryClient } from "../repository-client";
+import { useCharacters } from "../hooks";
 
 interface CharacterBrowserProps {
   onAddWithDefaults: (characterId: string) => void;
@@ -38,10 +39,11 @@ interface CharacterBrowserProps {
   locale: CountryLanguage;
   /** Favorites list to track which characters are already added */
   favorites?: FavoriteCard[];
+  logger: EndpointLogger;
 }
 
 /**
- * Character list item component - shows character info with description and model
+ * Character list item component - shows character info with description
  */
 export function CharacterListItem({
   character,
@@ -50,7 +52,7 @@ export function CharacterListItem({
   locale,
   isAdded = false,
 }: {
-  character: Character;
+  character: CharacterListItemType;
   onAdd: () => void;
   onCustomize?: () => void;
   locale: CountryLanguage;
@@ -59,14 +61,7 @@ export function CharacterListItem({
   const { t } = simpleT(locale);
   const isTouchDevice = useIsMobile();
 
-  const allModels = useMemo(() => Object.values(modelOptions), []);
-  const bestModel = useMemo(() => {
-    return CharactersRepositoryClient.resolveModelForSelection(
-      character.modelSelection,
-      allModels,
-    );
-  }, [allModels, character]);
-
+  // Regular character card
   return (
     <Div
       className={cn(
@@ -118,30 +113,53 @@ export function CharacterListItem({
 
       {/* Character Icon */}
       <Div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
-        <Icon icon={character.icon} className="h-5 w-5" />
+        <Icon icon={character.icon as never} className="h-5 w-5" />
       </Div>
 
       {/* Main Info - Full Width */}
       <Div className="flex-1 min-w-0">
-        <Div className="font-medium text-base pr-2">{t(character.name)}</Div>
-        <Div className="text-xs text-muted-foreground mt-1.5 line-clamp-2">
-          {t(character.description)}
+        {/* Title row with name and tagline */}
+        <Div className="flex items-baseline gap-1.5 min-w-0">
+          <Span className="font-medium text-base shrink-0">
+            {t(character.content.name)}
+          </Span>
+          {character.content.tagline && (
+            <Span className="text-xs text-muted-foreground truncate">
+              {t(character.content.tagline)}
+            </Span>
+          )}
         </Div>
-        {/* Model info row */}
-        <Div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70 mt-1.5">
-          {bestModel && (
+
+        {/* Description */}
+        <Span className="text-xs text-muted-foreground block mt-1 truncate">
+          {t(character.content.description)}
+        </Span>
+
+        {/* Model row - model info, provider, credits */}
+        <Div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
+          {character.content.modelRow?.modelInfo && (
             <>
-              <Icon icon={bestModel.icon} className="h-3 w-3" />
-              <Span className="truncate">{bestModel.name}</Span>
-              <Span className="text-muted-foreground/40">•</Span>
-              <Span className="shrink-0">
-                {CharactersRepositoryClient.formatCreditCost(
-                  bestModel.creditCost,
-                  t,
-                )}
+              <Icon
+                icon={character.content.modelRow.modelIcon as never}
+                className="h-4 w-4"
+              />
+              <Span className="truncate">
+                {character.content.modelRow.modelInfo}
               </Span>
+              <Span className="text-muted-foreground/40">•</Span>
             </>
           )}
+          {character.content.modelRow?.modelProvider && (
+            <>
+              <Span className="shrink-0">
+                {modelProviders[character.content.modelRow.modelProvider]?.name}
+              </Span>
+              <Span className="text-muted-foreground/40">•</Span>
+            </>
+          )}
+          <Span className="shrink-0">
+            {character.content.modelRow?.creditCost}
+          </Span>
         </Div>
       </Div>
     </Div>
@@ -162,7 +180,7 @@ export function CategorySection({
   addedCharacterIds,
 }: {
   category: (typeof CharacterCategory)[keyof typeof CharacterCategory];
-  characters: readonly Character[];
+  characters: readonly CharacterListItemType[];
   onAdd: (characterId: string) => void;
   onCustomize: (characterId: string) => void;
   onExpand?: () => void;
@@ -230,6 +248,7 @@ interface CharacterBrowserCoreProps {
   locale: CountryLanguage;
   searchQuery?: string;
   hideCompanions?: boolean;
+  logger: EndpointLogger;
 }
 
 /**
@@ -242,28 +261,62 @@ export function CharacterBrowserCore({
   locale,
   searchQuery = "",
   hideCompanions = false,
+  logger,
 }: CharacterBrowserCoreProps): JSX.Element {
   const { t } = simpleT(locale);
+
   const [expandedCategories, setExpandedCategories] = useState<
     Set<(typeof CharacterCategory)[keyof typeof CharacterCategory]>
   >(new Set());
 
+  // Fetch characters from API
+  const charactersEndpoint = useCharacters(logger);
+
   // Calculate which characters are already added to favorites (non-customized)
   const addedCharacterIds = useMemo(
-    () => CharactersRepositoryClient.getDefaultFavoriteCharacterIds(favorites),
+    () =>
+      new Set(
+        favorites.filter((f) => f.characterId).map((f) => f.characterId!),
+      ),
     [favorites],
   );
 
-  // Get all categories with their characters
+  // Get all characters as flat array
+  const allCharacters = useMemo(() => {
+    if (!charactersEndpoint.read?.data?.sections) {
+      return [];
+    }
+    return charactersEndpoint.read.data.sections.flatMap(
+      (section: { characters: CharacterListItemType[] }) => section.characters,
+    );
+  }, [charactersEndpoint.read?.data]);
+
+  // Get all categories with their characters - group by category field on each character
+  // Exclude default character from categories
   const categoriesWithCharacters = useMemo(() => {
-    const categories = Object.values(CharacterCategory);
-    return categories
-      .map((category) => ({
-        category,
-        characters: getCharactersByCategory(category),
-      }))
-      .filter((item) => item.characters.length > 0);
-  }, []);
+    if (allCharacters.length === 0) {
+      return [];
+    }
+
+    const grouped = new Map<
+      (typeof CharacterCategory)[keyof typeof CharacterCategory],
+      typeof allCharacters
+    >();
+
+    allCharacters.forEach((character: CharacterListItemType) => {
+      const existing = grouped.get(character.category);
+      if (existing) {
+        existing.push(character);
+      } else {
+        grouped.set(character.category, [character]);
+      }
+    });
+
+    return [...grouped.entries()].map(([category, characters]) => ({
+      category,
+      characters,
+    }));
+  }, [allCharacters]);
 
   // Filter by search
   const searchFilteredCharacters = useMemo(() => {
@@ -272,12 +325,12 @@ export function CharacterBrowserCore({
     }
 
     const query = searchQuery.toLowerCase();
-    return [...DEFAULT_CHARACTERS].filter(
-      (p) =>
-        t(p.name).toLowerCase().includes(query) ||
-        t(p.description).toLowerCase().includes(query),
+    return allCharacters.filter(
+      (p: CharacterListItemType) =>
+        t(p.content.name).toLowerCase().includes(query) ||
+        t(p.content.description).toLowerCase().includes(query),
     );
-  }, [searchQuery, t]);
+  }, [searchQuery, t, allCharacters]);
 
   const handleCategoryExpand = useCallback(
     (category: (typeof CharacterCategory)[keyof typeof CharacterCategory]) => {
@@ -305,16 +358,18 @@ export function CharacterBrowserCore({
         </Span>
         {searchFilteredCharacters.length > 0 ? (
           <Div className="flex flex-col gap-1">
-            {searchFilteredCharacters.map((character) => (
-              <CharacterListItem
-                key={character.id}
-                character={character}
-                onAdd={() => onAdd(character.id)}
-                onCustomize={() => onCustomize(character.id)}
-                locale={locale}
-                isAdded={addedCharacterIds?.has(character.id) ?? false}
-              />
-            ))}
+            {searchFilteredCharacters.map(
+              (character: CharacterListItemType) => (
+                <CharacterListItem
+                  key={character.id}
+                  character={character}
+                  onAdd={() => onAdd(character.id)}
+                  onCustomize={() => onCustomize(character.id)}
+                  locale={locale}
+                  isAdded={addedCharacterIds?.has(character.id) ?? false}
+                />
+              ),
+            )}
           </Div>
         ) : (
           <Div className="flex flex-col items-center justify-center py-8 text-center">
@@ -328,6 +383,99 @@ export function CharacterBrowserCore({
   ) : (
     // Category browser
     <Div className="flex flex-col gap-5 p-4">
+      {/* Default character at the top */}
+      {
+        <Div className="flex flex-col gap-5">
+          {/* Section: Advanced Model Access */}
+          <Div className="flex flex-col gap-3">
+            <Div className="flex flex-col gap-1">
+              <Span className="text-sm font-semibold">
+                {t(
+                  "app.api.agent.chat.characters.get.browser.advancedModelAccess",
+                )}
+              </Span>
+              <Span className="text-xs text-muted-foreground">
+                {t(
+                  "app.api.agent.chat.characters.get.browser.configureFiltersText",
+                )}{" "}
+                {Object.keys(modelOptions).length}{" "}
+                {t("app.api.agent.chat.characters.get.browser.aiModels")}
+              </Span>
+            </Div>
+
+            <Div
+              className={cn(
+                "relative flex items-start gap-3 p-4 rounded-xl border-2 transition-all",
+                "border-primary/30 bg-gradient-to-br from-primary/5 to-background/50",
+                "hover:border-primary/40 hover:shadow-md cursor-pointer group",
+              )}
+              onClick={() => onCustomize(NO_CHARACTER.id)}
+            >
+              {/* Icon */}
+              <Div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+                <Icon icon="sparkles" className="h-6 w-6 text-primary" />
+              </Div>
+
+              {/* Content */}
+              <Div className="flex-1 min-w-0">
+                <Span className="font-semibold text-base block text-primary">
+                  {t(
+                    "app.api.agent.chat.characters.get.browser.configureAiModelsTitle",
+                  )}
+                </Span>
+                <Span className="text-sm text-muted-foreground block mt-1">
+                  {t(
+                    "app.api.agent.chat.characters.get.browser.advancedChooseText",
+                  )}{" "}
+                  {Object.keys(modelOptions).length}{" "}
+                  {t(
+                    "app.api.agent.chat.characters.get.browser.modelsWithCustomFilters",
+                  )}
+                </Span>
+              </Div>
+
+              {/* Button */}
+              {onCustomize && (
+                <Button
+                  type="button"
+                  variant="default"
+                  size="sm"
+                  className="shrink-0 self-center"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCustomize(NO_CHARACTER.id);
+                  }}
+                >
+                  {t(
+                    "app.api.agent.chat.characters.get.browser.configureButton",
+                  )}
+                </Button>
+              )}
+            </Div>
+          </Div>
+
+          {/* Separator */}
+          <Div className="flex items-center gap-3">
+            <Separator className="flex-1" />
+            <Span className="text-xs text-muted-foreground/70 uppercase tracking-wider font-medium">
+              or
+            </Span>
+            <Separator className="flex-1" />
+          </Div>
+
+          {/* Section: Character Presets */}
+          <Div className="flex flex-col gap-1">
+            <Span className="text-sm font-semibold">
+              {t("app.api.agent.chat.characters.get.browser.characterPresets")}
+            </Span>
+            <Span className="text-xs text-muted-foreground">
+              {t("app.api.agent.chat.characters.get.browser.pickCharacterText")}
+            </Span>
+          </Div>
+        </Div>
+      }
+
+      {/* All other categories */}
       {categoriesWithCharacters
         .filter((item) => {
           // Filter out companions if hideCompanions is true
@@ -378,6 +526,7 @@ export function CharacterBrowser({
   onBack,
   locale,
   favorites = [],
+  logger,
 }: CharacterBrowserProps): JSX.Element {
   const { t } = simpleT(locale);
   const [searchQuery, setSearchQuery] = useState("");
@@ -433,6 +582,7 @@ export function CharacterBrowser({
           favorites={favorites}
           locale={locale}
           searchQuery={searchQuery}
+          logger={logger}
         />
       </Div>
     </Div>

@@ -486,7 +486,6 @@ export const translations: typeof enTranslations = {
     allCharacters: "Wszystkie",
   },
   selector: {
-    loading: "Ładowanie...",
     noResults: "Nie znaleziono wyników",
     tabs: {
       quick: "Szybki",
@@ -522,6 +521,7 @@ export const translations: typeof enTranslations = {
     forCharacter: "dla {{character}}",
     intelligence: "Inteligencja",
     contentLevel: "Poziom treści",
+    speed: "Szybkość",
     any: "Dowolny",
     result: "Wynik",
     bestMatch: "Najlepsza opcja dla twoich ustawień",
@@ -597,6 +597,22 @@ export const translations: typeof enTranslations = {
     editCharacter: "Edytuj jako własną postać",
     autoSelectedModel: "Auto-wybrany:",
     manualSelectedModel: "Wybrany:",
+    characterSelectedModel: "Model postaci:",
+    selectModelBelow: "Wybierz model poniżej",
+    chooseYourPath: "Wybierz swoją ścieżkę",
+    twoWaysToChat: "Dwa elastyczne sposoby na rozpoczęcie rozmowy",
+    directModels: "Bezpośredni dostęp do modeli",
+    directModelsDesc:
+      "Skonfiguruj filtry lub wybierz ręcznie spośród {{count}} modeli. Pełna kontrola nad wyborem AI.",
+    characterPresets: "Presety postaci",
+    characterPresetsDesc:
+      "Wybierz postać poniżej. Każda ma zoptymalizowane ustawienia, które możesz dostosować w dowolnym momencie.",
+    startWithDirectModels: "Rozpocznij z bezpośrednimi modelami",
+    orBrowsePresets: "Lub przeglądaj presety postaci poniżej",
+    loading: "Ładowanie...",
+    noModelsMatch: "Brak pasujących modeli",
+    adjustFiltersMessage:
+      "Dostosuj kryteria filtrowania, aby znaleźć dostępne modele",
     auto: "Auto",
     manual: "Ręczny",
     showLess: "Pokaż mniej",
@@ -618,8 +634,10 @@ export const translations: typeof enTranslations = {
     modelSelection: "Wybór modelu",
     autoMode: "Auto",
     manualMode: "Ręczny",
+    characterMode: "Postać",
     autoModeDescription: "Najlepszy model wybierany na podstawie filtrów",
     manualModeDescription: "Wybierz konkretny model do użycia",
+    characterBasedModeDescription: "Użyj domyślnych ustawień modelu postaci",
     customizeSettings: "Dostosuj ustawienia przed dodaniem",
     useNow: "Użyj teraz",
     browseAll: "Przeglądaj wszystkie postacie",
@@ -866,7 +884,15 @@ export const translations: typeof enTranslations = {
   },
   speech: {
     error: "Błąd rozpoznawania mowy",
+
     transcript: "Transkrypcja: {{text}}",
+  },
+  // Common
+  timestamp: {
+    justNow: "przed chwilą",
+    minutesAgo: "{{count}}m temu",
+    hoursAgo: "{{count}}h temu",
+    daysAgo: "{{count}}d temu",
   },
   publicFeed: {
     // Header
@@ -888,13 +914,6 @@ export const translations: typeof enTranslations = {
     comments: "komentarze",
     bestAnswer: "Najlepsza odpowiedź",
     rising: "Rosnące",
-
-    // Common
-    timestamp: {
-      justNow: "przed chwilą",
-      hoursAgo: "{{count}}h temu",
-      daysAgo: "{{count}}d temu",
-    },
   },
   state: {
     threadNotFound: "Nie znaleziono wątku",

@@ -33,13 +33,15 @@ import type { CharacterListItem } from "../characters/definition";
 import { useCharacters } from "../characters/hooks";
 import type { DefaultFolderId } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
-import { NEW_MESSAGE_ID } from "../enum";
+import { NEW_MESSAGE_ID, type ViewModeValue } from "../enum";
 import type { FolderUpdate } from "../folders/hooks/use-operations";
 import { useFolderOperations } from "../folders/hooks/use-operations";
+import { useChatSettings } from "../settings/hooks";
+import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { useMessageOperations } from "../threads/[threadId]/messages/hooks/use-operations";
 import type { ThreadUpdate } from "../threads/hooks/use-operations";
 import { useThreadOperations } from "../threads/hooks/use-operations";
-import { type ChatSettings, useChatStore } from "./store";
+import { useChatStore } from "./store";
 import { useBranchManagement } from "./use-branch-management";
 import type { UseCollapseStateReturn } from "./use-collapse-state";
 import { useCollapseState } from "./use-collapse-state";
@@ -57,7 +59,6 @@ import { useMessageActions } from "./use-message-actions";
 import { useMessageActions as useMessageEditorActions } from "./use-message-editor-actions";
 import { useMessageLoader } from "./use-message-loader";
 import { useNavigation } from "./use-navigation";
-import { useSettings } from "./use-settings";
 import { useSidebarCollapsed } from "./use-sidebar-collapsed";
 import { useStreamSync } from "./use-stream-sync";
 import { useThreadNavigation } from "./use-thread-navigation";
@@ -93,22 +94,20 @@ export interface UseChatReturn {
   selectedCharacter: string;
   selectedModel: ModelId;
   activeFavoriteId: string | null;
-  temperature: number;
-  maxTokens: number;
   ttsAutoplay: boolean;
   ttsVoice: typeof TtsVoiceValue;
   sidebarCollapsed: boolean;
-  viewMode: ChatSettings["viewMode"];
+  viewMode: typeof ViewModeValue;
   enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
-  setSelectedCharacter: (character: string) => void;
-  setSelectedModel: (model: ModelId) => void;
-  setActiveFavoriteId: (id: string | null) => void;
-  setTemperature: (temp: number) => void;
-  setMaxTokens: (tokens: number) => void;
+  setActiveFavorite: (
+    favoriteId: string,
+    characterId: string,
+    modelId: ModelId,
+    voice: typeof TtsVoiceValue,
+  ) => void;
   setTTSAutoplay: (autoplay: boolean) => void;
-  setTTSVoice: (voice: typeof TtsVoiceValue) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
-  setViewMode: (mode: ChatSettings["viewMode"]) => void;
+  setViewMode: (mode: typeof ViewModeValue) => void;
   setEnabledTools: (
     tools: Array<{ id: string; requiresConfirmation: boolean }>,
   ) => void;
@@ -246,12 +245,6 @@ export interface UseChatReturn {
   submitWithAudio: (audioFile: File) => Promise<void>;
   handleSubmit: () => Promise<void>;
   handleKeyDown: (e: TextareaKeyboardEvent) => void;
-  handleModelChange: (modelId: ModelId) => void;
-  handleFillInputWithPrompt: (
-    prompt: string,
-    characterId: string,
-    modelId?: ModelId,
-  ) => void;
   handleScreenshot: () => Promise<void>;
 
   // UI State
@@ -302,7 +295,6 @@ export function useChat(
   const folders = useChatStore((state) => state.folders);
   const isLoading = useChatStore((state) => state.isLoading);
   const isDataLoaded = useChatStore((state) => state.isDataLoaded);
-  const settings = useChatStore((state) => state.settings);
 
   // Get stable store methods (these are stable references from Zustand)
   const addThread = useChatStore((state) => state.addThread);
@@ -318,8 +310,6 @@ export function useChat(
   const deleteFolder = useChatStore((state) => state.deleteFolder);
   const setLoading = useChatStore((state) => state.setLoading);
   const setDataLoaded = useChatStore((state) => state.setDataLoaded);
-  const updateSettings = useChatStore((state) => state.updateSettings);
-  const hydrateSettings = useChatStore((state) => state.hydrateSettings);
 
   // Get stream store methods
   const streamingMessages = useAIStreamStore(
@@ -450,14 +440,15 @@ export function useChat(
     return charactersMap;
   }, [charactersEndpoint.read?.response]);
 
-  const settingsOps = useSettings({
-    chatStore: {
-      settings,
-      updateSettings,
-      hydrateSettings,
-    },
+  const settingsOps = useChatSettings({
+    user,
     logger,
   });
+
+  // Use default settings if none are loaded yet
+  const effectiveSettings = useMemo(() => {
+    return settingsOps.settings ?? ChatSettingsRepositoryClient.getDefaults();
+  }, [settingsOps.settings]);
 
   useStreamSync({
     streamingMessages,
@@ -518,7 +509,7 @@ export function useChat(
       reset: streamReset,
       addMessage: streamAddMessage,
     },
-    settings: settingsOps.settings,
+    settings: effectiveSettings,
     setInput: setInputAndSaveDraft,
     setAttachments: setAttachmentsAndSaveDraft,
     deductCredits: creditsHook.deductCredits,
@@ -579,13 +570,8 @@ export function useChat(
     input,
     attachments,
     isLoading,
-    enabledTools: settingsOps.settings.enabledTools,
     sendMessage: messageOps.sendMessage,
     setInput: setInputAndSaveDraft,
-    setSelectedModel: settingsOps.setSelectedModel,
-    setSelectedCharacter: settingsOps.setSelectedCharacter,
-    setEnabledTools: settingsOps.setEnabledTools,
-    inputRef,
     locale,
     logger,
     draftKey,
@@ -660,23 +646,16 @@ export function useChat(
     setAttachments: setAttachmentsAndSaveDraft,
 
     // Settings
-    selectedCharacter: settingsOps.settings.selectedCharacter,
-    selectedModel: settingsOps.settings.selectedModel,
-    activeFavoriteId: settingsOps.settings.activeFavoriteId,
-    temperature: settingsOps.settings.temperature,
-    maxTokens: settingsOps.settings.maxTokens,
-    ttsAutoplay: settingsOps.settings.ttsAutoplay,
-    ttsVoice: settingsOps.settings.ttsVoice,
+    selectedCharacter: effectiveSettings.selectedCharacter,
+    selectedModel: effectiveSettings.selectedModel,
+    activeFavoriteId: effectiveSettings.activeFavoriteId,
+    ttsAutoplay: effectiveSettings.ttsAutoplay,
+    ttsVoice: effectiveSettings.ttsVoice,
     sidebarCollapsed,
-    viewMode: settingsOps.settings.viewMode,
-    enabledTools: settingsOps.settings.enabledTools,
-    setSelectedCharacter: settingsOps.setSelectedCharacter,
-    setSelectedModel: settingsOps.setSelectedModel,
-    setActiveFavoriteId: settingsOps.setActiveFavoriteId,
-    setTemperature: settingsOps.setTemperature,
-    setMaxTokens: settingsOps.setMaxTokens,
+    viewMode: effectiveSettings.viewMode,
+    enabledTools: effectiveSettings.enabledTools,
+    setActiveFavorite: settingsOps.setActiveFavorite,
     setTTSAutoplay: settingsOps.setTTSAutoplay,
-    setTTSVoice: settingsOps.setTTSVoice,
     setSidebarCollapsed,
     setViewMode: settingsOps.setViewMode,
     setEnabledTools: settingsOps.setEnabledTools,
@@ -762,8 +741,6 @@ export function useChat(
     submitWithAudio: inputHandlers.submitWithAudio,
     handleSubmit: inputHandlers.handleSubmit,
     handleKeyDown: inputHandlers.handleKeyDown,
-    handleModelChange: inputHandlers.handleModelChange,
-    handleFillInputWithPrompt: inputHandlers.handleFillInputWithPrompt,
     handleScreenshot: inputHandlers.handleScreenshot,
 
     // UI State

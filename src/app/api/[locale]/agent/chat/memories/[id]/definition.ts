@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   requestUrlPathParamsField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -54,61 +54,51 @@ const { PATCH } = createEndpoint({
     { request: "data&urlPathParams", response: true },
     {
       // === REQUEST URL PARAMS ===
-      id: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.agent.chat.memories.id.patch.id.label" as const,
-          description:
-            "app.api.agent.chat.memories.id.patch.id.description" as const,
-        },
-        z.coerce.number().int().min(0),
-      ),
+      id: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.agent.chat.memories.id.patch.id.label" as const,
+        description:
+          "app.api.agent.chat.memories.id.patch.id.description" as const,
+        schema: z.coerce.number().int().min(0),
+      }),
 
       // === REQUEST DATA ===
-      content: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXTAREA,
-          label: "app.api.agent.chat.memories.id.patch.content.label" as const,
-          description:
-            "app.api.agent.chat.memories.id.patch.content.description" as const,
-          columns: 12,
-        },
-        z.string().max(1000).optional(),
-      ),
-      tags: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.memories.id.patch.tags.label" as const,
-          description:
-            "app.api.agent.chat.memories.id.patch.tags.description" as const,
-          columns: 6,
-        },
-        z.array(z.string()).optional(),
-      ),
-      priority: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.agent.chat.memories.id.patch.priority.label" as const,
-          description:
-            "app.api.agent.chat.memories.id.patch.priority.description" as const,
-          columns: 6,
-        },
-        z.coerce.number().min(0).max(100).optional(),
-      ),
+      content: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "app.api.agent.chat.memories.id.patch.content.label" as const,
+        description:
+          "app.api.agent.chat.memories.id.patch.content.description" as const,
+        columns: 12,
+        schema: z.string().max(1000).optional(),
+      }),
+      tags: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TAGS,
+        label: "app.api.agent.chat.memories.id.patch.tags.label" as const,
+        description:
+          "app.api.agent.chat.memories.id.patch.tags.description" as const,
+        columns: 6,
+        schema: z.array(z.string()).optional(),
+      }),
+      priority: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.agent.chat.memories.id.patch.priority.label" as const,
+        description:
+          "app.api.agent.chat.memories.id.patch.priority.description" as const,
+        columns: 6,
+        schema: z.coerce.number().min(0).max(100).optional(),
+      }),
 
       // === RESPONSE ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.memories.id.patch.response.success.content" as const,
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.memories.id.patch.response.success.content" as const,
+        schema: z.boolean(),
+      }),
     },
   ),
 
@@ -222,26 +212,22 @@ const { DELETE } = createEndpoint({
     { request: "urlPathParams", response: true },
     {
       // === REQUEST URL PARAMS ===
-      id: requestUrlPathParamsField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.agent.chat.memories.id.delete.id.label" as const,
-          description:
-            "app.api.agent.chat.memories.id.delete.id.description" as const,
-        },
-        z.coerce.number().int().min(0),
-      ),
+      id: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.agent.chat.memories.id.delete.id.label" as const,
+        description:
+          "app.api.agent.chat.memories.id.delete.id.description" as const,
+        schema: z.coerce.number().int().min(0),
+      }),
 
       // === RESPONSE ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.memories.id.delete.response.success.content" as const,
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.memories.id.delete.response.success.content" as const,
+        schema: z.boolean(),
+      }),
     },
   ),
 
@@ -309,7 +295,6 @@ const { DELETE } = createEndpoint({
   },
 
   examples: {
-    requests: undefined,
     responses: {
       delete: {
         success: true,

@@ -153,6 +153,14 @@ export function extractChartData<TTranslationKey extends string = string>(
     return null;
   }
 
+  // Single series object: {name: "...", data: [...], color: "..."}
+  if (isChartSeries(value)) {
+    const converted = toChartSeries<TTranslationKey>(value);
+    if (converted) {
+      return { type: "series", data: [converted] };
+    }
+  }
+
   // Array of data points or series
   if (Array.isArray(value)) {
     if (value.length === 0) {

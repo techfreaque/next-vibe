@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -60,116 +60,99 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // REQUEST FIELDS
-      planId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.subscription.checkout.form.fields.planId.label" as const,
-          description:
-            "app.api.subscription.checkout.form.fields.planId.description" as const,
-          placeholder:
-            "app.api.subscription.checkout.form.fields.planId.placeholder" as const,
-          columns: 6,
-          options: [
-            {
-              value: SubscriptionPlan.SUBSCRIPTION,
-              label: "app.api.subscription.plans.starter.title" as const,
-            },
-          ],
-        },
-        z.literal(SubscriptionPlan.SUBSCRIPTION),
-      ),
+      planId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.subscription.checkout.form.fields.planId.label" as const,
+        description:
+          "app.api.subscription.checkout.form.fields.planId.description" as const,
+        placeholder:
+          "app.api.subscription.checkout.form.fields.planId.placeholder" as const,
+        columns: 6,
+        options: [
+          {
+            value: SubscriptionPlan.SUBSCRIPTION,
+            label: "app.api.subscription.plans.starter.title" as const,
+          },
+        ],
+        schema: z.literal(SubscriptionPlan.SUBSCRIPTION),
+      }),
 
-      billingInterval: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.subscription.checkout.form.fields.billingInterval.label" as const,
-          description:
-            "app.api.subscription.checkout.form.fields.billingInterval.description" as const,
-          placeholder:
-            "app.api.subscription.checkout.form.fields.billingInterval.placeholder" as const,
-          columns: 6,
-          options: [
-            {
-              value: BillingInterval.MONTHLY,
-              label: "app.api.subscription.billing.monthly" as const,
-            },
-            {
-              value: BillingInterval.YEARLY,
-              label: "app.api.subscription.billing.yearly" as const,
-            },
-          ],
-        },
-        z.enum(BillingInterval).default(BillingInterval.MONTHLY),
-      ),
+      billingInterval: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.subscription.checkout.form.fields.billingInterval.label" as const,
+        description:
+          "app.api.subscription.checkout.form.fields.billingInterval.description" as const,
+        placeholder:
+          "app.api.subscription.checkout.form.fields.billingInterval.placeholder" as const,
+        columns: 6,
+        options: [
+          {
+            value: BillingInterval.MONTHLY,
+            label: "app.api.subscription.billing.monthly" as const,
+          },
+          {
+            value: BillingInterval.YEARLY,
+            label: "app.api.subscription.billing.yearly" as const,
+          },
+        ],
+        schema: z.enum(BillingInterval).default(BillingInterval.MONTHLY),
+      }),
 
-      provider: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.subscription.checkout.form.fields.provider.label" as const,
-          description:
-            "app.api.subscription.checkout.form.fields.provider.description" as const,
-          placeholder:
-            "app.api.subscription.checkout.form.fields.provider.placeholder" as const,
-          columns: 12,
-          options: PaymentProviderOptions,
-        },
-        z.enum(PaymentProviderDB).default(PaymentProvider.STRIPE),
-      ),
+      provider: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.subscription.checkout.form.fields.provider.label" as const,
+        description:
+          "app.api.subscription.checkout.form.fields.provider.description" as const,
+        placeholder:
+          "app.api.subscription.checkout.form.fields.provider.placeholder" as const,
+        columns: 12,
+        options: PaymentProviderOptions,
+        schema: z.enum(PaymentProviderDB).default(PaymentProvider.STRIPE),
+      }),
 
-      metadata: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.JSON,
-          label:
-            "app.api.subscription.checkout.form.fields.metadata.label" as const,
-          description:
-            "app.api.subscription.checkout.form.fields.metadata.description" as const,
-          placeholder:
-            "app.api.subscription.checkout.form.fields.metadata.placeholder" as const,
-          columns: 12,
-        },
-        z.record(z.string(), z.string()).optional(),
-      ),
+      metadata: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label:
+          "app.api.subscription.checkout.form.fields.metadata.label" as const,
+        description:
+          "app.api.subscription.checkout.form.fields.metadata.description" as const,
+        placeholder:
+          "app.api.subscription.checkout.form.fields.metadata.placeholder" as const,
+        columns: 12,
+        schema: z.record(z.string(), z.string()).optional(),
+      }),
 
       // RESPONSE FIELDS
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.checkout.response.success" as const,
-        },
-        z.boolean(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.checkout.response.success" as const,
+        schema: z.boolean(),
+      }),
 
-      sessionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.checkout.response.sessionId" as const,
-        },
-        z.string(),
-      ),
+      sessionId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.checkout.response.sessionId" as const,
+        schema: z.string(),
+      }),
 
-      checkoutUrl: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.subscription.checkout.response.checkoutUrl" as const,
-        },
-        z.string().url(),
-      ),
+      checkoutUrl: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.checkout.response.checkoutUrl" as const,
+        schema: z.string().url(),
+      }),
 
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.checkout.response.message" as const,
-        },
-        z.string().optional(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.checkout.response.message" as const,
+        schema: z.string().optional(),
+      }),
     },
   ),
 

@@ -27,9 +27,12 @@ import type {
   ReactWidgetProps,
   WidgetData,
 } from "../../../shared/widgets/types";
+import { hasChildren } from "../../../shared/widgets/utils/field-type-guards";
 import {
   getIconSizeClassName,
+  getLayoutClassName,
   getTextSizeClassName,
+  type LayoutConfig,
 } from "../../../shared/widgets/utils/widget-helpers";
 import { WidgetRenderer } from "../renderers/WidgetRenderer";
 
@@ -68,9 +71,25 @@ export function SectionWidget<const TKey extends string>({
   className,
   form,
   endpoint,
+  fieldName,
+  onSubmit,
+  onCancel,
+  isSubmitting,
+  submitButton,
+  cancelButton,
 }: ReactWidgetProps<typeof WidgetType.SECTION, TKey>): JSX.Element {
   const { t } = simpleT(context.locale);
-  const { emptyTextSize, chevronIconSize, chevronButtonSize } = field.ui;
+  const {
+    emptyTextSize,
+    chevronIconSize,
+    chevronButtonSize,
+    title: titleKey,
+    description: descriptionKey,
+    layoutType: layoutTypeRaw = "stacked",
+    spacing = "normal",
+    collapsible: uiCollapsible,
+    defaultCollapsed: uiDefaultCollapsed = false,
+  } = field.ui;
 
   // Get classes from config (no hardcoding!)
   const emptyTextSizeClass = getTextSizeClassName(emptyTextSize);
@@ -86,21 +105,163 @@ export function SectionWidget<const TKey extends string>({
           ? "h-10 w-10"
           : "h-8 w-8";
 
-  // Extract data using shared logic
+  // Check if this is a form section (has children) or display section (has content in data)
+  const isFormSection = hasChildren(field);
+
+  // State for collapsible sections - must be called before any early returns
+  const [isExpanded, setIsExpanded] = useState(!uiDefaultCollapsed);
+
+  // For form sections, render children
+  if (isFormSection && hasChildren(field)) {
+    const title = titleKey ? context.t(titleKey) : undefined;
+    const description = descriptionKey ? context.t(descriptionKey) : undefined;
+
+    // Map spacing to gap value
+    const gapValue =
+      spacing === "compact" ? "2" : spacing === "relaxed" ? "6" : "4";
+
+    // Get layout configuration
+    const layoutConfig: LayoutConfig = {
+      type: layoutTypeRaw === "grid" ? "grid" : "stack",
+      columns: layoutTypeRaw === "grid" ? 12 : undefined,
+      gap: gapValue,
+    };
+    const layoutClass = getLayoutClassName(layoutConfig);
+
+    // Get child data from value
+    const getChildData = (childName: string): WidgetData => {
+      if (
+        value &&
+        typeof value === "object" &&
+        !Array.isArray(value) &&
+        childName in value
+      ) {
+        const valueObj = value as Record<string, WidgetData>;
+        return valueObj[childName];
+      }
+      return null;
+    };
+
+    // Render children
+    const childrenElements = Object.entries(field.children).map(
+      ([childName, childField]) => {
+        const childData = getChildData(childName);
+        const childColumns =
+          (childField.ui as { columns?: number }).columns || 12;
+
+        // Construct nested field name for proper field config resolution
+        // e.g., if section is "contactInfo" and child is "email", pass "contactInfo.email"
+        const childFieldName = fieldName
+          ? `${fieldName}.${childName}`
+          : childName;
+
+        const gridStyle =
+          layoutConfig.type === "grid"
+            ? { gridColumn: `span ${childColumns} / span ${childColumns}` }
+            : undefined;
+
+        return (
+          <Div
+            key={childName}
+            {...(gridStyle
+              ? { style: gridStyle }
+              : {
+                  className: cn({
+                    [`col-span-${childColumns}`]: layoutConfig.type === "grid",
+                  }),
+                })}
+          >
+            <WidgetRenderer
+              widgetType={childField.ui.type}
+              fieldName={childFieldName}
+              data={childData}
+              field={childField}
+              context={context}
+              form={form}
+              onSubmit={onSubmit}
+              onCancel={onCancel}
+              isSubmitting={isSubmitting}
+              endpoint={endpoint}
+              submitButton={submitButton}
+              cancelButton={cancelButton}
+            />
+          </Div>
+        );
+      },
+    );
+
+    // Render non-collapsible form section
+    if (!uiCollapsible) {
+      return (
+        <Card className={className}>
+          {(title || description) && (
+            <CardHeader>
+              {title && <CardTitle>{title}</CardTitle>}
+              {description && <CardDescription>{description}</CardDescription>}
+            </CardHeader>
+          )}
+          <CardContent>
+            <Div className={layoutClass}>{childrenElements}</Div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    // Render collapsible form section
+    return (
+      <Collapsible
+        open={isExpanded}
+        onOpenChange={setIsExpanded}
+        className={className}
+      >
+        <Card>
+          <CollapsibleTrigger asChild>
+            <CardHeader className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
+              <Div className="flex items-center justify-between">
+                <Div className="flex-1">
+                  {title && <CardTitle>{title}</CardTitle>}
+                  {description && (
+                    <CardDescription>{description}</CardDescription>
+                  )}
+                </Div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(chevronButtonSizeClass, "p-0")}
+                  type="button"
+                >
+                  <ChevronDown
+                    className={cn(
+                      "text-gray-500 transition-transform",
+                      chevronIconSizeClass || "h-5 w-5",
+                      isExpanded && "rotate-180",
+                    )}
+                  />
+                </Button>
+              </Div>
+            </CardHeader>
+          </CollapsibleTrigger>
+
+          <CollapsibleContent>
+            <CardContent>
+              <Div className={layoutClass}>{childrenElements}</Div>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
+    );
+  }
+
+  // Display section (legacy format with content in data)
   const data = extractSectionData(value);
 
   // Extract values with defaults for hooks (hooks must be called unconditionally)
-  const { title, content, description, collapsible, defaultExpanded } =
-    data ?? {
-      title: "",
-      content: null,
-      description: undefined,
-      collapsible: false,
-      defaultExpanded: true,
-    };
-
-  // State for collapsible sections - must be called before any early returns
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded ?? true);
+  const { title, content, description, collapsible } = data ?? {
+    title: "",
+    content: null,
+    description: undefined,
+    collapsible: false,
+  };
 
   // Handle null case
   if (!data) {

@@ -1,33 +1,26 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  meta: {
-    title: "Anmelden - {{appName}}",
-    description: "Melden Sie sich bei Ihrem {{appName}} Konto an",
-    category: "Authentifizierung",
-    imageAlt: "{{appName}} Anmeldung",
-    keywords: "anmelden, einloggen, authentifizierung, {{appName}}",
-    ogTitle: "Bei {{appName}} anmelden",
-    ogDescription: "Greifen Sie auf Ihr {{appName}} Konto zu",
-    twitterTitle: "Bei {{appName}} anmelden",
-    twitterDescription: "Melden Sie sich bei Ihrem Konto an",
-  },
   auth: {
     login: {
-      title: "Willkommen zurück",
-      subtitle: "Melden Sie sich bei Ihrem Konto an, um fortzufahren",
+      title: "Anmelden",
+      subtitle: "Willkommen in der Gemeinschaft zurück",
       signInButton: "Anmelden",
-      forgotPassword: "Passwort vergessen?",
-      createAccount: "Konto erstellen",
-      orContinueWith: "Oder fortfahren mit",
-      emailLabel: "E-Mail-Adresse",
-      emailPlaceholder: "Geben Sie Ihre E-Mail ein",
-      passwordLabel: "Passwort",
-      passwordPlaceholder: "Geben Sie Ihr Passwort ein",
-      rememberMe: "Angemeldet bleiben",
     },
   },
-  login: {
-    dontHaveAccount: "Noch kein Konto?",
+  meta: {
+    title: "Anmelden - {{appName}}",
+    description: "Melden Sie sich in Ihrem {{appName}} Konto an",
+    category: "Authentifizierung",
+    imageAlt: "Anmelden",
+    keywords: "anmelden, konto, {{appName}}",
+    ogTitle: "Melden Sie sich bei {{appName}} an",
+    ogDescription: "Greifen Sie auf Ihr {{appName}} Konto zu",
+    twitterTitle: "Melden Sie sich bei {{appName}} an",
+    twitterDescription: "Greifen Sie auf Ihr Konto und Ihre Gespräche zu",
+  },
+  errors: {
+    failedToLoadBrowserIdentity:
+      "Browseridentität konnte nicht geladen werden. Bitte aktualisieren Sie die Seite.",
   },
 };

@@ -106,6 +106,7 @@ const {
   FolderTree,
   FolderX,
   FreedomGptLogo,
+  UncensoredAILogo,
   GabAILogo,
   Gamepad,
   Gift,

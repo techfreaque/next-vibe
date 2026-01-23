@@ -1,17 +1,16 @@
 /**
  * Subscription API Endpoint Definition
- * Defines the API endpoints for subscription management using createFormEndpoint
  */
 
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  field,
   objectField,
-  requestDataField,
+  requestField,
+  requestResponseField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -62,112 +61,82 @@ const { GET } = createEndpoint({
     },
     { response: true },
     {
-      id: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.id" as const,
-        },
-        z.uuid(),
-      ),
-      userId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.userId" as const,
-        },
-        z.uuid(),
-      ),
-      plan: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.planId" as const,
-        },
-        z.enum(SubscriptionPlan),
-      ),
-      billingInterval: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.billingInterval" as const,
-        },
-        z.enum(BillingInterval),
-      ),
-      status: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.status" as const,
-        },
-        z.enum(SubscriptionStatus),
-      ),
-      currentPeriodStart: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.currentPeriodStart" as const,
-        },
-        z.string(),
-      ),
-      currentPeriodEnd: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.currentPeriodEnd" as const,
-        },
-        z.string(),
-      ),
-      cancelAtPeriodEnd: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.cancelAtPeriodEnd" as const,
-        },
-        z.boolean(),
-      ),
-      cancelAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.cancelAt" as const,
-        },
-        z.string().optional(),
-      ),
-      canceledAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.canceledAt" as const,
-        },
-        z.string().optional(),
-      ),
-      endedAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.endedAt" as const,
-        },
-        z.string().optional(),
-      ),
-      provider: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.provider" as const,
-        },
-        z.enum(PaymentProviderDB),
-      ),
-      providerSubscriptionId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.subscription.response.providerSubscriptionId" as const,
-        },
-        z.string().optional(),
-      ),
-      createdAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.createdAt" as const,
-        },
-        z.string(),
-      ),
-      updatedAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.updatedAt" as const,
-        },
-        z.string(),
-      ),
+      id: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.id" as const,
+        schema: z.uuid(),
+      }),
+      userId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.userId" as const,
+        schema: z.uuid(),
+      }),
+      plan: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.planId" as const,
+        schema: z.enum(SubscriptionPlan),
+      }),
+      billingInterval: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.billingInterval" as const,
+        schema: z.enum(BillingInterval),
+      }),
+      status: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.status" as const,
+        schema: z.enum(SubscriptionStatus),
+      }),
+      currentPeriodStart: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.currentPeriodStart" as const,
+        schema: z.string(),
+      }),
+      currentPeriodEnd: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.currentPeriodEnd" as const,
+        schema: z.string(),
+      }),
+      cancelAtPeriodEnd: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.cancelAtPeriodEnd" as const,
+        schema: z.boolean(),
+      }),
+      cancelAt: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.cancelAt" as const,
+        schema: z.string().optional(),
+      }),
+      canceledAt: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.canceledAt" as const,
+        schema: z.string().optional(),
+      }),
+      endedAt: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.endedAt" as const,
+        schema: z.string().optional(),
+      }),
+      provider: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.provider" as const,
+        schema: z.enum(PaymentProviderDB),
+      }),
+      providerSubscriptionId: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.subscription.response.providerSubscriptionId" as const,
+        schema: z.string().optional(),
+      }),
+      createdAt: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.createdAt" as const,
+        schema: z.string(),
+      }),
+      updatedAt: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.updatedAt" as const,
+        schema: z.string(),
+      }),
     },
   ),
 
@@ -270,104 +239,79 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // Fields that are BOTH request AND response
-      plan: field(
-        z.enum(SubscriptionPlan),
-        { POST: { request: "data", response: true } },
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.subscription.form.fields.planId.label" as const,
-          description:
-            "app.api.subscription.form.fields.planId.description" as const,
-          options: SubscriptionPlanOptions,
-          columns: 6,
-        },
-      ),
-      billingInterval: field(
-        z.enum(BillingInterval),
-        { POST: { request: "data", response: true } },
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.subscription.form.fields.billingInterval.label" as const,
-          description:
-            "app.api.subscription.form.fields.billingInterval.description" as const,
-          options: BillingIntervalOptions,
-          columns: 6,
-        },
-      ),
-      cancelAtPeriodEnd: field(
-        z.boolean(),
-        { POST: { request: "data", response: true } },
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.subscription.form.fields.cancelAtPeriodEnd.label" as const,
-          description:
-            "app.api.subscription.form.fields.cancelAtPeriodEnd.description" as const,
-          columns: 12,
-        },
-      ),
+      plan: requestResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.subscription.form.fields.planId.label" as const,
+        description:
+          "app.api.subscription.form.fields.planId.description" as const,
+        options: SubscriptionPlanOptions,
+        columns: 6,
+        schema: z.enum(SubscriptionPlan),
+      }),
+      billingInterval: requestResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.subscription.form.fields.billingInterval.label" as const,
+        description:
+          "app.api.subscription.form.fields.billingInterval.description" as const,
+        options: BillingIntervalOptions,
+        columns: 6,
+        schema: z.enum(BillingInterval),
+      }),
+      cancelAtPeriodEnd: requestResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.subscription.form.fields.cancelAtPeriodEnd.label" as const,
+        description:
+          "app.api.subscription.form.fields.cancelAtPeriodEnd.description" as const,
+        columns: 12,
+        schema: z.boolean(),
+      }),
 
       // Response-only fields
-      id: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.id" as const,
-        },
-        z.uuid(),
-      ),
-      userId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.userId" as const,
-        },
-        z.uuid(),
-      ),
-      status: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.status" as const,
-        },
-        z.enum(SubscriptionStatus),
-      ),
-      currentPeriodStart: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.currentPeriodStart" as const,
-        },
-        z.string(),
-      ),
-      currentPeriodEnd: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.currentPeriodEnd" as const,
-        },
-        z.string(),
-      ),
-      createdAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.createdAt" as const,
-        },
-        z.string(),
-      ),
-      updatedAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.updatedAt" as const,
-        },
-        z.string(),
-      ),
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.message" as const,
-        },
-        z.string(),
-      ),
+      id: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.id" as const,
+        schema: z.uuid(),
+      }),
+      userId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.userId" as const,
+        schema: z.uuid(),
+      }),
+      status: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.status" as const,
+        schema: z.enum(SubscriptionStatus),
+      }),
+      currentPeriodStart: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.currentPeriodStart" as const,
+        schema: z.string(),
+      }),
+      currentPeriodEnd: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.currentPeriodEnd" as const,
+        schema: z.string(),
+      }),
+      createdAt: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.createdAt" as const,
+        schema: z.string(),
+      }),
+      updatedAt: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.updatedAt" as const,
+        schema: z.string(),
+      }),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.message" as const,
+        schema: z.string(),
+      }),
     },
   ),
 
@@ -497,122 +441,94 @@ const { PUT } = createEndpoint({
     { request: "data", response: true },
     {
       // REQUEST FIELDS
-      plan: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.subscription.form.fields.planId.label" as const,
-          description:
-            "app.api.subscription.form.fields.planId.description" as const,
-          options: SubscriptionPlanOptions,
-          columns: 6,
-        },
-        z.enum(SubscriptionPlan),
-      ),
-      billingInterval: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.subscription.form.fields.billingInterval.label" as const,
-          description:
-            "app.api.subscription.form.fields.billingInterval.description" as const,
-          options: BillingIntervalOptions,
-          columns: 6,
-        },
-        z.enum(BillingInterval),
-      ),
-      cancelAtPeriodEnd: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.subscription.form.fields.cancelAtPeriodEnd.label" as const,
-          description:
-            "app.api.subscription.form.fields.cancelAtPeriodEnd.description" as const,
-          columns: 12,
-        },
-        z.boolean(),
-      ),
+      plan: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.subscription.form.fields.planId.label" as const,
+        description:
+          "app.api.subscription.form.fields.planId.description" as const,
+        options: SubscriptionPlanOptions,
+        columns: 6,
+        schema: z.enum(SubscriptionPlan),
+      }),
+      billingInterval: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.subscription.form.fields.billingInterval.label" as const,
+        description:
+          "app.api.subscription.form.fields.billingInterval.description" as const,
+        options: BillingIntervalOptions,
+        columns: 6,
+        schema: z.enum(BillingInterval),
+      }),
+      cancelAtPeriodEnd: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.subscription.form.fields.cancelAtPeriodEnd.label" as const,
+        description:
+          "app.api.subscription.form.fields.cancelAtPeriodEnd.description" as const,
+        columns: 12,
+        schema: z.boolean(),
+      }),
 
       // RESPONSE FIELDS
-      id: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.id" as const,
-        },
-        z.uuid(),
-      ),
-      userId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.userId" as const,
-        },
-        z.uuid(),
-      ),
-      responsePlan: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.planId" as const,
-        },
-        z.enum(SubscriptionPlan),
-      ),
-      responseBillingInterval: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.billingInterval" as const,
-        },
-        z.enum(BillingInterval),
-      ),
-      status: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.status" as const,
-        },
-        z.enum(SubscriptionStatus),
-      ),
-      currentPeriodStart: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.currentPeriodStart" as const,
-        },
-        z.string(),
-      ),
-      currentPeriodEnd: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.currentPeriodEnd" as const,
-        },
-        z.string(),
-      ),
-      responseCancelAtPeriodEnd: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.cancelAtPeriodEnd" as const,
-        },
-        z.boolean(),
-      ),
-      createdAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.currentPeriodStart" as const,
-        },
-        z.string(),
-      ),
-      updatedAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.currentPeriodEnd" as const,
-        },
-        z.string(),
-      ),
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.message" as const,
-        },
-        z.string(),
-      ),
+      id: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.id" as const,
+        schema: z.uuid(),
+      }),
+      userId: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.userId" as const,
+        schema: z.uuid(),
+      }),
+      responsePlan: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.planId" as const,
+        schema: z.enum(SubscriptionPlan),
+      }),
+      responseBillingInterval: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.billingInterval" as const,
+        schema: z.enum(BillingInterval),
+      }),
+      status: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.status" as const,
+        schema: z.enum(SubscriptionStatus),
+      }),
+      currentPeriodStart: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.currentPeriodStart" as const,
+        schema: z.string(),
+      }),
+      currentPeriodEnd: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.currentPeriodEnd" as const,
+        schema: z.string(),
+      }),
+      responseCancelAtPeriodEnd: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.cancelAtPeriodEnd" as const,
+        schema: z.boolean(),
+      }),
+      createdAt: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.currentPeriodStart" as const,
+        schema: z.string(),
+      }),
+      updatedAt: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.currentPeriodEnd" as const,
+        schema: z.string(),
+      }),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.message" as const,
+        schema: z.string(),
+      }),
     },
   ),
 
@@ -686,7 +602,6 @@ const { PUT } = createEndpoint({
         message: "Subscription updated successfully",
       },
     },
-    urlPathParams: undefined,
   },
 });
 
@@ -723,45 +638,37 @@ const { DELETE } = createEndpoint({
     { request: "data", response: true },
     {
       // REQUEST FIELDS
-      cancelAtPeriodEnd: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.subscription.form.fields.cancelAtPeriodEnd.label" as const,
-          description:
-            "app.api.subscription.form.fields.cancelAtPeriodEnd.description" as const,
-          columns: 12,
-        },
-        z.boolean(),
-      ),
-      reason: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.subscription.form.fields.reason.label" as const,
-          description:
-            "app.api.subscription.form.fields.reason.description" as const,
-          columns: 12,
-        },
-        z.string().optional(),
-      ),
+      cancelAtPeriodEnd: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.subscription.form.fields.cancelAtPeriodEnd.label" as const,
+        description:
+          "app.api.subscription.form.fields.cancelAtPeriodEnd.description" as const,
+        columns: 12,
+        schema: z.boolean(),
+      }),
+      reason: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.subscription.form.fields.reason.label" as const,
+        description:
+          "app.api.subscription.form.fields.reason.description" as const,
+        columns: 12,
+        schema: z.string().optional(),
+      }),
 
       // RESPONSE FIELDS
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.success" as const,
-        },
-        z.boolean(),
-      ),
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.subscription.response.message" as const,
-        },
-        z.string(),
-      ),
+      success: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.success" as const,
+        schema: z.boolean(),
+      }),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.subscription.response.message" as const,
+        schema: z.string(),
+      }),
     },
   ),
 
@@ -825,7 +732,6 @@ const { DELETE } = createEndpoint({
         message: "Subscription canceled successfully",
       },
     },
-    urlPathParams: undefined,
   },
 });
 

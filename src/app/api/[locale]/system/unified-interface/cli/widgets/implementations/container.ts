@@ -15,6 +15,8 @@
  * All business logic imported from shared.
  */
 
+import type { z } from "zod";
+
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
@@ -72,7 +74,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
    */
   private renderContainerObject<const TKey extends string>(
     value: { [key: string]: WidgetData },
-    field: UnifiedField<TKey>,
+    field: UnifiedField<TKey, z.ZodTypeAny>,
     context: WidgetRenderContext,
     label?: string,
     description?: string,
@@ -110,7 +112,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
     data: { [key: string]: WidgetData },
     config: ContainerConfig,
     context: WidgetRenderContext,
-    field?: UnifiedField<TKey>,
+    field?: UnifiedField<TKey, z.ZodTypeAny>,
   ): string {
     const result: string[] = [];
     const layout = config.layout || { type: "vertical" as const, columns: 1 };
@@ -151,7 +153,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
     data: { [key: string]: WidgetData },
     columns: number,
     context: WidgetRenderContext,
-    field?: UnifiedField<TKey>,
+    field?: UnifiedField<TKey, z.ZodTypeAny>,
   ): string {
     const entries = Object.entries(data);
     const result: string[] = [];

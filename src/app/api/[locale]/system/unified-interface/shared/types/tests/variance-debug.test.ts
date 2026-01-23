@@ -16,35 +16,27 @@ import type { Methods } from "../enums";
 
 // Simulate the exact structure from retry/stop endpoints
 type TestEndpoint = CreateApiEndpoint<
-  "default",
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   string,
   ObjectField<
     {
-      jobId: PrimitiveField<
-        z.ZodUUID,
-        FieldUsageConfig,
-        string,
-        WidgetConfig<string>
-      >;
+      jobId: PrimitiveField<z.ZodUUID, FieldUsageConfig>;
       result: ObjectField<
         {
-          success: PrimitiveField<
-            z.ZodBoolean,
-            FieldUsageConfig,
-            string,
-            WidgetConfig<string>
-          >;
+          success: PrimitiveField<z.ZodBoolean, FieldUsageConfig>;
         },
         FieldUsageConfig,
         string,
-        WidgetConfig<string>
+        WidgetConfig<
+          string,
+          z.ZodTypeAny,
+          FieldUsageConfig,
+          Record<string, UnifiedField<string, z.ZodTypeAny>>
+        >
       >;
     },
-    FieldUsageConfig,
-    string,
-    WidgetConfig<string>
+    FieldUsageConfig
   >
 >;
 
@@ -54,7 +46,6 @@ const test1: Test1 = "PASS";
 
 // Try with simpler types
 type TestEndpoint2 = CreateApiEndpoint<
-  string,
   Methods.POST,
   readonly UserRoleValue[],
   string,

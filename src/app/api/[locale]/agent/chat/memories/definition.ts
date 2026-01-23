@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -74,47 +74,37 @@ const { GET } = createEndpoint({
           },
           { response: true },
           {
-            memoryNumber: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.agent.chat.memories.get.response.memories.memory.memoryNumber.text" as const,
-              },
-              z.coerce.number().int(),
-            ),
-            content: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.memories.get.response.memories.memory.content.content" as const,
-              },
-              z.string(),
-            ),
-            priority: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.agent.chat.memories.get.response.memories.memory.priority.text" as const,
-              },
-              z.coerce.number(),
-            ),
+            memoryNumber: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.agent.chat.memories.get.response.memories.memory.memoryNumber.text" as const,
+              schema: z.coerce.number().int(),
+            }),
+            content: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.memories.get.response.memories.memory.content.content" as const,
+              schema: z.string(),
+            }),
+            priority: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.agent.chat.memories.get.response.memories.memory.priority.text" as const,
+              schema: z.coerce.number(),
+            }),
             tags: responseArrayField(
               {
                 type: WidgetType.DATA_LIST,
               },
-              responseField(
-                {
-                  type: WidgetType.BADGE,
-                },
-                z.string(),
-              ),
+              responseField({
+                type: WidgetType.BADGE,
+                schema: z.string(),
+              }),
             ),
-            createdAt: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.memories.get.response.memories.memory.createdAt.content" as const,
-              },
-              dateSchema,
-            ),
+            createdAt: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.memories.get.response.memories.memory.createdAt.content" as const,
+              schema: dateSchema,
+            }),
           },
         ),
       ),
@@ -177,7 +167,6 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    requests: undefined,
     responses: {
       list: {
         memories: [
@@ -198,7 +187,6 @@ const { GET } = createEndpoint({
         ],
       },
     },
-    urlPathParams: undefined,
   },
 });
 
@@ -229,49 +217,41 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST ===
-      content: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXTAREA,
-          label: "app.api.agent.chat.memories.post.content.label" as const,
-          description:
-            "app.api.agent.chat.memories.post.content.description" as const,
-          columns: 12,
-        },
-        z.string().min(1).max(1000),
-      ),
-      tags: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.memories.post.tags.label" as const,
-          description:
-            "app.api.agent.chat.memories.post.tags.description" as const,
-          columns: 6,
-        },
-        z.array(z.string()).optional(),
-      ),
-      priority: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.agent.chat.memories.post.priority.label" as const,
-          description:
-            "app.api.agent.chat.memories.post.priority.description" as const,
-          columns: 6,
-        },
-        z.coerce.number().min(0).max(100).optional(),
-      ),
+      content: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "app.api.agent.chat.memories.post.content.label" as const,
+        description:
+          "app.api.agent.chat.memories.post.content.description" as const,
+        columns: 12,
+        schema: z.string().min(1).max(1000),
+      }),
+      tags: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TAGS,
+        label: "app.api.agent.chat.memories.post.tags.label" as const,
+        description:
+          "app.api.agent.chat.memories.post.tags.description" as const,
+        columns: 6,
+        schema: z.array(z.string()).optional(),
+      }),
+      priority: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.agent.chat.memories.post.priority.label" as const,
+        description:
+          "app.api.agent.chat.memories.post.priority.description" as const,
+        columns: 6,
+        schema: z.coerce.number().min(0).max(100).optional(),
+      }),
 
       // === RESPONSE ===
-      id: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.memories.post.response.id.content" as const,
-        },
-        z.coerce.number().int(),
-      ),
+      id: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.memories.post.response.id.content" as const,
+        schema: z.coerce.number().int(),
+      }),
     },
   ),
 
@@ -345,7 +325,6 @@ const { POST } = createEndpoint({
         id: 0,
       },
     },
-    urlPathParams: undefined,
   },
 });
 

@@ -6,11 +6,11 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
-  objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -47,254 +47,194 @@ const { GET } = createEndpoint({
     { response: true },
     {
       // Host field
-      host: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.host",
-        },
-        z.string().min(1),
-      ),
+      host: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.host",
+        schema: z.string().min(1),
+      }),
 
       // Port field
-      port: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.port",
-        },
-        z.coerce.number().int().min(1).max(65535),
-      ),
+      port: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.port",
+        schema: z.coerce.number().int().min(1).max(65535),
+      }),
 
       // Username field
-      username: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.username",
-        },
-        z.string().min(1),
-      ),
+      username: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.username",
+        schema: z.string().min(1),
+      }),
 
       // Password field
-      password: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.password",
-        },
-        z.string().min(1),
-      ),
+      password: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.password",
+        schema: z.string().min(1),
+      }),
 
       // TLS field
-      tls: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.tls",
-        },
-        z.boolean(),
-      ),
+      tls: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.tls",
+        schema: z.boolean(),
+      }),
 
       // Auto-reconnect field
-      autoReconnect: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.autoReconnect",
-        },
-        z.boolean(),
-      ),
+      autoReconnect: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.autoReconnect",
+        schema: z.boolean(),
+      }),
 
       // Logging level field
-      loggingLevel: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.loggingLevel",
-        },
-        z.enum(ImapLoggingLevel),
-      ),
+      loggingLevel: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.loggingLevel",
+        schema: z.enum(ImapLoggingLevel),
+      }),
 
       // Server configuration fields
-      serverEnabled: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.serverEnabled",
-        },
-        z.boolean(),
-      ),
+      serverEnabled: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.serverEnabled",
+        schema: z.boolean(),
+      }),
 
-      maxConnections: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.maxConnections",
-        },
-        z.coerce.number().int().min(1),
-      ),
+      maxConnections: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.maxConnections",
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      connectionTimeout: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.config.response.connectionTimeout",
-        },
-        z.coerce.number().int().min(1),
-      ),
+      connectionTimeout: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.connectionTimeout",
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      poolIdleTimeout: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.poolIdleTimeout",
-        },
-        z.coerce.number().int().min(1),
-      ),
+      poolIdleTimeout: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.poolIdleTimeout",
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      keepAlive: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.keepAlive",
-        },
-        z.boolean(),
-      ),
+      keepAlive: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.keepAlive",
+        schema: z.boolean(),
+      }),
 
       // Sync configuration fields
-      syncEnabled: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.syncEnabled",
-        },
-        z.boolean(),
-      ),
+      syncEnabled: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.syncEnabled",
+        schema: z.boolean(),
+      }),
 
-      syncInterval: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.syncInterval",
-        },
-        z.coerce.number().int().min(1),
-      ),
+      syncInterval: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.syncInterval",
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      maxMessages: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.maxMessages",
-        },
-        z.coerce.number().int().min(1),
-      ),
+      maxMessages: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.maxMessages",
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      batchSize: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.batchSize",
-        },
-        z.coerce.number().int().min(1),
-      ),
+      batchSize: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.batchSize",
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      concurrentAccounts: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.config.response.concurrentAccounts",
-        },
-        z.coerce.number().int().min(1),
-      ),
+      concurrentAccounts: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.concurrentAccounts",
+        schema: z.coerce.number().int().min(1),
+      }),
 
       // Performance configuration fields
-      cacheEnabled: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.cacheEnabled",
-        },
-        z.boolean(),
-      ),
+      cacheEnabled: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.cacheEnabled",
+        schema: z.boolean(),
+      }),
 
-      cacheMaxSize: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.cacheMaxSize",
-        },
-        z.coerce.number().int().min(1),
-      ),
+      cacheMaxSize: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.cacheMaxSize",
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      cacheTtl: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.cacheTtl",
-        },
-        z.coerce.number().int().min(1),
-      ),
+      cacheTtl: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.cacheTtl",
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      memoryThreshold: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.memoryThreshold",
-        },
-        z.coerce.number().int().min(1),
-      ),
+      memoryThreshold: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.memoryThreshold",
+        schema: z.coerce.number().int().min(1),
+      }),
 
       // Resilience configuration fields
-      maxRetries: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.maxRetries",
-        },
-        z.coerce.number().int().min(0),
-      ),
+      maxRetries: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.maxRetries",
+        schema: z.coerce.number().int().min(0),
+      }),
 
-      retryDelay: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.retryDelay",
-        },
-        z.coerce.number().int().min(1),
-      ),
+      retryDelay: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.retryDelay",
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      circuitBreakerThreshold: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
-        },
-        z.coerce.number().int().min(1),
-      ),
+      circuitBreakerThreshold: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      circuitBreakerTimeout: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
-        },
-        z.coerce.number().int().min(1),
-      ),
+      circuitBreakerTimeout: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
+        schema: z.coerce.number().int().min(1),
+      }),
 
       // Monitoring configuration fields
-      healthCheckInterval: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.config.response.healthCheckInterval",
-        },
-        z.coerce.number().int().min(1),
-      ),
+      healthCheckInterval: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.emails.imapClient.config.response.healthCheckInterval",
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      metricsEnabled: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.metricsEnabled",
-        },
-        z.boolean(),
-      ),
+      metricsEnabled: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.metricsEnabled",
+        schema: z.boolean(),
+      }),
 
       // Development configuration fields
-      debugMode: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.debugMode",
-        },
-        z.boolean(),
-      ),
+      debugMode: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.debugMode",
+        schema: z.boolean(),
+      }),
 
-      testMode: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.testMode",
-        },
-        z.boolean(),
-      ),
+      testMode: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.response.testMode",
+        schema: z.boolean(),
+      }),
     },
   ),
 
@@ -445,376 +385,314 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // Host field
-      host: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.emails.imapClient.config.serverEnabled.label",
-          description:
-            "app.api.emails.imapClient.config.serverEnabled.description",
-          placeholder:
-            "app.api.emails.imapClient.accounts.create.host.placeholder",
-          columns: 6,
-        },
-        z.string().min(1),
-      ),
+      host: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.emails.imapClient.config.serverEnabled.label",
+        description:
+          "app.api.emails.imapClient.config.serverEnabled.description",
+        placeholder:
+          "app.api.emails.imapClient.accounts.create.host.placeholder",
+        columns: 6,
+        schema: z.string().min(1),
+      }),
 
       // Port field
-      port: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.config.maxConnections.label",
-          description:
-            "app.api.emails.imapClient.config.maxConnections.description",
-          placeholder:
-            "app.api.emails.imapClient.accounts.create.port.placeholder",
-          columns: 6,
-        },
-        z.coerce.number().int().min(1).max(65535),
-      ),
+      port: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.config.maxConnections.label",
+        description:
+          "app.api.emails.imapClient.config.maxConnections.description",
+        placeholder:
+          "app.api.emails.imapClient.accounts.create.port.placeholder",
+        columns: 6,
+        schema: z.coerce.number().int().min(1).max(65535),
+      }),
 
       // Username field
-      username: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.emails.imapClient.accounts.create.username.label",
-          description:
-            "app.api.emails.imapClient.accounts.create.username.description",
-          placeholder:
-            "app.api.emails.imapClient.accounts.create.username.placeholder",
-          columns: 6,
-        },
-        z.string().min(1),
-      ),
+      username: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.emails.imapClient.accounts.create.username.label",
+        description:
+          "app.api.emails.imapClient.accounts.create.username.description",
+        placeholder:
+          "app.api.emails.imapClient.accounts.create.username.placeholder",
+        columns: 6,
+        schema: z.string().min(1),
+      }),
 
       // Password field
-      password: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.PASSWORD,
-          label: "app.api.emails.imapClient.accounts.create.password.label",
-          description:
-            "app.api.emails.imapClient.accounts.create.password.description",
-          placeholder:
-            "app.api.emails.imapClient.accounts.create.password.placeholder",
-          columns: 6,
-        },
-        z.string().min(1),
-      ),
+      password: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.PASSWORD,
+        label: "app.api.emails.imapClient.accounts.create.password.label",
+        description:
+          "app.api.emails.imapClient.accounts.create.password.description",
+        placeholder:
+          "app.api.emails.imapClient.accounts.create.password.placeholder",
+        columns: 6,
+        schema: z.string().min(1),
+      }),
 
       // TLS field
-      tls: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.emails.imapClient.accounts.create.secure.label",
-          description:
-            "app.api.emails.imapClient.accounts.create.secure.description",
-          columns: 6,
-        },
-        z.boolean(),
-      ),
+      tls: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.emails.imapClient.accounts.create.secure.label",
+        description:
+          "app.api.emails.imapClient.accounts.create.secure.description",
+        columns: 6,
+        schema: z.boolean(),
+      }),
 
       // Auto-reconnect field
-      autoReconnect: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.emails.imapClient.accounts.create.keepAlive.label",
-          description:
-            "app.api.emails.imapClient.accounts.create.keepAlive.description",
-          columns: 6,
-        },
-        z.boolean(),
-      ),
+      autoReconnect: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.emails.imapClient.accounts.create.keepAlive.label",
+        description:
+          "app.api.emails.imapClient.accounts.create.keepAlive.description",
+        columns: 6,
+        schema: z.boolean(),
+      }),
 
       // Logging level field
-      loggingLevel: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.emails.imapClient.config.loggingLevel.label",
-          description:
-            "app.api.emails.imapClient.config.loggingLevel.description",
-          options: ImapLoggingLevelOptions,
-          columns: 6,
-        },
-        z.enum(ImapLoggingLevel),
-      ),
+      loggingLevel: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.emails.imapClient.config.loggingLevel.label",
+        description:
+          "app.api.emails.imapClient.config.loggingLevel.description",
+        options: ImapLoggingLevelOptions,
+        columns: 6,
+        schema: z.enum(ImapLoggingLevel),
+      }),
 
       // Server configuration fields
-      serverEnabled: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.emails.imapClient.config.serverEnabled.label",
-          description:
-            "app.api.emails.imapClient.config.serverEnabled.description",
-          columns: 6,
-        },
-        z.boolean(),
-      ),
+      serverEnabled: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.emails.imapClient.config.serverEnabled.label",
+        description:
+          "app.api.emails.imapClient.config.serverEnabled.description",
+        columns: 6,
+        schema: z.boolean(),
+      }),
 
-      maxConnections: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.config.response.maxConnections",
-          description:
-            "app.api.emails.imapClient.config.maxConnections.description",
-          columns: 6,
-        },
-        z.coerce.number().int().min(1),
-      ),
+      maxConnections: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.config.response.maxConnections",
+        description:
+          "app.api.emails.imapClient.config.maxConnections.description",
+        columns: 6,
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      connectionTimeout: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.config.response.connectionTimeout",
-          description:
-            "app.api.emails.imapClient.config.connectionTimeout.description",
-          columns: 6,
-        },
-        z.coerce.number().int().min(1),
-      ),
+      connectionTimeout: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.config.response.connectionTimeout",
+        description:
+          "app.api.emails.imapClient.config.connectionTimeout.description",
+        columns: 6,
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      poolIdleTimeout: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.config.response.poolIdleTimeout",
-          description:
-            "app.api.emails.imapClient.config.serverEnabled.description",
-          columns: 6,
-        },
-        z.coerce.number().int().min(1),
-      ),
+      poolIdleTimeout: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.config.response.poolIdleTimeout",
+        description:
+          "app.api.emails.imapClient.config.serverEnabled.description",
+        columns: 6,
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      keepAlive: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.emails.imapClient.config.response.keepAlive",
-          description:
-            "app.api.emails.imapClient.config.serverEnabled.description",
-          columns: 6,
-        },
-        z.boolean(),
-      ),
+      keepAlive: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.emails.imapClient.config.response.keepAlive",
+        description:
+          "app.api.emails.imapClient.config.serverEnabled.description",
+        columns: 6,
+        schema: z.boolean(),
+      }),
 
       // Sync configuration fields
-      syncEnabled: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.emails.imapClient.config.syncEnabled.label",
-          description:
-            "app.api.emails.imapClient.config.syncEnabled.description",
-          columns: 6,
-        },
-        z.boolean(),
-      ),
+      syncEnabled: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.emails.imapClient.config.syncEnabled.label",
+        description: "app.api.emails.imapClient.config.syncEnabled.description",
+        columns: 6,
+        schema: z.boolean(),
+      }),
 
-      syncInterval: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.config.syncInterval.label",
-          description:
-            "app.api.emails.imapClient.config.syncInterval.description",
-          columns: 6,
-        },
-        z.coerce.number().int().min(1),
-      ),
+      syncInterval: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.config.syncInterval.label",
+        description:
+          "app.api.emails.imapClient.config.syncInterval.description",
+        columns: 6,
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      maxMessages: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.config.response.maxMessages",
-          description: "app.api.emails.imapClient.sync.maxMessages.description",
-          columns: 6,
-        },
-        z.coerce.number().int().min(1),
-      ),
+      maxMessages: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.config.response.maxMessages",
+        description: "app.api.emails.imapClient.sync.maxMessages.description",
+        columns: 6,
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      batchSize: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.config.response.batchSize",
-          description: "app.api.emails.imapClient.config.batchSize.description",
-          columns: 6,
-        },
-        z.coerce.number().int().min(1),
-      ),
+      batchSize: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.config.response.batchSize",
+        description: "app.api.emails.imapClient.config.batchSize.description",
+        columns: 6,
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      concurrentAccounts: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.config.response.concurrentAccounts",
-          description: "app.api.emails.imapClient.sync.accountIds.description",
-          columns: 6,
-        },
-        z.coerce.number().int().min(1),
-      ),
+      concurrentAccounts: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.config.response.concurrentAccounts",
+        description: "app.api.emails.imapClient.sync.accountIds.description",
+        columns: 6,
+        schema: z.coerce.number().int().min(1),
+      }),
 
       // Performance configuration fields
-      cacheEnabled: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.emails.imapClient.config.response.cacheEnabled",
-          description:
-            "app.api.emails.imapClient.config.serverEnabled.description",
-          columns: 6,
-        },
-        z.boolean(),
-      ),
+      cacheEnabled: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.emails.imapClient.config.response.cacheEnabled",
+        description:
+          "app.api.emails.imapClient.config.serverEnabled.description",
+        columns: 6,
+        schema: z.boolean(),
+      }),
 
-      cacheMaxSize: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.config.response.cacheMaxSize",
-          description: "app.api.emails.imapClient.config.batchSize.description",
-          columns: 6,
-        },
-        z.coerce.number().int().min(1),
-      ),
+      cacheMaxSize: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.config.response.cacheMaxSize",
+        description: "app.api.emails.imapClient.config.batchSize.description",
+        columns: 6,
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      cacheTtl: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.config.response.cacheTtl",
-          description: "app.api.emails.imapClient.config.form.description",
-          columns: 6,
-        },
-        z.coerce.number().int().min(1),
-      ),
+      cacheTtl: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.config.response.cacheTtl",
+        description: "app.api.emails.imapClient.config.form.description",
+        columns: 6,
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      memoryThreshold: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.config.response.memoryThreshold",
-          description: "app.api.emails.imapClient.config.form.description",
-          columns: 6,
-        },
-        z.coerce.number().int().min(1),
-      ),
+      memoryThreshold: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.config.response.memoryThreshold",
+        description: "app.api.emails.imapClient.config.form.description",
+        columns: 6,
+        schema: z.coerce.number().int().min(1),
+      }),
 
       // Resilience configuration fields
-      maxRetries: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.config.response.maxRetries",
-          description: "app.api.emails.imapClient.config.response.maxRetries",
-          columns: 6,
-        },
-        z.coerce.number().int().min(0),
-      ),
+      maxRetries: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.config.response.maxRetries",
+        description: "app.api.emails.imapClient.config.response.maxRetries",
+        columns: 6,
+        schema: z.coerce.number().int().min(0),
+      }),
 
-      retryDelay: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.config.response.retryDelay",
-          description: "app.api.emails.imapClient.config.response.retryDelay",
-          columns: 6,
-        },
-        z.coerce.number().int().min(1),
-      ),
+      retryDelay: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.config.response.retryDelay",
+        description: "app.api.emails.imapClient.config.response.retryDelay",
+        columns: 6,
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      circuitBreakerThreshold: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
-          description:
-            "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
-          columns: 6,
-        },
-        z.coerce.number().int().min(1),
-      ),
+      circuitBreakerThreshold: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
+        description:
+          "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
+        columns: 6,
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      circuitBreakerTimeout: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
-          description:
-            "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
-          columns: 6,
-        },
-        z.coerce.number().int().min(1),
-      ),
+      circuitBreakerTimeout: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
+        description:
+          "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
+        columns: 6,
+        schema: z.coerce.number().int().min(1),
+      }),
 
       // Monitoring configuration fields
-      healthCheckInterval: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.emails.imapClient.config.response.healthCheckInterval",
-          description:
-            "app.api.emails.imapClient.config.syncInterval.description",
-          columns: 6,
-        },
-        z.coerce.number().int().min(1),
-      ),
+      healthCheckInterval: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.imapClient.config.response.healthCheckInterval",
+        description:
+          "app.api.emails.imapClient.config.syncInterval.description",
+        columns: 6,
+        schema: z.coerce.number().int().min(1),
+      }),
 
-      metricsEnabled: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.emails.imapClient.config.response.metricsEnabled",
-          description:
-            "app.api.emails.imapClient.config.serverEnabled.description",
-          columns: 6,
-        },
-        z.boolean(),
-      ),
+      metricsEnabled: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.emails.imapClient.config.response.metricsEnabled",
+        description:
+          "app.api.emails.imapClient.config.serverEnabled.description",
+        columns: 6,
+        schema: z.boolean(),
+      }),
 
       // Development configuration fields
-      debugMode: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.emails.imapClient.config.response.debugMode",
-          description: "app.api.emails.imapClient.config.debugMode.description",
-          columns: 6,
-        },
-        z.boolean(),
-      ),
+      debugMode: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.emails.imapClient.config.response.debugMode",
+        description: "app.api.emails.imapClient.config.debugMode.description",
+        columns: 6,
+        schema: z.boolean(),
+      }),
 
-      testMode: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.emails.imapClient.config.response.testMode",
-          description: "app.api.emails.imapClient.config.debugMode.description",
-          columns: 6,
-        },
-        z.boolean(),
-      ),
+      testMode: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.emails.imapClient.config.response.testMode",
+        description: "app.api.emails.imapClient.config.debugMode.description",
+        columns: 6,
+        schema: z.boolean(),
+      }),
 
       // Response message
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.update.response.message",
-        },
-        z.string(),
-      ),
+      message: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.emails.imapClient.config.update.response.message",
+        schema: z.string(),
+      }),
     },
   ),
 

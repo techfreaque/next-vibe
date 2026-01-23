@@ -4,6 +4,8 @@
  * Used by both React and CLI implementations
  */
 
+import type { ZodTypeAny } from "zod";
+
 import type { IconKey } from "../../../react/icons";
 import type { UnifiedField } from "../../types/endpoint";
 import { WidgetType } from "../../types/enums";
@@ -152,7 +154,7 @@ export function formatTrendValue(trendValue: number): string {
  * Get metric configuration from field
  */
 export function getMetricConfig<TKey extends string>(
-  field: UnifiedField<TKey>,
+  field: UnifiedField<TKey, ZodTypeAny>,
 ): MetricConfig {
   const defaultConfig: MetricConfig = {
     format: "number",

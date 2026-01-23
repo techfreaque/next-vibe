@@ -200,12 +200,6 @@ export const translations: typeof enTranslations = {
           category: {
             label: "Kategorie",
           },
-          suggestedPrompts: {
-            label: "Vorgeschlagene Prompts (optional)",
-            description:
-              "Fügen Sie bis zu 4 Beispiel-Prompts hinzu, um Benutzern den Einstieg zu erleichtern",
-            placeholder: "Beispiel-Prompt {{number}}",
-          },
         },
         createCategory: "Kategorie erstellen",
         cancel: "Abbrechen",

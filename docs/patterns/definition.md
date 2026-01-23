@@ -52,7 +52,7 @@ All field functions generate interfaces for **CLI, React Web, React Native, AI T
 
 | Function                      | Context                        | Use Case                                 | Optional Variant                  |
 | ----------------------------- | ------------------------------ | ---------------------------------------- | --------------------------------- |
-| `requestDataField()`          | `{ request: "data" }`          | Request body fields (POST/PUT/PATCH)     | Use `.optional()` on Zod schema   |
+| `requestField()`              | `{ request: "data" }`          | Request body fields (POST/PUT/PATCH)     | Use `.optional()` on Zod schema   |
 | `requestUrlPathParamsField()` | `{ request: "urlPathParams" }` | URL path parameters (e.g., `/user/[id]`) | N/A (path params are required)    |
 | `responseField()`             | `{ response: true }`           | Response-only fields                     | Use `.optional()` on Zod schema   |
 | `requestResponseField()`      | Mixed context                  | Fields used in both request and response | Use `.optional()` on Zod schema   |
@@ -63,7 +63,7 @@ All field functions generate interfaces for **CLI, React Web, React Native, AI T
 
 **Important Notes:**
 
-- **Query parameters** for GET requests use `requestDataField()` - they are validated from URL search params automatically
+- **Query parameters** for GET requests use `requestField()` - they are validated from URL search params automatically
 - **Optional fields**: For primitive types (string, number, boolean), use `.optional()` on the Zod schema. For objects and arrays, use the dedicated optional field functions (`objectOptionalField()`, `arrayOptionalField()`, etc.)
 - **All interfaces are generated automatically**: CLI prompts, React forms, AI tool schemas, and MCP definitions are all created from the same definition
 
@@ -73,7 +73,7 @@ All field functions generate interfaces for **CLI, React Web, React Native, AI T
 
 ```typescript
 // ✅ CORRECT - Optional primitive field
-preferredModel: requestDataField(
+preferredModel: requestField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
@@ -389,7 +389,7 @@ Form fields use `columns` property for grid width (1-12):
 
 ```typescript
 // ✅ CORRECT - Form field with columns
-requestDataField(
+requestField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXT,
@@ -401,7 +401,7 @@ requestDataField(
 )
 
 // ✅ CORRECT - Full width textarea
-requestDataField(
+requestField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXTAREA,
@@ -413,7 +413,7 @@ requestDataField(
 )
 
 // ✅ CORRECT - Select field with options
-requestDataField(
+requestField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
@@ -426,7 +426,7 @@ requestDataField(
 )
 
 // ❌ WRONG - Don't use nested layout object
-requestDataField(
+requestField(
   {
     type: WidgetType.FORM_FIELD,
     layout: { columns: 6 },  // ❌ Invalid
@@ -573,8 +573,8 @@ contactInfo: objectField(
   },
   { request: "data" },
   {
-    email: requestDataField({...}, z.string().email()),
-    phone: requestDataField({...}, z.string()),
+    email: requestField({...}, z.string().email()),
+    phone: requestField({...}, z.string()),
   }
 )
 
@@ -588,9 +588,9 @@ addressInfo: objectField(
   },
   { request: "data" },
   {
-    street: requestDataField({...}, z.string()),
-    city: requestDataField({...}, z.string()),
-    country: requestDataField({...}, z.string()),
+    street: requestField({...}, z.string()),
+    city: requestField({...}, z.string()),
+    country: requestField({...}, z.string()),
   }
 )
 ```
@@ -607,7 +607,7 @@ addressInfo: objectField(
 **Email fields:**
 
 ```typescript
-email: requestDataField(
+email: requestField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.EMAIL,
@@ -622,7 +622,7 @@ email: requestDataField(
 **Phone fields:**
 
 ```typescript
-phone: requestDataField(
+phone: requestField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.PHONE,
@@ -637,7 +637,7 @@ phone: requestDataField(
 **Text areas:**
 
 ```typescript
-description: requestDataField(
+description: requestField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXTAREA,
@@ -652,7 +652,7 @@ description: requestDataField(
 **Select fields with enums:**
 
 ```typescript
-status: requestDataField(
+status: requestField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
@@ -735,7 +735,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   requestResponseField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
@@ -827,8 +827,8 @@ fields: objectField(
       { type: WidgetType.SECTION, ... },
       { request: "data" },
       {
-        firstName: requestDataField({...}, z.string()),
-        lastName: requestDataField({...}, z.string())
+        firstName: requestField({...}, z.string()),
+        lastName: requestField({...}, z.string())
       }
     ),
     email: responseField({...}, z.email()),
@@ -908,8 +908,8 @@ export type SomeStatus = UserGetRequestInput["status"];
 
 ```typescript
 // ❌ WRONG
-debug: requestDataField({...}, z.boolean().default(false))
-verbose: requestDataField({...}, z.boolean().default(false))
+debug: requestField({...}, z.boolean().default(false))
+verbose: requestField({...}, z.boolean().default(false))
 
 // ✅ CORRECT - Use logger.isDebugEnabled() in implementation
 ```

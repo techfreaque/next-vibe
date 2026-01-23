@@ -3,7 +3,6 @@ export const translations = {
     dashboard: "Dashboard",
     leadManagement: "Lead Management",
     users: "Users",
-    consultations: "Consultations",
     emails: "Emails",
     cronTasks: "Cron Tasks",
     admin: "Admin",

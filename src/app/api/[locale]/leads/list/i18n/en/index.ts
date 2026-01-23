@@ -2,6 +2,9 @@ export const translations = {
   get: {
     title: "List Leads",
     description: "Retrieve a paginated list of leads with filtering",
+    createButton: {
+      label: "Create Lead",
+    },
     form: {
       title: "Lead List Filters",
       description: "Configure filters for lead list",
@@ -96,7 +99,6 @@ export const translations = {
         convertedUserId: "Converted User ID",
         convertedAt: "Converted At",
         signedUpAt: "Signed Up At",
-        consultationBookedAt: "Consultation Booked At",
         subscriptionConfirmedAt: "Subscription Confirmed At",
         currentCampaignStage: "Current Campaign Stage",
         emailsSent: "Emails Sent",

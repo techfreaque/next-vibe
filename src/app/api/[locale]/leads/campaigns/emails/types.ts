@@ -32,7 +32,6 @@ interface LeadWithEmailType {
   convertedUserId?: string | null;
   convertedAt?: Date | null;
   signedUpAt?: Date | null;
-  consultationBookedAt?: Date | null;
   subscriptionConfirmedAt?: Date | null;
   currentCampaignStage?: string | null;
   emailJourneyVariant?:

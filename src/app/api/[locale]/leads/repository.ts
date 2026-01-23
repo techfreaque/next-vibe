@@ -363,7 +363,6 @@ export class LeadsRepository {
         };
         additionalDetails: {
           notes?: string;
-          consultationBookedAt?: Date | null;
           subscriptionConfirmedAt?: Date | null;
           metadata?: Record<string, string | number | boolean | null>;
         };
@@ -396,7 +395,6 @@ export class LeadsRepository {
         currentCampaignStage: campaignManagement.currentCampaignStage,
         source: campaignManagement.source,
         notes: additionalDetails.notes,
-        consultationBookedAt: additionalDetails.consultationBookedAt,
         subscriptionConfirmedAt: additionalDetails.subscriptionConfirmedAt,
         metadata: additionalDetails.metadata,
       };
@@ -683,7 +681,6 @@ export class LeadsRepository {
       convertedUserId: lead.convertedUserId,
       convertedAt: lead.convertedAt,
       signedUpAt: lead.signedUpAt,
-      consultationBookedAt: lead.consultationBookedAt,
       subscriptionConfirmedAt: lead.subscriptionConfirmedAt,
       currentCampaignStage: lead.currentCampaignStage,
       emailsSent: lead.emailsSent,
@@ -731,7 +728,6 @@ export class LeadsRepository {
           convertedUserId: lead.convertedUserId,
           convertedAt: lead.convertedAt,
           signedUpAt: lead.signedUpAt,
-          consultationBookedAt: lead.consultationBookedAt,
           subscriptionConfirmedAt: lead.subscriptionConfirmedAt,
         },
         metadata: {

@@ -91,7 +91,7 @@ export function ChatSidebar({
 
   // Fetch credits with server-side initial data (disables initial fetch)
   // Hook handles null case internally - called unconditionally per React rules
-  const endpoint = useCredits(logger, initialCredits ?? null);
+  const endpoint = useCredits(logger, initialCredits);
   const readState = endpoint?.read;
   const credits = readState?.response?.success
     ? readState.response.data

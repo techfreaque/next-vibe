@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -57,107 +57,90 @@ const { GET } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS (Filters) ===
-      campaignType: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.emails.smtpClient.list.fields.campaignType.label",
-          description:
-            "app.api.emails.smtpClient.list.fields.campaignType.description",
-          columns: 3,
-          options: CampaignTypeFilterOptions,
-        },
-        z.enum(CampaignTypeFilter).default(CampaignTypeFilter.ANY),
-      ),
+      campaignType: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.emails.smtpClient.list.fields.campaignType.label",
+        description:
+          "app.api.emails.smtpClient.list.fields.campaignType.description",
+        columns: 3,
+        options: CampaignTypeFilterOptions,
+        schema: z.enum(CampaignTypeFilter).default(CampaignTypeFilter.ANY),
+      }),
 
-      status: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.emails.smtpClient.list.fields.status.label",
-          description:
-            "app.api.emails.smtpClient.list.fields.status.description",
-          columns: 3,
-          options: SmtpAccountStatusFilterOptions,
-        },
-        z.enum(SmtpAccountStatusFilter).default(SmtpAccountStatusFilter.ANY),
-      ),
+      status: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.emails.smtpClient.list.fields.status.label",
+        description: "app.api.emails.smtpClient.list.fields.status.description",
+        columns: 3,
+        options: SmtpAccountStatusFilterOptions,
+        schema: z
+          .enum(SmtpAccountStatusFilter)
+          .default(SmtpAccountStatusFilter.ANY),
+      }),
 
-      healthStatus: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.emails.smtpClient.list.fields.healthStatus.label",
-          description:
-            "app.api.emails.smtpClient.list.fields.healthStatus.description",
-          columns: 3,
-          options: SmtpHealthStatusFilterOptions,
-        },
-        z.enum(SmtpHealthStatusFilter).default(SmtpHealthStatusFilter.ANY),
-      ),
+      healthStatus: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.emails.smtpClient.list.fields.healthStatus.label",
+        description:
+          "app.api.emails.smtpClient.list.fields.healthStatus.description",
+        columns: 3,
+        options: SmtpHealthStatusFilterOptions,
+        schema: z
+          .enum(SmtpHealthStatusFilter)
+          .default(SmtpHealthStatusFilter.ANY),
+      }),
 
-      search: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.emails.smtpClient.list.fields.search.label",
-          description:
-            "app.api.emails.smtpClient.list.fields.search.description",
-          placeholder:
-            "app.api.emails.smtpClient.list.fields.search.placeholder",
-          columns: 3,
-        },
-        z.string().optional(),
-      ),
+      search: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.emails.smtpClient.list.fields.search.label",
+        description: "app.api.emails.smtpClient.list.fields.search.description",
+        placeholder: "app.api.emails.smtpClient.list.fields.search.placeholder",
+        columns: 3,
+        schema: z.string().optional(),
+      }),
 
-      sortBy: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.emails.smtpClient.list.fields.sortBy.label",
-          description:
-            "app.api.emails.smtpClient.list.fields.sortBy.description",
-          columns: 3,
-          options: SmtpAccountSortFieldOptions,
-        },
-        z.enum(SmtpAccountSortField).optional(),
-      ),
+      sortBy: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.emails.smtpClient.list.fields.sortBy.label",
+        description: "app.api.emails.smtpClient.list.fields.sortBy.description",
+        columns: 3,
+        options: SmtpAccountSortFieldOptions,
+        schema: z.enum(SmtpAccountSortField).optional(),
+      }),
 
-      sortOrder: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.emails.smtpClient.list.fields.sortOrder.label",
-          description:
-            "app.api.emails.smtpClient.list.fields.sortOrder.description",
-          columns: 3,
-          options: SortOrderOptions,
-        },
-        z.enum(SortOrder).optional(),
-      ),
+      sortOrder: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "app.api.emails.smtpClient.list.fields.sortOrder.label",
+        description:
+          "app.api.emails.smtpClient.list.fields.sortOrder.description",
+        columns: 3,
+        options: SortOrderOptions,
+        schema: z.enum(SortOrder).optional(),
+      }),
 
-      page: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.smtpClient.list.fields.page.label",
-          description: "app.api.emails.smtpClient.list.fields.page.description",
-          columns: 3,
-        },
-        z.coerce.number().int().min(1).default(1),
-      ),
+      page: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.smtpClient.list.fields.page.label",
+        description: "app.api.emails.smtpClient.list.fields.page.description",
+        columns: 3,
+        schema: z.coerce.number().int().min(1).default(1),
+      }),
 
-      limit: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.smtpClient.list.fields.limit.label",
-          description:
-            "app.api.emails.smtpClient.list.fields.limit.description",
-          columns: 3,
-        },
-        z.coerce.number().int().min(1).max(100).default(10),
-      ),
+      limit: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.emails.smtpClient.list.fields.limit.label",
+        description: "app.api.emails.smtpClient.list.fields.limit.description",
+        columns: 3,
+        schema: z.coerce.number().int().min(1).max(100).default(10),
+      }),
 
       // === RESPONSE FIELDS ===
       accounts: responseArrayField(
@@ -176,66 +159,50 @@ const { GET } = createEndpoint({
           },
           { response: true },
           {
-            id: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.emails.smtpClient.list.response.account.id",
-              },
-              z.uuid(),
-            ),
-            name: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.emails.smtpClient.list.response.account.name",
-              },
-              z.string(),
-            ),
-            status: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.emails.smtpClient.list.response.account.status",
-              },
-              z.enum(SmtpAccountStatus),
-            ),
-            healthCheckStatus: responseField(
-              {
-                type: WidgetType.BADGE,
-                text: "app.api.emails.smtpClient.list.response.account.healthStatus",
-              },
-              z.enum(SmtpHealthStatus).nullable(),
-            ),
-            priority: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.smtpClient.list.response.account.priority",
-              },
-              z.coerce.number().int(),
-            ),
-            totalEmailsSent: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.smtpClient.list.response.account.totalEmailsSent",
-              },
-              z.coerce.number().int(),
-            ),
-            lastUsedAt: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.smtpClient.list.response.account.lastUsedAt",
-              },
-              dateSchema.nullable(),
-            ),
-            createdAt: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.smtpClient.list.response.account.createdAt",
-              },
-              z.string().datetime(),
-            ),
+            id: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.emails.smtpClient.list.response.account.id",
+              schema: z.uuid(),
+            }),
+            name: responseField({
+              type: WidgetType.TEXT,
+              content: "app.api.emails.smtpClient.list.response.account.name",
+              schema: z.string(),
+            }),
+            status: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.emails.smtpClient.list.response.account.status",
+              schema: z.enum(SmtpAccountStatus),
+            }),
+            healthCheckStatus: responseField({
+              type: WidgetType.BADGE,
+              text: "app.api.emails.smtpClient.list.response.account.healthStatus",
+              schema: z.enum(SmtpHealthStatus).nullable(),
+            }),
+            priority: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.smtpClient.list.response.account.priority",
+              schema: z.coerce.number().int(),
+            }),
+            totalEmailsSent: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.smtpClient.list.response.account.totalEmailsSent",
+              schema: z.coerce.number().int(),
+            }),
+            lastUsedAt: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.smtpClient.list.response.account.lastUsedAt",
+              schema: dateSchema.nullable(),
+            }),
+            createdAt: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.emails.smtpClient.list.response.account.createdAt",
+              schema: z.string().datetime(),
+            }),
           },
         ),
       ),
@@ -251,38 +218,27 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          page: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.smtpClient.list.response.pagination.page",
-            },
-            z.coerce.number().int(),
-          ),
-          limit: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.smtpClient.list.response.pagination.limit",
-            },
-            z.coerce.number().int(),
-          ),
-          total: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.smtpClient.list.response.pagination.total",
-            },
-            z.coerce.number().int(),
-          ),
-          totalPages: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.smtpClient.list.response.pagination.totalPages",
-            },
-            z.coerce.number().int(),
-          ),
+          page: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.smtpClient.list.response.pagination.page",
+            schema: z.coerce.number().int(),
+          }),
+          limit: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.smtpClient.list.response.pagination.limit",
+            schema: z.coerce.number().int(),
+          }),
+          total: responseField({
+            type: WidgetType.TEXT,
+            content: "app.api.emails.smtpClient.list.response.pagination.total",
+            schema: z.coerce.number().int(),
+          }),
+          totalPages: responseField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.emails.smtpClient.list.response.pagination.totalPages",
+            schema: z.coerce.number().int(),
+          }),
         },
       ),
     },

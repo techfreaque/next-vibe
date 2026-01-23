@@ -7,15 +7,20 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   objectField,
-  requestDataField,
+  requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+  submitButton,
+  widgetField,
+  widgetObjectField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
+  SpacingSize,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
@@ -49,11 +54,45 @@ const { POST } = createEndpoint({
       title: "app.api.leads.create.post.title",
       description: "app.api.leads.create.post.description",
       layoutType: LayoutType.STACKED,
+      paddingTop: "6",
+      noCard: true,
     },
+    { request: "data", response: true },
     {
-      [Methods.POST]: { request: "data", response: true },
-    },
-    {
+      // Top action buttons
+      topActions: widgetObjectField(
+        {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.INLINE,
+          gap: "2",
+          noCard: true,
+        },
+        { request: "data", response: true },
+        {
+          backButton: backButton({
+            label: "app.api.leads.create.post.backButton.label",
+            icon: "arrow-left",
+            variant: "outline",
+          }),
+          createButton: submitButton({
+            label: "app.api.leads.create.post.submitButton.label",
+            loadingText: "app.api.leads.create.post.submitButton.loadingText",
+            icon: "user-plus",
+            variant: "primary",
+            className: "ml-auto",
+          }),
+        },
+      ),
+
+      // Separator between buttons and content
+      separator: widgetField(
+        {
+          type: WidgetType.SEPARATOR,
+          spacingTop: SpacingSize.RELAXED,
+          spacingBottom: SpacingSize.RELAXED,
+        },
+        { response: true, request: "data" },
+      ),
       // === CONTACT INFORMATION ===
       contactInfo: objectField(
         {
@@ -64,56 +103,48 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          email: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.EMAIL,
-              label: "app.api.leads.create.post.email.label",
-              description: "app.api.leads.create.post.email.description",
-              placeholder: "app.api.leads.create.post.email.placeholder",
-              columns: 12,
-            },
-            z.email(),
-          ),
+          email: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.EMAIL,
+            label: "app.api.leads.create.post.email.label",
+            description: "app.api.leads.create.post.email.description",
+            placeholder: "app.api.leads.create.post.email.placeholder",
+            columns: 12,
+            schema: z.string().email(),
+          }),
 
-          businessName: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.leads.create.post.businessName.label",
-              description: "app.api.leads.create.post.businessName.description",
-              placeholder: "app.api.leads.create.post.businessName.placeholder",
-              columns: 12,
-            },
-            z.string().min(1).max(255),
-          ),
+          businessName: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.leads.create.post.businessName.label",
+            description: "app.api.leads.create.post.businessName.description",
+            placeholder: "app.api.leads.create.post.businessName.placeholder",
+            columns: 12,
+            schema: z.string().min(1).max(255),
+          }),
 
-          phone: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.PHONE,
-              label: "app.api.leads.create.post.phone.label",
-              description: "app.api.leads.create.post.phone.description",
-              placeholder: "app.api.leads.create.post.phone.placeholder",
-              columns: 6,
-            },
-            z
+          phone: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.PHONE,
+            label: "app.api.leads.create.post.phone.label",
+            description: "app.api.leads.create.post.phone.description",
+            placeholder: "app.api.leads.create.post.phone.placeholder",
+            columns: 6,
+            schema: z
               .string()
               .regex(/^\+?[1-9]\d{1,14}$/)
               .optional(),
-          ),
+          }),
 
-          website: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.URL,
-              label: "app.api.leads.create.post.website.label",
-              description: "app.api.leads.create.post.website.description",
-              placeholder: "app.api.leads.create.post.website.placeholder",
-              columns: 6,
-            },
-            z.string().url().optional(),
-          ),
+          website: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.URL,
+            label: "app.api.leads.create.post.website.label",
+            description: "app.api.leads.create.post.website.description",
+            placeholder: "app.api.leads.create.post.website.placeholder",
+            columns: 6,
+            schema: z.string().url().optional(),
+          }),
         },
       ),
 
@@ -128,31 +159,27 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          country: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.leads.create.post.country.label",
-              description: "app.api.leads.create.post.country.description",
-              placeholder: "app.api.leads.create.post.country.placeholder",
-              columns: 6,
-              options: CountriesOptions,
-            },
-            z.enum(Countries),
-          ),
+          country: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.leads.create.post.country.label",
+            description: "app.api.leads.create.post.country.description",
+            placeholder: "app.api.leads.create.post.country.placeholder",
+            columns: 6,
+            options: CountriesOptions,
+            schema: z.enum(Countries),
+          }),
 
-          language: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.leads.create.post.language.label",
-              description: "app.api.leads.create.post.language.description",
-              placeholder: "app.api.leads.create.post.language.placeholder",
-              columns: 6,
-              options: LanguagesOptions,
-            },
-            z.enum(Languages),
-          ),
+          language: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.leads.create.post.language.label",
+            description: "app.api.leads.create.post.language.description",
+            placeholder: "app.api.leads.create.post.language.placeholder",
+            columns: 6,
+            options: LanguagesOptions,
+            schema: z.enum(Languages),
+          }),
         },
       ),
 
@@ -166,30 +193,26 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          source: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.leads.create.post.source.label",
-              description: "app.api.leads.create.post.source.description",
-              placeholder: "app.api.leads.create.post.source.placeholder",
-              columns: 12,
-              options: LeadSourceOptions,
-            },
-            z.enum(LeadSource).optional(),
-          ),
+          source: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.leads.create.post.source.label",
+            description: "app.api.leads.create.post.source.description",
+            placeholder: "app.api.leads.create.post.source.placeholder",
+            columns: 12,
+            options: LeadSourceOptions,
+            schema: z.enum(LeadSource).optional(),
+          }),
 
-          notes: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXTAREA,
-              label: "app.api.leads.create.post.notes.label",
-              description: "app.api.leads.create.post.notes.description",
-              placeholder: "app.api.leads.create.post.notes.placeholder",
-              columns: 12,
-            },
-            z.string().max(1000).optional(),
-          ),
+          notes: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXTAREA,
+            label: "app.api.leads.create.post.notes.label",
+            description: "app.api.leads.create.post.notes.description",
+            placeholder: "app.api.leads.create.post.notes.placeholder",
+            columns: 12,
+            schema: z.string().max(1000).optional(),
+          }),
         },
       ),
 
@@ -212,35 +235,27 @@ const { POST } = createEndpoint({
             },
             { response: true },
             {
-              id: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.leads.create.post.response.summary.id",
-                },
-                z.uuid(),
-              ),
-              businessName: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.summary.businessName",
-                },
-                z.string(),
-              ),
-              email: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.leads.create.post.response.summary.email",
-                },
-                z.string().email().nullable(),
-              ),
-              status: responseField(
-                {
-                  type: WidgetType.BADGE,
-                  text: "app.api.leads.create.post.response.summary.status",
-                },
-                z.enum(LeadStatus),
-              ),
+              id: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.leads.create.post.response.summary.id",
+                schema: z.uuid(),
+              }),
+              businessName: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.create.post.response.summary.businessName",
+                schema: z.string(),
+              }),
+              email: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.leads.create.post.response.summary.email",
+                schema: z.string().email().nullable(),
+              }),
+              status: responseField({
+                type: WidgetType.BADGE,
+                text: "app.api.leads.create.post.response.summary.status",
+                schema: z.enum(LeadStatus),
+              }),
             },
           ),
 
@@ -253,38 +268,30 @@ const { POST } = createEndpoint({
             },
             { response: true },
             {
-              phone: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.contactDetails.phone",
-                },
-                z.string().nullable(),
-              ),
-              website: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.contactDetails.website",
-                },
-                z.string().nullable(),
-              ),
-              country: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.contactDetails.country",
-                },
-                z.string(),
-              ),
-              language: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.contactDetails.language",
-                },
-                z.string(),
-              ),
+              phone: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.create.post.response.contactDetails.phone",
+                schema: z.string().nullable(),
+              }),
+              website: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.create.post.response.contactDetails.website",
+                schema: z.string().nullable(),
+              }),
+              country: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.create.post.response.contactDetails.country",
+                schema: z.string(),
+              }),
+              language: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.create.post.response.contactDetails.language",
+                schema: z.string(),
+              }),
             },
           ),
 
@@ -297,29 +304,23 @@ const { POST } = createEndpoint({
             },
             { response: true },
             {
-              source: responseField(
-                {
-                  type: WidgetType.BADGE,
-                  text: "app.api.leads.create.post.response.trackingInfo.source",
-                },
-                z.enum(LeadSource).nullable(),
-              ),
-              emailsSent: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.trackingInfo.emailsSent",
-                },
-                z.coerce.number(),
-              ),
-              currentCampaignStage: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.trackingInfo.currentCampaignStage",
-                },
-                z.string().nullable(),
-              ),
+              source: responseField({
+                type: WidgetType.BADGE,
+                text: "app.api.leads.create.post.response.trackingInfo.source",
+                schema: z.enum(LeadSource).nullable(),
+              }),
+              emailsSent: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.create.post.response.trackingInfo.emailsSent",
+                schema: z.coerce.number(),
+              }),
+              currentCampaignStage: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.create.post.response.trackingInfo.currentCampaignStage",
+                schema: z.string().nullable(),
+              }),
             },
           ),
 
@@ -332,29 +333,23 @@ const { POST } = createEndpoint({
             },
             { response: true },
             {
-              notes: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.leads.create.post.response.metadata.notes",
-                },
-                z.string().nullable(),
-              ),
-              createdAt: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.metadata.createdAt",
-                },
-                dateSchema,
-              ),
-              updatedAt: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.metadata.updatedAt",
-                },
-                dateSchema,
-              ),
+              notes: responseField({
+                type: WidgetType.TEXT,
+                content: "app.api.leads.create.post.response.metadata.notes",
+                schema: z.string().nullable(),
+              }),
+              createdAt: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.create.post.response.metadata.createdAt",
+                schema: dateSchema,
+              }),
+              updatedAt: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.create.post.response.metadata.updatedAt",
+                schema: dateSchema,
+              }),
             },
           ),
         },

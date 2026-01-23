@@ -6,9 +6,9 @@
 import { relations } from "drizzle-orm";
 import { jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { z } from "zod";
 
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { users } from "@/app/api/[locale]/user/db";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -43,10 +43,6 @@ export const customCharacters = pgTable("custom_characters", {
   category: text("category").$type<typeof CharacterCategoryValue>().notNull(),
 
   voice: text("voice").$type<typeof TtsVoiceValue>(),
-  suggestedPrompts: jsonb("suggested_prompts")
-    .$type<string[]>()
-    .default([])
-    .notNull(),
 
   // Model selection (discriminated union from API)
   modelSelection: jsonb("model_selection")
@@ -79,19 +75,29 @@ export const customCharactersRelations = relations(
 /**
  * Schema for selecting custom characters
  */
-export const selectCustomCharacterSchema = createSelectSchema(customCharacters);
+export const selectCustomCharacterSchema = createSelectSchema(
+  customCharacters,
+  {
+    icon: iconSchema,
+  },
+);
 
 /**
  * Schema for inserting custom characters
  */
-export const insertCustomCharacterSchema = createInsertSchema(customCharacters);
+export const insertCustomCharacterSchema = createInsertSchema(
+  customCharacters,
+  {
+    icon: iconSchema,
+  },
+);
 
 /**
- * Type for custom character model
+ * Type for custom character model - uses Drizzle's $inferSelect to respect .$type annotations
  */
-export type CustomCharacter = z.infer<typeof selectCustomCharacterSchema>;
+export type CustomCharacter = typeof customCharacters.$inferSelect;
 
 /**
- * Type for new custom character model
+ * Type for new custom character model - uses Drizzle's $inferInsert to respect .$type annotations
  */
-export type NewCustomCharacter = z.infer<typeof insertCustomCharacterSchema>;
+export type NewCustomCharacter = typeof customCharacters.$inferInsert;

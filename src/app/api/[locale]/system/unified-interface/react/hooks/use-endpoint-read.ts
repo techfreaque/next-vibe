@@ -61,7 +61,7 @@ export function useEndpointRead<TEndpoint extends CreateApiEndpointAny>(
   const {
     formOptions = { persistForm: true, autoSubmit: true, debounceMs: 500 },
     queryOptions = {},
-    urlPathParams = {} as TEndpoint["types"]["UrlVariablesOutput"],
+    urlPathParams,
     autoPrefillData,
     initialState,
     initialData,
@@ -122,13 +122,11 @@ export function useEndpointRead<TEndpoint extends CreateApiEndpointAny>(
 
   // Enhanced query options with initial data support
   const enhancedQueryOptions = useMemo(() => {
-    // If initial data is provided, disable the query to prevent unnecessary fetches
-    const shouldDisableQuery = Boolean(initialData);
-
     return {
       ...queryOptions,
-      // Disable query when we have initial data from server
-      enabled: shouldDisableQuery ? false : (queryOptions.enabled ?? true),
+      // Keep query enabled so it gets cached properly in React Query
+      // This allows optimistic updates (updateEndpointData) to find the cached data
+      enabled: queryOptions.enabled ?? true,
       // Pass initial data for the query
       // This will be wrapped in a success response by useApiQuery
       initialData: initialData,
@@ -138,8 +136,7 @@ export function useEndpointRead<TEndpoint extends CreateApiEndpointAny>(
   // Use the existing query form hook with enhanced options
   const queryFormResult = useApiQueryForm({
     endpoint: primaryEndpoint,
-    urlPathParams:
-      urlPathParams || ({} as TEndpoint["types"]["UrlVariablesOutput"]),
+    urlPathParams: urlPathParams as TEndpoint["types"]["UrlVariablesOutput"],
     formOptions: enhancedFormOptions,
     queryOptions: enhancedQueryOptions,
     logger,

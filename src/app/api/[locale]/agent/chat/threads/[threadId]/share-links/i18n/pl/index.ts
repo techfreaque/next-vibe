@@ -1,6 +1,42 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  // Top-level keys used across methods
+  empty: "",
+  linkId: {
+    label: "ID linku",
+  },
+  label: {
+    label: "Etykieta",
+    description: "Opcjonalna etykieta do identyfikacji tego linku",
+    placeholder: "Wprowadź etykietę dla tego linku udostępniania",
+  },
+  allowPosting: {
+    label: "Zezwalaj na publikowanie",
+    description: "Zezwalaj odbiorcom na publikowanie wiadomości w tym wątku",
+  },
+  requireAuth: {
+    label: "Wymagaj uwierzytelnienia",
+    description:
+      "Wymagaj od użytkowników zalogowania się, aby uzyskać dostęp do tego linku",
+  },
+  shareLink: {
+    label: "Etykieta",
+    shareUrl: "Adres URL udostępniania",
+    active: "Aktywny",
+    allowPosting: "Zezwalaj na publikowanie",
+    requireAuth: "Wymagaj uwierzytelnienia",
+    accessCount: "Liczba dostępów",
+    lastAccessedAt: "Ostatni dostęp",
+    createdAt: "Utworzono",
+    editAction: "Edytuj",
+    deleteAction: "Odwołaj",
+  },
+  shareLinks: {
+    emptyTitle: "Brak linków udostępniania",
+    emptyDescription:
+      "Utwórz link udostępniania, aby udostępnić ten wątek innym",
+  },
   get: {
     title: "Pobierz linki udostępniania",
     description: "Pobierz wszystkie linki udostępniania dla wątku",
@@ -100,6 +136,7 @@ export const translations: typeof enTranslations = {
     label: {
       label: "Etykieta",
       description: "Opcjonalna etykieta do identyfikacji tego linku",
+      placeholder: "Wprowadź etykietę dla tego linku udostępniania",
     },
     allowPosting: {
       label: "Zezwalaj na publikowanie",
@@ -176,6 +213,7 @@ export const translations: typeof enTranslations = {
     label: {
       label: "Etykieta",
       description: "Opcjonalna etykieta do identyfikacji tego linku",
+      placeholder: "Wprowadź etykietę dla tego linku udostępniania",
     },
     allowPosting: {
       label: "Zezwalaj na publikowanie",
