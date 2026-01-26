@@ -2,6 +2,19 @@ import { translations as idTranslations } from "../../[id]/i18n/en";
 
 export const translations = {
   id: idTranslations,
+  fallbacks: {
+    unknownCharacter: "Unknown Character",
+    unknownModel: "Unknown Model",
+    unknown: "Unknown",
+    unknownProvider: "unknown",
+    noTagline: "",
+    noDescription: "",
+    zeroCredits: "0 credits",
+    noModelConfiguration: "Error: No model configuration",
+    configurationMissing: "Configuration missing",
+    noModel: "No model",
+    dash: "—",
+  },
   enums: {
     selectionType: {
       characterBased: "Based on Character",

@@ -14,7 +14,7 @@ import { useForm, type UseFormProps } from "react-hook-form";
 
 import { extractSchemaDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
 import { buildKey } from "./query-key-builder";
 import type { ApiStore, FormQueryParams } from "./store";

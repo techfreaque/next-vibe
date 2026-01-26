@@ -15,12 +15,12 @@ import {
   View,
 } from "react-native";
 
-import type { CategoryKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { CategoryKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import {
   Icon,
   ICON_CATEGORIES,
   ICON_CATEGORIES_LIST,
-} from "@/app/api/[locale]/system/unified-interface/react/icons";
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useTranslation } from "@/i18n/core/client";
 
 import type { IconPickerProps } from "../../web/ui/icon-picker";

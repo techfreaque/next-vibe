@@ -719,22 +719,8 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
     const byTemplate: ByTemplateType[] = templateStats
       .filter((item) => item.templateName)
       .map((item) => ({
-        templateName: item.templateName!,
-        templateId: item.templateName!,
+        template: item.templateName!,
         count: item.count,
-        percentage: totalEmails > 0 ? item.count / totalEmails : 0,
-        openRate:
-          item.deliveredEmails > 0
-            ? item.openedEmails / item.deliveredEmails
-            : 0,
-        clickRate:
-          item.openedEmails > 0 ? item.clickedEmails / item.openedEmails : 0,
-        historicalData: {
-          name: "app.api.emails.messages.stats.get.response.metrics.template_historical" as const satisfies TranslationKey,
-          data: [{ date: new Date().toISOString(), value: item.count }],
-          color: "#06b6d4",
-          type: ChartType.LINE,
-        },
       }));
 
     // Get engagement level data based on actual email interactions
@@ -776,20 +762,8 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
     ];
 
     const byEngagement: ByEngagementType[] = engagementData.map((item) => ({
-      engagementLevel: item.level,
+      engagement: item.level,
       count: item.count,
-      percentage: totalEmails > 0 ? item.count / totalEmails : 0,
-      historicalData: {
-        name: "app.api.emails.messages.stats.get.response.metrics.engagement_historical" as const satisfies TranslationKey,
-        data: [
-          {
-            date: new Date().toISOString(),
-            value: item.count,
-          },
-        ],
-        color: item.color,
-        type: ChartType.LINE,
-      },
     }));
 
     // Get retry count data based on actual retry counts
@@ -820,21 +794,9 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       },
     ];
 
-    const byRetryCount: ByRetryCountType[] = retryData.map((item) => ({
-      retryRange: item.range,
+    const byRetryCount: ByRetryCountType[] = retryData.map((item, index) => ({
+      retryCount: index,
       count: item.count,
-      percentage: totalEmails > 0 ? item.count / totalEmails : 0,
-      historicalData: {
-        name: item.translationKey,
-        data: [
-          {
-            date: new Date().toISOString(),
-            value: item.count,
-          },
-        ],
-        color: item.color,
-        type: ChartType.LINE,
-      },
     }));
 
     // Get user association stats
@@ -896,20 +858,8 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
 
     const byUserAssociation: ByUserAssociationType[] = associationData.map(
       (item) => ({
-        associationType: item.type,
+        association: item.type,
         count: item.count,
-        percentage: totalEmails > 0 ? item.count / totalEmails : 0,
-        historicalData: {
-          name: item.translationKey,
-          data: [
-            {
-              date: new Date().toISOString(),
-              value: item.count,
-            },
-          ],
-          color: item.color,
-          type: ChartType.LINE,
-        },
       }),
     );
 
@@ -952,15 +902,10 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
             : ActivityType.EMAIL_SENT;
 
       return {
-        type: activityType,
         id: email.id,
-        recipientEmail: email.recipientEmail,
-        templateName: email.templateName || undefined,
-        timestamp: email.createdAt,
-        details: {
-          subject: email.subject,
-          status: email.status,
-        },
+        action: activityType,
+        timestamp: email.createdAt.toISOString(),
+        details: email.subject || undefined,
       };
     });
   }
@@ -992,17 +937,19 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
     return templateStats
       .filter((item) => item.templateName)
       .map((item) => ({
-        templateName: item.templateName!,
-        templateId: item.templateId!,
-        emailsSent: item.totalEmails,
+        template: item.templateName!,
+        sent: item.sentEmails,
+        delivered: item.deliveredEmails,
+        opened: item.openedEmails,
+        clicked: item.clickedEmails,
+        deliveryRate:
+          item.sentEmails > 0 ? item.deliveredEmails / item.sentEmails : 0,
         openRate:
           item.deliveredEmails > 0
             ? item.openedEmails / item.deliveredEmails
             : 0,
         clickRate:
           item.openedEmails > 0 ? item.clickedEmails / item.openedEmails : 0,
-        deliveryRate:
-          item.sentEmails > 0 ? item.deliveredEmails / item.sentEmails : 0,
       }));
   }
 
@@ -1031,15 +978,16 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
 
     return providerStats.map((item) => ({
       provider: item.provider || EmailProvider.OTHER,
-      emailsSent: item.totalEmails,
+      sent: item.sentEmails,
+      delivered: item.deliveredEmails,
+      opened: item.openedEmails,
+      clicked: item.clickedEmails,
       deliveryRate:
         item.sentEmails > 0 ? item.deliveredEmails / item.sentEmails : 0,
       openRate:
         item.deliveredEmails > 0 ? item.openedEmails / item.deliveredEmails : 0,
       clickRate:
         item.openedEmails > 0 ? item.clickedEmails / item.openedEmails : 0,
-      reliability:
-        item.sentEmails > 0 ? item.deliveredEmails / item.sentEmails : 0,
     }));
   }
 }

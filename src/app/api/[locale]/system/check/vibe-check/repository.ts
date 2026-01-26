@@ -154,17 +154,10 @@ export class VibeCheckRepository {
         "data" in result &&
         result.data &&
         typeof result.data === "object" &&
-        "issues" in result.data
+        "items" in result.data &&
+        Array.isArray(result.data.items)
       ) {
-        const issuesData = result.data.issues;
-        if (
-          typeof issuesData === "object" &&
-          issuesData !== null &&
-          "items" in issuesData &&
-          Array.isArray(issuesData.items)
-        ) {
-          return issuesData.items as CheckIssue[];
-        }
+        return result.data.items as CheckIssue[];
       }
       return [];
     }
@@ -173,13 +166,10 @@ export class VibeCheckRepository {
     if (
       typeof data === "object" &&
       data !== null &&
-      "issues" in data &&
-      typeof data.issues === "object" &&
-      data.issues !== null &&
-      "items" in data.issues &&
-      Array.isArray(data.issues.items)
+      "items" in data &&
+      Array.isArray(data.items)
     ) {
-      return data.issues.items as CheckIssue[];
+      return data.items as CheckIssue[];
     }
     return [];
   }
@@ -200,32 +190,30 @@ export class VibeCheckRepository {
       if (!configResult.ready) {
         return success(
           {
-            issues: {
-              items: [
-                {
-                  file: configResult.configPath,
-                  severity: "error" as const,
-                  message: configResult.message,
-                  type: "oxlint" as const,
-                },
-              ],
-              files: [
-                {
-                  file: configResult.configPath,
-                  errors: 1,
-                  warnings: 0,
-                  total: 1,
-                },
-              ],
-              summary: {
-                totalIssues: 1,
-                totalFiles: 1,
-                totalErrors: 1,
-                displayedIssues: 1,
-                displayedFiles: 1,
-                currentPage: 1,
-                totalPages: 1,
+            items: [
+              {
+                file: configResult.configPath,
+                severity: "error" as const,
+                message: configResult.message,
+                type: "oxlint" as const,
               },
+            ],
+            files: [
+              {
+                file: configResult.configPath,
+                errors: 1,
+                warnings: 0,
+                total: 1,
+              },
+            ],
+            summary: {
+              totalIssues: 1,
+              totalFiles: 1,
+              totalErrors: 1,
+              displayedIssues: 1,
+              displayedFiles: 1,
+              currentPage: 1,
+              totalPages: 1,
             },
           },
           {
@@ -479,22 +467,20 @@ export class VibeCheckRepository {
     }
 
     return {
-      issues: {
-        items: limitedIssues,
-        files,
-        summary: {
-          totalIssues,
-          totalFiles,
-          totalErrors,
-          displayedIssues,
-          displayedFiles,
-          truncatedMessage:
-            displayedIssues < totalIssues || displayedFiles < totalFiles
-              ? `Showing ${displayedIssues} of ${totalIssues} issues from ${displayedFiles} of ${totalFiles} files`
-              : "",
-          currentPage: page,
-          totalPages,
-        },
+      items: limitedIssues,
+      files,
+      summary: {
+        totalIssues,
+        totalFiles,
+        totalErrors,
+        displayedIssues,
+        displayedFiles,
+        truncatedMessage:
+          displayedIssues < totalIssues || displayedFiles < totalFiles
+            ? `Showing ${displayedIssues} of ${totalIssues} issues from ${displayedFiles} of ${totalFiles} files`
+            : "",
+        currentPage: page,
+        totalPages,
       },
     };
   }

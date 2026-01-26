@@ -302,4 +302,11 @@ export const translations: typeof enTranslations = {
     },
   },
   threadId: threadsThreadIdTranslations,
+  publicFeed: {
+    timestamp: {
+      justNow: "Gerade eben",
+      hoursAgo: "vor {{hours}}h",
+      daysAgo: "vor {{days}}d",
+    },
+  },
 };

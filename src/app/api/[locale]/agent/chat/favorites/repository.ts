@@ -118,15 +118,19 @@ export class ChatFavoritesRepository {
         icon: "alert-circle",
         content: {
           titleRow: {
-            name: "Error: No model configuration",
-            tagline: "Configuration missing",
+            name: "app.api.agent.chat.favorites.fallbacks.noModelConfiguration" as const,
+            tagline:
+              "app.api.agent.chat.favorites.fallbacks.configurationMissing" as const,
           },
-          description: `Favorite ${favorite.id} has no model configuration`,
+          description:
+            "app.api.agent.chat.favorites.fallbacks.noDescription" as const,
           modelRow: {
             modelIcon: "alert-circle",
-            modelInfo: "No model",
-            modelProvider: "Unknown",
-            creditCost: "—",
+            modelInfo:
+              "app.api.agent.chat.favorites.fallbacks.noModel" as const,
+            modelProvider:
+              "app.api.agent.chat.favorites.fallbacks.unknown" as const,
+            creditCost: "app.api.agent.chat.favorites.fallbacks.dash" as const,
           },
         },
       };
@@ -159,10 +163,13 @@ export class ChatFavoritesRepository {
       favorite.customName ??
       character?.name ??
       resolvedModel?.name ??
-      "Unknown Model";
+      ("app.api.agent.chat.favorites.fallbacks.unknownModel" as const);
 
     // Compute tagline (return raw value) - empty for model-only
-    const tagline = isModelOnly ? null : (character?.tagline ?? "");
+    const tagline = isModelOnly
+      ? null
+      : (character?.tagline ??
+        ("app.api.agent.chat.favorites.fallbacks.noTagline" as const));
 
     // Compute description (return raw value)
     const description: TranslationKey | null = character
@@ -174,7 +181,9 @@ export class ChatFavoritesRepository {
     const modelRow: FavoriteCard["content"]["modelRow"] = resolvedModel
       ? {
           modelIcon: resolvedModel.icon,
-          modelInfo: isModelOnly ? "" : resolvedModel.name,
+          modelInfo: isModelOnly
+            ? ("app.api.agent.chat.favorites.fallbacks.noDescription" as const)
+            : resolvedModel.name,
           modelProvider: resolvedModel.provider,
           creditCost: CharactersRepositoryClient.formatCreditCost(
             resolvedModel.creditCost,
@@ -183,9 +192,11 @@ export class ChatFavoritesRepository {
         }
       : {
           modelIcon: "alert-circle",
-          modelInfo: "",
-          modelProvider: "Unknown",
-          creditCost: "—",
+          modelInfo:
+            "app.api.agent.chat.favorites.fallbacks.noDescription" as const,
+          modelProvider:
+            "app.api.agent.chat.favorites.fallbacks.unknown" as const,
+          creditCost: "app.api.agent.chat.favorites.fallbacks.dash" as const,
         };
 
     return {

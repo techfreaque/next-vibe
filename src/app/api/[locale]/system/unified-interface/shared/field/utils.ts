@@ -9,34 +9,29 @@ import { z } from "zod";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { IconKey } from "../../react/icons";
+import type { FieldUsageConfig } from "../../unified-ui/widgets/_shared/types";
+import type { IconKey } from "../../unified-ui/widgets/form-fields/icon-field/icons";
+import type { RangeSliderFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/range-slider-field/types";
+import type { NavigateButtonWidgetConfig } from "../../unified-ui/widgets/interactive/navigate-button/types";
+import type { SubmitButtonWidgetConfig } from "../../unified-ui/widgets/interactive/submit-button/types";
 import type { EndpointLogger } from "../logger/endpoint";
 import type {
   ArrayField,
   ArrayOptionalField,
-  CreateApiEndpointAny,
-  FieldUsageConfig,
   InferSchemaFromField,
   NavigateButtonConfig,
   ObjectField,
-  ObjectOptionalField,
-  ObjectUnionField,
   PrimitiveField,
   UnifiedField,
   WidgetField,
-  WidgetObjectField,
 } from "../types/endpoint";
+import type { CreateApiEndpointAny } from "../types/endpoint-base";
 import { FieldUsage, type SpacingSize, WidgetType } from "../types/enums";
 import type {
   ArrayWidgetConfig,
   DisplayOnlyWidgetConfig,
-  NavigateButtonWidgetConfig,
   ObjectWidgetConfig,
-  RangeSliderFieldWidgetConfig,
-  SubmitButtonWidgetConfig,
-  WidgetConfig,
 } from "../widgets/configs";
-import type { ArrayWidgetSchema } from "../widgets/utils/schema-constraints";
 
 // ============================================================================
 // TYPE GUARDS
@@ -434,7 +429,10 @@ export function responseRangeField<
     type: "primitive" as const,
     schema: rangeSchema,
     usage: { response: true },
-    ui: config,
+    ui: {
+      ...config,
+      schema: rangeSchema,
+    },
   };
 }
 
@@ -443,8 +441,7 @@ export function responseRangeField<
  */
 export function widgetField<
   TUsage extends FieldUsageConfig,
-  const TUIConfig extends DisplayOnlyWidgetConfig<string> =
-    DisplayOnlyWidgetConfig<TranslationKey>,
+  const TUIConfig extends DisplayOnlyWidgetConfig<TranslationKey>,
 >(
   ui: TUIConfig,
   usage: TUsage,
@@ -463,8 +460,7 @@ export function widgetField<
 export function widgetObjectField<
   TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
   TUsage extends FieldUsageConfig,
-  const TUIConfig extends ObjectWidgetConfig<string, TUsage, TChildren> =
-    ObjectWidgetConfig<TranslationKey, TUsage, TChildren>,
+  const TUIConfig extends ObjectWidgetConfig<TranslationKey, TUsage, TChildren>,
 >(
   ui: TUIConfig,
   usage: TUsage,
@@ -487,8 +483,7 @@ export function widgetObjectField<
 export function objectField<
   TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
   TUsage extends FieldUsageConfig,
-  const TUIConfig extends ObjectWidgetConfig<string, TUsage, TChildren> =
-    ObjectWidgetConfig<TranslationKey, TUsage, TChildren>,
+  const TUIConfig extends ObjectWidgetConfig<TranslationKey, TUsage, TChildren>,
 >(
   ui: TUIConfig,
   usage: TUsage,
@@ -525,12 +520,7 @@ export function scopedObjectField<
   TScopedTranslation extends ScopedTranslationType,
   TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
   TUsage extends FieldUsageConfig,
-  const TUIConfig extends ObjectWidgetConfig<string, TUsage, TChildren> =
-    ObjectWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
-      TUsage,
-      TChildren
-    >,
+  const TUIConfig extends ObjectWidgetConfig<TranslationKey, TUsage, TChildren>,
 >(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
   _scopedTranslation: TScopedTranslation,
@@ -559,10 +549,6 @@ export function scopedResponseArrayOptionalField<
   TChild extends UnifiedField<string, z.ZodTypeAny>,
   TSchema extends z.ZodTypeAny,
   const TUIConfig extends ArrayWidgetConfig<
-    string,
-    { response: true },
-    TChild
-  > = ArrayWidgetConfig<
     TScopedTranslation["ScopedTranslationKey"],
     { response: true },
     TChild
@@ -594,8 +580,7 @@ export function arrayField<
   TChild extends UnifiedField<string, z.ZodTypeAny>,
   TUsage extends FieldUsageConfig,
   TSchema extends ArrayWidgetSchema,
-  const TUIConfig extends ArrayWidgetConfig<string, TUsage, TChild> =
-    ArrayWidgetConfig<TranslationKey, TUsage, TChild>,
+  const TUIConfig extends ArrayWidgetConfig<TranslationKey, TUsage, TChild>,
 >(
   usage: TUsage,
   ui: TUIConfig,
@@ -616,10 +601,10 @@ export function requestDataArrayField<
   TChild extends UnifiedField<string, z.ZodTypeAny>,
   TSchema extends ArrayWidgetSchema,
   const TUIConfig extends ArrayWidgetConfig<
-    string,
+    TranslationKey,
     { request: "data" },
     TChild
-  > = ArrayWidgetConfig<TranslationKey, { request: "data" }, TChild>,
+  >,
 >(
   ui: TUIConfig,
   child: TChild,
@@ -639,10 +624,10 @@ export function responseArrayField<
   TChild extends UnifiedField<string, z.ZodTypeAny>,
   TSchema extends ArrayWidgetSchema,
   const TUIConfig extends ArrayWidgetConfig<
-    string,
+    TranslationKey,
     { response: true },
     TChild
-  > = ArrayWidgetConfig<TranslationKey, { response: true }, TChild>,
+  >,
 >(
   ui: TUIConfig,
   child: TChild,
@@ -663,10 +648,10 @@ export function objectOptionalField<
   TFieldUsageConfig extends FieldUsageConfig,
   TSchema extends z.ZodObject<z.ZodRawShape>,
   const TUIConfig extends ObjectWidgetConfig<
-    string,
+    TranslationKey,
     TFieldUsageConfig,
     TChild
-  > = ObjectWidgetConfig<TranslationKey, TFieldUsageConfig, TChild>,
+  >,
 >(
   ui: TUIConfig,
   usage: TFieldUsageConfig,
@@ -693,30 +678,29 @@ export function objectUnionField<
   TDiscriminator extends string,
   TVariants extends readonly [
     ObjectField<
-      Record<string, UnifiedField<string, z.ZodTypeAny>>,
+      Record<string, UnifiedField<TranslationKey, z.ZodTypeAny>>,
       FieldUsageConfig,
-      string,
+      TranslationKey,
       ObjectWidgetConfig<
-        string,
+        TranslationKey,
         FieldUsageConfig,
-        Record<string, UnifiedField<string, z.ZodTypeAny>>
+        Record<string, UnifiedField<TranslationKey, z.ZodTypeAny>>
       >
     >,
     ...ObjectField<
-      Record<string, UnifiedField<string, z.ZodTypeAny>>,
+      Record<string, UnifiedField<TranslationKey, z.ZodTypeAny>>,
       FieldUsageConfig,
-      string,
+      TranslationKey,
       ObjectWidgetConfig<
-        string,
+        TranslationKey,
         FieldUsageConfig,
-        Record<string, UnifiedField<string, z.ZodTypeAny>>
+        Record<string, UnifiedField<TranslationKey, z.ZodTypeAny>>
       >
     >[],
   ],
   TUsage extends FieldUsageConfig,
   TSchema extends z.ZodTypeAny,
-  const TUIConfig extends ObjectWidgetConfig<string, TUsage, TVariants> =
-    ObjectWidgetConfig<TranslationKey, TUsage, TVariants>,
+  const TUIConfig extends ObjectWidgetConfig<TranslationKey, TUsage, TVariants>,
 >(
   ui: TUIConfig,
   usage: TUsage,
@@ -746,8 +730,7 @@ export function arrayOptionalField<
   TChild extends UnifiedField<string, z.ZodTypeAny>,
   TUsage extends FieldUsageConfig,
   TSchema extends ArrayWidgetSchema,
-  const TUIConfig extends ArrayWidgetConfig<string, TUsage, TChild> =
-    ArrayWidgetConfig<TranslationKey, TUsage, TChild>,
+  const TUIConfig extends ArrayWidgetConfig<TranslationKey, TUsage, TChild>,
 >(
   usage: TUsage,
   ui: TUIConfig,
@@ -768,10 +751,10 @@ export function requestDataArrayOptionalField<
   TChild extends UnifiedField<string, z.ZodTypeAny>,
   TSchema extends ArrayWidgetSchema,
   const TUIConfig extends ArrayWidgetConfig<
-    string,
+    TranslationKey,
     { request: "data" },
     TChild
-  > = ArrayWidgetConfig<TranslationKey, { request: "data" }, TChild>,
+  >,
 >(
   ui: TUIConfig,
   child: TChild,
@@ -797,10 +780,10 @@ export function responseArrayOptionalField<
   TChild extends UnifiedField<string, z.ZodTypeAny>,
   TSchema extends ArrayWidgetSchema,
   const TUIConfig extends ArrayWidgetConfig<
-    string,
+    TranslationKey,
     { response: true },
     TChild
-  > = ArrayWidgetConfig<TranslationKey, { response: true }, TChild>,
+  >,
 >(
   ui: TUIConfig,
   child: TChild,

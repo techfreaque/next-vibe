@@ -19,13 +19,8 @@ import type { z } from "zod";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type {
-  ArrayOptionalField,
-  FieldUsageConfig,
-  ObjectField,
-  PrimitiveField,
-  UnifiedField,
-} from "../types/endpoint";
+import type { FieldUsageConfig } from "../../unified-ui/widgets/_shared/types";
+import type { UnifiedField } from "../types/endpoint";
 import type {
   ArrayWidgetConfig,
   FormFieldWidgetConfig,
@@ -33,6 +28,12 @@ import type {
   ResponseWidgetConfig,
 } from "../widgets/configs";
 
+/**
+ * Scoped translation object type for type inference
+ */
+interface ScopedTranslationType<TKey extends string> {
+  ScopedTranslationKey: TKey;
+}
 
 // ============================================================================
 // GENERIC FIELD FUNCTIONS (NEW SYSTEM)
@@ -45,21 +46,17 @@ import type {
  */
 export function requestField<
   TSchema extends z.ZodTypeAny,
-  TConfig extends FormFieldWidgetConfig<string, z.ZodTypeAny> =
-    FormFieldWidgetConfig<TranslationKey, TSchema>,
+  TConfig extends Omit<
+    FormFieldWidgetConfig<TranslationKey, TSchema, { request: "data" }>,
+    "usage" | "schemaType"
+  >,
 >(
   config: TConfig,
-): PrimitiveField<
-  TConfig["schema"],
-  { request: "data" },
-  TranslationKey,
-  TConfig
-> {
+): TConfig & { usage: { request: "data" }; schemaType: "primitive" } {
   return {
-    type: "primitive",
-    schema: config.schema,
+    ...config,
     usage: { request: "data" },
-    ui: config,
+    schemaType: "primitive" as const,
   };
 }
 
@@ -70,21 +67,22 @@ export function requestField<
  */
 export function responseField<
   TSchema extends z.ZodTypeAny,
-  TConfig extends ResponseWidgetConfig<string, z.ZodTypeAny> =
-    ResponseWidgetConfig<TranslationKey, TSchema>,
+  TConfig extends Omit<
+    ResponseWidgetConfig<
+      TranslationKey,
+      TSchema,
+      { response: true },
+      "primitive"
+    >,
+    "usage" | "schemaType"
+  >,
 >(
   config: TConfig,
-): PrimitiveField<
-  TConfig["schema"],
-  { response: true },
-  TranslationKey,
-  TConfig
-> {
+): TConfig & { usage: { response: true }; schemaType: "primitive" } {
   return {
-    type: "primitive",
-    schema: config.schema,
+    ...config,
     usage: { response: true },
-    ui: config,
+    schemaType: "primitive" as const,
   };
 }
 
@@ -95,21 +93,20 @@ export function responseField<
  */
 export function requestResponseField<
   TSchema extends z.ZodTypeAny,
-  TConfig extends FormFieldWidgetConfig<string, z.ZodTypeAny> =
-    FormFieldWidgetConfig<TranslationKey, TSchema>,
+  TConfig extends Omit<
+    FormFieldWidgetConfig<TranslationKey, TSchema, { request: "data" }>,
+    "usage" | "schemaType"
+  >,
 >(
   config: TConfig,
-): PrimitiveField<
-  TConfig["schema"],
-  { request: "data"; response: true },
-  TranslationKey,
-  TConfig
-> {
+): TConfig & {
+  usage: { request: "data"; response: true };
+  schemaType: "primitive";
+} {
   return {
-    type: "primitive",
-    schema: config.schema,
+    ...config,
     usage: { request: "data", response: true },
-    ui: config,
+    schemaType: "primitive" as const,
   };
 }
 
@@ -120,21 +117,21 @@ export function requestResponseField<
  */
 export function requestUrlPathParamsField<
   TSchema extends z.ZodTypeAny,
-  TConfig extends FormFieldWidgetConfig<string, z.ZodTypeAny> =
-    FormFieldWidgetConfig<TranslationKey, TSchema>,
+  TConfig extends Omit<
+    FormFieldWidgetConfig<
+      TranslationKey,
+      TSchema,
+      { request: "urlPathParams" }
+    >,
+    "usage" | "schemaType"
+  >,
 >(
   config: TConfig,
-): PrimitiveField<
-  TConfig["schema"],
-  { request: "urlPathParams" },
-  TranslationKey,
-  TConfig
-> {
+): TConfig & { usage: { request: "urlPathParams" }; schemaType: "primitive" } {
   return {
-    type: "primitive",
-    schema: config.schema,
+    ...config,
     usage: { request: "urlPathParams" },
-    ui: config,
+    schemaType: "primitive" as const,
   };
 }
 
@@ -145,21 +142,24 @@ export function requestUrlPathParamsField<
  */
 export function requestUrlPathParamsResponseField<
   TSchema extends z.ZodTypeAny,
-  TConfig extends FormFieldWidgetConfig<string, z.ZodTypeAny> =
-    FormFieldWidgetConfig<TranslationKey, TSchema>,
+  TConfig extends Omit<
+    FormFieldWidgetConfig<
+      TranslationKey,
+      TSchema,
+      { request: "urlPathParams" }
+    >,
+    "usage" | "schemaType"
+  >,
 >(
   config: TConfig,
-): PrimitiveField<
-  TConfig["schema"],
-  { request: "urlPathParams"; response: true },
-  TranslationKey,
-  TConfig
-> {
+): TConfig & {
+  usage: { request: "urlPathParams"; response: true };
+  schemaType: "primitive";
+} {
   return {
-    type: "primitive",
-    schema: config.schema,
+    ...config,
     usage: { request: "urlPathParams", response: true },
-    ui: config,
+    schemaType: "primitive" as const,
   };
 }
 
@@ -175,24 +175,20 @@ export function requestUrlPathParamsResponseField<
 export function scopedRequestField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TSchema extends z.ZodTypeAny,
-  TConfig extends FormFieldWidgetConfig<string, z.ZodTypeAny> =
-    FormFieldWidgetConfig<TScopedTranslation["ScopedTranslationKey"], TSchema>,
+  TConfig extends Omit<
+    FormFieldWidgetConfig<string, TSchema, { request: "data" }>,
+    "usage" | "schemaType"
+  >,
 >(
   scopedTranslation: TScopedTranslation,
   config: TConfig,
-): PrimitiveField<
-  TConfig["schema"],
-  { request: "data" },
-  TScopedTranslation["ScopedTranslationKey"],
-  TConfig
-> {
+): TConfig & { usage: { request: "data" }; schemaType: "primitive" } {
   // scopedTranslation is only used for type inference
   void scopedTranslation;
   return {
-    type: "primitive",
-    schema: config.schema,
+    ...config,
     usage: { request: "data" },
-    ui: config,
+    schemaType: "primitive" as const,
   };
 }
 
@@ -204,24 +200,20 @@ export function scopedRequestField<
 export function scopedResponseField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TSchema extends z.ZodTypeAny,
-  TConfig extends ResponseWidgetConfig<string, z.ZodTypeAny> =
-    ResponseWidgetConfig<TScopedTranslation["ScopedTranslationKey"], TSchema>,
+  TConfig extends Omit<
+    ResponseWidgetConfig<string, TSchema, { response: true }, "primitive">,
+    "usage" | "schemaType"
+  >,
 >(
   scopedTranslation: TScopedTranslation,
   config: TConfig,
-): PrimitiveField<
-  TConfig["schema"],
-  { response: true },
-  TScopedTranslation["ScopedTranslationKey"],
-  TConfig
-> {
+): TConfig & { usage: { response: true }; schemaType: "primitive" } {
   // scopedTranslation is only used for type inference
   void scopedTranslation;
   return {
-    type: "primitive",
-    schema: config.schema,
+    ...config,
     usage: { response: true },
-    ui: config,
+    schemaType: "primitive" as const,
   };
 }
 
@@ -231,76 +223,119 @@ export function scopedResponseField<
  */
 export function scopedObjectField<
   TScopedTranslation extends ScopedTranslationType<string>,
-  TSchema extends z.ZodObject<z.ZodRawShape>,
   TUsage extends FieldUsageConfig,
-  TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>> = Record<
+  TChildren extends Record<
     string,
-    UnifiedField<TScopedTranslation["ScopedTranslationKey"], TSchema>
+    UnifiedField<
+      TScopedTranslation["ScopedTranslationKey"],
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      never
+    >
   >,
-  const TUIConfig extends ObjectWidgetConfig<string, TUsage, TChildren> =
+  const TUIConfig extends Omit<
     ObjectWidgetConfig<
       TScopedTranslation["ScopedTranslationKey"],
       TUsage,
+      "object",
       TChildren
     >,
+    "schemaType"
+  >,
 >(
   scopedTranslation: TScopedTranslation,
   ui: TUIConfig,
-  usage: TUsage,
-  children: TChildren,
-): ObjectField<
-  TChildren,
-  TUsage,
-  TScopedTranslation["ScopedTranslationKey"],
-  TUIConfig
-> {
+): TUIConfig & {
+  schemaType: "object";
+} {
   // scopedTranslation is only used for type inference
   void scopedTranslation;
   return {
-    type: "object" as const,
-    children,
-    usage,
-    ui,
+    ...ui,
+    schemaType: "object" as const,
   };
 }
 
 /**
- * Scoped response array optional field creator
+ * Scoped response array optional field creator (NEW FLAT API)
  * Creates optional array fields with scoped translation keys
+ * Config includes usage and child directly
  */
 export function scopedResponseArrayOptionalField<
   TScopedTranslation extends ScopedTranslationType<string>,
-  TSchema extends z.ZodTypeAny,
-  TChild extends UnifiedField<string, z.ZodTypeAny> = UnifiedField<
-    TScopedTranslation["ScopedTranslationKey"],
-    TSchema
-  >,
-  const TUIConfig extends ArrayWidgetConfig<
-    string,
-    { response: true },
-    TChild
-  > = ArrayWidgetConfig<
-    TScopedTranslation["ScopedTranslationKey"],
-    { response: true },
-    TChild
+  TChild extends UnifiedField<string, z.ZodTypeAny, { response: true }, never>,
+  TConfig extends Omit<
+    ArrayWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      { response: true },
+      "array-optional",
+      TChild
+    >,
+    "schemaType" | "usage"
   >,
 >(
   scopedTranslation: TScopedTranslation,
-  ui: TUIConfig,
-  child: TChild,
-): ArrayOptionalField<
-  TChild,
-  { response: true },
-  TScopedTranslation["ScopedTranslationKey"],
-  TSchema,
-  TUIConfig
-> {
+  config: TConfig,
+): TConfig & {
+  usage: { response: true };
+  schemaType: "array-optional";
+} {
   // scopedTranslation is only used for type inference
   void scopedTranslation;
   return {
-    type: "array-optional" as const,
-    child,
+    ...config,
     usage: { response: true },
-    ui,
+    schemaType: "array-optional" as const,
   };
 }
+
+// ============================================================================
+// OBJECT FIELD FUNCTIONS (NEW SYSTEM - Fully Typed)
+// ============================================================================
+
+/**
+ * Type-safe object field creator with child constraints (NEW FLAT API)
+ *
+ * This is the new version where the config includes everything (usage + children),
+ * similar to how primitive fields include schema in their config.
+ *
+ * Each ObjectWidgetConfig variant can specify what children it expects, and the value type is fully
+ * inferred from the children (similar to how primitive fields work with schemas).
+ *
+ * Key differences from old objectField:
+ * - Flat API: single config parameter includes usage and children
+ * - Widget configs can enforce child field names and types via their own type definitions
+ * - Value type is inferred from children, not WidgetData (any)
+ * - Full type safety from config -> children -> value
+ *
+ * @example
+ * ```typescript
+ * // PaginationWidgetConfig requires specific fields
+ * objectFieldNew({
+ *   type: WidgetType.PAGINATION,
+ *   usage: { response: true },
+ *   children: {
+ *     page: responseField({ ... }, z.number()),
+ *     limit: responseField({ ... }, z.number()),
+ *     totalCount: responseField({ ... }, z.number()),
+ *   }
+ * })
+ * ```
+ */
+export function objectFieldNew<
+  TUsage extends FieldUsageConfig,
+  TChildren extends Record<
+    string,
+    UnifiedField<string, z.ZodTypeAny, TUsage, never>
+  >,
+  const TConfig extends Omit<
+    ObjectWidgetConfig<TranslationKey, TUsage, "object", TChildren>,
+    "schemaType"
+  >,
+>(config: TConfig): TConfig & { schemaType: "object" } {
+  return {
+    ...config,
+    schemaType: "object" as const,
+  };
+}
+

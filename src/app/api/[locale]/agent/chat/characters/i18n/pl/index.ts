@@ -3,6 +3,13 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   id: idTranslations,
+  fallbacks: {
+    unknownModel: "Nieznany Model",
+    unknownProvider: "nieznany",
+    unknownCreditCost: "? kredytów",
+    noDescription: "",
+    noTagline: "",
+  },
   enums: {
     category: {
       companion: "Towarzysze",

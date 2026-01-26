@@ -175,7 +175,7 @@ const { GET } = createEndpoint({
         },
         objectField(
           {
-            type: WidgetType.DATA_CARD,
+            type: WidgetType.DATA_CARDS,
             linkable: true,
             layoutType: LayoutType.GRID,
             columns: 12,

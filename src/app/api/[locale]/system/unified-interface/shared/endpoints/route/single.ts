@@ -9,7 +9,7 @@ import {
   createNextHandler,
   type NextHandlerReturnType,
 } from "../../../next-api/handler";
-import type { CreateApiEndpointAny } from "../../types/endpoint";
+import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import {
   type ApiHandlerOptions,
   createGenericHandler,

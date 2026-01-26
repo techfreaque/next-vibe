@@ -573,9 +573,11 @@ export const translations: typeof enTranslations = {
       },
       filesBuilt: {
         title: "Erstellte Dateien",
+        item: "Erstellte Datei",
       },
       filesCopied: {
         title: "Kopierte Dateien",
+        item: "Kopierte Datei",
       },
       packageJson: {
         title: "Generierte package.json",

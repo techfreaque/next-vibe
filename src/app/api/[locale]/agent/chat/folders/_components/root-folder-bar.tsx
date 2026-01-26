@@ -14,7 +14,7 @@ import {
   DefaultFolderId,
   isDefaultFolderId,
 } from "@/app/api/[locale]/agent/chat/config";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { FolderAccessModal } from "./folder-access-modal";

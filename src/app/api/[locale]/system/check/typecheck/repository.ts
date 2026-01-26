@@ -484,32 +484,30 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
 
         if (!configResult.ready) {
           return success({
-            issues: {
-              items: [
-                {
-                  file: configResult.configPath,
-                  severity: "error" as const,
-                  message: configResult.message,
-                  type: "type" as const,
-                },
-              ],
-              files: [
-                {
-                  file: configResult.configPath,
-                  errors: 1,
-                  warnings: 0,
-                  total: 1,
-                },
-              ],
-              summary: {
-                totalIssues: 1,
-                totalFiles: 1,
-                totalErrors: 1,
-                displayedIssues: 1,
-                displayedFiles: 1,
-                currentPage: 1,
-                totalPages: 1,
+            items: [
+              {
+                file: configResult.configPath,
+                severity: "error" as const,
+                message: configResult.message,
+                type: "type" as const,
               },
+            ],
+            files: [
+              {
+                file: configResult.configPath,
+                errors: 1,
+                warnings: 0,
+                total: 1,
+              },
+            ],
+            summary: {
+              totalIssues: 1,
+              totalFiles: 1,
+              totalErrors: 1,
+              displayedIssues: 1,
+              displayedFiles: 1,
+              currentPage: 1,
+              totalPages: 1,
             },
           });
         }
@@ -520,18 +518,16 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       if (!checkConfig.typecheck.enabled) {
         logger.info("Typecheck is disabled in check.config.ts");
         return success({
-          issues: {
-            items: [],
-            files: [],
-            summary: {
-              totalIssues: 0,
-              totalFiles: 0,
-              totalErrors: 0,
-              displayedIssues: 0,
-              displayedFiles: 0,
-              currentPage: 1,
-              totalPages: 1,
-            },
+          items: [],
+          files: [],
+          summary: {
+            totalIssues: 0,
+            totalFiles: 0,
+            totalErrors: 0,
+            displayedIssues: 0,
+            displayedFiles: 0,
+            currentPage: 1,
+            totalPages: 1,
           },
         });
       }
@@ -706,22 +702,20 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       .size;
 
     return {
-      issues: {
-        items: limitedIssues,
-        files,
-        summary: {
-          totalIssues,
-          totalFiles,
-          totalErrors,
-          displayedIssues,
-          displayedFiles,
-          truncatedMessage:
-            displayedIssues < totalIssues || displayedFiles < totalFiles
-              ? `Showing ${displayedIssues} of ${totalIssues} issues from ${displayedFiles} of ${totalFiles} files`
-              : "",
-          currentPage,
-          totalPages,
-        },
+      items: limitedIssues,
+      files,
+      summary: {
+        totalIssues,
+        totalFiles,
+        totalErrors,
+        displayedIssues,
+        displayedFiles,
+        truncatedMessage:
+          displayedIssues < totalIssues || displayedFiles < totalFiles
+            ? `Showing ${displayedIssues} of ${totalIssues} issues from ${displayedFiles} of ${totalFiles} files`
+            : "",
+        currentPage,
+        totalPages,
       },
     };
   }

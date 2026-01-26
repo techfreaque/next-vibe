@@ -47,5 +47,18 @@ export const translations: typeof enTranslations = {
       noDataAvailable: "Brak dostępnych danych",
       noDataToDisplay: "Brak danych do wyświetlenia",
     },
+    codeQualityList: {
+      noIssues: "Nie znaleziono problemów",
+    },
+    codeQualitySummary: {
+      summary: "Podsumowanie",
+      files: "Pliki",
+      issues: "Problemy",
+      errors: "Błędy",
+      of: "z",
+    },
+    codeQualityFiles: {
+      affectedFiles: "Dotknięte pliki",
+    },
   },
 };

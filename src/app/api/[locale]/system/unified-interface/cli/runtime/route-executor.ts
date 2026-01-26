@@ -26,10 +26,11 @@ import {
 } from "../../shared/endpoints/route/executor";
 import type { InferJwtPayloadTypeFromRoles } from "../../shared/endpoints/route/handler";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
-import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type { Platform } from "../../shared/types/platform";
+import { renderInkEndpointPage } from "../../unified-ui/renderers/cli/CliEndpointPage";
+import { CliResultFormatter } from "../../unified-ui/renderers/cli/response/result-formatter";
 import { getCliUser } from "../auth/cli-user";
-import { CliResultFormatter } from "../widgets/renderers/result-formatter";
 import {
   CliInputParser,
   type CliObject,
@@ -199,7 +200,7 @@ export class RouteDelegationHandler {
           urlPathParams: options.urlPathParams,
           positionalArgs: options.cliArgs?.positionalArgs ?? [],
           namedArgs: options.cliArgs?.namedArgs ?? [],
-          interactive: options.interactive ?? false,
+          interactive: false, // Non-interactive mode - args only
           dryRun: options.dryRun ?? false,
         },
         logger,
@@ -288,7 +289,7 @@ export class RouteDelegationHandler {
       };
 
       // Format result for CLI output
-      const formattedOutput = CliResultFormatter.formatResult(
+      const formattedOutput = await CliResultFormatter.formatResult(
         routeResult,
         options.output || "pretty",
         options.locale,

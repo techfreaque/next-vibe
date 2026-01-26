@@ -52,7 +52,7 @@ const { GET } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label:
-          "app.api.agent.chat.threads.threadId.shareLinks.threadId.label" as const,
+          "app.api.agent.chat.threads.threadId.shareLinks.shareLink.label" as const,
         schema: z.string().uuid(),
       }),
       shareLinks: responseArrayOptionalField(
@@ -250,7 +250,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label:
-          "app.api.agent.chat.threads.threadId.shareLinks.threadId.label" as const,
+          "app.api.agent.chat.threads.threadId.shareLinks.shareLink.label" as const,
         schema: z.string().uuid(),
       }),
       label: requestResponseField({
@@ -412,7 +412,7 @@ const { PATCH } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label:
-          "app.api.agent.chat.threads.threadId.shareLinks.threadId.label" as const,
+          "app.api.agent.chat.threads.threadId.shareLinks.shareLink.label" as const,
         schema: z.string().uuid(),
       }),
       linkId: requestField({
@@ -575,7 +575,7 @@ const { DELETE } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label:
-          "app.api.agent.chat.threads.threadId.shareLinks.threadId.label" as const,
+          "app.api.agent.chat.threads.threadId.shareLinks.shareLink.label" as const,
         schema: z.string().uuid(),
       }),
       linkId: requestField({

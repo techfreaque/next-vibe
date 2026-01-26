@@ -6,8 +6,10 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
-import { responseField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+import {
+  objectFieldNew,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -32,15 +34,13 @@ const { GET } = createEndpoint({
   icon: "coins",
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.agent.chat.credits.get.response.title",
-      description: "app.api.agent.chat.credits.get.response.description",
-      layoutType: LayoutType.STACKED,
-    },
-    { response: true },
-    {
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    title: "app.api.agent.chat.credits.get.response.title",
+    description: "app.api.agent.chat.credits.get.response.description",
+    layoutType: LayoutType.STACKED,
+    usage: { response: true },
+    children: {
       // Total credits available
       total: responseField({
         type: WidgetType.TEXT,
@@ -83,7 +83,7 @@ const { GET } = createEndpoint({
         schema: dateSchema.nullable(),
       }),
     },
-  ),
+  }),
 
   // === SUCCESS HANDLING ===
   successTypes: {

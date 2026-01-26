@@ -186,6 +186,7 @@ export class StreamPartHandler {
             toolName: part.toolName,
             input: "input" in part ? (part.input as JSONValue) : undefined,
           },
+          ctx,
           currentAssistantMessageId: ctx.currentAssistantMessageId,
           currentAssistantContent: ctx.currentAssistantContent,
           isInReasoningBlock: ctx.isInReasoningBlock,

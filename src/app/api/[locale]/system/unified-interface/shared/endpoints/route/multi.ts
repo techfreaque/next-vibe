@@ -11,7 +11,7 @@ import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { NextHandlerReturnType } from "../../../next-api/handler";
-import type { CreateApiEndpointAny } from "../../types/endpoint";
+import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import { Methods } from "../../types/enums";
 import type {
   GenericHandlerReturnType as GenericHandlerReturnTypeImport,

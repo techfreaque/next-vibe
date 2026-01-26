@@ -20,6 +20,7 @@ export const {
  * Platform Access Markers - Configuration markers for endpoint platform access
  * These are NEVER stored in database or assigned to users
  * They control which platforms can access an endpoint (_OFF) or bypass auth
+ * MCP_ON is an opt-in marker - only endpoints with MCP_ON are accessible via MCP
  */
 export const {
   enum: PlatformMarker,
@@ -30,7 +31,7 @@ export const {
   CLI_AUTH_BYPASS: "app.api.user.userRoles.enums.userRole.cliAuthBypass",
   AI_TOOL_OFF: "app.api.user.userRoles.enums.userRole.aiToolOff",
   WEB_OFF: "app.api.user.userRoles.enums.userRole.webOff",
-  MCP_OFF: "app.api.user.userRoles.enums.userRole.mcpOff",
+  MCP_ON: "app.api.user.userRoles.enums.userRole.mcpOn",
   PRODUCTION_OFF: "app.api.user.userRoles.enums.userRole.productionOff",
 });
 
@@ -75,7 +76,7 @@ export function isPlatformMarker(
     role === PlatformMarker.CLI_OFF ||
     role === PlatformMarker.WEB_OFF ||
     role === PlatformMarker.AI_TOOL_OFF ||
-    role === PlatformMarker.MCP_OFF ||
+    role === PlatformMarker.MCP_ON ||
     role === PlatformMarker.PRODUCTION_OFF ||
     role === PlatformMarker.CLI_AUTH_BYPASS
   );

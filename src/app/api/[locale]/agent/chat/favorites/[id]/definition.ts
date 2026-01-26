@@ -98,7 +98,6 @@ const { DELETE } = createEndpoint({
           level: 5,
           content:
             "app.api.agent.chat.favorites.id.delete.container.description" as const,
-          schema: z.string(),
         },
         { request: "data", response: true },
       ),
@@ -341,7 +340,7 @@ const { PATCH } = createEndpoint({
                   {
                     value: ModelSelectionType.CHARACTER_BASED,
                     label:
-                      "app.api.agent.chat.favorites.post.selectionType.characterBased" as const,
+                      "app.api.agent.chat.favorites.enums.selectionType.characterBased" as const,
                   },
                   {
                     value: ModelSelectionType.MANUAL,
@@ -383,7 +382,7 @@ const { PATCH } = createEndpoint({
                   {
                     value: ModelSelectionType.CHARACTER_BASED,
                     label:
-                      "app.api.agent.chat.favorites.post.selectionType.characterBased" as const,
+                      "app.api.agent.chat.favorites.enums.selectionType.characterBased" as const,
                   },
                   {
                     value: ModelSelectionType.MANUAL,
@@ -722,7 +721,7 @@ const { GET } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label:
-          "app.api.agent.chat.favorites.id.get.response.id.content" as const,
+          "app.api.agent.chat.favorites.get.response.favorite.id.content" as const,
         schema: z.string().uuid(),
       }),
       characterId: responseField({

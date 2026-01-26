@@ -48,7 +48,7 @@ const testPublicEndpoint = createEndpoint({
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
     { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    {},
+    { response: true },
     {},
   ),
   errorTypes: {
@@ -93,7 +93,9 @@ const testPublicEndpoint = createEndpoint({
   examples: {
     requests: undefined,
     urlPathParams: undefined,
-    responses: undefined,
+    responses: {
+      default: {},
+    },
   },
 });
 
@@ -108,7 +110,7 @@ const testAdminEndpoint = createEndpoint({
   allowedRoles: [UserRole.ADMIN] as const,
   fields: objectField(
     { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    {},
+    { response: true },
     {},
   ),
   errorTypes: {
@@ -153,7 +155,9 @@ const testAdminEndpoint = createEndpoint({
   examples: {
     requests: undefined,
     urlPathParams: undefined,
-    responses: undefined,
+    responses: {
+      default: {},
+    },
   },
 });
 

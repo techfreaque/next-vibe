@@ -7,7 +7,7 @@ import { Ul } from "next-vibe-ui/ui/ul";
 import type { Step } from "react-joyride";
 
 import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { TFunction } from "@/i18n/core/static-types";
 
 export interface TourStepConfig extends Step {

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 
 // Common reusable schemas
 

@@ -435,15 +435,6 @@ const { GET } = createEndpoint({
         schema: z.coerce.boolean().optional(),
       }),
 
-      hasBookedConsultation: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.stats.hasBookedConsultation.label",
-        description: "app.api.leads.stats.hasBookedConsultation.description",
-        columns: 3,
-        schema: z.coerce.boolean().optional(),
-      }),
-
       hasConfirmedSubscription: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,

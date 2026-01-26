@@ -6,8 +6,8 @@
 import { eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import {
   UserPermissionRole,
   type UserPermissionRoleValue,

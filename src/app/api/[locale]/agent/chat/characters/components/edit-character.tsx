@@ -13,8 +13,8 @@ import { useCallback, useMemo } from "react";
 
 import updateCharacterEndpoint from "@/app/api/[locale]/agent/chat/characters/[id]/definition";
 import { useCharacter } from "@/app/api/[locale]/agent/chat/characters/[id]/hooks";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointsPage";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

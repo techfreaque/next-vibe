@@ -105,6 +105,9 @@ export const translations = {
         badge: "2FA Required",
       },
     },
+    recommendations: {
+      item: "Recommended Login Option",
+    },
   },
   errors: {
     validation: {

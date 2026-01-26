@@ -19,6 +19,7 @@ import type {
   ExamplesList,
   ExtractInput,
   ExtractOutput,
+  FieldUsageConfig,
   InferSchemaFromField,
   ObjectField,
   PrimitiveField,
@@ -63,7 +64,6 @@ const test1_4: Test1_4_TupleExtends = "PASS";
 
 // Test 2.1: ApiEndpoint with literal type parameters
 type Test2_1_LiteralEndpoint = ApiEndpoint<
-  "default",
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   string,
@@ -73,7 +73,6 @@ type Test2_1_LiteralEndpoint = ApiEndpoint<
 // Test 2.2: Can it be assigned to ApiEndpoint with generic parameters?
 type Test2_2_Result =
   Test2_1_LiteralEndpoint extends ApiEndpoint<
-    string,
     Methods,
     readonly UserRoleValue[],
     string,
@@ -86,7 +85,6 @@ const test2_2: Test2_2_Result = "PASS"; // Fixed with 'out' variance!
 // Test 2.3: Check if the variance annotations work
 type Test2_3_WithVariance =
   Test2_1_LiteralEndpoint extends ApiEndpoint<
-    string,
     Methods,
     readonly UserRoleValue[],
     string,
@@ -102,22 +100,21 @@ const test2_3: Test2_3_WithVariance = "PASS"; // Passes with 'out' variance!
 
 // Test 3.1: CreateApiEndpoint with literal type parameters
 type Test3_1_LiteralCreate = CreateApiEndpoint<
-  "default",
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   string,
   ObjectField<
     {
-      jobId: PrimitiveField<
-        z.ZodUUID,
-        { request: "urlPathParams" },
-        string,
-        WidgetConfig<string, z.ZodTypeAny>
-      >;
+      jobId: PrimitiveField<z.ZodUUID, { request: "urlPathParams" }>;
     },
     { request: "urlPathParams"; response: true },
     string,
-    WidgetConfig<string, z.ZodTypeAny>
+    WidgetConfig<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      Record<string, UnifiedField<string, z.ZodTypeAny>>
+    >
   >
 >;
 
@@ -131,16 +128,16 @@ const test3_2: Test3_2_Result = "PASS"; // Fixed! CreateApiEndpoint now extends 
 type Test3_3_ObjectFieldExtendsUnified =
   ObjectField<
     {
-      jobId: PrimitiveField<
-        z.ZodUUID,
-        { request: "urlPathParams" },
-        string,
-        WidgetConfig<string, z.ZodTypeAny>
-      >;
+      jobId: PrimitiveField<z.ZodUUID, { request: "urlPathParams" }>;
     },
     { request: "urlPathParams"; response: true },
     string,
-    WidgetConfig<string, z.ZodTypeAny>
+    WidgetConfig<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      Record<string, UnifiedField<string, z.ZodTypeAny>>
+    >
   > extends UnifiedField<string, z.ZodTypeAny>
     ? "PASS"
     : "FAIL";
@@ -149,22 +146,21 @@ const test3_3: Test3_3_ObjectFieldExtendsUnified = "PASS"; // ObjectField DOES e
 // Test 3.4: Now test if CreateApiEndpoint with this ObjectField extends CreateApiEndpointAny
 type Test3_4_FullCheck =
   CreateApiEndpoint<
-    "default",
     Methods.POST,
     readonly ["app.api.user.userRoles.enums.userRole.admin"],
     string,
     ObjectField<
       {
-        jobId: PrimitiveField<
-          z.ZodUUID,
-          { request: "urlPathParams" },
-          string,
-          WidgetConfig<string, z.ZodTypeAny>
-        >;
+        jobId: PrimitiveField<z.ZodUUID, { request: "urlPathParams" }>;
       },
       { request: "urlPathParams"; response: true },
       string,
-      WidgetConfig<string, z.ZodTypeAny>
+      WidgetConfig<
+        string,
+        z.ZodTypeAny,
+        FieldUsageConfig,
+        Record<string, UnifiedField<string, z.ZodTypeAny>>
+      >
     >
   > extends CreateApiEndpointAny
     ? "PASS"
@@ -176,16 +172,16 @@ const test3_4: Test3_4_FullCheck = "PASS"; // We WANT this to pass
 // Let's test if this property type is compatible
 type TestObjectField = ObjectField<
   {
-    jobId: PrimitiveField<
-      z.ZodUUID,
-      { request: "urlPathParams" },
-      string,
-      WidgetConfig<string, z.ZodTypeAny>
-    >;
+    jobId: PrimitiveField<z.ZodUUID, { request: "urlPathParams" }>;
   },
   { request: "urlPathParams"; response: true },
   string,
-  WidgetConfig<string, z.ZodTypeAny>
+  WidgetConfig<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    Record<string, UnifiedField<string, z.ZodTypeAny>>
+  >
 >;
 type Test3_5_SchemaCompat = {
   readonly requestSchema: InferSchemaFromField<
@@ -221,13 +217,11 @@ const test3_6: Test3_6_TypesCompat = "PASS"; // types.Fields property is compati
 // CreateApiEndpoint extends ApiEndpoint<...>
 type Test3_7_ApiEndpointBase =
   ApiEndpoint<
-    "default",
     Methods.POST,
     readonly ["app.api.user.userRoles.enums.userRole.admin"],
     string,
     TestObjectField
   > extends ApiEndpoint<
-    string,
     Methods,
     readonly UserRoleValue[],
     string,
@@ -245,9 +239,19 @@ const test3_8: Test3_8_Direct = "PASS"; // We WANT ObjectField to extend Unified
 // Test 3.9: Test if WidgetConfig<string> is the issue
 // When used in a property position, does it break variance?
 type Test3_9_WidgetConfigProp = {
-  readonly ui: WidgetConfig<string, z.ZodTypeAny>;
+  readonly ui: WidgetConfig<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    Record<string, UnifiedField<string, z.ZodTypeAny>>
+  >;
 } extends {
-  readonly ui: WidgetConfig<string, z.ZodTypeAny>;
+  readonly ui: WidgetConfig<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    Record<string, UnifiedField<string, z.ZodTypeAny>>
+  >;
 }
   ? "PASS"
   : "FAIL";
@@ -258,17 +262,20 @@ type SimpleObjectField = ObjectField<
   Record<string, never>, // Empty children
   { request: "data" },
   string,
-  WidgetConfig<string, z.ZodTypeAny>
+  WidgetConfig<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    Record<string, UnifiedField<string, z.ZodTypeAny>>
+  >
 >;
 type Test3_10_SimpleObject =
   ApiEndpoint<
-    "default",
     Methods.POST,
     readonly ["app.api.user.userRoles.enums.userRole.admin"],
     string,
     SimpleObjectField
   > extends ApiEndpoint<
-    string,
     Methods,
     readonly UserRoleValue[],
     string,
@@ -340,13 +347,11 @@ const test3_13: Test3_13_V2 = "PASS"; // Method property is fine!
 // Let's directly check the actual ApiEndpoint type
 type Test3_14_ActualApiEndpoint =
   ApiEndpoint<
-    string,
     Methods,
     readonly UserRoleValue[],
     string,
     SimpleObjectField
   > extends ApiEndpoint<
-    string,
     Methods,
     readonly UserRoleValue[],
     string,
@@ -437,13 +442,11 @@ const test3_19: Test3_19_ConditionalExamples = "PASS"; // We WANT the conditiona
 // Test 3.20: Test with ONLY TExampleKey specific, all others generic
 type Test3_20_OnlyExampleKeySpecific =
   ApiEndpoint<
-    "default", // SPECIFIC
     Methods, // generic
     readonly UserRoleValue[], // generic
     string, // generic
     SimpleObjectField
   > extends ApiEndpoint<
-    string,
     Methods,
     readonly UserRoleValue[],
     string,
@@ -456,13 +459,11 @@ const test3_20: Test3_20_OnlyExampleKeySpecific = "PASS"; // We WANT this to wor
 // Test 3.21: Test with ONLY TMethod specific, all others generic
 type Test3_21_OnlyMethodSpecific =
   ApiEndpoint<
-    string, // generic
     Methods.POST, // SPECIFIC
     readonly UserRoleValue[], // generic
     string, // generic
     SimpleObjectField
   > extends ApiEndpoint<
-    string,
     Methods,
     readonly UserRoleValue[],
     string,
@@ -475,13 +476,11 @@ const test3_21: Test3_21_OnlyMethodSpecific = "PASS"; // We WANT this to work
 // Test 3.22: Test with ONLY TUserRoleValue specific, all others generic
 type Test3_22_OnlyRolesSpecific =
   ApiEndpoint<
-    string, // generic
     Methods, // generic
     readonly ["app.api.user.userRoles.enums.userRole.admin"], // SPECIFIC tuple
     string, // generic
     SimpleObjectField
   > extends ApiEndpoint<
-    string,
     Methods,
     readonly UserRoleValue[],
     string,
@@ -513,7 +512,6 @@ const test3_24: Test3_24_NoInfer = "PASS"; // We WANT NoInfer to preserve varian
 
 // Test 3.25: Minimal ApiEndpoint with just core properties
 interface MinimalApiEndpoint<
-  TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TFields extends UnifiedField<string, z.ZodTypeAny>,
@@ -523,17 +521,15 @@ interface MinimalApiEndpoint<
   readonly fields: TFields;
   readonly examples: ExamplesList<
     ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
-    TExampleKey
+    string
   >;
 }
 type Test3_25_MinimalApi =
   MinimalApiEndpoint<
-    "default",
     Methods.POST,
     readonly ["app.api.user.userRoles.enums.userRole.admin"],
     SimpleObjectField
   > extends MinimalApiEndpoint<
-    string,
     Methods,
     readonly UserRoleValue[],
     UnifiedField<string, z.ZodTypeAny>
@@ -544,11 +540,10 @@ const test3_25: Test3_25_MinimalApi = "PASS"; // With 'out' variance, interface 
 
 // Test 3.26: Add the options property which uses TMethod in conditional
 interface ApiEndpointWithOptions<
-  out TExampleKey extends string,
   out TMethod extends Methods,
   out TUserRoleValue extends readonly UserRoleValue[],
   out TFields extends UnifiedField<string, z.ZodTypeAny>,
-> extends MinimalApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields> {
+> extends MinimalApiEndpoint<TMethod, TUserRoleValue, TFields> {
   readonly options?: TMethod extends Methods.GET
     ? EndpointReadOptions<
         ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
@@ -561,12 +556,10 @@ interface ApiEndpointWithOptions<
 }
 type Test3_26_WithOptions =
   ApiEndpointWithOptions<
-    "default",
     Methods.POST,
     readonly ["app.api.user.userRoles.enums.userRole.admin"],
     SimpleObjectField
   > extends ApiEndpointWithOptions<
-    string,
     Methods,
     readonly UserRoleValue[],
     UnifiedField<string, z.ZodTypeAny>
@@ -577,17 +570,11 @@ const test3_26: Test3_26_WithOptions = "PASS"; // With 'out' variance, interface
 
 // Test 3.27: Add errorTypes and successTypes which use TScopedTranslationKey with NoInfer
 interface ApiEndpointWithErrorTypes<
-  TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
   TFields extends UnifiedField<string, z.ZodTypeAny>,
-> extends ApiEndpointWithOptions<
-  TExampleKey,
-  TMethod,
-  TUserRoleValue,
-  TFields
-> {
+> extends ApiEndpointWithOptions<TMethod, TUserRoleValue, TFields> {
   readonly errorTypes: Record<
     EndpointErrorTypes,
     {
@@ -602,13 +589,11 @@ interface ApiEndpointWithErrorTypes<
 }
 type Test3_27_WithErrorTypes =
   ApiEndpointWithErrorTypes<
-    "default",
     Methods.POST,
     readonly ["app.api.user.userRoles.enums.userRole.admin"],
     "app.api.someScope.title",
     SimpleObjectField
   > extends ApiEndpointWithErrorTypes<
-    string,
     Methods,
     readonly UserRoleValue[],
     string,
@@ -699,7 +684,6 @@ const test3_28e: Test3_28e_Result = "PASS"; // TypeScript infers covariance when
 
 // Test 3.29: Test actual CreateApiEndpoint assignability with all fixes applied
 type Test3_29_Specific = CreateApiEndpoint<
-  "default",
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   "app.api.someScope.title",
@@ -727,14 +711,12 @@ const test3_30_check: Test3_30_Check = true; // Should pass if Test3_30_Result i
 
 // Test 3.31: Test if ApiEndpoint works with all fixes
 type Test3_31_SpecificApi = ApiEndpoint<
-  "default",
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   "app.api.someScope.title",
   SimpleObjectField
 >;
 type Test3_31_GenericApi = ApiEndpoint<
-  string,
   Methods,
   readonly UserRoleValue[],
   string,
@@ -751,7 +733,6 @@ const test3_31: Test3_31_Result = "PASS"; // We WANT ApiEndpoint to work
 
 // Test 4.1: Test with generic TExampleKey but specific other params
 type Test4_1_GenericExample = CreateApiEndpoint<
-  string, // Generic
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   string,
@@ -764,7 +745,6 @@ const test4_1: Test4_1_Result = "PASS"; // Passes with variance!
 
 // Test 4.2: Test with generic TMethod but specific other params
 type Test4_2_GenericMethod = CreateApiEndpoint<
-  "default",
   Methods, // Generic
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   string,
@@ -777,7 +757,6 @@ const test4_2: Test4_2_Result = "PASS"; // Passes with variance!
 
 // Test 4.3: Test with generic TUserRoleValue but specific other params
 type Test4_3_GenericRoles = CreateApiEndpoint<
-  "default",
   Methods.POST,
   readonly UserRoleValue[], // Generic
   string,
@@ -790,7 +769,6 @@ const test4_3: Test4_3_Result = "PASS"; // Should pass!
 
 // Test 4.4: Tuple of UserRoleValue extends readonly UserRoleValue[]
 type Test4_4_OnlyRoleIssue = CreateApiEndpoint<
-  string,
   Methods,
   readonly ["app.api.user.userRoles.enums.userRole.admin"], // Tuple
   string,
@@ -845,7 +823,6 @@ const test5_3: Test5_3_Result = "PASS"; // With 'out', it works!
 
 // Test 6.1: With the 'out' variance we added, does it work?
 type Test6_1_WithOutVariance = ApiEndpoint<
-  "default",
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   string,
@@ -853,7 +830,6 @@ type Test6_1_WithOutVariance = ApiEndpoint<
 >;
 type Test6_1_Result =
   Test6_1_WithOutVariance extends ApiEndpoint<
-    string,
     Methods,
     readonly UserRoleValue[],
     string,
@@ -869,7 +845,6 @@ const test6_1: Test6_1_Result = "PASS"; // Should pass now with 'out'!
 
 // Test 7.1: CreateApiEndpoint with specific types extends CreateApiEndpointAny
 type Test7_1_CreateWithOut = CreateApiEndpoint<
-  "default",
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   string,

@@ -133,9 +133,7 @@ export class LeadStatsRepository {
       logger.debug("Getting leads stats");
 
       // Get date range from preset
-      const dateRange = getDateRangeFromPreset(
-        query.timeFilters.dateRangePreset,
-      );
+      const dateRange = getDateRangeFromPreset(query.dateRangePreset);
       dateFrom = dateRange.from;
       dateTo = dateRange.to;
 
@@ -164,7 +162,7 @@ export class LeadStatsRepository {
           whereConditions,
           dateFrom,
           dateTo,
-          query.timeFilters.timePeriod,
+          query.timePeriod,
           query,
           logger,
         ),
@@ -178,13 +176,6 @@ export class LeadStatsRepository {
         ...currentMetrics,
         historicalData,
         groupedStats,
-        metadata: {
-          generatedAt: new Date().toISOString(),
-          dataRange: {
-            from: dateFrom.toISOString(),
-            to: dateTo.toISOString(),
-          },
-        },
         recentActivity,
         topPerformingCampaigns,
         topPerformingSources,
@@ -223,48 +214,42 @@ export class LeadStatsRepository {
     conditions.push(lte(leads.createdAt, dateTo));
 
     // Status filter
-    if (
-      query.leadFilters.status &&
-      query.leadFilters.status !== LeadStatusFilter.ALL
-    ) {
-      const status = mapStatusFilter(query.leadFilters.status);
+    if (query.status && query.status !== LeadStatusFilter.ALL) {
+      const status = mapStatusFilter(query.status);
       if (status) {
         conditions.push(eq(leads.status, status));
       }
     }
 
     // Source filter
-    if (
-      query.leadFilters.source &&
-      query.leadFilters.source !== LeadSourceFilter.ALL
-    ) {
-      const source = mapSourceFilter(query.leadFilters.source);
+    if (query.source && query.source !== LeadSourceFilter.ALL) {
+      const source = mapSourceFilter(query.source);
       if (source) {
         conditions.push(eq(leads.source, source));
       }
     }
 
     // Country filter
-    if (query.leadFilters.country !== CountryFilter.ALL) {
+    if (query.country !== CountryFilter.ALL) {
       // Map filter to actual enum value
-      const countryValue = convertCountryFilter(query.leadFilters.country);
+      const countryValue = convertCountryFilter(query.country);
       if (countryValue) {
         conditions.push(eq(leads.country, countryValue));
       }
     }
 
     // Language filter
-    if (query.leadFilters.language !== LanguageFilter.ALL) {
+    if (query.language !== LanguageFilter.ALL) {
       // Map filter to actual enum value
-      const languageValue = convertLanguageFilter(query.leadFilters.language);
+      const languageValue = convertLanguageFilter(query.language);
       if (languageValue) {
         conditions.push(eq(leads.language, languageValue));
       }
     }
 
     // Campaign stage filter
-    if (query.leadFilters.campaignStage !== EmailCampaignStageFilter.ALL) {
-      const stage = mapCampaignStageFilter(query.leadFilters.campaignStage);
+    if (query.campaignStage !== EmailCampaignStageFilter.ALL) {
+      const stage = mapCampaignStageFilter(query.campaignStage);
       if (stage) {
         conditions.push(eq(leads.currentCampaignStage, stage));
       }
@@ -2245,8 +2230,8 @@ export class LeadStatsRepository {
 
     // Return array of data points - chart name and type come from UI config
     return statusGroups.map((group) => ({
-      x: group.status, // Translation key for the status
-      y: Number(group.count),
+      category: group.status, // Translation key for the status
+      value: Number(group.count),
       color: LeadStatsRepository.getStatusColor(group.status),
       percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
     }));
@@ -2279,8 +2264,8 @@ export class LeadStatsRepository {
     return sourceGroups
       .filter((group) => group.source !== null)
       .map((group) => ({
-        x: group.source!, // Translation key
-        y: Number(group.count),
+        category: group.source!,
+        value: Number(group.count),
         color: "#10b981",
         percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
       }));
@@ -2313,8 +2298,8 @@ export class LeadStatsRepository {
     return countryGroups
       .filter((group) => group.country !== null)
       .map((group) => ({
-        x: group.country, // Country code (translation key)
-        y: Number(group.count),
+        category: group.country, // Country code
+        value: Number(group.count),
         color: "#f59e0b",
         percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
       }));
@@ -2347,8 +2332,8 @@ export class LeadStatsRepository {
     return languageGroups
       .filter((group) => group.language !== null)
       .map((group) => ({
-        x: group.language, // Language code (translation key)
-        y: Number(group.count),
+        category: group.language, // Language code
+        value: Number(group.count),
         color: "#8b5cf6",
         percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
       }));
@@ -2381,8 +2366,8 @@ export class LeadStatsRepository {
     return stageGroups
       .filter((group) => group.stage !== null)
       .map((group) => ({
-        x: group.stage!, // Campaign stage (translation key)
-        y: Number(group.count),
+        category: group.stage!, // Campaign stage (translation key)
+        value: Number(group.count),
         color: "#06b6d4",
         percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
       }));
@@ -3062,8 +3047,8 @@ export class LeadStatsRepository {
     return variantGroups
       .filter((group) => group.variant !== null)
       .map((group) => ({
-        x: group.variant!, // Journey variant (translation key)
-        y: Number(group.count),
+        category: group.variant!, // Journey variant (translation key)
+        value: Number(group.count),
         color: "#f59e0b",
         percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
       }));
@@ -3116,7 +3101,7 @@ export class LeadStatsRepository {
 
     return engagementGroups.map((group) => ({
       x: levelToTranslationKey[group.level] || group.level,
-      y: Number(group.count),
+      value: Number(group.count),
       percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
       color: "#8b5cf6",
     }));

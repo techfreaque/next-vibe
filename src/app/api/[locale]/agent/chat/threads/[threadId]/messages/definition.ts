@@ -132,7 +132,7 @@ const { GET } = createEndpoint({
         },
         objectField(
           {
-            type: WidgetType.DATA_CARD,
+            type: WidgetType.DATA_CARDS,
             title:
               "app.api.agent.chat.threads.threadId.messages.get.response.messages.message.title" as const,
           },

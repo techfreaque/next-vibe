@@ -36,7 +36,7 @@ import { simpleT } from "@/i18n/core/shared";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { EndpointLogger } from "../../logger/endpoint";
-import type { CreateApiEndpointAny } from "../../types/endpoint";
+import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import type { Platform } from "../../types/platform";
 import { permissionsRegistry } from "../permissions/registry";
 import {

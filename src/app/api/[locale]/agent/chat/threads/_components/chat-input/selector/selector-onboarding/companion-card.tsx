@@ -8,7 +8,7 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { CharacterListItem } from "@/app/api/[locale]/agent/chat/characters/definition";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

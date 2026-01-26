@@ -30,6 +30,9 @@ export class StreamContext {
   pendingToolMessages = new Map<string, PendingToolData>();
   stepHasToolsAwaitingConfirmation = false;
 
+  // Loop control - set to true when model requests to stop the tool loop
+  shouldStopLoop = false;
+
   // Parent chain
   currentParentId: string | null;
   currentDepth: number;

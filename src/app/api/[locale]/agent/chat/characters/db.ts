@@ -9,7 +9,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
 import type { TranslationKey } from "@/i18n/core/static-types";
 

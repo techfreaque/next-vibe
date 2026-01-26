@@ -9,8 +9,8 @@ import {
   fail,
 } from "next-vibe/shared/types/response.schema";
 
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { Countries } from "@/i18n/core/config";
 
 import { EmailJourneyVariant } from "../../../enum";

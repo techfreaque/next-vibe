@@ -26,7 +26,6 @@ import {
   SpacingSize,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import {
   Countries,
   CountriesOptions,
@@ -288,7 +287,7 @@ const { GET } = createEndpoint({
               metadata: {
                 onRowClick: {
                   targetEndpoint: leadSingleDefinitions.GET,
-                  extractParams: (lead: Record<string, WidgetData>) => ({
+                  extractParams: (lead) => ({
                     urlPathParams: { id: lead.id as string },
                   }),
                 },

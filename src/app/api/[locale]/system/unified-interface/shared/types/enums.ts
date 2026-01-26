@@ -101,13 +101,11 @@ export enum WidgetType {
   NAVIGATE_BUTTON = "navigate_button",
   BUTTON_GROUP = "button_group",
   ACTION_BAR = "action_bar",
-  PAGINATION_INFO = "pagination_info",
   ACTION_LIST = "action_list",
 
   // Stats widgets
   STAT = "stat", // Simple stat display: number + label from field definition
   METRIC_CARD = "metric_card",
-  STATS_GRID = "stats_grid",
   CHART = "chart",
   PROGRESS = "progress",
 

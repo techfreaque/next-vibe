@@ -55,7 +55,7 @@ const { GET } = createEndpoint({
       title: "app.api.users.list.get.form.title" as const,
       description: "app.api.users.list.get.form.description" as const,
       layoutType: LayoutType.STACKED,
-      getCount: (data) => data.response?.paginationInfo?.totalCount,
+      getCount: (data) => data.paginationInfo?.totalCount,
       submitButton: {
         text: "app.api.users.list.get.actions.refresh" as const,
         loadingText: "app.api.users.list.get.actions.refreshing" as const,

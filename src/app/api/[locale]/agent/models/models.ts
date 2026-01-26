@@ -1,4 +1,4 @@
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import {
@@ -480,7 +480,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     name: "Claude Opus 4.5",
     provider: "anthropic",
     apiProvider: ApiProvider.OPENROUTER,
-    description: "app.chat.models.descriptions.claudeOpus45",
+    description: "app.api.agent.chat.models.descriptions.claudeOpus45",
     parameterCount: undefined,
     contextWindow: 1000000,
     icon: "si-anthropic",

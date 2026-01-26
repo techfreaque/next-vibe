@@ -6,7 +6,7 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+import { objectFieldNew } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   requestField,
   responseField,
@@ -40,18 +40,16 @@ const { POST } = createEndpoint({
   icon: "dollar-sign",
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.credits.purchase.post.container.title",
-      description: "app.api.credits.purchase.post.container.description",
-      layoutType: LayoutType.STACKED,
-    },
-    {
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    title: "app.api.credits.purchase.post.container.title",
+    description: "app.api.credits.purchase.post.container.description",
+    layoutType: LayoutType.STACKED,
+    usage: {
       request: "data",
       response: true,
     },
-    {
+    children: {
       // === REQUEST FIELDS ===
       quantity: requestField({
         schema: z.coerce.number().int().min(1).max(10),
@@ -97,7 +95,7 @@ const { POST } = createEndpoint({
         content: "app.api.credits.purchase.post.totalCredits.content",
       }),
     },
-  ),
+  }),
 
   // === SUCCESS HANDLING ===
   successTypes: {

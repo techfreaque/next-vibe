@@ -335,7 +335,7 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
 /* eslint-disable prettier/prettier */
 /* eslint-disable i18next/no-literal-string */
 
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
 /**
  * Map of aliases to their canonical full paths

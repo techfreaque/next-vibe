@@ -93,15 +93,22 @@ export class FavoritesRepositoryClient {
             icon: config.customIcon ?? ("user" as const),
             content: {
               titleRow: {
-                name: config.customName ?? "Unknown Character",
-                tagline: "",
+                name:
+                  config.customName ??
+                  ("app.api.agent.chat.favorites.fallbacks.unknownCharacter" as const),
+                tagline:
+                  "app.api.agent.chat.favorites.fallbacks.noTagline" as const,
               },
-              description: "",
+              description:
+                "app.api.agent.chat.favorites.fallbacks.noDescription" as const,
               modelRow: {
                 modelIcon: "sparkles" as const,
-                modelInfo: "Unknown",
-                modelProvider: "unknown",
-                creditCost: "0 credits",
+                modelInfo:
+                  "app.api.agent.chat.favorites.fallbacks.unknown" as const,
+                modelProvider:
+                  "app.api.agent.chat.favorites.fallbacks.unknownProvider" as const,
+                creditCost:
+                  "app.api.agent.chat.favorites.fallbacks.zeroCredits" as const,
               },
             },
           };
@@ -124,22 +131,30 @@ export class FavoritesRepositoryClient {
                 config.customName ??
                 character.name ??
                 bestModel?.name ??
-                "Unknown Model",
-              tagline: character.tagline,
+                ("app.api.agent.chat.favorites.fallbacks.unknownModel" as const),
+              tagline:
+                character.tagline ??
+                ("app.api.agent.chat.favorites.fallbacks.noTagline" as const),
             },
-            description: character.description,
+            description:
+              character.description ??
+              ("app.api.agent.chat.favorites.fallbacks.noDescription" as const),
             modelRow: bestModel
               ? {
                   modelIcon: bestModel.icon,
                   modelInfo: bestModel.name,
-                  modelProvider: bestModel.provider ?? "unknown",
+                  modelProvider:
+                    bestModel.provider ??
+                    ("app.api.agent.chat.favorites.fallbacks.unknownProvider" as const),
                   creditCost: `${bestModel.creditCost} credits`,
                 }
               : {
                   modelIcon: "sparkles" as const,
                   modelInfo: "No model found",
-                  modelProvider: "unknown",
-                  creditCost: "0 credits",
+                  modelProvider:
+                    "app.api.agent.chat.favorites.fallbacks.unknownProvider" as const,
+                  creditCost:
+                    "app.api.agent.chat.favorites.fallbacks.zeroCredits" as const,
                 },
           },
         };
@@ -359,10 +374,12 @@ export class FavoritesRepositoryClient {
             icon: "user" as const,
             info: {
               titleRow: {
-                name: "Unknown Character",
-                tagline: "",
+                name: "app.api.agent.chat.favorites.fallbacks.unknownCharacter" as const,
+                tagline:
+                  "app.api.agent.chat.favorites.fallbacks.noTagline" as const,
               },
-              description: "",
+              description:
+                "app.api.agent.chat.favorites.fallbacks.noDescription" as const,
             },
           },
         },
@@ -384,10 +401,16 @@ export class FavoritesRepositoryClient {
           icon: stored.customIcon ?? character.icon,
           info: {
             titleRow: {
-              name: character.name,
-              tagline: character.tagline,
+              name:
+                character.name ??
+                ("app.api.agent.chat.favorites.fallbacks.unknownCharacter" as const),
+              tagline:
+                character.tagline ??
+                ("app.api.agent.chat.favorites.fallbacks.noTagline" as const),
             },
-            description: character.description,
+            description:
+              character.description ??
+              ("app.api.agent.chat.favorites.fallbacks.noDescription" as const),
           },
         },
       },

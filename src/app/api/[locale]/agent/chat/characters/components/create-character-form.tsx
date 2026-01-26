@@ -12,8 +12,8 @@ import { type JSX, useCallback } from "react";
 
 import createCharacterEndpoint from "@/app/api/[locale]/agent/chat/characters/create/definition";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/characters/enum";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointsPage";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

@@ -43,11 +43,11 @@ import {
 } from "@/app/[locale]/chat/lib/utils/navigation";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
+import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   Icon,
   type IconKey,
-} from "@/app/api/[locale]/system/unified-interface/react/icons";
-import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

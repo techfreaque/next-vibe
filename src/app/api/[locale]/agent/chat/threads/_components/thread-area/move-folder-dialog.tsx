@@ -14,7 +14,7 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
 import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

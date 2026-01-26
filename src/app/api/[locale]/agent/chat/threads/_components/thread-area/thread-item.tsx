@@ -46,8 +46,8 @@ import {
 } from "@/app/[locale]/chat/lib/design-tokens";
 import type { UseChatReturn } from "@/app/api/[locale]/agent/chat/hooks/hooks";
 import type { ChatThread } from "@/app/api/[locale]/agent/chat/hooks/store";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";

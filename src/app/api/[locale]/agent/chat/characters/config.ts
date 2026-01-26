@@ -4,7 +4,7 @@
  * This file contains default/built-in characters that are read-only
  */
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { TtsVoice, type TtsVoiceValue } from "../../text-to-speech/enum";

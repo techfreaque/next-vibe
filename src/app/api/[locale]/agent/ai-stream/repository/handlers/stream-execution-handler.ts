@@ -19,6 +19,7 @@ import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/to
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import { MAX_TOOL_CALLS } from "../core/constants";
 import type { ProviderFactory } from "../core/provider-factory";
 import type { StreamContext } from "../core/stream-context";
 import type { StreamingTTSHandler } from "../streaming-tts";
@@ -83,8 +84,8 @@ export class StreamExecutionHandler {
       ...(tools
         ? {
             tools,
-            // Enable multi-step tool calling loop - AI can call tools up to 50 times
-            stopWhen: stepCountIs(50),
+            // Enable multi-step tool calling loop - AI can call tools up to MAX_TOOL_CALLS times
+            stopWhen: stepCountIs(MAX_TOOL_CALLS),
             onStepFinish: (): void => {
               // Tool arguments are already sent via tool-call stream events
             },

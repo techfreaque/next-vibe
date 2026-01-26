@@ -11,7 +11,7 @@ import * as React from "react";
 import {
   Icon,
   type IconKey,
-} from "@/app/api/[locale]/system/unified-interface/react/icons";
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
 import { Span } from "./span";

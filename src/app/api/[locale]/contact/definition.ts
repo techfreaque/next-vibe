@@ -16,7 +16,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
-  scopedObjectField,
+  scopedObjectFieldNew,
   scopedRequestField,
   scopedResponseArrayOptionalField,
   scopedResponseField,
@@ -60,18 +60,14 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ],
 
-  fields: scopedObjectField(
-    scopedTranslation,
-
-    {
-      type: WidgetType.CONTAINER,
-      title: "form.label",
-      description: "form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "form.label",
+    description: "form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       name: scopedRequestField(scopedTranslation, {
         schema: z.string().min(2),
         type: WidgetType.FORM_FIELD,
@@ -147,6 +143,12 @@ const { POST } = createEndpoint({
           type: WidgetType.DATA_LIST,
           title: "response.status",
           description: "response.description",
+          usage: { response: true },
+          children: scopedResponseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "response.status",
+            schema: z.string(),
+          }),
         },
         scopedResponseField(scopedTranslation, {
           type: WidgetType.TEXT,
@@ -155,7 +157,7 @@ const { POST } = createEndpoint({
         }),
       ),
     },
-  ),
+  }),
   examples: {
     requests: {
       default: {

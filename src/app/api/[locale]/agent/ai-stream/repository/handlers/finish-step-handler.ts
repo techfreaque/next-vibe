@@ -77,6 +77,25 @@ export class FinishStepHandler {
       return { shouldAbort: true };
     }
 
+    // Check if model requested to stop the loop via noLoop parameter
+    if (ctx.shouldStopLoop) {
+      logger.info(
+        "[AI Stream] Step complete - model requested loop stop via noLoop, aborting stream",
+        {
+          toolCallsInStep: ctx.pendingToolMessages.size,
+        },
+      );
+
+      // Abort the stream to stop the AI SDK from processing further
+      streamAbortController.abort(new Error("Model requested loop stop"));
+
+      // Close the controller to stop sending events to client
+      controller.close();
+
+      // Signal to exit the loop - model has enough information
+      return { shouldAbort: true };
+    }
+
     // After a step finishes, update currentParentId/currentDepth to point to the last message
     // The next ASSISTANT message should be a CHILD of the last tool message, so increment depth
     logger.info("[AI Stream] Step finished - updating parent chain", {

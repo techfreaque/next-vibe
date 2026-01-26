@@ -10,6 +10,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { ModelId } from "../agent/models/models";
 import type { CreditPackCheckoutSession } from "../payment/providers/types";
 import creditsDefinitions from "./definition";
 import type { CreditTypeIdentifierValue } from "./enum";
@@ -60,15 +61,15 @@ export class CreditRepository {
 
   static async deductCredits(
     // oxlint-disable-next-line no-unused-vars
-    _identifier: CreditIdentifier,
+    identifier: CreditIdentifier,
     // oxlint-disable-next-line no-unused-vars
-    _amount: number,
+    amount: number,
     // oxlint-disable-next-line no-unused-vars
-    _modelId: string,
+    modelId: ModelId | null,
     // oxlint-disable-next-line no-unused-vars
-    _messageId: string,
+    messageId: string,
     // oxlint-disable-next-line no-unused-vars
-    _logger: EndpointLogger,
+    logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("deductCredits is not implemented on native");
@@ -231,7 +232,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _amount: number,
     // oxlint-disable-next-line no-unused-vars
-    _modelId: string,
+    _modelId: ModelId | null,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
@@ -369,15 +370,15 @@ export class CreditRepository {
 
   static async deductEarnedCredits(
     // oxlint-disable-next-line no-unused-vars
-    _userId: string,
+    userId: string,
     // oxlint-disable-next-line no-unused-vars
-    _amount: number,
+    amountCents: number,
     // oxlint-disable-next-line no-unused-vars
-    _modelId: string,
+    payoutRequestId: string,
     // oxlint-disable-next-line no-unused-vars
-    _messageId: string,
+    currency: "BTC" | "USDC" | "CREDITS",
     // oxlint-disable-next-line no-unused-vars
-    _logger: EndpointLogger,
+    logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("deductEarnedCredits is not implemented on native");

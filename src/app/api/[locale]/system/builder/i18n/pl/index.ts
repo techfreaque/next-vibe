@@ -569,9 +569,11 @@ export const translations: typeof enTranslations = {
       },
       filesBuilt: {
         title: "Zbudowane pliki",
+        item: "Zbudowany plik",
       },
       filesCopied: {
         title: "Skopiowane pliki",
+        item: "Skopiowany plik",
       },
       packageJson: {
         title: "Wygenerowany package.json",

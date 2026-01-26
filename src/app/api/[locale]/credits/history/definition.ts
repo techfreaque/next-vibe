@@ -8,7 +8,7 @@ import { z } from "zod";
 import { CreditTransactionType } from "@/app/api/[locale]/credits/enum";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  objectFieldNew,
   responseArrayField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
@@ -41,39 +41,34 @@ const { GET } = createEndpoint({
   icon: "wallet",
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.agent.chat.credits.history.get.container.title",
-      description:
-        "app.api.agent.chat.credits.history.get.container.description",
-      layoutType: LayoutType.STACKED,
-      getCount: (data) => data.response?.paginationInfo?.total,
-      submitButton: {
-        text: "app.api.leads.list.get.actions.refresh",
-        loadingText: "app.api.leads.list.get.actions.refreshing",
-        position: "header",
-        icon: "refresh-cw",
-        variant: "ghost",
-        size: "sm",
-      },
-      showSubmitButton: false,
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    title: "app.api.agent.chat.credits.history.get.container.title",
+    description: "app.api.agent.chat.credits.history.get.container.description",
+    layoutType: LayoutType.STACKED,
+    getCount: (data) => data.response?.paginationInfo?.total,
+    submitButton: {
+      text: "app.api.leads.list.get.actions.refresh",
+      loadingText: "app.api.leads.list.get.actions.refreshing",
+      position: "header",
+      icon: "refresh-cw",
+      variant: "ghost",
+      size: "sm",
     },
-    { request: "data", response: true },
-    {
+    showSubmitButton: false,
+    usage: { request: "data", response: true },
+    children: {
       // === RESPONSE FIELDS ===
       transactions: responseArrayField(
         {
           type: WidgetType.CREDIT_TRANSACTION_LIST,
         },
-        objectField(
-          {
-            type: WidgetType.CREDIT_TRANSACTION_CARD,
-            leftFields: ["type", "createdAt"],
-            rightFields: ["amount", "balanceAfter"],
-          },
-          { response: true },
-          {
+        objectFieldNew({
+          type: WidgetType.CREDIT_TRANSACTION_CARD,
+          leftFields: ["type", "createdAt"],
+          rightFields: ["amount", "balanceAfter"],
+          usage: { response: true },
+          children: {
             id: responseField({
               type: WidgetType.TEXT,
               content: "app.api.agent.chat.credits.history.get.id" as const,
@@ -112,16 +107,14 @@ const { GET } = createEndpoint({
               schema: dateSchema,
             }),
           },
-        ),
+        }),
       ),
 
-      paginationInfo: objectField(
-        {
-          type: WidgetType.PAGINATION,
-          order: 2,
-        },
-        { request: "data", response: true },
-        {
+      paginationInfo: objectFieldNew({
+        type: WidgetType.PAGINATION,
+        order: 2,
+        usage: { request: "data", response: true },
+        children: {
           page: requestResponseField({
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
@@ -145,9 +138,9 @@ const { GET } = createEndpoint({
             schema: z.coerce.number(),
           }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   // === SUCCESS HANDLING ===
   successTypes: {

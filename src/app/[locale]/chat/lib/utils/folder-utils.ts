@@ -9,7 +9,7 @@ import {
   isDefaultFolderId,
 } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

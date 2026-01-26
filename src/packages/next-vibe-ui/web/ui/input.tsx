@@ -134,8 +134,8 @@ export type InputProps<
   disabled?: boolean;
   readOnly?: boolean;
   required?: boolean;
-  min?: number;
-  max?: number;
+  min?: InferValueType<T>;
+  max?: InferValueType<T>;
   step?: number;
   maxLength?: number;
   autoComplete?: string;

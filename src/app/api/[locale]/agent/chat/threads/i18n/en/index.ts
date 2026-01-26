@@ -300,4 +300,11 @@ export const translations = {
     },
   },
   threadId: threadsThreadIdTranslations,
+  publicFeed: {
+    timestamp: {
+      justNow: "Just now",
+      hoursAgo: "{{hours}}h ago",
+      daysAgo: "{{days}}d ago",
+    },
+  },
 };

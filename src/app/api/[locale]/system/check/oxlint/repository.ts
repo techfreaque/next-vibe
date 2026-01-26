@@ -55,32 +55,30 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         const configResult = await ensureConfigReady(logger, false);
         if (!configResult.ready) {
           return success({
-            issues: {
-              items: [
-                {
-                  file: configResult.configPath,
-                  severity: "error" as const,
-                  message: configResult.message,
-                  type: "oxlint" as const,
-                },
-              ],
-              files: [
-                {
-                  file: configResult.configPath,
-                  errors: 1,
-                  warnings: 0,
-                  total: 1,
-                },
-              ],
-              summary: {
-                totalIssues: 1,
-                totalFiles: 1,
-                totalErrors: 1,
-                displayedIssues: 1,
-                displayedFiles: 1,
-                currentPage: 1,
-                totalPages: 1,
+            items: [
+              {
+                file: configResult.configPath,
+                severity: "error" as const,
+                message: configResult.message,
+                type: "oxlint" as const,
               },
+            ],
+            files: [
+              {
+                file: configResult.configPath,
+                errors: 1,
+                warnings: 0,
+                total: 1,
+              },
+            ],
+            summary: {
+              totalIssues: 1,
+              totalFiles: 1,
+              totalErrors: 1,
+              displayedIssues: 1,
+              displayedFiles: 1,
+              currentPage: 1,
+              totalPages: 1,
             },
           });
         }
@@ -94,18 +92,16 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       if (!config.oxlint.enabled) {
         logger.info("Oxlint is disabled in check.config.ts");
         return success({
-          issues: {
-            items: [],
-            files: [],
-            summary: {
-              totalIssues: 0,
-              totalFiles: 0,
-              totalErrors: 0,
-              displayedIssues: 0,
-              displayedFiles: 0,
-              currentPage: 1,
-              totalPages: 1,
-            },
+          items: [],
+          files: [],
+          summary: {
+            totalIssues: 0,
+            totalFiles: 0,
+            totalErrors: 0,
+            displayedIssues: 0,
+            displayedFiles: 0,
+            currentPage: 1,
+            totalPages: 1,
           },
         });
       }
@@ -143,7 +139,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       );
 
       logger.debug(
-        `[OXLINT] Execution completed (${response.issues.items.length} issues found)`,
+        `[OXLINT] Execution completed (${response.items.length} issues found)`,
       );
 
       return success(response);
@@ -153,32 +149,30 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       logger.error(`[OXLINT] Execution failed: ${errorMessage}`);
 
       return success({
-        issues: {
-          items: [
-            {
-              file: "unknown",
-              severity: "error" as const,
-              message: errorMessage,
-              type: "oxlint" as const,
-            },
-          ],
-          files: [
-            {
-              file: "unknown",
-              errors: 1,
-              warnings: 0,
-              total: 1,
-            },
-          ],
-          summary: {
-            totalIssues: 1,
-            totalFiles: 1,
-            totalErrors: 1,
-            displayedIssues: 1,
-            displayedFiles: 1,
-            currentPage: 1,
-            totalPages: 1,
+        items: [
+          {
+            file: "unknown",
+            severity: "error" as const,
+            message: errorMessage,
+            type: "oxlint" as const,
           },
+        ],
+        files: [
+          {
+            file: "unknown",
+            errors: 1,
+            warnings: 0,
+            total: 1,
+          },
+        ],
+        summary: {
+          totalIssues: 1,
+          totalFiles: 1,
+          totalErrors: 1,
+          displayedIssues: 1,
+          displayedFiles: 1,
+          currentPage: 1,
+          totalPages: 1,
         },
       });
     }
@@ -386,22 +380,20 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       .size;
 
     return {
-      issues: {
-        items: limitedIssues,
-        files,
-        summary: {
-          totalIssues,
-          totalFiles,
-          totalErrors,
-          displayedIssues,
-          displayedFiles,
-          truncatedMessage:
-            displayedIssues < totalIssues || displayedFiles < totalFiles
-              ? `Showing ${displayedIssues} of ${totalIssues} issues from ${displayedFiles} of ${totalFiles} files`
-              : "",
-          currentPage,
-          totalPages,
-        },
+      items: limitedIssues,
+      files,
+      summary: {
+        totalIssues,
+        totalFiles,
+        totalErrors,
+        displayedIssues,
+        displayedFiles,
+        truncatedMessage:
+          displayedIssues < totalIssues || displayedFiles < totalFiles
+            ? `Showing ${displayedIssues} of ${totalIssues} issues from ${displayedFiles} of ${totalFiles} files`
+            : "",
+        currentPage,
+        totalPages,
       },
     };
   }

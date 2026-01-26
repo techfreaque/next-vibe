@@ -41,8 +41,7 @@ export class FavoritesCreateRepository {
 
     if (!userId) {
       return fail({
-        message:
-          "app.api.agent.chat.favorites.create.post.errors.unauthorized.title",
+        message: "app.api.agent.chat.favorites.post.errors.unauthorized.title",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -63,8 +62,7 @@ export class FavoritesCreateRepository {
         );
         if (!characterResult.success) {
           return fail({
-            message:
-              "app.api.agent.chat.favorites.create.post.errors.notFound.title",
+            message: "app.api.agent.chat.favorites.post.errors.notFound.title",
             errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
@@ -97,8 +95,7 @@ export class FavoritesCreateRepository {
 
       if (!favorite) {
         return fail({
-          message:
-            "app.api.agent.chat.favorites.create.post.errors.server.title",
+          message: "app.api.agent.chat.favorites.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -107,7 +104,7 @@ export class FavoritesCreateRepository {
     } catch (error) {
       logger.error("Failed to create favorite", parseError(error));
       return fail({
-        message: "app.api.agent.chat.favorites.create.post.errors.server.title",
+        message: "app.api.agent.chat.favorites.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

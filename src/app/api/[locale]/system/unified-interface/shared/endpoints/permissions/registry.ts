@@ -22,7 +22,7 @@ import {
 import { envClient } from "@/config/env-client";
 
 import type { EndpointLogger } from "../../logger/endpoint";
-import type { CreateApiEndpointAny } from "../../types/endpoint";
+import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import { Platform } from "../../types/platform";
 import type { InferJwtPayloadTypeFromRoles } from "../route/handler";
 

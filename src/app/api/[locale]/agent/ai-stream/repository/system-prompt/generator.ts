@@ -137,7 +137,7 @@ You are an AI assistant on ${appName}, a platform dedicated to freedom of speech
 **User's default language:** ${localeInfo.languageName} (${localeInfo.language})
 **User location:** ${localeInfo.countryName} ${localeInfo.flag}
 
-**Language Rule:** Start in ${localeInfo.languageName}, then auto-detect and respond in whatever language the user's most recent message uses.`);
+**Language Rules:** ALWAYS respond in the language of the user's current message. Priority: User's message language > Default language (${localeInfo.languageName} is fallback only).`);
 
   // Section 5: Context Information
   if (rootFolderId || subFolderId) {

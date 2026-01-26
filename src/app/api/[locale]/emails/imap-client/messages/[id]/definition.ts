@@ -61,9 +61,9 @@ const { GET } = createEndpoint({
       message: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.emails.imapClient.messages.id.get.message.title",
+          title: "app.api.emails.imapClient.messages.id.get.response.title",
           description:
-            "app.api.emails.imapClient.messages.id.get.message.description",
+            "app.api.emails.imapClient.messages.id.get.response.description",
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -419,9 +419,9 @@ const { PATCH } = createEndpoint({
       message: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.emails.imapClient.messages.id.patch.message.title",
+          title: "app.api.emails.imapClient.messages.id.patch.response.title",
           description:
-            "app.api.emails.imapClient.messages.id.patch.message.description",
+            "app.api.emails.imapClient.messages.id.patch.response.description",
           layoutType: LayoutType.GRID,
           columns: 12,
         },

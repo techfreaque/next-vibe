@@ -107,6 +107,9 @@ export const translations: typeof enTranslations = {
         badge: "Wymagane 2FA",
       },
     },
+    recommendations: {
+      item: "Zalecana opcja logowania",
+    },
   },
   errors: {
     validation: {

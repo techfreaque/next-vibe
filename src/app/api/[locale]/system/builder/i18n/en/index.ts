@@ -567,9 +567,11 @@ export const translations = {
       },
       filesBuilt: {
         title: "Files Built",
+        item: "Built File",
       },
       filesCopied: {
         title: "Files Copied",
+        item: "Copied File",
       },
       packageJson: {
         title: "Generated package.json",

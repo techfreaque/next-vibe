@@ -17,7 +17,6 @@ import type {
 } from "react-hook-form";
 import { View } from "react-native";
 
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type {
   FieldConfig,
   FieldStyleClassName,
@@ -26,6 +25,7 @@ import type {
 } from "@/app/api/[locale]/system/unified-interface/shared/field-config/field-config-types";
 import { getFieldConfig } from "@/app/api/[locale]/system/unified-interface/shared/field-config/infer-field-config";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction, TParams } from "@/i18n/core/static-types";

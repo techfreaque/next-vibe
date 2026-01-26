@@ -33,12 +33,12 @@ export class CharactersRepositoryClient {
    */
   static formatCreditCost(cost: number, t: TFunction): string {
     if (cost === 0) {
-      return t("app.api.agent.chat.characters.free");
+      return t("app.api.agent.chat.selector.free");
     }
     if (cost === 1) {
-      return t("app.api.agent.chat.characters.oneCredit");
+      return t("app.api.agent.chat.selector.creditsSingle");
     }
-    return t("app.api.agent.chat.characters.multipleCredits", { cost });
+    return t("app.api.agent.chat.selector.creditsExact", { cost });
   }
   /**
    * Convert model credit cost to price level

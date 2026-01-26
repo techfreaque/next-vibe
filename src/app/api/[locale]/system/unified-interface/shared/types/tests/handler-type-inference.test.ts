@@ -52,7 +52,7 @@ const testPublicOnlyEndpoint = createEndpoint({
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
     { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    {},
+    { request: "data" },
     {},
   ),
   errorTypes: {
@@ -95,9 +95,9 @@ const testPublicOnlyEndpoint = createEndpoint({
   },
   successTypes: { title: "test" as any, description: "test" as any },
   examples: {
-    requests: undefined,
-    urlPathParams: undefined,
-    responses: undefined,
+    requests: {
+      default: {},
+    },
   },
 });
 
@@ -113,7 +113,7 @@ const testAdminOnlyEndpoint = createEndpoint({
   allowedRoles: [UserRole.ADMIN] as const,
   fields: objectField(
     { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    {},
+    { request: "data" },
     {},
   ),
   errorTypes: {
@@ -156,9 +156,9 @@ const testAdminOnlyEndpoint = createEndpoint({
   },
   successTypes: { title: "test" as any, description: "test" as any },
   examples: {
-    requests: undefined,
-    urlPathParams: undefined,
-    responses: undefined,
+    requests: {
+      default: {},
+    },
   },
 });
 
@@ -174,7 +174,7 @@ const testMixedRolesEndpoint = createEndpoint({
   allowedRoles: [UserRole.PUBLIC, UserRole.ADMIN] as const,
   fields: objectField(
     { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    {},
+    { request: "data" },
     {},
   ),
   errorTypes: {
@@ -217,7 +217,9 @@ const testMixedRolesEndpoint = createEndpoint({
   },
   successTypes: { title: "test" as any, description: "test" as any },
   examples: {
-    requests: undefined,
+    requests: {
+      default: {},
+    },
     urlPathParams: undefined,
     responses: undefined,
   },

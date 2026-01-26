@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { zodSchemaToJsonSchema } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/endpoint-to-metadata";
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { endpointToToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -71,7 +71,7 @@ function addFieldDescriptions(
   locale: CountryLanguage,
   endpoint: CreateApiEndpointAny,
 ): Record<string, z.ZodTypeAny> {
-  if (!fields || fields.type !== "object" || !fields.children) {
+  if (!fields || fields.schemaType !== "object" || !fields.children) {
     return shape;
   }
 
@@ -79,7 +79,7 @@ function addFieldDescriptions(
 
   for (const [key, schema] of Object.entries(shape)) {
     const fieldDef = fields.children[key];
-    if (!fieldDef || fieldDef.type === "widget") {
+    if (!fieldDef || fieldDef.schemaType === "widget") {
       enhancedShape[key] = schema;
       continue;
     }

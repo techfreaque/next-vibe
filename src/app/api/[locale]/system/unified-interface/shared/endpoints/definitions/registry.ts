@@ -4,7 +4,7 @@ import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../logger/endpoint";
-import type { CreateApiEndpointAny } from "../../types/endpoint";
+import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import { Methods } from "../../types/enums";
 import type { Platform } from "../../types/platform";
 import { endpointToToolName } from "../../utils/path";

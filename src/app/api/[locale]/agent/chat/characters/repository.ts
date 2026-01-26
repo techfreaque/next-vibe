@@ -487,9 +487,13 @@ export class CharactersRepository {
         }
       : {
           modelIcon: "sparkles" as const,
-          modelInfo: "Unknown Model",
-          modelProvider: "unknown",
-          creditCost: "? credits",
+          modelInfo: t("app.api.agent.chat.characters.fallbacks.unknownModel"),
+          modelProvider: t(
+            "app.api.agent.chat.characters.fallbacks.unknownProvider",
+          ),
+          creditCost: t(
+            "app.api.agent.chat.characters.fallbacks.unknownCreditCost",
+          ),
         };
 
     return {
@@ -498,9 +502,16 @@ export class CharactersRepository {
       icon: char.icon ?? "sparkles",
       modelId,
       content: {
-        name: char.name ?? bestModel?.name ?? "Unknown Model",
-        description: char.description ?? "",
-        tagline: char.tagline ?? "",
+        name:
+          char.name ??
+          bestModel?.name ??
+          ("app.api.agent.chat.characters.fallbacks.unknownModel" as const),
+        description:
+          char.description ??
+          ("app.api.agent.chat.characters.fallbacks.noDescription" as const),
+        tagline:
+          char.tagline ??
+          ("app.api.agent.chat.characters.fallbacks.noTagline" as const),
         modelRow,
       },
     };

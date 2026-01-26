@@ -216,15 +216,15 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
     if (hours < 1) {
-      return t("app.chat.publicFeed.timestamp.justNow");
+      return t("app.api.agent.chat.threads.publicFeed.timestamp.justNow");
     }
     if (hours < 24) {
-      return t("app.chat.publicFeed.timestamp.hoursAgo", {
+      return t("app.api.agent.chat.threads.publicFeed.timestamp.hoursAgo", {
         count: hours.toString(),
       });
     }
     if (days < 30) {
-      return t("app.chat.publicFeed.timestamp.daysAgo", {
+      return t("app.api.agent.chat.threads.publicFeed.timestamp.daysAgo", {
         count: days.toString(),
       });
     }

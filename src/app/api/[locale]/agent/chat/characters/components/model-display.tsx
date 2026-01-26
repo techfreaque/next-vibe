@@ -5,7 +5,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
-import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -57,8 +57,8 @@ export function ModelDisplay({
           </Span>
           <Span className="text-xs text-destructive/80">
             {isAutoMode
-              ? t("app.chat.selector.adjustFiltersMessage" as const)
-              : t("app.chat.selector.modelNotFound" as const)}
+              ? t("app.api.agent.chat.selector.noModelsWarning" as const)
+              : t("app.api.agent.chat.selector.noMatchingModels" as const)}
           </Span>
         </Div>
       </Div>

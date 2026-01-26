@@ -7,6 +7,7 @@ import { translations as favoritesTranslations } from "../../favorites/i18n/de";
 import { translations as filesTranslations } from "../../files/[threadId]/[filename]/i18n/de";
 import { translations as foldersTranslations } from "../../folders/i18n/de";
 import { translations as memoriesTranslations } from "../../memories/i18n/de";
+import { translations as settingsTranslations } from "../../settings/i18n/de";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/de";
 import { translations as threadsTranslations } from "../../threads/i18n/de";
 import type { translations as enTranslations } from "../en";
@@ -28,6 +29,7 @@ export const translations: typeof enTranslations = {
     cli: "CLI",
     speech: "Sprache",
     sharing: "Teilen",
+    settings: "Einstellungen",
   },
   config: {
     folders: {
@@ -56,9 +58,6 @@ export const translations: typeof enTranslations = {
       flat: "Flach",
       debug: "Debug",
     },
-  },
-  favorites: {
-    ...favoritesTranslations,
   },
   components: {
     sidebar: {
@@ -303,6 +302,10 @@ export const translations: typeof enTranslations = {
   folders: foldersTranslations,
   memories: memoriesTranslations,
   characters: charaktersTranslations,
+  favorites: {
+    ...favoritesTranslations,
+  },
+  settings: settingsTranslations,
   threads: {
     ...threadsTranslations,
     messages: messagesTranslations,
@@ -335,6 +338,10 @@ export const translations: typeof enTranslations = {
         "Dolphin Llama 3 70B - Unzensiertes großes Sprachmodell basierend auf Llama 3",
       veniceUncensored:
         "Venice Uncensored - Unzensiertes KI-Modell für uneingeschränkte Konversationen",
+      claudeOpus45:
+        "Claude Opus 4.5 - Leistungsstärkstes Claude-Modell mit außergewöhnlichen Reasoning- und kreativen Fähigkeiten",
+      claudeHaiku45:
+        "Claude Haiku 4.5 - Schnelles und effizientes Claude-Modell optimiert für Geschwindigkeit und Kosteneffizienz",
     },
   },
   modelUtilities: {

@@ -5,727 +5,134 @@
  * This ensures type safety across CLI and React implementations.
  */
 
-import type { Route } from "next";
 import type { z } from "zod";
 
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
-
 import type {
-  CreateApiEndpointAny,
+  BaseWidgetConfig,
   FieldUsageConfig,
+  SchemaTypes,
+} from "../../unified-ui/widgets/_shared/types";
+import type { AccordionWidgetConfig } from "../../unified-ui/widgets/containers/accordion/types";
+import type { CodeOutputWidgetConfig } from "../../unified-ui/widgets/containers/code-output/types";
+import type { CodeQualityFilesWidgetConfig } from "../../unified-ui/widgets/containers/code-quality-files/types";
+import type { CodeQualityListWidgetConfig } from "../../unified-ui/widgets/containers/code-quality-list/types";
+import type { CodeQualitySummaryWidgetConfig } from "../../unified-ui/widgets/containers/code-quality-summary/types";
+import type { ContainerWidgetConfig } from "../../unified-ui/widgets/containers/container/types";
+import type { CreditTransactionCardWidgetConfig } from "../../unified-ui/widgets/containers/credit-transaction-card/types";
+import type { CreditTransactionListWidgetConfig } from "../../unified-ui/widgets/containers/credit-transaction-list/types";
+import type { DataGridWidgetConfig } from "../../unified-ui/widgets/containers/data-grid/types";
+import type { DataListWidgetConfig } from "../../unified-ui/widgets/containers/data-list/types";
+import type { DataTableWidgetConfig } from "../../unified-ui/widgets/containers/data-table/types";
+import type { GroupedListWidgetConfig } from "../../unified-ui/widgets/containers/grouped-list/types";
+import type { LinkCardWidgetConfig } from "../../unified-ui/widgets/containers/link-card/types";
+import type { MetricCardWidgetConfig } from "../../unified-ui/widgets/containers/metric-card/types";
+import type { PaginationWidgetConfig } from "../../unified-ui/widgets/containers/pagination/types";
+import type { SectionWidgetConfig } from "../../unified-ui/widgets/containers/section/types";
+import type { SeparatorWidgetConfig } from "../../unified-ui/widgets/containers/separator/types";
+import type { TabsWidgetConfig } from "../../unified-ui/widgets/containers/tabs/types";
+import type { AlertWidgetConfig } from "../../unified-ui/widgets/display-only/alert/types";
+import type { AvatarWidgetConfig } from "../../unified-ui/widgets/display-only/avatar/types";
+import type { BadgeWidgetConfig } from "../../unified-ui/widgets/display-only/badge/types";
+import type { ChartWidgetConfig } from "../../unified-ui/widgets/display-only/chart/types";
+import type { DescriptionWidgetConfig } from "../../unified-ui/widgets/display-only/description/types";
+import type { EmptyStateWidgetConfig } from "../../unified-ui/widgets/display-only/empty-state/types";
+import type { ErrorWidgetConfig } from "../../unified-ui/widgets/display-only/error/types";
+import type { IconWidgetConfig } from "../../unified-ui/widgets/display-only/icon/types";
+import type { KeyValueWidgetConfig } from "../../unified-ui/widgets/display-only/key-value/types";
+import type { LinkWidgetConfig } from "../../unified-ui/widgets/display-only/link/types";
+import type { LoadingWidgetConfig } from "../../unified-ui/widgets/display-only/loading/types";
+import type { MarkdownWidgetConfig } from "../../unified-ui/widgets/display-only/markdown/types";
+import type { ModelDisplayWidgetConfig } from "../../unified-ui/widgets/display-only/model-display/types";
+import type { PasswordStrengthWidgetConfig } from "../../unified-ui/widgets/display-only/password-strength/types";
+import type { StatWidgetConfig } from "../../unified-ui/widgets/display-only/stat/types";
+import type { TextWidgetConfig } from "../../unified-ui/widgets/display-only/text/types";
+import type { TitleWidgetConfig } from "../../unified-ui/widgets/display-only/title/types";
+import type { BooleanFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/boolean-field/types";
+import type { ColorFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/color-field/types";
+import type { CountrySelectFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/country-select-field/types";
+import type { CurrencySelectFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/currency-select-field/types";
+import type { DateFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/date-field/types";
+import type { DateRangeFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/date-range-field/types";
+import type { DateTimeFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/datetime-field/types";
+import type { EmailFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/email-field/types";
+import type { FileFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/file-field/types";
+import type { FilterPillsFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/filter-pills-field/types";
+import type { IconFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/icon-field/types";
+import type { IntFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/int-field/types";
+import type { JsonFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/json-field/types";
+import type { LanguageSelectFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/language-select-field/types";
+import type { MarkdownEditorWidgetConfig } from "../../unified-ui/widgets/form-fields/markdown-editor/types";
+import type { MultiSelectFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/multiselect-field/types";
+import type { NumberFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/number-field/types";
+import type { PasswordFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/password-field/types";
+import type { PhoneFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/phone-field/types";
+import type { RangeSliderFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/range-slider-field/types";
+import type { SelectFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/select-field/types";
+import type { SliderFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/slider-field/types";
+import type { TagsFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/tags-field/types";
+import type { TextArrayFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/text-array-field/types";
+import type { TextFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/text-field/types";
+import type { TextareaFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/textarea-field/types";
+import type { TimeFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/time-field/types";
+import type { TimeRangeFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/time-range-field/types";
+import type { TimezoneFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/timezone-field/types";
+import type { UrlFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/url-field/types";
+import type { UuidFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/uuid-field/types";
+import type { ButtonWidgetConfig } from "../../unified-ui/widgets/interactive/button/types";
+import type { FormAlertWidgetConfig } from "../../unified-ui/widgets/interactive/form-alert/types";
+import type { NavigateButtonWidgetConfig } from "../../unified-ui/widgets/interactive/navigate-button/types";
+import type { SubmitButtonWidgetConfig } from "../../unified-ui/widgets/interactive/submit-button/types";
+import type {
   InferSchemaFromField,
   ObjectField,
   ObjectUnionField,
   UnifiedField,
 } from "../types/endpoint";
+import type { CreateApiEndpointAny } from "../types/endpoint-base";
+import type { FieldUsage, LayoutType, WidgetType } from "../types/enums";
 import type {
-  FieldDataType,
-  FieldUsage,
-  LayoutType,
-  SpacingSize,
-  WidgetType,
-} from "../types/enums";
-import type { WidgetData } from "./types";
-import type {
-  ArrayWidgetSchema,
-  BooleanWidgetSchema,
-  DateWidgetSchema,
   EnumWidgetSchema,
   NumberWidgetSchema,
   StringWidgetSchema,
 } from "./utils/schema-constraints";
-
-/**
- * Layout configuration for containers and widgets
- */
-export interface LayoutConfig {
-  type: LayoutType;
-  columns?: number;
-  rows?: number;
-  gap?: SpacingSize;
-  padding?: SpacingSize;
-  margin?: SpacingSize;
-  spacing?: "compact" | "normal" | "relaxed"; // Added for consistent spacing control
-  responsive?: {
-    sm?: Partial<LayoutConfig>;
-    md?: Partial<LayoutConfig>;
-    lg?: Partial<LayoutConfig>;
-    xl?: Partial<LayoutConfig>;
-  };
-}
-
-/**
- * Common widget properties
- * TKey allows using either global TranslationKey or scoped translation keys
- */
-interface BaseWidgetConfig {
-  type: WidgetType;
-  className?: string;
-  order?: number;
-  /** Hide this field from rendering */
-  hidden?: boolean;
-  /** Render inline with next sibling that also has inline: true */
-  inline?: boolean;
-}
-
-/**
- * Prefill display configuration for form fields
- * When a field has a prefilled value from server/URL params, this controls how it's displayed
- */
-export interface PrefillDisplayConfig<TKey extends string> {
-  /** Display variant when field is prefilled */
-  variant: "badge" | "highlight" | "card";
-  /** Translation key for the label shown with prefilled value */
-  labelKey?: NoInfer<TKey>;
-  /** Icon to show with prefilled value */
-  icon?: IconKey;
-}
-
-/**
- * Common properties for form field widgets
- * TKey allows using either global TranslationKey or scoped translation keys
- * TKey is inferred from label/description values, then validated against expected type
- */
-interface BaseFormFieldWidgetConfig<
-  out TKey extends string,
-> extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
-  label?: NoInfer<TKey>;
-  description?: NoInfer<TKey>;
-  placeholder?: NoInfer<TKey>;
-  helpText?: NoInfer<TKey>;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
-  /**
-   * Make field readonly - displays value but cannot be edited
-   * Use with prefillDisplay to show special styling for server-provided values
-   */
-  readonly?: boolean;
-  /**
-   * Configure how prefilled values are displayed when readonly
-   * Only applies when field has a prefilled value
-   */
-  prefillDisplay?: PrefillDisplayConfig<TKey>;
-}
-
-// ============================================================================
-// FORM WIDGETS
-// ============================================================================
-
-// Text input
-export interface TextFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.TEXT;
-  schema: TSchema;
-}
-
-// Email input
-export interface EmailFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.EMAIL;
-  schema: TSchema;
-}
-
-// Password input
-export interface PasswordFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.PASSWORD;
-  schema: TSchema;
-}
-
-// Number input
-export interface NumberFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends NumberWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.NUMBER;
-  schema: TSchema;
-}
-
-// Boolean/Checkbox input
-export interface BooleanFieldWidgetConfig<
-  TKey extends string,
-  TSchema extends BooleanWidgetSchema,
-> extends Omit<BaseFormFieldWidgetConfig<TKey>, "placeholder"> {
-  fieldType: FieldDataType.BOOLEAN;
-  schema: TSchema;
-}
-
-// Select dropdown
-export interface SelectFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends EnumWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.SELECT;
-  options: Array<{ label: NoInfer<TKey>; value: string | number }>;
-  schema: TSchema;
-}
-
-// Multi-select
-export interface MultiSelectFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends ArrayWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.MULTISELECT;
-  options: Array<{ label: NoInfer<TKey>; value: string | number }>;
-  schema: TSchema;
-}
-
-// Filter pills (like select but displayed as pills)
-export interface FilterPillsFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends EnumWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.FILTER_PILLS;
-  options: Array<{
-    label: NoInfer<TKey>;
-    value: string | number;
-    icon?: IconKey;
-    description?: NoInfer<TKey>;
-  }>;
-  schema: TSchema;
-}
-
-// Range slider (min-max selection with visual slider)
-export interface RangeSliderFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends z.ZodOptional<
-    z.ZodObject<{
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      min: z.ZodOptional<z.ZodEnum<any>>;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      max: z.ZodOptional<z.ZodEnum<any>>;
-    }>
-  >,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.RANGE_SLIDER;
-  options: Array<{
-    label: NoInfer<TKey>;
-    value: string | number;
-    icon?: IconKey;
-    description?: NoInfer<TKey>;
-  }>;
-  minLabel?: NoInfer<TKey>; // Optional label for min handle (defaults to "Min")
-  maxLabel?: NoInfer<TKey>; // Optional label for max handle (defaults to "Max")
-  minDefault?: string | number; // Optional default min value
-  maxDefault?: string | number; // Optional default max value
-  schema: TSchema;
-}
-
-// Textarea
-export interface TextareaFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.TEXTAREA;
-  schema: TSchema;
-}
-
-// Phone input
-export interface PhoneFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.PHONE;
-  schema: TSchema;
-}
-
-// URL input
-export interface UrlFieldWidgetConfig<
-  TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.URL;
-  schema: TSchema;
-}
-
-// Integer input
-export interface IntFieldWidgetConfig<
-  TKey extends string,
-  TSchema extends NumberWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.INT;
-  schema: TSchema;
-}
-
-// Date input
-export interface DateFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends DateWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.DATE;
-  schema: TSchema;
-}
-
-// DateTime input
-export interface DateTimeFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends DateWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.DATETIME;
-  schema: TSchema;
-}
-
-// Time input
-export interface TimeFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends DateWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.TIME;
-  schema: TSchema;
-}
-
-// File input
-export interface FileFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.FILE;
-  schema: TSchema;
-}
-
-// UUID input
-export interface UuidFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.UUID;
-  schema: TSchema;
-}
-
-// JSON input
-export interface JsonFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.JSON;
-  schema: TSchema;
-}
-
-// Date range input
-export interface DateRangeFieldWidgetConfig<
-  TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends Omit<BaseFormFieldWidgetConfig<TKey>, "placeholder"> {
-  fieldType: FieldDataType.DATE_RANGE;
-  schema: TSchema;
-}
-
-// Time range input
-export interface TimeRangeFieldWidgetConfig<
-  TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends Omit<BaseFormFieldWidgetConfig<TKey>, "placeholder"> {
-  fieldType: FieldDataType.TIME_RANGE;
-  schema: TSchema;
-}
-
-// Timezone select
-export interface TimezoneFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.TIMEZONE;
-  schema: TSchema;
-}
-
-// Currency select
-export interface CurrencySelectFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.CURRENCY_SELECT;
-  schema: TSchema;
-}
-
-// Language select
-export interface LanguageSelectFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.LANGUAGE_SELECT;
-  schema: TSchema;
-}
-
-// Country select
-export interface CountrySelectFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.COUNTRY_SELECT;
-  schema: TSchema;
-}
-
-// Color picker
-export interface ColorFieldWidgetConfig<
-  TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends Omit<BaseFormFieldWidgetConfig<TKey>, "placeholder"> {
-  fieldType: FieldDataType.COLOR;
-  schema: TSchema;
-}
-
-// Icon picker
-export interface IconFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends StringWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.ICON;
-  schema: TSchema;
-}
-
-// Slider input
-export interface SliderFieldWidgetConfig<
-  TKey extends string,
-  TSchema extends NumberWidgetSchema,
-> extends Omit<BaseFormFieldWidgetConfig<TKey>, "placeholder"> {
-  fieldType: FieldDataType.SLIDER;
-  schema: TSchema;
-}
-
-// Tags input
-export interface TagsFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends ArrayWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.TAGS;
-  schema: TSchema;
-}
-
-// Text array input
-export interface TextArrayFieldWidgetConfig<
-  out TKey extends string,
-  TSchema extends ArrayWidgetSchema,
-> extends BaseFormFieldWidgetConfig<TKey> {
-  fieldType: FieldDataType.TEXT_ARRAY;
-  schema: TSchema;
-}
 
 // Union type for all form field widgets
 // Each widget uses its own specific schema constraint
 export type FormFieldWidgetConfig<
   TKey extends string,
   TSchema extends z.ZodTypeAny,
+  TUsage extends FieldUsageConfig,
 > =
-  | TextFieldWidgetConfig<TKey, TSchema>
-  | EmailFieldWidgetConfig<TKey, TSchema>
-  | PasswordFieldWidgetConfig<TKey, TSchema>
-  | NumberFieldWidgetConfig<TKey, TSchema>
-  | BooleanFieldWidgetConfig<TKey, TSchema>
-  | SelectFieldWidgetConfig<TKey, TSchema>
-  | MultiSelectFieldWidgetConfig<TKey, TSchema>
-  | FilterPillsFieldWidgetConfig<TKey, TSchema>
-  | RangeSliderFieldWidgetConfig<TKey, TSchema>
-  | TextareaFieldWidgetConfig<TKey, TSchema>
-  | PhoneFieldWidgetConfig<TKey, TSchema>
-  | UrlFieldWidgetConfig<TKey, TSchema>
-  | IntFieldWidgetConfig<TKey, TSchema>
-  | DateFieldWidgetConfig<TKey, TSchema>
-  | DateTimeFieldWidgetConfig<TKey, TSchema>
-  | TimeFieldWidgetConfig<TKey, TSchema>
-  | FileFieldWidgetConfig<TKey, TSchema>
-  | UuidFieldWidgetConfig<TKey, TSchema>
-  | JsonFieldWidgetConfig<TKey, TSchema>
-  | DateRangeFieldWidgetConfig<TKey, TSchema>
-  | TimeRangeFieldWidgetConfig<TKey, TSchema>
-  | TimezoneFieldWidgetConfig<TKey, TSchema>
-  | CurrencySelectFieldWidgetConfig<TKey, TSchema>
-  | LanguageSelectFieldWidgetConfig<TKey, TSchema>
-  | CountrySelectFieldWidgetConfig<TKey, TSchema>
-  | ColorFieldWidgetConfig<TKey, TSchema>
-  | IconFieldWidgetConfig<TKey, TSchema>
-  | SliderFieldWidgetConfig<TKey, TSchema>
-  | TagsFieldWidgetConfig<TKey, TSchema>
-  | TextArrayFieldWidgetConfig<TKey, TSchema>;
-
-export interface FormGroupWidgetConfig<
-  TKey extends string,
-> extends BaseWidgetConfig {
-  type: WidgetType.FORM_GROUP;
-  title?: NoInfer<TKey>;
-  description?: NoInfer<TKey>;
-  layoutType?: LayoutType;
-}
-
-export interface FormSectionWidgetConfig<
-  TKey extends string,
-> extends BaseWidgetConfig {
-  type: WidgetType.FORM_SECTION;
-  title?: NoInfer<TKey>;
-  description?: NoInfer<TKey>;
-}
-
-// ============================================================================
-// DATA DISPLAY WIDGETS
-// ============================================================================
-
-export interface DataTableWidgetConfig<
-  TKey extends string,
-> extends BaseWidgetConfig {
-  type: WidgetType.DATA_TABLE;
-  title?: NoInfer<TKey>;
-  description?: NoInfer<TKey>;
-  columns?: Array<{
-    key: string; // Field name from the data object (e.g., "id", "name", "email")
-    label: NoInfer<TKey>;
-    sortable?: boolean;
-    width?: string | number;
-    align?: "left" | "center" | "right";
-    format?:
-      | "text"
-      | "number"
-      | "date"
-      | "currency"
-      | "percentage"
-      | "boolean"
-      | "badge";
-    render?: string; // Custom render function ID
-  }>;
-  pagination?: {
-    enabled?: boolean;
-    pageSize?: number;
-    showSizeChanger?: boolean;
-    pageSizeOptions?: number[];
-    position?: "top" | "bottom" | "both";
-  };
-  sorting?: {
-    enabled?: boolean;
-    defaultSort?: Array<{
-      key: string;
-      direction: "asc" | "desc";
-    }>;
-    multiSort?: boolean;
-  };
-  filtering?: {
-    enabled?: boolean;
-    global?: boolean;
-    columns?: string[]; // Specific columns to enable filtering on
-  };
-  rowActions?: Array<{
-    label: NoInfer<TKey>;
-    icon?: IconKey;
-    onClick?: string; // Action ID
-  }>;
-  selectable?: boolean; // Enable row selection
-  hoverable?: boolean; // Highlight row on hover
-  striped?: boolean; // Alternate row colors
-  compact?: boolean; // Reduce row padding
-}
-
-export interface DataCardsWidgetConfig<
-  TKey extends string,
-  TItemData,
-> extends BaseWidgetConfig {
-  type: WidgetType.DATA_CARDS;
-  title?: NoInfer<TKey>;
-  description?: NoInfer<TKey>;
-  // Card field mapping - these are field names from child objects to display in card layout
-  cardTitle?: string; // Field name to use as card title (e.g., "name", "title")
-  cardSubtitle?: string; // Field name to use as card subtitle (e.g., "email", "description")
-  cardImage?: string; // Field name containing image URL (e.g., "avatarUrl", "imageUrl")
-  cardContent?: string[]; // Array of field names to display in card body (e.g., ["description", "status"])
-  cardMetadata?: string[]; // Array of field names to display as metadata (e.g., ["createdAt", "updatedAt"])
-  cardTemplate?: "default" | "eslint-issue" | "code-issue" | string; // Template name for card rendering
-  groupBy?: string; // Field to group cards by
-  showSummary?: boolean; // Show summary for groups
-  summaryTemplate?: string; // Template for summary rendering
-  layout?: LayoutConfig; // Layout configuration
-  maxItems?: number; // Maximum number of items to show initially (rest hidden behind "Show N more" button)
-  itemConfig?: {
-    template: "default" | "compact" | "detailed" | string;
-    size: "small" | "medium" | "large" | string;
-    spacing: "compact" | "normal" | "relaxed" | string;
-  };
-  // Spacing config
-  gap?: SpacingSize; // Gap between cards in grid
-  cardPadding?: SpacingSize; // Padding inside each card
-  groupGap?: SpacingSize; // Gap between groups
-  groupInnerGap?: SpacingSize; // Gap between group header and cards
-  groupHeaderGap?: SpacingSize; // Gap in group header
-  groupHeaderPadding?: SpacingSize; // Padding in group header
-  cardGap?: SpacingSize; // Gap between cards in a group
-  // Text size config
-  groupTitleSize?: "xs" | "sm" | "base" | "lg"; // Group title text size
-  badgeSize?: "xs" | "sm" | "base" | "lg"; // Badge text size
-  titleSize?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl"; // Title text size
-  descriptionSize?: "xs" | "sm" | "base" | "lg"; // Description text size
-  // Badge padding
-  badgePadding?: SpacingSize; // Badge padding
-  // Border radius
-  cardBorderRadius?: "none" | "sm" | "base" | "lg" | "xl" | "2xl" | "full"; // Card border radius
-  badgeBorderRadius?: "none" | "sm" | "base" | "lg" | "xl" | "2xl" | "full"; // Badge border radius
-  // Metadata for card interactions
-  metadata?: {
-    onCardClick?: CardClickMetadata<TItemData, CreateApiEndpointAny>;
-  };
-}
-
-/**
- * Card click metadata configuration
- * Infers the urlPathParams return type from the targetEndpoint
- */
-export interface CardClickMetadata<
-  TItemData,
-  TEndpoint extends CreateApiEndpointAny,
-> {
-  targetEndpoint: TEndpoint;
-  extractParams: (item: TItemData) => {
-    urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"];
-  };
-}
-
-export interface DataListWidgetConfig<
-  TKey extends string,
-  out TTargetEndpoint extends CreateApiEndpointAny | null =
-    CreateApiEndpointAny | null,
-> extends BaseWidgetConfig {
-  type: WidgetType.DATA_LIST;
-  title?: NoInfer<TKey>;
-  description?: NoInfer<TKey>;
-  optional?: boolean;
-  renderMode?: "default" | "compact" | "detailed" | string;
-  hierarchical?: boolean;
-  groupBy?: string; // Field name from data object to group by
-  sortBy?: string; // Field name from data object to sort by
-  columns?: number; // Number of columns for list layout
-  layout?: LayoutConfig; // Layout configuration for list display
-  showSummary?: boolean; // Show summary information
-  maxItems?: number; // Maximum items to display before pagination/truncation
-  // Spacing config
-  gap?: SpacingSize; // Main container gap
-  simpleArrayGap?: SpacingSize; // Gap for simple value arrays
-  viewSwitcherGap?: SpacingSize; // Gap in view switcher buttons
-  viewSwitcherPadding?: SpacingSize; // Padding in view switcher container
-  buttonPadding?: SpacingSize; // Padding for view switcher buttons
-  tableHeadPadding?: SpacingSize; // Padding for table head cells
-  tableCellPadding?: SpacingSize; // Padding for table body cells
-  gridGap?: SpacingSize; // Gap between grid cards
-  cardPadding?: SpacingSize; // Padding inside grid cards
-  cardInnerGap?: SpacingSize; // Gap between fields in grid cards
-  rowGap?: SpacingSize; // Gap between label and value in card rows
-  buttonSpacing?: SpacingSize; // Margin for show more/less buttons
-  // Metadata for additional widget behavior
-  metadata?: {
-    onRowClick?: TTargetEndpoint extends CreateApiEndpointAny
-      ? {
-          extractParams: (item: Record<string, WidgetData>) => {
-            urlPathParams?: Partial<
-              TTargetEndpoint["types"]["UrlVariablesOutput"]
-            >;
-            data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
-          };
-          targetEndpoint: TTargetEndpoint;
-        }
-      : never;
-  };
-  // Text size config
-  tableHeadSize?: "xs" | "sm" | "base" | "lg"; // Table head text size
-  tableCellSize?: "xs" | "sm" | "base" | "lg"; // Table cell text size
-  cardRowSize?: "xs" | "sm" | "base" | "lg"; // Card row text size
-  buttonSize?: "xs" | "sm" | "base" | "lg"; // Show more/less button text size
-}
-
-export interface DataGridWidgetConfig<
-  TKey extends string,
-> extends BaseWidgetConfig {
-  type: WidgetType.DATA_GRID;
-  title?: NoInfer<TKey>;
-  description?: NoInfer<TKey>;
-  columns?: number; // Number of columns in grid
-  layout?: LayoutConfig; // Layout configuration for grid display
-  gap?: SpacingSize; // Gap between grid items
-  responsive?: boolean; // Enable responsive column adjustment
-  minColumnWidth?: number | string; // Minimum column width (e.g., 200, "200px", "15rem")
-}
-
-export interface GroupedListWidgetConfig<
-  TKey extends string,
-> extends BaseWidgetConfig {
-  type: WidgetType.GROUPED_LIST;
-  title?: NoInfer<TKey>;
-  description?: NoInfer<TKey>;
-  groupBy?: string; // Field name from data object to group by (e.g., "file", "status", "category")
-  sortBy?: string; // Field name from data object to sort by (e.g., "severity", "createdAt", "name")
-  columns?: number;
-  hierarchical?: boolean;
-  renderMode?: "default" | "compact" | "detailed" | string;
-  maxItemsPerGroup?: number; // Maximum items to show per group before truncating
-  showSummary?: boolean; // Show summary for each group
-  // Spacing config
-  gap?: SpacingSize; // Gap between groups
-  headerPadding?: SpacingSize; // Padding for group header button
-  headerGap?: SpacingSize; // Gap between group title and badge
-  badgePadding?: SpacingSize; // Padding for item count badge
-  summaryPadding?: SpacingSize; // Padding for summary section
-  summaryGap?: SpacingSize; // Gap between summary items
-  itemPadding?: SpacingSize; // Padding for each item
-  itemGapX?: SpacingSize; // Horizontal gap in item grid
-  itemGapY?: SpacingSize; // Vertical gap in item grid
-  buttonPadding?: SpacingSize; // Padding for show more button
-  // Text size config
-  groupLabelSize?: "xs" | "sm" | "base" | "lg" | "xl"; // Group label text size
-  badgeSize?: "xs" | "sm" | "base" | "lg"; // Badge text size
-  iconSize?: "xs" | "sm" | "base" | "lg"; // Chevron icon size
-  summarySize?: "xs" | "sm" | "base" | "lg"; // Summary text size
-  itemSize?: "xs" | "sm" | "base" | "lg"; // Item text size
-  buttonSize?: "xs" | "sm" | "base" | "lg"; // Show more button text size
-  summaryTemplate?: string; // Template for group summary rendering
-  layout?: LayoutConfig; // Layout configuration for group display
-}
-
-export interface CodeQualityListWidgetConfig<
-  TKey extends string,
-> extends BaseWidgetConfig {
-  type: WidgetType.CODE_QUALITY_LIST;
-  title?: NoInfer<TKey>;
-  description?: NoInfer<TKey>;
-  groupBy?: string; // Field name from data object to group by (e.g., "file", "code")
-  sortBy?: "severity" | "file" | "line" | string; // Field name from data object to sort by
-  showSummary?: boolean;
-  columns?: number;
-  layoutType?: LayoutType;
-  maxItemsPerGroup?: number; // Maximum items to show per group before truncating (default: 100)
-  layout?: LayoutConfig; // Layout configuration for issue display
-}
-
-export interface CodeQualityFilesWidgetConfig<
-  TKey extends string,
-> extends BaseWidgetConfig {
-  type: WidgetType.CODE_QUALITY_FILES;
-  title?: NoInfer<TKey>;
-  description?: NoInfer<TKey>;
-}
-
-export interface CodeQualitySummaryWidgetConfig<
-  TKey extends string,
-> extends BaseWidgetConfig {
-  type: WidgetType.CODE_QUALITY_SUMMARY;
-  title?: NoInfer<TKey>;
-  description?: NoInfer<TKey>;
-}
-
-export interface MetadataCardWidgetConfig<
-  TKey extends string,
-> extends BaseWidgetConfig {
-  type: WidgetType.METADATA_CARD;
-  title?: NoInfer<TKey>;
-  description?: NoInfer<TKey>;
-}
-
-export interface KeyValueWidgetConfig<
-  TKey extends string,
-> extends BaseWidgetConfig {
-  type: WidgetType.KEY_VALUE;
-  label?: NoInfer<TKey>;
-  columns?: number;
-}
+  | TextFieldWidgetConfig<TKey, TSchema, TUsage>
+  | EmailFieldWidgetConfig<TKey, TSchema, TUsage>
+  | PasswordFieldWidgetConfig<TKey, TSchema, TUsage>
+  | NumberFieldWidgetConfig<TKey, TSchema, TUsage>
+  | BooleanFieldWidgetConfig<TKey, TSchema, TUsage>
+  | SelectFieldWidgetConfig<TKey, TSchema, TUsage>
+  | MultiSelectFieldWidgetConfig<TKey, TSchema, TUsage>
+  | FilterPillsFieldWidgetConfig<TKey, TSchema, TUsage>
+  | RangeSliderFieldWidgetConfig<TKey, TSchema, TUsage>
+  | TextareaFieldWidgetConfig<TKey, TSchema, TUsage>
+  | PhoneFieldWidgetConfig<TKey, TSchema, TUsage>
+  | UrlFieldWidgetConfig<TKey, TSchema, TUsage>
+  | IntFieldWidgetConfig<TKey, TSchema, TUsage>
+  | DateFieldWidgetConfig<TKey, TSchema, TUsage>
+  | DateTimeFieldWidgetConfig<TKey, TSchema, TUsage>
+  | TimeFieldWidgetConfig<TKey, TSchema, TUsage>
+  | FileFieldWidgetConfig<TKey, TSchema, TUsage>
+  | UuidFieldWidgetConfig<TKey, TSchema, TUsage>
+  | JsonFieldWidgetConfig<TKey, TSchema, TUsage>
+  | DateRangeFieldWidgetConfig<TKey, TSchema, TUsage>
+  | TimeRangeFieldWidgetConfig<TKey, TSchema, TUsage>
+  | TimezoneFieldWidgetConfig<TKey, TSchema, TUsage>
+  | CurrencySelectFieldWidgetConfig<TKey, TSchema, TUsage>
+  | LanguageSelectFieldWidgetConfig<TKey, TSchema, TUsage>
+  | CountrySelectFieldWidgetConfig<TKey, TSchema, TUsage>
+  | ColorFieldWidgetConfig<TKey, TSchema, TUsage>
+  | IconFieldWidgetConfig<TKey, TSchema, TUsage>
+  | SliderFieldWidgetConfig<TKey, TSchema, TUsage>
+  | TagsFieldWidgetConfig<TKey, TSchema, TUsage>
+  | TextArrayFieldWidgetConfig<TKey, TSchema, TUsage>;
 
 // ============================================================================
 // LAYOUT WIDGETS
@@ -1566,26 +973,6 @@ export interface StatWidgetConfig<
   schema: TSchema;
 }
 
-export interface StatsGridWidgetConfig<
-  TKey extends string,
-> extends BaseWidgetConfig {
-  type: WidgetType.STATS_GRID;
-  title?: NoInfer<TKey>;
-  stats?: Array<{
-    label: NoInfer<TKey>;
-    value: string | number;
-    format?: "number" | "percentage" | "currency" | "compact" | "bytes";
-    icon?: IconKey;
-    variant?: "default" | "success" | "warning" | "danger" | "info" | "muted";
-  }>;
-  columns?: number; // Number of stats per row (default: 3)
-  // Spacing config
-  gap?: SpacingSize; // Gap between stat cards
-  padding?: SpacingSize; // Padding for empty state
-  layout?: LayoutConfig; // Layout configuration for stats grid
-  spacing?: "compact" | "normal" | "relaxed"; // Spacing between stats
-}
-
 export interface ChartWidgetConfig<
   TKey extends string,
   TSchema extends z.ZodTypeAny,
@@ -1837,7 +1224,6 @@ export type ObjectWidgetConfig<
   | CodeQualitySummaryWidgetConfig<TKey>
   | CodeQualityListWidgetConfig<TKey>
   | DataListWidgetConfig<TKey>
-  | StatsGridWidgetConfig<TKey>
   | IssueCardWidgetConfig<TKey>
   | PaginationWidgetConfig
   | ModelDisplayWidgetConfig
@@ -1896,18 +1282,22 @@ export type DisplayOnlyWidgetConfig<TKey extends string> =
 export type RequestResponseDisplayWidgetConfig<
   TKey extends string,
   TSchema extends z.ZodTypeAny,
+  TUsage extends FieldUsageConfig,
+  TSchemaType extends "primitive",
 > =
-  | AlertWidgetConfig<TSchema>
-  | TitleWidgetConfig<TKey, TSchema>
-  | ChartWidgetConfig<TKey, TSchema>
-  | TextWidgetConfig<TKey, TSchema>
-  | IconWidgetConfig<TSchema>
-  | BadgeWidgetConfig<TKey, TSchema>
-  | LinkWidgetConfig<TKey, TSchema>
-  | StatWidgetConfig<TKey, TSchema>
-  | MarkdownWidgetConfig<TKey, TSchema>
-  | CodeOutputWidgetConfig<TSchema>
-  | StatusIndicatorWidgetConfig<TKey, TSchema>;
+  | AlertWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
+  | TitleWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
+  | ChartWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
+  | TextWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
+  | DescriptionWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
+  | IconWidgetConfig<TSchema, TUsage, TSchemaType>
+  | BadgeWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
+  | LinkWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
+  | KeyValueWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
+  | StatWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
+  | MarkdownWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
+  | CodeOutputWidgetConfig<TSchema, TUsage, TSchemaType>
+  | StatusIndicatorWidgetConfig<TKey, TSchema, TUsage, TSchemaType>;
 
 export type ResponseWidgetConfig<
   TKey extends string,

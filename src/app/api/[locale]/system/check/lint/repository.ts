@@ -90,32 +90,30 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
 
         if (!configResult.ready) {
           return success({
-            issues: {
-              items: [
-                {
-                  file: configResult.configPath,
-                  severity: "error" as const,
-                  message: configResult.message,
-                  type: "lint" as const,
-                },
-              ],
-              files: [
-                {
-                  file: configResult.configPath,
-                  errors: 1,
-                  warnings: 0,
-                  total: 1,
-                },
-              ],
-              summary: {
-                totalIssues: 1,
-                totalFiles: 1,
-                totalErrors: 1,
-                displayedIssues: 1,
-                displayedFiles: 1,
-                currentPage: 1,
-                totalPages: 1,
+            items: [
+              {
+                file: configResult.configPath,
+                severity: "error" as const,
+                message: configResult.message,
+                type: "lint" as const,
               },
+            ],
+            files: [
+              {
+                file: configResult.configPath,
+                errors: 1,
+                warnings: 0,
+                total: 1,
+              },
+            ],
+            summary: {
+              totalIssues: 1,
+              totalFiles: 1,
+              totalErrors: 1,
+              displayedIssues: 1,
+              displayedFiles: 1,
+              currentPage: 1,
+              totalPages: 1,
             },
           });
         }
@@ -129,18 +127,16 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         );
 
         return success({
-          issues: {
-            items: [],
-            files: [],
-            summary: {
-              totalIssues: 0,
-              totalFiles: 0,
-              totalErrors: 0,
-              displayedIssues: 0,
-              displayedFiles: 0,
-              currentPage: 1,
-              totalPages: 1,
-            },
+          items: [],
+          files: [],
+          summary: {
+            totalIssues: 0,
+            totalFiles: 0,
+            totalErrors: 0,
+            displayedIssues: 0,
+            displayedFiles: 0,
+            currentPage: 1,
+            totalPages: 1,
           },
         });
       }
@@ -149,18 +145,16 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       if (!checkConfig.eslint.enabled) {
         logger.info("ESLint is disabled in check.config.ts");
         return success({
-          issues: {
-            items: [],
-            files: [],
-            summary: {
-              totalIssues: 0,
-              totalFiles: 0,
-              totalErrors: 0,
-              displayedIssues: 0,
-              displayedFiles: 0,
-              currentPage: 1,
-              totalPages: 1,
-            },
+          items: [],
+          files: [],
+          summary: {
+            totalIssues: 0,
+            totalFiles: 0,
+            totalErrors: 0,
+            displayedIssues: 0,
+            displayedFiles: 0,
+            currentPage: 1,
+            totalPages: 1,
           },
         });
       }
@@ -189,7 +183,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         );
 
         logger.debug(
-          `[ESLINT] Sequential execution completed (${result.issues.items.length} issues found)`,
+          `[ESLINT] Sequential execution completed (${result.items.length} issues found)`,
         );
 
         return success(result);
@@ -218,18 +212,16 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
 
       if (filesToLint.length === 0) {
         return success({
-          issues: {
-            items: [],
-            files: [],
-            summary: {
-              totalIssues: 0,
-              totalFiles: 0,
-              totalErrors: 0,
-              displayedIssues: 0,
-              displayedFiles: 0,
-              currentPage: 1,
-              totalPages: 1,
-            },
+          items: [],
+          files: [],
+          summary: {
+            totalIssues: 0,
+            totalFiles: 0,
+            totalErrors: 0,
+            displayedIssues: 0,
+            displayedFiles: 0,
+            currentPage: 1,
+            totalPages: 1,
           },
         });
       }
@@ -263,7 +255,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       const mergedResult = this.mergeWorkerResults(workerResults, data, logger);
 
       logger.debug(
-        `[ESLINT] Parallel execution completed (${mergedResult.issues.items.length} issues found)`,
+        `[ESLINT] Parallel execution completed (${mergedResult.items.length} issues found)`,
       );
 
       return success(mergedResult);
@@ -273,32 +265,30 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       logger.error(`[ESLINT] Parallel execution failed: ${errorMessage}`);
 
       return success({
-        issues: {
-          items: [
-            {
-              file: "unknown",
-              severity: "error" as const,
-              message: errorMessage,
-              type: "lint" as const,
-            },
-          ],
-          files: [
-            {
-              file: "unknown",
-              errors: 1,
-              warnings: 0,
-              total: 1,
-            },
-          ],
-          summary: {
-            totalIssues: 1,
-            totalFiles: 1,
-            totalErrors: 1,
-            displayedIssues: 1,
-            displayedFiles: 1,
-            currentPage: 1,
-            totalPages: 1,
+        items: [
+          {
+            file: "unknown",
+            severity: "error" as const,
+            message: errorMessage,
+            type: "lint" as const,
           },
+        ],
+        files: [
+          {
+            file: "unknown",
+            errors: 1,
+            warnings: 0,
+            total: 1,
+          },
+        ],
+        summary: {
+          totalIssues: 1,
+          totalFiles: 1,
+          totalErrors: 1,
+          displayedIssues: 1,
+          displayedFiles: 1,
+          currentPage: 1,
+          totalPages: 1,
         },
       });
     }
@@ -663,22 +653,20 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       .size;
 
     return {
-      issues: {
-        items: limitedIssues,
-        files,
-        summary: {
-          totalIssues,
-          totalFiles,
-          totalErrors,
-          displayedIssues,
-          displayedFiles,
-          truncatedMessage:
-            displayedIssues < totalIssues || displayedFiles < totalFiles
-              ? `Showing ${displayedIssues} of ${totalIssues} issues from ${displayedFiles} of ${totalFiles} files`
-              : "",
-          currentPage,
-          totalPages,
-        },
+      items: limitedIssues,
+      files,
+      summary: {
+        totalIssues,
+        totalFiles,
+        totalErrors,
+        displayedIssues,
+        displayedFiles,
+        truncatedMessage:
+          displayedIssues < totalIssues || displayedFiles < totalFiles
+            ? `Showing ${displayedIssues} of ${totalIssues} issues from ${displayedFiles} of ${totalFiles} files`
+            : "",
+        currentPage,
+        totalPages,
       },
     };
   }

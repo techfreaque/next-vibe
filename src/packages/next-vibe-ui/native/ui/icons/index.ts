@@ -209,6 +209,7 @@ export { Trophy } from "./Trophy";
 export { Tv } from "./Tv";
 export { Twitter } from "./Twitter";
 export { Type } from "./Type";
+export { UncensoredAILogo } from "./UncensoredAILogo";
 export { Upload } from "./Upload";
 export { User } from "./User";
 export { UserCheck } from "./UserCheck";

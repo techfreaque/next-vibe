@@ -96,7 +96,7 @@ export interface UseEndpointOptions<T> {
       GetRequest<T> extends never ? never : GetUrlVariables<T>
     >;
     /** URL path parameters for the read endpoint */
-    urlPathParams?: GetRequest<T> extends never
+    urlPathParams?: GetUrlVariables<T> extends never
       ? undefined
       : GetUrlVariables<T>;
     /** Auto-prefill configuration */
@@ -131,8 +131,8 @@ export interface UseEndpointOptions<T> {
         : PrimaryMutationUrlVariables<T>
     >;
     /** URL path parameters for the create endpoint */
-    urlPathParams?: PrimaryMutationRequest<T> extends never
-      ? never
+    urlPathParams?: PrimaryMutationUrlVariables<T> extends never
+      ? undefined
       : PrimaryMutationUrlVariables<T>;
     /** Data to auto-prefill the form with (supports nested partial data) */
     autoPrefillData?: PrimaryMutationRequest<T> extends never
@@ -160,8 +160,8 @@ export interface UseEndpointOptions<T> {
       PatchRequest<T> extends never ? never : PatchUrlVariables<T>
     >;
     /** URL path parameters for the update endpoint */
-    urlPathParams?: PatchRequest<T> extends never
-      ? never
+    urlPathParams?: PatchUrlVariables<T> extends never
+      ? undefined
       : PatchUrlVariables<T>;
     /** Data to auto-prefill the form with (supports nested partial data) */
     autoPrefillData?: PatchRequest<T> extends never
@@ -185,7 +185,7 @@ export interface UseEndpointOptions<T> {
       DeleteRequest<T> extends never ? never : DeleteUrlVariables<T>
     >;
     /** URL path parameters for the delete endpoint */
-    urlPathParams?: DeleteRequest<T> extends never
+    urlPathParams?: DeleteUrlVariables<T> extends never
       ? undefined
       : DeleteUrlVariables<T>;
     /** Data to auto-prefill the form with */
@@ -732,7 +732,7 @@ export interface UseEndpointCreateOptions<T> {
       ? never
       : PrimaryMutationUrlVariables<T>
   >;
-  urlPathParams?: PrimaryMutationRequest<T> extends never
+  urlPathParams?: PrimaryMutationUrlVariables<T> extends never
     ? undefined
     : PrimaryMutationUrlVariables<T>;
   autoPrefillData?: PrimaryMutationRequest<T> extends never
@@ -758,7 +758,7 @@ export interface UseEndpointDeleteOptions<T> {
     DeleteRequest<T> extends never ? never : DeleteResponse<T>,
     DeleteRequest<T> extends never ? never : DeleteUrlVariables<T>
   >;
-  urlPathParams?: DeleteRequest<T> extends never
+  urlPathParams?: DeleteUrlVariables<T> extends never
     ? undefined
     : DeleteUrlVariables<T>;
 }

@@ -116,153 +116,52 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      issues: objectField(
-        {
-          type: WidgetType.CODE_QUALITY_LIST,
-          groupBy: "file",
-          sortBy: "severity",
-          showSummary: true,
-          layoutType: LayoutType.GRID,
-          columns: 1,
-        },
-        { response: true },
-        {
-          items: responseArrayField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.system.check.oxlint.response.issues.title",
-              description:
-                "app.api.system.check.oxlint.response.issues.emptyState.description",
-              layoutType: LayoutType.GRID,
-              columns: 12,
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                title: "app.api.system.check.oxlint.response.issues.title",
-                description:
-                  "app.api.system.check.oxlint.response.issues.emptyState.description",
-                layoutType: LayoutType.GRID,
-                columns: 12,
-              },
-              { response: true },
-              {
-                file: responseField({
-                  type: WidgetType.TEXT,
-                  content: "app.api.system.check.oxlint.response.issues.title",
-                  schema: z.string(),
-                }),
-                line: responseField({
-                  type: WidgetType.TEXT,
-                  content: "app.api.system.check.oxlint.response.issues.title",
-                  schema: z.coerce.number().optional(),
-                }),
-                column: responseField({
-                  type: WidgetType.TEXT,
-                  content: "app.api.system.check.oxlint.response.issues.title",
-                  schema: z.coerce.number().optional(),
-                }),
-                rule: responseField({
-                  type: WidgetType.TEXT,
-                  content: "app.api.system.check.oxlint.response.issues.title",
-                  schema: z.string().optional(),
-                }),
-                code: responseField({
-                  type: WidgetType.TEXT,
-                  content: "app.api.system.check.oxlint.response.issues.title",
-                  schema: z.string().optional(),
-                }),
-                severity: responseField({
-                  type: WidgetType.TEXT,
-                  content: "app.api.system.check.oxlint.response.issues.title",
-                  schema: z.enum(["error", "warning", "info"]),
-                }),
-                message: responseField({
-                  type: WidgetType.TEXT,
-                  content: "app.api.system.check.oxlint.response.success",
-                  schema: z.string(),
-                }),
-                type: responseField({
-                  type: WidgetType.TEXT,
-                  content: "app.api.system.check.oxlint.response.issues.title",
-                  schema: z.enum(["oxlint", "lint", "type"]),
-                }),
-              },
-            ),
-          ),
+      items: responseField({
+        type: WidgetType.CODE_QUALITY_LIST,
+        groupBy: "file",
+        sortBy: "severity",
+        showSummary: true,
+        schema: z.array(
+          z.object({
+            file: z.string(),
+            line: z.coerce.number().optional(),
+            column: z.coerce.number().optional(),
+            rule: z.string().optional(),
+            code: z.string().optional(),
+            severity: z.enum(["error", "warning", "info"]),
+            message: z.string(),
+            type: z.enum(["oxlint", "lint", "type"]),
+          }),
+        ),
+      }),
 
-          files: responseArrayField(
-            {
-              type: WidgetType.CODE_QUALITY_FILES,
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-              },
-              { response: true },
-              {
-                file: responseField({
-                  type: WidgetType.TEXT,
-                  schema: z.string(),
-                }),
-                errors: responseField({
-                  type: WidgetType.STAT,
-                  schema: z.number(),
-                }),
-                warnings: responseField({
-                  type: WidgetType.STAT,
-                  schema: z.number(),
-                }),
-                total: responseField({
-                  type: WidgetType.STAT,
-                  schema: z.number(),
-                }),
-              },
-            ),
-          ),
+      files: responseField({
+        type: WidgetType.CODE_QUALITY_FILES,
+        schema: z
+          .array(
+            z.object({
+              file: z.string(),
+              errors: z.number(),
+              warnings: z.number(),
+              total: z.number(),
+            }),
+          )
+          .optional(),
+      }),
 
-          summary: objectField(
-            {
-              type: WidgetType.CODE_QUALITY_SUMMARY,
-            },
-            { response: true },
-            {
-              totalIssues: responseField({
-                type: WidgetType.STAT,
-                schema: z.number(),
-              }),
-              totalFiles: responseField({
-                type: WidgetType.STAT,
-                schema: z.number(),
-              }),
-              totalErrors: responseField({
-                type: WidgetType.STAT,
-                schema: z.number(),
-              }),
-              displayedIssues: responseField({
-                type: WidgetType.STAT,
-                schema: z.number(),
-              }),
-              displayedFiles: responseField({
-                type: WidgetType.STAT,
-                schema: z.number(),
-              }),
-              truncatedMessage: responseField({
-                type: WidgetType.TEXT,
-                schema: z.string().optional(),
-              }),
-              currentPage: responseField({
-                type: WidgetType.STAT,
-                schema: z.number(),
-              }),
-              totalPages: responseField({
-                type: WidgetType.STAT,
-                schema: z.number(),
-              }),
-            },
-          ),
-        },
-      ),
+      summary: responseField({
+        type: WidgetType.CODE_QUALITY_SUMMARY,
+        schema: z.object({
+          totalIssues: z.number(),
+          totalFiles: z.number(),
+          totalErrors: z.number(),
+          displayedIssues: z.number(),
+          displayedFiles: z.number(),
+          truncatedMessage: z.string().optional(),
+          currentPage: z.number(),
+          totalPages: z.number(),
+        }),
+      }),
     },
   ),
 
@@ -332,48 +231,42 @@ const { POST } = createEndpoint({
     },
     responses: {
       default: {
-        issues: {
-          items: [],
-          files: [],
-          summary: {
-            totalIssues: 0,
-            totalFiles: 0,
-            totalErrors: 0,
-            displayedIssues: 0,
-            displayedFiles: 0,
-            currentPage: 1,
-            totalPages: 1,
-          },
+        items: [],
+        files: [],
+        summary: {
+          totalIssues: 0,
+          totalFiles: 0,
+          totalErrors: 0,
+          displayedIssues: 0,
+          displayedFiles: 0,
+          currentPage: 1,
+          totalPages: 1,
         },
       },
       verbose: {
-        issues: {
-          items: [],
-          files: [],
-          summary: {
-            totalIssues: 0,
-            totalFiles: 0,
-            totalErrors: 0,
-            displayedIssues: 0,
-            displayedFiles: 0,
-            currentPage: 1,
-            totalPages: 1,
-          },
+        items: [],
+        files: [],
+        summary: {
+          totalIssues: 0,
+          totalFiles: 0,
+          totalErrors: 0,
+          displayedIssues: 0,
+          displayedFiles: 0,
+          currentPage: 1,
+          totalPages: 1,
         },
       },
       fix: {
-        issues: {
-          items: [],
-          files: [],
-          summary: {
-            totalIssues: 0,
-            totalFiles: 0,
-            totalErrors: 0,
-            displayedIssues: 0,
-            displayedFiles: 0,
-            currentPage: 1,
-            totalPages: 1,
-          },
+        items: [],
+        files: [],
+        summary: {
+          totalIssues: 0,
+          totalFiles: 0,
+          totalErrors: 0,
+          displayedIssues: 0,
+          displayedFiles: 0,
+          currentPage: 1,
+          totalPages: 1,
         },
       },
     },
@@ -386,7 +279,7 @@ export type OxlintRequestOutput = typeof POST.types.RequestOutput;
 export type OxlintResponseInput = typeof POST.types.ResponseInput;
 export type OxlintResponseOutput = typeof POST.types.ResponseOutput;
 
-export type OxlintIssue = OxlintResponseOutput["issues"]["items"][number];
+export type OxlintIssue = OxlintResponseOutput["items"][number];
 
 const endpoints = { POST };
 export default endpoints;

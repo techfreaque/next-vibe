@@ -20,7 +20,6 @@ import type {
   ApiQueryFormOptions,
   ApiQueryOptions,
 } from "@/app/api/[locale]/system/unified-interface/react/hooks/types";
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { generateSchemaForUsage as generateSchemaFromUtils } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type {
   EndpointExamples,
@@ -34,6 +33,7 @@ import type {
   Methods,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import {
   UserRole,
   type UserRoleValue,
@@ -164,7 +164,7 @@ export interface ApiEndpoint<
   out TUserRoleValue extends readonly UserRoleValue[],
   out TScopedTranslationKey extends string = TranslationKey,
   out TFields extends UnifiedField<string, z.ZodTypeAny> = UnifiedField<
-    string,
+    TScopedTranslationKey,
     z.ZodTypeAny
   >,
 > {
@@ -460,7 +460,7 @@ export function createEndpoint<
   const TMethod extends Methods,
   const TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string = TranslationKey,
-  TFields extends UnifiedField<string, z.ZodTypeAny> = UnifiedField<
+  const TFields extends UnifiedField<string, z.ZodTypeAny> = UnifiedField<
     string,
     z.ZodTypeAny
   >,

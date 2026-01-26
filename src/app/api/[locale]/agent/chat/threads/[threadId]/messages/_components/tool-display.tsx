@@ -5,8 +5,8 @@ import type { JSX } from "react";
 import type { FieldValues } from "react-hook-form";
 
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
-import { ToolCallRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/ToolCallRenderer";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { ToolCallRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/ToolCallRenderer";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 

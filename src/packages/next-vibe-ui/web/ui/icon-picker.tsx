@@ -8,12 +8,12 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
-import type { CategoryKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { CategoryKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import {
   Icon,
   ICON_CATEGORIES,
   type IconKey,
-} from "@/app/api/[locale]/system/unified-interface/react/icons";
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useTranslation } from "@/i18n/core/client";
 
 import { Button } from "./button";

@@ -44,5 +44,18 @@ export const translations = {
       noDataAvailable: "No data available",
       noDataToDisplay: "No data to display",
     },
+    codeQualityList: {
+      noIssues: "No issues found",
+    },
+    codeQualitySummary: {
+      summary: "Summary",
+      files: "Files",
+      issues: "Issues",
+      errors: "Errors",
+      of: "of",
+    },
+    codeQualityFiles: {
+      affectedFiles: "Affected Files",
+    },
   },
 };

@@ -3,6 +3,19 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   id: idTranslations,
+  fallbacks: {
+    unknownCharacter: "Unbekannter Charakter",
+    unknownModel: "Unbekanntes Modell",
+    unknown: "Unbekannt",
+    unknownProvider: "unbekannt",
+    noTagline: "",
+    noDescription: "",
+    zeroCredits: "0 Credits",
+    noModelConfiguration: "Fehler: Keine Modellkonfiguration",
+    configurationMissing: "Konfiguration fehlt",
+    noModel: "Kein Modell",
+    dash: "—",
+  },
   enums: {
     selectionType: {
       characterBased: "Basierend auf Charakter",

@@ -12,7 +12,7 @@ export function UncensoredAILogo({
   className?: string;
 }): JSX.Element {
   return (
-    // oxlint-disable-next-line nextjs/no-img-element
+    // oxlint-disable-next-line nextjs/no-img-element, oxlint-plugin-i18n/no-literal-string
     <img
       src={`${envClient.NEXT_PUBLIC_APP_URL}/images/providers/uncensored.ai.png`}
       alt="Uncensored AI"

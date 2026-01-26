@@ -10,7 +10,7 @@ import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { EndpointLogger } from "../../logger/endpoint";
-import type { CreateApiEndpointAny } from "../../types/endpoint";
+import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import type { Platform } from "../../types/platform";
 import { permissionsRegistry } from "../permissions/registry";
 

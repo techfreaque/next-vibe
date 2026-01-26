@@ -13,7 +13,7 @@ import type { JSX } from "react";
 import React from "react";
 
 import definitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/definition";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointsPage";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

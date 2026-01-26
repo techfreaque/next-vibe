@@ -6,7 +6,7 @@ import type { UseFormReturn } from "react-hook-form";
 
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type {
   DeleteRequest,
   DeleteResponse,

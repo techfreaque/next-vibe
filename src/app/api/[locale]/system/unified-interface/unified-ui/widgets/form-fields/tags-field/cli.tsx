@@ -1,0 +1,42 @@
+/**
+ * Tags Field Widget - CLI Ink implementation
+ */
+
+import { Box, Text } from "ink";
+import type { JSX } from "react";
+
+import type { ArrayWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
+
+import type { InkWidgetProps } from "../../_shared/cli-types";
+import type { FieldUsageConfig } from "../../_shared/types";
+import type { TagsFieldWidgetConfig } from "./types";
+
+export function TagsFieldWidgetInk<TKey extends string>({
+  value,
+  field,
+  context,
+}: InkWidgetProps<
+  TagsFieldWidgetConfig<TKey, ArrayWidgetSchema, FieldUsageConfig>
+>): JSX.Element {
+  const { t } = context;
+  const tags = Array.isArray(value) ? value : [];
+  const displayValue = tags.length > 0 ? tags.join(", ") : "—";
+
+  return (
+    <Box flexDirection="column" marginBottom={1}>
+      {field.label && (
+        <Box marginBottom={0}>
+          <Text bold>
+            {t(field.label)}
+            {!field.schema.isOptional() && <Text color="blue"> *</Text>}
+          </Text>
+          {field.description && <Text dimColor> - {t(field.description)}</Text>}
+        </Box>
+      )}
+
+      <Box>
+        <Text>{displayValue}</Text>
+      </Box>
+    </Box>
+  );
+}

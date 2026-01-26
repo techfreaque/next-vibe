@@ -3,7 +3,7 @@
  * Default folder definitions and utilities
  */
 
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import {
   type UserPermissionRoleValue,
   UserRole,

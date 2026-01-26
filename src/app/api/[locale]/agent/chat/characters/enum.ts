@@ -17,8 +17,8 @@ import {
   Zap,
 } from "next-vibe-ui/ui/icons";
 
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { TranslationKey } from "@/i18n/core/static-types";
 import type { IconComponent } from "@/packages/next-vibe-ui/web/lib/helper";
 

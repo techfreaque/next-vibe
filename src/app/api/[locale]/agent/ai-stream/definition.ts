@@ -242,9 +242,9 @@ const { POST } = createEndpoint({
       toolConfirmations: requestDataArrayOptionalField(
         {
           type: WidgetType.DATA_LIST,
-          title: "app.api.agent.chat.aiStream.post.toolConfirmations.label",
+          title: "app.api.agent.aiStream.post.toolConfirmation.label",
           description:
-            "app.api.agent.chat.aiStream.post.toolConfirmation.description",
+            "app.api.agent.aiStream.post.toolConfirmation.description",
         },
         objectField(
           { type: WidgetType.CONTAINER },

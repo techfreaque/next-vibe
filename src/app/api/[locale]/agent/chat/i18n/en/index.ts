@@ -7,6 +7,7 @@ import { translations as favoritesTranslations } from "../../favorites/i18n/en";
 import { translations as filesTranslations } from "../../files/[threadId]/[filename]/i18n/en";
 import { translations as foldersTranslations } from "../../folders/i18n/en";
 import { translations as memoriesTranslations } from "../../memories/i18n/en";
+import { translations as settingsTranslations } from "../../settings/i18n/en";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/en";
 import { translations as threadsTranslations } from "../../threads/i18n/en";
 
@@ -27,6 +28,7 @@ export const translations = {
     cli: "CLI",
     speech: "Speech",
     sharing: "Sharing",
+    settings: "Settings",
   },
   config: {
     folders: {
@@ -299,6 +301,7 @@ export const translations = {
   favorites: {
     ...favoritesTranslations,
   },
+  settings: settingsTranslations,
   threads: {
     ...threadsTranslations,
     messages: messagesTranslations,
@@ -331,6 +334,10 @@ export const translations = {
         "Dolphin Llama 3 70B - Uncensored large language model based on Llama 3",
       veniceUncensored:
         "Venice Uncensored - Uncensored AI model for unrestricted conversations",
+      claudeOpus45:
+        "Claude Opus 4.5 - Most powerful Claude model with exceptional reasoning and creative capabilities",
+      claudeHaiku45:
+        "Claude Haiku 4.5 - Fast and efficient Claude model optimized for speed and cost-effectiveness",
     },
   },
   modelUtilities: {

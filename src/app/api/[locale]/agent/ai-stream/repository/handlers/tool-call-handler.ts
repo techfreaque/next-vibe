@@ -17,6 +17,8 @@ import {
   updateMessageContent,
 } from "../../../chat/threads/[threadId]/messages/repository";
 import { createStreamEvent, formatSSEEvent } from "../../events";
+import { NO_LOOP_PARAM } from "../core/constants";
+import type { StreamContext } from "../core/stream-context";
 
 export class ToolCallHandler {
   /**
@@ -29,6 +31,7 @@ export class ToolCallHandler {
       toolName: string;
       input?: JSONValue;
     };
+    ctx: StreamContext;
     currentAssistantMessageId: string | null;
     currentAssistantContent: string;
     isInReasoningBlock: boolean;
@@ -63,6 +66,7 @@ export class ToolCallHandler {
   }> {
     const {
       part,
+      ctx,
       currentAssistantContent,
       isInReasoningBlock,
       threadId,
@@ -199,6 +203,24 @@ export class ToolCallHandler {
 
     // Get tool arguments from the AI SDK part.input
     const toolCallArgs = (part.input as ToolCallResult) || {};
+
+    // Check for noLoop parameter to stop the tool calling loop
+    if (
+      typeof toolCallArgs === "object" &&
+      toolCallArgs !== null &&
+      !Array.isArray(toolCallArgs) &&
+      NO_LOOP_PARAM in toolCallArgs &&
+      toolCallArgs[NO_LOOP_PARAM] === true
+    ) {
+      ctx.shouldStopLoop = true;
+      logger.debug(
+        `[AI Stream] Model requested loop stop via ${NO_LOOP_PARAM} parameter`,
+        {
+          toolName: part.toolName,
+          toolCallId: part.toolCallId,
+        },
+      );
+    }
 
     // Get tool config to determine if confirmation is required
     const toolConfig = toolsConfig.get(part.toolName);

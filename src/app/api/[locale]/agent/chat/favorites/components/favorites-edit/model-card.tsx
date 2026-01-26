@@ -9,7 +9,7 @@ import type { JSX } from "react";
 
 import type { ModelOption } from "@/app/api/[locale]/agent/models/models";
 import { modelProviders } from "@/app/api/[locale]/agent/models/models";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

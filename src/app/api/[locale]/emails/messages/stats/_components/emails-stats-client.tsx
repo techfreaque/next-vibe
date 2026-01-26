@@ -520,8 +520,12 @@ export function EmailsStatsClient({
                     stats.topPerformingTemplates.map(
                       (
                         template: {
-                          templateName: string;
-                          emailsSent: number;
+                          template: string;
+                          sent: number;
+                          delivered: number;
+                          opened: number;
+                          clicked: number;
+                          deliveryRate: number;
                           openRate: number;
                           clickRate: number;
                         },
@@ -530,10 +534,10 @@ export function EmailsStatsClient({
                         <Div key={index} className="flex flex-col gap-2">
                           <Div className="flex items-center justify-between">
                             <Span className="text-sm font-medium">
-                              {template.templateName}
+                              {template.template}
                             </Span>
                             <Badge variant="secondary">
-                              {formatNumber(template.emailsSent)}{" "}
+                              {formatNumber(template.sent)}{" "}
                               {t("app.admin.emails.stats.admin.stats.sent")}
                             </Badge>
                           </Div>
@@ -750,11 +754,13 @@ export function EmailsStatsClient({
                       (
                         provider: {
                           provider: string;
-                          emailsSent: number;
+                          sent: number;
+                          delivered: number;
+                          opened: number;
+                          clicked: number;
                           deliveryRate: number;
                           openRate: number;
                           clickRate: number;
-                          reliability: number;
                         },
                         index: number,
                       ) => (
@@ -764,7 +770,7 @@ export function EmailsStatsClient({
                               {provider.provider}
                             </Span>
                             <Badge variant="outline">
-                              {formatNumber(provider.emailsSent)}{" "}
+                              {formatNumber(provider.sent)}{" "}
                               {t("app.admin.emails.stats.admin.stats.sent")}
                             </Badge>
                           </Div>
@@ -783,7 +789,7 @@ export function EmailsStatsClient({
                             </Span>
                           </Div>
                           <Progress
-                            value={provider.reliability * 100}
+                            value={provider.deliveryRate * 100}
                             className="h-1"
                           />
                         </Div>
@@ -814,10 +820,10 @@ export function EmailsStatsClient({
                     stats.recentActivity.map(
                       (
                         activity: {
-                          details?: { subject?: string };
-                          templateName?: string;
-                          recipientEmail: string;
-                          type: string;
+                          id: string;
+                          action: string;
+                          timestamp: string;
+                          details?: string;
                         },
                         index: number,
                       ) => (
@@ -827,27 +833,26 @@ export function EmailsStatsClient({
                         >
                           <Div className="flex flex-col gap-1">
                             <P className="text-sm font-medium">
-                              {(activity.details?.subject as string) ||
-                                activity.templateName ||
+                              {activity.details ||
                                 t(
                                   "app.admin.emails.stats.admin.stats.noSubject",
                                 )}
                             </P>
                             <P className="text-xs text-muted-foreground">
-                              {activity.recipientEmail} • {activity.type}
+                              {activity.action} • {activity.timestamp}
                             </P>
                           </Div>
                           <Badge
                             variant={
-                              activity.type === ActivityType.EMAIL_SENT ||
-                              activity.type === ActivityType.EMAIL_OPENED ||
-                              activity.type === ActivityType.LEAD_CONVERTED
+                              activity.action === ActivityType.EMAIL_SENT ||
+                              activity.action === ActivityType.EMAIL_OPENED ||
+                              activity.action === ActivityType.LEAD_CONVERTED
                                 ? "default"
                                 : "secondary"
                             }
                           >
                             {((): string => {
-                              const typeKey = activity.type.toLowerCase();
+                              const typeKey = activity.action.toLowerCase();
                               const activityTranslations = {
                                 lead_created: t(
                                   "app.admin.emails.stats.admin.stats.statuses.pending",
@@ -874,7 +879,7 @@ export function EmailsStatsClient({
                               return (
                                 activityTranslations[
                                   typeKey as keyof typeof activityTranslations
-                                ] || activity.type
+                                ] || activity.action
                               );
                             })()}
                           </Badge>
