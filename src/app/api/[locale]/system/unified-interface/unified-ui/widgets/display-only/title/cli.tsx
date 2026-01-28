@@ -23,16 +23,19 @@ import type { TitleWidgetConfig, TitleWidgetSchema } from "./types";
 export function TitleWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends TitleWidgetSchema,
-  TSchemaType extends "primitive" | "widget",
   TUsage extends FieldUsageConfig,
->({
-  field,
-  context,
-}: InkWidgetProps<
-  TEndpoint,
-  TitleWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
->): JSX.Element {
+>(
+  props:
+    | InkWidgetProps<
+        TEndpoint,
+        TitleWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | InkWidgetProps<
+        TEndpoint,
+        TitleWidgetConfig<TKey, TitleWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
+  const { field, context } = props;
   const { content, level: configLevel, fieldType } = field;
 
   // Level comes from field.ui (config), not from data

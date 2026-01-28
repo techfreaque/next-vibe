@@ -51,56 +51,16 @@ export function ButtonWidget<
   const buttonIcon = icon ? (icon as IconKey) : undefined;
   const buttonText = textKey ? context.t(textKey) : "Action";
 
-  const handleClick = async (): Promise<void> => {
-    if (!actionId) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        "ButtonWidget: No actionId specified in button configuration",
-      );
-      return;
-    }
-
-    // The value contains the entity ID (e.g., link ID) to act upon
-    const entityId = typeof field.value === "string" ? value : String(value);
-
-    // Handle delete action by calling endpoint mutation directly
-    if (actionId === "delete") {
-      if (!context.endpointMutations?.delete) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          "ButtonWidget: Delete action requested but no delete endpoint available",
-        );
-        return;
-      }
-
-      // Call DELETE endpoint with the entity ID
-      await context.endpointMutations.delete.submit({ linkId: entityId });
-      return;
-    }
-
-    // Handle edit action by calling endpoint mutation directly
-    if (actionId === "edit") {
-      if (!context.endpointMutations?.update) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          "ButtonWidget: Edit action requested but no update endpoint available",
-        );
-        return;
-      }
-
-      // For edit, we would typically need to open a form or navigate
-      // This is a placeholder for now - actual implementation depends on UX requirements
-      // eslint-disable-next-line no-console
-      console.log("Edit action triggered for entity:", entityId);
+  const handleClick = (): void => {
+    if (field.onClick) {
+      field.onClick();
     }
   };
 
   return (
     <Button
       type="button"
-      onClick={(): void => {
-        void handleClick();
-      }}
+      onClick={handleClick}
       variant={variant === "primary" ? "default" : variant}
       size={size}
       className={className}

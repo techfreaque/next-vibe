@@ -26,9 +26,7 @@ export function IntFieldWidgetInk<
   IntFieldWidgetConfig<TKey, NumberWidgetSchema, FieldUsageConfig>
 >): JSX.Element {
   const { t } = context;
-  const [inputValue, setInputValue] = useState(
-    field.value !== null && field.value !== undefined ? field.value : "",
-  );
+  const [inputValue, setInputValue] = useState(String(field.value || ""));
 
   // Response mode - just display the value
   if (context.response) {

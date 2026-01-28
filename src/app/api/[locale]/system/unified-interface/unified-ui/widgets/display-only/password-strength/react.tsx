@@ -5,7 +5,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
-import { useWatch } from "react-hook-form";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { simpleT } from "@/i18n/core/shared";
@@ -32,7 +31,7 @@ export function PasswordStrengthWidget<
   context,
 }: ReactWidgetProps<
   TEndpoint,
-  PasswordStrengthWidgetConfig<TUsage, "widget">
+  PasswordStrengthWidgetConfig<TUsage, "widget", TEndpoint>
 >): JSX.Element | null {
   const { t } = simpleT(context.locale);
   const {
@@ -64,7 +63,11 @@ export function PasswordStrengthWidget<
   const barHeightClass = getHeightClassName(barHeight);
 
   // Watch password field from form for real-time updates
-  const password = context.form?.watch(watchField);
+  const watchedValue = context.form?.watch(watchField);
+  const password =
+    typeof watchedValue === "string"
+      ? watchedValue
+      : String(watchedValue || "");
 
   if (!password) {
     return null;

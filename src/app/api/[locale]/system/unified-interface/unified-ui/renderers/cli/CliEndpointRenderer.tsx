@@ -23,11 +23,6 @@ import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/s
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { isResponseField } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
-import {
-  hasChildren,
-  isWidgetDataObject,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 import type {
   FieldUsageConfig,
@@ -37,6 +32,8 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { InkFormState } from "../../widgets/_shared/cli-types";
+import { isResponseField } from "../../widgets/_shared/type-guards";
+import { hasChildren, isObject } from "../../widgets/_shared/type-guards";
 import { InkWidgetRenderer } from "./CliWidgetRenderer";
 import { useCliNavigation } from "./use-cli-navigation";
 
@@ -295,7 +292,7 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
         .filter(([, field]) => "type" in field && field.type !== undefined)
         .map(([fieldName, field]) => {
           let fieldValue: WidgetData = undefined;
-          if (isWidgetDataObject(data)) {
+          if (isObject(data)) {
             fieldValue = data[fieldName];
           }
 

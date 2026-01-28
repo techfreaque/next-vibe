@@ -275,25 +275,25 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
       const returnWithParen = `      return (await import("${importPath}"))`;
       const fullLine = `      return (await import("${importPath}")).default.${method};`;
 
-      if (fullLine.length <= 100) {
-        // Short (<=100 chars): keep on one line
+      if (fullLine.length <= 80) {
+        // Short (<=80 chars, prettier printWidth): keep on one line
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (await import("${importPath}")).default.${method};`);
-      } else if (returnWithDefault.length <= 100) {
-        // Wrap after .default (returnWithDefault <=100, but fullLine >100)
+      } else if (returnWithDefault.length <= 80) {
+        // Wrap after .default (returnWithDefault <=80, but fullLine >80)
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (await import("${importPath}")).default
         .${method};`);
-      } else if (returnWithParen.length <= 100) {
-        // Wrap after import paren (returnWithParen <=100, but returnWithDefault >100)
+      } else if (returnWithParen.length <= 80) {
+        // Wrap after import paren (returnWithParen <=80, but returnWithDefault >80)
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (await import("${importPath}"))
         .default.${method};`);
       } else {
-        // Very long: wrap import statement itself (returnWithParen >100)
+        // Very long: wrap import statement itself (returnWithParen >80)
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (
@@ -321,8 +321,8 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
         const needsQuotes = /[^a-zA-Z0-9_$]/.test(alias);
         const key = needsQuotes ? `"${alias}"` : alias;
         const singleLine = `  ${key}: "${fullPath}",`;
-        // Check if line is 100+ chars, if so split it
-        if (singleLine.length >= 100) {
+        // Check if line is 80+ chars (prettier printWidth), if so split it
+        if (singleLine.length >= 80) {
           return `  ${key}:\n    "${fullPath}",`;
         }
         return singleLine;
@@ -361,7 +361,9 @@ export function getFullPath(
  * @param path - The endpoint path (e.g., "core/agent/chat/threads")
  * @returns The endpoint definition or null if not found
  */
-export async function getEndpoint(path: string): Promise<CreateApiEndpointAny | null> {
+export async function getEndpoint(
+  path: string,
+): Promise<CreateApiEndpointAny | null> {
   switch (path) {
 ${cases.join("\n")}
     default:

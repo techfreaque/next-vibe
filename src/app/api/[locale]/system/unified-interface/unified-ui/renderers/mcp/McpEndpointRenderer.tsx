@@ -14,7 +14,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { isResponseField } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 import type {
   BaseWidgetContext,
@@ -23,6 +22,7 @@ import type {
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { isResponseField } from "../../widgets/_shared/type-guards";
 import { useCliNavigation } from "../cli/use-cli-navigation";
 import { McpWidgetRenderer } from "./McpWidgetRenderer";
 

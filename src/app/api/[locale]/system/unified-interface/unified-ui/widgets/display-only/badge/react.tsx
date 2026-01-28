@@ -48,16 +48,19 @@ import type { BadgeWidgetConfig, BadgeWidgetSchema } from "./types";
 export function BadgeWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends BadgeWidgetSchema,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "primitive" | "widget",
->({
-  field,
-  context,
-}: ReactWidgetProps<
-  TEndpoint,
-  BadgeWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
->): JSX.Element {
+>(
+  props:
+    | ReactWidgetProps<
+        TEndpoint,
+        BadgeWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | ReactWidgetProps<
+        TEndpoint,
+        BadgeWidgetConfig<TKey, BadgeWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
+  const { field, context } = props;
   const {
     text: staticText,
     enumOptions,

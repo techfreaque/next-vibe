@@ -2,8 +2,6 @@
  * CodeOutput Widget Type Definitions
  */
 
-import type { z } from "zod";
-
 import type { SpacingSize, WidgetType } from "../../../../shared/types/enums";
 import type { StringWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type {
@@ -12,21 +10,17 @@ import type {
 } from "../../_shared/types";
 
 /**
- * CodeOutput widget requires an array or object schema
- */
-export type CodeOutputWidgetSchema =
-  | z.ZodArray<z.ZodTypeAny>
-  | z.ZodObject<z.ZodRawShape>;
-
-/**
  * Code Output Widget Configuration
  */
 export interface CodeOutputWidgetConfig<
+  out TKey extends string,
   TSchema extends StringWidgetSchema,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive" | "widget",
 > extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {
   type: WidgetType.CODE_OUTPUT;
+  title?: NoInfer<TKey>; // Optional title translation key
+  description?: NoInfer<TKey>; // Optional description translation key
   code?: string; // Literal code snippet from data
   language?: string; // Programming language for syntax highlighting
   format?: "eslint" | "generic" | "json" | "table";

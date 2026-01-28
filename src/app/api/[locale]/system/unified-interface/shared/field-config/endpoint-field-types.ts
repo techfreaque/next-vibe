@@ -3,7 +3,7 @@
  * Provides full type inference from definition.POST.fields to form components
  */
 
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { Countries } from "@/i18n/core/config";
 
 import type { PrefillDisplayConfig } from "./field-config-types";
@@ -14,7 +14,7 @@ import type { PrefillDisplayConfig } from "./field-config-types";
  */
 
 export interface EndpointFieldStructure<TKey extends string> {
-  type?: string;
+  schemaType?: string;
   children?: Record<string, EndpointFieldStructure<TKey>>;
   // Union-specific fields
   discriminator?: string;
@@ -72,7 +72,7 @@ export function getFieldStructureByPath<TKey extends string>(
     }
 
     // Handle object-union types
-    if (current.type === "object-union") {
+    if (current.schemaType === "object-union") {
       const unionField = current as EndpointFieldStructure<TKey> & {
         variants?: readonly EndpointFieldStructure<TKey>[];
       };
@@ -81,7 +81,10 @@ export function getFieldStructureByPath<TKey extends string>(
       // For other fields, we return the first match (assuming variants have consistent field definitions)
       if (unionField.variants && Array.isArray(unionField.variants)) {
         for (const variant of unionField.variants) {
-          if (variant.type === "object" || variant.type === "object-optional") {
+          if (
+            variant.schemaType === "object" ||
+            variant.schemaType === "object-optional"
+          ) {
             const variantChildren = variant.children as
               | Record<string, EndpointFieldStructure<TKey>>
               | undefined;
@@ -101,7 +104,8 @@ export function getFieldStructureByPath<TKey extends string>(
     }
     // Navigate through object children (both object and object-optional)
     else if (
-      (current.type === "object" || current.type === "object-optional") &&
+      (current.schemaType === "object" ||
+        current.schemaType === "object-optional") &&
       current.children
     ) {
       current = current.children[part];

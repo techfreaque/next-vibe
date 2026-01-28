@@ -31,23 +31,49 @@ import type { MetadataWidgetConfig, MetadataWidgetSchema } from "./types";
 export function MetadataWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends MetadataWidgetSchema,
   TUsage extends FieldUsageConfig,
->({
-  context,
-  field,
-}: ReactWidgetProps<
-  TEndpoint,
-  MetadataWidgetConfig<TKey, TSchema, TUsage, "primitive">
->): JSX.Element {
-  const text =
-    typeof field.value === "string" ? context.t(field.value) : field.value;
+>(
+  props:
+    | ReactWidgetProps<
+        TEndpoint,
+        MetadataWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | ReactWidgetProps<
+        TEndpoint,
+        MetadataWidgetConfig<TKey, MetadataWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
+  const { field, context } = props;
+  // Handle string values
+  if (typeof field.value === "string") {
+    return (
+      <Span
+        className={cn("text-[11px] text-muted-foreground/70", field.className)}
+      >
+        {context.t(field.value)}
+      </Span>
+    );
+  }
+
+  // Handle null/undefined
+  if (!field.value) {
+    return (
+      <Span
+        className={cn("text-[11px] text-muted-foreground/70", field.className)}
+      >
+        —
+      </Span>
+    );
+  }
+
+  // Handle object with key-value pairs
+  const entries = Object.entries(field.value);
 
   return (
     <Span
       className={cn("text-[11px] text-muted-foreground/70", field.className)}
     >
-      {text}
+      {entries.map(([key, val]) => `${key}: ${val}`).join(", ")}
     </Span>
   );
 }

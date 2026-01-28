@@ -9,8 +9,8 @@ import type { z } from "zod";
 import { isEmptySchema } from "../../../../shared/utils/validation";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
-import { hasChildren } from "../../shared/widgets/utils/field-type-guards";
 import { SchemaUIHandler } from "../../unified-ui/renderers/cli/response/schema-handler";
+import { hasChildren } from "../../unified-ui/widgets/_shared/type-guards";
 
 /**
  * CLI Input Parser - Static class for all input parsing and handling

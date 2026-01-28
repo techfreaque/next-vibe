@@ -7,15 +7,12 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { isResponseField } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
-import {
-  hasChildren,
-  isWidgetDataObject,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
 import { InkWidgetRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliWidgetRenderer";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 
+import { isResponseField } from "../../_shared/type-guards";
+import { hasChildren, isObject } from "../../_shared/type-guards";
 import type { DataListWidgetConfig } from "./types";
 
 /**
@@ -38,10 +35,6 @@ export function DataListWidgetInk<
 >({
   field,
   context,
-
-  onSubmit,
-  isSubmitting,
-  endpoint,
 }: InkWidgetProps<
   TEndpoint,
   DataListWidgetConfig<
@@ -86,16 +79,12 @@ export function DataListWidgetInk<
               if (!isResponseField(childField)) {
                 return false;
               }
-              const childValue = isWidgetDataObject(item)
-                ? item[childName]
-                : undefined;
+              const childValue = isObject(item) ? item[childName] : undefined;
               return childValue !== null && childValue !== undefined;
             }
             // In interactive mode, show all fields but filter response fields without data
             if (isResponseField(childField)) {
-              const childValue = isWidgetDataObject(item)
-                ? item[childName]
-                : undefined;
+              const childValue = isObject(item) ? item[childName] : undefined;
               return childValue !== null && childValue !== undefined;
             }
             return true;
@@ -108,7 +97,7 @@ export function DataListWidgetInk<
             {hasChildren(field) ? (
               <Box flexDirection="column">
                 {filteredChildren.map(([childName, childField]) => {
-                  const childValue = isWidgetDataObject(item)
+                  const childValue = isObject(item)
                     ? item[childName]
                     : undefined;
 

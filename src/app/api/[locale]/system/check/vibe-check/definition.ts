@@ -162,16 +162,18 @@ const { POST } = createEndpoint({
       items: responseField({
         type: WidgetType.CODE_QUALITY_LIST,
         editorUriSchemaFieldKey: "editorUriSchema",
-        schema: z.array(
-          z.object({
-            file: z.string(),
-            line: z.coerce.number().optional(),
-            column: z.coerce.number().optional(),
-            rule: z.string().optional(),
-            severity: z.enum(["error", "warning", "info"]),
-            message: z.string(),
-          }),
-        ),
+        schema: z
+          .array(
+            z.object({
+              file: z.string(),
+              line: z.coerce.number().optional(),
+              column: z.coerce.number().optional(),
+              rule: z.string().optional(),
+              severity: z.enum(["error", "warning", "info"]),
+              message: z.string(),
+            }),
+          )
+          .optional(),
       }),
 
       // === FILES LIST (optional for compact MCP responses) ===

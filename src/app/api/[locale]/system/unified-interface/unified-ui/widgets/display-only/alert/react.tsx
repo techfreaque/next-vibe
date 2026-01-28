@@ -4,10 +4,9 @@ import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
-import type { StringWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type { ReactWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
-import type { AlertWidgetConfig } from "./types";
+import type { AlertWidgetConfig, AlertWidgetSchema } from "./types";
 
 /**
  * Displays alert messages with configurable variants.
@@ -16,16 +15,19 @@ import type { AlertWidgetConfig } from "./types";
 export function AlertWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends StringWidgetSchema,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "primitive" | "widget",
->({
-  field,
-  context,
-}: ReactWidgetProps<
-  TEndpoint,
-  AlertWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
->): JSX.Element | null {
+>(
+  props:
+    | ReactWidgetProps<
+        TEndpoint,
+        AlertWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | ReactWidgetProps<
+        TEndpoint,
+        AlertWidgetConfig<TKey, AlertWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element | null {
+  const { field, context } = props;
   const { variant = "default", className, content: hardcodedContent } = field;
 
   let content: string | undefined;

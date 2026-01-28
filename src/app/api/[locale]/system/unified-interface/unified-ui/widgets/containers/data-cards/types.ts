@@ -3,8 +3,11 @@
  */
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
-import type { SpacingSize, WidgetType } from "../../../../shared/types/enums";
-import type { LayoutConfig } from "../../../../shared/widgets/layout-config";
+import type {
+  LayoutType,
+  SpacingSize,
+  WidgetType,
+} from "../../../../shared/types/enums";
 import type {
   ArrayChildConstraint,
   BaseArrayWidgetConfig,
@@ -44,7 +47,8 @@ interface BaseDataCardsConfig<TKey extends string, TItemData> {
   groupBy?: string; // Field to group cards by
   showSummary?: boolean; // Show summary for groups
   summaryTemplate?: string; // Template for summary rendering
-  layout?: LayoutConfig; // Layout configuration
+  layoutType?: LayoutType; // Layout type for cards grid
+
   maxItems?: number; // Maximum number of items to show initially (rest hidden behind "Show N more" button)
   itemConfig?: {
     template: "default" | "compact" | "detailed" | string;
@@ -132,7 +136,6 @@ export type DataCardsWidgetConfig<
     | ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>,
   TItemData,
 > =
-  | ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>
   | DataCardsArrayWidgetConfig<
       TKey,
       TUsage,

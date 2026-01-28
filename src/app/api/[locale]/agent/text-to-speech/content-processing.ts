@@ -10,7 +10,7 @@ import type {
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { getTranslatorFromEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
+import { getTranslatorFromEndpoint } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { parseError } from "../../shared/utils";

@@ -16,6 +16,7 @@ import {
 } from "next-vibe-ui/ui/form/form-alert";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
+import type { Path } from "react-hook-form";
 import { useWatch } from "react-hook-form";
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -25,7 +26,6 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import { LayoutType } from "../../../../shared/types/enums";
-import { hasChildren } from "../../../../shared/widgets/utils/field-type-guards";
 import {
   getIconSizeClassName,
   getLayoutClassName,
@@ -42,7 +42,12 @@ import type {
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
 } from "../../_shared/types";
-import type { ContainerWidgetConfig } from "./types";
+import type {
+  ContainerArrayWidgetConfig,
+  ContainerObjectWidgetConfig,
+  ContainerUnionWidgetConfig,
+  ContainerWidgetConfig,
+} from "./types";
 
 /**
  * Container Widget - Displays container layouts with nested fields
@@ -120,33 +125,60 @@ export function ContainerWidget<
     className,
   } = field;
 
-  // Extract properties based on field type
-  const discriminator =
-    "discriminator" in field ? field.discriminator : undefined;
-  // oxlint-disable-next-line typescript/no-explicit-any
-  const variants:
+  // Extract properties based on field type using schemaType discriminator
+  type ChildrenType =
+    | ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
     | UnionObjectWidgetConfigConstrain<TKey, ConstrainedChildUsage<TUsage>>
-    | undefined = "variants" in field ? field.variants : undefined;
-  const isUnionField = field.schemaType === "object-union";
+    | ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>
+    | undefined;
 
-  let childrenForRenderer: any;
+  let childrenForRenderer: ChildrenType;
+  let discriminator: string | undefined;
 
-  if (isUnionField && variants) {
-    childrenForRenderer = variants;
-  } else if (hasChildren(field)) {
-    childrenForRenderer = field.children;
+  // Type-safe extraction using schemaType discriminator
+  if (field.schemaType === "object-union") {
+    const unionField = field as ContainerUnionWidgetConfig<
+      TKey,
+      TUsage,
+      UnionObjectWidgetConfigConstrain<TKey, ConstrainedChildUsage<TUsage>>
+    >;
+    childrenForRenderer = unionField.variants;
+    discriminator = unionField.discriminator as string | undefined;
+  } else if (
+    field.schemaType === "object" ||
+    field.schemaType === "object-optional" ||
+    field.schemaType === "widget-object"
+  ) {
+    const objectField = field as ContainerObjectWidgetConfig<
+      TKey,
+      TUsage,
+      "object" | "object-optional" | "widget-object",
+      ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
+    >;
+    childrenForRenderer = objectField.children;
+  } else if (
+    field.schemaType === "array" ||
+    field.schemaType === "array-optional"
+  ) {
+    const arrayField = field as ContainerArrayWidgetConfig<
+      TKey,
+      TUsage,
+      "array" | "array-optional",
+      ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>
+    >;
+    childrenForRenderer = arrayField.child;
   }
 
-  // Call useWatch unconditionally (React hooks rule)
+  // Call useWatch unconditionally (React hooks rule) - disabled when not needed
   const watchPath =
     discriminator && fieldName
       ? `${fieldName}.${discriminator}`
-      : discriminator || "";
+      : (discriminator ?? "");
   const watchedDiscriminator = useWatch({
     control: context.form?.control,
-    name: watchPath,
-    disabled: !isUnionField || !context.form || !fieldName || !discriminator,
-  });
+    name: watchPath as Path<TEndpoint["types"]["RequestOutput"]>,
+    disabled: !discriminator || !context.form || !fieldName,
+  }) as string | undefined;
 
   const layoutTypeStr = layoutTypeRaw;
 

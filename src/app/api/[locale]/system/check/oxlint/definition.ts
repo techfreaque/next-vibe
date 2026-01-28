@@ -141,16 +141,18 @@ const { POST } = createEndpoint({
         groupBy: "file",
         sortBy: "severity",
         showSummary: true,
-        schema: z.array(
-          z.object({
-            file: z.string(),
-            line: z.coerce.number().optional(),
-            column: z.coerce.number().optional(),
-            rule: z.string().optional(),
-            severity: z.enum(["error", "warning", "info"]),
-            message: z.string(),
-          }),
-        ),
+        schema: z
+          .array(
+            z.object({
+              file: z.string(),
+              line: z.coerce.number().optional(),
+              column: z.coerce.number().optional(),
+              rule: z.string().optional(),
+              severity: z.enum(["error", "warning", "info"]),
+              message: z.string(),
+            }),
+          )
+          .optional(),
       }),
 
       files: responseField({
@@ -305,7 +307,7 @@ export type OxlintRequestOutput = typeof POST.types.RequestOutput;
 export type OxlintResponseInput = typeof POST.types.ResponseInput;
 export type OxlintResponseOutput = typeof POST.types.ResponseOutput;
 
-export type OxlintIssue = OxlintResponseOutput["items"][number];
+export type OxlintIssue = NonNullable<OxlintResponseOutput["items"]>[number];
 
 const endpoints = { POST };
 export default endpoints;

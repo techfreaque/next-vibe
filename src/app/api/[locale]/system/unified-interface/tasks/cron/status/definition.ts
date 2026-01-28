@@ -171,38 +171,6 @@ const { GET: cronStatusGetEndpoint } = createEndpoint({
       tasks: responseArrayField(
         {
           type: WidgetType.DATA_TABLE,
-          columns: [
-            {
-              key: "id",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.status.common.id",
-            },
-            {
-              key: "name",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.status.common.taskName",
-            },
-            {
-              key: "status",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.status.common.status",
-            },
-            {
-              key: "lastRun",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.status.common.lastRun",
-            },
-            {
-              key: "nextRun",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.status.common.nextRun",
-            },
-            {
-              key: "schedule",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.status.common.schedule",
-            },
-          ],
         },
         responseField({
           type: WidgetType.TEXT,

@@ -252,11 +252,11 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
 
         // eslint-disable-next-line i18next/no-literal-string
         const singleLine = `  setNestedPath(endpoints, ${arrayStr}, ${importName}.${method});`;
-        // Use multiline format for: 5+ segments, array already split, OR line > 100 chars
+        // Use multiline format for: 5+ segments, array already split, OR line > 80 chars (prettier printWidth)
         if (
           pathWithMethod.length >= 5 ||
           arrayStr.includes("\n") ||
-          singleLine.length > 100
+          singleLine.length > 80
         ) {
           // eslint-disable-next-line i18next/no-literal-string
           const multiLine = `  setNestedPath(\n    endpoints,\n    ${arrayStr},\n    ${importName}.${method},\n  );`;

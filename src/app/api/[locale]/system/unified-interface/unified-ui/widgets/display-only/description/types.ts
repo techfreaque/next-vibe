@@ -15,16 +15,11 @@ import type {
 } from "../../_shared/types";
 
 /**
- * Description widget schema - accepts string for description text
- */
-export type DescriptionWidgetSchema = StringWidgetSchema;
-
-/**
  * Description Widget Configuration
  * Displays explanatory or help text with styling options
  */
 export interface DescriptionWidgetConfig<
-  TSchema extends DescriptionWidgetSchema,
+  TSchema extends StringWidgetSchema,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive",
 > extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {

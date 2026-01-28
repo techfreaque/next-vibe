@@ -9,6 +9,7 @@ import {
 } from "next-vibe-ui/ui/accordion";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
+import type { Path } from "react-hook-form";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import { getSpacingClassName } from "../../../../shared/widgets/utils/widget-helpers";
@@ -91,7 +92,7 @@ export function AccordionWidget<
   const contentPaddingClass = getSpacingClassName("padding", contentPadding);
 
   // Runtime guard: verify value is an array and child is an object widget
-  if (!isArrayValue(field.value)) {
+  if (!Array.isArray(field.value)) {
     return (
       <Div className="text-center text-muted-foreground py-8">
         {context.t("system.ui.widgets.accordion.error-type")}
@@ -99,7 +100,7 @@ export function AccordionWidget<
     );
   }
 
-  if (!isObjectWidget(field.child)) {
+  if (!("children" in field.child)) {
     return (
       <Div className="text-center text-muted-foreground py-8">
         {context.t("system.ui.widgets.accordion.error-child")}
@@ -188,7 +189,11 @@ export function AccordionWidget<
                   className={cn("flex items-center", titleGapClass || "gap-2")}
                 >
                   <WidgetRenderer
-                    fieldName={triggerFieldName}
+                    fieldName={
+                      triggerFieldName as Path<
+                        TEndpoint["types"]["RequestOutput"]
+                      >
+                    }
                     field={{ ...triggerField, value: triggerData }}
                     context={context}
                   />
@@ -198,7 +203,11 @@ export function AccordionWidget<
                 className={cn(variant === "separated" && contentPaddingClass)}
               >
                 <WidgetRenderer
-                  fieldName={contentFieldName}
+                  fieldName={
+                    contentFieldName as Path<
+                      TEndpoint["types"]["RequestOutput"]
+                    >
+                  }
                   field={{ ...contentField, value: contentData }}
                   context={context}
                 />

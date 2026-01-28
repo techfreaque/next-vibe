@@ -135,19 +135,18 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       items: responseField({
         type: WidgetType.CODE_QUALITY_LIST,
-        groupBy: "file",
-        sortBy: "severity",
-        showSummary: true,
-        schema: z.array(
-          z.object({
-            file: z.string(),
-            line: z.coerce.number().optional(),
-            column: z.coerce.number().optional(),
-            rule: z.string().optional(),
-            severity: z.enum(["error", "warning", "info"]),
-            message: z.string(),
-          }),
-        ),
+        schema: z
+          .array(
+            z.object({
+              file: z.string(),
+              line: z.coerce.number().optional(),
+              column: z.coerce.number().optional(),
+              rule: z.string().optional(),
+              severity: z.enum(["error", "warning", "info"]),
+              message: z.string(),
+            }),
+          )
+          .optional(),
       }),
 
       files: responseField({
@@ -261,7 +260,9 @@ export type TypecheckRequestOutput = typeof POST.types.RequestOutput;
 export type TypecheckResponseInput = typeof POST.types.ResponseInput;
 export type TypecheckResponseOutput = typeof POST.types.ResponseOutput;
 
-export type TypecheckIssue = TypecheckResponseOutput["items"][number];
+export type TypecheckIssue = NonNullable<
+  TypecheckResponseOutput["items"]
+>[number];
 
 const endpoints = { POST };
 export default endpoints;

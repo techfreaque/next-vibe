@@ -18,7 +18,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { definitionsRegistry } from "../../unified-interface/shared/endpoints/definitions/registry";
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type { Platform } from "../../unified-interface/shared/types/platform";
-import { getTranslatorFromEndpoint } from "../../unified-interface/shared/widgets/utils/field-helpers";
+import { getTranslatorFromEndpoint } from "../../unified-interface/unified-ui/widgets/_shared/field-helpers";
 import type {
   HelpListRequestOutput,
   HelpListResponseOutput,

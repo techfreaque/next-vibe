@@ -6,8 +6,11 @@ import type { z } from "zod";
 
 import type { UnifiedField } from "../../../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
-import type { SpacingSize, WidgetType } from "../../../../shared/types/enums";
-import type { LayoutConfig } from "../../../../shared/widgets/layout-config";
+import type {
+  LayoutType,
+  SpacingSize,
+  WidgetType,
+} from "../../../../shared/types/enums";
 import type { WidgetData } from "../../../../shared/widgets/widget-data";
 import type {
   ArrayChildConstraint,
@@ -34,7 +37,7 @@ interface DataListWidgetCommonProps<
   groupBy?: string; // Field name from data object to group by
   sortBy?: string; // Field name from data object to sort by
   columns?: number; // Number of columns for list layout
-  layout?: LayoutConfig; // Layout configuration for list display
+  layoutType?: LayoutType; // Layout type for list display
   showSummary?: boolean; // Show summary information
   maxItems?: number; // Maximum items to display before pagination/truncation
   // Spacing config

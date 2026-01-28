@@ -3,6 +3,7 @@
  */
 
 import type { SpacingSize, WidgetType } from "../../../../shared/types/enums";
+import type { NumberWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
@@ -14,9 +15,9 @@ import type { IconKey } from "../../form-fields/icon-field/icons";
  */
 export interface StatWidgetConfig<
   TKey extends string,
-  TSchema extends StatsWidgetSchema,
+  TSchema extends NumberWidgetSchema,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "primitive",
+  TSchemaType extends "primitive" | "widget",
 > extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {
   type: WidgetType.STAT;
   label?: NoInfer<TKey>;

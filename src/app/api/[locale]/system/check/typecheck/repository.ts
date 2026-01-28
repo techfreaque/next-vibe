@@ -625,7 +625,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
             return lineA - lineB;
           });
 
-      return success(this.buildResponse(issues, effectiveData));
+      return success(this.buildResponse(issues, effectiveData, isMCP));
     } catch (error) {
       return this.handleError(
         error as Error,
@@ -634,6 +634,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         data,
         startTime,
         logger,
+        isMCP,
       );
     }
   }
@@ -699,6 +700,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
   private buildResponse(
     allIssues: TypecheckIssue[],
     data: TypecheckRequestOutput,
+    skipFiles = false,
   ): TypecheckResponseOutput {
     // Apply filtering
     const filteredIssues = filterIssues(allIssues, data.filter);
@@ -719,12 +721,23 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       limit,
     );
 
-    // Build files list from filtered issues
-    const fileStats = TypecheckRepositoryImpl.buildFileStats(filteredIssues);
-    const files = TypecheckRepositoryImpl.formatFileStats(fileStats);
+    // Build files list unless skipped (for compact MCP responses)
+    let files:
+      | Array<{
+          file: string;
+          errors?: number;
+          warnings?: number;
+          total: number;
+        }>
+      | undefined;
+
+    if (!skipFiles) {
+      const fileStats = TypecheckRepositoryImpl.buildFileStats(filteredIssues);
+      files = TypecheckRepositoryImpl.formatFileStats(fileStats);
+    }
 
     return {
-      items: paginatedIssues,
+      items: data.summaryOnly ? undefined : paginatedIssues,
       files,
       summary,
     };
@@ -842,6 +855,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     data: TypecheckRequestOutput,
     startTime: number,
     logger: EndpointLogger,
+    skipFiles = false,
   ): ApiResponseType<TypecheckResponseOutput> {
     const duration = Date.now() - startTime;
     const parsedError = parseError(error);
@@ -904,7 +918,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     const errorCode =
       hasCode && typeof error.code === "number" ? error.code : 0;
     if (errorCode === 2 || issues.length > 0) {
-      return success(this.buildResponse(issues, data));
+      return success(this.buildResponse(issues, data, skipFiles));
     }
 
     return fail({

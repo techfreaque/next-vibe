@@ -6,7 +6,6 @@
 import { Box, Text } from "ink";
 import type { JSX } from "react";
 
-import { isResponseField } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
 import { InkWidgetRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliWidgetRenderer";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 import type {
@@ -16,6 +15,7 @@ import type {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
+import { isResponseField } from "../../_shared/type-guards";
 import type { SectionWidgetConfig } from "./types";
 
 /**

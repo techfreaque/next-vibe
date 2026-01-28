@@ -56,16 +56,19 @@ const CHART_COLORS = [
 export function ChartWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends ChartWidgetSchema,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "primitive" | "widget",
->({
-  field,
-  context,
-}: ReactWidgetProps<
-  TEndpoint,
-  ChartWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
->): JSX.Element {
+>(
+  props:
+    | ReactWidgetProps<
+        TEndpoint,
+        ChartWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | ReactWidgetProps<
+        TEndpoint,
+        ChartWidgetConfig<TKey, ChartWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
+  const { field, context } = props;
   const { t: globalT } = simpleT(context.locale);
   const {
     chartType = "line",
@@ -102,7 +105,7 @@ export function ChartWidget<
   const description = descriptionKey ? context.t(descriptionKey) : undefined;
 
   // Extract chart data using shared logic
-  const chartData = extractChartData<TKey>(field.value);
+  const chartData = extractChartData(field.value);
 
   // No data - show empty state
   if (!chartData || chartData.data.length === 0) {
@@ -151,13 +154,13 @@ export function ChartWidget<
 
       // Calculate total for percentage calculation
       const totalValue = firstSeries.data
-        .filter((item: ChartDataPoint<TKey>) => item.y > 0)
-        .reduce((sum: number, item: ChartDataPoint<TKey>) => sum + item.y, 0);
+        .filter((item: ChartDataPoint) => item.y > 0)
+        .reduce((sum: number, item: ChartDataPoint) => sum + item.y, 0);
 
       const pieData =
         firstSeries?.data
-          .filter((d: ChartDataPoint<TKey>) => d.y > 0) // Filter out zero values for pie chart
-          .map((d: ChartDataPoint<TKey>) => {
+          .filter((d: ChartDataPoint) => d.y > 0) // Filter out zero values for pie chart
+          .map((d: ChartDataPoint) => {
             // Translate labels - context.t() returns original string if key not found
             const rawLabel = String(d.label ?? d.x ?? "Unknown");
             const translatedLabel = context.t(rawLabel as TranslationKey);

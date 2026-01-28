@@ -2,8 +2,11 @@
  * GroupedList Widget Type Definitions
  */
 
-import type { SpacingSize, WidgetType } from "../../../../shared/types/enums";
-import type { LayoutConfig } from "../../../../shared/widgets/layout-config";
+import type {
+  LayoutType,
+  SpacingSize,
+  WidgetType,
+} from "../../../../shared/types/enums";
 import type {
   ArrayChildConstraint,
   BaseArrayWidgetConfig,
@@ -49,5 +52,5 @@ export interface GroupedListWidgetConfig<
   itemSize?: "xs" | "sm" | "base" | "lg"; // Item text size
   buttonSize?: "xs" | "sm" | "base" | "lg"; // Show more button text size
   summaryTemplate?: string; // Template for group summary rendering
-  layout?: LayoutConfig; // Layout configuration for group display
+  layoutType?: LayoutType; // Layout type for group display
 }

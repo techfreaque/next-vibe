@@ -14,15 +14,20 @@ import type { CodeOutputWidgetConfig } from "./types";
 
 export function CodeOutputWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TSchema extends StringWidgetSchema,
+  TKey extends string,
   TUsage extends FieldUsageConfig,
->({
-  field,
-  context,
-}: InkWidgetProps<
-  TEndpoint,
-  CodeOutputWidgetConfig<TSchema, TUsage, "primitive">
->): JSX.Element {
+>(
+  props:
+    | InkWidgetProps<
+        TEndpoint,
+        CodeOutputWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | InkWidgetProps<
+        TEndpoint,
+        CodeOutputWidgetConfig<TKey, StringWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
+  const { field, context } = props;
   const code = field.value;
 
   if (!code) {

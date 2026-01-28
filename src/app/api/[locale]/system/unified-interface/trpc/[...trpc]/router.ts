@@ -37,7 +37,7 @@ import { tools as route24Tools } from "../../../guard/destroy/route";
 import { tools as route25Tools } from "../../../translations/reorganize/route";
 import { tools as route26Tools } from "../../../translations/restore-backup/route";
 import { tools as route27Tools } from "../../../translations/stats/route";
-import { tools as route28Tools } from "../../../help/route";
+import { tools as route28Tools } from "../../../help/interactive/route";
 import { tools as route29Tools } from "../../../db/schema-verify/route";
 import { tools as route30Tools } from "../../../db/utils/docker-operations/route";
 import { tools as route31Tools } from "../../../db/migrate-repair/route";
@@ -362,7 +362,9 @@ export const appRouter = router({
       "restore-backup": router({ ...route26 }),
       stats: router({ ...route27 }),
     }),
-    help: router({ ...route28 }),
+    help: router({
+      interactive: router({ ...route28 }),
+    }),
     db: router({
       "schema-verify": router({ ...route29 }),
       utils: router({

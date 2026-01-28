@@ -24,17 +24,15 @@ import { simpleT } from "@/i18n/core/shared";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import { WidgetType } from "../../../../shared/types/enums";
 import {
-  hasChildren,
-  isWidgetDataObject,
-} from "../../../../shared/widgets/utils/field-type-guards";
-import {
   getIconSizeClassName,
   getLayoutClassName,
   getTextSizeClassName,
   type LayoutConfig,
 } from "../../../../shared/widgets/utils/widget-helpers";
+import type { WidgetData } from "../../../../shared/widgets/widget-data";
 import { WidgetRenderer } from "../../../renderers/react/WidgetRenderer";
 import type { ReactWidgetProps } from "../../_shared/react-types";
+import { hasChildren, isObject } from "../../_shared/type-guards";
 import type {
   ConstrainedChildUsage,
   FieldUsageConfig,
@@ -272,7 +270,7 @@ export function SectionWidget<
   // Render content - can be a widget config or raw data
   const renderContent = (): JSX.Element => {
     // Check if content is a widget configuration
-    if (isWidgetDataObject(content)) {
+    if (isObject(content)) {
       const contentType =
         typeof content.type === "string" ? content.type : WidgetType.TEXT;
       const contentData = "data" in content ? content.data : content;

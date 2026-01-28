@@ -22,16 +22,16 @@ import type { LinkWidgetConfig, LinkWidgetSchema } from "./types";
 export function LinkWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends LinkWidgetSchema,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "primitive" | "widget",
->({
-  field,
-  context,
-}: InkWidgetProps<
-  TEndpoint,
-  LinkWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
->): JSX.Element {
+>(
+  props:
+    | InkWidgetProps<TEndpoint, LinkWidgetConfig<TKey, never, TUsage, "widget">>
+    | InkWidgetProps<
+        TEndpoint,
+        LinkWidgetConfig<TKey, LinkWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
+  const { field, context } = props;
   const t = context.t;
 
   // value is properly typed from schema - no assertions needed

@@ -26,7 +26,7 @@ export function DateFieldWidgetInk<
   DateFieldWidgetConfig<TKey, DateWidgetSchema, FieldUsageConfig>
 >): JSX.Element {
   const { t } = context;
-  const [inputValue, setInputValue] = useState(field.value);
+  const [inputValue, setInputValue] = useState(String(field.value || ""));
 
   // Response mode - just display the value
   if (context.response) {

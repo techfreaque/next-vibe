@@ -204,12 +204,20 @@ export type DisplayOnlyWidgetConfig<
       CreateApiEndpointAny | undefined
     >
   | FormAlertWidgetConfig<TUsage, TSchemaType>
-  | PasswordStrengthWidgetConfig<TUsage, TSchemaType>
+  | PasswordStrengthWidgetConfig<TUsage, TSchemaType, CreateApiEndpointAny>
   | TextWidgetConfig<TKey, never, TUsage, TSchemaType>
   | TitleWidgetConfig<TKey, never, TUsage, TSchemaType>
   | LoadingWidgetConfig<TKey, TUsage, TSchemaType>
   | EmptyStateWidgetConfig<TKey, TUsage, TSchemaType>
-  | ModelDisplayWidgetConfig<TUsage, TSchemaType>;
+  | ModelDisplayWidgetConfig<TUsage, TSchemaType>
+  | CodeOutputWidgetConfig<TKey, never, TUsage, TSchemaType>
+  | BadgeWidgetConfig<TKey, never, TUsage, TSchemaType>
+  | AlertWidgetConfig<TKey, never, TUsage, TSchemaType>
+  | ChartWidgetConfig<TKey, never, TUsage, TSchemaType>
+  | LinkWidgetConfig<TKey, never, TUsage, TSchemaType>
+  | MarkdownWidgetConfig<TKey, never, TUsage, TSchemaType>
+  | MetadataWidgetConfig<TKey, never, TUsage, TSchemaType>
+  | StatWidgetConfig<TKey, never, TUsage, TSchemaType>;
 
 export type RequestResponseDisplayWidgetConfig<
   TKey extends string,
@@ -229,7 +237,7 @@ export type RequestResponseDisplayWidgetConfig<
   | MarkdownWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
   | MetadataWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
   | MarkdownEditorWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
-  | CodeOutputWidgetConfig<TSchema, TUsage, TSchemaType>
+  | CodeOutputWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
   | StatusIndicatorWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
   | CodeQualitySummaryWidgetConfig<TSchema, TUsage, TSchemaType>
   | CodeQualityFilesWidgetConfig<TSchema, TUsage, TSchemaType>

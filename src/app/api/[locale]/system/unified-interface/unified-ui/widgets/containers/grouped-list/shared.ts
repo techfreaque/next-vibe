@@ -4,8 +4,6 @@
  * Used by both React and CLI implementations
  */
 
-import { isWidgetDataObject } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
-
 import type { WidgetData } from "../../../../shared/widgets/widget-data";
 
 /**
@@ -262,9 +260,7 @@ export function extractGroupedListData(
       const groupKey = "key" in group ? String(group.key) : "";
       const groupLabel = "label" in group ? String(group.label) : "";
       const groupItems = Array.isArray(group.items) ? group.items : [];
-      const groupSummary = isWidgetDataObject(group.summary)
-        ? group.summary
-        : undefined;
+      const groupSummary = isObject(group.summary) ? group.summary : undefined;
 
       // Filter items to only valid objects
       const validItems = groupItems.filter(

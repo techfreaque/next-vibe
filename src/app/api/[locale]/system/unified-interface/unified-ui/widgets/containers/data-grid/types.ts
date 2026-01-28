@@ -4,8 +4,11 @@
 
 import type { z } from "zod";
 
-import type { SpacingSize, WidgetType } from "../../../../shared/types/enums";
-import type { LayoutConfig } from "../../../../shared/widgets/layout-config";
+import type {
+  LayoutType,
+  SpacingSize,
+  WidgetType,
+} from "../../../../shared/types/enums";
 import type {
   ArrayChildConstraint,
   BaseArrayWidgetConfig,
@@ -73,9 +76,9 @@ export type DataGridWidgetConfig<
 interface BaseDataGridWidgetConfig<TKey extends string> {
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
-  columns?: number; // Number of columns in grid
-  layout?: LayoutConfig; // Layout configuration for grid display
+  layoutType?: LayoutType; // Layout type for grid
   gap?: SpacingSize; // Gap between grid items
+  padding?: SpacingSize; // Padding inside grid
   responsive?: boolean; // Enable responsive column adjustment
   minColumnWidth?: number | string; // Minimum column width (e.g., 200, "200px", "15rem")
 }

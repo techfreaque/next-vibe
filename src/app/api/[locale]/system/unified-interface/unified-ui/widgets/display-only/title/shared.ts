@@ -3,7 +3,9 @@
  * Platform-agnostic data extraction and processing for title widget
  */
 
-import type { TitleObjectSchema } from "./types";
+import type { z } from "zod";
+
+import type { TitleWidgetSchema } from "./types";
 
 /**
  * Processed title data structure
@@ -18,7 +20,7 @@ export interface ProcessedTitle {
  * Extract and validate title data
  */
 export function extractTitleData(
-  value: TitleObjectSchema,
+  value: z.output<TitleWidgetSchema>,
   context?: { t: (key: string) => string },
 ): ProcessedTitle | null {
   // Handle null/undefined

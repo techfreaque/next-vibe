@@ -24,7 +24,7 @@ export function TextArrayFieldWidgetInk<
 >): JSX.Element {
   const { t } = context;
   const items = field.value;
-  const displayValue = items.length > 0 ? items.join(", ") : "—";
+  const displayValue = items?.length ? items.join(", ") : "—";
 
   return (
     <Box flexDirection="column" marginBottom={1}>

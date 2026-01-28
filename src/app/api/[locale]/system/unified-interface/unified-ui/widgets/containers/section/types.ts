@@ -9,7 +9,6 @@ import type {
   SpacingSize,
   WidgetType,
 } from "../../../../shared/types/enums";
-import type { LayoutConfig } from "../../../../shared/widgets/layout-config";
 import type {
   BaseObjectWidgetConfig,
   ConstrainedChildUsage,
@@ -38,8 +37,11 @@ export interface SectionWidgetConfig<
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
   layoutType?: LayoutType;
-  layout?: LayoutConfig; // Layout configuration for section content
   columns?: number; // Number of columns for section layout
+  rows?: number; // Number of rows for section layout
+  gap?: SpacingSize; // Gap between children
+  padding?: SpacingSize; // Padding inside section
+  margin?: SpacingSize; // Margin outside section
   spacing?: "compact" | "normal" | "relaxed"; // Spacing within section
   collapsible?: boolean; // Allow section to be collapsed
   defaultCollapsed?: boolean; // Start collapsed (requires collapsible: true)

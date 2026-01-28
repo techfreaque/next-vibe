@@ -60,7 +60,7 @@ export default function EmptyStateWidget<
   context,
 }: ReactWidgetProps<
   TEndpoint,
-  EmptyStateWidgetConfig<TKey, TUsage>
+  EmptyStateWidgetConfig<TKey, TUsage, "widget">
 >): JSX.Element {
   const {
     title: titleKey,

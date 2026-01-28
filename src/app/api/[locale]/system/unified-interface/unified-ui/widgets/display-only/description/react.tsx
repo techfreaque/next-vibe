@@ -12,8 +12,8 @@ import {
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 
-import { extractDescriptionData } from "./shared";
-import type { DescriptionWidgetConfig, DescriptionWidgetSchema } from "./types";
+import type { StringWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
+import type { DescriptionWidgetConfig } from "./types";
 
 /**
  * Description Widget - Displays descriptive text with truncation
@@ -38,7 +38,7 @@ import type { DescriptionWidgetConfig, DescriptionWidgetSchema } from "./types";
  */
 export function DescriptionWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TSchema extends DescriptionWidgetSchema,
+  TSchema extends StringWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
   field,
@@ -71,14 +71,9 @@ export function DescriptionWidget<
                   ? ""
                   : "line-clamp-2";
 
-  // Extract data using shared logic with translation context
-  const data = extractDescriptionData(field.value, context);
-
-  if (!data) {
+  if (!field.value) {
     return <Div className={className}>—</Div>;
   }
-
-  const { text } = data;
 
   return (
     <Div
@@ -90,7 +85,7 @@ export function DescriptionWidget<
         className,
       )}
     >
-      {text}
+      {context.t(field.value)}
     </Div>
   );
 }

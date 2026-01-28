@@ -21,15 +21,19 @@ import type { MarkdownWidgetConfig } from "./types";
 export function MarkdownWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends StringWidgetSchema,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "primitive" | "widget",
->({
-  field,
-}: InkWidgetProps<
-  TEndpoint,
-  MarkdownWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
->): JSX.Element {
+>(
+  props:
+    | InkWidgetProps<
+        TEndpoint,
+        MarkdownWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | InkWidgetProps<
+        TEndpoint,
+        MarkdownWidgetConfig<TKey, StringWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
+  const { field } = props;
   if (!field.value) {
     return (
       <Box>

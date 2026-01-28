@@ -24,7 +24,7 @@ export function TagsFieldWidgetInk<
 >): JSX.Element {
   const { t } = context;
   const tags = field.value;
-  const displayValue = tags.length > 0 ? tags.join(", ") : "—";
+  const displayValue = tags?.length ? tags.join(", ") : "—";
 
   return (
     <Box flexDirection="column" marginBottom={1}>

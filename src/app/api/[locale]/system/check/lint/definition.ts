@@ -145,16 +145,18 @@ const { POST } = createEndpoint({
         groupBy: "file",
         sortBy: "severity",
         showSummary: true,
-        schema: z.array(
-          z.object({
-            file: z.string(),
-            line: z.coerce.number().optional(),
-            column: z.coerce.number().optional(),
-            rule: z.string().optional(),
-            severity: z.enum(["error", "warning", "info"]),
-            message: z.string(),
-          }),
-        ),
+        schema: z
+          .array(
+            z.object({
+              file: z.string(),
+              line: z.coerce.number().optional(),
+              column: z.coerce.number().optional(),
+              rule: z.string().optional(),
+              severity: z.enum(["error", "warning", "info"]),
+              message: z.string(),
+            }),
+          )
+          .optional(),
       }),
 
       files: responseField({
@@ -308,7 +310,7 @@ export type LintRequestOutput = typeof POST.types.RequestOutput;
 export type LintResponseInput = typeof POST.types.ResponseInput;
 export type LintResponseOutput = typeof POST.types.ResponseOutput;
 
-export type LintIssue = LintResponseOutput["items"][number];
+export type LintIssue = NonNullable<LintResponseOutput["items"]>[number];
 
 const endpoints = { POST };
 export default endpoints;

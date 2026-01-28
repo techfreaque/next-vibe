@@ -47,16 +47,19 @@ import type { LinkWidgetConfig, LinkWidgetSchema } from "./types";
 export function LinkWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends LinkWidgetSchema,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "primitive" | "widget",
->({
-  field,
-  context,
-}: ReactWidgetProps<
-  TEndpoint,
-  LinkWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
->): JSX.Element {
+>(
+  props:
+    | ReactWidgetProps<
+        TEndpoint,
+        LinkWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | ReactWidgetProps<
+        TEndpoint,
+        LinkWidgetConfig<TKey, LinkWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
+  const { field, context } = props;
   const { size, gap, iconSize, href, className } = field;
   const hrefValue = field.value || href;
 
@@ -75,7 +78,9 @@ export function LinkWidget<
 
   // If we have a value but can't extract link data, show the translated raw value
   if (!data) {
-    return <Span className={className}>{context.t(hrefValue)}</Span>;
+    const displayText =
+      typeof hrefValue === "string" ? context.t(hrefValue) : "—";
+    return <Span className={className}>{displayText}</Span>;
   }
 
   const { url, text, openInNewTab } = data;

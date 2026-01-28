@@ -360,7 +360,7 @@ export class VibeCheckRepository {
         sortedIssues,
         effectiveData.limit,
         effectiveData.page,
-        isMCP || data.summaryOnly, // Skip files/items for MCP or when summaryOnly is true
+        isMCP, // Skip files for MCP only
         data.filter, // Apply filter
         configResult.config.vibeCheck?.editorUriScheme, // Pass from config
         data.summaryOnly, // Pass summaryOnly flag
@@ -484,7 +484,7 @@ export class VibeCheckRepository {
       limit,
     );
 
-    // Build files list only if not skipped (for compact MCP responses or summaryOnly)
+    // Build files list unless skipped (for compact MCP responses)
     let files:
       | Array<{
           file: string;
@@ -494,14 +494,14 @@ export class VibeCheckRepository {
         }>
       | undefined;
 
-    if (!skipFiles && !summaryOnly) {
+    if (!skipFiles) {
       const fileStats = this.buildFileStats(filteredIssues);
       files = this.formatFileStats(fileStats);
     }
 
     return {
-      editorUriSchema: skipFiles || summaryOnly ? undefined : editorUriScheme,
-      items: paginatedIssues,
+      editorUriSchema: skipFiles ? undefined : editorUriScheme,
+      items: summaryOnly ? undefined : paginatedIssues,
       files,
       summary,
     };

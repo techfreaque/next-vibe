@@ -7,9 +7,11 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import type { NumberWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 
 import type { FieldUsageConfig } from "../../_shared/types";
+import { formatStatValue } from "./shared";
 import type { StatWidgetConfig } from "./types";
 
 /**
@@ -20,7 +22,7 @@ import type { StatWidgetConfig } from "./types";
 export function StatWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends StatsWidgetSchema,
+  TSchema extends NumberWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
   field,
@@ -29,21 +31,23 @@ export function StatWidgetInk<
   TEndpoint,
   StatWidgetConfig<TKey, TSchema, TUsage, "primitive">
 >): JSX.Element {
-  const { label: labelKey } = field;
+  const { label: labelKey, format, trend, trendValue } = field;
   const { t } = context;
 
   const label = labelKey ? t(labelKey) : undefined;
 
-  // Extract value and change - value comes from Zod schema so it's validated
-  // NumberWidgetSchema allows number or object with value/count/change/trend
-  let displayValue: string;
-  let change: number | undefined;
-  let trend: "up" | "down" | undefined;
+  // Handle non-numeric values
+  if (typeof field.value !== "number") {
+    return (
+      <Box flexDirection="column" marginY={1}>
+        {label && <Text dimColor>{label}</Text>}
+        <Text dimColor>{field.value}</Text>
+      </Box>
+    );
+  }
 
-  // Use field.value directly - schema guarantees the type
-  displayValue = field.value ?? field.value.count ?? field.value;
-  change = field.value.change;
-  trend = field.value.trend;
+  // Format the value using shared logic
+  const displayValue = formatStatValue(field.value, format, context.locale);
 
   // Determine color based on trend
   const trendColor =
@@ -57,11 +61,10 @@ export function StatWidgetInk<
         <Text bold color="blue">
           {displayValue}
         </Text>
-        {change !== undefined && (
+        {trend && trendValue !== undefined && (
           <Text color={trendColor}>
             {" "}
-            {trendIcon} {change > 0 ? "+" : ""}
-            {change}%
+            {trendIcon} {Math.abs(trendValue)}%
           </Text>
         )}
       </Box>

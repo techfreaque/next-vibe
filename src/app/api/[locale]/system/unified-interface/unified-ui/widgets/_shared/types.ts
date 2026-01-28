@@ -26,7 +26,12 @@ export interface BaseWidgetRendererProps<
   TEndpoint extends CreateApiEndpointAny,
 > {
   fieldName: string;
-  field: UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>; // oxlint-disable-line typescript/no-explicit-any
+  field: UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >;
   context: BaseWidgetContext<TEndpoint>;
 }
 
@@ -41,8 +46,7 @@ export interface BaseWidgetProps<
     string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    // oxlint-disable-next-line typescript/no-explicit-any
-    any
+    AnyChildrenConstrain<string, FieldUsageConfig>
   >,
 > {
   fieldName: Path<TEndpoint["types"]["RequestOutput"]>;
@@ -60,8 +64,7 @@ export type BaseWidgetFieldProps<
     string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    // oxlint-disable-next-line typescript/no-explicit-any
-    any
+    AnyChildrenConstrain<string, FieldUsageConfig>
   >,
 > = TWidgetConfig & {
   value: TWidgetConfig extends { schema: z.ZodTypeAny }
@@ -392,8 +395,12 @@ export type UnionObjectWidgetConfigConstrain<
  * Infer output type from a UnifiedField based on usage
  */
 type InferFieldOutput<
-  // oxlint-disable-next-line typescript/no-explicit-any
-  TField extends UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>,
+  TField extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >,
   TUsage extends FieldUsage = FieldUsage.ResponseData,
 > = z.output<InferSchemaFromField<TField, TUsage>>;
 
@@ -404,8 +411,12 @@ type InferChildrenOutput<TChildren> =
   // For Record of fields -> object output
   TChildren extends Record<
     string,
-    // oxlint-disable-next-line typescript/no-explicit-any
-    UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? {
         [K in keyof TChildren]: InferFieldOutput<TChildren[K]>;
@@ -415,8 +426,7 @@ type InferChildrenOutput<TChildren> =
           string,
           z.ZodTypeAny,
           FieldUsageConfig,
-          // oxlint-disable-next-line typescript/no-explicit-any
-          any
+          AnyChildrenConstrain<string, FieldUsageConfig>
         >
       ? InferFieldOutput<TChildren>[]
       : never;
@@ -425,8 +435,12 @@ type InferChildrenOutput<TChildren> =
  * Infer output type from single child field
  */
 type InferChildOutput<TChild> =
-  // oxlint-disable-next-line typescript/no-explicit-any
-  TChild extends UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>
+  TChild extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? InferFieldOutput<TChild>
     : never;
 
@@ -436,8 +450,12 @@ type InferChildOutput<TChild> =
 type InferUnionType<TVariants> =
   TVariants extends Record<
     string,
-    // oxlint-disable-next-line typescript/no-explicit-any
-    UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? InferFieldOutput<TVariants[keyof TVariants]>
     : never;

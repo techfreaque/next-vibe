@@ -28,7 +28,7 @@ export interface MetadataWidgetConfig<
   out TKey extends string,
   TSchema extends MetadataWidgetSchema,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "primitive",
+  TSchemaType extends "primitive" | "widget",
 > extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {
   type: WidgetType.METADATA;
 

@@ -23,15 +23,20 @@ import type { CodeOutputWidgetConfig } from "./types";
  */
 export function CodeOutputWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TSchema extends StringWidgetSchema,
+  TKey extends string,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "primitive" | "widget",
->({
-  field,
-}: ReactWidgetProps<
-  TEndpoint,
-  CodeOutputWidgetConfig<TSchema, TUsage, TSchemaType>
->): JSX.Element {
+>(
+  props:
+    | ReactWidgetProps<
+        TEndpoint,
+        CodeOutputWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | ReactWidgetProps<
+        TEndpoint,
+        CodeOutputWidgetConfig<TKey, StringWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
+  const { field } = props;
   const {
     emptyPadding,
     headerPadding,

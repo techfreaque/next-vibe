@@ -41,7 +41,7 @@ export function ModelDisplayWidget<
   ModelDisplayWidgetConfig<TUsage, TSchemaType>
 >): JSX.Element {
   // Watch modelSelection from form to react to changes
-  const watchedModelSelection = useWatch("modelSelection");
+  const watchedModelSelection = useWatch("modelSelection" as never);
 
   // Try to get data from multiple sources:
   // 1. Direct value (if widget field has data)
@@ -55,7 +55,8 @@ export function ModelDisplayWidget<
 
   // Try to get from form's watched modelSelection if not found in value
   if (!data && watchedModelSelection) {
-    data = watchedModelSelection;
+    data =
+      watchedModelSelection as FavoriteCreateRequestOutput["modelSelection"];
   }
 
   // Try to get from response context if not found yet

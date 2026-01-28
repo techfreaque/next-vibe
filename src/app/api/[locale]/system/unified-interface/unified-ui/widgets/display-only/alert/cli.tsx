@@ -14,16 +14,19 @@ import type { AlertWidgetConfig, AlertWidgetSchema } from "./types";
 export function AlertWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends AlertWidgetSchema,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "primitive" | "widget",
->({
-  field,
-  context,
-}: InkWidgetProps<
-  TEndpoint,
-  AlertWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
->): JSX.Element {
+>(
+  props:
+    | InkWidgetProps<
+        TEndpoint,
+        AlertWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | InkWidgetProps<
+        TEndpoint,
+        AlertWidgetConfig<TKey, AlertWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
+  const { field, context } = props;
   const { content, variant = "default" } = field;
 
   const message = content ? context.t(content) : field.value;

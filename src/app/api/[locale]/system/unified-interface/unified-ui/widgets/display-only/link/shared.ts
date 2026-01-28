@@ -4,6 +4,8 @@
  * Used by both React and CLI implementations
  */
 
+import type { z } from "zod";
+
 import type { LinkWidgetSchema } from "./types";
 
 /**
@@ -18,7 +20,9 @@ export interface ProcessedLink {
 /**
  * Extract and validate link data from schema-validated value
  */
-export function extractLinkData(value: LinkWidgetSchema): ProcessedLink | null {
+export function extractLinkData(
+  value: z.output<LinkWidgetSchema>,
+): ProcessedLink | null {
   // Handle string value directly (simple URL)
   if (typeof value === "string") {
     return {

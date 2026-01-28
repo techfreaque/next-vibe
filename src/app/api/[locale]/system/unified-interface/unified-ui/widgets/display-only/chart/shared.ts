@@ -21,38 +21,26 @@ import type {
 /**
  * Represents a single data point in a chart
  */
-export interface ChartDataPoint<TTranslationKey extends string = string> {
-  x: string;
-  y: number;
-  label?: TTranslationKey;
-  color?: string;
-}
+export type ChartDataPoint = z.output<typeof ChartDataPointSchema>;
 
 /**
  * Represents a series of data points with a name
  */
-export interface ChartSeries<TTranslationKey extends string = string> {
-  name: string;
-  data: ChartDataPoint<TTranslationKey>[];
-  color?: string;
-}
+export type ChartSeries = z.output<typeof ChartSeriesSchema>;
 
 /**
  * Result of chart data extraction
  */
-export interface ChartData<TTranslationKey extends string = string> {
+export interface ChartData {
   /** Chart display type */
   type: "single" | "series" | "pie";
   /** Array of series (single series for "single" type) */
-  data: ChartSeries<TTranslationKey>[];
+  data: ChartSeries[];
 }
 
-type BaseChartDataPoint = z.infer<typeof ChartDataPointSchema>;
-type BaseChartSeries = z.infer<typeof ChartSeriesSchema>;
-
 function isSeriesArray(
-  value: BaseChartDataPoint[] | BaseChartSeries[],
-): value is BaseChartSeries[] {
+  value: ChartDataPoint[] | ChartSeries[],
+): value is ChartSeries[] {
   return value.length > 0 && "data" in value[0];
 }
 
@@ -67,9 +55,9 @@ function isSeriesArray(
  * @param value - Schema-validated chart data
  * @returns Structured chart data or null if empty
  */
-export function extractChartData<TTranslationKey extends string = string>(
+export function extractChartData(
   value: z.output<ChartWidgetSchema>,
-): ChartData<TTranslationKey> | null {
+): ChartData | null {
   if (!value) {
     return null;
   }
@@ -100,14 +88,11 @@ export function extractChartData<TTranslationKey extends string = string>(
   }
 
   // Record format: {series1: [...], series2: [...]}
-  const series: ChartSeries<TTranslationKey>[] = Object.entries(value).map(
-    ([key, dataPoints]) => {
-      const seriesItem: ChartSeries<TTranslationKey> = {
-        name: key,
-        data: dataPoints,
-      };
-      return seriesItem;
-    },
+  const series: ChartSeries[] = Object.entries(value).map(
+    ([key, dataPoints]) => ({
+      name: key,
+      data: dataPoints,
+    }),
   );
 
   return series.length > 0 ? { type: "series", data: series } : null;

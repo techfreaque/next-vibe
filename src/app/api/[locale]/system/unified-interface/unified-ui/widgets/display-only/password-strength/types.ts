@@ -2,6 +2,9 @@
  * Password Strength Widget Type Definitions
  */
 
+import type { Path } from "react-hook-form";
+
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { SpacingSize, WidgetType } from "../../../../shared/types/enums";
 import type {
   BasePrimitiveDisplayOnlyWidgetConfig,
@@ -14,9 +17,10 @@ import type {
 export interface PasswordStrengthWidgetConfig<
   TUsage extends FieldUsageConfig,
   TSchemaType extends "widget",
+  TEndpoint extends CreateApiEndpointAny,
 > extends BasePrimitiveDisplayOnlyWidgetConfig<TUsage, TSchemaType> {
   type: WidgetType.PASSWORD_STRENGTH;
-  watchField: string;
+  watchField: Path<TEndpoint["types"]["RequestOutput"]>;
   /** Container gap */
   containerGap?: SpacingSize;
   /** Label text size */

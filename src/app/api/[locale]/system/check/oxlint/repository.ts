@@ -154,10 +154,11 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
           ? result.issues
           : sortIssuesByLocation(result.issues),
         effectiveData,
+        isMCP,
       );
 
       logger.debug(
-        `[OXLINT] Execution completed (${response.items?.length ?? 0} issues found)`,
+        `[OXLINT] Execution completed (${response.summary.displayedIssues ?? response.summary.totalIssues} issues found)`,
       );
 
       return success(response);
@@ -380,6 +381,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   private buildResponse(
     allIssues: OxlintIssue[],
     data: OxlintRequestOutput,
+    skipFiles = false,
   ): OxlintResponseOutput {
     // Apply filtering
     const filteredIssues = filterIssues(allIssues, data.filter);
@@ -400,7 +402,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       limit,
     );
 
-    // Build files list from filtered issues (unless summaryOnly is true)
+    // Build files list unless skipped (for compact MCP responses)
     let files:
       | Array<{
           file: string;
@@ -410,13 +412,13 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         }>
       | undefined;
 
-    if (!data.summaryOnly) {
+    if (!skipFiles) {
       const fileStats = this.buildFileStats(filteredIssues);
       files = this.formatFileStats(fileStats);
     }
 
     return {
-      items: paginatedIssues,
+      items: data.summaryOnly ? undefined : paginatedIssues,
       files,
       summary,
     };

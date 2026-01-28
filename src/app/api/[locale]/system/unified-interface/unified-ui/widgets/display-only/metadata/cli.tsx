@@ -20,20 +20,53 @@ import type { MetadataWidgetConfig, MetadataWidgetSchema } from "./types";
 export function MetadataWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends MetadataWidgetSchema,
   TUsage extends FieldUsageConfig,
->({
-  field,
-  context,
-}: InkWidgetProps<
-  TEndpoint,
-  MetadataWidgetConfig<TKey, TSchema, TUsage>
->): JSX.Element {
+>(
+  props:
+    | InkWidgetProps<
+        TEndpoint,
+        MetadataWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | InkWidgetProps<
+        TEndpoint,
+        MetadataWidgetConfig<TKey, MetadataWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
+  const { field, context } = props;
   const { title: titleKey } = field;
   const { t } = context;
 
   const title = titleKey ? t(titleKey) : "Metadata";
 
+  // Handle string values
+  if (typeof field.value === "string") {
+    return (
+      <Box flexDirection="column" marginY={1}>
+        <Text bold dimColor>
+          {title}
+        </Text>
+        <Box marginLeft={2}>
+          <Text>{field.value}</Text>
+        </Box>
+      </Box>
+    );
+  }
+
+  // Handle null/undefined
+  if (!field.value) {
+    return (
+      <Box flexDirection="column" marginY={1}>
+        <Text bold dimColor>
+          {title}
+        </Text>
+        <Box marginLeft={2}>
+          <Text dimColor>—</Text>
+        </Box>
+      </Box>
+    );
+  }
+
+  // Handle object with key-value pairs
   const entries = Object.entries(field.value);
 
   return (
@@ -45,7 +78,7 @@ export function MetadataWidgetInk<
         {entries.map(([key, val]) => (
           <Box key={key}>
             <Text dimColor>{key}: </Text>
-            <Text>{val}</Text>
+            <Text>{String(val)}</Text>
           </Box>
         ))}
       </Box>

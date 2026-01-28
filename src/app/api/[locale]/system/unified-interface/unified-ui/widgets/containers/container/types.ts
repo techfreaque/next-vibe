@@ -12,7 +12,6 @@ import type {
   LayoutType,
   WidgetType,
 } from "../../../../shared/types/enums";
-import type { LayoutConfig } from "../../../../shared/widgets/layout-config";
 import type {
   ArrayChildConstraint,
   BaseArrayWidgetConfig,
@@ -33,8 +32,8 @@ interface BaseContainerProps<TKey extends string> {
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
   layoutType?: LayoutType;
-  layout?: LayoutConfig;
   columns?: number;
+  rows?: number;
   /** Tailwind spacing value for gap between children (0, 1, 2, 3, 4, 6, 8) */
   gap?: "0" | "1" | "2" | "3" | "4" | "6" | "8";
   /** Alignment for flex/inline layouts (start = top-aligned, center = vertically centered, end = bottom-aligned) */
@@ -166,6 +165,19 @@ export interface ContainerObjectWidgetConfig<
     BaseObjectWidgetConfig<TKey, TUsage, TSchemaType, TChildren>,
     BaseContainerProps<TKey> {
   type: WidgetType.CONTAINER;
+  /**
+   * Type-safe function to extract count from container data
+   * Used to display counts in title (e.g., "Leads (42)")
+   * Receives the full output object inferred from children
+   */
+  getCount?: (
+    data: z.output<
+      InferSchemaFromField<
+        BaseObjectWidgetConfig<TKey, TUsage, TSchemaType, TChildren>,
+        FieldUsage.ResponseData
+      >
+    >,
+  ) => number | undefined;
 }
 
 /**
@@ -183,15 +195,26 @@ export interface ContainerUnionWidgetConfig<
     BaseObjectUnionWidgetConfig<TKey, TUsage, "object-union", TVariants>,
     BaseContainerProps<TKey> {
   type: WidgetType.CONTAINER;
+  /**
+   * Type-safe function to extract count from container data
+   * Used to display counts in title (e.g., "Leads (42)")
+   * Receives the full output object inferred from variants
+   */
+  getCount?: (
+    data: z.output<
+      InferSchemaFromField<
+        BaseObjectUnionWidgetConfig<TKey, TUsage, "object-union", TVariants>,
+        FieldUsage.ResponseData
+      >
+    >,
+  ) => number | undefined;
 }
 
 /**
- * Container Widget Configuration (union of object, array, and union variants)
- *
- * Uses distribution to properly narrow union types:
- * - When TSchemaType is "array" | "array-optional", only ArrayConfig is valid
- * - When TSchemaType is "object" | "object-optional" | "widget-object", only ObjectConfig is valid
- * - When TSchemaType is "object-union", only UnionConfig is valid
+ * Union type of all Container widget configurations
+ * - For arrays: Use ContainerArrayWidgetConfig with "array" | "array-optional"
+ * - For objects: Use ContainerObjectWidgetConfig with "object" | "object-optional" | "widget-object"
+ * - For unions: Use ContainerUnionWidgetConfig with "object-union"
  * - TChildren must match the respective constraint
  */
 export type ContainerWidgetConfig<

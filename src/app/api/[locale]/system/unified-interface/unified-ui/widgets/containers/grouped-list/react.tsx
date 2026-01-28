@@ -11,7 +11,6 @@ import { useEffect, useRef, useState } from "react";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
-import { isWidgetDataString } from "../../../../shared/widgets/utils/field-type-guards";
 import {
   getIconSizeClassName,
   getSpacingClassName,
@@ -19,6 +18,7 @@ import {
 } from "../../../../shared/widgets/utils/widget-helpers";
 import type { WidgetData } from "../../../../shared/widgets/widget-data";
 import type { ReactWidgetProps } from "../../_shared/react-types";
+import { isString } from "../../_shared/type-guards";
 import type {
   ArrayChildConstraint,
   ConstrainedChildUsage,
@@ -166,7 +166,7 @@ export function GroupedListWidget<
     <Div className={cn("flex flex-col", gapClass || "gap-4", className)}>
       {groups.map((group) => {
         const groupKey = group.key;
-        const groupLabel = isWidgetDataString(group.label, context);
+        const groupLabel = isString(group.label, context);
         const groupItems = group.items;
         const groupSummary = group.summary;
 
@@ -237,7 +237,7 @@ export function GroupedListWidget<
                   className={cn("flex flex-wrap", summaryGapClass || "gap-4")}
                 >
                   {Object.entries(groupSummary).map(([key, value]) => {
-                    const translatedKey = isWidgetDataString(key, context);
+                    const translatedKey = isString(key, context);
                     return (
                       <Div
                         key={key}
@@ -275,10 +275,7 @@ export function GroupedListWidget<
                         )}
                       >
                         {Object.entries(item).map(([key, value]) => {
-                          const translatedKey = isWidgetDataString(
-                            key,
-                            context,
-                          );
+                          const translatedKey = isString(key, context);
                           return (
                             <Div
                               key={key}

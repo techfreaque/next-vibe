@@ -34,9 +34,9 @@ import type { UnifiedField } from "../../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
 import { WidgetType } from "../../../shared/types/enums";
 import { Platform } from "../../../shared/types/platform";
-import { isResponseField } from "../../../shared/widgets/utils/field-helpers";
 import type { WidgetData } from "../../../shared/widgets/widget-data";
 import type { WidgetRenderContext } from "../../widgets/_shared/react-types";
+import { isResponseField } from "../../widgets/_shared/type-guards";
 import { WidgetRenderer } from "./WidgetRenderer";
 
 /**

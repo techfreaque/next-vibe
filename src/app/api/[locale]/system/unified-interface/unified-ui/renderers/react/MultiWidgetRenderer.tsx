@@ -2,22 +2,17 @@
 
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
+import type { Path } from "react-hook-form";
 import type z from "zod";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+
 import {
   isRequestField,
   isResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
-import {
-  hasChildren,
-  isConfigWithChildren,
-  isPrimitiveField,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
-import type { LayoutConfig } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
-import { getLayoutClassName } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
-
+} from "../../widgets/_shared/type-guards";
+import { isPrimitiveField } from "../../widgets/_shared/type-guards";
 import type {
   AnyChildrenConstrain,
   ArrayChildConstraint,
@@ -41,7 +36,6 @@ interface ObjectChildrenRendererProps<
   childrenSchema: TChildren;
   value: Record<string, z.ZodTypeAny> | null | undefined;
   fieldName: string | undefined;
-  layoutConfig: LayoutConfig | undefined;
   context: BaseWidgetContext<TEndpoint>;
 }
 
@@ -74,7 +68,6 @@ interface UnionObjectRendererProps<
   fieldName: string | undefined;
   discriminator: string | undefined;
   watchedDiscriminatorValue: string | undefined;
-  layoutConfig: LayoutConfig | undefined;
   context: BaseWidgetContext<TEndpoint>;
 }
 
@@ -91,7 +84,6 @@ export function ObjectChildrenRenderer<
   childrenSchema,
   value,
   fieldName,
-  layoutConfig,
   context,
 }: ObjectChildrenRendererProps<
   TKey,
@@ -104,9 +96,6 @@ export function ObjectChildrenRenderer<
   }
 
   const childrenToRender = Object.entries(childrenSchema);
-  const layoutClass = layoutConfig
-    ? getLayoutClassName(layoutConfig)
-    : undefined;
 
   const getChildData = (childName: string): z.ZodTypeAny | null => {
     if (!value) {
@@ -136,7 +125,9 @@ export function ObjectChildrenRenderer<
         result.push(
           <WidgetRenderer
             key={name}
-            fieldName={childFieldName}
+            fieldName={
+              childFieldName as Path<TEndpoint["types"]["RequestOutput"]>
+            }
             field={
               { ...field, value: data } as BaseWidgetFieldProps<typeof field>
             }
@@ -156,7 +147,9 @@ export function ObjectChildrenRenderer<
               return (
                 <WidgetRenderer
                   key={name}
-                  fieldName={childFieldName}
+                  fieldName={
+                    childFieldName as Path<TEndpoint["types"]["RequestOutput"]>
+                  }
                   field={
                     { ...field, value: data } as BaseWidgetFieldProps<
                       typeof field
@@ -191,9 +184,15 @@ export function ObjectChildrenRenderer<
       const isWidgetField = schemaType === "widget";
       const isWidgetOnlyObject =
         schemaType === "widget-object" &&
-        hasChildren(childField) &&
+        "children" in childField &&
+        childField.children !== undefined &&
+        typeof childField.children === "object" &&
         Object.values(childField.children).every(
-          (child) => (child as { schemaType?: string }).schemaType === "widget",
+          (child) =>
+            child &&
+            typeof child === "object" &&
+            "schemaType" in child &&
+            child.schemaType === "widget",
         );
 
       // Skip response-only fields that don't have data
@@ -239,7 +238,9 @@ export function ObjectChildrenRenderer<
         result.push(
           <WidgetRenderer
             key={childName}
-            fieldName={childFieldName}
+            fieldName={
+              childFieldName as Path<TEndpoint["types"]["RequestOutput"]>
+            }
             field={
               { ...childField, value: dataToPass } as BaseWidgetFieldProps<
                 typeof childField
@@ -257,7 +258,7 @@ export function ObjectChildrenRenderer<
     return result;
   };
 
-  return <Div className={layoutClass}>{renderChildren()}</Div>;
+  return <Div className="flex flex-col gap-4">{renderChildren()}</Div>;
 }
 
 ObjectChildrenRenderer.displayName = "ObjectChildrenRenderer";
@@ -290,7 +291,9 @@ export function ArrayChildRenderer<
         return (
           <WidgetRenderer
             key={index}
-            fieldName={itemFieldName}
+            fieldName={
+              itemFieldName as Path<TEndpoint["types"]["RequestOutput"]>
+            }
             field={
               { ...childSchema, value: itemData } as BaseWidgetFieldProps<
                 typeof childSchema
@@ -322,7 +325,6 @@ export function UnionObjectRenderer<
   discriminator,
   context,
   watchedDiscriminatorValue,
-  layoutConfig,
 }: UnionObjectRendererProps<TKey, TUsage, TVariants, TEndpoint>): JSX.Element {
   if (!variants || variants.length === 0 || !discriminator) {
     return <></>;
@@ -341,7 +343,7 @@ export function UnionObjectRenderer<
 
   // Find matching variant based on discriminator value
   const selectedVariant = variants.find((variant) => {
-    if (!isConfigWithChildren<TKey, TUsage>(variant) || !discriminator) {
+    if (!discriminator || !("children" in variant) || !variant.children) {
       return false;
     }
 
@@ -381,8 +383,9 @@ export function UnionObjectRenderer<
 
   if (
     referenceVariant &&
-    isConfigWithChildren<TKey, TUsage>(referenceVariant) &&
-    discriminator
+    discriminator &&
+    "children" in referenceVariant &&
+    referenceVariant.children
   ) {
     // Add discriminator field first from reference variant
     const refChildren = referenceVariant.children;
@@ -396,7 +399,8 @@ export function UnionObjectRenderer<
     // Then add other fields from selected variant (if it differs from reference)
     if (
       selectedVariant &&
-      isConfigWithChildren<TKey, TUsage>(selectedVariant)
+      "children" in selectedVariant &&
+      selectedVariant.children
     ) {
       const selectedChildren = selectedVariant.children;
       for (const key in selectedChildren) {
@@ -418,7 +422,6 @@ export function UnionObjectRenderer<
       childrenSchema={childrenToRender}
       value={value ?? undefined}
       fieldName={fieldName}
-      layoutConfig={layoutConfig}
       context={context}
     />
   );
@@ -438,7 +441,6 @@ interface MultiWidgetRendererProps<
     | undefined;
   value: Record<string, z.ZodTypeAny> | Array<z.ZodTypeAny> | null | undefined;
   fieldName: string | undefined;
-  layoutConfig: LayoutConfig | undefined;
   context: BaseWidgetContext<TEndpoint>;
   discriminator?: string;
   watchedDiscriminatorValue?: string;
@@ -492,7 +494,6 @@ export function MultiWidgetRenderer<
   children,
   value,
   fieldName,
-  layoutConfig,
   context,
   discriminator,
   watchedDiscriminatorValue,
@@ -511,7 +512,6 @@ export function MultiWidgetRenderer<
         discriminator={discriminator}
         context={context}
         watchedDiscriminatorValue={watchedDiscriminatorValue}
-        layoutConfig={layoutConfig}
       />
     );
   }
@@ -536,7 +536,6 @@ export function MultiWidgetRenderer<
       childrenSchema={objectChildren}
       value={value as Record<string, z.ZodTypeAny> | null | undefined}
       fieldName={fieldName}
-      layoutConfig={layoutConfig}
       context={context}
     />
   );

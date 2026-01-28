@@ -246,8 +246,8 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
     const loaderEntries = templatesById
       .map((t) => {
         const singleLine = `  "${t.id}": async () => (await import("${t.importPath}")).default,`;
-        // Wrap long lines (100+ chars)
-        if (singleLine.length >= 100) {
+        // Wrap long lines (80+ chars, prettier printWidth)
+        if (singleLine.length >= 80) {
           // eslint-disable-next-line i18next/no-literal-string
           return `  "${t.id}": async () =>\n    (await import("${t.importPath}")).default,`;
         }

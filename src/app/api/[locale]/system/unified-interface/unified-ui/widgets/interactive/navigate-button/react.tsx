@@ -10,12 +10,12 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
-import { isWidgetDataObject } from "../../../../shared/widgets/utils/field-type-guards";
 import {
   getIconSizeClassName,
   getSpacingClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
+import { isObject } from "../../_shared/type-guards";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { NavigateButtonWidgetConfig } from "./types";
 
@@ -140,7 +140,7 @@ export function NavigateButtonWidget<
     }
 
     // Extract params - use response.data as fallback if local value is empty (nested buttons)
-    let sourceData = isWidgetDataObject(field.value) ? field.value : {};
+    let sourceData = isObject(field.value) ? field.value : {};
 
     // If sourceData is empty and we have response data in context, use response.data
     // This handles nested buttons that don't have access to their parent data
@@ -149,9 +149,7 @@ export function NavigateButtonWidget<
       context.response?.success &&
       context.response.data
     ) {
-      sourceData = isWidgetDataObject(context.response.data)
-        ? context.response.data
-        : {};
+      sourceData = isObject(context.response.data) ? context.response.data : {};
     }
 
     const params = metadata.extractParams(sourceData);

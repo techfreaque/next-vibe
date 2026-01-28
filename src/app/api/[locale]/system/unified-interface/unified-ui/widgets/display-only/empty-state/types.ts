@@ -7,6 +7,7 @@ import type {
   BasePrimitiveDisplayOnlyWidgetConfig,
   FieldUsageConfig,
 } from "../../_shared/types";
+import type { IconKey } from "../../form-fields/icon-field/icons";
 
 /**
  * Empty State Widget Configuration
@@ -19,6 +20,7 @@ export interface EmptyStateWidgetConfig<
   type: WidgetType.EMPTY_STATE;
   title: NoInfer<TKey>;
   message?: NoInfer<TKey>;
+  icon?: IconKey;
   action?: {
     text: NoInfer<TKey>;
     onClick?: string;

@@ -7,14 +7,15 @@
 import type z from "zod";
 
 import type { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import {
-  isWidgetDataBoolean,
-  isWidgetDataNullish,
-  isWidgetDataObject,
-  isWidgetDataString,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
 
-import type { TitleWidgetSchema } from "../title/types";
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
+import {
+  isBoolean,
+  isNullish,
+  isObject,
+  isString,
+} from "../../_shared/type-guards";
+import type { BaseWidgetContext } from "../../_shared/types";
 import type { TextFormat, TextWidgetSchema } from "./types";
 
 /**
@@ -36,15 +37,15 @@ export interface ProcessedText {
  */
 export function extractTextData(
   value: z.output<TextWidgetSchema>,
-  context?: { t: (key: string) => string },
+  context?: BaseWidgetContext<CreateApiEndpointAny>,
 ): ProcessedText | null {
   // Handle null/undefined
-  if (isWidgetDataNullish(value)) {
+  if (isNullish(value)) {
     return null;
   }
 
   // Handle string value with translation
-  const stringValue = context ? isWidgetDataString(value, context) : null;
+  const stringValue = context ? isString(value, context) : null;
   if (stringValue) {
     return {
       text: stringValue,
@@ -61,7 +62,7 @@ export function extractTextData(
   }
 
   // Handle number value
-  if (isWidgetDatavalue) {
+  if (typeof value === "number") {
     return {
       text: String(value),
       format: "plain",
@@ -69,7 +70,7 @@ export function extractTextData(
   }
 
   // Handle boolean value
-  if (isWidgetDataBoolean(value)) {
+  if (isBoolean(value)) {
     return {
       text: value ? "true" : "false",
       format: "plain",
@@ -77,7 +78,7 @@ export function extractTextData(
   }
 
   // Handle object value with text properties
-  if (isWidgetDataObject(value)) {
+  if (isObject(value)) {
     const textValue = value["text"];
     const truncateValue = value["truncate"];
     const formatValue = value["format"];
@@ -128,11 +129,11 @@ export function extractTextData(
  * @returns Formatted date string or original value if formatting fails
  */
 function formatDateValue(
-  value: TitleWidgetSchema,
+  value: z.output<TextWidgetSchema>,
   locale: string,
   includeTime = true,
 ): string | null {
-  if (isWidgetDataNullish(value)) {
+  if (isNullish(value)) {
     return null;
   }
 
@@ -178,11 +179,11 @@ function formatDateValue(
  * @returns Formatted date string or null if not a date
  */
 export function formatIfDate(
-  value: TitleWidgetSchema,
+  value: z.output<TextWidgetSchema>,
   fieldType: FieldDataType | undefined,
   locale: string,
 ): string | null {
-  if (!fieldType || isWidgetDataNullish(value)) {
+  if (!fieldType || isNullish(value)) {
     return null;
   }
 

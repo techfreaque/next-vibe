@@ -194,10 +194,11 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
           effectiveData,
           enabledConfig,
           logger,
+          isMCP,
         );
 
         logger.debug(
-          `[ESLINT] Sequential execution completed (${result.items.length} issues found)`,
+          `[ESLINT] Sequential execution completed (${result.summary.displayedIssues ?? result.summary.totalIssues} issues found)`,
         );
 
         return success(result);
@@ -274,10 +275,11 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         workerResults,
         effectiveData,
         logger,
+        isMCP,
       );
 
       logger.debug(
-        `[ESLINT] Parallel execution completed (${mergedResult.items.length} issues found)`,
+        `[ESLINT] Parallel execution completed (${mergedResult.summary.displayedIssues ?? mergedResult.summary.totalIssues} issues found)`,
       );
 
       return success(mergedResult);
@@ -326,6 +328,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       eslint: { enabled: true; configPath: string; cachePath: string };
     },
     logger: EndpointLogger,
+    skipFiles = false,
   ): Promise<LintResponseOutput> {
     // Ensure cache directory exists
     const cacheDir = checkConfig.eslint.cachePath;
@@ -426,7 +429,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       ? result.issues
       : sortIssuesByLocation(result.issues);
 
-    return this.buildResponse(sortedIssues, data);
+    return this.buildResponse(sortedIssues, data, skipFiles);
   }
 
   /**
@@ -656,6 +659,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
   private buildResponse(
     allIssues: LintIssue[],
     data: LintRequestOutput,
+    skipFiles = false,
   ): LintResponseOutput {
     // Apply filtering
     const filteredIssues = filterIssues(allIssues, data.filter);
@@ -676,7 +680,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       limit,
     );
 
-    // Build files list from filtered issues (unless summaryOnly is true)
+    // Build files list unless skipped (for compact MCP responses)
     let files:
       | Array<{
           file: string;
@@ -686,13 +690,13 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         }>
       | undefined;
 
-    if (!data.summaryOnly) {
+    if (!skipFiles) {
       const fileStats = this.buildFileStats(filteredIssues);
       files = this.formatFileStats(fileStats);
     }
 
     return {
-      items: paginatedIssues,
+      items: data.summaryOnly ? undefined : paginatedIssues,
       files,
       summary,
     };
@@ -705,6 +709,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     workerResults: WorkerResult[],
     data: LintRequestOutput,
     logger: EndpointLogger,
+    skipFiles = false,
   ): LintResponseOutput {
     const allIssues: LintIssue[] = [];
 
@@ -722,7 +727,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       `[ESLINT] Merged results from ${workerResults.length} workers (${issues.length} total issues)`,
     );
 
-    return this.buildResponse(issues, data);
+    return this.buildResponse(issues, data, skipFiles);
   }
 
   /**

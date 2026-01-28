@@ -17,16 +17,19 @@ import type { ChartWidgetConfig, ChartWidgetSchema } from "./types";
 export function ChartWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends ChartWidgetSchema,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "primitive" | "widget",
->({
-  field,
-  context,
-}: InkWidgetProps<
-  TEndpoint,
-  ChartWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
->): JSX.Element {
+>(
+  props:
+    | InkWidgetProps<
+        TEndpoint,
+        ChartWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | InkWidgetProps<
+        TEndpoint,
+        ChartWidgetConfig<TKey, ChartWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
+  const { field, context } = props;
   const { t: globalT } = simpleT(context.locale);
   const {
     chartType = "line",
@@ -39,7 +42,7 @@ export function ChartWidgetInk<
   const title = chartTitleKey ? context.t(chartTitleKey) : undefined;
   const description = descriptionKey ? context.t(descriptionKey) : undefined;
 
-  const chartData = extractChartData<TKey>(field.value);
+  const chartData = extractChartData(field.value);
 
   if (!chartData || chartData.data.length === 0) {
     return (
@@ -85,7 +88,7 @@ export function ChartWidgetInk<
         {title && <Text bold>{title}</Text>}
         {description && <Text dimColor>{description}</Text>}
         <Box flexDirection="column" paddingTop={1}>
-          {pieData.map((d: ChartDataPoint<TKey>, idx: number) => {
+          {pieData.map((d: ChartDataPoint, idx: number) => {
             const rawLabel = String(d.label ?? d.x ?? "");
             const translatedLabel = context.t(rawLabel as TranslationKey);
             const percentage = totalValue > 0 ? (d.y / totalValue) * 100 : 0;
@@ -128,7 +131,7 @@ export function ChartWidgetInk<
                 {series.name}
               </Text>
             )}
-            {series.data.map((d: ChartDataPoint<TKey>, idx: number) => {
+            {series.data.map((d: ChartDataPoint, idx: number) => {
               const rawLabel = String(d.label ?? d.x ?? "");
               const translatedLabel = context.t(rawLabel as TranslationKey);
               const maxY = Math.max(...series.data.map((p) => p.y), 1);

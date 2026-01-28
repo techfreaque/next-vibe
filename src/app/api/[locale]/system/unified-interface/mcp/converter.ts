@@ -7,7 +7,10 @@ import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interf
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { endpointToToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import { hasChildren } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
+import {
+  hasChild,
+  hasChildren,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/type-guards";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { MCPTool } from "./types";
@@ -150,24 +153,8 @@ function addDescriptionsToZodObject(
     return schema;
   }
 
-  // Handle both old (type) and new (schemaType) field systems
-  const fieldType =
-    "type" in fieldDef
-      ? fieldDef.type
-      : "schemaType" in fieldDef
-        ? fieldDef.schemaType
-        : undefined;
-
-  if (fieldType === "widget" || fieldType === "primitive") {
-    return schema;
-  }
-
-  // Only process if fieldDef has children (object or array with object child)
-  if (fieldType !== "object" && fieldType !== "object-optional") {
-    return schema;
-  }
-
-  if (!fieldDef.children) {
+  // Use type guard to narrow to object fields
+  if (!hasChildren(fieldDef)) {
     return schema;
   }
 
@@ -190,27 +177,15 @@ function addDescriptionsToZodArray(
     return schema;
   }
 
-  // Handle both old (type) and new (schemaType) field systems
-  const fieldType =
-    "type" in fieldDef
-      ? fieldDef.type
-      : "schemaType" in fieldDef
-        ? fieldDef.schemaType
-        : undefined;
-
-  if (fieldType === "widget" || fieldType === "primitive") {
-    return schema;
-  }
-
-  // Only process if fieldDef is an array type
-  if (fieldType !== "array" && fieldType !== "array-optional") {
+  // Use type guard to narrow to array fields
+  if (!hasChild(fieldDef)) {
     return schema;
   }
 
   const itemSchema = schema._def.type;
 
   // If array items are objects, recursively add descriptions
-  if (itemSchema instanceof z.ZodObject && fieldDef.child) {
+  if (itemSchema instanceof z.ZodObject) {
     const enhancedItemSchema = addDescriptionsToZodObject(
       itemSchema,
       fieldDef.child,

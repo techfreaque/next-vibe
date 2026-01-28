@@ -95,16 +95,19 @@ function getTextEmphasisClassName(emphasis: TextEmphasis): string {
 export function TextWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends TextWidgetSchema,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "widget" | "primitive",
->({
-  field,
-  context,
-}: ReactWidgetProps<
-  TEndpoint,
-  TextWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
->): JSX.Element {
+>(
+  props:
+    | ReactWidgetProps<
+        TEndpoint,
+        TextWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | ReactWidgetProps<
+        TEndpoint,
+        TextWidgetConfig<TKey, TextWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
+  const { field, context } = props;
   const {
     content,
     fieldType,

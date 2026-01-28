@@ -275,25 +275,25 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
       const returnWithParen = `      return (await import("${importPath}"))`;
       const fullLine = `      return (await import("${importPath}")).tools.${method} as GenericHandlerBase;`;
 
-      if (fullLine.length <= 100) {
-        // Short (<=100 chars): keep on one line
+      if (fullLine.length <= 80) {
+        // Short (<=80 chars, prettier printWidth): keep on one line
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (await import("${importPath}")).tools.${method} as GenericHandlerBase;`);
-      } else if (returnWithTools.length <= 100) {
-        // Wrap after .tools (returnWithTools <=100, but fullLine >100)
+      } else if (returnWithTools.length <= 80) {
+        // Wrap after .tools (returnWithTools <=80, but fullLine >80)
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (await import("${importPath}")).tools
         .${method} as GenericHandlerBase;`);
-      } else if (returnWithParen.length <= 100) {
-        // Wrap after import paren (returnWithParen <=100, but returnWithTools >100)
+      } else if (returnWithParen.length <= 80) {
+        // Wrap after import paren (returnWithParen <=80, but returnWithTools >80)
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (await import("${importPath}"))
         .tools.${method} as GenericHandlerBase;`);
       } else {
-        // Very long: wrap import statement itself (returnWithParen >100)
+        // Very long: wrap import statement itself (returnWithParen >80)
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (
@@ -323,7 +323,9 @@ import type { GenericHandlerBase } from "../unified-interface/shared/endpoints/r
  * @param path - The route path (e.g., "core/agent/chat/threads")
  * @returns The route module or null if not found
  */
-export async function getRouteHandler(path: string): Promise<GenericHandlerBase | null> {
+export async function getRouteHandler(
+  path: string,
+): Promise<GenericHandlerBase | null> {
   switch (path) {
 ${cases.join("\n")}
     default:

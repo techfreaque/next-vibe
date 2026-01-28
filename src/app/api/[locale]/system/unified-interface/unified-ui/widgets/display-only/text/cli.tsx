@@ -22,16 +22,16 @@ import type { TextVariant, TextWidgetConfig, TextWidgetSchema } from "./types";
 export function TextWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends TextWidgetSchema,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "widget" | "primitive",
->({
-  field,
-  context,
-}: InkWidgetProps<
-  TEndpoint,
-  TextWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
->): JSX.Element {
+>(
+  props:
+    | InkWidgetProps<TEndpoint, TextWidgetConfig<TKey, never, TUsage, "widget">>
+    | InkWidgetProps<
+        TEndpoint,
+        TextWidgetConfig<TKey, TextWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
+  const { field, context } = props;
   const {
     content,
     fieldType,

@@ -48,16 +48,19 @@ import type { MarkdownWidgetConfig } from "./types";
 export function MarkdownWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends StringWidgetSchema,
-  TSchemaType extends "primitive" | "widget" = "widget",
-  TUsage extends FieldUsageConfig = FieldUsageConfig,
->({
-  context,
-  field,
-}: ReactWidgetProps<
-  TEndpoint,
-  MarkdownWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
->): JSX.Element {
+  TUsage extends FieldUsageConfig,
+>(
+  props:
+    | ReactWidgetProps<
+        TEndpoint,
+        MarkdownWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | ReactWidgetProps<
+        TEndpoint,
+        MarkdownWidgetConfig<TKey, StringWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
+  const { field, context } = props;
   const { t } = simpleT(context.locale);
 
   if (!field.value) {

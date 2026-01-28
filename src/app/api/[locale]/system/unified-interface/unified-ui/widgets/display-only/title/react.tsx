@@ -66,16 +66,19 @@ function getAlignmentClass(
 export function TitleWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends TitleWidgetSchema,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "widget" | "primitive",
->({
-  field,
-  context,
-}: ReactWidgetProps<
-  TEndpoint,
-  TitleWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
->): JSX.Element {
+>(
+  props:
+    | ReactWidgetProps<
+        TEndpoint,
+        TitleWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | ReactWidgetProps<
+        TEndpoint,
+        TitleWidgetConfig<TKey, TitleWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
+  const { field, context } = props;
   const {
     content,
     level: configLevel,
