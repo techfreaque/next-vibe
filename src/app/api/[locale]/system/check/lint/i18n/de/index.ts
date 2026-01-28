@@ -63,6 +63,17 @@ export const translations: typeof enTranslations = {
       label: "Sortierung überspringen",
       description: "Sortierung von Problemen überspringen (für Leistung)",
     },
+    filter: {
+      label: "Filter",
+      description:
+        "Filter issues by file path, message, or rule. Supports text matching or regex (/pattern/flags). Arrays enable OR logic for multiple filters.",
+      placeholder: "e.g., 'no-unused-vars' or '/src\\/components/i'",
+    },
+    summaryOnly: {
+      label: "Nur Zusammenfassung",
+      description:
+        "Gibt nur Zusammenfassungsstatistiken zurück, weglassen von Elementen und Dateilisten",
+    },
   },
   response: {
     issues: {

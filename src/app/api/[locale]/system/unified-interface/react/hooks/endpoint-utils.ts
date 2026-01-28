@@ -9,7 +9,7 @@ import {
 import { clearFormsAfterSuccessInDev } from "@/config/debug";
 import { envClient } from "@/config/env-client";
 
-import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type {
   AutoPrefillConfig,
   FormDataPriority,

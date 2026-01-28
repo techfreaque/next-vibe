@@ -20,6 +20,7 @@ import {
 } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import { simpleT } from "@/i18n/core/shared";
@@ -42,28 +43,28 @@ const formatDate = (date: Date | undefined): string => {
   if (!date) {
     return "";
   }
-  const d = date instanceof Date ? date : new Date(date);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 
 export function DateRangeFieldWidget<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TSchema extends StringWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
   field,
-  form,
   fieldName,
   context,
 }: ReactWidgetProps<
+  TEndpoint,
   DateRangeFieldWidgetConfig<TKey, TSchema, TUsage>
 >): JSX.Element {
   const { t } = context;
 
-  if (!form || !fieldName) {
+  if (!context.form || !fieldName) {
     return (
       <Div>
         {t(
@@ -79,8 +80,8 @@ export function DateRangeFieldWidget<
 
   return (
     <FormField
-      control={form.control}
-      name={fieldName as never}
+      control={context.form.control}
+      name={fieldName}
       render={({ field: formField, fieldState }) => {
         const validationState = getFieldValidationState(
           formField.value,
@@ -140,7 +141,7 @@ export function DateRangeFieldWidget<
               formField.value &&
               !fieldState.isDirty ? (
                 renderPrefillDisplay(
-                  String(formField.value),
+                  formField.value,
                   field.label,
                   field.prefillDisplay,
                   t,

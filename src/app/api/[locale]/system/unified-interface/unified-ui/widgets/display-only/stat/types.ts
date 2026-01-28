@@ -3,7 +3,6 @@
  */
 
 import type { SpacingSize, WidgetType } from "../../../../shared/types/enums";
-import type { NumberWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
@@ -15,14 +14,15 @@ import type { IconKey } from "../../form-fields/icon-field/icons";
  */
 export interface StatWidgetConfig<
   TKey extends string,
-  TSchema extends NumberWidgetSchema,
+  TSchema extends StatsWidgetSchema,
   TUsage extends FieldUsageConfig,
-> extends BasePrimitiveWidgetConfig<TUsage, "primitive", TSchema> {
+  TSchemaType extends "primitive",
+> extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {
   type: WidgetType.STAT;
   label?: NoInfer<TKey>;
-  format?: "number" | "percentage" | "currency" | "compact";
+  format?: StatFormat;
   icon?: IconKey;
-  variant?: "default" | "success" | "warning" | "danger" | "info" | "muted";
+  variant?: StatVariant;
   trend?: "up" | "down" | "neutral";
   trendValue?: number;
   size?: "sm" | "md" | "lg";
@@ -48,3 +48,19 @@ export interface StatWidgetConfig<
   labelSpacing?: SpacingSize;
   schema: TSchema;
 }
+
+/**
+ * Stat format types from UI config
+ */
+export type StatFormat = "number" | "percentage" | "currency" | "compact";
+
+/**
+ * Stat variant types from UI config
+ */
+export type StatVariant =
+  | "default"
+  | "success"
+  | "warning"
+  | "danger"
+  | "info"
+  | "muted";

@@ -67,7 +67,7 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          backButton: backButton(),
+          backButton: backButton({ usage: { response: true } }),
           createButton: navigateButtonField({
             targetEndpoint: createCharacterDefinitions.POST,
             extractParams: () => ({}),
@@ -77,19 +77,18 @@ const { GET } = createEndpoint({
             icon: "plus",
             variant: "default",
             className: "ml-auto",
+            usage: { response: true },
           }),
         },
       ),
 
       // Separator between buttons and content (widget field - pure UI)
-      separator: widgetField(
-        {
-          type: WidgetType.SEPARATOR,
-          spacingTop: SpacingSize.RELAXED,
-          spacingBottom: SpacingSize.RELAXED,
-        },
-        { response: true },
-      ),
+      separator: widgetField({
+        type: WidgetType.SEPARATOR,
+        spacingTop: SpacingSize.RELAXED,
+        spacingBottom: SpacingSize.RELAXED,
+        usage: { response: true },
+      }),
 
       // Sections array
       sections: responseArrayField(
@@ -233,32 +232,28 @@ const { GET } = createEndpoint({
                             variant: "muted",
                             schema: z.string(),
                           }),
-                          separator1: widgetField(
-                            {
-                              type: WidgetType.TEXT,
-                              size: "xs",
-                              variant: "muted",
-                              content:
-                                "app.api.agent.chat.characters.get.response.characters.character.separator.content" as const,
-                            },
-                            { response: true },
-                          ),
+                          separator1: widgetField({
+                            type: WidgetType.TEXT,
+                            size: "xs",
+                            variant: "muted",
+                            content:
+                              "app.api.agent.chat.characters.get.response.characters.character.separator.content" as const,
+                            usage: { response: true },
+                          }),
                           modelProvider: responseField({
                             type: WidgetType.TEXT,
                             size: "xs",
                             variant: "muted",
                             schema: z.string(),
                           }),
-                          separator2: widgetField(
-                            {
-                              type: WidgetType.TEXT,
-                              size: "xs",
-                              variant: "muted",
-                              content:
-                                "app.api.agent.chat.characters.get.response.characters.character.separator.content" as const,
-                            },
-                            { response: true },
-                          ),
+                          separator2: widgetField({
+                            type: WidgetType.TEXT,
+                            size: "xs",
+                            variant: "muted",
+                            content:
+                              "app.api.agent.chat.characters.get.response.characters.character.separator.content" as const,
+                            usage: { response: true },
+                          }),
                           creditCost: responseField({
                             type: WidgetType.TEXT,
                             size: "xs",
@@ -278,6 +273,7 @@ const { GET } = createEndpoint({
                     getEndpoint: characterSingleDefinitions.GET,
                     icon: "pencil",
                     variant: "ghost",
+                    usage: { response: true },
                   }),
                   deleteButton: navigateButtonField({
                     targetEndpoint: characterSingleDefinitions.DELETE,
@@ -288,6 +284,7 @@ const { GET } = createEndpoint({
                     icon: "trash",
                     variant: "ghost",
                     renderInModal: true,
+                    usage: { response: true },
                   }),
                 },
               ),

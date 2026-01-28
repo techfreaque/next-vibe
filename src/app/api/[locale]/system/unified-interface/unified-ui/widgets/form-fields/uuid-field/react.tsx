@@ -30,6 +30,7 @@ import {
   FormMessage,
 } from "@/packages/next-vibe-ui/web/ui/form/form";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { ReactWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import { DEFAULT_THEME } from "../_shared/constants";
@@ -39,20 +40,22 @@ import { getFieldValidationState } from "../_shared/validation";
 import type { UuidFieldWidgetConfig } from "./types";
 
 export function UuidFieldWidget<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TSchema extends StringWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
   field,
-  form,
+
   fieldName,
   context,
 }: ReactWidgetProps<
+  TEndpoint,
   UuidFieldWidgetConfig<TKey, TSchema, TUsage>
 >): JSX.Element {
   const { t } = context;
 
-  if (!form || !fieldName) {
+  if (!context.form || !fieldName) {
     return (
       <Div>
         {t(
@@ -68,8 +71,8 @@ export function UuidFieldWidget<
 
   return (
     <FormField
-      control={form.control}
-      name={fieldName as never}
+      control={context.form.control}
+      name={fieldName}
       render={({ field: formField, fieldState }) => {
         const validationState = getFieldValidationState(
           formField.value,
@@ -129,7 +132,7 @@ export function UuidFieldWidget<
               formField.value &&
               !fieldState.isDirty ? (
                 renderPrefillDisplay(
-                  String(formField.value),
+                  formField.value,
                   field.label,
                   field.prefillDisplay,
                   t,

@@ -1,17 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Test to debug variance issue with CreateApiEndpointAny
 import type { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type { CreateApiEndpoint } from "../../endpoints/definition/create";
-import type { WidgetConfig } from "../../widgets/configs";
 import type {
-  CreateApiEndpointAny,
-  ObjectField,
-  PrimitiveField,
-  UnifiedField,
-} from "../endpoint";
-import type { FieldUsageConfig } from "../endpoint";
+  AnyChildrenConstrain,
+  FieldUsageConfig,
+} from "../../../unified-ui/widgets/_shared/types";
+import type { CreateApiEndpoint } from "../../endpoints/definition/create";
+import type { UnifiedField } from "../../widgets/configs";
+import type { CreateApiEndpointAny } from "../endpoint-base";
 import type { Methods } from "../enums";
 
 // Simulate the exact structure from retry/stop endpoints
@@ -44,12 +43,18 @@ type TestEndpoint = CreateApiEndpoint<
 type Test1 = TestEndpoint extends CreateApiEndpointAny ? "PASS" : "FAIL";
 const test1: Test1 = "PASS";
 
-// Try with simpler types
+// Try with generic roles
 type TestEndpoint2 = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   string,
-  UnifiedField<string, z.ZodTypeAny>
+  AnyChildrenConstrain<string, FieldUsageConfig>,
+  UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
 >;
 
 type Test2 = TestEndpoint2 extends CreateApiEndpointAny ? "PASS" : "FAIL";

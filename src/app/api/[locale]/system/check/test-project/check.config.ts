@@ -28,6 +28,7 @@ const vibeCheck: CheckConfig["vibeCheck"] = {
   skipTypecheck: false,
   timeout: 3600,
   limit: 200,
+  editorUriScheme: "vscode://file/", // URI scheme for clickable file links
 };
 
 // ============================================================

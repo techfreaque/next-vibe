@@ -13,7 +13,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { LocalStorageCallbacks } from "../../../system/unified-interface/react/hooks/endpoint-types";
-import type { IconKey } from "../../../system/unified-interface/react/icons";
+import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { TtsVoiceValue } from "../../text-to-speech/enum";
 import { DEFAULT_CHARACTERS } from "../characters/config";
 import { CharactersRepositoryClient } from "../characters/repository-client";

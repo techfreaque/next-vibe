@@ -208,7 +208,7 @@ const { POST } = createEndpoint({
 
           smsPhoneNumber: requestField({
             type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.PHONE,
+            fieldType: FieldDataType.TEL,
             label: "app.api.emails.send.smsPhoneNumber.label",
             description: "app.api.emails.send.smsPhoneNumber.description",
             placeholder: "app.api.emails.send.smsPhoneNumber.placeholder",

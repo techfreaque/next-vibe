@@ -7,14 +7,18 @@ import { Span } from "next-vibe-ui/ui/span";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { JSX } from "react";
 
-import type { ObjectChildrenConstraint } from "../../../../shared/widgets/configs";
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import {
   getBorderRadiusClassName,
   getSpacingClassName,
   getTextSizeClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
-import type { FieldUsageConfig } from "../../_shared/types";
+import type {
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+  ObjectChildrenConstraint,
+} from "../../_shared/types";
 import type { TabsWidgetConfig } from "./types";
 
 /**
@@ -55,15 +59,19 @@ import type { TabsWidgetConfig } from "./types";
  * @param className - Optional CSS classes
  */
 export function TabsWidget<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "object",
-  TChildren extends ObjectChildrenConstraint<TKey, TUsage>,
+  TChildren extends ObjectChildrenConstraint<
+    TKey,
+    ConstrainedChildUsage<TUsage>
+  >,
 >({
-  value,
   field,
   context,
 }: ReactWidgetProps<
+  TEndpoint,
   TabsWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
 >): JSX.Element {
   const {
@@ -90,7 +98,10 @@ export function TabsWidget<
     preBorderRadius || "lg",
   );
 
-  if (!value || !value.tabs || value.tabs.length === 0) {
+  const tabs = Array.isArray(field.value?.tabs) ? field.value.tabs : [];
+  const activeTab = field.value?.activeTab;
+
+  if (tabs.length === 0) {
     return (
       <Div
         className={cn(
@@ -104,32 +115,36 @@ export function TabsWidget<
     );
   }
 
-  const { tabs, activeTab } = value;
   const defaultTab = activeTab || tabs[0]?.id;
 
   return (
     <Tabs defaultValue={defaultTab} className={className}>
       <TabsList className="w-full justify-start">
-        {tabs.map((tab, index) => {
-          // Get icon from config if available
-          const configTab = field.tabs?.[index];
-          const tabIcon = configTab?.icon;
+        {tabs.map(
+          (
+            tab: { id: string; label: string; disabled?: boolean },
+            index: number,
+          ) => {
+            // Get icon from config if available
+            const configTab = field.tabs?.[index];
+            const tabIcon = configTab?.icon;
 
-          return (
-            <TabsTrigger
-              key={tab.id}
-              value={tab.id}
-              disabled={tab.disabled}
-              className={cn("flex items-center", triggerGapClass || "gap-2")}
-            >
-              {tabIcon && <Span className={iconSizeClass}>{tabIcon}</Span>}
-              <Span>{tab.label}</Span>
-            </TabsTrigger>
-          );
-        })}
+            return (
+              <TabsTrigger
+                key={tab.id}
+                value={tab.id}
+                disabled={tab.disabled}
+                className={cn("flex items-center", triggerGapClass || "gap-2")}
+              >
+                {tabIcon && <Span className={iconSizeClass}>{tabIcon}</Span>}
+                <Span>{tab.label}</Span>
+              </TabsTrigger>
+            );
+          },
+        )}
       </TabsList>
 
-      {tabs.map((tab) => (
+      {tabs.map((tab: { id: string; content?: string | null }) => (
         <TabsContent
           key={tab.id}
           value={tab.id}

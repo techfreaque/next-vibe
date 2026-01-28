@@ -176,15 +176,13 @@ const { POST } = createEndpoint({
           }),
 
           // === PASSWORD STRENGTH INDICATOR ===
-          passwordStrength: widgetField(
-            {
-              type: WidgetType.PASSWORD_STRENGTH,
-              watchField: "formCard.password",
-              columns: 12,
-              order: 5.5,
-            },
-            { request: "data" },
-          ),
+          passwordStrength: widgetField({
+            type: WidgetType.PASSWORD_STRENGTH,
+            watchField: "formCard.password",
+            columns: 12,
+            order: 5.5,
+            usage: { request: "data" },
+          }),
 
           subscribeToNewsletter: requestField({
             type: WidgetType.FORM_FIELD,
@@ -229,43 +227,37 @@ const { POST } = createEndpoint({
           }),
 
           // === FORM ALERT (shows validation and API errors) ===
-          formAlert: widgetField(
-            {
-              type: WidgetType.FORM_ALERT,
-              columns: 12,
-              order: 9,
-            },
-            { request: "data" },
-          ),
+          formAlert: widgetField({
+            type: WidgetType.FORM_ALERT,
+            columns: 12,
+            order: 9,
+            usage: { request: "data" },
+          }),
 
           // === SUBMIT BUTTON (inside card) ===
-          submitButton: widgetField(
-            {
-              type: WidgetType.SUBMIT_BUTTON,
-              text: "app.api.user.public.signup.actions.submit",
-              loadingText: "app.api.user.public.signup.actions.submitting",
-              icon: "user-plus",
-              variant: "default",
-              size: "default",
-              columns: 12,
-              order: 10,
-            },
-            { request: "data" },
-          ),
+          submitButton: widgetField({
+            type: WidgetType.SUBMIT_BUTTON,
+            text: "app.api.user.public.signup.actions.submit",
+            loadingText: "app.api.user.public.signup.actions.submitting",
+            icon: "user-plus",
+            variant: "default",
+            size: "default",
+            columns: 12,
+            order: 10,
+            usage: { request: "data" },
+          }),
 
           // === FOOTER LINK (inside card, below button) ===
-          alreadyHaveAccount: widgetField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.user.public.signup.footer.alreadyHaveAccount",
-              format: "link",
-              href: "/user/login",
-              textAlign: "center",
-              columns: 12,
-              order: 11,
-            },
-            { request: "data" },
-          ),
+          alreadyHaveAccount: widgetField({
+            type: WidgetType.TEXT,
+            content: "app.api.user.public.signup.footer.alreadyHaveAccount",
+            format: "link",
+            href: "/user/login",
+            textAlign: "center",
+            columns: 12,
+            order: 11,
+            usage: { request: "data" },
+          }),
         },
       ),
 

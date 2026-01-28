@@ -20,6 +20,10 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { defaultLocale } from "@/i18n/core/config";
 
 import type { UserRoleValue } from "../../../../user/user-roles/enum";
+import type {
+  AnyChildrenConstrain,
+  FieldUsageConfig,
+} from "../../../unified-interface/unified-ui/widgets/_shared/types";
 
 /**
  * Call the API handler directly via the vibe runtime executor
@@ -29,7 +33,16 @@ export async function sendTestRequest<
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
-  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
+  TChildren extends AnyChildrenConstrain<
+    TScopedTranslationKey,
+    FieldUsageConfig
+  >,
+  TFields extends UnifiedField<
+    TScopedTranslationKey,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    TChildren
+  >,
 >({
   endpoint,
   data,
@@ -40,18 +53,21 @@ export async function sendTestRequest<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
+    TChildren,
     TFields
   >;
-  data: CreateApiEndpoint<
+  data?: CreateApiEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
+    TChildren,
     TFields
   >["types"]["RequestOutput"];
-  urlPathParams: CreateApiEndpoint<
+  urlPathParams?: CreateApiEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
+    TChildren,
     TFields
   >["types"]["UrlVariablesOutput"];
   user: JwtPayloadType;
@@ -61,6 +77,7 @@ export async function sendTestRequest<
       TMethod,
       TUserRoleValue,
       TScopedTranslationKey,
+      TChildren,
       TFields
     >["types"]["ResponseOutput"]
   >
@@ -101,7 +118,13 @@ export async function sendTestRequest<
       locale: defaultLocale,
       logger,
       platform: Platform.CLI, // Use CLI platform for testing
-    });
+    } as Parameters<
+      typeof RouteExecutionExecutor.executeGenericHandler<
+        typeof endpoint.types.RequestOutput,
+        typeof endpoint.types.UrlVariablesOutput,
+        typeof endpoint.types.ResponseOutput
+      >
+    >[0]);
 
     // Handle streaming responses (convert to error for tests)
     if (isStreamingResponse(result)) {

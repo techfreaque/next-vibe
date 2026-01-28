@@ -240,17 +240,6 @@ const { GET } = createEndpoint({
               }),
             },
           ),
-          recommendations: responseArrayField(
-            {
-              type: WidgetType.LINK_LIST,
-            },
-            responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.login.options.get.response.recommendations.item",
-              schema: z.string(),
-            }),
-          ),
         },
       ),
     },
@@ -363,10 +352,6 @@ const { GET } = createEndpoint({
             requireTwoFactor: false,
             securityDescription: "Standard security requirements",
           },
-          recommendations: [
-            "Try password login first",
-            "Social login is faster for new users",
-          ],
         },
       },
       withoutEmail: {
@@ -396,9 +381,6 @@ const { GET } = createEndpoint({
             requireTwoFactor: false,
             securityDescription: "Standard security requirements",
           },
-          recommendations: [
-            "Enter your email to see personalized login options",
-          ],
         },
       },
       checkOptions: {
@@ -424,10 +406,6 @@ const { GET } = createEndpoint({
             securityDescription:
               "Enhanced security: 2FA required, limited attempts",
           },
-          recommendations: [
-            "Use password login with 2FA",
-            "Keep your authenticator app ready",
-          ],
         },
       },
     },

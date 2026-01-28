@@ -7,12 +7,12 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
 import { useApiForm } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation-form";
-import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointRenderer";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { EndpointRenderer } from "../../../unified-interface/unified-ui/renderers/react/EndpointRenderer";
 import type { HelpListResponseOutput } from "../definition";
 import helpListEndpoints from "../definition";
 

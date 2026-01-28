@@ -63,6 +63,17 @@ export const translations: typeof enTranslations = {
       label: "Pomiń sortowanie",
       description: "Pomiń sortowanie problemów (wydajność)",
     },
+    filter: {
+      label: "Filter",
+      description:
+        "Filter issues by file path, message, or rule. Supports text matching or regex (/pattern/flags). Arrays enable OR logic for multiple filters.",
+      placeholder: "e.g., 'no-unused-vars' or '/src\\/components/i'",
+    },
+    summaryOnly: {
+      label: "Tylko Podsumowanie",
+      description:
+        "Zwraca tylko statystyki podsumowania, pomija elementy i listy plików",
+    },
   },
   response: {
     issues: {

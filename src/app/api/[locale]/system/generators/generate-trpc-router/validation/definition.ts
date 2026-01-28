@@ -78,7 +78,7 @@ export const { POST } = createEndpoint({
   path: ["system", "generators", "generate-trpc-router", "validation"],
   fields: objectField(
     {
-      type: WidgetType.FORM_GROUP,
+      type: WidgetType.CONTAINER,
       layoutType: LayoutType.GRID,
       columns: 1,
     },

@@ -9,27 +9,30 @@ import { z } from "zod";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { FieldUsageConfig } from "../../unified-ui/widgets/_shared/types";
+import type {
+  AnyChildrenConstrain,
+  ArrayChildConstraint,
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+  ObjectChildrenConstraint,
+  UnionObjectWidgetConfigConstrain,
+} from "../../unified-ui/widgets/_shared/types";
 import type { IconKey } from "../../unified-ui/widgets/form-fields/icon-field/icons";
 import type { RangeSliderFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/range-slider-field/types";
 import type { NavigateButtonWidgetConfig } from "../../unified-ui/widgets/interactive/navigate-button/types";
 import type { SubmitButtonWidgetConfig } from "../../unified-ui/widgets/interactive/submit-button/types";
 import type { EndpointLogger } from "../logger/endpoint";
 import type {
-  ArrayField,
-  ArrayOptionalField,
   InferSchemaFromField,
   NavigateButtonConfig,
-  ObjectField,
-  PrimitiveField,
   UnifiedField,
-  WidgetField,
 } from "../types/endpoint";
 import type { CreateApiEndpointAny } from "../types/endpoint-base";
 import { FieldUsage, type SpacingSize, WidgetType } from "../types/enums";
 import type {
   ArrayWidgetConfig,
   DisplayOnlyWidgetConfig,
+  ObjectUnionWidgetConfig,
   ObjectWidgetConfig,
 } from "../widgets/configs";
 
@@ -320,27 +323,28 @@ export function extractSchemaDefaults<T>(
  * )
  */
 export function requestDataRangeField<
+  TKey extends string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TEnum extends z.ZodEnum<any>,
 >(
   config: Omit<
-    RangeSliderFieldWidgetConfig<TranslationKey, never>,
-    "schema"
+    RangeSliderFieldWidgetConfig<
+      TKey,
+      z.ZodOptional<
+        z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
+      >,
+      { request: "data" }
+    >,
+    "schema" | "usage" | "schemaType"
   > & {
     schema: TEnum;
   },
-): PrimitiveField<
+): RangeSliderFieldWidgetConfig<
+  TKey,
   z.ZodOptional<
     z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
   >,
-  { request: "data" },
-  TranslationKey,
-  RangeSliderFieldWidgetConfig<
-    TranslationKey,
-    z.ZodOptional<
-      z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
-    >
-  >
+  { request: "data" }
 > {
   const rangeSchema = z
     .object({
@@ -349,36 +353,39 @@ export function requestDataRangeField<
     })
     .optional();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Destructuring to exclude schema from restConfig
+  const { schema: _unusedSchema, ...restConfig } = config;
   return {
-    type: "primitive" as const,
+    ...restConfig,
+    schemaType: "primitive" as const,
     schema: rangeSchema,
     usage: { request: "data" },
-    ui: { ...config, schema: rangeSchema },
   };
 }
 
 export function requestResponseRangeField<
+  TKey extends string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TEnum extends z.ZodEnum<any>,
 >(
   config: Omit<
-    RangeSliderFieldWidgetConfig<TranslationKey, never>,
+    RangeSliderFieldWidgetConfig<
+      TKey,
+      z.ZodOptional<
+        z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
+      >,
+      { request: "data"; response: true }
+    >,
     "schema"
   > & {
     schema: TEnum;
   },
-): PrimitiveField<
+): RangeSliderFieldWidgetConfig<
+  TKey,
   z.ZodOptional<
     z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
   >,
-  { request: "data"; response: true },
-  TranslationKey,
-  RangeSliderFieldWidgetConfig<
-    TranslationKey,
-    z.ZodOptional<
-      z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
-    >
-  >
+  { request: "data"; response: true }
 > {
   const rangeSchema = z
     .object({
@@ -387,36 +394,39 @@ export function requestResponseRangeField<
     })
     .optional();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Destructuring to exclude schema from restConfig
+  const { schema: _unusedSchema, ...restConfig } = config;
   return {
-    type: "primitive" as const,
+    ...restConfig,
+    schemaType: "primitive" as const,
     schema: rangeSchema,
     usage: { request: "data", response: true },
-    ui: { ...config, schema: rangeSchema },
   };
 }
 
 export function responseRangeField<
+  TKey extends string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TEnum extends z.ZodEnum<any>,
 >(
   config: Omit<
-    RangeSliderFieldWidgetConfig<TranslationKey, never>,
-    "schema"
+    RangeSliderFieldWidgetConfig<
+      TKey,
+      z.ZodOptional<
+        z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
+      >,
+      { request?: never; response: true }
+    >,
+    "schema" | "usage" | "schemaType"
   > & {
     schema: TEnum;
   },
-): PrimitiveField<
+): RangeSliderFieldWidgetConfig<
+  TKey,
   z.ZodOptional<
     z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
   >,
-  { response: true },
-  TranslationKey,
-  RangeSliderFieldWidgetConfig<
-    TranslationKey,
-    z.ZodOptional<
-      z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
-    >
-  >
+  { request?: never; response: true }
 > {
   const rangeSchema = z
     .object({
@@ -425,14 +435,13 @@ export function responseRangeField<
     })
     .optional();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Destructuring to exclude schema from restConfig
+  const { schema: _unusedSchema, ...restConfig } = config;
   return {
-    type: "primitive" as const,
+    ...restConfig,
+    schemaType: "primitive" as const,
     schema: rangeSchema,
     usage: { response: true },
-    ui: {
-      ...config,
-      schema: rangeSchema,
-    },
   };
 }
 
@@ -440,16 +449,17 @@ export function responseRangeField<
  * Create a widget-only field (buttons, alerts, static content)
  */
 export function widgetField<
+  TKey extends string,
   TUsage extends FieldUsageConfig,
-  const TUIConfig extends DisplayOnlyWidgetConfig<TranslationKey>,
->(
-  ui: TUIConfig,
-  usage: TUsage,
-): WidgetField<TUsage, TranslationKey, TUIConfig> {
+  const TUIConfig extends Omit<
+    DisplayOnlyWidgetConfig<TKey, TUsage, "widget">,
+    "schemaType" | "schema"
+  >,
+>(ui: TUIConfig): TUIConfig & { schemaType: "widget"; schema: never } {
   return {
-    type: "widget" as const,
-    usage,
-    ui,
+    schemaType: "widget" as const,
+    schema: undefined as never,
+    ...ui,
   };
 }
 
@@ -458,19 +468,30 @@ export function widgetField<
  * This is like widgetField but for grouped widgets - renders based on usage pattern, not response data
  */
 export function widgetObjectField<
-  TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
+  TKey extends string,
   TUsage extends FieldUsageConfig,
-  const TUIConfig extends ObjectWidgetConfig<TranslationKey, TUsage, TChildren>,
+  TChildren extends Record<
+    string,
+    UnifiedField<TKey, z.ZodTypeAny, ConstrainedChildUsage<TUsage>, any>
+  >,
+  const TUIConfig extends Omit<
+    ObjectWidgetConfig<TKey, TUsage, "widget-object", TChildren>,
+    "usage" | "children" | "schemaType"
+  >,
 >(
   ui: TUIConfig,
   usage: TUsage,
   children: TChildren,
-): WidgetObjectField<TChildren, TUsage, TranslationKey, TUIConfig> {
+): TUIConfig & {
+  schemaType: "widget-object";
+  children: TChildren;
+  usage: TUsage;
+} {
   return {
-    type: "widget-object" as const,
+    schemaType: "widget-object" as const,
     children,
     usage,
-    ui,
+    ...ui,
   };
 }
 
@@ -481,19 +502,30 @@ export function widgetObjectField<
  * For scoped translations, use scopedObjectField<ScopedKeyType> instead.
  */
 export function objectField<
-  TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
+  TKey extends string,
   TUsage extends FieldUsageConfig,
-  const TUIConfig extends ObjectWidgetConfig<TranslationKey, TUsage, TChildren>,
+  TChildren extends ObjectChildrenConstraint<
+    TKey,
+    ConstrainedChildUsage<TUsage>
+  >,
+  const TUIConfig extends Omit<
+    ObjectWidgetConfig<TKey, TUsage, "object", TChildren>,
+    "children" | "usage" | "schemaType" | "getCount"
+  >,
 >(
-  ui: TUIConfig,
+  uiConfig: TUIConfig,
   usage: TUsage,
   children: TChildren,
-): ObjectField<TChildren, TUsage, TranslationKey, TUIConfig> {
+): TUIConfig & {
+  schemaType: "object";
+  usage: TUsage;
+  children: TChildren;
+} {
   return {
-    type: "object" as const,
-    children,
+    schemaType: "object" as const,
+    ...uiConfig,
     usage,
-    ui,
+    children,
   };
 }
 
@@ -518,26 +550,37 @@ interface ScopedTranslationType<TKey extends string = string> {
  */
 export function scopedObjectField<
   TScopedTranslation extends ScopedTranslationType,
-  TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
   TUsage extends FieldUsageConfig,
-  const TUIConfig extends ObjectWidgetConfig<TranslationKey, TUsage, TChildren>,
+  TChildren extends ObjectChildrenConstraint<
+    TScopedTranslation["ScopedTranslationKey"],
+    ConstrainedChildUsage<TUsage>
+  >,
+  const TUIConfig extends Omit<
+    ObjectWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      TUsage,
+      "object",
+      TChildren
+    >,
+    "usage" | "children" | "schemaType"
+  >,
 >(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
   _scopedTranslation: TScopedTranslation,
   ui: TUIConfig,
   usage: TUsage,
   children: TChildren,
-): ObjectField<
-  TChildren,
-  TUsage,
+): ObjectWidgetConfig<
   TScopedTranslation["ScopedTranslationKey"],
-  TUIConfig
+  TUsage,
+  "object",
+  TChildren
 > {
   return {
-    type: "object" as const,
+    schemaType: "object" as const,
     children,
     usage,
-    ui,
+    ...ui,
   };
 }
 
@@ -546,11 +589,14 @@ export function scopedObjectField<
  */
 export function scopedResponseArrayOptionalField<
   TScopedTranslation extends ScopedTranslationType,
-  TChild extends UnifiedField<string, z.ZodTypeAny>,
-  TSchema extends z.ZodTypeAny,
+  TChild extends ArrayChildConstraint<
+    TScopedTranslation["ScopedTranslationKey"],
+    ConstrainedChildUsage<{ request?: never; response: true }>
+  >,
   const TUIConfig extends ArrayWidgetConfig<
     TScopedTranslation["ScopedTranslationKey"],
     { response: true },
+    "array-optional",
     TChild
   >,
 >(
@@ -558,18 +604,16 @@ export function scopedResponseArrayOptionalField<
   _scopedTranslation: TScopedTranslation,
   ui: TUIConfig,
   child: TChild,
-): ArrayOptionalField<
-  TChild,
-  { response: true },
-  TScopedTranslation["ScopedTranslationKey"],
-  TSchema,
-  TUIConfig
-> {
+): TUIConfig & {
+  schemaType: "array-optional";
+  child: TChild;
+  usage: { request?: never; response: true };
+} {
   return {
-    type: "array-optional" as const,
+    ...ui,
+    schemaType: "array-optional" as const,
     child,
     usage: { response: true },
-    ui,
   };
 }
 
@@ -577,20 +621,24 @@ export function scopedResponseArrayOptionalField<
  * Create an array field containing repeated items
  */
 export function arrayField<
-  TChild extends UnifiedField<string, z.ZodTypeAny>,
+  TKey extends string,
+  TChild extends AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>,
   TUsage extends FieldUsageConfig,
-  TSchema extends ArrayWidgetSchema,
-  const TUIConfig extends ArrayWidgetConfig<TranslationKey, TUsage, TChild>,
+  const TUIConfig extends ArrayWidgetConfig<TKey, TUsage, "array", TChild>,
 >(
   usage: TUsage,
   ui: TUIConfig,
   child: TChild,
-): ArrayField<TChild, TUsage, TranslationKey, TSchema, TUIConfig> {
+): TUIConfig & {
+  schemaType: "array";
+  child: TChild;
+  usage: TUsage;
+} {
   return {
-    type: "array" as const,
+    ...ui,
+    schemaType: "array" as const,
     child,
     usage,
-    ui,
   };
 }
 
@@ -598,22 +646,33 @@ export function arrayField<
  * Create a request array field
  */
 export function requestDataArrayField<
-  TChild extends UnifiedField<string, z.ZodTypeAny>,
-  TSchema extends ArrayWidgetSchema,
-  const TUIConfig extends ArrayWidgetConfig<
-    TranslationKey,
-    { request: "data" },
-    TChild
+  TKey extends string,
+  TChild extends ArrayChildConstraint<
+    TKey,
+    ConstrainedChildUsage<{ request: "data"; response?: never }>
+  >, // oxlint-disable-line typescript/no-explicit-any
+  const TUIConfig extends Omit<
+    ArrayWidgetConfig<
+      TKey,
+      { request: "data"; response?: never },
+      "array",
+      TChild
+    >,
+    "child" | "schemaType" | "usage"
   >,
 >(
   ui: TUIConfig,
   child: TChild,
-): ArrayField<TChild, { request: "data" }, TranslationKey, TSchema, TUIConfig> {
+): TUIConfig & {
+  schemaType: "array";
+  child: TChild;
+  usage: { request: "data"; response?: never };
+} {
   return {
-    type: "array" as const,
+    ...ui,
+    schemaType: "array" as const,
     child,
     usage: { request: "data" },
-    ui,
   };
 }
 
@@ -621,22 +680,33 @@ export function requestDataArrayField<
  * Create a response array field
  */
 export function responseArrayField<
-  TChild extends UnifiedField<string, z.ZodTypeAny>,
-  TSchema extends ArrayWidgetSchema,
-  const TUIConfig extends ArrayWidgetConfig<
-    TranslationKey,
-    { response: true },
-    TChild
+  TKey extends string,
+  TChild extends ArrayChildConstraint<
+    TKey,
+    ConstrainedChildUsage<{ response: true }>
+  >,
+  const TUIConfig extends Omit<
+    ArrayWidgetConfig<
+      TKey,
+      { request?: never; response: true },
+      "array",
+      TChild
+    >,
+    "child" | "schemaType" | "usage"
   >,
 >(
   ui: TUIConfig,
   child: TChild,
-): ArrayField<TChild, { response: true }, TranslationKey, TSchema, TUIConfig> {
+): TUIConfig & {
+  schemaType: "array";
+  child: TChild;
+  usage: { request?: never; response: true };
+} {
   return {
-    type: "array" as const,
+    ...ui,
+    schemaType: "array" as const,
     child,
     usage: { response: true },
-    ui,
   };
 }
 
@@ -644,30 +714,30 @@ export function responseArrayField<
  * Create an optional object field
  */
 export function objectOptionalField<
-  TChild extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
+  TKey extends string,
   TFieldUsageConfig extends FieldUsageConfig,
-  TSchema extends z.ZodObject<z.ZodRawShape>,
-  const TUIConfig extends ObjectWidgetConfig<
-    TranslationKey,
-    TFieldUsageConfig,
-    TChild
+  TChildren extends ObjectChildrenConstraint<
+    TKey,
+    ConstrainedChildUsage<TFieldUsageConfig>
+  >,
+  const TUIConfig extends Omit<
+    ObjectWidgetConfig<TKey, TFieldUsageConfig, "object-optional", TChildren>,
+    "usage" | "children" | "schemaType"
   >,
 >(
   ui: TUIConfig,
   usage: TFieldUsageConfig,
-  children: TChild,
-): ObjectOptionalField<
-  TChild,
-  TFieldUsageConfig,
-  TranslationKey,
-  TSchema,
-  TUIConfig
-> {
+  children: TChildren,
+): TUIConfig & {
+  schemaType: "object-optional";
+  children: TChildren;
+  usage: TFieldUsageConfig;
+} {
   return {
-    type: "object-optional" as const,
+    schemaType: "object-optional" as const,
     children,
     usage,
-    ui,
+    ...ui,
   };
 }
 
@@ -675,51 +745,34 @@ export function objectOptionalField<
  * Create a discriminated union object field
  */
 export function objectUnionField<
-  TDiscriminator extends string,
-  TVariants extends readonly [
-    ObjectField<
-      Record<string, UnifiedField<TranslationKey, z.ZodTypeAny>>,
-      FieldUsageConfig,
-      TranslationKey,
-      ObjectWidgetConfig<
-        TranslationKey,
-        FieldUsageConfig,
-        Record<string, UnifiedField<TranslationKey, z.ZodTypeAny>>
-      >
-    >,
-    ...ObjectField<
-      Record<string, UnifiedField<TranslationKey, z.ZodTypeAny>>,
-      FieldUsageConfig,
-      TranslationKey,
-      ObjectWidgetConfig<
-        TranslationKey,
-        FieldUsageConfig,
-        Record<string, UnifiedField<TranslationKey, z.ZodTypeAny>>
-      >
-    >[],
-  ],
+  TKey extends string,
   TUsage extends FieldUsageConfig,
-  TSchema extends z.ZodTypeAny,
-  const TUIConfig extends ObjectWidgetConfig<TranslationKey, TUsage, TVariants>,
+  TDiscriminator extends string,
+  const TVariants extends UnionObjectWidgetConfigConstrain<
+    TKey,
+    ConstrainedChildUsage<TUsage>
+  >,
+  const TUIConfig extends Omit<
+    ObjectUnionWidgetConfig<TKey, TUsage, TVariants>,
+    "usage" | "discriminator" | "variants" | "schemaType"
+  >,
 >(
   ui: TUIConfig,
   usage: TUsage,
   discriminator: TDiscriminator,
   variants: TVariants,
-): ObjectUnionField<
-  TDiscriminator,
-  TranslationKey,
-  TVariants,
-  TUsage,
-  TSchema,
-  TUIConfig
-> {
+): TUIConfig & {
+  schemaType: "object-union";
+  discriminator: TDiscriminator;
+  variants: TVariants;
+  usage: TUsage;
+} {
   return {
-    type: "object-union" as const,
+    schemaType: "object-union" as const,
     discriminator,
     variants,
     usage,
-    ui,
+    ...ui,
   };
 }
 
@@ -727,20 +780,29 @@ export function objectUnionField<
  * Create an optional array field
  */
 export function arrayOptionalField<
-  TChild extends UnifiedField<string, z.ZodTypeAny>,
+  TKey extends string,
   TUsage extends FieldUsageConfig,
-  TSchema extends ArrayWidgetSchema,
-  const TUIConfig extends ArrayWidgetConfig<TranslationKey, TUsage, TChild>,
+  TChild extends ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>,
+  const TUIConfig extends ArrayWidgetConfig<
+    TKey,
+    TUsage,
+    "array-optional",
+    TChild
+  >,
 >(
   usage: TUsage,
   ui: TUIConfig,
   child: TChild,
-): ArrayOptionalField<TChild, TUsage, TranslationKey, TSchema, TUIConfig> {
+): TUIConfig & {
+  schemaType: "array-optional";
+  child: TChild;
+  usage: TUsage;
+} {
   return {
-    type: "array-optional" as const,
+    ...ui,
+    schemaType: "array-optional" as const,
     child,
     usage,
-    ui,
   };
 }
 
@@ -748,28 +810,33 @@ export function arrayOptionalField<
  * Create an optional request array field
  */
 export function requestDataArrayOptionalField<
-  TChild extends UnifiedField<string, z.ZodTypeAny>,
-  TSchema extends ArrayWidgetSchema,
-  const TUIConfig extends ArrayWidgetConfig<
-    TranslationKey,
-    { request: "data" },
-    TChild
+  TKey extends string,
+  TChild extends ArrayChildConstraint<
+    TKey,
+    ConstrainedChildUsage<{ request: "data"; response?: never }>
+  >,
+  TUIConfig extends Omit<
+    ArrayWidgetConfig<
+      TKey,
+      { request: "data"; response?: never },
+      "array-optional",
+      TChild
+    >,
+    "child" | "schemaType" | "usage"
   >,
 >(
   ui: TUIConfig,
   child: TChild,
-): ArrayOptionalField<
-  TChild,
-  { request: "data" },
-  TranslationKey,
-  TSchema,
-  TUIConfig
-> {
+): TUIConfig & {
+  schemaType: "array-optional";
+  child: TChild;
+  usage: { request: "data"; response?: never };
+} {
   return {
-    type: "array-optional" as const,
+    ...ui,
+    schemaType: "array-optional" as const,
     child,
     usage: { request: "data" },
-    ui,
   };
 }
 
@@ -777,28 +844,33 @@ export function requestDataArrayOptionalField<
  * Create an optional response array field
  */
 export function responseArrayOptionalField<
-  TChild extends UnifiedField<string, z.ZodTypeAny>,
-  TSchema extends ArrayWidgetSchema,
-  const TUIConfig extends ArrayWidgetConfig<
-    TranslationKey,
-    { response: true },
-    TChild
+  TKey extends string,
+  TChild extends ArrayChildConstraint<
+    TKey,
+    ConstrainedChildUsage<{ request?: never; response: true }>
+  >,
+  const TUIConfig extends Omit<
+    ArrayWidgetConfig<
+      TKey,
+      { request?: never; response: true },
+      "array-optional",
+      TChild
+    >,
+    "child" | "schemaType" | "usage"
   >,
 >(
   ui: TUIConfig,
   child: TChild,
-): ArrayOptionalField<
-  TChild,
-  { response: true },
-  TranslationKey,
-  TSchema,
-  TUIConfig
-> {
+): TUIConfig & {
+  schemaType: "array-optional";
+  child: TChild;
+  usage: { request?: never; response: true };
+} {
   return {
-    type: "array-optional" as const,
+    ...ui,
+    schemaType: "array-optional" as const,
     child,
     usage: { response: true },
-    ui,
   };
 }
 
@@ -887,40 +959,25 @@ type MakeOptional<T, IsOptional extends boolean> = IsOptional extends true
  */
 export type InferUnionType<
   TTranslatedKey extends string,
-  TVariants extends readonly ObjectField<
-    Record<string, UnifiedField<string, z.ZodTypeAny>>,
-    FieldUsageConfig,
+  TVariants extends readonly ObjectWidgetConfig<
     string,
-    WidgetConfig<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      Record<string, UnifiedField<string, z.ZodTypeAny>>
-    >
+    FieldUsageConfig,
+    "object",
+    ObjectChildrenConstraint<string, FieldUsageConfig>
   >[],
   Usage extends FieldUsage,
 > = TVariants extends readonly [infer Head, ...infer Tail]
-  ? Head extends ObjectField<
-      Record<string, UnifiedField<string, z.ZodTypeAny>>,
-      FieldUsageConfig,
+  ? Head extends ObjectWidgetConfig<
       string,
-      WidgetConfig<
-        string,
-        z.ZodTypeAny,
-        FieldUsageConfig,
-        Record<string, UnifiedField<string, z.ZodTypeAny>>
-      >
+      FieldUsageConfig,
+      "object",
+      ObjectChildrenConstraint<string, FieldUsageConfig>
     >
-    ? Tail extends ObjectField<
-        Record<string, UnifiedField<string, z.ZodTypeAny>>,
-        FieldUsageConfig,
+    ? Tail extends ObjectWidgetConfig<
         string,
-        WidgetConfig<
-          string,
-          z.ZodTypeAny,
-          FieldUsageConfig,
-          Record<string, UnifiedField<string, z.ZodTypeAny>>
-        >
+        FieldUsageConfig,
+        "object",
+        ObjectChildrenConstraint<string, FieldUsageConfig>
       >[]
       ?
           | InferFieldType<Head, Usage, TTranslatedKey>
@@ -933,7 +990,8 @@ export type InferUnionType<
  * Infer field type based on usage
  */
 export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
-  F extends UnifiedField<TKey, infer TSchema>
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Type parameters used for narrowing
+  F extends UnifiedField<TKey, infer TSchema, infer _TUsage, infer _TChildren>
     ? F extends {
         type: "primitive";
         usage: infer U;
@@ -983,17 +1041,10 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
               variants: infer TVariants;
               usage: infer U;
             }
-          ? TVariants extends readonly ObjectField<
-              Record<string, UnifiedField<string, z.ZodTypeAny>>,
-              FieldUsageConfig,
-              string,
-              WidgetConfig<
-                string,
-                z.ZodTypeAny,
-                FieldUsageConfig,
-                Record<string, UnifiedField<string, z.ZodTypeAny>>
-              >
-            >[]
+          ? TVariants extends UnionObjectWidgetConfigConstrain<
+              TKey,
+              ConstrainedChildUsage<U>
+            >
             ? Usage extends FieldUsage.ResponseData
               ? HasResponseUsage<U> extends true
                 ? InferUnionType<TKey, TVariants, Usage>
@@ -1052,7 +1103,10 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
  * Checks each field's optional flag to make properties optional in the resulting type
  */
 export type InferObjectType<C, Usage extends FieldUsage, TKey extends string> =
-  C extends Record<string, UnifiedField<string, z.ZodTypeAny>>
+  C extends Record<
+    string,
+    UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any> // oxlint-disable-line typescript/no-explicit-any
+  >
     ? {
         -readonly [K in keyof C as InferFieldType<
           C[K],
@@ -1121,7 +1175,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
   };
 
   interface FieldWithType {
-    type:
+    schemaType?:
       | "primitive"
       | "widget"
       | "widget-object"
@@ -1132,26 +1186,19 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       | "array-optional";
     usage?: FieldUsageConfig;
     schema?: z.ZodTypeAny;
-    children?: Record<string, UnifiedField<string, z.ZodTypeAny>>;
-    child?: UnifiedField<string, z.ZodTypeAny>;
-    discriminator?: string;
-    variants?: readonly ObjectField<
-      Record<string, UnifiedField<string, z.ZodTypeAny>>,
-      FieldUsageConfig,
+    children?: Record<
       string,
-      WidgetConfig<
-        string,
-        z.ZodTypeAny,
-        FieldUsageConfig,
-        Record<string, UnifiedField<string, z.ZodTypeAny>>
-      >
-    >[];
-    ui?: WidgetConfig<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      Record<string, UnifiedField<string, z.ZodTypeAny>>
+      UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any> // oxlint-disable-line typescript/no-explicit-any
     >;
+    child?: UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>; // oxlint-disable-line typescript/no-explicit-any;
+    discriminator?: string;
+    variants?: readonly ObjectWidgetConfig<
+      string,
+      FieldUsageConfig,
+      "object",
+      Record<string, UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>>
+    >[];
+    optional?: boolean;
   }
 
   const typedField = field as F & FieldWithType;
@@ -1160,18 +1207,18 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
   const neverType = z.never()._def.type;
 
   // Widget-only fields have no schema and are skipped during schema generation
-  if (typedField.type === "widget") {
+  if (typedField.schemaType === "widget") {
     return z.never() as InferSchemaFromField<F, Usage>;
   }
 
-  if (typedField.type === "primitive") {
+  if (typedField.schemaType === "primitive") {
     if (hasUsage(typedField.usage)) {
       return typedField.schema as InferSchemaFromField<F, Usage>;
     }
     return z.never() as InferSchemaFromField<F, Usage>;
   }
 
-  if (typedField.type === "object") {
+  if (typedField.schemaType === "object") {
     // Check if the object itself has the required usage
     // If it has explicit usage that doesn't match, skip processing children
     const objectHasUsage = typedField.usage ? hasUsage(typedField.usage) : true;
@@ -1192,10 +1239,12 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
 
     if (typedField.children) {
       for (const [key, childField] of Object.entries(typedField.children)) {
+        const field = childField;
+
         // CRITICAL: Skip widget fields completely - they should NEVER be in validation schemas
         // Widget fields (formAlert, submitButton, etc.) are UI-only and don't send/receive data
         const isWidgetField =
-          "type" in childField && childField.type === "widget";
+          "schemaType" in field && field.schemaType === "widget";
         if (isWidgetField) {
           continue;
         }
@@ -1203,11 +1252,18 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         // CRITICAL: Skip objectFields that only contain widget children - they're UI-only containers
         // Examples: footerLinks container with only widget links inside
         const isObjectFieldWithOnlyWidgets =
-          childField.type === "object" &&
-          childField.children &&
-          Object.values(childField.children).every(
+          "schemaType" in field &&
+          field.schemaType === "object" &&
+          "children" in field &&
+          field.children &&
+          Object.values(
+            field.children as Record<
+              string,
+              UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any> // oxlint-disable-line typescript/no-explicit-any
+            >,
+          ).every(
             (grandchild) =>
-              "type" in grandchild && grandchild.type === "widget",
+              "schemaType" in grandchild && grandchild.schemaType === "widget",
           );
         if (isObjectFieldWithOnlyWidgets) {
           continue;
@@ -1215,19 +1271,23 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
 
         // Check if the child field has the required usage BEFORE generating the schema
         // This is more efficient and avoids issues with z.never() detection
-        if (childField.usage) {
+        if (
+          "usage" in field &&
+          field.usage &&
+          typeof field.usage === "object" &&
+          field.usage !== null
+        ) {
           const childHasUsage =
             targetUsage === FieldUsage.ResponseData
-              ? "response" in childField.usage &&
-                childField.usage.response === true
+              ? "response" in field.usage && field.usage.response === true
               : targetUsage === FieldUsage.RequestData
-                ? "request" in childField.usage &&
-                  (childField.usage.request === "data" ||
-                    childField.usage.request === "data&urlPathParams")
+                ? "request" in field.usage &&
+                  (field.usage.request === "data" ||
+                    field.usage.request === "data&urlPathParams")
                 : targetUsage === FieldUsage.RequestUrlParams
-                  ? "request" in childField.usage &&
-                    (childField.usage.request === "urlPathParams" ||
-                      childField.usage.request === "data&urlPathParams")
+                  ? "request" in field.usage &&
+                    (field.usage.request === "urlPathParams" ||
+                      field.usage.request === "data&urlPathParams")
                   : false;
 
           // Skip fields that don't have the required usage
@@ -1258,12 +1318,8 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     // This preserves the specific field types instead of collapsing to ZodTypeAny
     let objectSchema = z.object(shape);
 
-    // Apply optional modifier if specified in UI config
-    if (
-      typedField.ui &&
-      "optional" in typedField.ui &&
-      typedField.ui.optional
-    ) {
+    // Apply optional modifier if specified in widget config
+    if ("optional" in typedField && typedField.optional) {
       const optionalSchema = objectSchema.nullable().optional();
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex Zod schema inference requires unknown as intermediate step for type safety between incompatible generic structures.
       return optionalSchema as unknown as InferSchemaFromField<F, Usage>;
@@ -1272,7 +1328,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     return objectSchema as InferSchemaFromField<F, Usage>;
   }
 
-  if (typedField.type === "object-optional") {
+  if (typedField.schemaType === "object-optional") {
     // Check if the object itself has the required usage
     const objectHasUsage = typedField.usage ? hasUsage(typedField.usage) : true;
 
@@ -1287,7 +1343,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       for (const [key, childField] of Object.entries(typedField.children)) {
         // Skip widget fields - they're UI-only
         const isWidgetField =
-          "type" in childField && childField.type === "widget";
+          "schemaType" in childField && childField.schemaType === "widget";
         if (isWidgetField) {
           continue;
         }
@@ -1312,7 +1368,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     return objectSchema as InferSchemaFromField<F, Usage>;
   }
 
-  if (typedField.type === "object-union") {
+  if (typedField.schemaType === "object-union") {
     // Check if the union itself has the required usage
     const unionHasUsage = typedField.usage ? hasUsage(typedField.usage) : true;
 
@@ -1370,7 +1426,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     return unionSchema as any as InferSchemaFromField<F, Usage>;
   }
 
-  if (typedField.type === "array") {
+  if (typedField.schemaType === "array") {
     if (hasUsage(typedField.usage)) {
       // Check if child exists
       if (!typedField.child) {
@@ -1395,12 +1451,8 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
 
       let arraySchema = z.array(childSchema);
 
-      // Apply optional modifier if specified in UI config
-      if (
-        typedField.ui &&
-        "optional" in typedField.ui &&
-        typedField.ui.optional
-      ) {
+      // Apply optional modifier if specified in config
+      if (typedField.optional) {
         const optionalArraySchema = arraySchema.nullable().optional();
         // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex Zod schema inference requires unknown as intermediate step for type safety between incompatible generic structures.
         return optionalArraySchema as unknown as InferSchemaFromField<F, Usage>;
@@ -1411,7 +1463,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     return z.never() as InferSchemaFromField<F, Usage>;
   }
 
-  if (typedField.type === "array-optional") {
+  if (typedField.schemaType === "array-optional") {
     if (hasUsage(typedField.usage)) {
       // Check if child exists
       if (!typedField.child) {
@@ -1524,20 +1576,34 @@ export function generateResponseSchema<F>(
  * ```
  */
 export function navigateButtonField<
+  TUsage extends FieldUsageConfig,
   TTargetEndpoint extends CreateApiEndpointAny,
   TGetEndpoint extends CreateApiEndpointAny | undefined = undefined,
 >(
-  config: NavigateButtonConfig<TTargetEndpoint, TGetEndpoint, TranslationKey>,
-): WidgetField<
-  { response: true },
+  config: Omit<
+    NavigateButtonConfig<
+      TTargetEndpoint,
+      TGetEndpoint,
+      TranslationKey,
+      TUsage,
+      "widget"
+    >,
+    "schemaType" | "type"
+  >,
+): NavigateButtonWidgetConfig<
   TranslationKey,
-  NavigateButtonWidgetConfig<TTargetEndpoint, TGetEndpoint, TranslationKey>
+  TUsage,
+  "widget",
+  TTargetEndpoint
 > {
   const widgetConfig: NavigateButtonWidgetConfig<
-    TTargetEndpoint,
-    TGetEndpoint,
-    TranslationKey
+    TranslationKey,
+    TUsage,
+    "widget",
+    TTargetEndpoint
   > = {
+    schemaType: "widget" as const,
+    usage: config.usage,
     type: WidgetType.NAVIGATE_BUTTON,
     label: config.label,
     icon: config.icon,
@@ -1555,11 +1621,7 @@ export function navigateButtonField<
     },
   };
 
-  return {
-    type: "widget" as const,
-    usage: { response: true },
-    ui: widgetConfig,
-  };
+  return widgetConfig;
 }
 
 /**
@@ -1580,21 +1642,25 @@ export function navigateButtonField<
  */
 export function editButton<
   TTargetEndpoint extends CreateApiEndpointAny,
+  TUsage extends FieldUsageConfig,
   TGetEndpoint extends CreateApiEndpointAny | undefined = undefined,
 >(
   config: NavigateButtonConfig<
     TTargetEndpoint,
     TGetEndpoint,
-    TranslationKey
+    TranslationKey,
+    TUsage,
+    "widget"
   > & {
     getEndpoint?: TGetEndpoint;
   },
-): WidgetField<
-  { response: true },
+): NavigateButtonWidgetConfig<
   TranslationKey,
-  NavigateButtonWidgetConfig<TTargetEndpoint, TGetEndpoint, TranslationKey>
+  TUsage,
+  "widget",
+  TTargetEndpoint
 > {
-  return navigateButtonField<TTargetEndpoint, TGetEndpoint>({
+  return navigateButtonField<TUsage, TTargetEndpoint, TGetEndpoint>({
     ...config,
     prefillFromGet: true,
   });
@@ -1625,16 +1691,27 @@ export function editButton<
  * })
  * ```
  */
-export function deleteButton<TTargetEndpoint extends CreateApiEndpointAny>(
-  config: NavigateButtonConfig<TTargetEndpoint, undefined, TranslationKey> & {
-    popNavigationOnSuccess?: number;
-  },
-): WidgetField<
-  { response: true },
+export function deleteButton<
+  TTargetEndpoint extends CreateApiEndpointAny,
+  TUsage extends FieldUsageConfig,
+>(
+  config: Omit<
+    NavigateButtonConfig<
+      TTargetEndpoint,
+      undefined,
+      TranslationKey,
+      TUsage,
+      "widget"
+    >,
+    "schemaType" | "type" | "getEndpoint" | "prefillFromGet"
+  >,
+): NavigateButtonWidgetConfig<
   TranslationKey,
-  NavigateButtonWidgetConfig<TTargetEndpoint, undefined, TranslationKey>
+  TUsage,
+  "widget",
+  TTargetEndpoint
 > {
-  return navigateButtonField<TTargetEndpoint, undefined>({
+  return navigateButtonField<TUsage, TTargetEndpoint, undefined>({
     ...config,
     renderInModal: true,
     icon: config.icon ?? "trash",
@@ -1654,31 +1731,27 @@ export function deleteButton<TTargetEndpoint extends CreateApiEndpointAny>(
  * backButton: backButton({ label: "back_to_list" })
  * ```
  */
-export function backButton(
-  config?: Pick<
-    NavigateButtonConfig<never, never, TranslationKey>,
-    "label" | "icon" | "variant" | "size" | "className"
+export function backButton<TUsage extends FieldUsageConfig>(
+  config: Omit<
+    NavigateButtonConfig<never, never, TranslationKey, TUsage, "widget">,
+    | "schemaType"
+    | "type"
+    | "targetEndpoint"
+    | "extractParams"
+    | "prefillFromGet"
+    | "getEndpoint"
+    | "popNavigationOnSuccess"
   >,
-): WidgetField<
-  { response: true },
-  TranslationKey,
-  NavigateButtonWidgetConfig<null, undefined, TranslationKey>
-> {
+): NavigateButtonWidgetConfig<TranslationKey, TUsage, "widget", undefined> {
   return {
-    type: "widget" as const,
-    usage: { response: true },
-    ui: {
-      type: WidgetType.NAVIGATE_BUTTON,
-      label: config?.label,
-      icon: config?.icon ?? "arrow-left",
-      variant: config?.variant,
-      size: config?.size,
-      className: config?.className,
-      // targetEndpoint: null signals back navigation
-      metadata: {
-        targetEndpoint: null,
-      },
-    },
+    schemaType: "widget" as const,
+    usage: config.usage,
+    type: WidgetType.NAVIGATE_BUTTON,
+    label: config?.label,
+    icon: config?.icon ?? "arrow-left",
+    variant: config?.variant,
+    size: config?.size,
+    className: config?.className,
   };
 }
 
@@ -1699,7 +1772,7 @@ export function backButton(
  * })
  * ```
  */
-export function submitButton(config: {
+export function submitButton<TUsage extends FieldUsageConfig>(config: {
   label?: TranslationKey;
   loadingText?: TranslationKey;
   icon?: IconKey;
@@ -1714,25 +1787,20 @@ export function submitButton(config: {
   size?: "default" | "sm" | "lg" | "icon";
   iconSize?: "xs" | "sm" | "base" | "lg";
   iconSpacing?: SpacingSize;
+  usage: TUsage;
   className?: string;
-}): WidgetField<
-  { request: "data" },
-  TranslationKey,
-  SubmitButtonWidgetConfig<TranslationKey>
-> {
+}): SubmitButtonWidgetConfig<TranslationKey, TUsage, "widget"> {
   return {
-    type: "widget" as const,
-    usage: { request: "data" },
-    ui: {
-      type: WidgetType.SUBMIT_BUTTON,
-      text: config.label,
-      loadingText: config.loadingText,
-      icon: config.icon,
-      variant: config.variant ?? "default",
-      size: config.size ?? "default",
-      iconSize: config.iconSize,
-      iconSpacing: config.iconSpacing,
-      className: config.className,
-    },
+    schemaType: "widget" as const,
+    usage: config.usage,
+    type: WidgetType.SUBMIT_BUTTON,
+    text: config.label,
+    loadingText: config.loadingText,
+    icon: config.icon,
+    variant: config.variant ?? "default",
+    size: config.size ?? "default",
+    iconSize: config.iconSize,
+    iconSpacing: config.iconSpacing,
+    className: config.className,
   };
 }

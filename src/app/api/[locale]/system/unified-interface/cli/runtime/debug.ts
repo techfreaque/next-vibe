@@ -498,11 +498,6 @@ export class CliResourceManager {
       // Force close any remaining problematic handles
       this.resourceMonitor.forceCloseHandles();
 
-      // Give a moment for cleanup to complete
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 50);
-      });
-
       // Check for remaining problematic handles
       if (verbose) {
         const handles = this.resourceMonitor.getActiveHandles();

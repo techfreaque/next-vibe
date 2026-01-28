@@ -3,7 +3,7 @@
  * These helpers reduce duplication across hook types and component types
  */
 
-import type { CreateApiEndpointAny } from "./endpoint";
+import type { CreateApiEndpointAny } from "./endpoint-base";
 
 // ============================================================================
 // METHOD-SPECIFIC TYPE EXTRACTORS

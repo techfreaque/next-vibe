@@ -8,12 +8,9 @@ import type { z } from "zod";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { BaseExecutionContext } from "../shared/endpoints/route/executor";
-import type { JsonValue } from "../shared/utils/error-types";
-
-export type ParameterValue = JsonValue;
+import type { WidgetData } from "../shared/widgets/widget-data";
 
 /**
  * JSON-RPC 2.0 Base Types
@@ -24,8 +21,7 @@ export type JsonRpcVersion = "2.0";
  * JSON-RPC Request (generic version)
  */
 
-// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: MCP tool parameters require 'unknown' for flexible schema definitions
-export interface JsonRpcRequest<TParams = unknown> {
+export interface JsonRpcRequest<TParams> {
   jsonrpc: JsonRpcVersion;
   method: string;
   params?: TParams;
@@ -36,10 +32,10 @@ export interface JsonRpcRequest<TParams = unknown> {
  * JSON-RPC Response (generic version)
  */
 
-// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Tool result type requires 'unknown' for flexible return values
-export interface JsonRpcResponse<TResult = unknown> {
+export interface JsonRpcResponse {
   jsonrpc: JsonRpcVersion;
-  result?: TResult;
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Response serialization requires 'unknown' for flexible response types
+  result?: unknown;
   error?: JsonRpcError;
   id: string | number | null;
 }
@@ -47,7 +43,7 @@ export interface JsonRpcResponse<TResult = unknown> {
 export interface JsonRpcError {
   code: number;
   message: string;
-  data?: Record<string, ParameterValue>;
+  data?: Record<string, WidgetData>;
 }
 
 /**
@@ -156,7 +152,7 @@ export interface MCPToolsListResult {
  */
 export interface MCPToolCallParams {
   name: string;
-  arguments?: Record<string, ParameterValue>;
+  arguments?: Record<string, WidgetData>;
 }
 
 export interface MCPToolCallResult {
@@ -170,28 +166,11 @@ export type MCPContent =
   | { type: "resource"; uri: string; mimeType?: string };
 
 /**
- * MCP Server Configuration
- */
-export interface MCPServerConfig {
-  name: string;
-  version: string;
-  locale: CountryLanguage;
-  debug: boolean;
-  capabilities: {
-    tools: boolean;
-    prompts: boolean;
-    resources: boolean;
-  };
-  rootDir: string;
-  excludePaths: string[];
-}
-
-/**
  * MCP Execution Context
  * Extends BaseExecutionContext with MCP-specific fields
  */
 export interface MCPExecutionContext<
-  TData = { [key: string]: ParameterValue },
+  TData = { [key: string]: WidgetData },
 > extends Omit<BaseExecutionContext<TData>, "user" | "requestId"> {
   /** More specific user type for MCP */
   user: JwtPayloadType;
@@ -221,26 +200,4 @@ export interface MCPToolMetadata {
   requestSchema?: z.ZodTypeAny;
   responseSchema?: z.ZodTypeAny;
   aliases?: readonly string[];
-}
-
-/**
- * MCP Transport Interface
- */
-export interface IMCPTransport {
-  start(): Promise<void>;
-  stop(): Promise<void>;
-  send(message: JsonRpcResponse): Promise<void>;
-  onMessage(handler: (message: JsonRpcRequest) => Promise<void>): void;
-}
-
-/**
- * MCP Protocol Handler Interface
- */
-export interface IMCPProtocolHandler {
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Protocol extension requires 'unknown' for flexible message payloads
-  handleRequest(request: JsonRpcRequest<unknown>): Promise<JsonRpcResponse>;
-  handleInitialize(params: MCPInitializeParams): Promise<MCPInitializeResult>;
-  handleToolsList(params: MCPToolsListParams): Promise<MCPToolsListResult>;
-  handleToolCall(params: MCPToolCallParams): Promise<MCPToolCallResult>;
-  handlePing(): Promise<Record<string, never>>;
 }

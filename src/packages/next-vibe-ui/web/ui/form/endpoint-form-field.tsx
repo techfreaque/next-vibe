@@ -18,10 +18,6 @@ import type {
   FieldValues,
 } from "react-hook-form";
 
-import {
-  Icon,
-  type IconKey,
-} from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type {
   FieldConfig,
   FieldStyleClassName,
@@ -30,7 +26,11 @@ import type {
   RequiredFieldTheme,
 } from "@/app/api/[locale]/system/unified-interface/shared/field-config/field-config-types";
 import { getFieldConfig } from "@/app/api/[locale]/system/unified-interface/shared/field-config/infer-field-config";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import {
+  Icon,
+  type IconKey,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { simpleT } from "@/i18n/core/shared";

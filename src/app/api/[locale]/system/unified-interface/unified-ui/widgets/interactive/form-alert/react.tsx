@@ -8,6 +8,7 @@ import type { JSX } from "react";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { ReactWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { FormAlertWidgetConfig } from "./types";
@@ -15,10 +16,14 @@ import type { FormAlertWidgetConfig } from "./types";
 /**
  * Displays form validation and API errors from context.response.
  */
-export function FormAlertWidget<TUsage extends FieldUsageConfig>({
+export function FormAlertWidget<
+  TUsage extends FieldUsageConfig,
+  TEndpoint extends CreateApiEndpointAny,
+>({
   context,
   field,
 }: ReactWidgetProps<
+  TEndpoint,
   FormAlertWidgetConfig<TUsage, "widget">
 >): JSX.Element | null {
   const response = context.response;

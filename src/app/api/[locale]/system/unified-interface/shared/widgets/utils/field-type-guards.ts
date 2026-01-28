@@ -7,166 +7,85 @@
 
 import type { z } from "zod";
 
+import type {
+  AnyChildrenConstrain,
+  FieldUsageConfig,
+} from "../../../unified-ui/widgets/_shared/types";
 import type { UnifiedField } from "../../types/endpoint";
-
-/**
- * Type guard for ObjectField - has children property
- */
-export function isObjectField<TKey extends string>(
-  field: UnifiedField<TKey, z.ZodTypeAny>,
-): field is Extract<UnifiedField<TKey, z.ZodTypeAny>, { type: "object" }> {
-  return field.type === "object";
-}
-
-/**
- * Type guard for ObjectOptionalField - has children property
- */
-export function isObjectOptionalField<TKey extends string>(
-  field: UnifiedField<TKey, z.ZodTypeAny>,
-): field is Extract<
-  UnifiedField<TKey, z.ZodTypeAny>,
-  { type: "object-optional" }
-> {
-  return field.type === "object-optional";
-}
+import type { WidgetData } from "../widget-data";
 
 /**
  * Type guard for ObjectUnionField - has discriminator and variants
  */
 export function isObjectUnionField<TKey extends string>(
-  field: UnifiedField<TKey, z.ZodTypeAny>,
-): field is Extract<
-  UnifiedField<TKey, z.ZodTypeAny>,
-  { type: "object-union" }
-> {
-  return field.type === "object-union";
+  // oxlint-disable-next-line typescript/no-explicit-any
+  field: UnifiedField<TKey, z.ZodTypeAny, FieldUsageConfig, any>,
+  // oxlint-disable-next-line typescript/no-explicit-any
+): field is UnifiedField<TKey, z.ZodTypeAny, FieldUsageConfig, any> & {
+  schemaType: "object-union";
+  variants: readonly UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    never
+  >[];
+} {
+  return "schemaType" in field && field.schemaType === "object-union";
 }
 
 /**
  * Type guard for PrimitiveField - has schema property
  */
 export function isPrimitiveField<TKey extends string>(
-  field: UnifiedField<TKey, z.ZodTypeAny>,
-): field is Extract<UnifiedField<TKey, z.ZodTypeAny>, { type: "primitive" }> {
-  return field.type === "primitive";
-}
-
-/**
- * Type guard for ArrayField - has child property
- */
-export function isArrayField<TKey extends string>(
-  field: UnifiedField<TKey, z.ZodTypeAny>,
-): field is Extract<UnifiedField<TKey, z.ZodTypeAny>, { type: "array" }> {
-  return field.type === "array";
-}
-
-/**
- * Type guard for ArrayOptionalField - has child property
- */
-export function isArrayOptionalField<TKey extends string>(
-  field: UnifiedField<TKey, z.ZodTypeAny>,
+  field: UnifiedField<TKey, z.ZodTypeAny, FieldUsageConfig, any>, // oxlint-disable-line typescript/no-explicit-any,
 ): field is Extract<
-  UnifiedField<TKey, z.ZodTypeAny>,
-  { type: "array-optional" }
+  UnifiedField<TKey, z.ZodTypeAny, FieldUsageConfig, any>, // oxlint-disable-line typescript/no-explicit-any,
+  { schemaType: "primitive" }
 > {
-  return field.type === "array-optional";
-}
-
-/**
- * Type guard for WidgetField - UI-only field with no schema
- */
-export function isWidgetField<TKey extends string>(
-  field: UnifiedField<TKey, z.ZodTypeAny>,
-): field is Extract<UnifiedField<TKey, z.ZodTypeAny>, { type: "widget" }> {
-  return field.type === "widget";
+  return "schemaType" in field && field.schemaType === "primitive";
 }
 
 /**
  * Combined type guard for fields with children (object or object-optional)
+ * Properly constrains children to ObjectChildrenConstraint for type safety
  */
-export function hasChildren<TKey extends string>(
-  field: UnifiedField<TKey, z.ZodTypeAny>,
-): field is
-  | Extract<UnifiedField<TKey, z.ZodTypeAny>, { type: "object" }>
-  | Extract<UnifiedField<TKey, z.ZodTypeAny>, { type: "object-optional" }> {
-  return field.type === "object" || field.type === "object-optional";
-}
-
-/**
- * Combined type guard for any field that can contain children (object, object-optional, or object-union)
- */
-export function canHaveChildren<TKey extends string>(
-  field: UnifiedField<TKey, z.ZodTypeAny>,
-): field is
-  | Extract<UnifiedField<TKey, z.ZodTypeAny>, { type: "object" }>
-  | Extract<UnifiedField<TKey, z.ZodTypeAny>, { type: "object-optional" }>
-  | Extract<UnifiedField<TKey, z.ZodTypeAny>, { type: "object-union" }> {
+export function hasChildren<
+  TKey extends string,
+  TUsage extends FieldUsageConfig = FieldUsageConfig,
+>(
+  // oxlint-disable-next-line typescript/no-explicit-any
+  field: UnifiedField<TKey, z.ZodTypeAny, TUsage, any>,
+  // oxlint-disable-next-line typescript/no-explicit-any
+): field is UnifiedField<TKey, z.ZodTypeAny, TUsage, any> & {
+  schemaType: "object" | "object-optional" | "widget-object";
+  // oxlint-disable-next-line typescript/no-explicit-any
+  children: Record<string, UnifiedField<TKey, z.ZodTypeAny, TUsage, any>>;
+} {
   return (
-    field.type === "object" ||
-    field.type === "object-optional" ||
-    field.type === "object-union"
+    "schemaType" in field &&
+    (field.schemaType === "object" ||
+      field.schemaType === "object-optional" ||
+      field.schemaType === "widget-object")
   );
 }
 
 /**
- * Get children from a field that supports them (returns empty object if no children)
+ * Type guard for fields with child (array or array-optional)
  */
-export function getFieldChildren<TKey extends string>(
-  field: UnifiedField<TKey, z.ZodTypeAny>,
-): Record<string, UnifiedField<TKey, z.ZodTypeAny>> {
-  if (hasChildren(field)) {
-    return field.children;
-  }
-  return {};
+export function hasChild<TKey extends string>(
+  // oxlint-disable-next-line typescript/no-explicit-any
+  field: UnifiedField<TKey, z.ZodTypeAny, FieldUsageConfig, any>,
+  // oxlint-disable-next-line typescript/no-explicit-any
+): field is UnifiedField<TKey, z.ZodTypeAny, FieldUsageConfig, any> & {
+  schemaType: "array" | "array-optional";
+  // oxlint-disable-next-line typescript/no-explicit-any
+  child: UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>;
+} {
+  return (
+    "schemaType" in field &&
+    (field.schemaType === "array" || field.schemaType === "array-optional")
+  );
 }
-
-/**
- * Check if field has a specific widget type in its UI config
- */
-export function hasWidgetType<TKey extends string>(
-  field: UnifiedField<TKey, z.ZodTypeAny>,
-  widgetType: string,
-): boolean {
-  return field.ui?.type === widgetType;
-}
-
-/**
- * Recursively check if field or any of its children has a specific widget type
- */
-export function hasWidgetTypeInTree<TKey extends string>(
-  field: UnifiedField<TKey, z.ZodTypeAny>,
-  widgetType: string,
-): boolean {
-  // Check direct field
-  if (hasWidgetType(field, widgetType)) {
-    return true;
-  }
-
-  // Check children
-  if (hasChildren(field)) {
-    return Object.values(field.children).some((child) =>
-      hasWidgetTypeInTree(child, widgetType),
-    );
-  }
-
-  // Check union variants
-  if (isObjectUnionField(field)) {
-    return field.variants.some((variant) =>
-      hasWidgetTypeInTree(variant, widgetType),
-    );
-  }
-
-  return false;
-}
-
-// ============================================================================
-// WIDGETDATA TYPE GUARDS
-// ============================================================================
-
-/**
- * Import WidgetData type for type guards
- */
-import type { WidgetData } from "../types";
 
 /**
  * Type guard for WidgetData plain objects (excludes arrays, primitives, null, undefined)
@@ -178,26 +97,12 @@ export function isWidgetDataObject(
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-/**
- * Type guard for WidgetData arrays (excludes typed arrays like string[], number[])
- */
-export function isWidgetDataArray(value: WidgetData): value is WidgetData[] {
-  return Array.isArray(value);
-}
-
 export function isWidgetDataString(
   value: WidgetData,
   context: { t: (key: string) => string },
 ): string | null {
   const isString = typeof value === "string";
   return isString ? context.t(value) : null;
-}
-
-/**
- * Type guard for WidgetData number values
- */
-export function isWidgetDataNumber(value: WidgetData): value is number {
-  return typeof value === "number";
 }
 
 /**
@@ -217,16 +122,28 @@ export function isWidgetDataNullish(
 }
 
 /**
- * Type guard for WidgetData primitive values (string, number, boolean, null, undefined)
+ * Type guard for widget config objects with children property
+ * Used when checking variant configs from unions
  */
-export function isWidgetDataPrimitive(
-  value: WidgetData,
-): value is string | number | boolean | null | undefined {
+export function isConfigWithChildren<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+>(
+  config: unknown,
+): config is {
+  schemaType: "object" | "object-optional" | "widget-object";
+  children: Record<string, AnyChildrenConstrain<TKey, TUsage>>;
+} {
   return (
-    typeof value === "string" ||
-    typeof value === "number" ||
-    typeof value === "boolean" ||
-    value === null ||
-    value === undefined
+    config !== null &&
+    typeof config === "object" &&
+    "schemaType" in config &&
+    (config.schemaType === "object" ||
+      config.schemaType === "object-optional" ||
+      config.schemaType === "widget-object") &&
+    "children" in config &&
+    config.children !== undefined &&
+    typeof config.children === "object" &&
+    !Array.isArray(config.children)
   );
 }

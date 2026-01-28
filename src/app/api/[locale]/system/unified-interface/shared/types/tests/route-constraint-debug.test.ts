@@ -1,15 +1,25 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
- * Incremental constraint testing for CreateApiEndpointAny
- * Each test validates one specific constraint parameter
+ * Route Constraint Tests
+ *
+ * Tests constraint validation for endpoint creation and field configuration.
  */
 
 import type { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type { WidgetConfig } from "../../widgets/configs";
-import type { ObjectField, PrimitiveField, UnifiedField } from "../endpoint";
-import type { FieldUsageConfig } from "../endpoint";
+import type {
+  AnyChildrenConstrain,
+  FieldUsageConfig,
+} from "../../../unified-ui/widgets/_shared/types";
+import type { CreateApiEndpoint } from "../../endpoints/definition/create";
+import type {
+  RequestResponseWidgetConfig,
+  UnifiedField,
+} from "../../widgets/configs";
+import type { CreateApiEndpointAny } from "../endpoint-base";
+import type { Methods } from "../enums";
 
 // ============================================================================
 // STEP 1: Test TKey variance - can specific TKey extend string?
@@ -27,10 +37,12 @@ const test1_1: Test1_1_LiteralExtendsString = "PASS";
 
 // Test 2.1: WidgetConfig with specific TKey extends WidgetConfig<string>
 type Test2_1_WidgetConfigVariance =
-  WidgetConfig<"app.test", z.ZodTypeAny> extends WidgetConfig<
-    string,
-    z.ZodTypeAny
-  >
+  UnifiedField<
+    "app.test",
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    never
+  > extends UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>
     ? "PASS"
     : "FAIL";
 const test2_1: Test2_1_WidgetConfigVariance = "PASS";
@@ -41,12 +53,12 @@ const test2_1: Test2_1_WidgetConfigVariance = "PASS";
 
 // Test 3.1: PrimitiveField with specific TKey extends UnifiedField<string, z.ZodTypeAny>
 type Test3_1_PrimitiveFieldVariance =
-  PrimitiveField<
+  RequestResponseWidgetConfig<
+    "app.test",
     z.ZodString,
     FieldUsageConfig,
-    "app.test",
-    WidgetConfig<"app.test", z.ZodTypeAny>
-  > extends UnifiedField<string, z.ZodTypeAny>
+    "primitive"
+  > extends UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>
     ? "PASS"
     : "FAIL";
 const test3_1: Test3_1_PrimitiveFieldVariance = "PASS";
@@ -111,19 +123,20 @@ type Test5_3_ArrayExtendsArray =
 const test5_3: Test5_3_ArrayExtendsArray = "PASS";
 
 // ============================================================================
-// STEP 6: Test CreateApiEndpoint structure
+// STEP 6: Test CreateApiEndpoint structure with proper constraints
 // ============================================================================
-
-import type { CreateApiEndpoint } from "../../endpoints/definition/create";
-// Test 6.1: CreateApiEndpoint with all generic parameters extends CreateApiEndpointAny
-import type { CreateApiEndpointAny } from "../endpoint";
-import type { Methods } from "../enums";
 
 type GenericEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   string,
-  UnifiedField<string, z.ZodTypeAny>
+  AnyChildrenConstrain<string, FieldUsageConfig>,
+  UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
 >;
 
 type Test6_1_GenericEndpointExtendsAny =
@@ -134,19 +147,13 @@ const test6_1: Test6_1_GenericEndpointExtendsAny = "PASS";
 type SpecificEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly [SpecificRole],
-  "app.test",
-  ObjectField<
-    {
-      field1: PrimitiveField<
-        z.ZodString,
-        FieldUsageConfig,
-        "app.test",
-        WidgetConfig<"app.test", z.ZodTypeAny>
-      >;
-    },
+  string,
+  AnyChildrenConstrain<string, FieldUsageConfig>,
+  UnifiedField<
+    string,
+    z.ZodTypeAny,
     FieldUsageConfig,
-    "app.test",
-    WidgetConfig<"app.test", z.ZodTypeAny>
+    AnyChildrenConstrain<string, FieldUsageConfig>
   >
 >;
 
@@ -186,8 +193,6 @@ export {
   test1_1,
   test2_1,
   test3_1,
-  test4_1,
-  test4_2,
   test5_1,
   test5_2,
   test5_3,

@@ -29,7 +29,7 @@ export interface ButtonWidgetConfig<
     | "ghost"
     | "link";
   size?: "default" | "sm" | "lg" | "icon";
-  onClick?: string; // Action ID
+  onClick?: () => void;
   /** Icon size */
   iconSize?: "xs" | "sm" | "base" | "lg";
   /** Spacing to the right of icon */

@@ -19,13 +19,17 @@ import type { z } from "zod";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { FieldUsageConfig } from "../../unified-ui/widgets/_shared/types";
-import type { UnifiedField } from "../types/endpoint";
+import type {
+  ArrayChildConstraint,
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+  ObjectChildrenConstraint,
+} from "../../unified-ui/widgets/_shared/types";
 import type {
   ArrayWidgetConfig,
   FormFieldWidgetConfig,
   ObjectWidgetConfig,
-  ResponseWidgetConfig,
+  RequestResponseWidgetConfig,
 } from "../widgets/configs";
 
 /**
@@ -47,12 +51,19 @@ interface ScopedTranslationType<TKey extends string> {
 export function requestField<
   TSchema extends z.ZodTypeAny,
   TConfig extends Omit<
-    FormFieldWidgetConfig<TranslationKey, TSchema, { request: "data" }>,
+    FormFieldWidgetConfig<
+      TranslationKey,
+      TSchema,
+      { request: "data"; response?: never }
+    >,
     "usage" | "schemaType"
   >,
 >(
   config: TConfig,
-): TConfig & { usage: { request: "data" }; schemaType: "primitive" } {
+): TConfig & {
+  usage: { request: "data"; response?: never };
+  schemaType: "primitive";
+} {
   return {
     ...config,
     usage: { request: "data" },
@@ -68,7 +79,7 @@ export function requestField<
 export function responseField<
   TSchema extends z.ZodTypeAny,
   TConfig extends Omit<
-    ResponseWidgetConfig<
+    RequestResponseWidgetConfig<
       TranslationKey,
       TSchema,
       { response: true },
@@ -78,7 +89,10 @@ export function responseField<
   >,
 >(
   config: TConfig,
-): TConfig & { usage: { response: true }; schemaType: "primitive" } {
+): TConfig & {
+  usage: { request?: never; response: true };
+  schemaType: "primitive";
+} {
   return {
     ...config,
     usage: { response: true },
@@ -121,13 +135,16 @@ export function requestUrlPathParamsField<
     FormFieldWidgetConfig<
       TranslationKey,
       TSchema,
-      { request: "urlPathParams" }
+      { request: "urlPathParams"; response?: never }
     >,
     "usage" | "schemaType"
   >,
 >(
   config: TConfig,
-): TConfig & { usage: { request: "urlPathParams" }; schemaType: "primitive" } {
+): TConfig & {
+  usage: { request: "urlPathParams"; response?: never };
+  schemaType: "primitive";
+} {
   return {
     ...config,
     usage: { request: "urlPathParams" },
@@ -176,13 +193,20 @@ export function scopedRequestField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TSchema extends z.ZodTypeAny,
   TConfig extends Omit<
-    FormFieldWidgetConfig<string, TSchema, { request: "data" }>,
+    FormFieldWidgetConfig<
+      string,
+      TSchema,
+      { request: "data"; response?: never }
+    >,
     "usage" | "schemaType"
   >,
 >(
   scopedTranslation: TScopedTranslation,
   config: TConfig,
-): TConfig & { usage: { request: "data" }; schemaType: "primitive" } {
+): TConfig & {
+  usage: { request: "data"; response?: never };
+  schemaType: "primitive";
+} {
   // scopedTranslation is only used for type inference
   void scopedTranslation;
   return {
@@ -201,13 +225,21 @@ export function scopedResponseField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TSchema extends z.ZodTypeAny,
   TConfig extends Omit<
-    ResponseWidgetConfig<string, TSchema, { response: true }, "primitive">,
+    RequestResponseWidgetConfig<
+      string,
+      TSchema,
+      { request?: never; response: true },
+      "primitive"
+    >,
     "usage" | "schemaType"
   >,
 >(
   scopedTranslation: TScopedTranslation,
   config: TConfig,
-): TConfig & { usage: { response: true }; schemaType: "primitive" } {
+): TConfig & {
+  usage: { request?: never; response: true };
+  schemaType: "primitive";
+} {
   // scopedTranslation is only used for type inference
   void scopedTranslation;
   return {
@@ -224,14 +256,9 @@ export function scopedResponseField<
 export function scopedObjectField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TUsage extends FieldUsageConfig,
-  TChildren extends Record<
-    string,
-    UnifiedField<
-      TScopedTranslation["ScopedTranslationKey"],
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      never
-    >
+  TChildren extends ObjectChildrenConstraint<
+    TScopedTranslation["ScopedTranslationKey"],
+    ConstrainedChildUsage<TUsage>
   >,
   const TUIConfig extends Omit<
     ObjectWidgetConfig<
@@ -263,11 +290,14 @@ export function scopedObjectField<
  */
 export function scopedResponseArrayOptionalField<
   TScopedTranslation extends ScopedTranslationType<string>,
-  TChild extends UnifiedField<string, z.ZodTypeAny, { response: true }, never>,
+  TChild extends ArrayChildConstraint<
+    TScopedTranslation["ScopedTranslationKey"],
+    ConstrainedChildUsage<{ request?: never; response: true }>
+  >,
   TConfig extends Omit<
     ArrayWidgetConfig<
       TScopedTranslation["ScopedTranslationKey"],
-      { response: true },
+      { request?: never; response: true },
       "array-optional",
       TChild
     >,
@@ -277,7 +307,7 @@ export function scopedResponseArrayOptionalField<
   scopedTranslation: TScopedTranslation,
   config: TConfig,
 ): TConfig & {
-  usage: { response: true };
+  usage: { request?: never; response: true };
   schemaType: "array-optional";
 } {
   // scopedTranslation is only used for type inference
@@ -323,13 +353,14 @@ export function scopedResponseArrayOptionalField<
  * ```
  */
 export function objectFieldNew<
+  TKey extends string,
   TUsage extends FieldUsageConfig,
-  TChildren extends Record<
-    string,
-    UnifiedField<string, z.ZodTypeAny, TUsage, never>
+  TChildren extends ObjectChildrenConstraint<
+    TKey,
+    ConstrainedChildUsage<TUsage>
   >,
   const TConfig extends Omit<
-    ObjectWidgetConfig<TranslationKey, TUsage, "object", TChildren>,
+    ObjectWidgetConfig<TKey, TUsage, "object", TChildren>,
     "schemaType"
   >,
 >(config: TConfig): TConfig & { schemaType: "object" } {
@@ -339,3 +370,19 @@ export function objectFieldNew<
   };
 }
 
+export {
+  backButton,
+  deleteButton,
+  navigateButtonField,
+  objectField,
+  objectOptionalField,
+  objectUnionField,
+  requestDataArrayField,
+  requestDataArrayOptionalField,
+  requestDataRangeField,
+  responseArrayField,
+  responseArrayOptionalField,
+  submitButton,
+  widgetField,
+  widgetObjectField,
+} from "./utils";

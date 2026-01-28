@@ -87,7 +87,7 @@ export function currencyField(
   placeholder: TranslationKey,
   required = false,
   multiple = false,
-): ReturnType<typeof requestField> {
+) {
   const schema = multiple
     ? z.array(z.enum(CURRENCY_OPTIONS.map((c) => c.value)))
     : z.enum(CURRENCY_OPTIONS.map((c) => c.value));
@@ -138,20 +138,59 @@ export function languageField(
   placeholder: TranslationKey,
   required = false,
   multiple = false,
-): ReturnType<typeof requestField> {
-  const schema = multiple
-    ? z.array(z.enum(LANGUAGE_OPTIONS.map((l) => l.value)))
-    : z.enum(LANGUAGE_OPTIONS.map((l) => l.value));
+) {
+  if (multiple) {
+    if (required) {
+      const schema = z.array(z.enum(LANGUAGE_OPTIONS.map((l) => l.value)));
+      return requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label,
+        description,
+        placeholder,
+        options: [...LANGUAGE_OPTIONS],
+        required,
+        schema,
+      });
+    }
+    const schema = z
+      .array(z.enum(LANGUAGE_OPTIONS.map((l) => l.value)))
+      .optional();
+    return requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.MULTISELECT,
+      label,
+      description,
+      placeholder,
+      options: [...LANGUAGE_OPTIONS],
+      required,
+      schema,
+    });
+  }
 
+  if (required) {
+    const schema = z.enum(LANGUAGE_OPTIONS.map((l) => l.value));
+    return requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.SELECT,
+      label,
+      description,
+      placeholder,
+      options: [...LANGUAGE_OPTIONS],
+      required,
+      schema,
+    });
+  }
+  const schema = z.enum(LANGUAGE_OPTIONS.map((l) => l.value)).optional();
   return requestField({
     type: WidgetType.FORM_FIELD,
-    fieldType: multiple ? FieldDataType.MULTISELECT : FieldDataType.SELECT,
+    fieldType: FieldDataType.SELECT,
     label,
     description,
     placeholder,
     options: [...LANGUAGE_OPTIONS],
     required,
-    schema: required ? schema : schema.optional(),
+    schema,
   });
 }
 
@@ -203,20 +242,59 @@ export function countryField(
   placeholder: TranslationKey,
   required = false,
   multiple = false,
-): ReturnType<typeof requestField> {
-  const schema = multiple
-    ? z.array(z.enum(COUNTRY_OPTIONS.map((c) => c.value)))
-    : z.enum(COUNTRY_OPTIONS.map((c) => c.value));
+) {
+  if (multiple) {
+    if (required) {
+      const schema = z.array(z.enum(COUNTRY_OPTIONS.map((c) => c.value)));
+      return requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label,
+        description,
+        placeholder,
+        options: [...COUNTRY_OPTIONS],
+        required,
+        schema,
+      });
+    }
+    const schema = z
+      .array(z.enum(COUNTRY_OPTIONS.map((c) => c.value)))
+      .optional();
+    return requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.MULTISELECT,
+      label,
+      description,
+      placeholder,
+      options: [...COUNTRY_OPTIONS],
+      required,
+      schema,
+    });
+  }
 
+  if (required) {
+    const schema = z.enum(COUNTRY_OPTIONS.map((c) => c.value));
+    return requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.SELECT,
+      label,
+      description,
+      placeholder,
+      options: [...COUNTRY_OPTIONS],
+      required,
+      schema,
+    });
+  }
+  const schema = z.enum(COUNTRY_OPTIONS.map((c) => c.value)).optional();
   return requestField({
     type: WidgetType.FORM_FIELD,
-    fieldType: multiple ? FieldDataType.MULTISELECT : FieldDataType.SELECT,
+    fieldType: FieldDataType.SELECT,
     label,
     description,
     placeholder,
     options: [...COUNTRY_OPTIONS],
     required,
-    schema: required ? schema : schema.optional(),
+    schema,
   });
 }
 
@@ -310,19 +388,58 @@ export function timezoneField(
   placeholder: TranslationKey,
   required = false,
   multiple = false,
-): ReturnType<typeof requestField> {
-  const schema = multiple
-    ? z.array(z.enum(TIMEZONE_OPTIONS.map((t) => t.value)))
-    : z.enum(TIMEZONE_OPTIONS.map((t) => t.value));
+) {
+  if (multiple) {
+    if (required) {
+      const schema = z.array(z.enum(TIMEZONE_OPTIONS.map((t) => t.value)));
+      return requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label,
+        description,
+        placeholder,
+        options: [...TIMEZONE_OPTIONS],
+        required,
+        schema,
+      });
+    }
+    const schema = z
+      .array(z.enum(TIMEZONE_OPTIONS.map((t) => t.value)))
+      .optional();
+    return requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.MULTISELECT,
+      label,
+      description,
+      placeholder,
+      options: [...TIMEZONE_OPTIONS],
+      required,
+      schema,
+    });
+  }
 
+  if (required) {
+    const schema = z.enum(TIMEZONE_OPTIONS.map((t) => t.value));
+    return requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.SELECT,
+      label,
+      description,
+      placeholder,
+      options: [...TIMEZONE_OPTIONS],
+      required,
+      schema,
+    });
+  }
+  const schema = z.enum(TIMEZONE_OPTIONS.map((t) => t.value)).optional();
   return requestField({
     type: WidgetType.FORM_FIELD,
-    fieldType: multiple ? FieldDataType.MULTISELECT : FieldDataType.SELECT,
+    fieldType: FieldDataType.SELECT,
     label,
     description,
     placeholder,
     options: [...TIMEZONE_OPTIONS],
     required,
-    schema: required ? schema : schema.optional(),
+    schema,
   });
 }

@@ -9,31 +9,34 @@ import { useState } from "react";
 
 import type { DateWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { TimeFieldWidgetConfig } from "./types";
 
-export function TimeFieldWidgetInk<TKey extends string>({
-  value,
+export function TimeFieldWidgetInk<
+  TKey extends string,
+  TEndpoint extends CreateApiEndpointAny,
+>({
   field,
   fieldName,
   context,
-  form,
 }: InkWidgetProps<
+  TEndpoint,
   TimeFieldWidgetConfig<TKey, DateWidgetSchema, FieldUsageConfig>
 >): JSX.Element {
   const { t } = context;
   const [inputValue, setInputValue] = useState(
-    value instanceof Date
-      ? `${String(value.getHours()).padStart(2, "0")}:${String(value.getMinutes()).padStart(2, "0")}`
+    field.value instanceof Date
+      ? `${String(field.value.getHours()).padStart(2, "0")}:${String(field.value.getMinutes()).padStart(2, "0")}`
       : "",
   );
 
   // Response mode - just display the value
   if (context.response) {
     const displayValue =
-      value instanceof Date
-        ? `${String(value.getHours()).padStart(2, "0")}:${String(value.getMinutes()).padStart(2, "0")}`
+      field.value instanceof Date
+        ? `${String(field.value.getHours()).padStart(2, "0")}:${String(field.value.getMinutes()).padStart(2, "0")}`
         : "—";
     return (
       <Box flexDirection="column">
@@ -49,7 +52,7 @@ export function TimeFieldWidgetInk<TKey extends string>({
   }
 
   // Request mode - show interactive input
-  if (!form || !fieldName) {
+  if (!context.form || !fieldName) {
     return (
       <Box>
         <Text color="red">
@@ -62,7 +65,7 @@ export function TimeFieldWidgetInk<TKey extends string>({
   }
 
   const isRequired = !field.schema.isOptional();
-  const error = form.errors[fieldName];
+  const error = context.form.errors[fieldName];
 
   return (
     <Box flexDirection="column" marginBottom={1}>
@@ -88,7 +91,7 @@ export function TimeFieldWidgetInk<TKey extends string>({
             if (!Number.isNaN(hours) && !Number.isNaN(minutes)) {
               const date = new Date();
               date.setHours(hours, minutes, 0, 0);
-              form.setValue(fieldName, date);
+              context.form?.setValue(fieldName, date);
             }
           }}
           placeholder={field.placeholder ? t(field.placeholder) : "HH:MM"}

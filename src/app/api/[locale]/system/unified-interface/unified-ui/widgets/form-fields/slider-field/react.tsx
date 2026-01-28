@@ -36,6 +36,7 @@ import {
   FormMessage,
 } from "@/packages/next-vibe-ui/web/ui/form/form";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { FieldUsageConfig } from "../../_shared/types";
 import { DEFAULT_THEME } from "../_shared/constants";
 import { renderPrefillDisplay } from "../_shared/prefill";
@@ -44,20 +45,22 @@ import { getFieldValidationState } from "../_shared/validation";
 import type { SliderFieldWidgetConfig } from "./types";
 
 export function SliderFieldWidget<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TSchema extends NumberWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
   field,
-  form,
+
   fieldName,
   context,
 }: ReactWidgetProps<
+  TEndpoint,
   SliderFieldWidgetConfig<TKey, TSchema, TUsage>
 >): JSX.Element {
   const { t } = context;
 
-  if (!form || !fieldName) {
+  if (!context.form || !fieldName) {
     return (
       <Div>
         {t(
@@ -73,8 +76,8 @@ export function SliderFieldWidget<
 
   return (
     <FormField
-      control={form.control}
-      name={fieldName as never}
+      control={context.form.control}
+      name={fieldName}
       render={({ field: formField, fieldState }) => {
         const validationState = getFieldValidationState(
           formField.value,
@@ -139,7 +142,7 @@ export function SliderFieldWidget<
               formField.value &&
               !fieldState.isDirty ? (
                 renderPrefillDisplay(
-                  String(formField.value),
+                  formField.value,
                   field.label,
                   field.prefillDisplay,
                   t,

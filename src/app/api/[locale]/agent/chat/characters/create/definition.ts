@@ -83,7 +83,7 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // Back button navigation
-      backButton: backButton(),
+      backButton: backButton({ usage: { response: true } }),
       // === REQUEST ===
       name: requestField({
         schema: z.string().min(1).max(100),
@@ -206,13 +206,11 @@ const { POST } = createEndpoint({
                 columns: 12,
                 schema: z.literal(ModelSelectionType.MANUAL),
               }),
-              modelDisplay: widgetField(
-                {
-                  type: WidgetType.MODEL_DISPLAY,
-                  columns: 12,
-                },
-                { request: "data" },
-              ),
+              modelDisplay: widgetField({
+                type: WidgetType.MODEL_DISPLAY,
+                columns: 12,
+                usage: { request: "data" },
+              }),
               manualModelId: requestField({
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.SELECT,
@@ -254,13 +252,11 @@ const { POST } = createEndpoint({
                 columns: 12,
                 schema: z.literal(ModelSelectionType.FILTERS),
               }),
-              modelDisplay: widgetField(
-                {
-                  type: WidgetType.MODEL_DISPLAY,
-                  columns: 12,
-                },
-                { request: "data" },
-              ),
+              modelDisplay: widgetField({
+                type: WidgetType.MODEL_DISPLAY,
+                columns: 12,
+                usage: { request: "data" },
+              }),
               intelligenceRange: requestDataRangeField({
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.RANGE_SLIDER,

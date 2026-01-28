@@ -9,6 +9,7 @@ import {
   type IconKey,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import {
   getIconSizeClassName,
   getSpacingClassName,
@@ -22,19 +23,22 @@ import type { ButtonWidgetConfig } from "./types";
  * Used for actions like Edit, Delete, etc. within data cards.
  */
 export function ButtonWidget<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TUsage extends FieldUsageConfig,
+  TSchemaType extends "widget",
 >({
   field,
   context,
-  value,
-}: ReactWidgetProps<ButtonWidgetConfig<TKey, TUsage>>): JSX.Element {
+}: ReactWidgetProps<
+  TEndpoint,
+  ButtonWidgetConfig<TKey, TUsage, TSchemaType>
+>): JSX.Element {
   const {
     text: textKey,
     icon,
     variant = "default",
     size = "default",
-    onClick: actionId,
     iconSize,
     iconSpacing,
     className,
@@ -57,7 +61,7 @@ export function ButtonWidget<
     }
 
     // The value contains the entity ID (e.g., link ID) to act upon
-    const entityId = typeof value === "string" ? value : String(value);
+    const entityId = typeof field.value === "string" ? value : String(value);
 
     // Handle delete action by calling endpoint mutation directly
     if (actionId === "delete") {

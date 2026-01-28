@@ -3,10 +3,18 @@
  * This is a placeholder for native implementation
  */
 
-import type { RangeSliderProps } from "../../web/ui/range-slider";
 import type { JSX } from "react";
 
-export function RangeSlider(_props: RangeSliderProps): JSX.Element {}
+import type { TranslationKey } from "@/i18n/core/static-types";
+
+import type { RangeSliderProps } from "../../web/ui/range-slider";
+
+export function RangeSlider<TTranslationKey extends string = TranslationKey>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _props: RangeSliderProps<TTranslationKey>,
+): JSX.Element {
+  return <></>;
+}
 
 export type {
   RangeSliderOption,

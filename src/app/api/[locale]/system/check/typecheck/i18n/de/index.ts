@@ -71,6 +71,17 @@ export const translations: typeof enTranslations = {
       label: "Sortierung überspringen",
       description: "Sortierung von Problemen überspringen (für Leistung)",
     },
+    filter: {
+      label: "Filter",
+      description:
+        "Probleme nach Dateipfad, Nachricht oder Regel filtern. Unterstützt Textabstimmung oder Regex (/pattern/flags). Arrays ermöglichen OR-Logik für mehrere Filter.",
+      placeholder: "z.B. 'TS2304' oder '/src\\/components/i'",
+    },
+    summaryOnly: {
+      label: "Nur Zusammenfassung",
+      description:
+        "Gibt nur Zusammenfassungsstatistiken zurück, weglassen von Elementen und Dateilisten",
+    },
   },
 
   // Response fields

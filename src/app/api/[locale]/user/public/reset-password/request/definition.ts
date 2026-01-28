@@ -106,15 +106,6 @@ const { POST } = createEndpoint({
               .string()
               .describe("Human-readable status message explaining the result"),
           }),
-          nextSteps: responseArrayField(
-            {
-              type: WidgetType.LINK_LIST,
-            },
-            responseField({
-              type: WidgetType.TEXT,
-              schema: z.string(),
-            }),
-          ),
         },
       ),
     },
@@ -209,32 +200,18 @@ const { POST } = createEndpoint({
         response: {
           success: true,
           message: "Password reset link sent successfully",
-          nextSteps: [
-            "Check your email inbox and spam folder",
-            "Click the reset link in the email",
-            "Create a new secure password",
-          ],
         },
       },
       invalidEmail: {
         response: {
           success: false,
           message: "No account found with this email address",
-          nextSteps: [
-            "Check your email spelling",
-            "Try a different email address",
-            "Contact support if you need help",
-          ],
         },
       },
       rateLimited: {
         response: {
           success: false,
           message: "Too many reset requests. Please wait before trying again.",
-          nextSteps: [
-            "Wait 15 minutes before requesting again",
-            "Check if you already received a reset email",
-          ],
         },
       },
     },

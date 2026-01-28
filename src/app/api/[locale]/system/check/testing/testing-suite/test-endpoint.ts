@@ -15,6 +15,10 @@ import {
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type {
+  AnyChildrenConstrain,
+  FieldUsageConfig,
+} from "../../../unified-interface/unified-ui/widgets/_shared/types";
 import { sendTestRequest } from "./send-test-request";
 import type { TestEndpointOptions, TestRunner } from "./types";
 
@@ -48,12 +52,18 @@ export function testEndpoint<
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
-  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
+  TFields extends UnifiedField<
+    TScopedTranslationKey,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
+  >,
 >(
   endpoint: CreateApiEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
+    AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>,
     TFields
   >,
   options: TestEndpointOptions<
@@ -79,6 +89,7 @@ export function testEndpoint<
           TMethod,
           TUserRoleValue,
           TScopedTranslationKey,
+          AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>,
           TFields
         >({
           endpoint,

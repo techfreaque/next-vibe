@@ -7,30 +7,33 @@ import TextInput from "ink-text-input";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { NumberWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { IntFieldWidgetConfig } from "./types";
 
-export function IntFieldWidgetInk<TKey extends string>({
-  value,
+export function IntFieldWidgetInk<
+  TEndpoint extends CreateApiEndpointAny,
+  TKey extends string,
+>({
   field,
   fieldName,
   context,
-  form,
 }: InkWidgetProps<
+  TEndpoint,
   IntFieldWidgetConfig<TKey, NumberWidgetSchema, FieldUsageConfig>
 >): JSX.Element {
   const { t } = context;
   const [inputValue, setInputValue] = useState(
-    value !== null && value !== undefined ? String(value) : "",
+    field.value !== null && field.value !== undefined ? field.value : "",
   );
 
   // Response mode - just display the value
   if (context.response) {
     const displayValue =
-      value !== null && value !== undefined ? String(value) : "—";
+      field.value !== null && field.value !== undefined ? field.value : "—";
     return (
       <Box flexDirection="column">
         {field.label && (
@@ -45,7 +48,7 @@ export function IntFieldWidgetInk<TKey extends string>({
   }
 
   // Request mode - show interactive input
-  if (!form || !fieldName) {
+  if (!context.form || !fieldName) {
     return (
       <Box>
         <Text color="red">
@@ -58,7 +61,7 @@ export function IntFieldWidgetInk<TKey extends string>({
   }
 
   const isRequired = !field.schema.isOptional();
-  const error = form.errors[fieldName];
+  const error = context.form.errors[fieldName];
 
   return (
     <Box flexDirection="column" marginBottom={1}>
@@ -82,7 +85,7 @@ export function IntFieldWidgetInk<TKey extends string>({
             setInputValue(newValue);
             const numValue = parseInt(newValue, 10);
             if (!Number.isNaN(numValue)) {
-              form.setValue(fieldName, numValue);
+              context.form?.setValue(fieldName, numValue);
             }
           }}
           placeholder={field.placeholder ? t(field.placeholder) : undefined}

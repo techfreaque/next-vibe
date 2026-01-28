@@ -301,11 +301,11 @@ const { POST } = createEndpoint({
               layoutType: LayoutType.GRID,
               columns: 12,
               optional: true,
-              icon: "code",
+              icon: "code" as const,
             },
             objectField(
               {
-                type: WidgetType.DATA_CARD,
+                type: WidgetType.DATA_CARDS,
                 title: "app.api.system.builder.post.fields.fileToCompile.title",
                 layoutType: LayoutType.GRID,
                 columns: 12,
@@ -1095,11 +1095,11 @@ const { POST } = createEndpoint({
               layoutType: LayoutType.GRID,
               columns: 12,
               optional: true,
-              icon: "copy",
+              icon: "copy" as const,
             },
             objectField(
               {
-                type: WidgetType.DATA_CARD,
+                type: WidgetType.DATA_CARDS,
                 title: "app.api.system.builder.post.fields.copyConfig.title",
                 layoutType: LayoutType.GRID,
                 columns: 12,
@@ -1462,25 +1462,6 @@ const { POST } = createEndpoint({
       stepTimings: responseArrayOptionalField(
         {
           type: WidgetType.DATA_TABLE,
-          columns: [
-            {
-              key: "step",
-              label: "app.api.system.builder.post.fields.stepTimings.step",
-            },
-            {
-              key: "duration",
-              label: "app.api.system.builder.post.fields.stepTimings.duration",
-            },
-            {
-              key: "status",
-              label: "app.api.system.builder.post.fields.stepTimings.status",
-            },
-            {
-              key: "filesAffected",
-              label:
-                "app.api.system.builder.post.fields.stepTimings.filesAffected",
-            },
-          ],
           optional: true,
           icon: "list-checks",
         },

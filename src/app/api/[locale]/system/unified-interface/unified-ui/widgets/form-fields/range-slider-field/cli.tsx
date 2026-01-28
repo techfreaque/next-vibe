@@ -6,17 +6,21 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 import type { z } from "zod";
 
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { EnumWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { RangeSliderFieldWidgetConfig } from "./types";
 
-export function RangeSliderFieldWidgetInk<TKey extends string>({
-  value,
+export function RangeSliderFieldWidgetInk<
+  TEndpoint extends CreateApiEndpointAny,
+  TKey extends string,
+>({
   field,
   context,
 }: InkWidgetProps<
+  TEndpoint,
   RangeSliderFieldWidgetConfig<
     TKey,
     z.ZodOptional<
@@ -29,13 +33,11 @@ export function RangeSliderFieldWidgetInk<TKey extends string>({
   >
 >): JSX.Element {
   const { t } = context;
-  const rangeValue =
-    value && typeof value === "object"
-      ? (value as { min?: string | number; max?: string | number })
-      : {};
   const displayValue =
-    rangeValue.min !== undefined || rangeValue.max !== undefined
-      ? `${rangeValue.min ?? "—"} - ${rangeValue.max ?? "—"}`
+    field.value &&
+    typeof field.value === "object" &&
+    (field.value.min !== undefined || field.value.max !== undefined)
+      ? `${field.value.min ?? "—"} - ${field.value.max ?? "—"}`
       : "—";
 
   return (

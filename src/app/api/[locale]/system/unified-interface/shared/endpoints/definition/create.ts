@@ -33,6 +33,11 @@ import type {
   Methods,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type {
+  AnyChildrenConstrain,
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import {
   UserRole,
@@ -162,10 +167,16 @@ export interface EndpointDeleteOptions<TRequest, TResponse, TUrlVariables> {
 export interface ApiEndpoint<
   out TMethod extends Methods,
   out TUserRoleValue extends readonly UserRoleValue[],
-  out TScopedTranslationKey extends string = TranslationKey,
-  out TFields extends UnifiedField<string, z.ZodTypeAny> = UnifiedField<
+  out TScopedTranslationKey extends string,
+  out TChildren extends AnyChildrenConstrain<
     TScopedTranslationKey,
-    z.ZodTypeAny
+    FieldUsageConfig
+  >,
+  out TFields extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    TChildren
   >,
 > {
   // Core endpoint metadata - all required for type safety
@@ -333,7 +344,15 @@ export type InferFieldType<F, Usage extends FieldUsage> =
 // Fixed object type inference - filter out never fields and remove readonly
 // Uses flexible constraint that accepts both readonly and mutable properties
 type InferObjectType<C, Usage extends FieldUsage> =
-  C extends Record<string, UnifiedField<string, z.ZodTypeAny>>
+  C extends Record<
+    string,
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig> | never
+    >
+  >
     ? {
         -readonly [K in keyof C as InferFieldType<C[K], Usage> extends never
           ? never
@@ -376,14 +395,34 @@ export interface CreateApiEndpoint<
   out TMethod extends Methods,
   out TUserRoleValue extends readonly UserRoleValue[],
   out TScopedTranslationKey extends string,
-  out TFields extends UnifiedField<string, z.ZodTypeAny>,
+  out TChildren extends AnyChildrenConstrain<
+    TScopedTranslationKey,
+    ConstrainedChildUsage<FieldUsageConfig>
+  > = never,
+  out TFields extends UnifiedField<
+    TScopedTranslationKey,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    TChildren
+  > = UnifiedField<
+    TScopedTranslationKey,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    TChildren
+  >,
   RequestInput = InferRequestInput<TFields>,
   RequestOutput = InferRequestOutput<TFields>,
   ResponseInput = InferResponseInput<TFields>,
   ResponseOutput = InferResponseOutput<TFields>,
   UrlVariablesInput = InferUrlVariablesInput<TFields>,
   UrlVariablesOutput = InferUrlVariablesOutput<TFields>,
-> extends ApiEndpoint<TMethod, TUserRoleValue, TScopedTranslationKey, TFields> {
+> extends ApiEndpoint<
+  TMethod,
+  TUserRoleValue,
+  TScopedTranslationKey,
+  TChildren,
+  TFields
+> {
   readonly scopedTranslation: {
     readonly ScopedTranslationKey: TScopedTranslationKey;
     readonly scopedT: (locale: CountryLanguage) => {
@@ -438,12 +477,22 @@ export type CreateEndpointReturnInMethod<
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
-  TFields extends UnifiedField<string, z.ZodTypeAny>,
+  TChildren extends AnyChildrenConstrain<
+    TScopedTranslationKey,
+    ConstrainedChildUsage<FieldUsageConfig>
+  >,
+  TFields extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    TChildren
+  >,
 > = {
   readonly [KMethod in TMethod]: CreateApiEndpoint<
     KMethod,
     TUserRoleValue,
     TScopedTranslationKey,
+    TChildren,
     TFields
   >;
 };
@@ -460,16 +509,29 @@ export function createEndpoint<
   const TMethod extends Methods,
   const TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string = TranslationKey,
-  const TFields extends UnifiedField<string, z.ZodTypeAny> = UnifiedField<
+  TChildren extends
+    | AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
+    | never = never,
+  const TFields extends UnifiedField<
     string,
-    z.ZodTypeAny
-  >,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    // oxlint-disable-next-line typescript/no-explicit-any
+    TChildren
+  > = UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, TChildren>,
 >(
-  config: ApiEndpoint<TMethod, TUserRoleValue, TScopedTranslationKey, TFields>,
+  config: ApiEndpoint<
+    TMethod,
+    TUserRoleValue,
+    TScopedTranslationKey,
+    TChildren,
+    TFields
+  >,
 ): CreateEndpointReturnInMethod<
   TMethod,
   TUserRoleValue,
   TScopedTranslationKey,
+  TChildren,
   TFields
 > {
   // Generate schemas from unified fields
@@ -502,6 +564,7 @@ export function createEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
+    TChildren,
     TFields
   > = {
     method: config.method,
@@ -559,6 +622,7 @@ export function createEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
+    TChildren,
     TFields
   >;
 }

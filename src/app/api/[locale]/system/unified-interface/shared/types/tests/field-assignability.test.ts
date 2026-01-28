@@ -1,33 +1,33 @@
 /**
- * Test ObjectField assignability to UnifiedField
+ * Field Assignability Tests
+ *
+ * Tests that specific field types are assignable to generic field types.
  */
 
 import type { z } from "zod";
 
-import type { WidgetConfig } from "../../widgets/configs";
-import type { ObjectField, PrimitiveField, UnifiedField } from "../endpoint";
-import type { FieldUsageConfig } from "../endpoint";
+import type { FieldUsageConfig } from "../../../unified-ui/widgets/_shared/types";
+import type {
+  RequestResponseWidgetConfig,
+  UnifiedField,
+} from "../../widgets/configs";
 
-// Test: Can a specific ObjectField be assigned to generic UnifiedField?
-type SpecificObjectField = ObjectField<
-  {
-    file: PrimitiveField<
-      z.ZodString,
-      FieldUsageConfig,
-      "app.test",
-      WidgetConfig<"app.test", z.ZodTypeAny>
-    >;
-  },
-  FieldUsageConfig,
+// Test: Can a specific RequestResponseWidgetConfig be assigned to generic UnifiedField?
+type SpecificField = RequestResponseWidgetConfig<
   "app.test",
-  WidgetConfig<"app.test", z.ZodTypeAny>
+  z.ZodString,
+  { request: "data" },
+  "primitive"
 >;
 
-type GenericUnifiedField = UnifiedField<string, z.ZodTypeAny>;
+type GenericUnifiedField = UnifiedField<
+  string,
+  z.ZodTypeAny,
+  FieldUsageConfig,
+  never
+>;
 
-type Test1_Result = SpecificObjectField extends GenericUnifiedField
-  ? "PASS"
-  : "FAIL";
+type Test1_Result = SpecificField extends GenericUnifiedField ? "PASS" : "FAIL";
 const test1: Test1_Result = "PASS"; // Should PASS with variance annotations
 
 export { test1 };

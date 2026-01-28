@@ -7,10 +7,10 @@
 
 import type { Control, FieldPath, FieldValues } from "react-hook-form";
 
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { Countries, CountryLanguage } from "@/i18n/core/config";
 
-import type { CreateApiEndpointAny } from "../types/endpoint";
+import type { CreateApiEndpointAny } from "../types/endpoint-base";
 
 export interface EndpointFormFieldProps<
   TEndpoint extends CreateApiEndpointAny,

@@ -20,6 +20,7 @@ import {
 } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { NumberWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import { simpleT } from "@/i18n/core/shared";
@@ -39,18 +40,21 @@ import { getFieldValidationState } from "../_shared/validation";
 import type { IntFieldWidgetConfig } from "./types";
 
 export function IntFieldWidget<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TSchema extends NumberWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
   field,
-  form,
   fieldName,
   context,
-}: ReactWidgetProps<IntFieldWidgetConfig<TKey, TSchema, TUsage>>): JSX.Element {
+}: ReactWidgetProps<
+  TEndpoint,
+  IntFieldWidgetConfig<TKey, TSchema, TUsage>
+>): JSX.Element {
   const { t } = context;
 
-  if (!form || !fieldName) {
+  if (!context.form || !fieldName) {
     return (
       <Div>
         {t(
@@ -66,8 +70,8 @@ export function IntFieldWidget<
 
   return (
     <FormField
-      control={form.control}
-      name={fieldName as never}
+      control={context.form.control}
+      name={fieldName}
       render={({ field: formField, fieldState }) => {
         const validationState = getFieldValidationState(
           formField.value,
@@ -127,7 +131,7 @@ export function IntFieldWidget<
               formField.value &&
               !fieldState.isDirty ? (
                 renderPrefillDisplay(
-                  String(formField.value),
+                  formField.value,
                   field.label,
                   field.prefillDisplay,
                   t,
@@ -135,21 +139,9 @@ export function IntFieldWidget<
               ) : (
                 <Input
                   type="number"
-                  value={
-                    formField.value !== null && formField.value !== undefined
-                      ? formField.value
-                      : ""
-                  }
+                  value={formField.value}
                   onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === "") {
-                      formField.onChange(null);
-                    } else {
-                      const num = parseInt(value, 10);
-                      if (!Number.isNaN(num)) {
-                        formField.onChange(num);
-                      }
-                    }
+                    formField.onChange(e.target.value);
                   }}
                   onBlur={formField.onBlur}
                   placeholder={

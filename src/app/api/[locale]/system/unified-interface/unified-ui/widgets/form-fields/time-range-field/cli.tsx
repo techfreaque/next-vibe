@@ -7,19 +7,23 @@ import type { JSX } from "react";
 
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { TimeRangeFieldWidgetConfig } from "./types";
 
-export function TimeRangeFieldWidgetInk<TKey extends string>({
-  value,
+export function TimeRangeFieldWidgetInk<
+  TKey extends string,
+  TEndpoint extends CreateApiEndpointAny,
+>({
   field,
   context,
 }: InkWidgetProps<
+  TEndpoint,
   TimeRangeFieldWidgetConfig<TKey, StringWidgetSchema, FieldUsageConfig>
 >): JSX.Element {
   const { t } = context;
-  const displayValue = value ? String(value) : "—";
+  const displayValue = field.value ? field.value : "—";
 
   return (
     <Box flexDirection="column" marginBottom={1}>

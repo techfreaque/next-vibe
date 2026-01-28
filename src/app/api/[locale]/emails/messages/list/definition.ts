@@ -198,7 +198,6 @@ const { GET } = createEndpoint({
       emails: responseArrayField(
         {
           type: WidgetType.DATA_TABLE,
-          columns: [],
         },
         objectField(
           {

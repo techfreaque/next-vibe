@@ -63,7 +63,7 @@ const { GET } = createEndpoint({
       layoutType: LayoutType.GRID,
       columns: 12,
     },
-    { response: true },
+    { response: true, request: "data" },
     {
       // === REQUEST FIELDS ===
       format: requestField({
@@ -248,6 +248,20 @@ const { GET } = createEndpoint({
         mimeType: MimeType.CSV,
         totalRecords: 150,
         exportedAt: new Date("2023-01-01T12:00:00.000Z"),
+      },
+    },
+    requests: {
+      default: {
+        format: ExportFormat.CSV,
+        status: LeadStatus.NEW,
+        country: Countries.GLOBAL,
+        language: Languages.EN,
+        source: LeadSource.WEBSITE,
+        search: "example",
+        dateFrom: new Date("2023-01-01T00:00:00.000Z"),
+        dateTo: new Date("2023-01-01T00:00:00.000Z"),
+        includeMetadata: false,
+        includeEngagementData: false,
       },
     },
   },

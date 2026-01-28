@@ -6,7 +6,7 @@
 /* eslint-disable simple-import-sort/imports */
 /* eslint-disable prettier/prettier */
 
-import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { setNestedPath } from "next-vibe/shared/utils/object-path";
 
 import { default as endpointDefinition_GET_0 } from "../../agent/chat/threads/definition";

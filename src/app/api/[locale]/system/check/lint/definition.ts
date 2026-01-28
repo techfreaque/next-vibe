@@ -34,7 +34,6 @@ const { POST } = createEndpoint({
     UserRole.WEB_OFF,
     UserRole.PRODUCTION_OFF,
     UserRole.AI_TOOL_OFF,
-    UserRole.MCP_OFF,
     UserRole.CLI_AUTH_BYPASS,
   ],
   aliases: ["eslint", "elint", "el"],
@@ -119,6 +118,27 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
+      // Filter issues by file path, message, or rule
+      filter: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.check.lint.fields.filter.label",
+        description: "app.api.system.check.lint.fields.filter.description",
+        placeholder: "app.api.system.check.lint.fields.filter.placeholder",
+        columns: 8,
+        schema: z.union([z.string(), z.array(z.string())]).optional(),
+      }),
+
+      // Only return summary stats, omit items and files lists
+      summaryOnly: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.check.lint.fields.summaryOnly.label",
+        description: "app.api.system.check.lint.fields.summaryOnly.description",
+        columns: 4,
+        schema: z.boolean().default(false),
+      }),
+
       // === RESPONSE FIELDS ===
       items: responseField({
         type: WidgetType.CODE_QUALITY_LIST,
@@ -131,10 +151,8 @@ const { POST } = createEndpoint({
             line: z.coerce.number().optional(),
             column: z.coerce.number().optional(),
             rule: z.string().optional(),
-            code: z.string().optional(),
             severity: z.enum(["error", "warning", "info"]),
             message: z.string(),
-            type: z.enum(["oxlint", "lint", "type"]),
           }),
         ),
       }),
@@ -145,8 +163,8 @@ const { POST } = createEndpoint({
           .array(
             z.object({
               file: z.string(),
-              errors: z.number(),
-              warnings: z.number(),
+              errors: z.number().optional(),
+              warnings: z.number().optional(),
               total: z.number(),
             }),
           )
@@ -158,12 +176,14 @@ const { POST } = createEndpoint({
         schema: z.object({
           totalIssues: z.number(),
           totalFiles: z.number(),
-          totalErrors: z.number(),
-          displayedIssues: z.number(),
-          displayedFiles: z.number(),
+          totalErrors: z.number().optional(),
+          filteredIssues: z.number().optional(),
+          filteredFiles: z.number().optional(),
+          displayedIssues: z.number().optional(),
+          displayedFiles: z.number().optional(),
           truncatedMessage: z.string().optional(),
-          currentPage: z.number(),
-          totalPages: z.number(),
+          currentPage: z.number().optional(),
+          totalPages: z.number().optional(),
         }),
       }),
     },
@@ -240,6 +260,8 @@ const { POST } = createEndpoint({
           totalIssues: 0,
           totalFiles: 0,
           totalErrors: 0,
+          filteredIssues: 0,
+          filteredFiles: 0,
           displayedIssues: 0,
           displayedFiles: 0,
           currentPage: 1,
@@ -253,6 +275,8 @@ const { POST } = createEndpoint({
           totalIssues: 0,
           totalFiles: 0,
           totalErrors: 0,
+          filteredIssues: 0,
+          filteredFiles: 0,
           displayedIssues: 0,
           displayedFiles: 0,
           currentPage: 1,
@@ -266,6 +290,8 @@ const { POST } = createEndpoint({
           totalIssues: 0,
           totalFiles: 0,
           totalErrors: 0,
+          filteredIssues: 0,
+          filteredFiles: 0,
           displayedIssues: 0,
           displayedFiles: 0,
           currentPage: 1,

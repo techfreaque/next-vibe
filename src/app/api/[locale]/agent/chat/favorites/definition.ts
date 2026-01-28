@@ -65,15 +65,13 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          backButton: backButton(),
-          title: widgetField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.favorites.get.container.title" as const,
-            },
-            { response: true },
-          ),
+          backButton: backButton({ usage: { response: true } }),
+          title: widgetField({
+            type: WidgetType.TEXT,
+            content:
+              "app.api.agent.chat.favorites.get.container.title" as const,
+            usage: { response: true },
+          }),
           createButton: navigateButtonField({
             targetEndpoint: createDefinitions.POST,
             extractParams: () => ({}),
@@ -83,6 +81,7 @@ const { GET } = createEndpoint({
             icon: "plus",
             variant: "ghost",
             className: "ml-auto",
+            usage: { response: true },
           }),
         },
       ),
@@ -189,32 +188,28 @@ const { GET } = createEndpoint({
                       variant: "muted",
                       schema: z.string(),
                     }),
-                    separator1: widgetField(
-                      {
-                        type: WidgetType.TEXT,
-                        size: "xs",
-                        variant: "muted",
-                        content:
-                          "app.api.agent.chat.favorites.get.response.favorite.separator.content" as const,
-                      },
-                      { response: true },
-                    ),
+                    separator1: widgetField({
+                      type: WidgetType.TEXT,
+                      size: "xs",
+                      variant: "muted",
+                      content:
+                        "app.api.agent.chat.favorites.get.response.favorite.separator.content" as const,
+                      usage: { response: true },
+                    }),
                     modelProvider: responseField({
                       type: WidgetType.TEXT,
                       size: "xs",
                       variant: "muted",
                       schema: z.string(),
                     }),
-                    separator2: widgetField(
-                      {
-                        type: WidgetType.TEXT,
-                        size: "xs",
-                        variant: "muted",
-                        content:
-                          "app.api.agent.chat.favorites.get.response.favorite.separator.content" as const,
-                      },
-                      { response: true },
-                    ),
+                    separator2: widgetField({
+                      type: WidgetType.TEXT,
+                      size: "xs",
+                      variant: "muted",
+                      content:
+                        "app.api.agent.chat.favorites.get.response.favorite.separator.content" as const,
+                      usage: { response: true },
+                    }),
                     creditCost: responseField({
                       type: WidgetType.TEXT,
                       size: "xs",
@@ -235,6 +230,7 @@ const { GET } = createEndpoint({
               }),
               prefillFromGet: true,
               getEndpoint: favoriteDefinition.GET,
+              usage: { response: true },
             }),
             deleteButton: navigateButtonField({
               icon: "trash",
@@ -246,6 +242,7 @@ const { GET } = createEndpoint({
               }),
               prefillFromGet: false,
               renderInModal: true,
+              usage: { response: true },
             }),
           },
         ),

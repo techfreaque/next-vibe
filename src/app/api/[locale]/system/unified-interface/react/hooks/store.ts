@@ -13,7 +13,7 @@ import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import { type CreateApiEndpointAny } from "../../shared/types/endpoint";
+import { type CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { executeQuery } from "./query-executor";
 import { buildKey } from "./query-key-builder";
 import type { ApiMutationOptions, ApiQueryOptions } from "./types";

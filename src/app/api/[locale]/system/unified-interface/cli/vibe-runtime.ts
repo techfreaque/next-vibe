@@ -186,7 +186,12 @@ program
 
           performanceMonitor.mark("renderStart");
           if (helpResult.formattedOutput) {
-            process.stdout.write(`${helpResult.formattedOutput}\n`);
+            // Write output and wait for it to drain before exiting (important when piped)
+            await new Promise<void>((resolve) => {
+              process.stdout.write(`${helpResult.formattedOutput}\n`, () => {
+                resolve();
+              });
+            });
           }
           performanceMonitor.mark("renderEnd");
 
@@ -250,7 +255,12 @@ program
 
         performanceMonitor.mark("renderStart");
         if (result.formattedOutput && command !== "mcp") {
-          process.stdout.write(`${result.formattedOutput}\n`);
+          // Write output and wait for it to drain before exiting (important when piped)
+          await new Promise<void>((resolve) => {
+            process.stdout.write(`${result.formattedOutput}\n`, () => {
+              resolve();
+            });
+          });
         }
         performanceMonitor.mark("renderEnd");
 

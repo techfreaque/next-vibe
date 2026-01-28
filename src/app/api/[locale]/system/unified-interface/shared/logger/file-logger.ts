@@ -9,25 +9,30 @@ import type { LoggerMetadata } from "./endpoint";
 /**
  * File logger configuration
  */
-const DEBUG_DIR = ".vibe-debug";
-const DEBUG_FILE = "mcp-auth.log";
+const DEBUG_DIR = ".tmp";
+const DEBUG_FILE = "vibe-mcp.log";
 
 /**
  * Get debug file path
  * Creates debug directory if it doesn't exist
  */
 function getDebugFilePath(): string {
-  const { existsSync, mkdirSync, join } = require("node:fs");
-  // Use VIBE_PROJECT_ROOT if available, otherwise use cwd
-  const projectRoot = process.env.VIBE_PROJECT_ROOT || process.cwd();
+  const { existsSync, mkdirSync } = require("node:fs");
+  const { join } = require("node:path");
+  // Use PROJECT_ROOT if available, otherwise use cwd
+  const projectRoot = process.env.PROJECT_ROOT || process.cwd();
   const debugDir = join(projectRoot, DEBUG_DIR);
 
   // Create debug directory if it doesn't exist
   if (!existsSync(debugDir)) {
     try {
       mkdirSync(debugDir, { recursive: true });
-    } catch {
-      // Ignore errors - logging is best effort
+    } catch (error) {
+      // Write error to stderr so we know why it failed
+      // eslint-disable-next-line no-console
+      process.stderr.write(
+        `Failed to create debug dir at ${debugDir}: ${String(error)}\n`,
+      );
     }
   }
 
@@ -36,16 +41,12 @@ function getDebugFilePath(): string {
 
 /**
  * Write debug message to file
- * This is used when MCP silent mode is enabled and console logging is disabled
+ * Always logs when called - this function is only invoked in MCP mode
  */
 export function fileLog(
   message: string,
   data?: Record<string, LoggerMetadata>,
 ): void {
-  // Only log if DEBUG_FILE_LOGGING is enabled
-  if (process.env.DEBUG_FILE_LOGGING !== "true") {
-    return;
-  }
   const { appendFileSync } = require("node:fs");
 
   try {
@@ -56,33 +57,9 @@ export function fileLog(
 
     const debugPath = getDebugFilePath();
     appendFileSync(debugPath, logEntry, "utf-8");
-  } catch {
-    // Ignore errors - logging is best effort
-    // We can't log the error because we're in silent mode
+  } catch (error) {
+    // Write error to stderr for debugging
+    // eslint-disable-next-line no-console
+    process.stderr.write(`File log failed: ${String(error)}\n`);
   }
-}
-
-/**
- * Clear debug log file
- * Useful at the start of a new session
- */
-export function clearDebugLog(): void {
-  if (process.env.DEBUG_FILE_LOGGING !== "true") {
-    return;
-  }
-
-  try {
-    const debugPath = getDebugFilePath();
-    const fs = require("node:fs");
-    fs.writeFileSync(debugPath, "", "utf-8");
-  } catch {
-    // Ignore errors - logging is best effort
-  }
-}
-
-/**
- * Get debug log file path for user display
- */
-export function getDebugLogPath(): string {
-  return getDebugFilePath();
 }

@@ -5,24 +5,28 @@
 import { Box, Text } from "ink";
 import type { JSX } from "react";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { ArrayWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { MultiSelectFieldWidgetConfig } from "./types";
 
-export function MultiSelectFieldWidgetInk<TKey extends string>({
-  value,
+export function MultiSelectFieldWidgetInk<
+  TKey extends string,
+  TEndpoint extends CreateApiEndpointAny,
+>({
   field,
   context,
 }: InkWidgetProps<
+  TEndpoint,
   MultiSelectFieldWidgetConfig<TKey, ArrayWidgetSchema, FieldUsageConfig>
 >): JSX.Element {
   const { t } = context;
 
   // value is array of selected values
-  const selectedValues = Array.isArray(value) ? value : [];
+  const selectedValues = field.value;
   const selectedOptions = field.options.filter((opt) =>
-    selectedValues.includes(opt.value),
+    selectedValues?.includes(opt.value),
   );
   const displayValue =
     selectedOptions.length > 0

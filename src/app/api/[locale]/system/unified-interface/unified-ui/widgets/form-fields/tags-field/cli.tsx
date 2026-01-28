@@ -5,21 +5,25 @@
 import { Box, Text } from "ink";
 import type { JSX } from "react";
 
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ArrayWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { TagsFieldWidgetConfig } from "./types";
 
-export function TagsFieldWidgetInk<TKey extends string>({
-  value,
+export function TagsFieldWidgetInk<
+  TEndpoint extends CreateApiEndpointAny,
+  TKey extends string,
+>({
   field,
   context,
 }: InkWidgetProps<
+  TEndpoint,
   TagsFieldWidgetConfig<TKey, ArrayWidgetSchema, FieldUsageConfig>
 >): JSX.Element {
   const { t } = context;
-  const tags = Array.isArray(value) ? value : [];
+  const tags = field.value;
   const displayValue = tags.length > 0 ? tags.join(", ") : "—";
 
   return (

@@ -15,7 +15,6 @@ import {
   getIconSizeClassName,
   getSpacingClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
-import type { WidgetData } from "../../../../shared/widgets/widget-data";
 import type { ReactWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { NavigateButtonWidgetConfig } from "./types";
@@ -32,15 +31,17 @@ import type { NavigateButtonWidgetConfig } from "./types";
  * - popNavigationOnSuccess: How many times to pop navigation stack after success
  */
 export function NavigateButtonWidget<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TUsage extends FieldUsageConfig,
+  TSchemaType extends "widget",
   TTargetEndpoint extends CreateApiEndpointAny | undefined,
 >({
   field,
   context,
-  value,
 }: ReactWidgetProps<
-  NavigateButtonWidgetConfig<TKey, TUsage, TTargetEndpoint>
+  TEndpoint,
+  NavigateButtonWidgetConfig<TKey, TUsage, TSchemaType, TTargetEndpoint>
 >): JSX.Element {
   const {
     label,
@@ -139,9 +140,7 @@ export function NavigateButtonWidget<
     }
 
     // Extract params - use response.data as fallback if local value is empty (nested buttons)
-    let sourceData = isWidgetDataObject(value)
-      ? (value as Record<string, WidgetData>)
-      : {};
+    let sourceData = isWidgetDataObject(field.value) ? field.value : {};
 
     // If sourceData is empty and we have response data in context, use response.data
     // This handles nested buttons that don't have access to their parent data
@@ -151,7 +150,7 @@ export function NavigateButtonWidget<
       context.response.data
     ) {
       sourceData = isWidgetDataObject(context.response.data)
-        ? (context.response.data as Record<string, WidgetData>)
+        ? context.response.data
         : {};
     }
 
@@ -163,14 +162,10 @@ export function NavigateButtonWidget<
 
     // If prefillFromGet is true but no getEndpoint provided, use current endpoint if it's a GET
     let effectiveGetEndpoint = metadata.getEndpoint;
-    if (
-      metadata.prefillFromGet &&
-      !effectiveGetEndpoint &&
-      context.currentEndpoint
-    ) {
+    if (metadata.prefillFromGet && !effectiveGetEndpoint && context.endpoint) {
       // Check if current endpoint is a GET endpoint
-      if (context.currentEndpoint.method === "GET") {
-        effectiveGetEndpoint = context.currentEndpoint;
+      if (context.endpoint.method === "GET") {
+        effectiveGetEndpoint = context.endpoint;
         context.logger.debug(
           "NavigateButtonWidget: Using current GET endpoint for prefill",
         );

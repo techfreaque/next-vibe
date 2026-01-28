@@ -20,7 +20,7 @@ import { definitionsRegistry } from "../../system/unified-interface/shared/endpo
 import type { EndpointLogger } from "../../system/unified-interface/shared/logger/endpoint";
 import type { Platform } from "../../system/unified-interface/shared/types/platform";
 import { endpointToToolName } from "../../system/unified-interface/shared/utils/path";
-import type { CreateApiEndpointAny } from "../unified-interface/shared/types/endpoint";
+import type { CreateApiEndpointAny } from "../unified-interface/shared/types/endpoint-base";
 import { getTranslatorFromEndpoint } from "../unified-interface/shared/widgets/utils/field-helpers";
 import type { HelpRequestOutput, HelpResponseOutput } from "./definition";
 

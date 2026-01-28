@@ -91,15 +91,13 @@ const { DELETE } = createEndpoint({
     },
     { request: "urlPathParams", response: true },
     {
-      title: widgetField(
-        {
-          type: WidgetType.TITLE,
-          level: 5,
-          content:
-            "app.api.agent.chat.characters.id.delete.container.description" as const,
-        },
-        { request: "data", response: true },
-      ),
+      title: widgetField({
+        type: WidgetType.TITLE,
+        level: 5,
+        content:
+          "app.api.agent.chat.characters.id.delete.container.description" as const,
+        usage: { request: "urlPathParams", response: true },
+      }),
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField({
         type: WidgetType.FORM_FIELD,
@@ -117,6 +115,7 @@ const { DELETE } = createEndpoint({
           "app.api.agent.chat.characters.id.delete.backButton.label" as const,
         icon: "arrow-left",
         variant: "outline",
+        usage: { request: "urlPathParams", response: true },
       }),
       submitButton: submitButton({
         label:
@@ -125,6 +124,7 @@ const { DELETE } = createEndpoint({
           "app.api.agent.chat.characters.id.delete.actions.deleting" as const,
         icon: "trash",
         variant: "destructive",
+        usage: { request: "urlPathParams", response: true },
       }),
     },
   ),
@@ -241,6 +241,7 @@ const { PATCH } = createEndpoint({
               "app.api.agent.chat.characters.id.patch.backButton.label" as const,
             icon: "arrow-left",
             variant: "outline",
+            usage: { request: "data", response: true },
           }),
           deleteButton: deleteButton({
             label:
@@ -253,6 +254,7 @@ const { PATCH } = createEndpoint({
             variant: "destructive",
             className: "ml-auto",
             popNavigationOnSuccess: 2, // Pop twice: edit -> details -> list
+            usage: { request: "data", response: true },
           }),
           createButton: submitButton({
             label:
@@ -261,19 +263,18 @@ const { PATCH } = createEndpoint({
               "app.api.agent.chat.characters.id.patch.submitButton.loadingText" as const,
             icon: "save",
             variant: "primary",
+            usage: { request: "data", response: true },
           }),
         },
       ),
 
       // Separator between buttons and content (widget field - pure UI)
-      separator: widgetField(
-        {
-          type: WidgetType.SEPARATOR,
-          spacingTop: SpacingSize.RELAXED,
-          spacingBottom: SpacingSize.RELAXED,
-        },
-        { response: true, request: "data" },
-      ),
+      separator: widgetField({
+        type: WidgetType.SEPARATOR,
+        spacingTop: SpacingSize.RELAXED,
+        spacingBottom: SpacingSize.RELAXED,
+        usage: { request: "data", response: true },
+      }),
       // === URL PARAMETERS ===
       id: requestUrlPathParamsResponseField({
         type: WidgetType.FORM_FIELD,
@@ -412,13 +413,11 @@ const { PATCH } = createEndpoint({
                 columns: 12,
                 schema: z.literal(ModelSelectionType.MANUAL),
               }),
-              modelDisplay: widgetField(
-                {
-                  type: WidgetType.MODEL_DISPLAY,
-                  columns: 12,
-                },
-                { request: "data" },
-              ),
+              modelDisplay: widgetField({
+                type: WidgetType.MODEL_DISPLAY,
+                columns: 12,
+                usage: { request: "data", response: true },
+              }),
               manualModelId: requestResponseField({
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.SELECT,
@@ -460,13 +459,11 @@ const { PATCH } = createEndpoint({
                 columns: 12,
                 schema: z.literal(ModelSelectionType.FILTERS),
               }),
-              modelDisplay: widgetField(
-                {
-                  type: WidgetType.MODEL_DISPLAY,
-                  columns: 12,
-                },
-                { request: "data" },
-              ),
+              modelDisplay: widgetField({
+                type: WidgetType.MODEL_DISPLAY,
+                columns: 12,
+                usage: { request: "data", response: true },
+              }),
               intelligenceRange: requestDataRangeField({
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.RANGE_SLIDER,
@@ -742,6 +739,7 @@ const { GET } = createEndpoint({
           backButton: backButton({
             icon: "arrow-left",
             variant: "outline",
+            usage: { response: true },
           }),
 
           // Edit button - uses self-referencing GET endpoint for prefill
@@ -758,6 +756,7 @@ const { GET } = createEndpoint({
             icon: "pencil",
             variant: "default",
             className: "ml-auto",
+            usage: { response: true },
           }),
 
           // Delete button
@@ -771,19 +770,18 @@ const { GET } = createEndpoint({
             icon: "trash",
             variant: "destructive",
             popNavigationOnSuccess: 1, // Pop once: details -> list
+            usage: { response: true },
           }),
         },
       ),
 
       // Separator between buttons and content (widget field - pure UI)
-      separator: widgetField(
-        {
-          type: WidgetType.SEPARATOR,
-          spacingTop: SpacingSize.RELAXED,
-          spacingBottom: SpacingSize.RELAXED,
-        },
-        { response: true },
-      ),
+      separator: widgetField({
+        type: WidgetType.SEPARATOR,
+        spacingTop: SpacingSize.RELAXED,
+        spacingBottom: SpacingSize.RELAXED,
+        usage: { response: true },
+      }),
 
       // === Icon (inline) ===
       icon: responseField({
@@ -907,13 +905,11 @@ const { GET } = createEndpoint({
                 disabled: true,
                 schema: z.literal(ModelSelectionType.MANUAL),
               }),
-              modelDisplay: widgetField(
-                {
-                  type: WidgetType.MODEL_DISPLAY,
-                  columns: 12,
-                },
-                { response: true },
-              ),
+              modelDisplay: widgetField({
+                type: WidgetType.MODEL_DISPLAY,
+                columns: 12,
+                usage: { response: true },
+              }),
               manualModelId: responseField({
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.SELECT,
@@ -955,13 +951,11 @@ const { GET } = createEndpoint({
                 disabled: true,
                 schema: z.literal(ModelSelectionType.FILTERS),
               }),
-              modelDisplay: widgetField(
-                {
-                  type: WidgetType.MODEL_DISPLAY,
-                  columns: 12,
-                },
-                { response: true },
-              ),
+              modelDisplay: widgetField({
+                type: WidgetType.MODEL_DISPLAY,
+                columns: 12,
+                usage: { response: true },
+              }),
               intelligenceRange: responseRangeField({
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.RANGE_SLIDER,
@@ -1076,6 +1070,7 @@ const { GET } = createEndpoint({
         label: "app.api.agent.chat.characters.id.get.backButton.label" as const,
         icon: "arrow-left",
         variant: "outline",
+        usage: { response: true },
       }),
     },
   ),

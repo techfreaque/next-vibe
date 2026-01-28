@@ -27,7 +27,9 @@ const vibeCheck: CheckConfig["vibeCheck"] = {
   skipOxlint: false,
   skipTypecheck: false,
   timeout: 3600,
-  limit: 200,
+  limit: 20000,
+  mcpLimit: 20, // Compact limit for MCP platform
+  editorUriScheme: "vscode://file/", // URI scheme for clickable file links
 };
 
 // ============================================================
@@ -961,8 +963,13 @@ export function createEslintStub(rules: string[]): EslintStubPlugin {
  */
 export function formatIgnorePatterns(patterns: string[]): IgnoreFormats {
   const eslintPatterns = patterns.map((pattern) => {
-    // Already a glob pattern - keep as-is
-    if (pattern.includes("*")) {
+    // Already a glob pattern or regex - keep as-is
+    if (
+      pattern.includes("*") ||
+      pattern.includes("$") ||
+      pattern.includes("^") ||
+      pattern.includes("\\")
+    ) {
       return pattern;
     }
     // File with extension (but not dotfile) - wrap with **/ prefix only

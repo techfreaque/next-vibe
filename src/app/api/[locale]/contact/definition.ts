@@ -16,15 +16,13 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
-  scopedObjectFieldNew,
+  scopedObjectField,
   scopedRequestField,
-  scopedResponseArrayOptionalField,
   scopedResponseField,
 } from "../system/unified-interface/shared/field/utils-new";
 import {
   ContactPriority,
   ContactPriorityOptions,
-  ContactStatus,
   ContactSubject,
   ContactSubjectOptions,
 } from "./enum";
@@ -60,7 +58,7 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: scopedObjectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "form.label",
     description: "form.description",
@@ -126,36 +124,11 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      // Note: leadId comes from JWT payload (user.leadId) on server-side
       success: scopedResponseField(scopedTranslation, {
         schema: z.boolean(),
         type: WidgetType.TEXT,
         content: "response.success",
       }),
-      messageId: scopedResponseField(scopedTranslation, {
-        schema: z.string().optional(),
-        type: WidgetType.TEXT,
-        content: "response.messageId",
-      }),
-      status: scopedResponseArrayOptionalField(
-        scopedTranslation,
-        {
-          type: WidgetType.DATA_LIST,
-          title: "response.status",
-          description: "response.description",
-          usage: { response: true },
-          children: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "response.status",
-            schema: z.string(),
-          }),
-        },
-        scopedResponseField(scopedTranslation, {
-          type: WidgetType.TEXT,
-          content: "response.status",
-          schema: z.string(),
-        }),
-      ),
     },
   }),
   examples: {
@@ -188,18 +161,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        messageId: "msg_123",
-        status: [ContactStatus.NEW],
       },
       success: {
         success: true,
-        messageId: "msg_456",
-        status: [ContactStatus.NEW],
       },
       general: {
         success: true,
-        messageId: "msg_789",
-        status: [ContactStatus.NEW],
       },
     },
   },

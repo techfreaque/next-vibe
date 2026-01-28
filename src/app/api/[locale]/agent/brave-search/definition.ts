@@ -84,8 +84,7 @@ const { GET } = createEndpoint({
       title: "app.api.agent.chat.tools.braveSearch.get.form.title" as const,
       description:
         "app.api.agent.chat.tools.braveSearch.get.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -169,9 +168,8 @@ const { GET } = createEndpoint({
 
       results: responseArrayField(
         {
-          type: WidgetType.LINK_LIST,
-          layoutType: LayoutType.GRID,
-          columns: 12,
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.STACKED,
         },
         objectField(
           {

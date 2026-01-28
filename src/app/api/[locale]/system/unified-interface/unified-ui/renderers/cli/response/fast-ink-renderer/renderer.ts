@@ -10,7 +10,10 @@ import type { BoxProps, StaticProps, TextProps } from "ink";
 import { Box, Static, Text } from "ink";
 import type { JSXElementConstructor, ReactElement, ReactNode } from "react";
 import Reconciler from "react-reconciler";
-import { DefaultEventPriority, LegacyRoot } from "react-reconciler/constants.js";
+import {
+  DefaultEventPriority,
+  LegacyRoot,
+} from "react-reconciler/constants.js";
 
 // NoEventPriority is available at runtime but not in type definitions
 const NoEventPriority = 0;
@@ -43,7 +46,10 @@ type ComponentFunction =
 
 interface RenderNode {
   type: string | ComponentFunction;
-  props: Record<string, string | number | boolean | null | undefined | RenderNode | RenderNode[]>;
+  props: Record<
+    string,
+    string | number | boolean | null | undefined | RenderNode | RenderNode[]
+  >;
   children: RenderNode[];
 }
 
@@ -144,7 +150,9 @@ function parseElement(element: ReactNode): RenderNode | null {
     // Safely access props - element.props is unknown type from React
     const elementProps = "props" in element ? element.props : null;
     const elementChildren =
-      elementProps && typeof elementProps === "object" && "children" in elementProps
+      elementProps &&
+      typeof elementProps === "object" &&
+      "children" in elementProps
         ? elementProps.children
         : null;
 
@@ -213,7 +221,10 @@ function renderText(node: RenderNode): string {
   let content = "";
 
   if (props.children !== null) {
-    if (typeof props.children === "string" || typeof props.children === "number") {
+    if (
+      typeof props.children === "string" ||
+      typeof props.children === "number"
+    ) {
       content = String(props.children);
     } else if (typeof props.children === "object" && "type" in props.children) {
       // Handle nested React elements
@@ -328,7 +339,9 @@ function applyPadding(
   const lines = text.split("\n");
 
   // Apply left and right padding
-  const paddedLines = lines.map((line) => " ".repeat(left) + line + " ".repeat(right));
+  const paddedLines = lines.map(
+    (line) => " ".repeat(left) + line + " ".repeat(right),
+  );
 
   // Apply top and bottom padding
   const topPadding = "\n".repeat(top);
@@ -576,7 +589,13 @@ function renderBox(node: RenderNode): string {
   }
 
   if (paddingTop || paddingBottom || paddingLeft || paddingRight) {
-    output = applyPadding(output, paddingTop, paddingBottom, paddingLeft, paddingRight);
+    output = applyPadding(
+      output,
+      paddingTop,
+      paddingBottom,
+      paddingLeft,
+      paddingRight,
+    );
   }
 
   // ============================================================================
@@ -639,7 +658,11 @@ function renderBox(node: RenderNode): string {
     }
 
     // Apply border colors
-    const applyBorderColor = (char: string, color?: string, dim?: boolean): string => {
+    const applyBorderColor = (
+      char: string,
+      color?: string,
+      dim?: boolean,
+    ): string => {
       let styled = char;
       if (dim) {
         styled = chalk.dim(styled);
@@ -668,7 +691,11 @@ function renderBox(node: RenderNode): string {
     // Top border
     if (borderTop) {
       const left = borderLeft
-        ? applyBorderColor(borderChars.topLeft, borderTopColor, borderTopDimColor)
+        ? applyBorderColor(
+            borderChars.topLeft,
+            borderTopColor,
+            borderTopDimColor,
+          )
         : "";
       const middle = applyBorderColor(
         borderChars.horizontal.repeat(maxWidth),
@@ -676,7 +703,11 @@ function renderBox(node: RenderNode): string {
         borderTopDimColor,
       );
       const right = borderRight
-        ? applyBorderColor(borderChars.topRight, borderTopColor, borderTopDimColor)
+        ? applyBorderColor(
+            borderChars.topRight,
+            borderTopColor,
+            borderTopDimColor,
+          )
         : "";
       borderedLines.push(left + middle + right);
     }
@@ -684,10 +715,18 @@ function renderBox(node: RenderNode): string {
     // Content with side borders
     for (const line of lines) {
       const left = borderLeft
-        ? applyBorderColor(borderChars.vertical, borderLeftColor, borderLeftDimColor)
+        ? applyBorderColor(
+            borderChars.vertical,
+            borderLeftColor,
+            borderLeftDimColor,
+          )
         : "";
       const right = borderRight
-        ? applyBorderColor(borderChars.vertical, borderRightColor, borderRightDimColor)
+        ? applyBorderColor(
+            borderChars.vertical,
+            borderRightColor,
+            borderRightDimColor,
+          )
         : "";
       const paddedLine = line + " ".repeat(Math.max(0, maxWidth - line.length));
       borderedLines.push(left + paddedLine + right);
@@ -696,7 +735,11 @@ function renderBox(node: RenderNode): string {
     // Bottom border
     if (borderBottom) {
       const left = borderLeft
-        ? applyBorderColor(borderChars.bottomLeft, borderBottomColor, borderBottomDimColor)
+        ? applyBorderColor(
+            borderChars.bottomLeft,
+            borderBottomColor,
+            borderBottomDimColor,
+          )
         : "";
       const middle = applyBorderColor(
         borderChars.horizontal.repeat(maxWidth),
@@ -704,7 +747,11 @@ function renderBox(node: RenderNode): string {
         borderBottomDimColor,
       );
       const right = borderRight
-        ? applyBorderColor(borderChars.bottomRight, borderBottomColor, borderBottomDimColor)
+        ? applyBorderColor(
+            borderChars.bottomRight,
+            borderBottomColor,
+            borderBottomDimColor,
+          )
         : "";
       borderedLines.push(left + middle + right);
     }
@@ -849,7 +896,10 @@ function renderStatic<T>(node: RenderNode): string {
     // Render as a box with these styles
     const boxNode: RenderNode = {
       type: Box,
-      props: props.style as Record<string, string | number | boolean | null | undefined>,
+      props: props.style as Record<
+        string,
+        string | number | boolean | null | undefined
+      >,
       children: [{ type: "text", props: { content: output }, children: [] }],
     };
     output = renderBox(boxNode);
@@ -890,7 +940,10 @@ function createStaticReconciler(): ReturnType<typeof Reconciler> {
 
       // Copy primitive props
       for (const key in props) {
-        if (key !== "children" && Object.prototype.hasOwnProperty.call(props, key)) {
+        if (
+          key !== "children" &&
+          Object.prototype.hasOwnProperty.call(props, key)
+        ) {
           const propValue = props[key];
 
           // Handle Ink's style object - extract and flatten style properties

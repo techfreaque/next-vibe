@@ -73,6 +73,7 @@ const { POST } = createEndpoint({
             label: "app.api.leads.create.post.backButton.label",
             icon: "arrow-left",
             variant: "outline",
+            usage: { request: "data", response: true },
           }),
           createButton: submitButton({
             label: "app.api.leads.create.post.submitButton.label",
@@ -80,19 +81,18 @@ const { POST } = createEndpoint({
             icon: "user-plus",
             variant: "primary",
             className: "ml-auto",
+            usage: { request: "data", response: true },
           }),
         },
       ),
 
       // Separator between buttons and content
-      separator: widgetField(
-        {
-          type: WidgetType.SEPARATOR,
-          spacingTop: SpacingSize.RELAXED,
-          spacingBottom: SpacingSize.RELAXED,
-        },
-        { response: true, request: "data" },
-      ),
+      separator: widgetField({
+        type: WidgetType.SEPARATOR,
+        spacingTop: SpacingSize.RELAXED,
+        spacingBottom: SpacingSize.RELAXED,
+        usage: { request: "data", response: true },
+      }),
       // === CONTACT INFORMATION ===
       contactInfo: objectField(
         {
@@ -125,7 +125,7 @@ const { POST } = createEndpoint({
 
           phone: requestField({
             type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.PHONE,
+            fieldType: FieldDataType.TEL,
             label: "app.api.leads.create.post.phone.label",
             description: "app.api.leads.create.post.phone.description",
             placeholder: "app.api.leads.create.post.phone.placeholder",

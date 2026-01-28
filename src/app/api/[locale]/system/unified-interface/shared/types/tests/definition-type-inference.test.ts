@@ -23,10 +23,7 @@ import {
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import type {
-  FieldUsageConfig,
   InferSchemaFromField,
-  ObjectField,
-  PrimitiveField,
   UnifiedField,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -34,7 +31,26 @@ import {
   LayoutType,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetConfig } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
+import type {
+  ObjectWidgetConfig,
+  RequestResponseWidgetConfig,
+} from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
+import type {
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+  ObjectChildrenConstraint,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+
+// Legacy ObjectField type alias for backward compatibility in tests
+// ObjectField<TChildren, TUsage, TKey> → ObjectWidgetConfig<TKey, TUsage, "object", TChildren>
+type ObjectField<
+  TChildren extends ObjectChildrenConstraint<
+    TKey,
+    ConstrainedChildUsage<TUsage>
+  >,
+  TUsage extends FieldUsageConfig,
+  TKey extends string,
+> = ObjectWidgetConfig<TKey, TUsage, "object", TChildren>;
 
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;
@@ -125,8 +141,7 @@ type ImapStep4c3e_DirectFieldsExtendObjectField =
   ImapStep4c3_DirectFields extends ObjectField<
     infer _TChildren,
     infer _TUsage,
-    infer TKey,
-    infer _TUI
+    infer TKey
   >
     ? TKey
     : "no-match";
@@ -150,14 +165,18 @@ type ImapStep4c3f_HasUI = ImapStep4c3_DirectFields extends { ui: infer UI }
   ? UI
   : "no-ui";
 
-// Step 4c3g: Test just the type property
-type ImapStep4c3g_TypeOnly = ImapStep4c3_DirectFields extends { type: "object" }
+// Step 4c3g: Test just the schemaType property
+type ImapStep4c3g_TypeOnly = ImapStep4c3_DirectFields extends {
+  schemaType: "object";
+}
   ? true
   : false;
-type ImapStep4c3g_TypeAny = ImapStep4c3_DirectFields extends { type: string }
+type ImapStep4c3g_TypeAny = ImapStep4c3_DirectFields extends {
+  schemaType: string;
+}
   ? true
   : false;
-type ImapStep4c3g_ExtractType = ImapStep4c3_DirectFields["type"];
+type ImapStep4c3g_ExtractType = ImapStep4c3_DirectFields["schemaType"];
 // If type is widened to string, TypeAny will be true but TypeOnly will be false
 
 type ImapStep4c3g_TypeOnlyVerify = Expect<Equal<ImapStep4c3g_TypeOnly, true>>;
@@ -268,59 +287,43 @@ type Test10a_ExtractTKey =
   Test10a_FieldsType extends ObjectField<
     infer _TChildren,
     infer _TUsage,
-    infer TKey,
-    infer _TUI
+    infer TKey
   >
     ? TKey
     : "no-match";
 // This will show us what TKey the field has
 
 // Test 10b: Check if a simple PrimitiveField matches with string TKey
-type Test10b_SimplePrimitive = PrimitiveField<
+type Test10b_SimplePrimitive = RequestResponseWidgetConfig<
+  string,
   z.ZodString,
   { response: true },
-  string,
-  WidgetConfig<
-    string,
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    Record<string, UnifiedField<string, z.ZodTypeAny>>
-  >
+  "primitive"
 >;
 type Test10b_MatchesWithString =
-  Test10b_SimplePrimitive extends PrimitiveField<
+  Test10b_SimplePrimitive extends RequestResponseWidgetConfig<
+    string,
     infer _TSchema,
     FieldUsageConfig,
-    string,
-    WidgetConfig<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      Record<string, UnifiedField<string, z.ZodTypeAny>>
-    >
+    "primitive"
   >
     ? true
     : false;
 type Test10b_Verify = Expect<Equal<Test10b_MatchesWithString, true>>;
 
 // Test 10c: Check if a narrow TKey field matches with wide TKey pattern
-type Test10c_NarrowPrimitive = PrimitiveField<
+type Test10c_NarrowPrimitive = RequestResponseWidgetConfig<
+  "app.common.test",
   z.ZodString,
   { response: true },
-  "app.common.test",
-  WidgetConfig<"app.common.test", z.ZodTypeAny>
+  "primitive"
 >;
 type Test10c_MatchesWithString =
-  Test10c_NarrowPrimitive extends PrimitiveField<
+  Test10c_NarrowPrimitive extends RequestResponseWidgetConfig<
+    string,
     infer _TSchema,
     FieldUsageConfig,
-    string,
-    WidgetConfig<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      Record<string, UnifiedField<string, z.ZodTypeAny>>
-    >
+    "primitive"
   >
     ? true
     : false;
@@ -328,41 +331,36 @@ type Test10c_Verify = Expect<Equal<Test10c_MatchesWithString, true>>;
 
 // Test 10d: Check if wide TKey field matches with narrow TKey pattern
 type WideUnion = "app.common.test" | "app.common.other";
-type Test10d_WidePrimitive = PrimitiveField<
+type Test10d_WidePrimitive = RequestResponseWidgetConfig<
+  string,
   z.ZodString,
   { response: true },
-  string,
-  WidgetConfig<
-    string,
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    Record<string, UnifiedField<string, z.ZodTypeAny>>
-  >
+  "primitive"
 >;
 type Test10d_MatchesWithNarrow =
-  Test10d_WidePrimitive extends PrimitiveField<
+  Test10d_WidePrimitive extends RequestResponseWidgetConfig<
+    WideUnion,
     infer _TSchema,
     FieldUsageConfig,
-    WideUnion,
-    WidgetConfig<WideUnion, z.ZodTypeAny>
+    "primitive"
   >
     ? true
     : false;
 // With covariance (out), this should be FALSE because string is wider than WideUnion
 
 // Test 10e: Check narrow matches wide (should be true with covariance)
-type Test10e_NarrowField = PrimitiveField<
+type Test10e_NarrowField = RequestResponseWidgetConfig<
+  "app.common.test",
   z.ZodString,
   { response: true },
-  "app.common.test",
-  WidgetConfig<"app.common.test", z.ZodTypeAny>
+  "primitive"
 >;
 type Test10e_MatchesWithWide =
-  Test10e_NarrowField extends PrimitiveField<
+  Test10e_NarrowField extends RequestResponseWidgetConfig<
+    WideUnion,
     infer _TSchema,
     FieldUsageConfig,
-    WideUnion,
-    WidgetConfig<WideUnion, z.ZodTypeAny>
+    "primitive"
   >
     ? true
     : false;
@@ -374,13 +372,7 @@ type Test10f_MatchesObjectFieldString =
   Test10f_ImapFields extends ObjectField<
     infer _TChildren,
     FieldUsageConfig,
-    string,
-    WidgetConfig<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      Record<string, UnifiedField<string, z.ZodTypeAny>>
-    >
+    string
   >
     ? true
     : false;
@@ -393,8 +385,7 @@ type Test10g_MatchesWithScopedKey =
   Test10f_ImapFields extends ObjectField<
     infer _TChildren,
     FieldUsageConfig,
-    Test10g_ScopedKey,
-    WidgetConfig<Test10g_ScopedKey, z.ZodTypeAny>
+    Test10g_ScopedKey
   >
     ? true
     : false;
@@ -402,12 +393,7 @@ type Test10g_MatchesWithScopedKey =
 
 // Test 10h: What is the actual TKey in the IMAP fields?
 type Test10h_ExtractedTKey =
-  Test10f_ImapFields extends ObjectField<
-    infer _C,
-    infer _U,
-    infer TKey,
-    infer _UI
-  >
+  Test10f_ImapFields extends ObjectField<infer _C, infer _U, infer TKey>
     ? TKey
     : "extraction-failed";
 
@@ -425,11 +411,11 @@ type Test10j_ScopedKeyAssignable =
 // ============================================================================
 
 // Test 11a: Simple InferSchemaFromField with matching TKey
-type Test11a_SimpleField = PrimitiveField<
+type Test11a_SimpleField = RequestResponseWidgetConfig<
+  "test.key",
   z.ZodString,
   { response: true },
-  "test.key",
-  WidgetConfig<"test.key", z.ZodTypeAny>
+  "primitive"
 >;
 type Test11a_InferredSchema = InferSchemaFromField<
   Test11a_SimpleField,
@@ -505,7 +491,7 @@ const simpleTestField = responseField({
 });
 type Test12a_SimpleField = typeof simpleTestField;
 type Test12a_ExtractTKey =
-  Test12a_SimpleField extends PrimitiveField<
+  Test12a_SimpleField extends RequestResponseWidgetConfig<
     infer _S,
     infer _U,
     infer TKey,
@@ -529,12 +515,7 @@ const containerField = objectField(
 );
 type Test12b_ContainerField = typeof containerField;
 type Test12b_ExtractTKey =
-  Test12b_ContainerField extends ObjectField<
-    infer _C,
-    infer _U,
-    infer TKey,
-    infer _UI
-  >
+  Test12b_ContainerField extends ObjectField<infer _C, infer _U, infer TKey>
     ? TKey
     : "no-match";
 
@@ -567,21 +548,10 @@ type Test12d_IsNotNever = Test12d_InferredSchema extends z.ZodNever
 // Test 13b: Check if ObjectField with TKey=string matches ObjectField with TKey=narrow
 type EmptyChildren = Record<string, never>;
 type Test13b_StringToNarrow =
-  ObjectField<
+  ObjectField<EmptyChildren, { response: true }, string> extends ObjectField<
     EmptyChildren,
     { response: true },
-    string,
-    WidgetConfig<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      Record<string, UnifiedField<string, z.ZodTypeAny>>
-    >
-  > extends ObjectField<
-    EmptyChildren,
-    { response: true },
-    "narrow",
-    WidgetConfig<"narrow", z.ZodTypeAny>
+    "narrow"
   >
     ? true
     : false;
@@ -589,21 +559,10 @@ type Test13b_StringToNarrow =
 
 // Test 13c: Check if ObjectField with TKey=narrow matches ObjectField with TKey=string
 type Test13c_NarrowToString =
-  ObjectField<
+  ObjectField<EmptyChildren, { response: true }, "narrow"> extends ObjectField<
     EmptyChildren,
     { response: true },
-    "narrow",
-    WidgetConfig<"narrow", z.ZodTypeAny>
-  > extends ObjectField<
-    EmptyChildren,
-    { response: true },
-    string,
-    WidgetConfig<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      Record<string, UnifiedField<string, z.ZodTypeAny>>
-    >
+    string
   >
     ? true
     : false;
@@ -612,17 +571,17 @@ type Test13c_Verify = Expect<Equal<Test13c_NarrowToString, true>>;
 
 // Test 13d: What is TUIConfig in IMAP fields?
 type Test13d_ImapUI =
-  Test10f_ImapFields extends ObjectField<infer _C, infer _U, infer _K, infer UI>
-    ? UI
+  Test10f_ImapFields extends ObjectField<infer _C, infer _U, infer _K>
+    ? never
     : "no-ui";
 
 // Test 13e: Does the IMAP UI extend WidgetConfig<string>?
 type Test13e_UIExtendsWidgetConfigString =
-  Test13d_ImapUI extends WidgetConfig<
+  Test13d_ImapUI extends UnifiedField<
     string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    Record<string, UnifiedField<string, z.ZodTypeAny>>
+    never
   >
     ? true
     : false;
@@ -632,7 +591,7 @@ type Test13e_UIExtendsWidgetConfigString =
 
 // Test 13g: Check the children type
 type Test13g_ImapChildren =
-  Test10f_ImapFields extends ObjectField<infer C, infer _U, infer _K, infer _UI>
+  Test10f_ImapFields extends ObjectField<infer C, infer _U, infer _K>
     ? C
     : "no-children";
 
@@ -640,7 +599,7 @@ type Test13g_ImapChildren =
 type Test13h_ChildrenAreUnifiedFields =
   Test13g_ImapChildren extends Record<
     string,
-    UnifiedField<string, z.ZodTypeAny>
+    UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any> // oxlint-disable-line typescript/no-explicit-any
   >
     ? true
     : false;
@@ -648,39 +607,18 @@ type Test13h_ChildrenAreUnifiedFields =
 // Test 13i: Create a minimal ObjectField and test pattern matching
 type Test13i_MinimalField = ObjectField<
   {
-    name: PrimitiveField<
+    name: RequestResponseWidgetConfig<
+      string,
       z.ZodString,
       { response: true },
-      string,
-      WidgetConfig<
-        string,
-        z.ZodTypeAny,
-        FieldUsageConfig,
-        Record<string, UnifiedField<string, z.ZodTypeAny>>
-      >
+      "primitive"
     >;
   },
   { response: true },
-  string,
-  WidgetConfig<
-    string,
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    Record<string, UnifiedField<string, z.ZodTypeAny>>
-  >
+  string
 >;
 type Test13i_MatchesString =
-  Test13i_MinimalField extends ObjectField<
-    infer _C,
-    FieldUsageConfig,
-    string,
-    WidgetConfig<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      Record<string, UnifiedField<string, z.ZodTypeAny>>
-    >
-  >
+  Test13i_MinimalField extends ObjectField<infer _C, FieldUsageConfig, string>
     ? true
     : false;
 type Test13i_Verify = Expect<Equal<Test13i_MatchesString, true>>;
@@ -688,8 +626,8 @@ type Test13i_Verify = Expect<Equal<Test13i_MatchesString, true>>;
 // Test 13j: The key question - why doesn't IMAP fields match ObjectField<..., string>?
 // Let's check each component separately
 
-// 13j-1: Does the type match?
-type Test13j1_TypeMatches = Test10f_ImapFields extends { type: "object" }
+// 13j-1: Does the schemaType match?
+type Test13j1_TypeMatches = Test10f_ImapFields extends { schemaType: "object" }
   ? true
   : false;
 type Test13j1_Verify = Expect<Equal<Test13j1_TypeMatches, true>>;
@@ -711,30 +649,20 @@ type Test13j3_ChildrenMatches = Test10f_ImapFields extends {
 
 // 13j-4: Does ui match WidgetConfig<string>?
 type Test13j4_UIMatches = Test10f_ImapFields extends {
-  ui: WidgetConfig<
-    string,
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    Record<string, UnifiedField<string, z.ZodTypeAny>>
-  >;
+  ui: UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>; // oxlint-disable-line typescript/no-explicit-any;
 }
   ? true
   : false;
 
 // 13j-5: Check without the UI constraint
 type Test13j5_MatchesWithoutUI =
-  Test10f_ImapFields extends ObjectField<infer _C, infer _U, string, infer _UI>
+  Test10f_ImapFields extends ObjectField<infer _C, infer _U, string>
     ? true
     : false;
 
 // 13j-6: Check without TKey constraint (use any string)
 type Test13j6_MatchesAnyTKey =
-  Test10f_ImapFields extends ObjectField<
-    infer _C,
-    infer _U,
-    infer _TKey,
-    infer _UI
-  >
+  Test10f_ImapFields extends ObjectField<infer _C, infer _U, infer _TKey>
     ? true
     : false;
 
@@ -807,8 +735,8 @@ const directObjectField = objectField(
 );
 type Test15a_DirectType = typeof directObjectField;
 
-// Test 15b: Does this direct field have type: "object"?
-type Test15b_HasTypeObject = Test15a_DirectType extends { type: "object" }
+// Test 15b: Does this direct field have schemaType: "object"?
+type Test15b_HasTypeObject = Test15a_DirectType extends { schemaType: "object" }
   ? true
   : false;
 type Test15b_Verify = Expect<Equal<Test15b_HasTypeObject, true>>;
@@ -818,19 +746,14 @@ type Test15c_TypeProperty = Test15a_DirectType["type"];
 
 // Test 15d: Does it match ObjectField pattern with string TKey?
 type Test15d_MatchesObjectField =
-  Test15a_DirectType extends ObjectField<infer _C, infer _U, string, infer _UI>
+  Test15a_DirectType extends ObjectField<infer _C, infer _U, string>
     ? true
     : false;
 type Test15d_Verify = Expect<Equal<Test15d_MatchesObjectField, true>>;
 
 // Test 15e: What is the TKey in the direct field?
 type Test15e_ExtractTKey =
-  Test15a_DirectType extends ObjectField<
-    infer _C,
-    infer _U,
-    infer TKey,
-    infer _UI
-  >
+  Test15a_DirectType extends ObjectField<infer _C, infer _U, infer TKey>
     ? TKey
     : "no-match";
 
@@ -852,7 +775,9 @@ const fieldWithLabels = objectField(
   },
 );
 type Test15f_FieldWithLabels = typeof fieldWithLabels;
-type Test15f_HasTypeObject = Test15f_FieldWithLabels extends { type: "object" }
+type Test15f_HasTypeObject = Test15f_FieldWithLabels extends {
+  schemaType: "object";
+}
   ? true
   : false;
 type Test15f_Verify = Expect<Equal<Test15f_HasTypeObject, true>>;

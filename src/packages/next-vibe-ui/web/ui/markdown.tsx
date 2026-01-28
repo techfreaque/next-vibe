@@ -384,8 +384,16 @@ export function Markdown({
             // eslint-disable-next-line @typescript-eslint/no-base-to-string
             const codeString = String(children).replace(/\n$/, "");
 
+            // Check if this is a code block (has newlines or is in a pre tag)
+            const isCodeBlock = codeString.includes("\n") || className;
+
             if (match) {
               return <CodeBlock code={codeString} language={match[1]} />;
+            }
+
+            // If it's a code block without language, use "text" as default
+            if (isCodeBlock) {
+              return <CodeBlock code={codeString} language="text" />;
             }
 
             // Inline code

@@ -20,6 +20,7 @@ import {
 } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { EnumWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -39,20 +40,21 @@ import { getFieldValidationState } from "../_shared/validation";
 import type { FilterPillsFieldWidgetConfig } from "./types";
 
 export function FilterPillsFieldWidget<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TSchema extends EnumWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
   field,
-  form,
   fieldName,
   context,
 }: ReactWidgetProps<
+  TEndpoint,
   FilterPillsFieldWidgetConfig<TKey, TSchema, TUsage>
 >): JSX.Element {
   const { t } = context;
 
-  if (!form || !fieldName) {
+  if (!context.form || !fieldName) {
     return (
       <Div>
         {t(
@@ -68,8 +70,8 @@ export function FilterPillsFieldWidget<
 
   return (
     <FormField
-      control={form.control}
-      name={fieldName as never}
+      control={context.form.control}
+      name={fieldName}
       render={({ field: formField, fieldState }) => {
         const validationState = getFieldValidationState(
           formField.value,

@@ -3,7 +3,7 @@
  * Common path manipulation functions
  */
 
-import type { CreateApiEndpointAny } from "../types/endpoint";
+import type { CreateApiEndpointAny } from "../types/endpoint-base";
 
 /**
  * Path separator - underscore used consistently across entire codebase

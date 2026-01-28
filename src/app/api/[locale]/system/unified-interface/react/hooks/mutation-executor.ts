@@ -15,7 +15,7 @@ import { EndpointErrorTypes } from "@/app/api/[locale]/system/unified-interface/
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { callApi, containsFile, objectToFormData } from "./api-utils";
 
 /**

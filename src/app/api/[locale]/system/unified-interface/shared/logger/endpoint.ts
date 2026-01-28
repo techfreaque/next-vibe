@@ -6,6 +6,7 @@ import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { ErrorResponseType } from "../../../../shared/types/response.schema";
+import { fileLog } from "./file-logger";
 
 /**
  * Logger metadata - structured data for logging
@@ -23,15 +24,13 @@ export type LoggerMetadata =
   | LoggerMetadata[];
 
 /**
- * Dynamically import and use file logging
- * Only imports when actually needed (in MCP mode)
+ * Write to file for MCP mode
  */
-async function writeToFile(
+function writeToFile(
   message: string,
   data?: Record<string, LoggerMetadata>,
-): Promise<void> {
+): void {
   try {
-    const { fileLog } = await import("./file-logger");
     fileLog(message, data);
   } catch {
     // Ignore errors - logging is best effort
@@ -98,9 +97,13 @@ export function createEndpointLogger(
   return {
     info(message: string, ...metadata: LoggerMetadata[]): void {
       if (mcpSilentMode) {
+        if (!(debugEnabled || enableDebugLogger)) {
+          // use --verbose / or set
+          return;
+        }
         // In MCP mode, dynamically import and log to file instead of console
         const metadataObj = metadata.length > 0 ? { metadata } : undefined;
-        void writeToFile(`[INFO] ${formatMessage(message)}`, metadataObj);
+        writeToFile(`[INFO] ${formatMessage(message)}`, metadataObj);
       } else {
         // oxlint-disable-next-line no-console
         console.log(formatMessage(message), ...metadata);
@@ -113,13 +116,17 @@ export function createEndpointLogger(
       ...metadata: LoggerMetadata[]
     ): void {
       if (mcpSilentMode) {
+        if (!(debugEnabled || enableDebugLogger)) {
+          // use --verbose / or set src/config/debug.ts to true
+          return;
+        }
         // In MCP mode, dynamically import and log to file instead of console
         const typedError = error ? parseError(error) : undefined;
         const metadataObj = {
           error: typedError,
           ...(metadata.length > 0 && { metadata }),
         };
-        void writeToFile(`[ERROR] ${formatMessage(message)}`, metadataObj);
+        writeToFile(`[ERROR] ${formatMessage(message)}`, metadataObj);
       } else {
         // oxlint-disable-next-line no-console
         console.error(formatMessage(message), error, ...metadata);
@@ -128,12 +135,13 @@ export function createEndpointLogger(
 
     vibe(message: string, ...metadata: LoggerMetadata[]): void {
       if (mcpSilentMode) {
-        // In MCP mode, dynamically import and log to file instead of console
+        if (!(debugEnabled || enableDebugLogger)) {
+          // use --verbose / or set src/config/debug.ts to true
+          return;
+        }
+        // In MCP mode, log to file instead of console
         const metadataObj = metadata.length > 0 ? { metadata } : undefined;
-        void writeToFile(
-          `[VIBE] [${getElapsedTime()}] ${message}`,
-          metadataObj,
-        );
+        writeToFile(`[VIBE] [${getElapsedTime()}] ${message}`, metadataObj);
       } else {
         // Special vibe formatting - messages are plain strings
         // oxlint-disable-next-line no-console
@@ -146,7 +154,7 @@ export function createEndpointLogger(
         if (mcpSilentMode) {
           // In MCP mode, dynamically import and log to file instead of console
           const metadataObj = metadata.length > 0 ? { metadata } : undefined;
-          void writeToFile(`[DEBUG] ${formatMessage(message)}`, metadataObj);
+          writeToFile(`[DEBUG] ${formatMessage(message)}`, metadataObj);
         } else {
           // oxlint-disable-next-line no-console
           console.log(formatMessage(message), ...metadata);
@@ -155,9 +163,13 @@ export function createEndpointLogger(
     },
     warn(message: string, ...metadata: LoggerMetadata[]): void {
       if (mcpSilentMode) {
+        if (!(debugEnabled || enableDebugLogger)) {
+          // use --verbose / or set src/config/debug.ts to true
+          return;
+        }
         // In MCP mode, dynamically import and log to file instead of console
         const metadataObj = metadata.length > 0 ? { metadata } : undefined;
-        void writeToFile(`[WARN] ${formatMessage(message)}`, metadataObj);
+        writeToFile(`[WARN] ${formatMessage(message)}`, metadataObj);
       } else {
         // oxlint-disable-next-line no-console
         console.warn(formatMessage(message), ...metadata);

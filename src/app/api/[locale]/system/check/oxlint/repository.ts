@@ -7,6 +7,7 @@ import { existsSync, promises as fs } from "node:fs";
 import { relative, resolve } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
 import { success } from "../../../shared/types/response.schema";
@@ -14,6 +15,7 @@ import { parseError } from "../../../shared/utils/parse-error";
 import { ensureConfigReady } from "../config/repository";
 import { sortIssuesByLocation } from "../config/shared";
 import type { CheckConfig } from "../config/types";
+import { calculateFilteredSummary, filterIssues } from "../shared/filter-utils";
 import type {
   OxlintIssue,
   OxlintRequestOutput,
@@ -27,6 +29,7 @@ export interface OxlintRepositoryInterface {
   execute(
     data: OxlintRequestOutput,
     logger: EndpointLogger,
+    platform: Platform,
     providedConfig?: CheckConfig,
   ): Promise<ApiResponseType<OxlintResponseOutput>>;
 }
@@ -40,8 +43,10 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   async execute(
     data: OxlintRequestOutput,
     logger: EndpointLogger,
+    platform: Platform,
     providedConfig?: CheckConfig,
   ): Promise<ApiResponseType<OxlintResponseOutput>> {
+    const isMCP = platform === Platform.MCP;
     try {
       logger.debug(
         `[OXLINT] Starting execution (path: ${data.path || "./"}, fix: ${data.fix})`,
@@ -88,6 +93,17 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       // Store config for use in methods
       this.config = config;
 
+      // Apply mcpLimit when platform is MCP
+      const defaults = config.vibeCheck || {};
+      const defaultLimit = isMCP
+        ? (defaults.mcpLimit ?? defaults.limit ?? 100)
+        : (defaults.limit ?? 200);
+
+      const effectiveData = {
+        ...data,
+        limit: data.limit ?? defaultLimit,
+      };
+
       // Check if oxlint is enabled
       if (!config.oxlint.enabled) {
         logger.info("Oxlint is disabled in check.config.ts");
@@ -113,10 +129,10 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       await fs.mkdir(cacheDir, { recursive: true });
 
       // Handle multiple paths - support files, folders, or mixed
-      const targetPaths = data.path
-        ? Array.isArray(data.path)
-          ? data.path
-          : [data.path]
+      const targetPaths = effectiveData.path
+        ? Array.isArray(effectiveData.path)
+          ? effectiveData.path
+          : [effectiveData.path]
         : ["./"];
 
       logger.debug(
@@ -127,19 +143,21 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       // Oxlint will handle file discovery based on ignore patterns in config
       const result = await this.runOxlint(
         targetPaths,
-        data.fix,
-        data.timeout,
+        effectiveData.fix,
+        effectiveData.timeout,
         logger,
       );
 
       // Build response with pagination
       const response = this.buildResponse(
-        data.skipSorting ? result.issues : sortIssuesByLocation(result.issues),
-        data,
+        effectiveData.skipSorting
+          ? result.issues
+          : sortIssuesByLocation(result.issues),
+        effectiveData,
       );
 
       logger.debug(
-        `[OXLINT] Execution completed (${response.items.length} issues found)`,
+        `[OXLINT] Execution completed (${response.items?.length ?? 0} issues found)`,
       );
 
       return success(response);
@@ -187,7 +205,6 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     timeout: number,
     logger: EndpointLogger,
   ): Promise<{ issues: OxlintIssue[] }> {
-    // eslint-disable-next-line i18next/no-literal-string
     logger.debug(`[OXLINT] Running on ${paths.length} path(s)`);
 
     // Build oxlint command arguments
@@ -341,12 +358,17 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
    */
   private formatFileStats(
     fileStats: Map<string, { errors: number; warnings: number; total: number }>,
-  ): Array<{ file: string; errors: number; warnings: number; total: number }> {
+  ): Array<{
+    file: string;
+    errors?: number;
+    warnings?: number;
+    total: number;
+  }> {
     return [...fileStats.entries()]
       .map(([file, stats]) => ({
         file,
-        errors: stats.errors,
-        warnings: stats.warnings,
+        ...(stats.errors !== stats.total && { errors: stats.errors }),
+        ...(stats.warnings > 0 && { warnings: stats.warnings }),
         total: stats.total,
       }))
       .toSorted((a, b) => a.file.localeCompare(b.file));
@@ -359,42 +381,44 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     allIssues: OxlintIssue[],
     data: OxlintRequestOutput,
   ): OxlintResponseOutput {
-    const totalIssues = allIssues.length;
-    const totalFiles = new Set(allIssues.map((issue) => issue.file)).size;
-    const totalErrors = allIssues.filter(
-      (issue) => issue.severity === "error",
-    ).length;
+    // Apply filtering
+    const filteredIssues = filterIssues(allIssues, data.filter);
 
-    const fileStats = this.buildFileStats(allIssues);
-    const files = this.formatFileStats(fileStats);
-
+    // Pagination
     const limit = data.limit;
     const currentPage = data.page;
-    const totalPages = Math.ceil(totalIssues / limit);
     const startIndex = (currentPage - 1) * limit;
     const endIndex = startIndex + limit;
-    const limitedIssues = allIssues.slice(startIndex, endIndex);
+    const paginatedIssues = filteredIssues.slice(startIndex, endIndex);
 
-    const displayedIssues = limitedIssues.length;
-    const displayedFiles = new Set(limitedIssues.map((issue) => issue.file))
-      .size;
+    // Calculate summary with filter awareness
+    const summary = calculateFilteredSummary(
+      allIssues,
+      filteredIssues,
+      paginatedIssues,
+      currentPage,
+      limit,
+    );
+
+    // Build files list from filtered issues (unless summaryOnly is true)
+    let files:
+      | Array<{
+          file: string;
+          errors?: number;
+          warnings?: number;
+          total: number;
+        }>
+      | undefined;
+
+    if (!data.summaryOnly) {
+      const fileStats = this.buildFileStats(filteredIssues);
+      files = this.formatFileStats(fileStats);
+    }
 
     return {
-      items: limitedIssues,
+      items: paginatedIssues,
       files,
-      summary: {
-        totalIssues,
-        totalFiles,
-        totalErrors,
-        displayedIssues,
-        displayedFiles,
-        truncatedMessage:
-          displayedIssues < totalIssues || displayedFiles < totalFiles
-            ? `Showing ${displayedIssues} of ${totalIssues} issues from ${displayedFiles} of ${totalFiles} files`
-            : "",
-        currentPage,
-        totalPages,
-      },
+      summary,
     };
   }
 
@@ -560,15 +584,14 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
           message = `'${name}' is unused. Either use it or remove it.`;
         }
 
+        const ruleCode = diagnostic.code;
         issues.push({
           file: relativePath,
           line,
           column,
-          rule: diagnostic.code,
-          code: diagnostic.code,
+          ...(ruleCode && { rule: ruleCode }),
           severity,
           message,
-          type: "oxlint",
         });
       }
     } catch (error) {

@@ -79,7 +79,9 @@ const { GET } = createEndpoint({
       title: "app.api.leads.list.get.form.title" as const,
       description: "app.api.leads.list.get.form.description" as const,
       layoutType: LayoutType.STACKED,
-      getCount: (data) => data.response?.paginationInfo?.total,
+      getCount: (data: {
+        response?: { paginationInfo?: { total?: number } };
+      }) => data.response?.paginationInfo?.total,
       submitButton: {
         text: "app.api.leads.list.get.actions.refresh" as const,
         loadingText: "app.api.leads.list.get.actions.refreshing" as const,
@@ -101,7 +103,9 @@ const { GET } = createEndpoint({
         },
         { request: "data", response: true },
         {
-          backButton: backButton(),
+          backButton: backButton({
+            usage: { request: "data", response: true },
+          }),
           createButton: navigateButtonField({
             targetEndpoint: createLeadDefinitions.POST,
             extractParams: () => ({}),
@@ -110,19 +114,18 @@ const { GET } = createEndpoint({
             icon: "plus",
             variant: "default",
             className: "ml-auto",
+            usage: { request: "data", response: true },
           }),
         },
       ),
 
       // Separator between buttons and content
-      separator: widgetField(
-        {
-          type: WidgetType.SEPARATOR,
-          spacingTop: SpacingSize.RELAXED,
-          spacingBottom: SpacingSize.RELAXED,
-        },
-        { response: true, request: "data" },
-      ),
+      separator: widgetField({
+        type: WidgetType.SEPARATOR,
+        spacingTop: SpacingSize.RELAXED,
+        spacingBottom: SpacingSize.RELAXED,
+        usage: { request: "data", response: true },
+      }),
 
       // === STATUS & CAMPAIGN FILTERS (with Search) ===
       statusFilters: objectOptionalField(
@@ -260,13 +263,11 @@ const { GET } = createEndpoint({
       ),
 
       // === FORM ALERT (shows validation and API errors) ===
-      formAlert: widgetField(
-        {
-          type: WidgetType.FORM_ALERT,
-          order: 3.5,
-        },
-        { request: "data" },
-      ),
+      formAlert: widgetField({
+        type: WidgetType.FORM_ALERT,
+        order: 3.5,
+        usage: { request: "data" },
+      }),
 
       // === RESPONSE FIELDS ===
       response: objectField(
@@ -287,7 +288,7 @@ const { GET } = createEndpoint({
               metadata: {
                 onRowClick: {
                   targetEndpoint: leadSingleDefinitions.GET,
-                  extractParams: (lead) => ({
+                  extractParams: (lead: { id: string }) => ({
                     urlPathParams: { id: lead.id as string },
                   }),
                 },

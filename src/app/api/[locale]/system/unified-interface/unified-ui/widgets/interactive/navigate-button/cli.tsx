@@ -12,6 +12,7 @@ import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-bas
 import type { NavigateButtonWidgetConfig } from "./types";
 
 export function NavigateButtonWidgetInk<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TUsage extends FieldUsageConfig,
   TTargetEndpoint extends CreateApiEndpointAny | undefined,
@@ -19,6 +20,7 @@ export function NavigateButtonWidgetInk<
   field,
   context,
 }: InkWidgetProps<
+  TEndpoint,
   NavigateButtonWidgetConfig<TKey, TUsage, "widget", TTargetEndpoint>
 >): JSX.Element {
   const { t } = context;

@@ -135,14 +135,15 @@ class PermissionsRegistry implements IPermissionsRegistry {
         break;
 
       case "mcp":
+        // MCP uses opt-in model: only endpoints with MCP_ON marker are accessible
         if (
-          platformMarkers.includes(PlatformMarker.MCP_OFF) ||
+          !platformMarkers.includes(PlatformMarker.MCP_ON) ||
           platformMarkers.includes(PlatformMarker.CLI_OFF)
         ) {
           return {
             allowed: false,
-            reason: `Endpoint is not accessible via ${platformStr.toUpperCase()} platform`,
-            blockedByRole: PlatformMarker.MCP_OFF,
+            reason: `Endpoint is not accessible via ${platformStr.toUpperCase()} platform (requires MCP_ON marker)`,
+            blockedByRole: PlatformMarker.MCP_ON,
           };
         }
         break;

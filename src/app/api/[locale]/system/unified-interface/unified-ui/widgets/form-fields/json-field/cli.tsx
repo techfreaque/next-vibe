@@ -7,28 +7,34 @@ import TextInput from "ink-text-input";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+
+import type { StringWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { JsonFieldWidgetConfig } from "./types";
-import type { StringWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 
-export function JsonFieldWidgetInk<TKey extends string>({
-  value,
+export function JsonFieldWidgetInk<
+  TEndpoint extends CreateApiEndpointAny,
+  TKey extends string,
+>({
   field,
   fieldName,
   context,
-  form,
 }: InkWidgetProps<
+  TEndpoint,
   JsonFieldWidgetConfig<TKey, StringWidgetSchema, FieldUsageConfig>
 >): JSX.Element {
   const { t } = context;
   const [inputValue, setInputValue] = useState(
-    value ? JSON.stringify(value, null, 2) : "",
+    field.value ? JSON.stringify(field.value, null, 2) : "",
   );
 
   // Response mode - just display the value
   if (context.response) {
-    const displayValue = value ? JSON.stringify(value, null, 2) : "—";
+    const displayValue = field.value
+      ? JSON.stringify(field.value, null, 2)
+      : "—";
     return (
       <Box flexDirection="column">
         {field.label && (
@@ -43,7 +49,7 @@ export function JsonFieldWidgetInk<TKey extends string>({
   }
 
   // Request mode - show interactive input
-  if (!form || !fieldName) {
+  if (!context.form || !fieldName) {
     return (
       <Box>
         <Text color="red">
@@ -56,7 +62,7 @@ export function JsonFieldWidgetInk<TKey extends string>({
   }
 
   const isRequired = !field.schema.isOptional();
-  const error = form.errors[fieldName];
+  const error = context.form.errors[fieldName];
 
   return (
     <Box flexDirection="column" marginBottom={1}>
@@ -80,7 +86,7 @@ export function JsonFieldWidgetInk<TKey extends string>({
             setInputValue(newValue);
             try {
               const parsed = JSON.parse(newValue);
-              form.setValue(fieldName, parsed);
+              context.form?.setValue(fieldName, parsed);
             } catch {
               // Invalid JSON, don't update form
             }

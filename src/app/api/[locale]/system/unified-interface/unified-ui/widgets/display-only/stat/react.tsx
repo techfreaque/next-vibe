@@ -6,6 +6,8 @@ import { Minus, TrendingDown, TrendingUp } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+
 import type { NumberWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import {
   getIconSizeClassName,
@@ -13,10 +15,10 @@ import {
   getTextSizeClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
+import type { FieldUsageConfig } from "../../_shared/types";
 import { Icon } from "../../form-fields/icon-field/icons";
 import { formatStatValue } from "./shared";
 import type { StatWidgetConfig } from "./types";
-import type { FieldUsageConfig } from "../../_shared/types";
 
 // Color variants for different stat types
 type StatVariant =
@@ -80,14 +82,18 @@ const variantClasses: Record<StatVariant, string> = {
  * @param className - Optional CSS classes
  */
 export function StatWidget<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TSchema extends NumberWidgetSchema,
   TUsage extends FieldUsageConfig,
+  TSchemaType extends "primitive",
 >({
-  value,
   field,
   context,
-}: ReactWidgetProps<StatWidgetConfig<TKey, TSchema, TUsage>>): JSX.Element {
+}: ReactWidgetProps<
+  TEndpoint,
+  StatWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
+>): JSX.Element {
   const {
     label: labelKey,
     format,
@@ -140,11 +146,10 @@ export function StatWidget<
       padding: "p-5",
     },
   };
-  const sizeDefault =
-    sizeDefaults[size as keyof typeof sizeDefaults] || sizeDefaults.md;
+  const sizeDefault = sizeDefaults[size] || sizeDefaults.md;
 
   // Handle non-numeric values
-  if (typeof value !== "number") {
+  if (typeof field.value !== "number") {
     return (
       <Card className={cn("h-full", className)}>
         <CardContent
@@ -169,7 +174,7 @@ export function StatWidget<
   }
 
   // Format the value
-  const formattedValue = formatStatValue(value, format, context.locale);
+  const formattedValue = formatStatValue(field.value, format, context.locale);
 
   // Get variant class
   const variantClass =

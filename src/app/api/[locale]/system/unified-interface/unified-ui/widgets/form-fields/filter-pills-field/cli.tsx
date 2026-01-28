@@ -5,22 +5,27 @@
 import { Box, Text } from "ink";
 import type { JSX } from "react";
 
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+
+import type { EnumWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { FilterPillsFieldWidgetConfig } from "./types";
-import type { EnumWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 
-export function FilterPillsFieldWidgetInk<TKey extends string>({
-  value,
+export function FilterPillsFieldWidgetInk<
+  TEndpoint extends CreateApiEndpointAny,
+  TKey extends string,
+>({
   field,
   context,
 }: InkWidgetProps<
+  TEndpoint,
   FilterPillsFieldWidgetConfig<TKey, EnumWidgetSchema, FieldUsageConfig>
 >): JSX.Element {
   const { t } = context;
 
   // Find selected option
-  const selectedOption = field.options.find((opt) => opt.value === value);
+  const selectedOption = field.options.find((opt) => opt.value === field.value);
   const displayValue = selectedOption ? t(selectedOption.label) : "—";
 
   return (

@@ -29,7 +29,7 @@ import {
   createGenericHandler,
 } from "../shared/endpoints/route/handler";
 import { createEndpointLogger } from "../shared/logger/endpoint";
-import type { CreateApiEndpointAny } from "../shared/types/endpoint";
+import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Methods } from "../shared/types/enums";
 import { Platform } from "../shared/types/platform";
 

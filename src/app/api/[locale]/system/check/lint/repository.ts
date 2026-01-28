@@ -7,6 +7,7 @@ import { promises as fs } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
 import { success } from "../../../shared/types/response.schema";
@@ -22,6 +23,7 @@ import {
 } from "../config/shared";
 import type { CheckConfig } from "../config/types";
 import { getSystemResources } from "../config/utils";
+import { calculateFilteredSummary, filterIssues } from "../shared/filter-utils";
 import type {
   LintIssue,
   LintRequestOutput,
@@ -51,10 +53,8 @@ interface WorkerResult {
     line?: number;
     column?: number;
     rule?: string;
-    code?: string;
     severity: "error" | "warning" | "info";
     message: string;
-    type: "oxlint" | "lint" | "type";
   }>;
   duration: number;
   error?: string;
@@ -67,6 +67,7 @@ export interface LintRepositoryInterface {
   execute(
     data: LintRequestOutput,
     logger: EndpointLogger,
+    platform?: Platform,
     providedConfig?: CheckConfig,
   ): Promise<ApiResponseType<LintResponseOutput>>;
 }
@@ -78,8 +79,10 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
   async execute(
     data: LintRequestOutput,
     logger: EndpointLogger,
+    platform: Platform,
     providedConfig?: CheckConfig,
   ): Promise<ApiResponseType<LintResponseOutput>> {
+    const isMCP = platform === Platform.MCP;
     try {
       // Use provided config or load it
       let checkConfig: CheckConfig;
@@ -161,6 +164,17 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
 
       logger.debug("[ESLINT] Configuration loaded");
 
+      // Apply mcpLimit when platform is MCP
+      const defaults = checkConfig.vibeCheck || {};
+      const defaultLimit = isMCP
+        ? (defaults.mcpLimit ?? defaults.limit ?? 100)
+        : (defaults.limit ?? 200);
+
+      const effectiveData = {
+        ...data,
+        limit: data.limit ?? defaultLimit,
+      };
+
       // At this point, we know eslint is enabled (checked above)
       const enabledConfig = checkConfig as CheckConfig & {
         eslint: { enabled: true; configPath: string; cachePath: string };
@@ -173,11 +187,11 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         // Non-parallel mode: pass paths directly to eslint
 
         logger.debug(
-          `[ESLINT] Starting sequential execution (path: ${data.path || "./"}, fix: ${data.fix})`,
+          `[ESLINT] Starting sequential execution (path: ${effectiveData.path || "./"}, fix: ${effectiveData.fix})`,
         );
 
         const result = await this.executeSequential(
-          data,
+          effectiveData,
           enabledConfig,
           logger,
         );
@@ -192,7 +206,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       // Parallel mode: discover files and distribute across workers
 
       logger.debug(
-        `[ESLINT] Starting parallel execution (path: ${data.path || "./"}, fix: ${data.fix})`,
+        `[ESLINT] Starting parallel execution (path: ${effectiveData.path || "./"}, fix: ${effectiveData.fix})`,
       );
 
       // Get system resources and determine optimal worker count
@@ -203,10 +217,14 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       );
 
       // Discover files to lint using config's ignored directories
-      const filesToLint = await discoverFiles(data.path || "./", logger, {
-        extensions: enabledConfig.eslint.lintableExtensions,
-        ignores: enabledConfig.eslint.ignores || [],
-      });
+      const filesToLint = await discoverFiles(
+        effectiveData.path || "./",
+        logger,
+        {
+          extensions: enabledConfig.eslint.lintableExtensions,
+          ignores: enabledConfig.eslint.ignores || [],
+        },
+      );
 
       logger.debug(`[ESLINT] Found ${filesToLint.length} files to lint`);
 
@@ -234,7 +252,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       const workerTasks = this.distributeFiles(
         filesToLint,
         resources.maxWorkers,
-        data,
+        effectiveData,
         eslintConfigPath,
       );
 
@@ -252,7 +270,11 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       );
 
       // Merge results from all workers
-      const mergedResult = this.mergeWorkerResults(workerResults, data, logger);
+      const mergedResult = this.mergeWorkerResults(
+        workerResults,
+        effectiveData,
+        logger,
+      );
 
       logger.debug(
         `[ESLINT] Parallel execution completed (${mergedResult.items.length} issues found)`,
@@ -485,7 +507,6 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
                 tasks[i].id,
                 String(result.reason),
               ),
-              type: "lint" as const,
             },
           ],
           duration: 0,
@@ -570,7 +591,6 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
             file: "worker-error",
             severity: "error" as const,
             message: errorMessage,
-            type: "lint" as const,
           },
         ],
         duration: Date.now() - startTime,
@@ -614,12 +634,17 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
    */
   private formatFileStats(
     fileStats: Map<string, { errors: number; warnings: number; total: number }>,
-  ): Array<{ file: string; errors: number; warnings: number; total: number }> {
+  ): Array<{
+    file: string;
+    errors?: number;
+    warnings?: number;
+    total: number;
+  }> {
     return [...fileStats.entries()]
       .map(([file, stats]) => ({
         file,
-        errors: stats.errors,
-        warnings: stats.warnings,
+        ...(stats.errors !== stats.total && { errors: stats.errors }),
+        ...(stats.warnings > 0 && { warnings: stats.warnings }),
         total: stats.total,
       }))
       .toSorted((a, b) => a.file.localeCompare(b.file));
@@ -632,42 +657,44 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     allIssues: LintIssue[],
     data: LintRequestOutput,
   ): LintResponseOutput {
-    const totalIssues = allIssues.length;
-    const totalFiles = new Set(allIssues.map((issue) => issue.file)).size;
-    const totalErrors = allIssues.filter(
-      (issue) => issue.severity === "error",
-    ).length;
+    // Apply filtering
+    const filteredIssues = filterIssues(allIssues, data.filter);
 
-    const fileStats = this.buildFileStats(allIssues);
-    const files = this.formatFileStats(fileStats);
-
+    // Pagination
     const limit = data.limit;
     const currentPage = data.page;
-    const totalPages = Math.ceil(totalIssues / limit);
     const startIndex = (currentPage - 1) * limit;
     const endIndex = startIndex + limit;
-    const limitedIssues = allIssues.slice(startIndex, endIndex);
+    const paginatedIssues = filteredIssues.slice(startIndex, endIndex);
 
-    const displayedIssues = limitedIssues.length;
-    const displayedFiles = new Set(limitedIssues.map((issue) => issue.file))
-      .size;
+    // Calculate summary with filter awareness
+    const summary = calculateFilteredSummary(
+      allIssues,
+      filteredIssues,
+      paginatedIssues,
+      currentPage,
+      limit,
+    );
+
+    // Build files list from filtered issues (unless summaryOnly is true)
+    let files:
+      | Array<{
+          file: string;
+          errors?: number;
+          warnings?: number;
+          total: number;
+        }>
+      | undefined;
+
+    if (!data.summaryOnly) {
+      const fileStats = this.buildFileStats(filteredIssues);
+      files = this.formatFileStats(fileStats);
+    }
 
     return {
-      items: limitedIssues,
+      items: paginatedIssues,
       files,
-      summary: {
-        totalIssues,
-        totalFiles,
-        totalErrors,
-        displayedIssues,
-        displayedFiles,
-        truncatedMessage:
-          displayedIssues < totalIssues || displayedFiles < totalFiles
-            ? `Showing ${displayedIssues} of ${totalIssues} issues from ${displayedFiles} of ${totalFiles} files`
-            : "",
-        currentPage,
-        totalPages,
-      },
+      summary,
     };
   }
 
@@ -851,15 +878,14 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
             hasFixableInResult = true;
           }
 
+          const ruleId = msg.ruleId;
           resultIssues.push({
             file: relativePath,
             line: msg.line,
             column: msg.column,
-            rule: msg.ruleId || "unknown",
-            code: msg.ruleId || "unknown",
+            ...(ruleId && { rule: ruleId }),
             severity: msg.severity === 2 ? "error" : "warning",
             message: msg.message,
-            type: "lint",
           });
         }
 

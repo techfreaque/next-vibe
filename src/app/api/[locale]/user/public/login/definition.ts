@@ -110,27 +110,23 @@ const { POST } = createEndpoint({
           }),
 
           // === FORM ALERT (shows validation and API errors) ===
-          formAlert: widgetField(
-            {
-              type: WidgetType.FORM_ALERT,
-              order: 4,
-            },
-            { request: "data" },
-          ),
+          formAlert: widgetField({
+            type: WidgetType.FORM_ALERT,
+            order: 4,
+            usage: { request: "data" },
+          }),
 
           // === SUBMIT BUTTON (inside card) ===
-          submitButton: widgetField(
-            {
-              type: WidgetType.SUBMIT_BUTTON,
-              text: "app.api.user.public.login.actions.submit",
-              loadingText: "app.api.user.public.login.actions.submitting",
-              icon: "log-in",
-              variant: "default",
-              size: "default",
-              order: 5,
-            },
-            { request: "data" },
-          ),
+          submitButton: widgetField({
+            type: WidgetType.SUBMIT_BUTTON,
+            text: "app.api.user.public.login.actions.submit",
+            loadingText: "app.api.user.public.login.actions.submitting",
+            icon: "log-in",
+            variant: "default",
+            size: "default",
+            order: 5,
+            usage: { request: "data" },
+          }),
 
           // === FOOTER LINKS (inside card, below button) ===
           footerLinks: objectField(
@@ -143,28 +139,24 @@ const { POST } = createEndpoint({
             },
             { request: "data" },
             {
-              forgotPassword: widgetField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.user.public.login.footer.forgotPassword",
-                  format: "link",
-                  href: "/user/reset-password",
-                  textAlign: "center",
-                  columns: 12,
-                },
-                { request: "data" },
-              ),
-              createAccount: widgetField(
-                {
-                  type: WidgetType.TEXT,
-                  content: "app.api.user.public.login.footer.createAccount",
-                  format: "link",
-                  href: "/user/signup",
-                  textAlign: "center",
-                  columns: 12,
-                },
-                { request: "data" },
-              ),
+              forgotPassword: widgetField({
+                type: WidgetType.TEXT,
+                content: "app.api.user.public.login.footer.forgotPassword",
+                format: "link",
+                href: "/user/reset-password",
+                textAlign: "center",
+                columns: 12,
+                usage: { request: "data" },
+              }),
+              createAccount: widgetField({
+                type: WidgetType.TEXT,
+                content: "app.api.user.public.login.footer.createAccount",
+                format: "link",
+                href: "/user/signup",
+                textAlign: "center",
+                columns: 12,
+                usage: { request: "data" },
+              }),
             },
           ),
         },

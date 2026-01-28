@@ -11,7 +11,7 @@ import type { FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type { EnhancedMutationResult } from "./use-api-mutation";
 
 /**

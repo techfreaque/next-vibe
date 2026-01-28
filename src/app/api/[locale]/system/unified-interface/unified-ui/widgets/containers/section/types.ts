@@ -9,11 +9,12 @@ import type {
   SpacingSize,
   WidgetType,
 } from "../../../../shared/types/enums";
-import type { ObjectChildrenConstraint } from "../../../../shared/widgets/configs";
 import type { LayoutConfig } from "../../../../shared/widgets/layout-config";
 import type {
   BaseObjectWidgetConfig,
+  ConstrainedChildUsage,
   FieldUsageConfig,
+  ObjectChildrenConstraint,
 } from "../../_shared/types";
 
 /**
@@ -28,8 +29,11 @@ export interface SectionWidgetConfig<
   TKey extends string,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "object" | "object-optional" | "widget-object",
-  TChildren extends ObjectChildrenConstraint<string, FieldUsageConfig>,
-> extends BaseObjectWidgetConfig<TUsage, TSchemaType, TChildren> {
+  TChildren extends ObjectChildrenConstraint<
+    TKey,
+    ConstrainedChildUsage<TUsage>
+  >,
+> extends BaseObjectWidgetConfig<TKey, TUsage, TSchemaType, TChildren> {
   type: WidgetType.SECTION;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;

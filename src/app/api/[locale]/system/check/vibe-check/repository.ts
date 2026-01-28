@@ -23,6 +23,7 @@ import type { LintResponseOutput } from "../lint/definition";
 import { lintRepository } from "../lint/repository";
 import type { OxlintResponseOutput } from "../oxlint/definition";
 import { oxlintRepository } from "../oxlint/repository";
+import { calculateFilteredSummary, filterIssues } from "../shared/filter-utils";
 import type { TypecheckResponseOutput } from "../typecheck/definition";
 import { typecheckRepository } from "../typecheck/repository";
 import type {
@@ -46,10 +47,8 @@ interface CheckIssue {
   line?: number;
   column?: number;
   rule?: string;
-  code?: string;
   severity: "error" | "warning" | "info";
   message: string;
-  type: "oxlint" | "lint" | "type";
 }
 
 export class VibeCheckRepository {
@@ -68,6 +67,7 @@ export class VibeCheckRepository {
     timeout: number,
     config: CheckConfig,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<CheckResult> {
     const startTime = Date.now();
     const result = await oxlintRepository.execute(
@@ -78,11 +78,15 @@ export class VibeCheckRepository {
         skipSorting: true,
         limit: 999999,
         page: 1,
+        summaryOnly: false,
       },
       logger,
+      platform,
       config,
     );
-    logger.info("✓ Oxlint check completed");
+    logger.info(
+      `✓ Oxlint check completed with ${result.success ? result.data.items?.length : 0} issues`,
+    );
     return {
       type: "oxlint",
       result,
@@ -96,6 +100,7 @@ export class VibeCheckRepository {
     timeout: number,
     config: CheckConfig,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<CheckResult> {
     const startTime = Date.now();
     const result = await lintRepository.execute(
@@ -107,11 +112,15 @@ export class VibeCheckRepository {
         skipSorting: true,
         limit: 999999,
         page: 1,
+        summaryOnly: false,
       },
       logger,
+      platform,
       config,
     );
-    logger.info("✓ ESLint check completed");
+    logger.info(
+      `✓ ESLint check completed with ${result.success ? result.data.items?.length : 0} issues`,
+    );
     return {
       type: "eslint",
       result,
@@ -124,6 +133,7 @@ export class VibeCheckRepository {
     timeout: number,
     config: CheckConfig,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<CheckResult> {
     const startTime = Date.now();
     const result = await typecheckRepository.execute(
@@ -134,11 +144,16 @@ export class VibeCheckRepository {
         disableFilter: false,
         limit: 999999,
         page: 1,
+        summaryOnly: false,
       },
       logger,
+      platform,
       config,
     );
-    logger.info("✓ TypeScript check completed");
+
+    logger.info(
+      `✓ TypeScript check completed with ${result.success ? result.data.items?.length : 0} issues`,
+    );
     return {
       type: "typecheck",
       result,
@@ -190,22 +205,24 @@ export class VibeCheckRepository {
       if (!configResult.ready) {
         return success(
           {
+            editorUriSchema: isMCP ? undefined : "vscode://file/", // Default or skip for MCP
             items: [
               {
                 file: configResult.configPath,
                 severity: "error" as const,
                 message: configResult.message,
-                type: "oxlint" as const,
               },
             ],
-            files: [
-              {
-                file: configResult.configPath,
-                errors: 1,
-                warnings: 0,
-                total: 1,
-              },
-            ],
+            files: isMCP
+              ? undefined
+              : [
+                  {
+                    file: configResult.configPath,
+                    errors: 1,
+                    warnings: 0,
+                    total: 1,
+                  },
+                ],
             summary: {
               totalIssues: 1,
               totalFiles: 1,
@@ -227,6 +244,12 @@ export class VibeCheckRepository {
 
       // Apply defaults from check.config.ts
       const defaults = configResult.config.vibeCheck || {};
+
+      // Use mcpLimit when platform is MCP, otherwise use regular limit
+      const defaultLimit = isMCP
+        ? (defaults.mcpLimit ?? defaults.limit ?? 20)
+        : (defaults.limit ?? 20000);
+
       const effectiveData = {
         ...data,
         fix: data.fix ?? defaults.fix ?? false,
@@ -234,7 +257,7 @@ export class VibeCheckRepository {
         skipOxlint: defaults.skipOxlint ?? false,
         skipTypecheck: defaults.skipTypecheck ?? false,
         timeout: data.timeout ?? defaults.timeout ?? 3600,
-        limit: data.limit ?? defaults.limit ?? 200,
+        limit: data.limit ?? defaultLimit,
         page: data.page ?? 1,
       };
 
@@ -262,6 +285,7 @@ export class VibeCheckRepository {
             effectiveData.timeout,
             configResult.config,
             logger,
+            platform,
           ).then((result) => {
             if (firstCheckStart === 0) {
               firstCheckStart = Date.now();
@@ -283,6 +307,7 @@ export class VibeCheckRepository {
               effectiveData.timeout,
               configResult.config,
               logger,
+              platform,
             ).then((result) => {
               if (firstCheckStart === 0) {
                 firstCheckStart = Date.now();
@@ -304,6 +329,7 @@ export class VibeCheckRepository {
               effectiveData.timeout,
               configResult.config,
               logger,
+              platform,
             ).then((result) => {
               if (firstCheckStart === 0) {
                 firstCheckStart = Date.now();
@@ -334,7 +360,10 @@ export class VibeCheckRepository {
         sortedIssues,
         effectiveData.limit,
         effectiveData.page,
-        isMCP, // Skip files list for compact MCP responses
+        isMCP || data.summaryOnly, // Skip files/items for MCP or when summaryOnly is true
+        data.filter, // Apply filter
+        configResult.config.vibeCheck?.editorUriScheme, // Pass from config
+        data.summaryOnly, // Pass summaryOnly flag
       );
 
       return success(response, {
@@ -377,7 +406,6 @@ export class VibeCheckRepository {
           file: "check-error",
           severity: "error",
           message: String(checkResult.reason),
-          type: "oxlint",
         });
         continue;
       }
@@ -435,53 +463,47 @@ export class VibeCheckRepository {
     limit: number,
     page: number,
     skipFiles = false,
+    filter?: string | string[],
+    editorUriScheme?: string,
+    summaryOnly = false,
   ): VibeCheckResponseOutput {
-    const totalIssues = allIssues.length;
-    const totalFiles = new Set(allIssues.map((issue) => issue.file)).size;
-    const totalErrors = allIssues.filter(
-      (issue) => issue.severity === "error",
-    ).length;
+    // Apply filtering
+    const filteredIssues = filterIssues(allIssues, filter);
 
-    const totalPages = Math.ceil(totalIssues / limit);
+    // Pagination
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
-    const limitedIssues = allIssues.slice(startIndex, endIndex);
+    const paginatedIssues = filteredIssues.slice(startIndex, endIndex);
 
-    const displayedIssues = limitedIssues.length;
-    const displayedFiles = new Set(limitedIssues.map((issue) => issue.file))
-      .size;
+    // Calculate summary with filter awareness
+    const summary = calculateFilteredSummary(
+      allIssues,
+      filteredIssues,
+      paginatedIssues,
+      page,
+      limit,
+    );
 
-    // Build files list only if not skipped (for compact MCP responses)
+    // Build files list only if not skipped (for compact MCP responses or summaryOnly)
     let files:
       | Array<{
           file: string;
-          errors: number;
-          warnings: number;
+          errors?: number;
+          warnings?: number;
           total: number;
         }>
       | undefined;
 
-    if (!skipFiles) {
-      const fileStats = this.buildFileStats(allIssues);
+    if (!skipFiles && !summaryOnly) {
+      const fileStats = this.buildFileStats(filteredIssues);
       files = this.formatFileStats(fileStats);
     }
 
     return {
-      items: limitedIssues,
+      editorUriSchema: skipFiles || summaryOnly ? undefined : editorUriScheme,
+      items: paginatedIssues,
       files,
-      summary: {
-        totalIssues,
-        totalFiles,
-        totalErrors,
-        displayedIssues,
-        displayedFiles,
-        truncatedMessage:
-          displayedIssues < totalIssues || displayedFiles < totalFiles
-            ? `Showing ${displayedIssues} of ${totalIssues} issues from ${displayedFiles} of ${totalFiles} files`
-            : "",
-        currentPage: page,
-        totalPages,
-      },
+      summary,
     };
   }
 
@@ -514,12 +536,17 @@ export class VibeCheckRepository {
 
   private static formatFileStats(
     fileStats: Map<string, { errors: number; warnings: number; total: number }>,
-  ): Array<{ file: string; errors: number; warnings: number; total: number }> {
+  ): Array<{
+    file: string;
+    errors?: number;
+    warnings?: number;
+    total: number;
+  }> {
     return [...fileStats.entries()]
       .map(([file, stats]) => ({
         file,
-        errors: stats.errors,
-        warnings: stats.warnings,
+        ...(stats.errors !== stats.total && { errors: stats.errors }),
+        ...(stats.warnings > 0 && { warnings: stats.warnings }),
         total: stats.total,
       }))
       .toSorted((a, b) => a.file.localeCompare(b.file));

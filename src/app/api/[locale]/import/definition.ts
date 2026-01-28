@@ -302,7 +302,6 @@ const { POST: ImportCsvPost } = createEndpoint({
           errors: responseArrayField(
             {
               type: WidgetType.DATA_TABLE,
-              columns: [],
             },
             objectField(
               {

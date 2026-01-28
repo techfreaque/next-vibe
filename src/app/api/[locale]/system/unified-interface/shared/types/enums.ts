@@ -80,7 +80,6 @@ export enum WidgetType {
   MARKDOWN_EDITOR = "markdown_editor",
   LINK = "link",
   LINK_CARD = "link_card",
-  LINK_LIST = "link_list",
 
   // Specialized content widgets
   FILE_PATH = "file_path",
@@ -100,8 +99,6 @@ export enum WidgetType {
   BUTTON = "button",
   NAVIGATE_BUTTON = "navigate_button",
   BUTTON_GROUP = "button_group",
-  ACTION_BAR = "action_bar",
-  ACTION_LIST = "action_list",
 
   // Stats widgets
   STAT = "stat", // Simple stat display: number + label from field definition
@@ -135,7 +132,7 @@ export enum FieldDataType {
   // Input field types
   TEXT = "text",
   EMAIL = "email",
-  PHONE = "phone",
+  TEL = "tel",
   URL = "url",
   PASSWORD = "password",
   NUMBER = "number",

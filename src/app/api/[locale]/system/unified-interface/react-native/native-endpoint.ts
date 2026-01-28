@@ -26,7 +26,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { envClient } from "@/config/env-client";
 import { type CountryLanguage } from "@/i18n/core/config";
 
-import { type CreateApiEndpointAny } from "../shared/types/endpoint";
+import { type CreateApiEndpointAny } from "../shared/types/endpoint-base";
 
 /**
  * Type helpers to extract input/output types from endpoint definitions

@@ -13,6 +13,7 @@ import { promisify } from "node:util";
 import { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
 import {
@@ -24,6 +25,7 @@ import { parseError } from "../../../shared/utils/parse-error";
 import { parseJsonWithComments } from "../../../shared/utils/parse-json";
 import { ensureConfigReady } from "../config/repository";
 import type { CheckConfig } from "../config/types";
+import { calculateFilteredSummary, filterIssues } from "../shared/filter-utils";
 import type {
   TypecheckIssue,
   TypecheckRequestOutput,
@@ -93,6 +95,7 @@ export interface TypecheckRepositoryInterface {
   execute(
     data: TypecheckRequestOutput,
     logger: EndpointLogger,
+    platform: Platform,
     providedConfig?: CheckConfig,
   ): Promise<ApiResponseType<TypecheckResponseOutput>>;
 }
@@ -194,12 +197,13 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     }
 
     const [, file, lineNum, colNum, severity, code, message] = match;
+    const ruleCode = code.trim();
 
     return {
       file: file.trim(),
       line: parseInt(lineNum, 10),
       column: parseInt(colNum, 10),
-      code: code.trim(),
+      ...(ruleCode && { rule: ruleCode }),
       severity: severity === "error" ? "error" : "warning",
       message: message.trim(),
     };
@@ -468,8 +472,10 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
   async execute(
     data: TypecheckRequestOutput,
     logger: EndpointLogger,
+    platform: Platform,
     providedConfig?: CheckConfig,
   ): Promise<ApiResponseType<TypecheckResponseOutput>> {
+    const isMCP = platform === Platform.MCP;
     const startTime = Date.now();
     let output = "";
     let config: TypecheckConfig | undefined;
@@ -513,6 +519,17 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         }
         checkConfig = configResult.config;
       }
+
+      // Apply mcpLimit when platform is MCP
+      const defaults = checkConfig.vibeCheck || {};
+      const defaultLimit = isMCP
+        ? (defaults.mcpLimit ?? defaults.limit ?? 100)
+        : (defaults.limit ?? 200);
+
+      const effectiveData = {
+        ...data,
+        limit: data.limit ?? defaultLimit,
+      };
 
       // Check if typecheck is enabled
       if (!checkConfig.typecheck.enabled) {
@@ -589,17 +606,14 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         output,
         useTsgo,
         config.targetPath,
-        data.disableFilter,
+        effectiveData.disableFilter,
       );
 
       // Build response with optional sorting
-      const allIssues = [
-        ...errors.map((e) => ({ ...e, type: "type" as const })),
-        ...warnings.map((w) => ({ ...w, type: "type" as const })),
-      ];
+      const allIssues = [...errors, ...warnings];
 
       // Skip sorting if requested (when vibe-check already sorted)
-      const issues = data.skipSorting
+      const issues = effectiveData.skipSorting
         ? allIssues
         : allIssues.toSorted((a, b) => {
             const fileCompare = a.file.localeCompare(b.file);
@@ -611,7 +625,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
             return lineA - lineB;
           });
 
-      return success(this.buildResponse(issues, data));
+      return success(this.buildResponse(issues, effectiveData));
     } catch (error) {
       return this.handleError(
         error as Error,
@@ -663,12 +677,17 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
    */
   private static formatFileStats(
     fileStats: Map<string, { errors: number; warnings: number; total: number }>,
-  ): Array<{ file: string; errors: number; warnings: number; total: number }> {
+  ): Array<{
+    file: string;
+    errors?: number;
+    warnings?: number;
+    total: number;
+  }> {
     return [...fileStats.entries()]
       .map(([file, stats]) => ({
         file,
-        errors: stats.errors,
-        warnings: stats.warnings,
+        ...(stats.errors !== stats.total && { errors: stats.errors }),
+        ...(stats.warnings > 0 && { warnings: stats.warnings }),
         total: stats.total,
       }))
       .toSorted((a, b) => a.file.localeCompare(b.file));
@@ -681,42 +700,33 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     allIssues: TypecheckIssue[],
     data: TypecheckRequestOutput,
   ): TypecheckResponseOutput {
-    const totalIssues = allIssues.length;
-    const totalFiles = new Set(allIssues.map((issue) => issue.file)).size;
-    const totalErrors = allIssues.filter(
-      (issue) => issue.severity === "error",
-    ).length;
+    // Apply filtering
+    const filteredIssues = filterIssues(allIssues, data.filter);
 
-    const fileStats = TypecheckRepositoryImpl.buildFileStats(allIssues);
-    const files = TypecheckRepositoryImpl.formatFileStats(fileStats);
-
+    // Pagination
     const limit = data.limit;
     const currentPage = data.page;
-    const totalPages = Math.ceil(totalIssues / limit);
     const startIndex = (currentPage - 1) * limit;
     const endIndex = startIndex + limit;
-    const limitedIssues = allIssues.slice(startIndex, endIndex);
+    const paginatedIssues = filteredIssues.slice(startIndex, endIndex);
 
-    const displayedIssues = limitedIssues.length;
-    const displayedFiles = new Set(limitedIssues.map((issue) => issue.file))
-      .size;
+    // Calculate summary with filter awareness
+    const summary = calculateFilteredSummary(
+      allIssues,
+      filteredIssues,
+      paginatedIssues,
+      currentPage,
+      limit,
+    );
+
+    // Build files list from filtered issues
+    const fileStats = TypecheckRepositoryImpl.buildFileStats(filteredIssues);
+    const files = TypecheckRepositoryImpl.formatFileStats(fileStats);
 
     return {
-      items: limitedIssues,
+      items: paginatedIssues,
       files,
-      summary: {
-        totalIssues,
-        totalFiles,
-        totalErrors,
-        displayedIssues,
-        displayedFiles,
-        truncatedMessage:
-          displayedIssues < totalIssues || displayedFiles < totalFiles
-            ? `Showing ${displayedIssues} of ${totalIssues} issues from ${displayedFiles} of ${totalFiles} files`
-            : "",
-        currentPage,
-        totalPages,
-      },
+      summary,
     };
   }
 
@@ -850,10 +860,9 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       file: string;
       line?: number;
       column?: number;
-      code?: string;
+      rule?: string;
       severity: "error" | "warning" | "info";
       message: string;
-      type: "type";
     }> = [];
 
     if (hasStderr && typeof error.stderr === "string") {
@@ -862,7 +871,6 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         file: "unknown",
         severity: "error",
         message: error.stderr.trim(),
-        type: "type",
       });
     }
 
@@ -878,7 +886,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       );
 
       for (const err of errors) {
-        issues.push({ ...err, type: "type" });
+        issues.push(err);
       }
     }
 
@@ -888,7 +896,6 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         file: "unknown",
         severity: "error",
         message: parsedError.message,
-        type: "type",
       });
     }
 

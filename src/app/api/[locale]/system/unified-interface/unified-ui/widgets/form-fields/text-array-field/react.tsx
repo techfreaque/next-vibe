@@ -32,6 +32,7 @@ import {
   FormMessage,
 } from "@/packages/next-vibe-ui/web/ui/form/form";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { FieldUsageConfig } from "../../_shared/types";
 import { DEFAULT_THEME } from "../_shared/constants";
 import { getFieldStyleClassName } from "../_shared/styling";
@@ -39,20 +40,22 @@ import { getFieldValidationState } from "../_shared/validation";
 import type { TextArrayFieldWidgetConfig } from "./types";
 
 export function TextArrayFieldWidget<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TSchema extends ArrayWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
   field,
-  form,
+
   fieldName,
   context,
 }: ReactWidgetProps<
+  TEndpoint,
   TextArrayFieldWidgetConfig<TKey, TSchema, TUsage>
 >): JSX.Element {
   const { t } = context;
 
-  if (!form || !fieldName) {
+  if (!context.form || !fieldName) {
     return (
       <Div>
         {t(
@@ -68,8 +71,8 @@ export function TextArrayFieldWidget<
 
   return (
     <FormField
-      control={form.control}
-      name={fieldName as never}
+      control={context.form.control}
+      name={fieldName}
       render={({ field: formField, fieldState }) => {
         const validationState = getFieldValidationState(
           formField.value,

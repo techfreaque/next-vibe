@@ -14,8 +14,8 @@ import { lintRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger }) => {
-      return await lintRepository.execute(data, logger);
+    handler: async ({ data, logger, platform }) => {
+      return await lintRepository.execute(data, logger, platform);
     },
   },
 });

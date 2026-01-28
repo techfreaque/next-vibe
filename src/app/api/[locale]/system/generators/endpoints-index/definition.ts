@@ -30,7 +30,6 @@ const { POST } = createEndpoint({
     UserRole.ADMIN,
     UserRole.WEB_OFF,
     UserRole.AI_TOOL_OFF,
-    UserRole.MCP_OFF,
     UserRole.PRODUCTION_OFF,
   ],
 

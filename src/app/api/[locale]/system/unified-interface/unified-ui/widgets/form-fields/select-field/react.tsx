@@ -38,6 +38,7 @@ import {
   FormMessage,
 } from "@/packages/next-vibe-ui/web/ui/form/form";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { FieldUsageConfig } from "../../_shared/types";
 import { DEFAULT_THEME, OPTION_KEY_PREFIX } from "../_shared/constants";
 import { renderPrefillDisplay } from "../_shared/prefill";
@@ -46,20 +47,22 @@ import { getFieldValidationState } from "../_shared/validation";
 import type { SelectFieldWidgetConfig } from "./types";
 
 export function SelectFieldWidget<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TSchema extends EnumWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
   field,
-  form,
+
   fieldName,
   context,
 }: ReactWidgetProps<
+  TEndpoint,
   SelectFieldWidgetConfig<TKey, TSchema, TUsage>
 >): JSX.Element {
   const { t } = context;
 
-  if (!form || !fieldName) {
+  if (!context.form || !fieldName) {
     return (
       <Div>
         {t(
@@ -75,8 +78,8 @@ export function SelectFieldWidget<
 
   return (
     <FormField
-      control={form.control}
-      name={fieldName as never}
+      control={context.form.control}
+      name={fieldName}
       render={({ field: formField, fieldState }) => {
         const validationState = getFieldValidationState(
           formField.value,
@@ -136,18 +139,18 @@ export function SelectFieldWidget<
               formField.value &&
               !fieldState.isDirty ? (
                 renderPrefillDisplay(
-                  String(formField.value),
+                  formField.value,
                   field.label,
                   field.prefillDisplay,
                   t,
                 )
               ) : (
                 <Select
-                  key={`${formField.name}-${String(formField.value) || "empty"}`}
+                  key={`${formField.name}-${formField.value || "empty"}`}
                   onValueChange={(value) => formField.onChange(value)}
                   value={
                     formField.value !== undefined && formField.value !== null
-                      ? String(formField.value)
+                      ? formField.value
                       : undefined
                   }
                   disabled={field.disabled || field.readonly}

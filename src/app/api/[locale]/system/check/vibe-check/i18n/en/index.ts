@@ -1,7 +1,7 @@
 export const translations = {
   title: "Vibe Check",
   description:
-    "Run comprehensive code quality checks (Oxlint + ESLint + TypeScript). IMPORTANT: Use this instead of running 'eslint', 'tsc', or 'oxlint' directly - vibe-check runs all checks in parallel and is significantly faster. The goal is to fix ALL issues, not just some.",
+    "Run comprehensive code quality checks (Oxlint + ESLint + TypeScript). This tool enforces correctness at the cost of convenience. Errors are symptoms, not the problem—fix the root cause, not the warning. Don't hide issues with assertions or type gymnastics; they mask the real problem and will catastrophically fail in production when users depend on them. Instead, fix the architecture. Let types flow naturally, maintain DRY principles, and let type coherence guide your design. Every unresolved issue is a production risk. This tool exists to force rigorous correctness over rushing—because angry users in production is the real catastrophe. Always use this tool—never call oxlint, eslint, or tsc directly. Built-in pagination and filtering preserve context space while enforcing rigorous correctness over rushing.",
   category: "Development Tools",
   tag: "quality",
 
@@ -43,22 +43,22 @@ export const translations = {
   fields: {
     fix: {
       label: "Auto Fix Issues",
-      description:
-        "Automatically fix linting issues that can be auto-fixed. Use this when you want to fix issues automatically.",
+      description: "Auto-fix linting issues where possible (default: true)",
     },
     createConfig: {
       label: "Create Config",
       description:
-        "Create default check.config.ts configuration file if missing. Use check.config.ts to configure skip options (skipEslint, skipOxlint, skipTypecheck).",
+        "Create default check.config.ts if missing. Use check.config.ts to configure skip options (skipEslint, skipOxlint, skipTypecheck).",
     },
     timeoutSeconds: {
       label: "Timeout (seconds)",
-      description: "Maximum execution time in seconds (1-3600)",
+      description:
+        "Maximum execution time in seconds, range 1-3600 (default: 3600)",
     },
     paths: {
       label: "Target Paths",
       description:
-        'Specific file paths or directories to check (string or array of strings). Leave empty to check ALL files in the project (recommended for comprehensive quality checks). Examples: "src/app" or ["src/components", "src/utils"]. Only specify paths if you need to focus on a subset of files.',
+        "File paths or directories to check (string or array). RECOMMENDED: Specify paths for the area you're working on (fast, focused). Leave empty to check ALL files (slow, use only for comprehensive audits). Examples: 'src/app/feature' or ['src/feature/file.tsx', 'src/feature/other.tsx']. Note: Glob patterns (e.g., '**/*.test.ts') are not supported yet.",
       placeholder: "e.g., src/app or src/components/Button.tsx",
       options: {
         src: "Source Directory (src/)",
@@ -71,11 +71,21 @@ export const translations = {
     limit: {
       label: "Limit",
       description:
-        "Number of issues to display per page (1-10000, default: 100). IMPORTANT: This only controls display, not detection. Use high values (1000+) or pagination to see ALL issues - the goal is to fix everything, not just the first page.",
+        "Issues to display per page, range 1-10000 (default: 20000 for web/CLI, 2 for MCP). Controls display only, not detection. Use high values or pagination to see all issues.",
     },
     page: {
       label: "Page",
-      description: "Page number for paginated results (starts at 1)",
+      description: "Page number for paginated results (default: 1)",
+    },
+    filter: {
+      label: "Filter",
+      description:
+        "Filter issues by file path, message, or rule. Supports text matching or regex (/pattern/flags). Arrays enable OR logic for multiple filters.",
+      placeholder: "e.g., 'no-unused-vars' or '/src\\/components/i'",
+    },
+    summaryOnly: {
+      label: "Summary Only",
+      description: "Only return summary stats, omit items and files lists",
     },
   },
 

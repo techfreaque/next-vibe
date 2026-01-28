@@ -10,7 +10,7 @@ import { useCallback, useMemo } from "react";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
-import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { executeQuery } from "./query-executor";
 import { buildKey } from "./query-key-builder";
 import {

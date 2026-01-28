@@ -7,7 +7,7 @@ import { useMemo } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type { AutoPrefillConfig, FormDataSources } from "./endpoint-types";
 import { determineFormDataPriority } from "./endpoint-utils";
 import type {

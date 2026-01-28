@@ -15,6 +15,7 @@ export function UncensoredAILogo({
     // oxlint-disable-next-line nextjs/no-img-element, oxlint-plugin-i18n/no-literal-string
     <img
       src={`${envClient.NEXT_PUBLIC_APP_URL}/images/providers/uncensored.ai.png`}
+      // oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string
       alt="Uncensored AI"
       className={className}
     />

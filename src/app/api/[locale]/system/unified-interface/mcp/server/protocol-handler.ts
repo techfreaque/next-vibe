@@ -11,12 +11,13 @@ import { getCliUser } from "@/app/api/[locale]/system/unified-interface/cli/auth
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { definitionsRegistry } from "../../shared/endpoints/definitions/registry";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import { Platform } from "../../shared/types/platform";
+import type { WidgetData } from "../../shared/widgets/widget-data";
 import { endpointToMCPTool } from "../converter";
 import { mcpRegistry } from "../registry";
 import type {
-  IMCPProtocolHandler,
   JsonRpcError,
   JsonRpcRequest,
   JsonRpcResponse,
@@ -26,9 +27,22 @@ import type {
   MCPToolCallResult,
   MCPToolsListParams,
   MCPToolsListResult,
-  ParameterValue,
 } from "../types";
 import { MCPErrorCode, MCPMethod } from "../types";
+
+/**
+ * MCP Protocol Handler Interface
+ */
+export interface IMCPProtocolHandler {
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Protocol extension requires 'unknown' for flexible message payloads
+  handleRequest(
+    request: JsonRpcRequest<unknown>,
+  ): Promise<JsonRpcResponse<unknown>>;
+  handleInitialize(params: MCPInitializeParams): Promise<MCPInitializeResult>;
+  handleToolsList(params: MCPToolsListParams): Promise<MCPToolsListResult>;
+  handleToolCall(params: MCPToolCallParams): Promise<MCPToolCallResult>;
+  handlePing(): Promise<Record<string, never>>;
+}
 
 /**
  * MCP Protocol Handler Implementation
@@ -55,7 +69,8 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
   async handleRequest(
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Protocol message handling requires 'unknown' for flexible message types
     request: JsonRpcRequest<unknown>,
-  ): Promise<JsonRpcResponse> {
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Protocol message handling requires 'unknown' for flexible message types
+  ): Promise<JsonRpcResponse<unknown>> {
     this.logger.debug("[MCP Protocol] Received request", {
       method: request.method,
       id: request.id,
@@ -187,7 +202,11 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     this.logger.info("[MCP Protocol] Listing tools");
 
     // Get full endpoints with field information for proper schema generation
-    const endpoints = mcpRegistry.getEndpoints(this.user, this.logger);
+    const endpoints = definitionsRegistry.getEndpointsForUser(
+      Platform.MCP,
+      this.user,
+      this.logger,
+    );
 
     // Convert to MCP tool format with proper JSON Schema and translated descriptions
     const tools = endpoints.map((endpoint) =>
@@ -210,6 +229,8 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
   async handleToolCall(params: MCPToolCallParams): Promise<MCPToolCallResult> {
     this.logger.info("[MCP Protocol] Calling tool", {
       toolName: params.name,
+      argumentsKeys: Object.keys(params.arguments || {}),
+      argumentsData: JSON.stringify(params.arguments),
     });
 
     // Execute tool - params.arguments is already properly typed from MCPToolCallParams
@@ -252,7 +273,8 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
 
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Response serialization requires 'unknown' for flexible response types
     result: unknown,
-  ): JsonRpcResponse {
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Response serialization requires 'unknown' for flexible response types
+  ): JsonRpcResponse<unknown> {
     return {
       jsonrpc: "2.0",
       result,
@@ -267,8 +289,8 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     id: string | number | null,
     code: MCPErrorCode,
     message: string,
-    data?: Record<string, ParameterValue>,
-  ): JsonRpcResponse {
+    data?: Record<string, WidgetData>,
+  ): JsonRpcResponse<unknown> {
     const error: JsonRpcError = {
       code,
       message,

@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form";
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type { ApiMutationOptions } from "./types";
 import { type MutationVariables, useApiMutation } from "./use-api-mutation";
 

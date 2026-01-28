@@ -17,7 +17,7 @@ import type { z } from "zod";
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";
-import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type {
   DeleteRequest,
   DeleteResponse,

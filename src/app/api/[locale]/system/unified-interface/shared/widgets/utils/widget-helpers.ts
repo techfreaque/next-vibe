@@ -4,7 +4,7 @@
  * Pure functions with no side effects - can be used in any environment
  */
 
-import type { WidgetData } from "../types";
+import type { WidgetData } from "../widget-data";
 
 /**
  * Layout Configuration Types
@@ -15,16 +15,6 @@ export interface LayoutConfig {
   columns?: number;
   alignItems?: "start" | "center" | "end";
 }
-
-/**
- * Severity types for code quality
- */
-type SeverityType = "error" | "warning" | "info";
-
-/**
- * Badge variant types (React component specific)
- */
-type BadgeVariant = "destructive" | "default" | "secondary";
 
 /**
  * Trend direction types
@@ -97,21 +87,6 @@ export function getLayoutClassName(config: LayoutConfig): string {
 }
 
 /**
- * Get grid class name based on column count
- * Used by: DataCardsWidget, LinkListWidget
- */
-export function getGridClassName(columns: 1 | 2 | 3 | 4): string {
-  const gridClassMap: Record<number, string> = {
-    1: "grid-cols-1",
-    2: "grid-cols-1 md:grid-cols-2",
-    3: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-    4: "grid-cols-1 md:grid-cols-2 lg:grid-cols-4",
-  };
-
-  return gridClassMap[columns] ?? "grid-cols-1";
-}
-
-/**
  * Check if URL is external (starts with http:// or https://)
  * Used by: LinkWidget, LinkCardWidget
  */
@@ -150,121 +125,6 @@ export function getTrendColorClassName(direction?: TrendDirection): string {
     default:
       return "text-muted-foreground";
   }
-}
-
-/**
- * Get severity badge variant
- * Used by: CodeQualityListWidget
- */
-export function getSeverityVariant(severity: SeverityType): BadgeVariant {
-  switch (severity) {
-    case "error":
-      return "destructive";
-    case "warning":
-      return "default";
-    case "info":
-      return "secondary";
-  }
-}
-
-/**
- * Extract column configuration from data table value
- * Used by: DataTableWidget
- */
-export interface ColumnConfig {
-  align: "text-left" | "text-center" | "text-right";
-  sortable: boolean;
-  width?: string | number;
-  format?: (value: WidgetData) => WidgetData;
-}
-
-export function extractColumnConfig(
-  value: WidgetData,
-  columnKey: string,
-): ColumnConfig {
-  const defaultConfig: ColumnConfig = {
-    align: "text-left",
-    sortable: false,
-  };
-
-  if (
-    typeof value !== "object" ||
-    value === null ||
-    Array.isArray(value) ||
-    !("columns" in value) ||
-    !Array.isArray(value.columns)
-  ) {
-    return defaultConfig;
-  }
-
-  const rawColumn = value.columns.find(
-    (c: WidgetData) =>
-      typeof c === "object" && c !== null && "key" in c && c.key === columnKey,
-  );
-
-  if (!rawColumn || typeof rawColumn !== "object" || rawColumn === null) {
-    return defaultConfig;
-  }
-
-  const align =
-    "align" in rawColumn && typeof rawColumn.align === "string"
-      ? (rawColumn.align as "text-left" | "text-center" | "text-right")
-      : "text-left";
-
-  const sortable =
-    "sortable" in rawColumn && typeof rawColumn.sortable === "boolean"
-      ? rawColumn.sortable
-      : false;
-
-  const width =
-    "width" in rawColumn &&
-    (typeof rawColumn.width === "string" || typeof rawColumn.width === "number")
-      ? rawColumn.width
-      : undefined;
-
-  const format =
-    "format" in rawColumn && typeof rawColumn.format === "function"
-      ? (rawColumn.format as (value: WidgetData) => WidgetData)
-      : undefined;
-
-  return {
-    align,
-    sortable,
-    width,
-    format,
-  };
-}
-
-/**
- * Sort table rows by column
- * Used by: DataTableWidget
- */
-export function sortTableRows<T extends Record<string, WidgetData>>(
-  rows: T[],
-  sortBy: string | null,
-  sortOrder: "asc" | "desc",
-): T[] {
-  if (!sortBy) {
-    return rows;
-  }
-
-  return rows.toSorted((a, b) => {
-    const aVal = a[sortBy];
-    const bVal = b[sortBy];
-
-    if (aVal === bVal) {
-      return 0;
-    }
-    if (aVal === null || aVal === undefined) {
-      return 1;
-    }
-    if (bVal === null || bVal === undefined) {
-      return -1;
-    }
-
-    const comparison = aVal < bVal ? -1 : 1;
-    return sortOrder === "asc" ? comparison : -comparison;
-  });
 }
 
 /**
@@ -338,23 +198,6 @@ export function getIconSizeClassName(
     return "h-6 w-6";
   }
   return "h-4 w-4";
-}
-
-/**
- * Get thumbnail size CSS class name from config
- * Used by: LinkCardWidget, and other thumbnail-based widgets
- * IMPORTANT: FULL class strings for Tailwind purge!
- */
-export function getThumbnailSizeClassName(
-  size: "sm" | "base" | "lg" | undefined,
-): string {
-  if (size === "sm") {
-    return "w-12 h-12";
-  }
-  if (size === "lg") {
-    return "w-20 h-20";
-  }
-  return "w-16 h-16";
 }
 
 /**
@@ -503,25 +346,6 @@ export function getBorderRadiusClassName(
     return "rounded-full";
   }
   return "";
-}
-
-/**
- * Get button size CSS class name from config
- * IMPORTANT: FULL class strings for Tailwind purge!
- */
-export function getButtonSizeClassName(
-  size: "xs" | "sm" | "base" | "lg" | undefined,
-): string {
-  if (size === "xs") {
-    return "h-6 w-6";
-  }
-  if (size === "sm") {
-    return "h-8 w-8";
-  }
-  if (size === "lg") {
-    return "h-10 w-10";
-  }
-  return "h-8 w-8";
 }
 
 /**

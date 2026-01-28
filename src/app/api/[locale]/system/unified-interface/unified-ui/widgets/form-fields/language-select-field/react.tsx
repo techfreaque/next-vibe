@@ -26,6 +26,7 @@ import {
 } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import { simpleT } from "@/i18n/core/shared";
@@ -37,11 +38,11 @@ import {
   FormMessage,
 } from "@/packages/next-vibe-ui/web/ui/form/form";
 
-import { DEFAULT_THEME } from "../_shared/constants";
-import { getFieldValidationState } from "../_shared/validation";
-import { getFieldStyleClassName } from "../_shared/styling";
-import type { LanguageSelectFieldWidgetConfig } from "./types";
 import type { FieldUsageConfig } from "../../_shared/types";
+import { DEFAULT_THEME } from "../_shared/constants";
+import { getFieldStyleClassName } from "../_shared/styling";
+import { getFieldValidationState } from "../_shared/validation";
+import type { LanguageSelectFieldWidgetConfig } from "./types";
 
 // Common languages
 const LANGUAGES = [
@@ -58,20 +59,21 @@ const LANGUAGES = [
 ];
 
 export function LanguageSelectFieldWidget<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TSchema extends StringWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
   field,
-  form,
   fieldName,
   context,
 }: ReactWidgetProps<
+  TEndpoint,
   LanguageSelectFieldWidgetConfig<TKey, TSchema, TUsage>
 >): JSX.Element {
   const { t } = context;
 
-  if (!form || !fieldName) {
+  if (!context.form || !fieldName) {
     return (
       <Div>
         {t(
@@ -87,8 +89,8 @@ export function LanguageSelectFieldWidget<
 
   return (
     <FormField
-      control={form.control}
-      name={fieldName as never}
+      control={context.form.control}
+      name={fieldName}
       render={({ field: formField, fieldState }) => {
         const validationState = getFieldValidationState(
           formField.value,
@@ -148,7 +150,7 @@ export function LanguageSelectFieldWidget<
                 onValueChange={(value) => formField.onChange(value)}
                 value={
                   formField.value !== undefined && formField.value !== null
-                    ? String(formField.value)
+                    ? formField.value
                     : undefined
                 }
                 disabled={field.disabled || field.readonly}

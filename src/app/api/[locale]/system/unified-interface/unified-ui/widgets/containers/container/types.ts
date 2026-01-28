@@ -6,62 +6,29 @@ import type { z } from "zod";
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 
+import type { InferSchemaFromField } from "../../../../shared/types/endpoint";
 import type {
-  ObjectField,
-  UnifiedField,
-} from "../../../../shared/types/endpoint";
-import type { LayoutType, WidgetType } from "../../../../shared/types/enums";
-import type {
-  InferSchemasFromChildren,
-  ObjectWidgetConfig,
-} from "../../../../shared/widgets/configs";
+  FieldUsage,
+  LayoutType,
+  WidgetType,
+} from "../../../../shared/types/enums";
 import type { LayoutConfig } from "../../../../shared/widgets/layout-config";
 import type {
+  ArrayChildConstraint,
+  BaseArrayWidgetConfig,
   BaseObjectUnionWidgetConfig,
   BaseObjectWidgetConfig,
+  ConstrainedChildUsage,
   FieldUsageConfig,
+  ObjectChildrenConstraint,
+  UnionObjectWidgetConfigConstrain,
 } from "../../_shared/types";
 import type { SpacingSize } from "../../display-only/title/types";
 
 /**
- * Container widget requires an object schema
- */
-export type ContainerWidgetSchema = z.ZodObject<z.ZodRawShape>;
-
-/**
  * Base container properties shared between regular and union variants
  */
-interface BaseContainerProps<
-  TKey extends string,
-  TChildren extends
-    | Record<string, UnifiedField<string, z.ZodTypeAny>>
-    | readonly [
-        ObjectField<
-          Record<string, UnifiedField<string, z.ZodTypeAny>>,
-          FieldUsageConfig,
-          string,
-          ObjectWidgetConfig<
-            string,
-            FieldUsageConfig,
-            "object",
-            Record<string, UnifiedField<string, z.ZodTypeAny>>
-          >
-        >,
-        ...ObjectField<
-          Record<string, UnifiedField<string, z.ZodTypeAny>>,
-          FieldUsageConfig,
-          string,
-          ObjectWidgetConfig<
-            string,
-            FieldUsageConfig,
-            "object",
-            Record<string, UnifiedField<string, z.ZodTypeAny>>
-          >
-        >[],
-      ]
-    | UnifiedField<string, z.ZodTypeAny>,
-  TUsage extends FieldUsageConfig,
-> {
+interface BaseContainerProps<TKey extends string> {
   type: WidgetType.CONTAINER;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
@@ -151,64 +118,81 @@ interface BaseContainerProps<
    * @default true
    */
   showSubmitButton?: boolean;
+}
+
+/**
+ * Container with array child
+ */
+export interface ContainerArrayWidgetConfig<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+  TSchemaType extends "array" | "array-optional",
+  TChild extends ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>,
+>
+  extends
+    BaseArrayWidgetConfig<TKey, TUsage, TSchemaType, TChild>,
+    BaseContainerProps<TKey> {
+  type: WidgetType.CONTAINER;
   /**
-   * Type-safe function to extract count from request/response data
+   * Type-safe function to extract count from container data
    * Used to display counts in title (e.g., "Leads (42)")
+   * Receives the full output object inferred from children
    */
-  getCount?: (data: {
-    request?: InferSchemasFromChildren<TChildren, TUsage>["request"];
-    response?: InferSchemasFromChildren<TChildren, TUsage>["response"];
-  }) => number | undefined;
+  getCount?: TChild extends ArrayChildConstraint<
+    TKey,
+    ConstrainedChildUsage<TUsage>
+  >
+    ? (
+        data: NoInfer<
+          z.output<InferSchemaFromField<TChild, FieldUsage.ResponseData>>
+        >,
+      ) => number | undefined
+    : never;
 }
 
 /**
  * Container with regular object children
  */
-export type ContainerObjectWidgetConfig<
+export interface ContainerObjectWidgetConfig<
   TKey extends string,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "object" | "object-optional" | "widget-object",
-  TChildren extends
-    | Record<string, UnifiedField<string, z.ZodTypeAny>>
-    | UnifiedField<string, z.ZodTypeAny>,
-> = BaseObjectWidgetConfig<TUsage, TSchemaType, TChildren> &
-  BaseContainerProps<TKey, TChildren, TUsage>;
+  TChildren extends ObjectChildrenConstraint<
+    TKey,
+    ConstrainedChildUsage<TUsage>
+  >,
+>
+  extends
+    BaseObjectWidgetConfig<TKey, TUsage, TSchemaType, TChildren>,
+    BaseContainerProps<TKey> {
+  type: WidgetType.CONTAINER;
+}
 
 /**
  * Container with discriminated union
  */
-export type ContainerUnionWidgetConfig<
+export interface ContainerUnionWidgetConfig<
   TKey extends string,
   TUsage extends FieldUsageConfig,
-  TVariants extends readonly [
-    ObjectField<
-      Record<string, UnifiedField<string, z.ZodTypeAny>>,
-      FieldUsageConfig,
-      string,
-      ObjectWidgetConfig<
-        string,
-        FieldUsageConfig,
-        "object",
-        Record<string, UnifiedField<string, z.ZodTypeAny>>
-      >
-    >,
-    ...ObjectField<
-      Record<string, UnifiedField<string, z.ZodTypeAny>>,
-      FieldUsageConfig,
-      string,
-      ObjectWidgetConfig<
-        string,
-        FieldUsageConfig,
-        "object",
-        Record<string, UnifiedField<string, z.ZodTypeAny>>
-      >
-    >[],
-  ],
-> = BaseObjectUnionWidgetConfig<TUsage, "object-union", TVariants> &
-  BaseContainerProps<TKey, TVariants, TUsage>;
+  TVariants extends UnionObjectWidgetConfigConstrain<
+    TKey,
+    ConstrainedChildUsage<TUsage>
+  >,
+>
+  extends
+    BaseObjectUnionWidgetConfig<TKey, TUsage, "object-union", TVariants>,
+    BaseContainerProps<TKey> {
+  type: WidgetType.CONTAINER;
+}
 
 /**
- * Container Widget Configuration (union of object and union variants)
+ * Container Widget Configuration (union of object, array, and union variants)
+ *
+ * Uses distribution to properly narrow union types:
+ * - When TSchemaType is "array" | "array-optional", only ArrayConfig is valid
+ * - When TSchemaType is "object" | "object-optional" | "widget-object", only ObjectConfig is valid
+ * - When TSchemaType is "object-union", only UnionConfig is valid
+ * - TChildren must match the respective constraint
  */
 export type ContainerWidgetConfig<
   TKey extends string,
@@ -217,71 +201,14 @@ export type ContainerWidgetConfig<
     | "object"
     | "object-optional"
     | "object-union"
+    | "array"
+    | "array-optional"
     | "widget-object",
   TChildren extends
-    | Record<string, UnifiedField<string, z.ZodTypeAny>>
-    | readonly [
-        ObjectField<
-          Record<string, UnifiedField<string, z.ZodTypeAny>>,
-          FieldUsageConfig,
-          string,
-          ObjectWidgetConfig<
-            string,
-            FieldUsageConfig,
-            "object",
-            Record<string, UnifiedField<string, z.ZodTypeAny>>
-          >
-        >,
-        ...ObjectField<
-          Record<string, UnifiedField<string, z.ZodTypeAny>>,
-          FieldUsageConfig,
-          string,
-          ObjectWidgetConfig<
-            string,
-            FieldUsageConfig,
-            "object",
-            Record<string, UnifiedField<string, z.ZodTypeAny>>
-          >
-        >[],
-      ]
-    | UnifiedField<string, z.ZodTypeAny>,
+    | ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
+    | UnionObjectWidgetConfigConstrain<TKey, ConstrainedChildUsage<TUsage>>
+    | ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>,
 > =
-  | ContainerObjectWidgetConfig<
-      TKey,
-      TUsage,
-      TSchemaType & ("object" | "object-optional" | "widget-object"),
-      TChildren &
-        (
-          | Record<string, UnifiedField<string, z.ZodTypeAny>>
-          | UnifiedField<string, z.ZodTypeAny>
-        )
-    >
-  | ContainerUnionWidgetConfig<
-      TKey,
-      TUsage,
-      TChildren &
-        readonly [
-          ObjectField<
-            Record<string, UnifiedField<string, z.ZodTypeAny>>,
-            FieldUsageConfig,
-            string,
-            ObjectWidgetConfig<
-              string,
-              FieldUsageConfig,
-              "object",
-              Record<string, UnifiedField<string, z.ZodTypeAny>>
-            >
-          >,
-          ...ObjectField<
-            Record<string, UnifiedField<string, z.ZodTypeAny>>,
-            FieldUsageConfig,
-            string,
-            ObjectWidgetConfig<
-              string,
-              FieldUsageConfig,
-              "object",
-              Record<string, UnifiedField<string, z.ZodTypeAny>>
-            >
-          >[],
-        ]
-    >;
+  | ContainerArrayWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
+  | ContainerUnionWidgetConfig<TKey, TUsage, TChildren>
+  | ContainerObjectWidgetConfig<TKey, TUsage, TSchemaType, TChildren>;

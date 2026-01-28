@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Vibe Check",
   description:
-    "Umfassende Code-Qualitätsprüfungen durchführen (Oxlint + ESLint + TypeScript). WICHTIG: Verwenden Sie dies anstelle von direktem 'eslint', 'tsc' oder 'oxlint' - vibe-check führt alle Prüfungen parallel aus und ist deutlich schneller. Das Ziel ist es, ALLE Probleme zu beheben, nicht nur einige.",
+    "Umfassende Code-Qualitätsprüfungen durchführen (Oxlint + ESLint + TypeScript). Dieses Tool erzwingt Korrektheit auf Kosten von Bequemlichkeit. Fehler sind Symptome, nicht das Problem—behebe die Grundursache, nicht die Warnung. Verstecke Probleme nicht mit Assertions oder Typ-Gymnastics; sie verbergen das eigentliche Problem und scheitern katastrophal in der Produktion, wenn Benutzer darauf angewiesen sind. Stattdessen die Architektur beheben. Lasse Typen natürlich fließen, halte DRY-Prinzipien ein und lasse Typ-Kohärenz dein Design leiten. Jedes ungelöste Problem ist ein Produktionsrisiko. Dieses Tool erzwingt rigorose Korrektheit statt Eile—weil verärgerte Benutzer in der Produktion die echte Katastrophe sind. Verwende immer dieses Tool—rufe niemals oxlint, eslint oder tsc direkt auf. Eingebaute Pagination und Filterung bewahren Kontextplatz, während gleichzeitig rigorose Korrektheit vor Hast durchgesetzt wird.",
   category: "Entwicklungstools",
   tag: "qualität",
 
@@ -46,21 +46,22 @@ export const translations: typeof enTranslations = {
     fix: {
       label: "Probleme automatisch beheben",
       description:
-        "Linting-Probleme automatisch beheben, die auto-fixbar sind. Verwenden Sie dies, wenn Sie Probleme automatisch beheben möchten.",
+        "Linting-Probleme automatisch beheben wo möglich (Standard: true)",
     },
     createConfig: {
       label: "Konfiguration erstellen",
       description:
-        "Standard check.config.ts Konfigurationsdatei erstellen falls nicht vorhanden. Verwenden Sie check.config.ts um Skip-Optionen zu konfigurieren (skipEslint, skipOxlint, skipTypecheck).",
+        "Standard check.config.ts erstellen falls nicht vorhanden. Verwenden Sie check.config.ts um Skip-Optionen zu konfigurieren (skipEslint, skipOxlint, skipTypecheck).",
     },
     timeoutSeconds: {
       label: "Timeout (Sekunden)",
-      description: "Maximale Ausführungszeit in Sekunden (1-3600)",
+      description:
+        "Maximale Ausführungszeit in Sekunden, Bereich 1-3600 (Standard: 3600)",
     },
     paths: {
       label: "Zielpfade",
       description:
-        'Spezifische Dateipfade oder Verzeichnisse zum Prüfen (String oder Array von Strings). Leer lassen um ALLE Dateien im Projekt zu prüfen (empfohlen für umfassende Qualitätsprüfungen). Beispiele: "src/app" oder ["src/components", "src/utils"]. Nur Pfade angeben wenn Sie sich auf eine Teilmenge konzentrieren müssen.',
+        "Dateipfade oder Verzeichnisse zum Prüfen (String oder Array). EMPFOHLEN: Geben Sie Pfade für den Bereich an, an dem Sie arbeiten (schnell, fokussiert). Leer lassen um ALLE Dateien zu prüfen (langsam, nur für umfassende Audits verwenden). Beispiele: 'src/app/feature' oder ['src/feature/file.tsx', 'src/feature/other.tsx']. Hinweis: Glob-Muster (z.B. '**/*.test.ts') werden noch nicht unterstützt.",
       placeholder: "z.B. src/app oder src/components/Button.tsx",
       options: {
         src: "Quellverzeichnis (src/)",
@@ -73,11 +74,22 @@ export const translations: typeof enTranslations = {
     limit: {
       label: "Limit",
       description:
-        "Anzahl der Probleme pro Seite (1-10000, Standard: 100). WICHTIG: Dies kontrolliert nur die Anzeige, nicht die Erkennung. Verwenden Sie hohe Werte (1000+) oder Paginierung um ALLE Probleme zu sehen - das Ziel ist es, alles zu beheben, nicht nur die erste Seite.",
+        "Probleme pro Seite, Bereich 1-10000 (Standard: 20000 für Web/CLI, 2 für MCP). Kontrolliert nur Anzeige, nicht Erkennung. Verwenden Sie hohe Werte oder Paginierung um alle Probleme zu sehen.",
     },
     page: {
       label: "Seite",
-      description: "Seitennummer für paginierte Ergebnisse (beginnt bei 1)",
+      description: "Seitennummer für paginierte Ergebnisse (Standard: 1)",
+    },
+    filter: {
+      label: "Filter",
+      description:
+        "Probleme nach Dateipfad, Nachricht oder Regel filtern. Unterstützt Textabgleich oder Regex (/pattern/flags). Arrays ermöglichen ODER-Logik für mehrere Filter.",
+      placeholder: "z.B. 'no-unused-vars' oder '/src\\/components/i'",
+    },
+    summaryOnly: {
+      label: "Nur Zusammenfassung",
+      description:
+        "Gibt nur Zusammenfassungsstatistiken zurück, weglassen von Elementen und Dateilisten",
     },
   },
 

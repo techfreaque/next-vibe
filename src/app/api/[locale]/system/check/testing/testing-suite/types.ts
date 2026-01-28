@@ -7,6 +7,12 @@ import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type {
+  AnyChildrenConstrain,
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+} from "../../../unified-interface/unified-ui/widgets/_shared/types";
+
 /**
  * Options for testing an API endpoint
  */
@@ -14,7 +20,15 @@ export interface TestEndpointOptions<
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
-  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
+  TFields extends UnifiedField<
+    TScopedTranslationKey,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<
+      TScopedTranslationKey,
+      ConstrainedChildUsage<FieldUsageConfig>
+    >
+  >,
 > {
   /**
    * Custom test cases to run in addition to (or instead of) example tests
@@ -39,7 +53,15 @@ export interface TestRunner<
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
-  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
+  TFields extends UnifiedField<
+    TScopedTranslationKey,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<
+      TScopedTranslationKey,
+      ConstrainedChildUsage<FieldUsageConfig>
+    >
+  >,
 > {
   /**
    * Execute the endpoint with the given data and URL params
@@ -50,12 +72,20 @@ export interface TestRunner<
       TMethod,
       TUserRoleValue,
       TScopedTranslationKey,
+      AnyChildrenConstrain<
+        TScopedTranslationKey,
+        ConstrainedChildUsage<FieldUsageConfig>
+      >,
       TFields
     >["types"]["RequestOutput"];
     urlPathParams: CreateApiEndpoint<
       TMethod,
       TUserRoleValue,
       TScopedTranslationKey,
+      AnyChildrenConstrain<
+        TScopedTranslationKey,
+        ConstrainedChildUsage<FieldUsageConfig>
+      >,
       TFields
     >["types"]["UrlVariablesOutput"];
     user: JwtPayloadType;
@@ -65,6 +95,10 @@ export interface TestRunner<
         TMethod,
         TUserRoleValue,
         TScopedTranslationKey,
+        AnyChildrenConstrain<
+          TScopedTranslationKey,
+          ConstrainedChildUsage<FieldUsageConfig>
+        >,
         TFields
       >["types"]["ResponseOutput"]
     >
@@ -77,6 +111,10 @@ export interface TestRunner<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
+    AnyChildrenConstrain<
+      TScopedTranslationKey,
+      ConstrainedChildUsage<FieldUsageConfig>
+    >,
     TFields
   >;
 }

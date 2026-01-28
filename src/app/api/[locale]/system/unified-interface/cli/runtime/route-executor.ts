@@ -28,6 +28,7 @@ import type { InferJwtPayloadTypeFromRoles } from "../../shared/endpoints/route/
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type { Platform } from "../../shared/types/platform";
+import type { WidgetData } from "../../shared/widgets/widget-data";
 import { renderInkEndpointPage } from "../../unified-ui/renderers/cli/CliEndpointPage";
 import { CliResultFormatter } from "../../unified-ui/renderers/cli/response/result-formatter";
 import { getCliUser } from "../auth/cli-user";
@@ -191,6 +192,49 @@ export class RouteDelegationHandler {
         logger,
       });
       const endpoint = endpointResult.success ? endpointResult.data : null;
+
+      // Interactive mode: Use Ink terminal UI
+      if (options.interactive && endpoint) {
+        // Render interactive Ink UI - it handles form and submission
+        renderInkEndpointPage({
+          endpoint: { [endpoint.method]: endpoint },
+          locale: options.locale,
+          user: cliUser,
+          debug: options.verbose || false,
+          onSubmit: async (data: WidgetData) => {
+            // Execute the endpoint when user submits
+            const result = await RouteExecutionExecutor.executeGenericHandler<
+              CliRequestData,
+              CliUrlParams,
+              WidgetData
+            >({
+              toolName: resolvedCommand,
+              data: data as CliRequestData,
+              urlPathParams: options.urlPathParams || {},
+              user: cliUser,
+              locale: options.locale,
+              logger,
+              platform: options.platform,
+            });
+
+            return result;
+          },
+          initialData: options.data,
+        });
+
+        // Return empty result - Ink handles everything
+        return {
+          success: true,
+          data: undefined,
+          metadata: {
+            executionTime: Date.now() - startTime,
+            endpointPath: resolvedCommand,
+            method: endpoint.method,
+            resolvedCommand,
+          },
+          formattedOutput: "", // Ink handles rendering
+        };
+      }
 
       // CLI-specific: Collect input data (parse CLI args, interactive forms)
       const inputData = await CliInputParser.collectCliRequestData(

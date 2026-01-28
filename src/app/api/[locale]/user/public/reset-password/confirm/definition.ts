@@ -168,24 +168,6 @@ const { POST } = createEndpoint({
               "app.api.user.public.resetPassword.confirm.response.message.label" as const,
             schema: z.string().describe("Human-readable status message"),
           }),
-          securityTip: responseField({
-            type: WidgetType.TEXT,
-            content:
-              "app.api.user.public.resetPassword.confirm.response.securityTip" as const,
-            schema: z
-              .string()
-              .optional()
-              .describe("Optional security recommendation"),
-          }),
-          nextSteps: responseArrayField(
-            {
-              type: WidgetType.LINK_LIST,
-            },
-            responseField({
-              type: WidgetType.TEXT,
-              schema: z.string(),
-            }),
-          ),
         },
       ),
     },
@@ -296,13 +278,6 @@ const { POST } = createEndpoint({
           success: true,
           message:
             "Password reset successfully! You can now log in with your new password.",
-          securityTip:
-            "Consider enabling two-factor authentication for better security",
-          nextSteps: [
-            "Log in with your new password",
-            "Update saved passwords in your browser",
-            "Consider enabling 2FA for added security",
-          ],
         },
       },
       mismatchedPasswords: {
@@ -310,10 +285,6 @@ const { POST } = createEndpoint({
           success: false,
           message:
             "Passwords do not match. Please ensure both password fields are identical.",
-          nextSteps: [
-            "Make sure both password fields match",
-            "Use a password manager to avoid typing errors",
-          ],
         },
       },
       expiredToken: {
@@ -321,10 +292,6 @@ const { POST } = createEndpoint({
           success: false,
           message:
             "Reset token has expired. Please request a new password reset.",
-          nextSteps: [
-            "Request a new password reset",
-            "Complete the reset process within 15 minutes",
-          ],
         },
       },
     },

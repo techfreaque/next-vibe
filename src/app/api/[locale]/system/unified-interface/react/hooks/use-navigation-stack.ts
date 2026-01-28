@@ -2,10 +2,8 @@
 
 import { create } from "zustand";
 
-import type {
-  CreateApiEndpointAny,
-  NavigationStackEntry,
-} from "../../shared/types/endpoint";
+import type { NavigationStackEntry } from "../../shared/types/endpoint";
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 
 /**
  * Navigation stack store interface

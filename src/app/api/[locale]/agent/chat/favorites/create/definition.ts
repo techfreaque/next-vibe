@@ -96,6 +96,7 @@ const { POST } = createEndpoint({
               "app.api.agent.chat.favorites.post.backButton.label" as const,
             icon: "arrow-left",
             variant: "outline",
+            usage: { request: "data", response: true },
           }),
           submitButton: submitButton({
             label:
@@ -105,19 +106,18 @@ const { POST } = createEndpoint({
             icon: "plus",
             variant: "primary",
             className: "ml-auto",
+            usage: { request: "data", response: true },
           }),
         },
       ),
 
       // Separator between buttons and content
-      separator: widgetField(
-        {
-          type: WidgetType.SEPARATOR,
-          spacingTop: SpacingSize.RELAXED,
-          spacingBottom: SpacingSize.RELAXED,
-        },
-        { request: "data", response: true },
-      ),
+      separator: widgetField({
+        type: WidgetType.SEPARATOR,
+        spacingTop: SpacingSize.RELAXED,
+        spacingBottom: SpacingSize.RELAXED,
+        usage: { request: "data", response: true },
+      }),
 
       // === REQUEST ===
       characterId: requestField({
@@ -206,13 +206,11 @@ const { POST } = createEndpoint({
                 columns: 12,
                 schema: z.literal(ModelSelectionType.CHARACTER_BASED),
               }),
-              modelDisplay: widgetField(
-                {
-                  type: WidgetType.MODEL_DISPLAY,
-                  columns: 12,
-                },
-                { response: true },
-              ),
+              modelDisplay: widgetField({
+                type: WidgetType.MODEL_DISPLAY,
+                columns: 12,
+                usage: { request: "data" },
+              }),
             },
           ),
           // Variant 2: Manual model selection
@@ -248,13 +246,11 @@ const { POST } = createEndpoint({
                 columns: 12,
                 schema: z.literal(ModelSelectionType.MANUAL),
               }),
-              modelDisplay: widgetField(
-                {
-                  type: WidgetType.MODEL_DISPLAY,
-                  columns: 12,
-                },
-                { response: true },
-              ),
+              modelDisplay: widgetField({
+                type: WidgetType.MODEL_DISPLAY,
+                columns: 12,
+                usage: { request: "data" },
+              }),
               manualModelId: requestField({
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.SELECT,
@@ -296,13 +292,11 @@ const { POST } = createEndpoint({
                 columns: 12,
                 schema: z.literal(ModelSelectionType.FILTERS),
               }),
-              modelDisplay: widgetField(
-                {
-                  type: WidgetType.MODEL_DISPLAY,
-                  columns: 12,
-                },
-                { response: true },
-              ),
+              modelDisplay: widgetField({
+                type: WidgetType.MODEL_DISPLAY,
+                columns: 12,
+                usage: { request: "data" },
+              }),
               intelligenceRange: requestDataRangeField({
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.RANGE_SLIDER,

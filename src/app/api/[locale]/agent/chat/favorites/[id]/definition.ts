@@ -41,7 +41,6 @@ import {
 import {
   objectField,
   requestField,
-  requestResponseField,
   requestUrlPathParamsField,
   requestUrlPathParamsResponseField,
   responseField,
@@ -92,20 +91,19 @@ const { DELETE } = createEndpoint({
     },
     { request: "urlPathParams" },
     {
-      title: widgetField(
-        {
-          type: WidgetType.TITLE,
-          level: 5,
-          content:
-            "app.api.agent.chat.favorites.id.delete.container.description" as const,
-        },
-        { request: "data", response: true },
-      ),
+      title: widgetField({
+        type: WidgetType.TITLE,
+        level: 5,
+        content:
+          "app.api.agent.chat.favorites.id.delete.container.description" as const,
+        usage: { request: "urlPathParams" },
+      }),
       backButton: backButton({
         label:
           "app.api.agent.chat.favorites.id.delete.backButton.label" as const,
         icon: "arrow-left",
         variant: "outline",
+        usage: { request: "urlPathParams" },
       }),
       deleteButton: submitButton({
         label: "app.api.agent.chat.favorites.id.delete.actions.delete" as const,
@@ -114,6 +112,7 @@ const { DELETE } = createEndpoint({
         icon: "trash",
         variant: "destructive",
         className: "ml-auto",
+        usage: { request: "urlPathParams" },
       }),
 
       // === REQUEST (URL Path Params) ===
@@ -236,6 +235,7 @@ const { PATCH } = createEndpoint({
               "app.api.agent.chat.favorites.id.patch.backButton.label" as const,
             icon: "arrow-left",
             variant: "outline",
+            usage: { request: "data", response: true },
           }),
           deleteButton: deleteButton({
             label:
@@ -248,6 +248,7 @@ const { PATCH } = createEndpoint({
             variant: "destructive",
             className: "ml-auto",
             popNavigationOnSuccess: 2, // Pop twice: edit -> details -> list
+            usage: { request: "data", response: true },
           }),
           submitButton: submitButton({
             label:
@@ -256,19 +257,18 @@ const { PATCH } = createEndpoint({
               "app.api.agent.chat.favorites.id.patch.submitButton.loadingText" as const,
             icon: "save",
             variant: "primary",
+            usage: { request: "data", response: true },
           }),
         },
       ),
 
       // Separator between buttons and content
-      separator: widgetField(
-        {
-          type: WidgetType.SEPARATOR,
-          spacingTop: SpacingSize.RELAXED,
-          spacingBottom: SpacingSize.RELAXED,
-        },
-        { response: true, request: "data" },
-      ),
+      separator: widgetField({
+        type: WidgetType.SEPARATOR,
+        spacingTop: SpacingSize.RELAXED,
+        spacingBottom: SpacingSize.RELAXED,
+        usage: { request: "data", response: true },
+      }),
 
       // === REQUEST (URL Path Params) ===
       id: requestUrlPathParamsField({
@@ -356,13 +356,11 @@ const { PATCH } = createEndpoint({
                 columns: 12,
                 schema: z.literal(ModelSelectionType.CHARACTER_BASED),
               }),
-              modelDisplay: widgetField(
-                {
-                  type: WidgetType.MODEL_DISPLAY,
-                  columns: 12,
-                },
-                { response: true },
-              ),
+              modelDisplay: widgetField({
+                type: WidgetType.MODEL_DISPLAY,
+                columns: 12,
+                usage: { request: "data" },
+              }),
             },
           ),
           // Variant 2: Manual model selection
@@ -398,13 +396,11 @@ const { PATCH } = createEndpoint({
                 columns: 12,
                 schema: z.literal(ModelSelectionType.MANUAL),
               }),
-              modelDisplay: widgetField(
-                {
-                  type: WidgetType.MODEL_DISPLAY,
-                  columns: 12,
-                },
-                { response: true },
-              ),
+              modelDisplay: widgetField({
+                type: WidgetType.MODEL_DISPLAY,
+                columns: 12,
+                usage: { request: "data" },
+              }),
               manualModelId: requestField({
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.SELECT,
@@ -446,13 +442,11 @@ const { PATCH } = createEndpoint({
                 columns: 12,
                 schema: z.literal(ModelSelectionType.FILTERS),
               }),
-              modelDisplay: widgetField(
-                {
-                  type: WidgetType.MODEL_DISPLAY,
-                  columns: 12,
-                },
-                { response: true },
-              ),
+              modelDisplay: widgetField({
+                type: WidgetType.MODEL_DISPLAY,
+                columns: 12,
+                usage: { request: "data" },
+              }),
               intelligenceRange: requestDataRangeField({
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.RANGE_SLIDER,
@@ -798,14 +792,12 @@ const { GET } = createEndpoint({
               ),
             },
           ),
-          separator: widgetField(
-            {
-              type: WidgetType.SEPARATOR,
-              spacingTop: SpacingSize.RELAXED,
-              spacingBottom: SpacingSize.RELAXED,
-            },
-            { response: true },
-          ),
+          separator: widgetField({
+            type: WidgetType.SEPARATOR,
+            spacingTop: SpacingSize.RELAXED,
+            spacingBottom: SpacingSize.RELAXED,
+            usage: { response: true },
+          }),
 
           actions: widgetObjectField(
             {
@@ -822,6 +814,7 @@ const { GET } = createEndpoint({
                 size: "sm",
                 targetEndpoint: charactersDefinitions.GET,
                 extractParams: () => ({}),
+                usage: { response: true },
               }),
               modifyCharacter: navigateButtonField({
                 icon: "trash",
@@ -833,6 +826,7 @@ const { GET } = createEndpoint({
                 }),
                 prefillFromGet: true,
                 getEndpoint: characterDefinitions.GET,
+                usage: { response: true },
               }),
             },
           ),
@@ -882,173 +876,11 @@ const { GET } = createEndpoint({
                   "app.api.agent.chat.favorites.id.get.response.selectionType.content" as const,
                 schema: z.literal(ModelSelectionType.CHARACTER_BASED),
               }),
-              modelDisplay: widgetField(
-                {
-                  type: WidgetType.MODEL_DISPLAY,
-                  columns: 12,
-                },
-                { response: true },
-              ),
-              intelligenceRange: requestDataRangeField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.RANGE_SLIDER,
-                label:
-                  "app.api.agent.chat.characters.post.intelligenceRange.label" as const,
-                description:
-                  "app.api.agent.chat.characters.post.intelligenceRange.description" as const,
-                options: INTELLIGENCE_DISPLAY.map((tier) => ({
-                  label: tier.label,
-                  value: tier.value,
-                  icon: tier.icon,
-                  description: tier.description,
-                })),
-                minLabel:
-                  "app.api.agent.chat.characters.post.intelligenceRange.minLabel" as const,
-                maxLabel:
-                  "app.api.agent.chat.characters.post.intelligenceRange.maxLabel" as const,
+              modelDisplay: widgetField({
+                type: WidgetType.MODEL_DISPLAY,
                 columns: 12,
-                disabled: true,
-                schema: z.enum(IntelligenceLevel),
+                usage: { response: true },
               }),
-              priceRange: requestDataRangeField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.RANGE_SLIDER,
-                label:
-                  "app.api.agent.chat.characters.post.priceRange.label" as const,
-                description:
-                  "app.api.agent.chat.characters.post.priceRange.description" as const,
-                options: PRICE_DISPLAY.map((tier) => ({
-                  label: tier.label,
-                  value: tier.value,
-                  icon: tier.icon,
-                  description: tier.description,
-                })),
-                minLabel:
-                  "app.api.agent.chat.characters.post.priceRange.minLabel" as const,
-                maxLabel:
-                  "app.api.agent.chat.characters.post.priceRange.maxLabel" as const,
-                columns: 12,
-                disabled: true,
-                schema: z.enum(PriceLevel),
-              }),
-              contentRange: requestDataRangeField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.RANGE_SLIDER,
-                label:
-                  "app.api.agent.chat.characters.post.contentRange.label" as const,
-                description:
-                  "app.api.agent.chat.characters.post.contentRange.description" as const,
-                options: CONTENT_DISPLAY.map((tier) => ({
-                  label: tier.label,
-                  value: tier.value,
-                  icon: tier.icon,
-                  description: tier.description,
-                })),
-                minLabel:
-                  "app.api.agent.chat.characters.post.contentRange.minLabel" as const,
-                maxLabel:
-                  "app.api.agent.chat.characters.post.contentRange.maxLabel" as const,
-                columns: 12,
-                disabled: true,
-                schema: z.enum(ContentLevel),
-              }),
-              speedRange: requestDataRangeField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.RANGE_SLIDER,
-                label:
-                  "app.api.agent.chat.characters.post.speedRange.label" as const,
-                description:
-                  "app.api.agent.chat.characters.post.speedRange.description" as const,
-                options: SPEED_DISPLAY.map((tier) => ({
-                  label: tier.label,
-                  value: tier.value,
-                  icon: tier.icon,
-                  description: tier.description,
-                })),
-                minLabel:
-                  "app.api.agent.chat.characters.post.speedRange.minLabel" as const,
-                maxLabel:
-                  "app.api.agent.chat.characters.post.speedRange.maxLabel" as const,
-                columns: 12,
-                disabled: true,
-                schema: z.enum(SpeedLevel),
-              }),
-              preferredStrengths: requestResponseField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.MULTISELECT,
-                label:
-                  "app.api.agent.chat.characters.post.preferredStrengths.label" as const,
-                description:
-                  "app.api.agent.chat.characters.post.preferredStrengths.description" as const,
-                options: ModelUtilityOptions,
-                columns: 6,
-                disabled: true,
-                schema: z.array(z.enum(ModelUtilityDB)).nullable().optional(),
-              }),
-              ignoredWeaknesses: requestResponseField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.MULTISELECT,
-                label:
-                  "app.api.agent.chat.characters.post.ignoredWeaknesses.label" as const,
-                description:
-                  "app.api.agent.chat.characters.post.ignoredWeaknesses.description" as const,
-                options: ModelUtilityOptions,
-                columns: 6,
-                disabled: true,
-                schema: z.array(z.enum(ModelUtilityDB)).nullable().optional(),
-              }),
-            },
-          ),
-          // Variant 2: Manual model selection
-          objectField(
-            {
-              type: WidgetType.CONTAINER,
-              layoutType: LayoutType.STACKED,
-            },
-            { response: true },
-            {
-              selectionType: responseField({
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.favorites.id.get.response.selectionType.content" as const,
-                schema: z.literal(ModelSelectionType.MANUAL),
-              }),
-              modelDisplay: widgetField(
-                {
-                  type: WidgetType.MODEL_DISPLAY,
-                  columns: 12,
-                },
-                { response: true },
-              ),
-              manualModelId: responseField({
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.favorites.id.get.response.manualModelId.content" as const,
-                schema: z.enum(ModelId),
-              }),
-            },
-          ),
-          // Variant 3: -based selection
-          objectField(
-            {
-              type: WidgetType.CONTAINER,
-              layoutType: LayoutType.STACKED,
-            },
-            { response: true },
-            {
-              selectionType: responseField({
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.favorites.id.get.response.selectionType.content" as const,
-                schema: z.literal(ModelSelectionType.FILTERS),
-              }),
-              modelDisplay: widgetField(
-                {
-                  type: WidgetType.MODEL_DISPLAY,
-                  columns: 12,
-                },
-                { response: true },
-              ),
               intelligenceRange: responseRangeField({
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.RANGE_SLIDER,
@@ -1133,7 +965,7 @@ const { GET } = createEndpoint({
                 disabled: true,
                 schema: z.enum(SpeedLevel),
               }),
-              preferredStrengths: requestResponseField({
+              preferredStrengths: responseField({
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.MULTISELECT,
                 label:
@@ -1145,7 +977,163 @@ const { GET } = createEndpoint({
                 disabled: true,
                 schema: z.array(z.enum(ModelUtilityDB)).nullable().optional(),
               }),
-              ignoredWeaknesses: requestResponseField({
+              ignoredWeaknesses: responseField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.MULTISELECT,
+                label:
+                  "app.api.agent.chat.characters.post.ignoredWeaknesses.label" as const,
+                description:
+                  "app.api.agent.chat.characters.post.ignoredWeaknesses.description" as const,
+                options: ModelUtilityOptions,
+                columns: 6,
+                disabled: true,
+                schema: z.array(z.enum(ModelUtilityDB)).nullable().optional(),
+              }),
+            },
+          ),
+          // Variant 2: Manual model selection
+          objectField(
+            {
+              type: WidgetType.CONTAINER,
+              layoutType: LayoutType.STACKED,
+            },
+            { response: true },
+            {
+              selectionType: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.favorites.id.get.response.selectionType.content" as const,
+                schema: z.literal(ModelSelectionType.MANUAL),
+              }),
+              modelDisplay: widgetField({
+                type: WidgetType.MODEL_DISPLAY,
+                columns: 12,
+                usage: { response: true },
+              }),
+              manualModelId: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.favorites.id.get.response.manualModelId.content" as const,
+                schema: z.enum(ModelId),
+              }),
+            },
+          ),
+          // Variant 3: -based selection
+          objectField(
+            {
+              type: WidgetType.CONTAINER,
+              layoutType: LayoutType.STACKED,
+            },
+            { response: true },
+            {
+              selectionType: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.favorites.id.get.response.selectionType.content" as const,
+                schema: z.literal(ModelSelectionType.FILTERS),
+              }),
+              modelDisplay: widgetField({
+                type: WidgetType.MODEL_DISPLAY,
+                columns: 12,
+                usage: { response: true },
+              }),
+              intelligenceRange: responseRangeField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.RANGE_SLIDER,
+                label:
+                  "app.api.agent.chat.characters.post.intelligenceRange.label" as const,
+                description:
+                  "app.api.agent.chat.characters.post.intelligenceRange.description" as const,
+                options: INTELLIGENCE_DISPLAY.map((tier) => ({
+                  label: tier.label,
+                  value: tier.value,
+                  icon: tier.icon,
+                  description: tier.description,
+                })),
+                minLabel:
+                  "app.api.agent.chat.characters.post.intelligenceRange.minLabel" as const,
+                maxLabel:
+                  "app.api.agent.chat.characters.post.intelligenceRange.maxLabel" as const,
+                columns: 12,
+                disabled: true,
+                schema: z.enum(IntelligenceLevel),
+              }),
+              priceRange: responseRangeField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.RANGE_SLIDER,
+                label:
+                  "app.api.agent.chat.characters.post.priceRange.label" as const,
+                description:
+                  "app.api.agent.chat.characters.post.priceRange.description" as const,
+                options: PRICE_DISPLAY.map((tier) => ({
+                  label: tier.label,
+                  value: tier.value,
+                  icon: tier.icon,
+                  description: tier.description,
+                })),
+                minLabel:
+                  "app.api.agent.chat.characters.post.priceRange.minLabel" as const,
+                maxLabel:
+                  "app.api.agent.chat.characters.post.priceRange.maxLabel" as const,
+                columns: 12,
+                disabled: true,
+                schema: z.enum(PriceLevel),
+              }),
+              contentRange: responseRangeField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.RANGE_SLIDER,
+                label:
+                  "app.api.agent.chat.characters.post.contentRange.label" as const,
+                description:
+                  "app.api.agent.chat.characters.post.contentRange.description" as const,
+                options: CONTENT_DISPLAY.map((tier) => ({
+                  label: tier.label,
+                  value: tier.value,
+                  icon: tier.icon,
+                  description: tier.description,
+                })),
+                minLabel:
+                  "app.api.agent.chat.characters.post.contentRange.minLabel" as const,
+                maxLabel:
+                  "app.api.agent.chat.characters.post.contentRange.maxLabel" as const,
+                columns: 12,
+                disabled: true,
+                schema: z.enum(ContentLevel),
+              }),
+              speedRange: responseRangeField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.RANGE_SLIDER,
+                label:
+                  "app.api.agent.chat.characters.post.speedRange.label" as const,
+                description:
+                  "app.api.agent.chat.characters.post.speedRange.description" as const,
+                options: SPEED_DISPLAY.map((tier) => ({
+                  label: tier.label,
+                  value: tier.value,
+                  icon: tier.icon,
+                  description: tier.description,
+                })),
+                minLabel:
+                  "app.api.agent.chat.characters.post.speedRange.minLabel" as const,
+                maxLabel:
+                  "app.api.agent.chat.characters.post.speedRange.maxLabel" as const,
+                columns: 12,
+                disabled: true,
+                schema: z.enum(SpeedLevel),
+              }),
+              preferredStrengths: responseField({
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.MULTISELECT,
+                label:
+                  "app.api.agent.chat.characters.post.preferredStrengths.label" as const,
+                description:
+                  "app.api.agent.chat.characters.post.preferredStrengths.description" as const,
+                options: ModelUtilityOptions,
+                columns: 6,
+                disabled: true,
+                schema: z.array(z.enum(ModelUtilityDB)).nullable().optional(),
+              }),
+              ignoredWeaknesses: responseField({
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.MULTISELECT,
                 label:
@@ -1193,6 +1181,7 @@ const { GET } = createEndpoint({
           backButton: backButton({
             icon: "arrow-left",
             variant: "outline",
+            usage: { response: true },
           }),
 
           // Edit button - uses self-referencing GET endpoint for prefill
@@ -1207,6 +1196,7 @@ const { GET } = createEndpoint({
             icon: "pencil",
             variant: "default",
             className: "ml-auto",
+            usage: { response: true },
           }),
 
           // Delete button
@@ -1220,6 +1210,7 @@ const { GET } = createEndpoint({
             icon: "trash",
             variant: "destructive",
             popNavigationOnSuccess: 1, // Pop once: details -> list
+            usage: { response: true },
           }),
         },
       ),

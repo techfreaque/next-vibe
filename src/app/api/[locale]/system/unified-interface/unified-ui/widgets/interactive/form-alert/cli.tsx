@@ -7,12 +7,19 @@ import type { JSX } from "react";
 
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { FormAlertWidgetConfig } from "./types";
 
-export function FormAlertWidgetInk<TUsage extends FieldUsageConfig>({
+export function FormAlertWidgetInk<
+  TUsage extends FieldUsageConfig,
+  TEndpoint extends CreateApiEndpointAny,
+>({
   context,
-}: InkWidgetProps<FormAlertWidgetConfig<TUsage, "widget">>): JSX.Element {
+}: InkWidgetProps<
+  TEndpoint,
+  FormAlertWidgetConfig<TUsage, "widget">
+>): JSX.Element {
   const { response } = context;
 
   if (!response || response.success) {

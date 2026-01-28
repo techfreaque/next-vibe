@@ -7,20 +7,24 @@ import type { JSX } from "react";
 
 import type { NumberWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { SliderFieldWidgetConfig } from "./types";
 
-export function SliderFieldWidgetInk<TKey extends string>({
-  value,
+export function SliderFieldWidgetInk<
+  TKey extends string,
+  TEndpoint extends CreateApiEndpointAny,
+>({
   field,
   context,
 }: InkWidgetProps<
+  TEndpoint,
   SliderFieldWidgetConfig<TKey, NumberWidgetSchema, FieldUsageConfig>
 >): JSX.Element {
   const { t } = context;
   const displayValue =
-    value !== null && value !== undefined ? String(value) : "—";
+    field.value !== null && field.value !== undefined ? field.value : "—";
 
   return (
     <Box flexDirection="column" marginBottom={1}>

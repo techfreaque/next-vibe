@@ -13,7 +13,7 @@ import type { BaseFormFieldWidgetConfig } from "../_shared/types";
  * Slider field widget configuration
  */
 export interface SliderFieldWidgetConfig<
-  out TKey extends string,
+  TKey extends string,
   TSchema extends NumberWidgetSchema,
   TUsage extends FieldUsageConfig,
 > extends BaseFormFieldWidgetConfig<TKey, TUsage, "primitive", TSchema> {

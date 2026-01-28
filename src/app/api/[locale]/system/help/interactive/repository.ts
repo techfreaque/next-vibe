@@ -29,14 +29,14 @@ import type {
   RouteExecutionContext,
 } from "../../unified-interface/cli/runtime/route-executor";
 import { RouteDelegationHandler } from "../../unified-interface/cli/runtime/route-executor";
-import { SchemaUIHandler } from "../../unified-interface/cli/widgets/renderers/schema-handler";
 import { definitionsRegistry } from "../../unified-interface/shared/endpoints/definitions/registry";
-import type { CreateApiEndpointAny } from "../../unified-interface/shared/types/endpoint";
+import type { CreateApiEndpointAny } from "../../unified-interface/shared/types/endpoint-base";
 import { Platform } from "../../unified-interface/shared/types/platform";
 import {
   endpointToToolName,
   splitPath,
 } from "../../unified-interface/shared/utils/path";
+import { SchemaUIHandler } from "../../unified-interface/unified-ui/renderers/cli/response/schema-handler";
 
 /**
  * Interactive session state

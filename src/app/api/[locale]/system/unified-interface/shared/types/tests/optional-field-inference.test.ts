@@ -52,7 +52,7 @@ const optionalArrayField = requestDataArrayField(
   } as const,
   objectField(
     {
-      type: WidgetType.DATA_CARD,
+      type: WidgetType.CONTAINER,
       title: "test" as TranslationKey,
       description: "test" as TranslationKey,
     },
@@ -104,8 +104,9 @@ const testResponseArrayOptional = responseArrayOptionalField(
   ),
 );
 
-// Verify type is array-optional
-type TestResponseArrayOptionalType = typeof testResponseArrayOptional.type;
+// Verify schemaType is array-optional
+type TestResponseArrayOptionalType =
+  typeof testResponseArrayOptional.schemaType;
 type TestResponseArrayOptionalCheck = Expect<
   Equal<TestResponseArrayOptionalType, "array-optional">
 >;
@@ -135,8 +136,8 @@ const testObjectOptional = objectOptionalField(
   },
 );
 
-// Verify type is object-optional
-type TestObjectOptionalType = typeof testObjectOptional.type;
+// Verify schemaType is object-optional
+type TestObjectOptionalType = typeof testObjectOptional.schemaType;
 type TestObjectOptionalCheck = Expect<
   Equal<TestObjectOptionalType, "object-optional">
 >;

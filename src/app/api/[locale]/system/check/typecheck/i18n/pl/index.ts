@@ -69,6 +69,17 @@ export const translations: typeof enTranslations = {
       label: "Pomiń sortowanie",
       description: "Pomiń sortowanie problemów (wydajność)",
     },
+    filter: {
+      label: "Filter",
+      description:
+        "Filtruj problemy po ścieżce pliku, wiadomości lub regule. Obsługuje dopasowanie tekstu lub regex (/pattern/flags). Tablice umożliwiają logikę OR dla wielu filtrów.",
+      placeholder: "np. 'TS2304' lub '/src\\/components/i'",
+    },
+    summaryOnly: {
+      label: "Tylko Podsumowanie",
+      description:
+        "Zwraca tylko statystyki podsumowania, pomija elementy i listy plików",
+    },
   },
 
   // Response fields

@@ -22,7 +22,7 @@ import {
   formatGenerator,
   formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
-import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { PATH_SEPARATOR } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 
 import {

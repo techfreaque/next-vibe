@@ -146,7 +146,6 @@ const { GET } = createEndpoint({
       accounts: responseArrayField(
         {
           type: WidgetType.DATA_TABLE,
-          columns: [],
         },
         objectField(
           {

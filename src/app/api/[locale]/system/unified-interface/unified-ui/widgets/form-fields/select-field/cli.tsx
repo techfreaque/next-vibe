@@ -7,21 +7,25 @@ import type { JSX } from "react";
 
 import type { EnumWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { SelectFieldWidgetConfig } from "./types";
 
-export function SelectFieldWidgetInk<TKey extends string>({
-  value,
+export function SelectFieldWidgetInk<
+  TKey extends string,
+  TEndpoint extends CreateApiEndpointAny,
+>({
   field,
   context,
 }: InkWidgetProps<
+  TEndpoint,
   SelectFieldWidgetConfig<TKey, EnumWidgetSchema, FieldUsageConfig>
 >): JSX.Element {
   const { t } = context;
 
   // Find selected option
-  const selectedOption = field.options.find((opt) => opt.value === value);
+  const selectedOption = field.options.find((opt) => opt.value === field.value);
   const displayValue = selectedOption ? t(selectedOption.label) : "—";
 
   return (

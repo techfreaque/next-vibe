@@ -7,19 +7,23 @@ import type { JSX } from "react";
 
 import type { ArrayWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { TextArrayFieldWidgetConfig } from "./types";
 
-export function TextArrayFieldWidgetInk<TKey extends string>({
-  value,
+export function TextArrayFieldWidgetInk<
+  TKey extends string,
+  TEndpoint extends CreateApiEndpointAny,
+>({
   field,
   context,
 }: InkWidgetProps<
+  TEndpoint,
   TextArrayFieldWidgetConfig<TKey, ArrayWidgetSchema, FieldUsageConfig>
 >): JSX.Element {
   const { t } = context;
-  const items = Array.isArray(value) ? value : [];
+  const items = field.value;
   const displayValue = items.length > 0 ? items.join(", ") : "—";
 
   return (

@@ -5,10 +5,7 @@
 
 import "server-only";
 
-import type {
-  ErrorResponseType,
-  ResponseType,
-} from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -17,10 +14,12 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { definitionLoader } from "../shared/endpoints/definition/loader";
 import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
 import { RouteExecutionExecutor } from "../shared/endpoints/route/executor";
-import type { CreateApiEndpointAny } from "../shared/types/endpoint";
+import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
+import { McpResultFormatter } from "../unified-ui/renderers/mcp/McpResultFormatter";
 import type {
   MCPExecutionContext,
   MCPToolCallResult,
@@ -122,20 +121,6 @@ export class MCPRegistry implements IMCPRegistry {
   }
 
   /**
-   * Get full endpoints for a specific user (filtered by permissions)
-   * Returns endpoints with field information for schema generation
-   */
-  getEndpoints(
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): CreateApiEndpointAny[] {
-    this.ensureInitialized(logger);
-
-    // Get filtered endpoints from shared registry
-    return definitionsRegistry.getEndpointsForUser(Platform.MCP, user, logger);
-  }
-
-  /**
    * Get tool metadata by name
    */
   getToolByName(name: string, logger: EndpointLogger): MCPToolMetadata | null {
@@ -214,7 +199,29 @@ export class MCPRegistry implements IMCPRegistry {
         errorMessage: result.success ? undefined : result.message,
       });
 
-      return this.convertToMCPResult(result, context.toolName, context.locale);
+      // Load endpoint definition for rendering (optional, for pretty output)
+      // Only load if we have data to render
+      let endpoint: CreateApiEndpointAny | null = null;
+      if (result.success && result.data) {
+        const endpointResult = await definitionLoader.load({
+          identifier: context.toolName,
+          platform: Platform.MCP,
+          user: context.user,
+          logger,
+        });
+        if (endpointResult.success) {
+          endpoint = endpointResult.data;
+        }
+      }
+
+      return this.convertToMCPResult(
+        result,
+        context.toolName,
+        context.locale,
+        logger,
+        endpoint,
+        context.user,
+      );
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("[MCP Registry] Tool execution failed with exception", {
@@ -273,37 +280,62 @@ export class MCPRegistry implements IMCPRegistry {
     result: ResponseType<TData>,
     toolName: string,
     locale: CountryLanguage,
+    logger: EndpointLogger,
+    endpoint: CreateApiEndpointAny | null,
+    user: JwtPayloadType,
   ): MCPToolCallResult {
-    if (result.success) {
+    const { t } = simpleT(locale);
+
+    if (result.success && result.data) {
+      // Format successful response using endpoint renderer if available
+      const formattedData = McpResultFormatter.formatSuccess(
+        result.data,
+        endpoint,
+        locale,
+        logger,
+        user,
+      );
+      logger.debug("[MCP Registry] Tool execution successful", {
+        toolName,
+        formattedData,
+      });
+
       return {
         content: [
           {
             type: "text",
-            text: JSON.stringify(result.data || result, null, 2),
+            text: formattedData,
           },
         ],
         isError: false,
       };
     }
 
-    const { t } = simpleT(locale);
+    if (result.success) {
+      // Success with no data
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
+        isError: false,
+      };
+    }
 
-    // Extract error message from ResponseType
+    // Error response
     const errorMessage = result.message
       ? t(result.message, result.messageParams)
       : t("app.api.system.unifiedInterface.mcp.registry.toolExecutionFailed");
 
-    const errorDetails: {
-      tool: string;
-      error: ErrorResponseType;
-    } = {
-      tool: toolName,
-      error: result,
-    };
     return this.fail({
       error: errorMessage,
       code: MCPErrorCode.TOOL_EXECUTION_FAILED,
-      details: errorDetails,
+      details: {
+        tool: toolName,
+        error: result,
+      },
     });
   }
 

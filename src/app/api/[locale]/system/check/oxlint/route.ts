@@ -14,8 +14,8 @@ import { oxlintRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger }) => {
-      return await oxlintRepository.execute(data, logger);
+    handler: async ({ data, logger, platform }) => {
+      return await oxlintRepository.execute(data, logger, platform);
     },
   },
 });

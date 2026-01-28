@@ -1,6 +1,7 @@
 export const translations = {
   title: "Oxlint",
-  description: "Run ESLint with Oxlint configuration on your codebase",
+  description:
+    "Run Oxlint (fast Rust linter) on your codebase. Use vibe-check for comprehensive checks (ESLint + Oxlint + TypeScript). Note: Default values are configurable in check.config.ts.",
   category: "System Checks",
   tag: "Oxlint",
   status: {
@@ -26,20 +27,22 @@ export const translations = {
   fields: {
     path: {
       label: "Path",
-      description: "Path to lint",
+      description:
+        "File paths or directories to check (string or array). RECOMMENDED: Specify paths for the area you're working on (fast, focused). Leave empty to check ALL files (slow, use only for comprehensive audits). Examples: 'src/app/feature' or ['src/feature/file.tsx', 'src/feature/other.tsx']",
       placeholder: "Enter path to lint",
     },
     verbose: {
       label: "Verbose",
-      description: "Enable verbose output",
+      description: "Enable detailed output with additional information",
     },
     fix: {
       label: "Auto Fix",
-      description: "Automatically fix issues",
+      description: "Auto-fix issues where possible (default: true)",
     },
     timeoutSeconds: {
       label: "Timeout (seconds)",
-      description: "Maximum execution time",
+      description:
+        "Maximum execution time in seconds, range 1-3600 (default: 3600)",
     },
     cacheDir: {
       label: "Cache Directory",
@@ -47,19 +50,30 @@ export const translations = {
     },
     createConfig: {
       label: "Create Config",
-      description: "Automatically create configuration file if missing",
+      description: "Create configuration file if missing",
     },
     limit: {
       label: "Limit",
-      description: "Maximum number of issues to display",
+      description:
+        "Issues to display per page, range 1-10000 (default: 20000 for web/CLI, 2 for MCP). Controls display only, not detection.",
     },
     page: {
       label: "Page",
-      description: "Page number for pagination",
+      description: "Page number for paginated results (default: 1)",
     },
     skipSorting: {
       label: "Skip Sorting",
-      description: "Skip sorting issues (for performance)",
+      description: "Skip sorting issues for better performance",
+    },
+    filter: {
+      label: "Filter",
+      description:
+        "Filter issues by file path, message, or rule. Supports text matching or regex (/pattern/flags). Arrays enable OR logic for multiple filters.",
+      placeholder: "e.g., 'no-unused-vars' or '/src\\/components/i'",
+    },
+    summaryOnly: {
+      label: "Summary Only",
+      description: "Only return summary stats, omit items and files lists",
     },
   },
   response: {

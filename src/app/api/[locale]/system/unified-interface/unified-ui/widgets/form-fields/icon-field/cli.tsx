@@ -5,21 +5,25 @@
 import { Box, Text } from "ink";
 import type { JSX } from "react";
 
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { IconFieldWidgetConfig } from "./types";
 
-export function IconFieldWidgetInk<TKey extends string>({
-  value,
+export function IconFieldWidgetInk<
+  TEndpoint extends CreateApiEndpointAny,
+  TKey extends string,
+>({
   field,
   context,
 }: InkWidgetProps<
+  TEndpoint,
   IconFieldWidgetConfig<TKey, StringWidgetSchema, FieldUsageConfig>
 >): JSX.Element {
   const { t } = context;
-  const displayValue = value ? String(value) : "—";
+  const displayValue = field.value ? field.value : "—";
 
   return (
     <Box flexDirection="column" marginBottom={1}>

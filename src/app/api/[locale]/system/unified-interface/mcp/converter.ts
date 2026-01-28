@@ -7,6 +7,7 @@ import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interf
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { endpointToToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import { hasChildren } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { MCPTool } from "./types";
@@ -64,6 +65,7 @@ function generateInputSchema(
 
 /**
  * Add descriptions to schema fields from endpoint field metadata
+ * Recursively processes nested objects and arrays
  */
 function addFieldDescriptions(
   shape: Record<string, z.ZodTypeAny>,
@@ -71,7 +73,7 @@ function addFieldDescriptions(
   locale: CountryLanguage,
   endpoint: CreateApiEndpointAny,
 ): Record<string, z.ZodTypeAny> {
-  if (!fields || fields.schemaType !== "object" || !fields.children) {
+  if (!fields || !hasChildren(fields)) {
     return shape;
   }
 
@@ -79,29 +81,187 @@ function addFieldDescriptions(
 
   for (const [key, schema] of Object.entries(shape)) {
     const fieldDef = fields.children[key];
-    if (!fieldDef || fieldDef.schemaType === "widget") {
+    if (!fieldDef) {
       enhancedShape[key] = schema;
       continue;
     }
 
-    // Get description from field UI config
+    // Get description from field config if available
     let description: string | undefined;
-    if (
-      fieldDef.ui &&
-      "description" in fieldDef.ui &&
-      fieldDef.ui.description
-    ) {
-      const descKey = fieldDef.ui.description as string;
+    if ("description" in fieldDef && typeof fieldDef.description === "string") {
+      const descKey = fieldDef.description;
       const { t } = endpoint.scopedTranslation.scopedT(locale);
-
       description = t(descKey);
     }
 
+    // Recursively process nested schemas
+    let enhancedSchema = schema;
+
+    // Handle ZodObject - recursively add descriptions to nested fields
+    if (schema instanceof z.ZodObject) {
+      enhancedSchema = addDescriptionsToZodObject(
+        schema,
+        fieldDef,
+        locale,
+        endpoint,
+      );
+    }
+    // Handle ZodArray - recursively add descriptions to array items
+    else if (schema instanceof z.ZodArray) {
+      enhancedSchema = addDescriptionsToZodArray(
+        schema,
+        fieldDef,
+        locale,
+        endpoint,
+      );
+    }
+    // Handle ZodOptional/ZodNullable - unwrap and process inner schema
+    else if (
+      schema instanceof z.ZodOptional ||
+      schema instanceof z.ZodNullable
+    ) {
+      enhancedSchema = addDescriptionsToWrappedSchema(
+        schema,
+        fieldDef,
+        locale,
+        endpoint,
+      );
+    }
+
     // Add description to schema
-    enhancedShape[key] = description ? schema.describe(description) : schema;
+    enhancedShape[key] = description
+      ? enhancedSchema.describe(description)
+      : enhancedSchema;
   }
 
   return enhancedShape;
+}
+
+/**
+ * Add descriptions to ZodObject fields recursively
+ */
+function addDescriptionsToZodObject(
+  schema: z.ZodObject<z.ZodRawShape>,
+  fieldDef: CreateApiEndpointAny["fields"],
+  locale: CountryLanguage,
+  endpoint: CreateApiEndpointAny,
+): z.ZodObject<z.ZodRawShape> {
+  if (!fieldDef) {
+    return schema;
+  }
+
+  // Handle both old (type) and new (schemaType) field systems
+  const fieldType =
+    "type" in fieldDef
+      ? fieldDef.type
+      : "schemaType" in fieldDef
+        ? fieldDef.schemaType
+        : undefined;
+
+  if (fieldType === "widget" || fieldType === "primitive") {
+    return schema;
+  }
+
+  // Only process if fieldDef has children (object or array with object child)
+  if (fieldType !== "object" && fieldType !== "object-optional") {
+    return schema;
+  }
+
+  if (!fieldDef.children) {
+    return schema;
+  }
+
+  const shape = schema.shape;
+  const enhancedShape = addFieldDescriptions(shape, fieldDef, locale, endpoint);
+
+  return z.object(enhancedShape) as z.ZodObject<z.ZodRawShape>;
+}
+
+/**
+ * Add descriptions to ZodArray item schema recursively
+ */
+function addDescriptionsToZodArray(
+  schema: z.ZodArray<z.ZodTypeAny>,
+  fieldDef: CreateApiEndpointAny["fields"],
+  locale: CountryLanguage,
+  endpoint: CreateApiEndpointAny,
+): z.ZodArray<z.ZodTypeAny> {
+  if (!fieldDef) {
+    return schema;
+  }
+
+  // Handle both old (type) and new (schemaType) field systems
+  const fieldType =
+    "type" in fieldDef
+      ? fieldDef.type
+      : "schemaType" in fieldDef
+        ? fieldDef.schemaType
+        : undefined;
+
+  if (fieldType === "widget" || fieldType === "primitive") {
+    return schema;
+  }
+
+  // Only process if fieldDef is an array type
+  if (fieldType !== "array" && fieldType !== "array-optional") {
+    return schema;
+  }
+
+  const itemSchema = schema._def.type;
+
+  // If array items are objects, recursively add descriptions
+  if (itemSchema instanceof z.ZodObject && fieldDef.child) {
+    const enhancedItemSchema = addDescriptionsToZodObject(
+      itemSchema,
+      fieldDef.child,
+      locale,
+      endpoint,
+    );
+    return z.array(enhancedItemSchema);
+  }
+
+  return schema;
+}
+
+/**
+ * Add descriptions to wrapped schemas (ZodOptional, ZodNullable)
+ */
+function addDescriptionsToWrappedSchema(
+  schema: z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>,
+  fieldDef: CreateApiEndpointAny["fields"],
+  locale: CountryLanguage,
+  endpoint: CreateApiEndpointAny,
+): z.ZodTypeAny {
+  const innerSchema = schema._def.innerType;
+
+  // Recursively process inner schema
+  if (innerSchema instanceof z.ZodObject) {
+    const enhancedInner = addDescriptionsToZodObject(
+      innerSchema,
+      fieldDef,
+      locale,
+      endpoint,
+    );
+    if (schema instanceof z.ZodOptional) {
+      return enhancedInner.optional();
+    } else {
+      return enhancedInner.nullable();
+    }
+  } else if (innerSchema instanceof z.ZodArray) {
+    const enhancedInner = addDescriptionsToZodArray(
+      innerSchema,
+      fieldDef,
+      locale,
+      endpoint,
+    );
+    if (schema instanceof z.ZodOptional) {
+      return enhancedInner.optional();
+    } else {
+      return enhancedInner.nullable();
+    }
+  }
+
+  return schema;
 }
 
 /**

@@ -21,6 +21,7 @@ import {
 } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { NumberWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import { simpleT } from "@/i18n/core/shared";
@@ -40,20 +41,21 @@ import { getFieldValidationState } from "../_shared/validation";
 import type { NumberFieldWidgetConfig } from "./types";
 
 export function NumberFieldWidget<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TSchema extends NumberWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
   field,
-  form,
   fieldName,
   context,
 }: ReactWidgetProps<
+  TEndpoint,
   NumberFieldWidgetConfig<TKey, TSchema, TUsage>
 >): JSX.Element {
   const { t } = context;
 
-  if (!form || !fieldName) {
+  if (!context.form || !fieldName) {
     return (
       <Div>
         {t(
@@ -69,8 +71,8 @@ export function NumberFieldWidget<
 
   return (
     <FormField
-      control={form.control}
-      name={fieldName as never}
+      control={context.form.control}
+      name={fieldName}
       render={({ field: formField, fieldState }) => {
         const validationState = getFieldValidationState(
           formField.value,
@@ -130,7 +132,7 @@ export function NumberFieldWidget<
               formField.value &&
               !fieldState.isDirty ? (
                 renderPrefillDisplay(
-                  String(formField.value),
+                  formField.value,
                   field.label,
                   field.prefillDisplay,
                   t,
@@ -138,7 +140,7 @@ export function NumberFieldWidget<
               ) : (
                 <NumberInput
                   name={formField.name}
-                  value={Number(formField.value) || field.min || 1}
+                  value={formField.value || field.min || 1}
                   onChange={(value) => formField.onChange(value)}
                   onBlur={formField.onBlur}
                   min={field.min}

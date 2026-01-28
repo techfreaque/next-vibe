@@ -8,7 +8,17 @@ import * as readline from "node:readline";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";
-import type { IMCPTransport, JsonRpcRequest, JsonRpcResponse } from "../types";
+import type { JsonRpcRequest, JsonRpcResponse } from "../types";
+
+/**
+ * MCP Transport Interface
+ */
+export interface IMCPTransport {
+  start(): Promise<void>;
+  stop(): Promise<void>;
+  send(message: JsonRpcResponse): Promise<void>;
+  onMessage(handler: (message: JsonRpcRequest) => Promise<void>): void;
+}
 
 /**
  * STDIO Transport Implementation

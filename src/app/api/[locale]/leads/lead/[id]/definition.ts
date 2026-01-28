@@ -12,7 +12,6 @@ import {
   navigateButtonField,
   objectField,
   requestField,
-  requestResponseField,
   requestUrlPathParamsField,
   responseField,
   submitButton,
@@ -70,14 +69,12 @@ const { DELETE } = createEndpoint({
     },
     { request: "urlPathParams" },
     {
-      title: widgetField(
-        {
-          type: WidgetType.TITLE,
-          level: 5,
-          content: "app.api.leads.lead.id.delete.container.description",
-        },
-        { request: "urlPathParams" },
-      ),
+      title: widgetField({
+        type: WidgetType.TITLE,
+        level: 5,
+        content: "app.api.leads.lead.id.delete.container.description",
+        usage: { request: "urlPathParams" },
+      }),
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField({
         type: WidgetType.FORM_FIELD,
@@ -94,12 +91,14 @@ const { DELETE } = createEndpoint({
         label: "app.api.leads.lead.id.delete.backButton.label",
         icon: "arrow-left",
         variant: "outline",
+        usage: { request: "urlPathParams" },
       }),
       submitButton: submitButton({
         label: "app.api.leads.lead.id.delete.actions.delete",
         loadingText: "app.api.leads.lead.id.delete.actions.deleting",
         icon: "trash",
         variant: "destructive",
+        usage: { request: "urlPathParams" },
       }),
     },
   ),
@@ -205,6 +204,7 @@ const { PATCH } = createEndpoint({
             label: "app.api.leads.lead.id.patch.backButton.label",
             icon: "arrow-left",
             variant: "outline",
+            usage: { request: "data", response: true },
           }),
           deleteButton: deleteButton({
             label: "app.api.leads.lead.id.patch.deleteButton.label",
@@ -216,25 +216,25 @@ const { PATCH } = createEndpoint({
             variant: "destructive",
             className: "ml-auto",
             popNavigationOnSuccess: 2, // Pop twice: edit -> details -> list
+            usage: { request: "data", response: true },
           }),
           saveButton: submitButton({
             label: "app.api.leads.lead.id.patch.submitButton.label",
             loadingText: "app.api.leads.lead.id.patch.submitButton.loadingText",
             icon: "save",
             variant: "primary",
+            usage: { request: "data", response: true },
           }),
         },
       ),
 
       // Separator between buttons and content
-      separator: widgetField(
-        {
-          type: WidgetType.SEPARATOR,
-          spacingTop: SpacingSize.RELAXED,
-          spacingBottom: SpacingSize.RELAXED,
-        },
-        { request: "data", response: true },
-      ),
+      separator: widgetField({
+        type: WidgetType.SEPARATOR,
+        spacingTop: SpacingSize.RELAXED,
+        spacingBottom: SpacingSize.RELAXED,
+        usage: { request: "data", response: true },
+      }),
 
       // === UPDATE FIELDS ===
       updates: objectField(
@@ -319,7 +319,7 @@ const { PATCH } = createEndpoint({
             {
               phone: requestField({
                 type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.PHONE,
+                fieldType: FieldDataType.TEL,
                 label: "app.api.leads.lead.id.patch.phone.label",
                 description: "app.api.leads.lead.id.patch.phone.description",
                 placeholder: "app.api.leads.lead.id.patch.phone.placeholder",
@@ -489,8 +489,7 @@ const { PATCH } = createEndpoint({
             },
             { response: true },
             {
-              // === URL PARAMETERS ===
-              id: requestResponseField({
+              id: responseField({
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.UUID,
                 label: "app.api.leads.lead.id.patch.id.label",
@@ -910,6 +909,7 @@ const { GET } = createEndpoint({
           backButton: backButton({
             icon: "arrow-left",
             variant: "outline",
+            usage: { response: true },
           }),
 
           // Edit button - uses self-referencing GET endpoint for prefill
@@ -926,6 +926,7 @@ const { GET } = createEndpoint({
             icon: "pencil",
             variant: "default",
             className: "ml-auto",
+            usage: { response: true },
           }),
 
           // Delete button
@@ -941,19 +942,18 @@ const { GET } = createEndpoint({
             icon: "trash",
             variant: "destructive",
             popNavigationOnSuccess: 1,
+            usage: { response: true },
           }),
         },
       ),
 
       // Separator between buttons and content
-      separator: widgetField(
-        {
-          type: WidgetType.SEPARATOR,
-          spacingTop: SpacingSize.RELAXED,
-          spacingBottom: SpacingSize.RELAXED,
-        },
-        { response: true },
-      ),
+      separator: widgetField({
+        type: WidgetType.SEPARATOR,
+        spacingTop: SpacingSize.RELAXED,
+        spacingBottom: SpacingSize.RELAXED,
+        usage: { response: true },
+      }),
 
       // === RESPONSE FIELDS ===
       lead: objectField(

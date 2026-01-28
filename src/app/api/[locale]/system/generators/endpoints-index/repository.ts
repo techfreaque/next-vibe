@@ -22,7 +22,7 @@ import {
   formatGenerator,
   formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
-import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
 import {
   extractNestedPath,
@@ -280,7 +280,7 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
 /* eslint-disable simple-import-sort/imports */
 /* eslint-disable prettier/prettier */
 
-import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { setNestedPath } from "next-vibe/shared/utils/object-path";
 
 ${imports.join("\n")}

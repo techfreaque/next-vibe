@@ -19,7 +19,7 @@ import { simpleT } from "@/i18n/core/shared";
 
 import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
 import { RouteExecutionExecutor } from "../shared/endpoints/route/executor";
-import type { CreateApiEndpointAny } from "../shared/types/endpoint";
+import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
 import { endpointToToolName, getPreferredToolName } from "../shared/utils/path";
 
@@ -110,6 +110,12 @@ function createToolFromEndpoint(
     description,
     inputSchema,
     execute: async (params) => {
+      context.logger.debug("[Tools Loader] Tool execute called", {
+        toolName,
+        internalToolName,
+        requiresConfirmation,
+      });
+
       // Params are already validated and transformed by the validate function above
       const transformedParams = params;
 

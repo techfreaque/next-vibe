@@ -5,7 +5,9 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
+import { useWatch } from "react-hook-form";
 
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { simpleT } from "@/i18n/core/shared";
 
 import {
@@ -14,19 +16,24 @@ import {
   getTextSizeClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
+import type { FieldUsageConfig } from "../../_shared/types";
 import { calculatePasswordStrength } from "./shared";
 import type { PasswordStrengthWidgetConfig } from "./types";
-import type { FieldUsageConfig } from "../../_shared/types";
 
 /**
  * Displays a visual indicator of password strength.
  * Watches the password form field and updates in real-time.
  */
-export function PasswordStrengthWidget<TUsage extends FieldUsageConfig>({
+export function PasswordStrengthWidget<
+  TEndpoint extends CreateApiEndpointAny,
+  TUsage extends FieldUsageConfig,
+>({
   field,
   context,
-  form,
-}: ReactWidgetProps<PasswordStrengthWidgetConfig<TUsage>>): JSX.Element | null {
+}: ReactWidgetProps<
+  TEndpoint,
+  PasswordStrengthWidgetConfig<TUsage, "widget">
+>): JSX.Element | null {
   const { t } = simpleT(context.locale);
   const {
     watchField,
@@ -56,7 +63,8 @@ export function PasswordStrengthWidget<TUsage extends FieldUsageConfig>({
   );
   const barHeightClass = getHeightClassName(barHeight);
 
-  const password = form?.watch(watchField) as string | undefined;
+  // Watch password field from form for real-time updates
+  const password = context.form?.watch(watchField);
 
   if (!password) {
     return null;

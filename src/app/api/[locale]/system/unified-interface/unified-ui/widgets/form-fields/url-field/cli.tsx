@@ -9,25 +9,28 @@ import { useState } from "react";
 
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { UrlFieldWidgetConfig } from "./types";
 
-export function UrlFieldWidgetInk<TKey extends string>({
-  value,
+export function UrlFieldWidgetInk<
+  TKey extends string,
+  TEndpoint extends CreateApiEndpointAny,
+>({
   field,
   fieldName,
   context,
-  form,
 }: InkWidgetProps<
+  TEndpoint,
   UrlFieldWidgetConfig<TKey, StringWidgetSchema, FieldUsageConfig>
 >): JSX.Element {
   const { t } = context;
-  const [inputValue, setInputValue] = useState(value ? String(value) : "");
+  const [inputValue, setInputValue] = useState(field.value ? field.value : "");
 
   // Response mode - just display the value
   if (context.response) {
-    const displayValue = value ? String(value) : "—";
+    const displayValue = field.value ? field.value : "—";
     return (
       <Box flexDirection="column">
         {field.label && (
@@ -42,7 +45,7 @@ export function UrlFieldWidgetInk<TKey extends string>({
   }
 
   // Request mode - show interactive input
-  if (!form || !fieldName) {
+  if (!context.form || !fieldName) {
     return (
       <Box>
         <Text color="red">
@@ -55,7 +58,7 @@ export function UrlFieldWidgetInk<TKey extends string>({
   }
 
   const isRequired = !field.schema.isOptional();
-  const error = form.errors[fieldName];
+  const error = context.form.errors[fieldName];
 
   return (
     <Box flexDirection="column" marginBottom={1}>
@@ -77,7 +80,7 @@ export function UrlFieldWidgetInk<TKey extends string>({
           value={inputValue}
           onChange={(newValue) => {
             setInputValue(newValue);
-            form.setValue(fieldName, newValue);
+            context.form?.setValue(fieldName, newValue);
           }}
           placeholder={field.placeholder ? t(field.placeholder) : undefined}
         />

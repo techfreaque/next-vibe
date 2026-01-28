@@ -219,24 +219,6 @@ const { GET } = createEndpoint({
           users: responseArrayField(
             {
               type: WidgetType.DATA_TABLE,
-              columns: [
-                {
-                  key: "privateName",
-                  label: "app.api.user.search.columns.privateName" as const,
-                },
-                {
-                  key: "publicName",
-                  label: "app.api.user.search.columns.publicName" as const,
-                },
-                {
-                  key: "email",
-                  label: "app.api.user.search.columns.email" as const,
-                },
-                {
-                  key: "userRoles",
-                  label: "app.api.user.search.columns.userRoles" as const,
-                },
-              ],
             },
             objectField(
               {

@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Vibe Check",
   description:
-    "Przeprowadź kompleksowe sprawdzenia jakości kodu (Oxlint + ESLint + TypeScript). WAŻNE: Użyj tego zamiast bezpośredniego uruchamiania 'eslint', 'tsc' lub 'oxlint' - vibe-check wykonuje wszystkie sprawdzenia równolegle i jest znacznie szybszy. Celem jest naprawienie WSZYSTKICH problemów, a nie tylko niektórych.",
+    "Przeprowadź kompleksowe sprawdzenia jakości kodu (Oxlint + ESLint + TypeScript). To narzędzie wymusza poprawność kosztem wygody. Błędy to objawy, nie problem—napraw przyczynę główną, nie ostrzeżenie. Nie ukrywaj problemów za pomocą asercji czy typ-gimnastyki; ukrywają one rzeczywisty problem i katastrofalnie zawiodą w produkcji, gdy użytkownicy się na nich opierają. Zamiast tego napraw architekturę. Pozwól typom naturalnie płynąć, trzymaj się zasad DRY i pozwól koherencji typów kierować twoim projektem. Każdy nierozwiązany problem to zagrożenie dla produkcji. To narzędzie wymusza rygorystyczną poprawność zamiast pośpiechu—ponieważ źli użytkownicy w produkcji to prawdziwa katastrofa. Zawsze używaj tego narzędzia—nigdy nie wywołuj bezpośrednio oxlint, eslint ani tsc. Wbudowana paginacja i filtrowanie zachowują miejsce kontekstowe, jednocześnie wymuszając rygorystyczną poprawność zamiast pośpiechu.",
   category: "Narzędzia Deweloperskie",
   tag: "jakość",
 
@@ -47,21 +47,22 @@ export const translations: typeof enTranslations = {
     fix: {
       label: "Automatyczne Naprawianie Problemów",
       description:
-        "Automatycznie napraw problemy lintingu, które można rozwiązać automatycznie. Użyj tego, gdy chcesz naprawić problemy automatycznie.",
+        "Automatycznie napraw problemy lintingu gdzie możliwe (domyślnie: true)",
     },
     createConfig: {
       label: "Utwórz Konfigurację",
       description:
-        "Utwórz domyślny plik konfiguracyjny check.config.ts jeśli brakuje. Użyj check.config.ts aby skonfigurować opcje pomijania (skipEslint, skipOxlint, skipTypecheck).",
+        "Utwórz domyślny check.config.ts jeśli brakuje. Użyj check.config.ts aby skonfigurować opcje pomijania (skipEslint, skipOxlint, skipTypecheck).",
     },
     timeoutSeconds: {
       label: "Limit czasu (sekundy)",
-      description: "Maksymalny czas wykonania w sekundach (1-3600)",
+      description:
+        "Maksymalny czas wykonania w sekundach, zakres 1-3600 (domyślnie: 3600)",
     },
     paths: {
       label: "Ścieżki Docelowe",
       description:
-        'Konkretne ścieżki plików lub katalogi do sprawdzenia (string lub tablica stringów). Zostaw puste aby sprawdzić WSZYSTKIE pliki w projekcie (zalecane dla kompleksowych sprawdzeń jakości). Przykłady: "src/app" lub ["src/components", "src/utils"]. Podaj ścieżki tylko jeśli musisz skupić się na podzbiorze plików.',
+        "Ścieżki plików lub katalogi do sprawdzenia (string lub tablica). ZALECANE: Określ ścieżki dla obszaru, nad którym pracujesz (szybkie, skupione). Zostaw puste aby sprawdzić WSZYSTKIE pliki (wolne, używaj tylko do kompleksowych audytów). Przykłady: 'src/app/feature' lub ['src/feature/file.tsx', 'src/feature/other.tsx']. Uwaga: Wzorce Glob (np. '**/*.test.ts') nie są jeszcze obsługiwane.",
       placeholder: "np. src/app lub src/components/Button.tsx",
       options: {
         src: "Katalog Źródłowy (src/)",
@@ -74,11 +75,22 @@ export const translations: typeof enTranslations = {
     limit: {
       label: "Limit",
       description:
-        "Liczba problemów na stronę (1-10000, domyślnie: 100). WAŻNE: To kontroluje tylko wyświetlanie, nie wykrywanie. Używaj wysokich wartości (1000+) lub paginacji aby zobaczyć WSZYSTKIE problemy - celem jest naprawienie wszystkiego, nie tylko pierwszej strony.",
+        "Problemy na stronę, zakres 1-10000 (domyślnie: 20000 dla web/CLI, 2 dla MCP). Kontroluje tylko wyświetlanie, nie wykrywanie. Używaj wysokich wartości lub paginacji aby zobaczyć wszystkie problemy.",
     },
     page: {
       label: "Strona",
-      description: "Numer strony dla paginowanych wyników (zaczyna się od 1)",
+      description: "Numer strony dla paginowanych wyników (domyślnie: 1)",
+    },
+    filter: {
+      label: "Filtr",
+      description:
+        "Filtruj problemy według ścieżki pliku, wiadomości lub reguły. Obsługuje dopasowanie tekstu lub regex (/pattern/flags). Tablice umożliwiają logikę LUB dla wielu filtrów.",
+      placeholder: "np. 'no-unused-vars' lub '/src\\/components/i'",
+    },
+    summaryOnly: {
+      label: "Tylko Podsumowanie",
+      description:
+        "Zwraca tylko statystyki podsumowania, pomija elementy i listy plików",
     },
   },
 

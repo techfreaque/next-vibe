@@ -12,6 +12,8 @@ import { languageConfig } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
+import { NO_LOOP_PARAM } from "../core/constants";
+
 /**
  * Formatting instructions for non-call mode responses
  */
@@ -173,6 +175,14 @@ Before each message, you receive metadata in format: \`[Context: ID:abc12345 | M
 - Check metadata before responding - multiple models/characters may be in one thread
 - Vote counts indicate valuable/controversial messages
 - These \`[Context: ...]\` tags are AUTO-GENERATED. Do NOT include them in your responses.`);
+
+  // Section 7.5: Tool Loop Control
+  sections.push(`## Tool Loop Control
+
+To stop the tool calling loop early and return your response:
+- Add \`"${NO_LOOP_PARAM}": true\` to ANY tool call arguments
+- The system will stop after that tool completes so include everything you need in your response with the tool call.
+- Use this when you have enough information and don't need more tool calls`);
 
   // Section 8: User Memories (if available)
   if (memorySummary && memorySummary.trim()) {

@@ -46,7 +46,8 @@ export interface MarkdownEditorWidgetConfig<
   out TKey extends string,
   TSchema extends MarkdownEditorWidgetSchema,
   TUsage extends FieldUsageConfig,
-> extends BasePrimitiveWidgetConfig<TUsage, "primitive", TSchema> {
+  TSchemaType extends "primitive",
+> extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {
   type: WidgetType.MARKDOWN_EDITOR;
 
   /** Label translation key */

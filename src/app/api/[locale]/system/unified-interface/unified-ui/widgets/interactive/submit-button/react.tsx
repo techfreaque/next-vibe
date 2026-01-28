@@ -10,6 +10,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { simpleT } from "@/i18n/core/shared";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import {
   getIconSizeClassName,
   getSpacingClassName,
@@ -22,15 +23,17 @@ import type { SubmitButtonWidgetConfig } from "./types";
  * Renders a submit button for forms with loading state support.
  */
 export function SubmitButtonWidget<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TUsage extends FieldUsageConfig,
+  TSchemaType extends "widget",
 >({
   field,
   context,
-  form,
-  onSubmit,
-  isSubmitting,
-}: ReactWidgetProps<SubmitButtonWidgetConfig<TKey, TUsage>>): JSX.Element {
+}: ReactWidgetProps<
+  TEndpoint,
+  SubmitButtonWidgetConfig<TKey, TUsage, TSchemaType>
+>): JSX.Element {
   const { t: globalT } = simpleT(context.locale);
   const {
     text: textKey,
@@ -65,11 +68,11 @@ export function SubmitButtonWidget<
     <Button
       type="submit"
       onClick={(): void => {
-        if (form && onSubmit) {
-          void form.handleSubmit(onSubmit)();
+        if (context.form && context.onSubmit) {
+          void context.form.handleSubmit(context.onSubmit)();
         }
       }}
-      disabled={isSubmitting}
+      disabled={context.isSubmitting}
       variant={variant === "primary" ? "default" : variant}
       size={size}
       className={className}
@@ -80,7 +83,7 @@ export function SubmitButtonWidget<
           className={cn(iconSizeClass || "h-4 w-4", iconSpacingClass || "mr-2")}
         />
       )}
-      {isSubmitting ? loadingText : buttonText}
+      {context.isSubmitting ? loadingText : buttonText}
     </Button>
   );
 }

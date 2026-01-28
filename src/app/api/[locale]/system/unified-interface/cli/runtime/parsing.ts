@@ -8,7 +8,8 @@ import type { z } from "zod";
 
 import { isEmptySchema } from "../../../../shared/utils/validation";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
-import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
+import { hasChildren } from "../../shared/widgets/utils/field-type-guards";
 import { SchemaUIHandler } from "../../unified-ui/renderers/cli/response/schema-handler";
 
 /**
@@ -337,7 +338,7 @@ export class CliInputParser {
     }
 
     const fields = endpointDefinition.fields;
-    if (!fields || fields.schemaType !== "object" || !("children" in fields)) {
+    if (!fields || !hasChildren(fields)) {
       return shortcuts;
     }
 

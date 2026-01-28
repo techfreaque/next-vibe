@@ -153,13 +153,11 @@ const { GET } = createEndpoint({
       ),
 
       // === FORM ALERT (shows validation and API errors) ===
-      formAlert: widgetField(
-        {
-          type: WidgetType.FORM_ALERT,
-          order: 2.5,
-        },
-        { request: "data" },
-      ),
+      formAlert: widgetField({
+        type: WidgetType.FORM_ALERT,
+        order: 2.5,
+        usage: { request: "data" },
+      }),
 
       // === RESPONSE FIELDS ===
       response: objectField(

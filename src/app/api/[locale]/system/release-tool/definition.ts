@@ -108,7 +108,6 @@ const { POST } = createEndpoint({
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.AI_TOOL_OFF,
-    UserRole.MCP_OFF,
     UserRole.WEB_OFF,
     UserRole.CLI_AUTH_BYPASS,
   ],
@@ -1632,23 +1631,6 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.DATA_TABLE,
           title: "app.api.system.releaseTool.response.packages",
-          columns: [
-            { key: "name", label: "app.api.system.releaseTool.table.name" },
-            {
-              key: "directory",
-              label: "app.api.system.releaseTool.table.directory",
-            },
-            {
-              key: "version",
-              label: "app.api.system.releaseTool.table.version",
-            },
-            { key: "tag", label: "app.api.system.releaseTool.table.tag" },
-            { key: "status", label: "app.api.system.releaseTool.table.status" },
-            {
-              key: "message",
-              label: "app.api.system.releaseTool.table.message",
-            },
-          ],
         },
         objectField(
           {
@@ -1694,7 +1676,7 @@ const { POST } = createEndpoint({
       // Git info displayed as metadata card
       gitInfo: objectOptionalField(
         {
-          type: WidgetType.METADATA_CARD,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.releaseTool.response.gitInfo",
         },
         { response: true },
@@ -1725,7 +1707,7 @@ const { POST } = createEndpoint({
       // CI environment as metadata card
       ciEnvironment: objectOptionalField(
         {
-          type: WidgetType.METADATA_CARD,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.releaseTool.response.ciEnvironment",
         },
         { response: true },
@@ -1762,18 +1744,6 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.DATA_TABLE,
           title: "app.api.system.releaseTool.response.published",
-          columns: [
-            { key: "name", label: "app.api.system.releaseTool.table.name" },
-            {
-              key: "version",
-              label: "app.api.system.releaseTool.table.version",
-            },
-            {
-              key: "registry",
-              label: "app.api.system.releaseTool.table.registry",
-            },
-            { key: "url", label: "app.api.system.releaseTool.table.url" },
-          ],
         },
         objectField(
           {

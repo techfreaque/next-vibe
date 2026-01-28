@@ -13,7 +13,8 @@ import type {
  */
 export interface PasswordStrengthWidgetConfig<
   TUsage extends FieldUsageConfig,
-> extends BasePrimitiveDisplayOnlyWidgetConfig<TUsage, "widget"> {
+  TSchemaType extends "widget",
+> extends BasePrimitiveDisplayOnlyWidgetConfig<TUsage, TSchemaType> {
   type: WidgetType.PASSWORD_STRENGTH;
   watchField: string;
   /** Container gap */

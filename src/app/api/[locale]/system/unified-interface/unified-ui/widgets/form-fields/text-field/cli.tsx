@@ -12,6 +12,7 @@ import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-inter
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { TextFieldWidgetConfig } from "./types";
 
 /**
@@ -21,22 +22,24 @@ import type { TextFieldWidgetConfig } from "./types";
  * Mirrors the React TextFieldWidget component structure.
  */
 export function TextFieldWidgetInk<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TSchema extends StringWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
-  value,
   field,
   fieldName,
   context,
-  form,
-}: InkWidgetProps<TextFieldWidgetConfig<TKey, TSchema, TUsage>>): JSX.Element {
+}: InkWidgetProps<
+  TEndpoint,
+  TextFieldWidgetConfig<TKey, TSchema, TUsage>
+>): JSX.Element {
   const { t } = context;
-  const [inputValue, setInputValue] = useState(value ? String(value) : "");
+  const [inputValue, setInputValue] = useState(field.value ? field.value : "");
 
   // Response mode - just display the value
   if (context.response) {
-    const displayValue = value ? String(value) : "—";
+    const displayValue = field.value ? field.value : "—";
     return (
       <Box flexDirection="column">
         {field.label && (
@@ -51,7 +54,7 @@ export function TextFieldWidgetInk<
   }
 
   // Request mode - show interactive input
-  if (!form || !fieldName) {
+  if (!context.form || !fieldName) {
     return (
       <Box>
         <Text color="red">
@@ -64,7 +67,7 @@ export function TextFieldWidgetInk<
   }
 
   const isRequired = !field.schema.isOptional();
-  const error = form.errors[fieldName];
+  const error = context.form.errors[fieldName];
 
   return (
     <Box flexDirection="column" marginBottom={1}>
@@ -88,7 +91,7 @@ export function TextFieldWidgetInk<
           value={inputValue}
           onChange={(newValue) => {
             setInputValue(newValue);
-            form.setValue(fieldName, newValue);
+            context.form?.setValue(fieldName, newValue);
           }}
           placeholder={field.placeholder ? t(field.placeholder) : undefined}
         />

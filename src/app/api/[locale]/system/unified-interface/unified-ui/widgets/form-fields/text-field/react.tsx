@@ -32,6 +32,7 @@ import {
   FormMessage,
 } from "@/packages/next-vibe-ui/web/ui/form/form";
 
+import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { FieldUsageConfig } from "../../_shared/types";
 import { DEFAULT_THEME } from "../_shared/constants";
 import { renderPrefillDisplay } from "../_shared/prefill";
@@ -57,20 +58,21 @@ import type { TextFieldWidgetConfig } from "./types";
  * @returns Platform-agnostic text field component
  */
 export function TextFieldWidget<
+  TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TSchema extends StringWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
   field,
-  form,
   fieldName,
   context,
 }: ReactWidgetProps<
+  TEndpoint,
   TextFieldWidgetConfig<TKey, TSchema, TUsage>
 >): JSX.Element {
   const { t } = context;
 
-  if (!form || !fieldName) {
+  if (!context.form || !fieldName) {
     return (
       <Div>
         {t(
@@ -88,8 +90,8 @@ export function TextFieldWidget<
 
   return (
     <FormField
-      control={form.control}
-      name={fieldName as never}
+      control={context.form.control}
+      name={fieldName}
       render={({ field: formField, fieldState }) => {
         const validationState = getFieldValidationState(
           formField.value,
@@ -151,7 +153,7 @@ export function TextFieldWidget<
               !fieldState.isDirty ? (
                 // Render prefilled readonly display
                 renderPrefillDisplay(
-                  String(formField.value),
+                  formField.value,
                   field.label,
                   field.prefillDisplay,
                   t,
@@ -160,7 +162,7 @@ export function TextFieldWidget<
                 // Render normal text input
                 <Input
                   name={formField.name}
-                  value={formField.value ? String(formField.value) : ""}
+                  value={formField.value ? formField.value : ""}
                   onChange={(e) => formField.onChange(e.target.value)}
                   onBlur={formField.onBlur}
                   type={field.fieldType}

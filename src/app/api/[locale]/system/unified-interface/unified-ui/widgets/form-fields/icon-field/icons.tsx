@@ -508,7 +508,7 @@ const ICON_LOADERS: Record<IconLibraryName, IconLoader> = {
   Youtube: async () =>
     await import("@/packages/next-vibe-ui/web/ui/icons/Youtube"),
   Zap: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Zap"),
-} as const;
+};
 
 /**
  * Helper to create emoji icon components
@@ -912,7 +912,7 @@ export const ICON_REGISTRY = {
   tool: createEmojiIcon("🔧"),
   outbox: createEmojiIcon("📤"),
   wand2: createEmojiIcon("🪄"),
-} as const satisfies Record<string, IconLibraryName | IconComponent>;
+} satisfies Record<string, IconLibraryName | IconComponent>;
 
 /**
  * Type-safe union of all icon keys in the registry
@@ -1406,7 +1406,7 @@ export const ICON_CATEGORIES = {
       "crown",
     ],
   },
-} as const satisfies Record<
+} satisfies Record<
   string,
   { readonly name: TranslationKey; readonly icons: IconKey[] }
 >;

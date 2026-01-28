@@ -51,7 +51,7 @@ function extractFieldConfig<TKey extends string>(
     case FieldDataType.EMAIL:
       return { ...baseConfig, type: "email" as const };
 
-    case FieldDataType.PHONE:
+    case FieldDataType.TEL:
       return {
         ...baseConfig,
         type: "phone" as const,

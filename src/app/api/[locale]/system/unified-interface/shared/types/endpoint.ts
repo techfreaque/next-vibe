@@ -6,63 +6,20 @@
 
 import type { z } from "zod";
 
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
-
-import type { IconKey } from "../../react/icons";
-import type { CreateApiEndpoint } from "../endpoints/definition/create";
 import type {
-  DisplayOnlyWidgetConfig,
-  ObjectWidgetConfig,
-  ResponseWidgetConfig,
-  WidgetConfig,
-} from "../widgets/configs";
-import type { WidgetData } from "../widgets/types";
-import type { Methods } from "./enums";
+  ArrayChildConstraint,
+  BasePrimitiveDisplayOnlyWidgetConfig,
+  FieldUsageConfig,
+  ObjectChildrenConstraint,
+} from "../../unified-ui/widgets/_shared/types";
+import type { IconKey } from "../../unified-ui/widgets/form-fields/icon-field/icons";
+import type { ObjectWidgetConfig } from "../widgets/configs";
+
+// Re-export UnifiedField from configs.ts where it's now defined
+export type { UnifiedField } from "../widgets/configs";
+import type { WidgetData } from "../widgets/widget-data";
+import type { CreateApiEndpointAny } from "./endpoint-base";
 import type { FieldUsage } from "./enums";
-
-// ============================================================================
-// ENDPOINT REGISTRY TYPES
-// ============================================================================
-
-/**
- * Type alias for CreateApiEndpoint - accepts any generic parameters
- * This is a branded type that any CreateApiEndpoint can be assigned to
- * Uses string for TScopedTranslationKey to accept any translation key type
- * Explicitly provides any for computed type parameters to accept any specific computed types
- */
-export type CreateApiEndpointAny = CreateApiEndpoint<
-  Methods,
-  readonly UserRoleValue[],
-  string,
-  UnifiedField<string, z.ZodTypeAny>,
-  // oxlint-disable-next-line no-explicit-any
-  any, // RequestInput
-  // oxlint-disable-next-line no-explicit-any
-  any, // RequestOutput
-  // oxlint-disable-next-line no-explicit-any
-  any, // ResponseInput
-  // oxlint-disable-next-line no-explicit-any
-  any, // ResponseOutput
-  // oxlint-disable-next-line no-explicit-any
-  any, // UrlVariablesInput
-  // oxlint-disable-next-line no-explicit-any
-  any // UrlVariablesOutput
->;
-
-/**
- * API section type for nested endpoint structure
- * Used in generated endpoints.ts file
- * Accepts CreateApiEndpoint with any type parameters or CreateEndpointReturnInMethod
- */
-export interface ApiSection {
-  readonly GET?: CreateApiEndpointAny;
-  readonly POST?: CreateApiEndpointAny;
-  readonly PUT?: CreateApiEndpointAny;
-  readonly PATCH?: CreateApiEndpointAny;
-  readonly DELETE?: CreateApiEndpointAny;
-  readonly [key: string]: CreateApiEndpointAny | ApiSection | undefined;
-}
 
 // ============================================================================
 // SCHEMA TYPE PRESERVATION AND BACK-PROPAGATION SYSTEM
@@ -80,10 +37,6 @@ export type ExtractOutput<T> = z.output<T>;
  */
 export type ExtractInput<T> = z.input<T>;
 
-/**
- * USAGE MATCHING: Fixed to work correctly with method-specific patterns
- * This now properly handles the case where method-specific usage should be filtered
- */
 type MatchesUsage<
   TUsage,
   TTargetUsage extends FieldUsage,
@@ -103,232 +56,149 @@ type MatchesUsage<
 
 /**
  * Helper type to convert variant fields to Zod object schemas
- * Uses string for pattern matching since fields have TKey=string
+ * Uses simplified constraint checking for better recursion
  */
 type InferVariantSchemas<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for API compatibility
   _TTranslationKey extends string,
-  TVariants extends readonly ObjectField<
-    Record<string, UnifiedField<string, z.ZodTypeAny>>,
-    FieldUsageConfig,
+  TVariants extends readonly ObjectWidgetConfig<
     string,
-    WidgetConfig<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      Record<string, UnifiedField<string, z.ZodTypeAny>>
-    >
+    FieldUsageConfig,
+    "object",
+    ObjectChildrenConstraint<string, FieldUsageConfig>
   >[],
   Usage extends FieldUsage,
 > = TVariants extends readonly [infer Head, ...infer Tail]
-  ? Head extends ObjectField<
-      Record<string, UnifiedField<string, z.ZodTypeAny>>,
-      FieldUsageConfig,
+  ? Tail extends readonly ObjectWidgetConfig<
       string,
-      WidgetConfig<
-        string,
-        z.ZodTypeAny,
-        FieldUsageConfig,
-        Record<string, UnifiedField<string, z.ZodTypeAny>>
-      >
-    >
-    ? Tail extends readonly ObjectField<
-        Record<string, UnifiedField<string, z.ZodTypeAny>>,
-        FieldUsageConfig,
-        string,
-        WidgetConfig<
-          string,
-          z.ZodTypeAny,
-          FieldUsageConfig,
-          Record<string, UnifiedField<string, z.ZodTypeAny>>
-        >
-      >[]
-      ? [
-          InferSchemaFromField<Head, Usage>,
-          ...InferVariantSchemas<string, Tail, Usage>,
-        ]
-      : [InferSchemaFromField<Head, Usage>]
-    : []
+      FieldUsageConfig,
+      "object",
+      ObjectChildrenConstraint<string, FieldUsageConfig>
+    >[]
+    ? [
+        _InferSchemaFromFieldImpl<Normalize<Head>, Usage>,
+        ...InferVariantSchemas<string, Tail, Usage>,
+      ]
+    : [_InferSchemaFromFieldImpl<Normalize<Head>, Usage>]
   : [];
 
-export type InferSchemaFromField<F, Usage extends FieldUsage> =
-  // Handle PrimitiveField - use string for pattern matching
-  F extends PrimitiveField<infer TSchemaInferred, FieldUsageConfig, string>
-    ? F extends { usage: infer TUsage }
-      ? MatchesUsage<TUsage, Usage> extends true
-        ? TSchemaInferred
-        : z.ZodNever
+// Normalize intersection types to simple object types for pattern matching
+type Normalize<T> = { [K in keyof T]: T[K] };
+
+export type InferSchemaFromField<
+  F,
+  Usage extends FieldUsage,
+> = _InferSchemaFromFieldImpl<Normalize<F>, Usage>;
+
+type _InferSchemaFromFieldImpl<F, Usage extends FieldUsage> =
+  // Handle PrimitiveField - extract schema directly from the config
+  F extends {
+    schema: infer TSchema;
+    usage: infer TUsage;
+    schemaType: "primitive";
+  }
+    ? MatchesUsage<TUsage, Usage> extends true
+      ? TSchema
       : z.ZodNever
-    : // Handle ObjectUnionField - use string for pattern matching
-      F extends ObjectUnionField<
-          infer TDiscriminator extends string,
-          string,
-          infer TVariants,
-          FieldUsageConfig,
-          z.ZodTypeAny
-        >
-      ? F extends { usage: infer TUsage }
-        ? MatchesUsage<TUsage, Usage> extends true
-          ? TVariants extends readonly [
-              ObjectField<
-                Record<string, UnifiedField<string, z.ZodTypeAny>>,
-                FieldUsageConfig,
-                string,
-                WidgetConfig<
-                  string,
-                  z.ZodTypeAny,
-                  FieldUsageConfig,
-                  Record<string, UnifiedField<string, z.ZodTypeAny>>
-                >
-              >,
-              ObjectField<
-                Record<string, UnifiedField<string, z.ZodTypeAny>>,
-                FieldUsageConfig,
-                string,
-                WidgetConfig<
-                  string,
-                  z.ZodTypeAny,
-                  FieldUsageConfig,
-                  Record<string, UnifiedField<string, z.ZodTypeAny>>
-                >
-              >,
-              ...ObjectField<
-                Record<string, UnifiedField<string, z.ZodTypeAny>>,
-                FieldUsageConfig,
-                string,
-                WidgetConfig<
-                  string,
-                  z.ZodTypeAny,
-                  FieldUsageConfig,
-                  Record<string, UnifiedField<string, z.ZodTypeAny>>
-                >
-              >[],
-            ]
-            ? z.ZodDiscriminatedUnion<
-                InferVariantSchemas<string, TVariants, Usage> extends infer T
-                  ? T extends readonly [
-                      z.ZodObject<z.ZodRawShape>,
-                      z.ZodObject<z.ZodRawShape>,
-                      ...z.ZodObject<z.ZodRawShape>[],
-                    ]
-                    ? T
-                    : readonly [
-                        z.ZodObject<z.ZodRawShape>,
-                        z.ZodObject<z.ZodRawShape>,
-                      ]
-                  : readonly [
-                      z.ZodObject<z.ZodRawShape>,
-                      z.ZodObject<z.ZodRawShape>,
-                    ],
-                TDiscriminator
-              >
-            : z.ZodNever
+    : // Handle ObjectField - check for object schemaType with children
+      F extends {
+          schemaType: "object";
+          children: infer TChildren;
+          usage: infer TUsage;
+        }
+      ? MatchesUsage<TUsage, Usage> extends true
+        ? {
+            [K in keyof TChildren as _InferSchemaFromFieldImpl<
+              Normalize<TChildren[K]>,
+              Usage
+            > extends z.ZodNever
+              ? never
+              : K]: _InferSchemaFromFieldImpl<Normalize<TChildren[K]>, Usage>;
+          } extends infer TShape extends z.ZodRawShape
+          ? z.ZodObject<TShape>
           : z.ZodNever
         : z.ZodNever
-      : // Handle ObjectField - use string for pattern matching
-        F extends ObjectField<
-            infer TChildren,
-            FieldUsageConfig,
-            string,
-            WidgetConfig<
+      : // Handle ObjectUnionField - use string for pattern matching
+        F extends {
+            schemaType: "object-union";
+            discriminator: infer TDiscriminator extends string;
+            variants: infer TVariants extends readonly ObjectWidgetConfig<
               string,
-              z.ZodTypeAny,
               FieldUsageConfig,
-              Record<string, UnifiedField<string, z.ZodTypeAny>>
-            >
-          >
-        ? F extends { usage: infer TUsage }
+              "object",
+              ObjectChildrenConstraint<string, FieldUsageConfig>
+            >[];
+            usage: infer TUsage;
+          }
+        ? MatchesUsage<TUsage, Usage> extends true
+          ? InferVariantSchemas<
+              string,
+              TVariants,
+              Usage
+            > extends infer TSchemas extends readonly [
+              z.ZodObject<z.ZodRawShape>,
+              z.ZodObject<z.ZodRawShape>,
+              ...z.ZodObject<z.ZodRawShape>[],
+            ]
+            ? z.ZodDiscriminatedUnion<TSchemas, TDiscriminator>
+            : z.ZodNever
+          : z.ZodNever
+        : // Handle ObjectOptionalField - match on widget config structure directly
+          F extends {
+              schemaType: "object-optional";
+              children: infer TChildren;
+              usage: infer TUsage;
+            }
           ? MatchesUsage<TUsage, Usage> extends true
-            ? z.ZodObject<{
-                [K in keyof TChildren as InferSchemaFromField<
-                  TChildren[K],
+            ? {
+                [K in keyof TChildren as _InferSchemaFromFieldImpl<
+                  Normalize<TChildren[K]>,
                   Usage
                 > extends z.ZodNever
                   ? never
-                  : K]: InferSchemaFromField<TChildren[K], Usage>;
-              }>
-            : z.ZodNever
-          : z.ZodNever
-        : // Handle ObjectOptionalField - use string for pattern matching
-          F extends ObjectOptionalField<
-              infer TChildren,
-              FieldUsageConfig,
-              string,
-              z.ZodTypeAny,
-              WidgetConfig<
-                string,
-                z.ZodTypeAny,
-                FieldUsageConfig,
-                Record<string, UnifiedField<string, z.ZodTypeAny>>
-              >
-            >
-          ? F extends { usage: infer TUsage }
-            ? MatchesUsage<TUsage, Usage> extends true
-              ? z.ZodOptional<
-                  z.ZodNullable<
-                    z.ZodObject<{
-                      [K in keyof TChildren as InferSchemaFromField<
-                        TChildren[K],
-                        Usage
-                      > extends z.ZodNever
-                        ? never
-                        : K]: InferSchemaFromField<TChildren[K], Usage>;
-                    }>
-                  >
-                >
+                  : K]: _InferSchemaFromFieldImpl<
+                  Normalize<TChildren[K]>,
+                  Usage
+                >;
+              } extends infer TShape extends z.ZodRawShape
+              ? z.ZodOptional<z.ZodNullable<z.ZodObject<TShape>>>
               : z.ZodNever
             : z.ZodNever
-          : // Handle ArrayField - use string for pattern matching
-            F extends ArrayField<
-                infer TChild,
-                FieldUsageConfig,
-                string,
-                z.ZodTypeAny,
-                WidgetConfig<
-                  string,
-                  z.ZodTypeAny,
-                  FieldUsageConfig,
-                  UnifiedField<string, z.ZodTypeAny>
-                >
-              >
-            ? F extends { usage: infer TUsage }
-              ? MatchesUsage<TUsage, Usage> extends true
-                ? z.ZodArray<
-                    TChild extends UnifiedField<string, z.ZodTypeAny>
-                      ? InferSchemaFromField<TChild, Usage>
-                      : TChild extends z.ZodTypeAny
-                        ? TChild
-                        : z.ZodNever
-                  >
-                : z.ZodNever
-              : z.ZodNever
-            : // Handle ArrayOptionalField - use string for pattern matching
-              F extends ArrayOptionalField<
-                  infer TChild,
-                  FieldUsageConfig,
-                  string,
-                  z.ZodTypeAny,
-                  WidgetConfig<
-                    string,
-                    z.ZodTypeAny,
-                    FieldUsageConfig,
-                    UnifiedField<string, z.ZodTypeAny>
-                  >
-                >
-              ? F extends { usage: infer TUsage }
-                ? MatchesUsage<TUsage, Usage> extends true
-                  ? z.ZodOptional<
-                      z.ZodNullable<
-                        z.ZodArray<
-                          TChild extends UnifiedField<string, z.ZodTypeAny>
-                            ? InferSchemaFromField<TChild, Usage>
-                            : TChild extends z.ZodTypeAny
-                              ? TChild
-                              : z.ZodNever
-                        >
-                      >
-                    >
+          : // Handle ArrayField - match on widget config structure directly
+            F extends {
+                schemaType: "array";
+                child: infer TChild;
+                usage: infer TUsageArray;
+              }
+            ? MatchesUsage<TUsageArray, Usage> extends true
+              ? TChild extends ArrayChildConstraint<string, FieldUsageConfig>
+                ? _InferSchemaFromFieldImpl<
+                    Normalize<TChild>,
+                    Usage
+                  > extends infer TSchema extends z.ZodTypeAny
+                  ? z.ZodArray<TSchema>
                   : z.ZodNever
+                : TChild extends z.ZodTypeAny
+                  ? z.ZodArray<TChild>
+                  : z.ZodNever
+              : z.ZodNever
+            : // Handle ArrayOptionalField - match on widget config structure directly
+              F extends {
+                  schemaType: "array-optional";
+                  child: infer TChild;
+                  usage: infer TUsageArray;
+                }
+              ? MatchesUsage<TUsageArray, Usage> extends true
+                ? TChild extends ArrayChildConstraint<string, FieldUsageConfig>
+                  ? _InferSchemaFromFieldImpl<
+                      Normalize<TChild>,
+                      Usage
+                    > extends infer TSchema extends z.ZodTypeAny
+                    ? z.ZodOptional<z.ZodNullable<z.ZodArray<TSchema>>>
+                    : z.ZodNever
+                  : TChild extends z.ZodTypeAny
+                    ? z.ZodOptional<z.ZodNullable<z.ZodArray<TChild>>>
+                    : z.ZodNever
                 : z.ZodNever
               : // Fallback: If F is not a UnifiedField but is a ZodTypeAny, return it directly
                 F extends z.ZodTypeAny
@@ -349,9 +219,11 @@ export type InferSchemaFromField<F, Usage extends FieldUsage> =
  */
 export interface NavigateButtonConfig<
   TTargetEndpoint extends CreateApiEndpointAny,
-  TGetEndpoint extends CreateApiEndpointAny | undefined = undefined,
-  TKey extends string = string,
-> {
+  TGetEndpoint extends CreateApiEndpointAny | undefined,
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+  TSchemaType extends "widget",
+> extends BasePrimitiveDisplayOnlyWidgetConfig<TUsage, TSchemaType> {
   /** Target endpoint to navigate to */
   targetEndpoint: TTargetEndpoint;
   /**
@@ -409,19 +281,6 @@ export interface NavigationStackEntry<
 // ============================================================================
 
 /**
- * Field usage configuration
- * Supports both current format (backward compatible) and method-specific configuration
- */
-export type FieldUsageConfig =
-  | { request: "data"; response?: never }
-  | { request: "urlPathParams"; response?: never }
-  | { request: "data&urlPathParams"; response?: never }
-  | { request?: never; response: true }
-  | { request: "data"; response: true }
-  | { request: "urlPathParams"; response: true }
-  | { request: "data&urlPathParams"; response: true };
-
-/**
  * Examples list using mapped type
  * TypeScript infers covariance naturally for mapped types in readonly positions
  */
@@ -449,219 +308,3 @@ export type EndpointExamples<
   ([TResponse] extends [never] | [undefined]
     ? { responses?: never }
     : { responses: ExamplesList<TResponse, TExampleKey> });
-
-// ============================================================================
-// FIELD SYSTEM TYPES
-// ============================================================================
-
-/**
- * Primitive field type
- */
-export interface PrimitiveField<
-  out TSchema extends z.ZodTypeAny,
-  out TUsage extends FieldUsageConfig,
-  out TKey extends string = TranslationKey,
-  out TUIConfig extends ResponseWidgetConfig<TKey, TSchema> =
-    ResponseWidgetConfig<TKey, TSchema>,
-> {
-  type: "primitive";
-  schema: TSchema;
-  usage: TUsage;
-
-  ui: TUIConfig;
-  apiKey?: string;
-  uiKey?: string;
-}
-
-/**
- * Object field type with children
- */
-export interface ObjectField<
-  out TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
-  out TUsage extends FieldUsageConfig,
-  out TKey extends string = TranslationKey,
-  TUIConfig extends WidgetConfig<string, z.ZodTypeAny, TUsage, TChildren> =
-    WidgetConfig<TKey, z.ZodTypeAny, TUsage, TChildren>,
-> {
-  type: "object";
-  usage: TUsage;
-
-  ui: TUIConfig;
-  children: TChildren;
-}
-
-/**
- * Optional object field type
- */
-export interface ObjectOptionalField<
-  out TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
-  out TUsage extends FieldUsageConfig,
-  out TKey extends string,
-  out TSchema extends z.ZodTypeAny,
-  out TUIConfig extends WidgetConfig<string, z.ZodTypeAny, TUsage, TChildren> =
-    WidgetConfig<TKey, TSchema, TUsage, TChildren>,
-> {
-  type: "object-optional";
-  usage: TUsage;
-
-  ui: TUIConfig;
-  children: TChildren;
-}
-
-/**
- * Object union field type for discriminated unions
- */
-export interface ObjectUnionField<
-  out TDiscriminator extends string,
-  out TKey extends string,
-  out TVariants extends readonly [
-    ObjectField<
-      Record<string, UnifiedField<string, z.ZodTypeAny>>,
-      FieldUsageConfig,
-      string
-    >,
-    ...ObjectField<
-      Record<string, UnifiedField<string, z.ZodTypeAny>>,
-      FieldUsageConfig,
-      string
-    >[],
-  ],
-  out TUsage extends FieldUsageConfig,
-  out TSchema extends z.ZodTypeAny,
-  out TUIConfig extends WidgetConfig<string, z.ZodTypeAny, TUsage, TVariants> =
-    WidgetConfig<TKey, TSchema, TUsage, TVariants>,
-> {
-  type: "object-union";
-  discriminator: TDiscriminator;
-  variants: TVariants;
-  usage: TUsage;
-
-  ui: TUIConfig;
-}
-
-/**
- * Array field type
- */
-export interface ArrayField<
-  out TChild extends UnifiedField<string, z.ZodTypeAny>,
-  out TUsage extends FieldUsageConfig,
-  out TKey extends string,
-  out TSchema extends z.ZodTypeAny,
-  out TUIConfig extends WidgetConfig<string, z.ZodTypeAny, TUsage, TChild> =
-    WidgetConfig<TKey, TSchema, TUsage, TChild>,
-> {
-  type: "array";
-  usage: TUsage;
-
-  ui: TUIConfig;
-  child: TChild;
-}
-
-/**
- * Optional array field type
- */
-export interface ArrayOptionalField<
-  out TChild extends UnifiedField<string, z.ZodTypeAny>,
-  out TUsage extends FieldUsageConfig,
-  out TKey extends string,
-  out TSchema extends z.ZodTypeAny,
-  out TUIConfig extends WidgetConfig<string, z.ZodTypeAny, TUsage, TChild> =
-    WidgetConfig<TKey, TSchema, TUsage, TChild>,
-> {
-  type: "array-optional";
-  usage: TUsage;
-
-  ui: TUIConfig;
-  child: TChild;
-}
-
-/**
- * Widget field (UI-only, no schema)
- */
-export interface WidgetField<
-  out TUsage extends FieldUsageConfig,
-  out TKey extends string,
-  out TUIConfig extends Omit<DisplayOnlyWidgetConfig<string>, "schema"> = Omit<
-    DisplayOnlyWidgetConfig<TKey>,
-    "schema"
-  >,
-> {
-  type: "widget";
-  usage: TUsage;
-  ui: TUIConfig;
-}
-
-export interface WidgetObjectField<
-  out TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
-  out TUsage extends FieldUsageConfig,
-  out TKey extends string,
-  out TUIConfig extends ObjectWidgetConfig<string, TUsage, TChildren> =
-    ObjectWidgetConfig<TKey, TUsage, TChildren>,
-> {
-  type: "widget-object";
-  usage: TUsage;
-  ui: TUIConfig;
-  children: TChildren;
-}
-
-/**
- * Unified field type that supports all field configurations with enhanced type preservation
- *
- * TSchema: The Zod schema type for primitive fields
- * TKey: The translation key type - can be global TranslationKey or scoped translation keys
- *
- * When using scoped translations, pass the scoped key type:
- * UnifiedField<z.ZodTypeAny, ContactTranslationKey>
- *
- * This ensures all widget configs in the field tree use the correct translation key type.
- *
- */
-export type UnifiedField<TKey extends string, TSchema extends z.ZodTypeAny> =
-  | PrimitiveField<TSchema, FieldUsageConfig, TKey>
-  | ObjectField<
-      Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
-      FieldUsageConfig,
-      TKey
-    >
-  | ObjectOptionalField<
-      Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
-      FieldUsageConfig,
-      TKey,
-      TSchema
-    >
-  | ObjectUnionField<
-      string,
-      TKey,
-      readonly [
-        ObjectField<
-          Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
-          FieldUsageConfig,
-          TKey
-        >,
-        ...ObjectField<
-          Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
-          FieldUsageConfig,
-          TKey
-        >[],
-      ],
-      FieldUsageConfig,
-      TSchema
-    >
-  | ArrayField<
-      UnifiedField<TKey, z.ZodTypeAny>,
-      FieldUsageConfig,
-      TKey,
-      TSchema
-    >
-  | ArrayOptionalField<
-      UnifiedField<TKey, z.ZodTypeAny>,
-      FieldUsageConfig,
-      TKey,
-      TSchema
-    >
-  | WidgetField<FieldUsageConfig, TKey>
-  | WidgetObjectField<
-      Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
-      FieldUsageConfig,
-      TKey
-    >;

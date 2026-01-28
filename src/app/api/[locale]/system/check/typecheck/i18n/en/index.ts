@@ -1,7 +1,8 @@
 export const translations = {
   // Main endpoint properties
   title: "TypeScript Type Check",
-  description: "Run TypeScript type checking on specified files or directories",
+  description:
+    "Run TypeScript type checking on specified files or directories. Use vibe-check for comprehensive checks (ESLint + Oxlint + TypeScript). Note: Default values are configurable in check.config.ts.",
   category: "System Checks",
   tag: "typecheck",
 
@@ -34,7 +35,7 @@ export const translations = {
     path: {
       label: "Path",
       description:
-        "File or directory path to check (optional, defaults to current directory)",
+        "File paths or directories to check (string or array). RECOMMENDED: Specify paths for the area you're working on (fast, focused). Leave empty to check ALL files (slow, use only for comprehensive audits). Examples: 'src/app/feature' or ['src/feature/file.tsx', 'src/feature/other.tsx']",
       placeholder: "src/components",
     },
     verbose: {
@@ -47,23 +48,35 @@ export const translations = {
     },
     createConfig: {
       label: "Create Config",
-      description: "Automatically create configuration file if missing",
+      description: "Create configuration file if missing",
     },
     timeout: {
       label: "Timeout (seconds)",
-      description: "Maximum execution time in seconds",
+      description:
+        "Maximum execution time in seconds, range 1-3600 (default: 3600)",
     },
     limit: {
       label: "Limit",
-      description: "Maximum number of issues to display",
+      description:
+        "Issues to display per page, range 1-10000 (default: 20000 for web/CLI, 2 for MCP). Controls display only, not detection.",
     },
     page: {
       label: "Page",
-      description: "Page number for pagination",
+      description: "Page number for paginated results (default: 1)",
     },
     skipSorting: {
       label: "Skip Sorting",
-      description: "Skip sorting issues (for performance)",
+      description: "Skip sorting issues for better performance",
+    },
+    filter: {
+      label: "Filter",
+      description:
+        "Filter issues by file path, message, or rule. Supports text matching or regex (/pattern/flags). Arrays enable OR logic for multiple filters.",
+      placeholder: "e.g., 'TS2304' or '/src\\/components/i'",
+    },
+    summaryOnly: {
+      label: "Summary Only",
+      description: "Only return summary stats, omit items and files lists",
     },
   },
 

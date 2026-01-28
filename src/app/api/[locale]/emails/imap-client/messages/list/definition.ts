@@ -172,7 +172,6 @@ const { GET } = createEndpoint({
       messages: responseArrayField(
         {
           type: WidgetType.DATA_TABLE,
-          columns: [],
         },
         objectField(
           {

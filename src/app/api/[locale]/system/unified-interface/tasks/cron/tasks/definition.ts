@@ -133,38 +133,6 @@ const { GET } = createEndpoint({
       tasks: responseArrayField(
         {
           type: WidgetType.DATA_TABLE,
-          columns: [
-            {
-              key: "name",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.name",
-            },
-            {
-              key: "status",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.status",
-            },
-            {
-              key: "priority",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.priority",
-            },
-            {
-              key: "category",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.category",
-            },
-            {
-              key: "lastRun",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.lastRun",
-            },
-            {
-              key: "nextRun",
-              label:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.nextRun",
-            },
-          ],
         },
         objectField(
           {
