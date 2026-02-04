@@ -394,16 +394,8 @@ export class PasswordRepository {
   ): Promise<ResponseType<ResetPasswordRequestPostResponseOutput>> {
     logger.debug("Password reset request processed");
     return success({
-      response: {
-        success: true,
-        message:
-          "app.api.user.public.resetPassword.request.response.success.message",
-        nextSteps: [
-          "app.api.user.public.resetPassword.request.response.nextSteps.checkEmail",
-          "app.api.user.public.resetPassword.request.response.nextSteps.clickLink",
-          "app.api.user.public.resetPassword.request.response.nextSteps.createPassword",
-        ],
-      },
+      message:
+        "app.api.user.public.resetPassword.request.response.success.message",
     });
   }
 

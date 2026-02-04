@@ -248,6 +248,12 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
         const singleLine = `  "${t.id}": async () => (await import("${t.importPath}")).default,`;
         // Wrap long lines (80+ chars, prettier printWidth)
         if (singleLine.length >= 80) {
+          // Check if even the split version is too long
+          const splitLine = `    (await import("${t.importPath}")).default,`;
+          if (splitLine.length > 80) {
+            // eslint-disable-next-line i18next/no-literal-string
+            return `  "${t.id}": async () =>\n    (\n      await import("${t.importPath}")\n    ).default,`;
+          }
           // eslint-disable-next-line i18next/no-literal-string
           return `  "${t.id}": async () =>\n    (await import("${t.importPath}")).default,`;
         }
@@ -258,21 +264,49 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
     // Generate metadata map - sorted by ID
     const metadataEntries = templatesById
       .map((t) => {
-        // Format exampleProps: single line for small objects (no quotes on keys), multiline for large (no quotes on keys)
+        // Format exampleProps: check line length for single line format
         const propsKeys = Object.keys(t.metadata.exampleProps || {});
         let examplePropsStr: string;
-        if (propsKeys.length <= 2) {
-          // Single line: { key: value }
+        if (propsKeys.length > 0) {
+          // Try single line first
           const entries = Object.entries(t.metadata.exampleProps)
             .map(([k, v]) => `${k}: ${JSON.stringify(v)}`)
             .join(", ");
-          examplePropsStr = `{ ${entries} }`;
+          const singleLinePropFormat = `{ ${entries} }`;
+          const examplePropsLineLength =
+            `    exampleProps: ${singleLinePropFormat},`.length;
+
+          if (examplePropsLineLength > 80) {
+            // Multiline: each property on its own line (with trailing commas)
+            const multilineEntries = Object.entries(t.metadata.exampleProps)
+              .map(([k, v]) => {
+                const valueStr = JSON.stringify(v);
+                // Check if this single property line would be too long
+                const propLine = `      ${k}: ${valueStr},`;
+                if (propLine.length > 80) {
+                  // Wrap the value on next line if it's a string
+                  if (typeof v === "string") {
+                    // eslint-disable-next-line i18next/no-literal-string
+                    return `      ${k}:\n        ${valueStr},`;
+                  }
+                }
+                return propLine;
+              })
+              .join("\n");
+            examplePropsStr = `{\n${multilineEntries}\n    }`;
+          } else {
+            examplePropsStr = singleLinePropFormat;
+          }
         } else {
-          // Multiline: each property on its own line (with trailing commas)
-          const entries = Object.entries(t.metadata.exampleProps)
-            .map(([k, v]) => `      ${k}: ${JSON.stringify(v)},`)
-            .join("\n");
-          examplePropsStr = `{\n${entries}\n    }`;
+          examplePropsStr = "{}";
+        }
+
+        // Check if description line would be too long (>80 chars)
+        const descriptionLine = `    description: "${t.metadata.description}",`;
+        let descriptionStr = descriptionLine;
+        if (descriptionLine.length > 80) {
+          // eslint-disable-next-line i18next/no-literal-string
+          descriptionStr = `    description:\n      "${t.metadata.description}",`;
         }
 
         // eslint-disable-next-line i18next/no-literal-string
@@ -280,7 +314,7 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
     id: "${t.metadata.id}",
     version: "${t.metadata.version}",
     name: "${t.metadata.name}",
-    description: "${t.metadata.description}",
+${descriptionStr}
     category: "${t.metadata.category}",
     path: "${t.metadata.path}",
     exampleProps: ${examplePropsStr},
@@ -329,7 +363,9 @@ ${metadataEntries}
  * Get template by ID (lazy loads on first access)
  * Returns the template with its specific props type
  */
-export async function getTemplate(id: string): Promise<AnyEmailTemplate | undefined> {
+export async function getTemplate(
+  id: string,
+): Promise<AnyEmailTemplate | undefined> {
   const loader = templateLoaders[id];
   if (!loader) {
     return undefined;
@@ -341,7 +377,9 @@ export async function getTemplate(id: string): Promise<AnyEmailTemplate | undefi
 /**
  * Get template metadata without loading the component
  */
-export function getTemplateMetadata(id: string): TemplateCachedMetadata | undefined {
+export function getTemplateMetadata(
+  id: string,
+): TemplateCachedMetadata | undefined {
   return templateMetadataMap[id];
 }
 
@@ -362,7 +400,9 @@ export function getAllTemplateMetadata(): TemplateCachedMetadata[] {
 /**
  * Get templates by category (metadata only)
  */
-export function getTemplatesByCategory(category: string): TemplateCachedMetadata[] {
+export function getTemplatesByCategory(
+  category: string,
+): TemplateCachedMetadata[] {
   return getAllTemplateMetadata().filter((t) => t.category === category);
 }
 
@@ -388,21 +428,49 @@ export function hasTemplate(id: string): boolean {
     // Generate metadata map (same as server version)
     const metadataEntries = templatesById
       .map((t) => {
-        // Format exampleProps: single line for small objects (no quotes on keys), multiline for large (no quotes on keys)
+        // Format exampleProps: check line length for single line format
         const propsKeys = Object.keys(t.metadata.exampleProps || {});
         let examplePropsStr: string;
-        if (propsKeys.length <= 2) {
-          // Single line: { key: value }
+        if (propsKeys.length > 0) {
+          // Try single line first
           const entries = Object.entries(t.metadata.exampleProps)
             .map(([k, v]) => `${k}: ${JSON.stringify(v)}`)
             .join(", ");
-          examplePropsStr = `{ ${entries} }`;
+          const singleLinePropFormat = `{ ${entries} }`;
+          const examplePropsLineLength =
+            `    exampleProps: ${singleLinePropFormat},`.length;
+
+          if (examplePropsLineLength > 80) {
+            // Multiline: each property on its own line (with trailing commas)
+            const multilineEntries = Object.entries(t.metadata.exampleProps)
+              .map(([k, v]) => {
+                const valueStr = JSON.stringify(v);
+                // Check if this single property line would be too long
+                const propLine = `      ${k}: ${valueStr},`;
+                if (propLine.length > 80) {
+                  // Wrap the value on next line if it's a string
+                  if (typeof v === "string") {
+                    // eslint-disable-next-line i18next/no-literal-string
+                    return `      ${k}:\n        ${valueStr},`;
+                  }
+                }
+                return propLine;
+              })
+              .join("\n");
+            examplePropsStr = `{\n${multilineEntries}\n    }`;
+          } else {
+            examplePropsStr = singleLinePropFormat;
+          }
         } else {
-          // Multiline: each property on its own line (with trailing commas)
-          const entries = Object.entries(t.metadata.exampleProps)
-            .map(([k, v]) => `      ${k}: ${JSON.stringify(v)},`)
-            .join("\n");
-          examplePropsStr = `{\n${entries}\n    }`;
+          examplePropsStr = "{}";
+        }
+
+        // Check if description line would be too long (>80 chars)
+        const descriptionLine = `    description: "${t.metadata.description}",`;
+        let descriptionStr = descriptionLine;
+        if (descriptionLine.length > 80) {
+          // eslint-disable-next-line i18next/no-literal-string
+          descriptionStr = `    description:\n      "${t.metadata.description}",`;
         }
 
         // eslint-disable-next-line i18next/no-literal-string
@@ -410,7 +478,7 @@ export function hasTemplate(id: string): boolean {
     id: "${t.metadata.id}",
     version: "${t.metadata.version}",
     name: "${t.metadata.name}",
-    description: "${t.metadata.description}",
+${descriptionStr}
     category: "${t.metadata.category}",
     path: "${t.metadata.path}",
     exampleProps: ${examplePropsStr},
@@ -444,7 +512,9 @@ ${metadataEntries}
 /**
  * Get template metadata without loading the component
  */
-export function getTemplateMetadata(id: string): TemplateCachedMetadata | undefined {
+export function getTemplateMetadata(
+  id: string,
+): TemplateCachedMetadata | undefined {
   return templateMetadataMap[id];
 }
 
@@ -458,7 +528,9 @@ export function getAllTemplateMetadata(): TemplateCachedMetadata[] {
 /**
  * Get templates by category (metadata only)
  */
-export function getTemplatesByCategory(category: string): TemplateCachedMetadata[] {
+export function getTemplatesByCategory(
+  category: string,
+): TemplateCachedMetadata[] {
   return getAllTemplateMetadata().filter((t) => t.category === category);
 }
 `;

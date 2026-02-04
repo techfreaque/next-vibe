@@ -15,24 +15,34 @@ import {
 import { Title } from "next-vibe-ui/ui/title";
 import type { JSX } from "react";
 import { useState } from "react";
-import type { z } from "zod";
 
 import { simpleT } from "@/i18n/core/shared";
 
-import type { UnifiedField } from "../../../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import {
   getSpacingClassName,
   getTextSizeClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
-import { WidgetRenderer } from "../../../renderers/react/WidgetRenderer";
+import { MultiWidgetRenderer } from "../../../renderers/react/MultiWidgetRenderer";
+import { getFieldLabel } from "../../_shared/field-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
-import type { FieldUsageConfig } from "../../_shared/types";
+import { hasChild } from "../../_shared/type-guards";
+import type {
+  ArrayChildConstraint,
+  BaseWidgetConfig,
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+  ObjectChildrenConstraint,
+  SchemaTypes,
+} from "../../_shared/types";
+import {
+  useWidgetLocale,
+  useWidgetTranslation,
+} from "../../_shared/use-widget-context";
 import {
   extractDataListData,
   getListDisplayItems,
   getRemainingListItemsCount,
-  type ListItem,
 } from "./shared";
 import type { DataListWidgetConfig } from "./types";
 
@@ -90,20 +100,17 @@ export function DataListWidget<
     | "object-optional"
     | "widget-object"
     | "array-optional",
-  TChildOrChildren,
+  TChildOrChildren extends
+    | ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>
+    | ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>,
 >({
   field,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
-  DataListWidgetConfig<
-    TKey,
-    TUsage,
-    TSchemaType,
-    TChildOrChildren,
-    TTargetEndpoint
-  >
+  DataListWidgetConfig<TKey, TUsage, TSchemaType, TChildOrChildren, undefined>
 >): JSX.Element {
+  const locale = useWidgetLocale();
+  const contextT = useWidgetTranslation();
   const {
     gap,
     simpleArrayGap,
@@ -150,19 +157,12 @@ export function DataListWidget<
   const cardRowSizeClass = getTextSizeClassName(cardRowSize);
   const buttonSizeClass = getTextSizeClassName(buttonSize);
 
-  const { t: globalT } = simpleT(context.locale);
+  const { t: globalT } = simpleT(locale);
   const [showAll, setShowAll] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
 
+  // field.value is a conditional type from BaseWidgetFieldProps — cast at extraction boundary
   const data = extractDataListData(field.value);
-
-  // Get row click handler from metadata
-  const onRowClick = field.metadata?.extractParams
-    ? {
-        extractParams: field.metadata.extractParams,
-        targetEndpoint: field.metadata.targetEndpoint,
-      }
-    : undefined;
 
   if (!data) {
     return (
@@ -176,16 +176,28 @@ export function DataListWidget<
 
   const { items, title, maxItems } = data;
 
-  let fieldDefinitions: Record<
-    string,
-    UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any> // oxlint-disable-line typescript/no-explicit-any
+  let fieldDefinitions: ObjectChildrenConstraint<
+    TKey,
+    ConstrainedChildUsage<TUsage>
   > = {};
+  let simpleArrayChild:
+    | BaseWidgetConfig<FieldUsageConfig, SchemaTypes>
+    | undefined;
 
-  const childField = field.child;
-  const isSimpleValueArray = childField && !("children" in childField);
-
-  if (childField) {
-    fieldDefinitions = childField.children;
+  if (hasChild(field)) {
+    const child = field.child;
+    // Check if child is an object widget (has children property)
+    if (
+      typeof child === "object" &&
+      child !== null &&
+      "children" in child &&
+      child.children &&
+      typeof child.children === "object"
+    ) {
+      fieldDefinitions = child.children;
+    } else {
+      simpleArrayChild = child;
+    }
   }
 
   const displayItems = showAll ? items : getListDisplayItems(items, maxItems);
@@ -193,7 +205,7 @@ export function DataListWidget<
   const hasMore = !showAll && remainingCount > 0;
 
   // For simple value arrays, render as inline list
-  if (isSimpleValueArray && childField) {
+  if (simpleArrayChild) {
     return (
       <Div
         className={cn(
@@ -202,15 +214,11 @@ export function DataListWidget<
           field.className,
         )}
       >
-        {displayItems.map((item, index: number) => (
-          <WidgetRenderer
-            key={index}
-            data={item}
-            field={childField}
-            context={context}
-            endpoint={endpoint}
-          />
-        ))}
+        <MultiWidgetRenderer
+          childrenSchema={simpleArrayChild}
+          value={displayItems}
+          fieldName={undefined}
+        />
       </Div>
     );
   }
@@ -260,35 +268,9 @@ export function DataListWidget<
           <Table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <TableHeader className="bg-gray-50 dark:bg-gray-800">
               <TableRow>
-                {Object.entries(fieldDefinitions).map(([key, fieldDef]) => {
-                  // Check for label first, then fallback to content/text/href, then key
-                  let label = key;
-                  if (fieldDef) {
-                    if (
-                      "label" in fieldDef &&
-                      typeof fieldDef.label === "string"
-                    ) {
-                      label = context.t(fieldDef.label);
-                    } else if (
-                      "content" in fieldDef &&
-                      typeof fieldDef.content === "string"
-                    ) {
-                      label = context.t(fieldDef.content);
-                    } else if (
-                      "text" in fieldDef &&
-                      typeof fieldDef.text === "string"
-                    ) {
-                      label = context.t(fieldDef.text);
-                    } else if (
-                      "href" in fieldDef &&
-                      typeof fieldDef.href === "string"
-                    ) {
-                      // For LINK widgets that use href as the label key
-                      label = fieldDef.href;
-                    }
-                  }
-
-                  return (
+                {Object.entries(fieldDefinitions)
+                  .filter(([, fieldDef]) => !fieldDef.hidden)
+                  .map(([key, fieldDef]) => (
                     <TableHead
                       key={key}
                       className={cn(
@@ -297,75 +279,46 @@ export function DataListWidget<
                         tableHeadSizeClass || "text-xs",
                       )}
                     >
-                      {label}
+                      {getFieldLabel(fieldDef, key, contextT)}
                     </TableHead>
-                  );
-                })}
+                  ))}
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
-              {displayItems.map((item: ListItem, index: number) => {
-                if (!item || typeof item !== "object") {
-                  return null;
-                }
-
-                const handleRowClick = onRowClick
-                  ? (): void => {
-                      if (!context.navigation || !onRowClick.targetEndpoint) {
-                        return;
-                      }
-                      const params = onRowClick.extractParams(item);
-                      context.logger.debug("DataListWidget: extracted params", {
-                        params,
-                      });
-                      context.navigation.push(
-                        onRowClick.targetEndpoint,
-                        params,
-                        false,
-                        undefined,
-                      );
-                    }
-                  : undefined;
-
-                return (
-                  <TableRow
-                    key={index}
-                    className={cn(
-                      "hover:bg-gray-50 dark:hover:bg-gray-800",
-                      onRowClick && "cursor-pointer",
-                    )}
-                    onClick={handleRowClick}
-                  >
-                    {Object.entries(fieldDefinitions).map(([key, fieldDef]) => {
-                      const cellValue = key in item ? item[key] : null;
-
-                      return (
-                        <TableCell
-                          key={key}
-                          className={cn(
-                            "whitespace-nowrap text-gray-900 dark:text-gray-100",
-                            tableCellPaddingClass || "px-6 py-4",
-                            tableCellSizeClass || "text-sm",
-                          )}
-                        >
-                          {fieldDef ? (
-                            <WidgetRenderer
-                              data={cellValue}
-                              field={fieldDef}
-                              context={context}
-                              endpoint={endpoint}
-                            />
-                          ) : (
-                            <Span className="text-gray-600 dark:text-gray-400">
-                              {`${cellValue ?? "—"}`}
-                            </Span>
-                          )}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
+              <MultiWidgetRenderer
+                childrenSchema={hasChild(field) ? field.child : undefined}
+                value={displayItems}
+                fieldName={undefined}
+                renderItem={({ itemData, index }) => {
+                  return (
+                    <TableRow
+                      key={index}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                    >
+                      {Object.entries(fieldDefinitions)
+                        .filter(([, fieldDef]) => !fieldDef.hidden)
+                        .map(([key, fieldDef]) => {
+                          return (
+                            <TableCell
+                              key={key}
+                              className={cn(
+                                "whitespace-nowrap text-gray-900 dark:text-gray-100",
+                                tableCellPaddingClass || "px-6 py-4",
+                                tableCellSizeClass || "text-sm",
+                              )}
+                            >
+                              <MultiWidgetRenderer
+                                childrenSchema={{ [key]: fieldDef }}
+                                value={itemData}
+                                fieldName={undefined}
+                              />
+                            </TableCell>
+                          );
+                        })}
+                    </TableRow>
+                  );
+                }}
+              />
             </TableBody>
           </Table>
         </Div>
@@ -378,103 +331,54 @@ export function DataListWidget<
             gridGapClass || "gap-4",
           )}
         >
-          {displayItems.map((card, index: number) => {
-            const handleCardClick = onRowClick
-              ? (): void => {
-                  if (!context.navigation || !onRowClick.targetEndpoint) {
-                    return;
-                  }
-                  const params = onRowClick.extractParams(card);
-                  context.logger.debug("DataListWidget: extracted params", {
-                    params,
-                  });
-                  context.navigation.push(
-                    onRowClick.targetEndpoint,
-                    params,
-                    false,
-                    undefined,
-                  );
-                }
-              : undefined;
-
-            return (
-              <Div
-                key={index}
-                className={cn(
-                  "overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800",
-                  onRowClick && "cursor-pointer",
-                )}
-                onClick={handleCardClick}
-              >
-                <Div className={cn(cardPaddingClass || "p-4")}>
-                  <Div
-                    className={cn(
-                      "flex flex-col",
-                      cardInnerGapClass || "gap-2",
-                    )}
-                  >
-                    {card &&
-                      typeof card === "object" &&
-                      Object.entries(card).map(([key, cardValue]) => {
-                        const fieldDef = fieldDefinitions[key];
-                        // Check for label first, then fallback to content/text/href, then key
-                        let label = key;
-                        if (fieldDef) {
-                          if (
-                            "label" in fieldDef &&
-                            typeof fieldDef.label === "string"
-                          ) {
-                            label = context.t(fieldDef.label);
-                          } else if (
-                            "content" in fieldDef &&
-                            typeof fieldDef.content === "string"
-                          ) {
-                            label = context.t(fieldDef.content);
-                          } else if (
-                            "text" in fieldDef &&
-                            typeof fieldDef.text === "string"
-                          ) {
-                            label = context.t(fieldDef.text);
-                          } else if (
-                            "href" in fieldDef &&
-                            typeof fieldDef.href === "string"
-                          ) {
-                            label = fieldDef.href;
-                          }
-                        }
-
-                        return (
-                          <Div
-                            key={key}
-                            className={cn(
-                              "flex justify-between",
-                              rowGapClass || "gap-4",
-                              cardRowSizeClass || "text-sm",
-                            )}
-                          >
-                            <Span className="font-medium text-gray-700 dark:text-gray-300">
-                              {label}:
-                            </Span>
-                            <Div className="text-right">
-                              {fieldDef ? (
-                                <WidgetRenderer
-                                  field={{ ...fieldDef, value: cardValue }}
-                                  context={context}
-                                />
-                              ) : (
-                                <Span className="text-gray-600 dark:text-gray-400">
-                                  {`${cardValue ?? "—"}`}
-                                </Span>
+          <MultiWidgetRenderer
+            childrenSchema={hasChild(field) ? field.child : undefined}
+            value={displayItems}
+            fieldName={undefined}
+            renderItem={({ itemData, index }) => {
+              return (
+                <Div
+                  key={index}
+                  className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+                >
+                  <Div className={cn(cardPaddingClass || "p-4")}>
+                    <Div
+                      className={cn(
+                        "flex flex-col",
+                        cardInnerGapClass || "gap-2",
+                      )}
+                    >
+                      {Object.entries(fieldDefinitions)
+                        .filter(([, fieldDef]) => !fieldDef.hidden)
+                        .map(([key, fieldDef]) => {
+                          return (
+                            <Div
+                              key={key}
+                              className={cn(
+                                "flex justify-between",
+                                rowGapClass || "gap-4",
+                                cardRowSizeClass || "text-sm",
                               )}
+                            >
+                              <Span className="font-medium text-gray-700 dark:text-gray-300">
+                                {getFieldLabel(fieldDef, key, contextT)}:
+                              </Span>
+                              <Div className="text-right">
+                                <MultiWidgetRenderer
+                                  childrenSchema={{ [key]: fieldDef }}
+                                  value={itemData}
+                                  fieldName={undefined}
+                                />
+                              </Div>
                             </Div>
-                          </Div>
-                        );
-                      })}
+                          );
+                        })}
+                    </Div>
                   </Div>
                 </Div>
-              </Div>
-            );
-          })}
+              );
+            }}
+          />
         </Div>
       )}
 

@@ -21,10 +21,10 @@ export type JsonRpcVersion = "2.0";
  * JSON-RPC Request (generic version)
  */
 
-export interface JsonRpcRequest<TParams> {
+export interface JsonRpcRequest {
   jsonrpc: JsonRpcVersion;
   method: string;
-  params?: TParams;
+  params?: WidgetData;
   id?: string | number;
 }
 
@@ -34,8 +34,11 @@ export interface JsonRpcRequest<TParams> {
 
 export interface JsonRpcResponse {
   jsonrpc: JsonRpcVersion;
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Response serialization requires 'unknown' for flexible response types
-  result?: unknown;
+  result?:
+    | WidgetData
+    | MCPInitializeResult
+    | MCPToolsListResult
+    | MCPToolCallResult;
   error?: JsonRpcError;
   id: string | number | null;
 }

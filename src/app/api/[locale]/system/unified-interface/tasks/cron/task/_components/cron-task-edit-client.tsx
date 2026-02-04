@@ -14,6 +14,7 @@ import type React from "react";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { IndividualCronTaskType } from "@/app/api/[locale]/system/unified-interface/tasks/cron/task/[id]/definition";
 import { useCronTaskEndpoint } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/hooks";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -23,12 +24,14 @@ interface CronTaskEditClientProps {
   taskId: string;
   locale: CountryLanguage;
   initialData: IndividualCronTaskType;
+  user: JwtPayloadType;
 }
 
 export function CronTaskEditClient({
   taskId,
   locale,
   initialData,
+  user,
 }: CronTaskEditClientProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const router = useRouter();
@@ -36,6 +39,7 @@ export function CronTaskEditClient({
   // Create logger and get endpoint for form handling
   const logger = createEndpointLogger(false, Date.now(), locale);
   const endpoint = useCronTaskEndpoint(
+    user,
     {
       taskId,
       enabled: true,

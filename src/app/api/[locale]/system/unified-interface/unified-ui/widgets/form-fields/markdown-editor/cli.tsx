@@ -30,6 +30,7 @@ export function MarkdownEditorWidgetInk<
   field,
 }: InkWidgetProps<
   TEndpoint,
+  TUsage,
   MarkdownEditorWidgetConfig<TKey, TSchema, TUsage, "primitive">
 >): JSX.Element {
   const extractedData = extractEditableTextData(field.value);

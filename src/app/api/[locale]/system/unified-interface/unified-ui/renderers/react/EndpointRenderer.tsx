@@ -15,9 +15,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
 import type { JSX } from "react";
+import { useMemo } from "react";
 import type {
   DefaultValues,
   FieldValues,
+  Path,
   UseFormReturn,
 } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -30,13 +32,18 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { useNavigationStack } from "../../../react/hooks/use-navigation-stack";
 import type { EndpointLogger } from "../../../shared/logger/endpoint";
-import type { UnifiedField } from "../../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
 import { WidgetType } from "../../../shared/types/enums";
 import { Platform } from "../../../shared/types/platform";
 import type { WidgetData } from "../../../shared/widgets/widget-data";
-import type { WidgetRenderContext } from "../../widgets/_shared/react-types";
+import {
+  extractAllFields,
+  scanForInlineButtons,
+  withValue,
+} from "../../widgets/_shared/field-helpers";
+import type { ReactWidgetContext } from "../../widgets/_shared/react-types";
 import { isResponseField } from "../../widgets/_shared/type-guards";
+import { WidgetContextProvider } from "../../widgets/_shared/WidgetContextProvider";
 import { WidgetRenderer } from "./WidgetRenderer";
 
 /**
@@ -110,85 +117,11 @@ export interface EndpointRendererProps<
   /** Full ResponseType<T> from endpoint (includes success/error state) */
   response?: ResponseType<WidgetData>;
   /** Endpoint mutations for widgets to trigger directly */
-  endpointMutations?: WidgetRenderContext["endpointMutations"];
+  endpointMutations?: ReactWidgetContext<TEndpoint>["endpointMutations"];
   /** Logger instance for widgets to use directly */
   logger: EndpointLogger;
   /** User object for permission checks */
   user: JwtPayloadType;
-}
-
-/**
- * Extract ALL fields from endpoint definition
- * Recursively extracts fields from nested containers, preserving full paths
- * Handles object, object-optional, and object-union types
- */
-function extractAllFields<const TKey extends string>(
-  fields: UnifiedField<TKey, ZodTypeAny>,
-  parentPath = "",
-): Array<[string, UnifiedField<TKey, ZodTypeAny>]> {
-  if (!fields || typeof fields !== "object") {
-    return [];
-  }
-
-  const fieldsObj = fields as {
-    type?: string;
-    children?: Record<string, UnifiedField<TKey, ZodTypeAny>>;
-    discriminator?: string;
-    variants?: readonly UnifiedField<TKey, ZodTypeAny>[];
-  };
-
-  // Handle object-union fields
-  if (fieldsObj.type === "object-union") {
-    // For unions, add the union field itself (widgets will handle variant switching)
-    const fullPath = parentPath ? `${parentPath}` : "";
-    return fullPath ? [[fullPath, fields]] : [];
-  }
-
-  // Check if this is an object field with children
-  if (
-    (fieldsObj.type !== "object" && fieldsObj.type !== "object-optional") ||
-    !fieldsObj.children
-  ) {
-    return [];
-  }
-
-  const result: Array<[string, UnifiedField<TKey, ZodTypeAny>]> = [];
-
-  for (const [fieldName, fieldDef] of Object.entries(fieldsObj.children)) {
-    if (typeof fieldDef === "object" && fieldDef !== null) {
-      // Check if this is a container with nested fields
-      const fieldDefObj = fieldDef as {
-        type?: string;
-        children?: Record<string, UnifiedField<TKey, ZodTypeAny>>;
-        discriminator?: string;
-        variants?: readonly UnifiedField<TKey, ZodTypeAny>[];
-        ui?: { type?: string };
-      };
-
-      // Handle union fields
-      if (fieldDefObj.type === "object-union") {
-        // Add the union field itself - union widget will handle variant rendering
-        const fullPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
-        result.push([fullPath, fieldDef as UnifiedField<TKey, ZodTypeAny>]);
-      } else if (
-        (fieldDefObj.type === "object" ||
-          fieldDefObj.type === "object-optional") &&
-        fieldDefObj.children &&
-        fieldDefObj.ui?.type === "container"
-      ) {
-        // Add the container itself instead of flattening its children
-        // ContainerWidget will handle rendering children with proper grid layout
-        const fullPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
-        result.push([fullPath, fieldDef as UnifiedField<TKey, ZodTypeAny>]);
-      } else {
-        // Regular field, add it with full path
-        const fullPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
-        result.push([fullPath, fieldDef as UnifiedField<TKey, ZodTypeAny>]);
-      }
-    }
-  }
-
-  return result;
 }
 
 /**
@@ -221,6 +154,7 @@ export function EndpointRenderer<
 
   // Check if endpoint.fields itself is a container or array widget (render directly)
   const isRootContainer =
+    "schemaType" in endpoint.fields &&
     (endpoint.fields.schemaType === "object" ||
       endpoint.fields.schemaType === "object-optional" ||
       endpoint.fields.schemaType === "array" ||
@@ -241,8 +175,22 @@ export function EndpointRenderer<
   // Use external form if provided, otherwise use internal form
   const form = externalForm ?? internalForm;
 
+  // Wrap onSubmit for widgets - widgets trigger submission without data parameter
+  const handleWidgetSubmit = onSubmit
+    ? (): void => {
+        void form.handleSubmit(onSubmit)();
+      }
+    : undefined;
+
+  // Scan endpoint fields for inline buttons/alerts (memoized)
+  // This determines if the root container should auto-add buttons
+  const inlineButtonInfo = useMemo(
+    () => scanForInlineButtons(endpoint.fields),
+    [endpoint.fields],
+  );
+
   // Create render context with scoped translation from endpoint definition
-  const context: WidgetRenderContext = {
+  const context: ReactWidgetContext<TEndpoint> = {
     locale,
     isInteractive: true,
     logger,
@@ -254,11 +202,22 @@ export function EndpointRenderer<
     endpointMutations,
     t: endpoint.scopedTranslation.scopedT(locale).t,
     navigation,
-    currentEndpoint: endpoint,
+    endpoint,
+    form,
+    onSubmit: handleWidgetSubmit,
+    onCancel,
+    isSubmitting,
+    submitButton,
+    cancelButton,
+    buttonState: {
+      hasRenderedSubmitButton: false,
+      hasRenderedBackButton: false,
+    },
   };
 
   // Check if there are any request fields
-  const hasRequest = endpoint.fields.usage.request;
+  const hasRequest =
+    "usage" in endpoint.fields && endpoint.fields.usage.request;
 
   /**
    * NEW APPROACH: If the root field is a container widget, render it directly.
@@ -275,46 +234,34 @@ export function EndpointRenderer<
         }
       : undefined;
 
-    // Wrap onSubmit for widgets - widgets trigger submission without data parameter
-    const handleWidgetSubmit = onSubmit
-      ? (): void => {
-          void form.handleSubmit(onSubmit)();
-        }
-      : undefined;
-
     const rootWidget = (
       <WidgetRenderer
-        widgetType={endpoint.fields.type}
-        fieldName=""
-        data={data ?? null}
-        field={endpoint.fields}
-        context={context}
-        form={form as UseFormReturn<FieldValues>}
-        onSubmit={handleWidgetSubmit}
-        onCancel={onCancel}
-        isSubmitting={isSubmitting}
-        endpoint={endpoint}
-        submitButton={submitButton}
-        cancelButton={cancelButton}
+        fieldName={"" as Path<TEndpoint["types"]["RequestOutput"]>}
+        field={withValue(endpoint.fields, data, null)}
+        inlineButtonInfo={inlineButtonInfo}
       />
     );
 
     // Always wrap in Form if we have form fields (request fields)
     if (hasRequest) {
       return (
-        <Form form={form} onSubmit={handleFormSubmit} className={className}>
-          {rootWidget}
-          {children}
-        </Form>
+        <WidgetContextProvider context={context}>
+          <Form form={form} onSubmit={handleFormSubmit} className={className}>
+            {rootWidget}
+            {children}
+          </Form>
+        </WidgetContextProvider>
       );
     }
 
     // No request fields - just response display, no form needed
     return (
-      <Div className={className}>
-        {rootWidget}
-        {children}
-      </Div>
+      <WidgetContextProvider context={context}>
+        <Div className={className}>
+          {rootWidget}
+          {children}
+        </Div>
+      </WidgetContextProvider>
     );
   }
 
@@ -326,8 +273,21 @@ export function EndpointRenderer<
 
   // Sort fields by order (lower numbers first, undefined/null last)
   const fields = allFields.toSorted(([, fieldA], [, fieldB]) => {
-    const orderA = fieldA.ui?.order ?? Number.MAX_SAFE_INTEGER;
-    const orderB = fieldB.ui?.order ?? Number.MAX_SAFE_INTEGER;
+    let orderA = Number.MAX_SAFE_INTEGER;
+    if ("ui" in fieldA && fieldA.ui && typeof fieldA.ui === "object") {
+      const ui = fieldA.ui;
+      if ("order" in ui && typeof ui.order === "number") {
+        orderA = ui.order;
+      }
+    }
+
+    let orderB = Number.MAX_SAFE_INTEGER;
+    if ("ui" in fieldB && fieldB.ui && typeof fieldB.ui === "object") {
+      const ui = fieldB.ui;
+      if ("order" in ui && typeof ui.order === "number") {
+        orderB = ui.order;
+      }
+    }
     return orderA - orderB;
   });
 
@@ -345,62 +305,46 @@ export function EndpointRenderer<
     return true;
   });
 
-  // Wrap onSubmit for widgets - widgets trigger submission without data parameter
-  const handleWidgetSubmit = onSubmit
-    ? (): void => {
-        void form.handleSubmit(onSubmit)();
-      }
-    : undefined;
-
   // Render all widgets in sorted order (respecting order property across request/response)
   const allWidgets = visibleFields.map(([fieldName, field]) => {
-    const fieldData =
+    const fieldValue =
       data && typeof data === "object" && !Array.isArray(data)
         ? data[fieldName]
-        : null;
+        : undefined;
+
     return (
       <WidgetRenderer
         key={fieldName}
-        widgetType={field.ui.type}
-        fieldName={fieldName}
-        data={fieldData}
-        field={field}
-        context={context}
-        form={form as UseFormReturn<FieldValues>}
-        onSubmit={handleWidgetSubmit}
-        isSubmitting={isSubmitting}
-        endpoint={endpoint}
+        fieldName={fieldName as Path<TEndpoint["types"]["RequestOutput"]>}
+        field={withValue(field, fieldValue, data)}
       />
     );
   });
 
   // Always wrap in Form if we have form fields (request fields)
   if (hasRequest) {
-    // Wrap onSubmit for form handling - this will be passed to Form component
-    const handleFormSubmit = onSubmit
-      ? (): void => {
-          void form.handleSubmit(onSubmit)();
-        }
-      : undefined;
-
     return (
-      <Form form={form} onSubmit={handleFormSubmit} className={className}>
-        <Div className="flex flex-col gap-6">
-          {allWidgets}
-          {children}
-        </Div>
-      </Form>
+      <WidgetContextProvider context={context}>
+        <Form form={form} onSubmit={handleWidgetSubmit} className={className}>
+          <Div className="flex flex-col gap-6">
+            {allWidgets}
+            {children}
+          </Div>
+        </Form>
+      </WidgetContextProvider>
     );
   }
 
   // No request fields - just response display, no form needed
   return (
-    <Div className={className}>
-      <Div className="flex flex-col gap-4">
-        {allWidgets}
-        {children}
+    <WidgetContextProvider context={context}>
+      <Div className={className}>
+        <Div className="flex flex-col gap-4">
+          {allWidgets}
+          {children}
+        </Div>
       </Div>
-    </Div>
+    </WidgetContextProvider>
   );
 }
 

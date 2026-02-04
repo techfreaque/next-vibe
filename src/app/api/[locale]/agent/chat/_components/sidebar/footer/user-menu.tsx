@@ -13,14 +13,14 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface UserMenuProps {
-  user: JwtPayloadType | undefined;
+  user: JwtPayloadType;
   locale: CountryLanguage;
   logger: EndpointLogger;
 }
 
 export function UserMenu({ user, locale, logger }: UserMenuProps): JSX.Element {
   const { t } = simpleT(locale);
-  const logout = useLogout(logger);
+  const logout = useLogout(logger, user);
   return !user || user.isPublic ? (
     <Link href={`/${locale}/user/login`}>
       <Button

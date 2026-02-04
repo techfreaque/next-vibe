@@ -6,6 +6,7 @@
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import definitions from "./definition";
 
@@ -15,6 +16,7 @@ import definitions from "./definition";
  * Following the cron pattern for consistency
  */
 export function useLeadByIdEndpoint(
+  user: JwtPayloadType,
   logger: EndpointLogger,
   params: {
     leadId: string;
@@ -32,6 +34,7 @@ export function useLeadByIdEndpoint(
       persistenceKey: `lead-edit-${params.leadId}-form`, // eslint-disable-line i18next/no-literal-string -- Form persistence key
     },
     logger,
+    user,
   );
 }
 

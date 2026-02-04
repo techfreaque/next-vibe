@@ -38,7 +38,7 @@ import { TooltipProvider } from "next-vibe-ui/ui/tooltip";
 import { TooltipTrigger } from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import {
   chatColors,
@@ -484,6 +484,7 @@ export function ThreadItem({
 
       {/* Permissions Dialog */}
       <ThreadPermissionsDialog
+        user={user}
         open={permissionsDialogOpen}
         onOpenChange={setPermissionsDialogOpen}
         threadId={thread.id}

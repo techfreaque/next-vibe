@@ -7,6 +7,7 @@ import type { JSX } from "react";
 
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { NavigateButtonWidgetConfig } from "./types";
@@ -18,12 +19,12 @@ export function NavigateButtonWidgetInk<
   TTargetEndpoint extends CreateApiEndpointAny | undefined,
 >({
   field,
-  context,
 }: InkWidgetProps<
   TEndpoint,
+  TUsage,
   NavigateButtonWidgetConfig<TKey, TUsage, "widget", TTargetEndpoint>
 >): JSX.Element {
-  const { t } = context;
+  const t = useInkWidgetTranslation();
 
   return (
     <Box>

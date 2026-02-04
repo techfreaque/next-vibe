@@ -21,11 +21,9 @@ import type {
   JsonRpcError,
   JsonRpcRequest,
   JsonRpcResponse,
-  MCPInitializeParams,
   MCPInitializeResult,
   MCPToolCallParams,
   MCPToolCallResult,
-  MCPToolsListParams,
   MCPToolsListResult,
 } from "../types";
 import { MCPErrorCode, MCPMethod } from "../types";
@@ -34,14 +32,11 @@ import { MCPErrorCode, MCPMethod } from "../types";
  * MCP Protocol Handler Interface
  */
 export interface IMCPProtocolHandler {
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Protocol extension requires 'unknown' for flexible message payloads
-  handleRequest(
-    request: JsonRpcRequest<unknown>,
-  ): Promise<JsonRpcResponse<unknown>>;
-  handleInitialize(params: MCPInitializeParams): Promise<MCPInitializeResult>;
-  handleToolsList(params: MCPToolsListParams): Promise<MCPToolsListResult>;
+  handleRequest(request: JsonRpcRequest): Promise<JsonRpcResponse>;
+  handleInitialize(params: WidgetData): Promise<MCPInitializeResult>;
+  handleToolsList(params: WidgetData): Promise<MCPToolsListResult>;
   handleToolCall(params: MCPToolCallParams): Promise<MCPToolCallResult>;
-  handlePing(): Promise<Record<string, never>>;
+  handlePing(): Promise<{ [key: string]: never }>;
 }
 
 /**
@@ -66,11 +61,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
   /**
    * Handle incoming JSON-RPC request
    */
-  async handleRequest(
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Protocol message handling requires 'unknown' for flexible message types
-    request: JsonRpcRequest<unknown>,
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Protocol message handling requires 'unknown' for flexible message types
-  ): Promise<JsonRpcResponse<unknown>> {
+  async handleRequest(request: JsonRpcRequest): Promise<JsonRpcResponse> {
     this.logger.debug("[MCP Protocol] Received request", {
       method: request.method,
       id: request.id,
@@ -88,16 +79,26 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
 
       // Route to appropriate handler
 
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Request parsing requires 'unknown' for untrusted input
-      let result: unknown;
+      let result:
+        | MCPInitializeResult
+        | MCPToolsListResult
+        | MCPToolCallResult
+        | { [key: string]: never };
 
       switch (request.method) {
-        case MCPMethod.INITIALIZE:
-          result = await this.handleInitialize(
-            request.params as MCPInitializeParams,
-          );
+        case MCPMethod.INITIALIZE: {
+          if (!request.params) {
+            return this.fail(
+              request.id ?? null,
+              MCPErrorCode.INVALID_PARAMS,
+              // eslint-disable-next-line i18next/no-literal-string
+              "Initialize params are required",
+            );
+          }
+          result = await this.handleInitialize(request.params);
           this.initialized = true;
           break;
+        }
 
         case MCPMethod.PING:
           result = await this.handlePing();
@@ -112,9 +113,8 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
               "Server not initialized. Call initialize first.",
             );
           }
-          result = await this.handleToolsList(
-            request.params as MCPToolsListParams,
-          );
+
+          result = await this.handleToolsList();
           break;
 
         case MCPMethod.TOOLS_CALL:
@@ -126,9 +126,15 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
               "Server not initialized. Call initialize first.",
             );
           }
-          result = await this.handleToolCall(
-            request.params as MCPToolCallParams,
-          );
+          if (!request.params) {
+            return this.fail(
+              request.id ?? null,
+              MCPErrorCode.INVALID_PARAMS,
+              // eslint-disable-next-line i18next/no-literal-string
+              "Tool call params are required",
+            );
+          }
+          result = await this.handleToolCall(request.params);
           break;
 
         default:
@@ -159,13 +165,33 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
   /**
    * Handle initialize request
    */
-  async handleInitialize(
-    params: MCPInitializeParams,
-  ): Promise<MCPInitializeResult> {
+  async handleInitialize(params: WidgetData): Promise<MCPInitializeResult> {
+    const typedParams = params;
     this.logger.info("[MCP Protocol] Initializing", {
-      clientName: params.clientInfo.name,
-      clientVersion: params.clientInfo.version,
-      protocolVersion: params.protocolVersion,
+      clientName:
+        typeof typedParams === "object" &&
+        typedParams !== null &&
+        "clientInfo" in typedParams &&
+        typeof typedParams.clientInfo === "object" &&
+        typedParams.clientInfo !== null &&
+        "name" in typedParams.clientInfo
+          ? String(typedParams.clientInfo.name)
+          : "unknown",
+      clientVersion:
+        typeof typedParams === "object" &&
+        typedParams !== null &&
+        "clientInfo" in typedParams &&
+        typeof typedParams.clientInfo === "object" &&
+        typedParams.clientInfo !== null &&
+        "version" in typedParams.clientInfo
+          ? String(typedParams.clientInfo.version)
+          : "unknown",
+      protocolVersion:
+        typeof typedParams === "object" &&
+        typedParams !== null &&
+        "protocolVersion" in typedParams
+          ? String(typedParams.protocolVersion)
+          : "unknown",
     });
 
     // Initialize registry
@@ -195,10 +221,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
   /**
    * Handle tools/list request
    */
-  async handleToolsList(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _params: MCPToolsListParams,
-  ): Promise<MCPToolsListResult> {
+  async handleToolsList(): Promise<MCPToolsListResult> {
     this.logger.info("[MCP Protocol] Listing tools");
 
     // Get full endpoints with field information for proper schema generation
@@ -260,7 +283,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
    * Handle ping request
    */
   // eslint-disable-next-line @typescript-eslint/require-await
-  async handlePing(): Promise<Record<string, never>> {
+  async handlePing(): Promise<{ [key: string]: never }> {
     this.logger.debug("[MCP Protocol] Ping");
     return {};
   }
@@ -270,11 +293,12 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
    */
   private success(
     id: string | number | null,
-
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Response serialization requires 'unknown' for flexible response types
-    result: unknown,
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Response serialization requires 'unknown' for flexible response types
-  ): JsonRpcResponse<unknown> {
+    result:
+      | MCPInitializeResult
+      | MCPToolsListResult
+      | MCPToolCallResult
+      | { [key: string]: never },
+  ): JsonRpcResponse {
     return {
       jsonrpc: "2.0",
       result,
@@ -290,7 +314,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     code: MCPErrorCode,
     message: string,
     data?: Record<string, WidgetData>,
-  ): JsonRpcResponse<unknown> {
+  ): JsonRpcResponse {
     const error: JsonRpcError = {
       code,
       message,

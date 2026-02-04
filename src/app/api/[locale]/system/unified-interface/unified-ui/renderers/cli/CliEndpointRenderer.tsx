@@ -15,25 +15,29 @@
 import { Box, Text } from "ink";
 import type { JSX } from "react";
 import { useState } from "react";
-import type { ZodTypeAny } from "zod";
+import type { Path } from "react-hook-form";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
-import type {
-  FieldUsageConfig,
-  InkWidgetContext,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
+import type { InkWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { InkFormState } from "../../widgets/_shared/cli-types";
-import { isResponseField } from "../../widgets/_shared/type-guards";
-import { hasChildren, isObject } from "../../widgets/_shared/type-guards";
+import {
+  extractAllFields,
+  withValue,
+} from "../../widgets/_shared/field-helpers";
+import { InkWidgetContextProvider } from "../../widgets/_shared/InkWidgetContextProvider";
+import { isObject, isResponseField } from "../../widgets/_shared/type-guards";
+import type {
+  BaseWidgetConfig,
+  FieldUsageConfig,
+  SchemaTypes,
+} from "../../widgets/_shared/types";
 import { InkWidgetRenderer } from "./CliWidgetRenderer";
 import { useCliNavigation } from "./use-cli-navigation";
 
@@ -65,69 +69,11 @@ export interface InkEndpointRendererProps<
   onRenderComplete?: () => void;
   /** Whether this is result-formatter mode (only show response fields) vs interactive mode (show all fields) */
   responseOnly?: boolean;
-}
-
-/**
- * Extract ALL fields from endpoint definition
- * Recursively extracts fields from nested containers
- * (Same logic as React EndpointRenderer)
- *
- * NOTE: Returns heterogeneous array of fields - children type info is lost
- * This is necessary because we can't preserve specific field types from a union
- */
-// Heterogeneous field array - must accept/return `any` for fourth type param
-// oxlint-disable-next-line typescript/no-explicit-any
-function extractAllFields<const TKey extends string>(
-  // oxlint-disable-next-line typescript/no-explicit-any
-  fields: UnifiedField<TKey, ZodTypeAny, FieldUsageConfig, any>,
-  parentPath = "",
-  // oxlint-disable-next-line typescript/no-explicit-any
-): Array<[string, UnifiedField<TKey, ZodTypeAny, FieldUsageConfig, any>]> {
-  if (!fields || typeof fields !== "object") {
-    return [];
-  }
-
-  // Handle object-union fields using proper typing
-  if ("schemaType" in fields && fields.schemaType === "object-union") {
-    const fullPath = parentPath ? `${parentPath}` : "";
-    return fullPath ? [[fullPath, fields]] : [];
-  }
-
-  // Check if this is an object field with children using guards
-  if (!hasChildren(fields)) {
-    return [];
-  }
-
-  const result: Array<
-    // oxlint-disable-next-line typescript/no-explicit-any
-    [string, UnifiedField<TKey, ZodTypeAny, FieldUsageConfig, any>]
-  > = [];
-
-  for (const [fieldName, fieldDef] of Object.entries(fields.children)) {
-    if (typeof fieldDef === "object" && fieldDef !== null) {
-      // Handle object-union fields
-      if ("schemaType" in fieldDef && fieldDef.schemaType === "object-union") {
-        const fullPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
-        result.push([fullPath, fieldDef]);
-      }
-      // Handle object fields with CONTAINER widget type
-      else if (
-        hasChildren(fieldDef) &&
-        "type" in fieldDef &&
-        fieldDef.type === WidgetType.CONTAINER
-      ) {
-        const fullPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
-        result.push([fullPath, fieldDef]);
-      }
-      // Include all other fields
-      else {
-        const fullPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
-        result.push([fullPath, fieldDef]);
-      }
-    }
-  }
-
-  return result;
+  /** Platform identifier for widget rendering context */
+  platform:
+    | typeof Platform.CLI
+    | typeof Platform.CLI_PACKAGE
+    | typeof Platform.MCP;
 }
 
 /**
@@ -145,6 +91,7 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   response,
   onRenderComplete,
   responseOnly = false,
+  platform,
 }: InkEndpointRendererProps<TEndpoint>): JSX.Element {
   // Form state management
   const [formValues, setFormValues] = useState<
@@ -179,10 +126,10 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   // Create render context with CLI-specific form state
   const context: InkWidgetContext<TEndpoint> = {
     locale,
-    isInteractive: true,
+    isInteractive: platform !== Platform.MCP,
     logger,
     user,
-    platform: Platform.CLI,
+    platform,
     endpointFields: endpoint.fields,
     disabled: false,
     response,
@@ -196,39 +143,41 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     isSubmitting,
   };
 
-  // Check if root is a container widget using proper type checking
+  // Check if root is a container/array widget that should render directly
   const isRootContainer =
-    hasChildren(endpoint.fields) &&
-    "type" in endpoint.fields &&
-    (endpoint.fields.type === WidgetType.CONTAINER ||
-      endpoint.fields.type === WidgetType.DATA_LIST ||
-      endpoint.fields.type === WidgetType.DATA_CARDS ||
-      endpoint.fields.type === WidgetType.DATA_TABLE);
+    "schemaType" in endpoint.fields &&
+    (endpoint.fields.schemaType === "object" ||
+      endpoint.fields.schemaType === "object-optional" ||
+      endpoint.fields.schemaType === "widget-object" ||
+      endpoint.fields.schemaType === "array" ||
+      endpoint.fields.schemaType === "array-optional");
+
+  logger.debug(`[InkEndpointRenderer] Rendering endpoint`, {
+    isRootContainer,
+    responseOnly,
+    hasData: !!data,
+    dataKeys:
+      data && typeof data === "object" && !Array.isArray(data)
+        ? Object.keys(data)
+        : [],
+  });
 
   // If root is a container, render it directly (same as React)
-  if (
-    isRootContainer &&
-    "type" in endpoint.fields &&
-    endpoint.fields.type !== undefined
-  ) {
+  if (isRootContainer) {
     // Call onRenderComplete if provided
     if (onRenderComplete) {
       onRenderComplete();
     }
 
-    // Augment root field with data value
-    const rootFieldWithValue = Object.assign({}, endpoint.fields, {
-      value: data,
-    });
-
     return (
-      <Box flexDirection="column">
-        <InkWidgetRenderer
-          fieldName="root"
-          field={rootFieldWithValue}
-          context={context}
-        />
-      </Box>
+      <InkWidgetContextProvider context={context}>
+        <Box flexDirection="column">
+          <InkWidgetRenderer
+            fieldName={"root" as Path<TEndpoint["types"]["RequestOutput"]>}
+            field={withValue(endpoint.fields, data, null)}
+          />
+        </Box>
+      </InkWidgetContextProvider>
     );
   }
 
@@ -257,16 +206,37 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
 
   // Filter visible fields
   const visibleFields = fields.filter(([fieldName, field]) => {
+    // Skip hidden fields
+    const hidden = "hidden" in field && field.hidden === true;
+    if (hidden) {
+      return false;
+    }
+
     // In responseOnly mode (result-formatter), only show response fields with data
     if (responseOnly) {
       if (!isResponseField(field)) {
+        logger.debug(
+          `[InkEndpointRenderer] Filtering out non-response field in responseOnly mode`,
+          {
+            fieldName,
+            hasResponseUsage: (
+              field as BaseWidgetConfig<FieldUsageConfig, SchemaTypes>
+            ).usage.response,
+          },
+        );
         return false;
       }
       const fieldData =
         data && typeof data === "object" && !Array.isArray(data)
           ? data[fieldName]
           : undefined;
-      return fieldData !== null && fieldData !== undefined;
+      const hasData = fieldData !== null && fieldData !== undefined;
+      logger.debug(`[InkEndpointRenderer] Response field check`, {
+        fieldName,
+        hasData,
+        fieldData: hasData ? JSON.stringify(fieldData).slice(0, 100) : "none",
+      });
+      return hasData;
     }
 
     // In interactive mode, show all fields
@@ -287,29 +257,26 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
       {context.t("app.api.system.unifiedInterface.cli.vibe.noFields")}
     </Text>
   ) : (
-    <Box flexDirection="column">
-      {visibleFields
-        .filter(([, field]) => "type" in field && field.type !== undefined)
-        .map(([fieldName, field]) => {
-          let fieldValue: WidgetData = undefined;
-          if (isObject(data)) {
-            fieldValue = data[fieldName];
-          }
+    <InkWidgetContextProvider context={context}>
+      <Box flexDirection="column">
+        {visibleFields
+          .filter(([, field]) => "type" in field && field.type !== undefined)
+          .map(([fieldName, field]) => {
+            const fieldValue: WidgetData = isObject(data)
+              ? data[fieldName]
+              : undefined;
 
-          // Augment field with value from data
-          const fieldWithValue = Object.assign({}, field, {
-            value: fieldValue,
-          });
-
-          return (
-            <InkWidgetRenderer
-              key={fieldName}
-              fieldName={fieldName}
-              field={fieldWithValue}
-              context={context}
-            />
-          );
-        })}
-    </Box>
+            return (
+              <InkWidgetRenderer
+                key={fieldName}
+                fieldName={
+                  fieldName as Path<TEndpoint["types"]["RequestOutput"]>
+                }
+                field={withValue(field, fieldValue, data)}
+              />
+            );
+          })}
+      </Box>
+    </InkWidgetContextProvider>
   );
 }

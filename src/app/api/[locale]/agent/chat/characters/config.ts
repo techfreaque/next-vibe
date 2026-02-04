@@ -3,7 +3,10 @@
  * Centralized character definitions for consistent behavior across the application
  * This file contains default/built-in characters that are read-only
  */
-import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
+import {
+  ModelUtility,
+  type ModelUtilityValue,
+} from "@/app/api/[locale]/agent/models/enum";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -26,6 +29,17 @@ import {
 } from "./enum";
 
 /**
+ * Legacy model selection type for config
+ * Includes unused fields that are kept for backwards compatibility
+ */
+type ConfigModelSelection =
+  | (Omit<FiltersModelSelection, "priceRange"> & {
+      preferredStrengths?: (typeof ModelUtilityValue)[] | null;
+      ignoredWeaknesses?: (typeof ModelUtilityValue)[] | null;
+    })
+  | ManualModelSelection;
+
+/**
  * Character type representing FULL character details
  * Used when:
  * - Defining default characters in config
@@ -36,7 +50,7 @@ import {
  *
  * Excludes database-specific fields like userId, createdAt, updatedAt
  */
-interface Character {
+export interface Character {
   id: string;
   name: TranslationKey;
   tagline: TranslationKey;
@@ -46,12 +60,31 @@ interface Character {
   category: typeof CharacterCategoryValue;
   voice: typeof TtsVoiceValue;
   suggestedPrompts: string[];
-  modelSelection:
-    | Omit<FiltersModelSelection, "priceRange">
-    | ManualModelSelection;
+  modelSelection: ConfigModelSelection;
   ownershipType: typeof CharacterOwnershipTypeValue;
   modelInfo?: string;
   creditCost?: string;
+}
+
+/**
+ * Helper type to get clean model selection without legacy fields
+ */
+export type CleanModelSelection = FiltersModelSelection | ManualModelSelection;
+
+/**
+ * Helper function to convert ConfigModelSelection to CleanModelSelection
+ * Removes legacy fields (preferredStrengths, ignoredWeaknesses)
+ */
+export function toCleanModelSelection(
+  config: ConfigModelSelection,
+): CleanModelSelection {
+  if (config.selectionType === ModelSelectionType.MANUAL) {
+    return config;
+  }
+  // FILTERS - remove legacy fields
+  // oxlint-disable-next-line no-unused-vars
+  const { preferredStrengths, ignoredWeaknesses, ...clean } = config;
+  return clean;
 }
 
 export const NO_CHARACTER_ID = "default";
@@ -73,7 +106,7 @@ export const NO_CHARACTER = {
     speedRange: {},
     preferredStrengths: null,
     ignoredWeaknesses: null,
-  } satisfies Omit<FiltersModelSelection, "priceRange">,
+  },
 };
 
 /**

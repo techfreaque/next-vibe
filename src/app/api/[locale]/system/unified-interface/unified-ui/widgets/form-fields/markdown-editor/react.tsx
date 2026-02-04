@@ -15,6 +15,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import { useWidgetIsInteractive } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
@@ -34,11 +35,12 @@ export function MarkdownEditorWidget<
   TUsage extends FieldUsageConfig,
 >({
   field,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   MarkdownEditorWidgetConfig<TKey, TSchema, TUsage, "primitive">
 >): JSX.Element {
+  const isInteractive = useWidgetIsInteractive();
   const {
     gap = "md",
     inputHeight = "sm",
@@ -106,7 +108,7 @@ export function MarkdownEditorWidget<
     }
   };
 
-  if (!context.isInteractive) {
+  if (!isInteractive) {
     return <Span className={cn("text-foreground", className)}>{value}</Span>;
   }
 

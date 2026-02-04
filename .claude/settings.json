@@ -3,6 +3,8 @@
     "allow": ["Bash(find:*)", "Bash(vibe check:*)", "Bash(git diff:*)"],
     "deny": [
       "Bash(git:*)",
+      "Bash(npx tsc:*)",
+      "Bash(bunx tsc:*)",
       "Bash(bun run build:*)",
       "Bash(vibe build:*)",
       "Bash(npm run build:*)",

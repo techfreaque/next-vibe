@@ -9,27 +9,34 @@ import { useState } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { DateWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
+import {
+  useInkWidgetForm,
+  useInkWidgetResponse,
+  useInkWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
-import type { InkWidgetProps } from "../../_shared/cli-types";
+import { type InkWidgetProps, isInkFormState } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { DateFieldWidgetConfig } from "./types";
 
 export function DateFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
+  TUsage extends FieldUsageConfig,
 >({
   field,
   fieldName,
-  context,
 }: InkWidgetProps<
   TEndpoint,
-  DateFieldWidgetConfig<TKey, DateWidgetSchema, FieldUsageConfig>
+  TUsage,
+  DateFieldWidgetConfig<TKey, DateWidgetSchema, TUsage>
 >): JSX.Element {
-  const { t } = context;
+  const t = useInkWidgetTranslation();
+  const form = useInkWidgetForm();
   const [inputValue, setInputValue] = useState(String(field.value || ""));
 
   // Response mode - just display the value
-  if (context.response) {
+  if (useInkWidgetResponse()) {
     const displayValue =
       field.value instanceof Date
         ? field.value.toISOString().split("T")[0]
@@ -48,7 +55,7 @@ export function DateFieldWidgetInk<
   }
 
   // Request mode - show interactive input
-  if (!context.form || !fieldName) {
+  if (!form || !fieldName) {
     return (
       <Box>
         <Text color="red">
@@ -60,8 +67,20 @@ export function DateFieldWidgetInk<
     );
   }
 
+  if (!isInkFormState(form)) {
+    return (
+      <Box>
+        <Text color="red">
+          {t(
+            "app.api.system.unifiedInterface.cli.widgets.formField.invalidFormType",
+          )}
+        </Text>
+      </Box>
+    );
+  }
+
   const isRequired = !field.schema.isOptional();
-  const error = context.form.errors[fieldName];
+  const errorMessage = form.errors[fieldName];
 
   return (
     <Box flexDirection="column" marginBottom={1}>
@@ -85,16 +104,18 @@ export function DateFieldWidgetInk<
             setInputValue(newValue);
             const date = new Date(newValue);
             if (!Number.isNaN(date.getTime())) {
-              context.form?.setValue(fieldName, date);
+              if (form) {
+                form.setValue(fieldName, date);
+              }
             }
           }}
           placeholder={field.placeholder ? t(field.placeholder) : "YYYY-MM-DD"}
         />
       </Box>
 
-      {error && (
+      {errorMessage && (
         <Box marginTop={0}>
-          <Text color="red">{error}</Text>
+          <Text color="red">{errorMessage}</Text>
         </Box>
       )}
     </Box>

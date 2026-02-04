@@ -86,6 +86,14 @@ export interface TitleWidgetConfig<
   /** Subtitle margin top */
   subtitleGap?: SpacingSize;
 
+  /**
+   * Function to extract a count from data to append to title
+   * Example: "List Leads (42)"
+   * Receives data from parent context (e.g., form values)
+   */
+  // oxlint-disable-next-line typescript/no-explicit-any
+  getCount?: (data: any) => number | undefined;
+
   /** Schema constraint for the field value */
   schema: TSchema;
 }

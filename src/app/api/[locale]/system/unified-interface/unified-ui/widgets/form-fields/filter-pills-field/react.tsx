@@ -23,7 +23,10 @@ import type { JSX } from "react";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { EnumWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import {
+  Icon,
+  type IconKey,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { simpleT } from "@/i18n/core/shared";
 import {
   FormControl,
@@ -34,7 +37,12 @@ import {
 } from "@/packages/next-vibe-ui/web/ui/form/form";
 
 import type { FieldUsageConfig } from "../../_shared/types";
-import { DEFAULT_THEME } from "../_shared/constants";
+import {
+  useWidgetForm,
+  useWidgetLocale,
+  useWidgetTranslation,
+} from "../../_shared/use-widget-context";
+import { getTheme } from "../_shared/constants";
 import { getFieldStyleClassName } from "../_shared/styling";
 import { getFieldValidationState } from "../_shared/validation";
 import type { FilterPillsFieldWidgetConfig } from "./types";
@@ -47,14 +55,16 @@ export function FilterPillsFieldWidget<
 >({
   field,
   fieldName,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   FilterPillsFieldWidgetConfig<TKey, TSchema, TUsage>
 >): JSX.Element {
-  const { t } = context;
+  const t = useWidgetTranslation();
+  const locale = useWidgetLocale();
+  const form = useWidgetForm();
 
-  if (!context.form || !fieldName) {
+  if (!form || !fieldName) {
     return (
       <Div>
         {t(
@@ -64,13 +74,13 @@ export function FilterPillsFieldWidget<
     );
   }
 
-  const { t: globalT } = simpleT(context.locale);
-  const theme = field.theme || DEFAULT_THEME;
+  const { t: globalT } = simpleT(locale);
+  const theme = getTheme(field.theme);
   const isRequired = !field.schema.isOptional();
 
   return (
     <FormField
-      control={context.form.control}
+      control={form.control}
       name={fieldName}
       render={({ field: formField, fieldState }) => {
         const validationState = getFieldValidationState(
@@ -130,42 +140,49 @@ export function FilterPillsFieldWidget<
 
             <FormControl>
               <Div className="flex flex-wrap items-center gap-2">
-                {field.options.map((option) => {
-                  const isSelected = formField.value === option.value;
+                {field.options.map(
+                  (option: {
+                    label: TKey;
+                    value: string | number;
+                    icon?: IconKey;
+                    description?: TKey;
+                  }) => {
+                    const isSelected = formField.value === option.value;
 
-                  return (
-                    <Button
-                      key={`${option.value}`}
-                      type="button"
-                      variant={isSelected ? "default" : "outline"}
-                      onClick={() => {
-                        if (!field.disabled && !field.readonly) {
-                          formField.onChange(option.value);
-                        }
-                      }}
-                      disabled={field.disabled || field.readonly}
-                      size="sm"
-                      className={cn(
-                        "flex items-center gap-1.5 h-9 px-3 transition-all",
-                        !isSelected &&
-                          "hover:border-primary/50 hover:bg-primary/5",
-                      )}
-                    >
-                      {option.icon && (
-                        <Icon
-                          icon={option.icon}
-                          className={cn(
-                            "h-4 w-4",
-                            isSelected && "text-primary-foreground",
-                          )}
-                        />
-                      )}
-                      <Span className="text-xs font-medium">
-                        {t(option.label)}
-                      </Span>
-                    </Button>
-                  );
-                })}
+                    return (
+                      <Button
+                        key={`${option.value}`}
+                        type="button"
+                        variant={isSelected ? "default" : "outline"}
+                        onClick={() => {
+                          if (!field.disabled && !field.readonly) {
+                            formField.onChange(option.value);
+                          }
+                        }}
+                        disabled={field.disabled || field.readonly}
+                        size="sm"
+                        className={cn(
+                          "flex items-center gap-1.5 h-9 px-3 transition-all",
+                          !isSelected &&
+                            "hover:border-primary/50 hover:bg-primary/5",
+                        )}
+                      >
+                        {option.icon && (
+                          <Icon
+                            icon={option.icon}
+                            className={cn(
+                              "h-4 w-4",
+                              isSelected && "text-primary-foreground",
+                            )}
+                          />
+                        )}
+                        <Span className="text-xs font-medium">
+                          {t(option.label)}
+                        </Span>
+                      </Button>
+                    );
+                  },
+                )}
               </Div>
             </FormControl>
 

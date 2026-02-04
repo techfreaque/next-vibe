@@ -5,11 +5,14 @@
 
 import { Box, Text } from "ink";
 import type { JSX } from "react";
-import type { z } from "zod";
 
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
-import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import type {
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+  ObjectChildrenConstraint,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { MetricCardWidgetConfig } from "./types";
@@ -24,41 +27,24 @@ export function MetricCardWidgetInk<
   TKey extends string,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "object" | "object-optional" | "widget-object",
-  TChildren extends Record<
-    string,
-    UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any> // oxlint-disable-line typescript/no-explicit-any
+  TChildren extends ObjectChildrenConstraint<
+    TKey,
+    ConstrainedChildUsage<TUsage>
   >,
 >({
   field,
-  context,
 }: InkWidgetProps<
   TEndpoint,
+  TUsage,
   MetricCardWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
 >): JSX.Element {
-  const { title: titleKey } = field;
-  const { t } = context;
+  const t = useInkWidgetTranslation();
+  const { title: titleKey, change, trend } = field;
 
   const title = titleKey ? t(titleKey) : undefined;
-  const description = field.description ? t(field.description) : undefined;
 
-  // Extract metric data
-  let displayValue: string;
-  let change: number | undefined;
-  let trend: "up" | "down" | undefined;
-
-  if (field.value !== null) {
-    displayValue = String(
-      field.value ?? field.value.metric ?? field.value.count ?? "0",
-    );
-    change =
-      typeof field.value.change === "number" ? field.value.change : undefined;
-    trend =
-      field.value.trend === "up" || field.value.trend === "down"
-        ? field.value.trend
-        : undefined;
-  } else {
-    displayValue = String(field.value ?? "0");
-  }
+  // Extract metric data from config (not from field.value)
+  const displayValue = String(field.value ?? "0");
 
   const trendColor =
     trend === "up" ? "green" : trend === "down" ? "red" : undefined;
@@ -85,7 +71,6 @@ export function MetricCardWidgetInk<
           </Text>
         )}
       </Box>
-      {description && <Text dimColor>{description}</Text>}
     </Box>
   );
 }

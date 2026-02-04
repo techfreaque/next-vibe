@@ -26,11 +26,12 @@ import { Input } from "next-vibe-ui/ui/input";
 import { Progress } from "next-vibe-ui/ui/progress";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
-import React from "react";
+import { useEffect, useMemo } from "react";
 
 import leadsImportDefinitions from "@/app/api/[locale]/leads/import/definition";
 import { useLeadsImportEndpoint } from "@/app/api/[locale]/leads/import/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -46,6 +47,7 @@ interface CsvImportDialogProps {
   onOpenChange: (open: boolean) => void;
   onImportComplete?: (result: ImportResult) => void;
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 export function CsvImportDialog({
@@ -53,17 +55,18 @@ export function CsvImportDialog({
   onOpenChange,
   onImportComplete,
   locale,
+  user,
 }: CsvImportDialogProps): React.JSX.Element {
   const { t } = simpleT(locale);
-  const logger = React.useMemo(
+  const logger = useMemo(
     () => createEndpointLogger(false, Date.now(), locale),
     [locale],
   );
 
-  const endpoint = useLeadsImportEndpoint(logger);
+  const endpoint = useLeadsImportEndpoint(user, logger);
 
   // Handle successful submission
-  React.useEffect(() => {
+  useEffect(() => {
     if (endpoint.create.response?.success && onImportComplete) {
       onImportComplete(endpoint.create.response.data);
       endpoint.setSelectedFile(null);

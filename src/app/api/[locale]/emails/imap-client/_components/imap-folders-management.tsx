@@ -23,13 +23,14 @@ import type { JSX } from "react";
 import { useImapAccountsList } from "@/app/api/[locale]/emails/imap-client/accounts/list/hooks";
 import { useImapFoldersList } from "@/app/api/[locale]/emails/imap-client/folders/list/hooks";
 import { useImapFoldersSync } from "@/app/api/[locale]/emails/imap-client/folders/sync/hooks";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 
 import { ImapFoldersList } from "./imap-folders-list";
 
 interface ImapFoldersManagementProps {
-  logger: EndpointLogger;
+  user: JwtPayloadType;
 }
 
 /**
@@ -37,12 +38,13 @@ interface ImapFoldersManagementProps {
  * Uses useEndpoint for all state management following leads/cron patterns
  */
 export function ImapFoldersManagement({
-  logger,
+  user,
 }: ImapFoldersManagementProps): JSX.Element {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Use endpoints for data management - no local useState
-  const accountsEndpoint = useImapAccountsList(logger);
+  const accountsEndpoint = useImapAccountsList(user, logger);
 
   // Get accounts data for the dropdown
   const accountsResponse = accountsEndpoint.read?.response;
@@ -54,8 +56,8 @@ export function ImapFoldersManagement({
   const selectedAccountId = accounts.length > 0 ? accounts[0].id : "";
 
   // Only initialize folders endpoint if we have an account ID
-  const foldersEndpoint = useImapFoldersList(selectedAccountId, logger);
-  const syncEndpoint = useImapFoldersSync(logger);
+  const foldersEndpoint = useImapFoldersList(user, selectedAccountId, logger);
+  const syncEndpoint = useImapFoldersSync(user, logger);
 
   return (
     <Div className="flex flex-col gap-6">
@@ -126,7 +128,7 @@ export function ImapFoldersManagement({
 
             {/* Folders Display */}
             <Div className="border rounded-lg">
-              <ImapFoldersList accountId={selectedAccountId} logger={logger} />
+              <ImapFoldersList accountId={selectedAccountId} user={user} />
             </Div>
           </Div>
         </CardContent>

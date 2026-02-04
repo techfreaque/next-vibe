@@ -85,6 +85,7 @@ const DEFAULT_THEME: RequiredFieldTheme = {
   showAllRequired: false,
   requiredColor: "blue",
   completedColor: "green",
+  descriptionStyle: "tooltip",
 };
 
 // Constants
@@ -161,6 +162,8 @@ function getFieldStyleClassName(
         "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
       ),
       descriptionClassName: "text-sm text-muted-foreground",
+      inlineDescriptionClassName:
+        "text-sm text-muted-foreground flex items-center gap-2 mt-1",
     };
   }
 
@@ -208,6 +211,10 @@ function getFieldStyleClassName(
           "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
         ),
         descriptionClassName: cn("text-sm", colors.descriptionClassName),
+        inlineDescriptionClassName: cn(
+          "text-sm flex items-center gap-2 mt-1",
+          colors.descriptionClassName,
+        ),
       };
     }
     // Required field without value - enhanced blueish highlight
@@ -256,6 +263,10 @@ function getFieldStyleClassName(
         "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
       ),
       descriptionClassName: cn("text-sm", colors.descriptionClassName),
+      inlineDescriptionClassName: cn(
+        "text-sm flex items-center gap-2 mt-1",
+        colors.descriptionClassName,
+      ),
     };
   }
 
@@ -269,6 +280,8 @@ function getFieldStyleClassName(
       "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
     ),
     descriptionClassName: "text-sm text-muted-foreground",
+    inlineDescriptionClassName:
+      "text-sm text-muted-foreground flex items-center gap-2 mt-1",
   };
 }
 
@@ -705,13 +718,19 @@ export function EndpointFormField<
   config: providedConfig,
   control,
   endpoint,
-  theme = DEFAULT_THEME,
+  theme: partialTheme,
   className,
   style,
   locale,
 }: EndpointFormFieldProps<TKey, TFieldValues, TName, TEndpoint> & {
   style?: React.CSSProperties;
 }): JSX.Element {
+  // Merge partial theme with defaults
+  const theme: RequiredFieldTheme = {
+    ...DEFAULT_THEME,
+    ...partialTheme,
+  };
+
   // Extract from endpoint
   const {
     fields: endpointFields,

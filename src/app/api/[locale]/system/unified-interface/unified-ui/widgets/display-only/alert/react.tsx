@@ -6,6 +6,7 @@ import type { JSX } from "react";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { ReactWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
+import { useWidgetTranslation } from "../../_shared/use-widget-context";
 import type { AlertWidgetConfig, AlertWidgetSchema } from "./types";
 
 /**
@@ -20,21 +21,24 @@ export function AlertWidget<
   props:
     | ReactWidgetProps<
         TEndpoint,
+        TUsage,
         AlertWidgetConfig<TKey, never, TUsage, "widget">
       >
     | ReactWidgetProps<
         TEndpoint,
+        TUsage,
         AlertWidgetConfig<TKey, AlertWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element | null {
-  const { field, context } = props;
+  const t = useWidgetTranslation();
+  const { field } = props;
   const { variant = "default", className, content: hardcodedContent } = field;
 
   let content: string | undefined;
   if (field.value) {
-    content = context.t(field.value);
+    content = t(field.value);
   } else if (hardcodedContent) {
-    content = context.t(hardcodedContent);
+    content = t(hardcodedContent);
   }
 
   if (!content) {

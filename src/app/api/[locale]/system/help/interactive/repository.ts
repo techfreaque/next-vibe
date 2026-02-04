@@ -37,6 +37,7 @@ import {
   splitPath,
 } from "../../unified-interface/shared/utils/path";
 import { SchemaUIHandler } from "../../unified-interface/unified-ui/renderers/cli/response/schema-handler";
+import { getTranslatorFromEndpoint } from "../../unified-interface/unified-ui/widgets/_shared/field-helpers";
 
 /**
  * Interactive session state
@@ -423,9 +424,6 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
   private getTranslatorForRoute(route: CreateApiEndpointAny): {
     t: (key: string) => string;
   } {
-    const {
-      getTranslatorFromEndpoint,
-    } = require("../../unified-interface/shared/widgets/utils/field-helpers");
     return getTranslatorFromEndpoint(route)(this.getSession().locale);
   }
 

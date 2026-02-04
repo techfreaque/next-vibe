@@ -9,6 +9,10 @@ import type { JSX } from "react";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import {
+  useWidgetLocale,
+  useWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { KeyValueWidgetConfig, KeyValueWidgetSchema } from "./types";
 
@@ -36,13 +40,15 @@ export function KeyValueWidget<
   TUsage extends FieldUsageConfig,
 >({
   field,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   KeyValueWidgetConfig<TKey, TSchema, TUsage, "primitive">
 >): JSX.Element {
+  const locale = useWidgetLocale();
+  const t = useWidgetTranslation();
   const { label: labelKey, className } = field;
-  const label = labelKey ? context.t(labelKey) : undefined;
+  const label = labelKey ? t(labelKey) : undefined;
 
   if (
     !field.value ||
@@ -87,11 +93,9 @@ export function KeyValueWidget<
       <Div className="flex flex-wrap gap-3">
         {entries.map(([key, val]) => {
           // Try to translate key, fallback to raw key
-          const translatedKey = key.startsWith("app.") ? context.t(key) : key;
+          const translatedKey = t(key);
           const displayValue =
-            typeof val === "number"
-              ? val.toLocaleString(context.locale)
-              : String(val);
+            typeof val === "number" ? val.toLocaleString(locale) : String(val);
 
           return (
             <Div

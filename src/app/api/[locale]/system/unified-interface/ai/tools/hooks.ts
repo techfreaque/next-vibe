@@ -7,9 +7,13 @@
 
 import { useMemo } from "react";
 
-import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
+import type {
+  EndpointReturn,
+  UseEndpointOptions,
+} from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import definitions from "./definition";
 
@@ -23,27 +27,27 @@ import definitions from "./definition";
  * - Caches results for performance
  */
 export function useAIToolsList(
+  user: JwtPayloadType,
   logger: EndpointLogger,
   params?: {
     enabled?: boolean;
   },
 ): ReturnType<typeof useEndpoint<typeof definitions>> {
-  const queryOptions = useMemo(
-    () => ({
-      enabled: params?.enabled !== false,
-      refetchOnWindowFocus: false,
-      staleTime: 60 * 1000, // 60 seconds
-    }),
+  const queryOptions: UseEndpointOptions<typeof definitions> = useMemo(
+    () =>
+      ({
+        read: {
+          queryOptions: {
+            enabled: params?.enabled !== false,
+            refetchOnWindowFocus: false,
+            staleTime: 60 * 1000, // 60 seconds
+          },
+        },
+      }) satisfies UseEndpointOptions<typeof definitions>,
     [params?.enabled],
   );
 
-  return useEndpoint(
-    definitions,
-    {
-      queryOptions,
-    },
-    logger,
-  );
+  return useEndpoint(definitions, queryOptions, logger, user);
 }
 
 /**

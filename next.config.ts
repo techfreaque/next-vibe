@@ -28,6 +28,12 @@ const nextConfig: NextConfig = {
           "next-vibe": "./src/app/api/[locale]/v1/core",
           "next-vibe-ui": "./src/packages/next-vibe-ui/web",
           "@": "./src",
+          "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter":
+            "./src/app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter.stub.ts",
+          "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer":
+            "./src/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer.stub.tsx",
+          "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointPage":
+            "./src/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointPage.stub.tsx",
         },
         rules: {
           "*.native.tsx": {
@@ -102,8 +108,31 @@ const nextConfig: NextConfig = {
           sourcePath,
           "./packages/next-vibe-ui/web",
         );
+
         // Use absolute paths for better compatibility with Vercel
         config.resolve.alias["@"] = sourcePath;
+
+        // Stub out CLI/MCP renderers to prevent bundling ink dependencies
+        if (isServer) {
+          config.resolve.alias[
+            "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter"
+          ] = path.resolve(
+            sourcePath,
+            "./app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter.stub.ts",
+          );
+          config.resolve.alias[
+            "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer"
+          ] = path.resolve(
+            sourcePath,
+            "./app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer.stub.tsx",
+          );
+          config.resolve.alias[
+            "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointPage"
+          ] = path.resolve(
+            sourcePath,
+            "./app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointPage.stub.tsx",
+          );
+        }
 
         return config;
       },
@@ -128,6 +157,12 @@ const nextConfig: NextConfig = {
     // Drizzle packages (needed for middleware module resolution with Zod v4)
     "drizzle-zod",
     "zod",
+    // cli rendering
+    "ink",
+    "terminal-link",
+    "chalk",
+    "supports-hyperlinks",
+    "module",
   ],
 
   // Ensure WebSocket routes are properly handled

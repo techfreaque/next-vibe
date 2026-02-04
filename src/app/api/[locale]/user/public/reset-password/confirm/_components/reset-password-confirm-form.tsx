@@ -18,7 +18,7 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { FormItem } from "next-vibe-ui/ui/form/form";
-import type { JSX } from "react";
+import { useMemo, type JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useResetPasswordConfirm } from "@/app/api/[locale]/user/public/reset-password/confirm/hooks";
@@ -28,25 +28,27 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import { PasswordStrengthIndicator } from "../../../signup/_components/password-strength-indicator";
 import resetConfirmDefinitions from "@/app/api/[locale]/user/public/reset-password/confirm/definition";
+import type { JwtPayloadType } from "../../../../auth/types";
 
 interface ResetPasswordConfirmFormProps {
   locale: CountryLanguage;
   token: string;
   tokenValidationResponse: ResponseType<ResetPasswordValidateGetResponseOutput>;
+  user: JwtPayloadType;
 }
 
 export default function ResetPasswordConfirmForm({
   locale,
   token,
   tokenValidationResponse,
+  user,
 }: ResetPasswordConfirmFormProps): JSX.Element {
   const { t } = simpleT(locale);
 
   // Initialize logger for client-side operations
-  const logger = createEndpointLogger(
-    envClient.NODE_ENV === Environment.DEVELOPMENT,
-    Date.now(),
-    locale,
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
   );
 
   const {
@@ -57,7 +59,7 @@ export default function ResetPasswordConfirmForm({
     tokenValid,
     alert,
     isSuccess,
-  } = useResetPasswordConfirm(token, tokenValidationResponse, logger);
+  } = useResetPasswordConfirm(token, tokenValidationResponse, logger, user);
 
   // If the token is invalid
   if (tokenValid === false) {

@@ -45,10 +45,10 @@ export const languageConfig = {
 
   mappings: {
     currencyByCountry: {
-      DE: "EUR",
-      PL: "PLN",
-      US: "USD",
-      GLOBAL: "USD",
+      DE: "EUR" as const,
+      PL: "PLN" as const,
+      US: "USD" as const,
+      GLOBAL: "USD" as const,
     },
 
     languageByCountry: {

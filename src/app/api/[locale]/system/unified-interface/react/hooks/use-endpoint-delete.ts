@@ -13,8 +13,10 @@ import { useForm } from "react-hook-form";
 
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
+import { deepMerge } from "./endpoint-utils";
 import type { ApiMutationOptions } from "./types";
 import { type MutationVariables, useApiMutation } from "./use-api-mutation";
 
@@ -32,6 +34,7 @@ import { type MutationVariables, useApiMutation } from "./use-api-mutation";
 export function useEndpointDelete<TEndpoint extends CreateApiEndpointAny>(
   deleteEndpoint: TEndpoint | null,
   logger: EndpointLogger,
+  user: JwtPayloadType,
   options: {
     mutationOptions?: ApiMutationOptions<
       TEndpoint["types"]["RequestOutput"],
@@ -103,11 +106,32 @@ export function useEndpointDelete<TEndpoint extends CreateApiEndpointAny>(
     }
   }, [autoPrefillData, form, logger]);
 
+  // Merge endpoint-level mutation options with hook-level options
+  // Hook-level options take priority
+  const mergedMutationOptions = useMemo(() => {
+    const endpointMutOpts = deleteEndpoint.options?.mutationOptions as
+      | ApiMutationOptions<
+          TEndpoint["types"]["RequestOutput"],
+          TEndpoint["types"]["ResponseOutput"],
+          TEndpoint["types"]["UrlVariablesOutput"]
+        >
+      | undefined;
+    const hookMutOpts = options.mutationOptions as
+      | ApiMutationOptions<
+          TEndpoint["types"]["RequestOutput"],
+          TEndpoint["types"]["ResponseOutput"],
+          TEndpoint["types"]["UrlVariablesOutput"]
+        >
+      | undefined;
+    return deepMerge(endpointMutOpts, hookMutOpts);
+  }, [deleteEndpoint.options?.mutationOptions, options.mutationOptions]);
+
   // Use the existing mutation hook for consistency
   const mutation = useApiMutation(
     deleteEndpoint,
     logger,
-    options.mutationOptions ?? {},
+    user,
+    mergedMutationOptions,
   );
 
   // Create a submit function that calls the mutation

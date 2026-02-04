@@ -8,6 +8,7 @@ import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { EditSmtpAccountForm } from "@/app/api/[locale]/emails/smtp-client/edit/_components/edit-smtp-account-form";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -18,6 +19,7 @@ export default async function EditSmtpAccountPage({
 }): Promise<JSX.Element> {
   const { locale, id } = await params;
   const { t } = simpleT(locale);
+  const user = await requireAdminUser(locale);
 
   return (
     <Div className="flex flex-col gap-6">
@@ -32,7 +34,7 @@ export default async function EditSmtpAccountPage({
       </Div>
 
       {/* Form Component */}
-      <EditSmtpAccountForm locale={locale} accountId={id} />
+      <EditSmtpAccountForm locale={locale} accountId={id} user={user} />
     </Div>
   );
 }

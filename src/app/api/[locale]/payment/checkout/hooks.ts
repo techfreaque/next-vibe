@@ -27,6 +27,7 @@ import type {
   SubscriptionPlanValue,
 } from "../../subscription/enum";
 import { BillingInterval, SubscriptionPlan } from "../../subscription/enum";
+import type { JwtPayloadType } from "../../user/auth/types";
 import { handleCheckoutRedirect } from "../utils/redirect";
 import type {
   CheckoutRequestOutput,
@@ -40,6 +41,7 @@ import checkoutEndpoints from "./definition";
  */
 export function useSubscriptionCheckout(
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): EndpointReturn<typeof checkoutEndpoints> {
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -118,6 +120,7 @@ export function useSubscriptionCheckout(
       },
     },
     logger,
+    user,
   );
 }
 
@@ -125,7 +128,10 @@ export function useSubscriptionCheckout(
  * Hook for subscription checkout with simplified interface
  * Provides a convenience wrapper around the main hook
  */
-export function useCheckout(logger: EndpointLogger): {
+export function useCheckout(
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+): {
   createCheckout: (
     planId: typeof SubscriptionPlanValue,
     billingInterval: typeof BillingIntervalValue,
@@ -134,7 +140,7 @@ export function useCheckout(logger: EndpointLogger): {
   isPending: boolean;
   error: ErrorResponseType | null;
 } {
-  const endpoint = useSubscriptionCheckout(logger);
+  const endpoint = useSubscriptionCheckout(logger, user);
 
   const createCheckout = (
     planId: typeof SubscriptionPlanValue,

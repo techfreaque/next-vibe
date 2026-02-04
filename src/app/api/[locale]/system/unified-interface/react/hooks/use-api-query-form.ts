@@ -15,6 +15,7 @@ import { useForm, type UseFormProps } from "react-hook-form";
 import { extractSchemaDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { buildKey } from "./query-key-builder";
 import type { ApiStore, FormQueryParams } from "./store";
@@ -109,9 +110,11 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   formOptions = { persistForm: true, autoSubmit: true, debounceMs: 500 },
   queryOptions = { enabled: true },
   logger,
+  user,
 }: {
   endpoint: TEndpoint;
   urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
+  user: JwtPayloadType;
   formOptions?: ApiQueryFormOptions<TEndpoint["types"]["RequestOutput"]> & {
     /**
      * Whether to enable form persistence
@@ -442,6 +445,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     requestData: queryParams,
     urlPathParams: urlPathParams,
     logger,
+    user,
     options: {
       ...queryOptions,
       enabled: finalEnabled,

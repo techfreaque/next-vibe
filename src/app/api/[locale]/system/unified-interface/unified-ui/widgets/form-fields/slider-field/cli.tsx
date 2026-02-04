@@ -6,6 +6,7 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type { NumberWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { InkWidgetProps } from "../../_shared/cli-types";
@@ -14,15 +15,16 @@ import type { SliderFieldWidgetConfig } from "./types";
 
 export function SliderFieldWidgetInk<
   TKey extends string,
+  TUsage extends FieldUsageConfig,
   TEndpoint extends CreateApiEndpointAny,
 >({
   field,
-  context,
 }: InkWidgetProps<
   TEndpoint,
-  SliderFieldWidgetConfig<TKey, NumberWidgetSchema, FieldUsageConfig>
+  TUsage,
+  SliderFieldWidgetConfig<TKey, NumberWidgetSchema, TUsage>
 >): JSX.Element {
-  const { t } = context;
+  const t = useInkWidgetTranslation();
   const displayValue =
     field.value !== null && field.value !== undefined ? field.value : "—";
 

@@ -8,6 +8,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import type React from "react";
 
 import { CronStatsClient } from "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/_components/cron-stats-client";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -40,9 +41,10 @@ export default async function CronStatsPage({
   params,
 }: CronStatsPageProps): Promise<React.JSX.Element> {
   const { locale } = await params;
+  const user = await requireAdminUser(locale, `/${locale}/admin/cron/stats`);
   return (
     <Div className="flex flex-col gap-6">
-      <CronStatsClient locale={locale} />
+      <CronStatsClient locale={locale} user={user} />
     </Div>
   );
 }

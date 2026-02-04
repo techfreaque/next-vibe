@@ -19,7 +19,7 @@ import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
 
-import type { FavoriteModelSelection } from "./create/definition";
+import type { FavoriteGetModelSelection } from "./[id]/definition";
 
 /**
  * Favorites Table
@@ -48,8 +48,12 @@ export const chatFavorites = pgTable("chat_favorites", {
   // Custom TTS voice (overrides character voice, null means use character default)
   voice: text("voice").$type<typeof TtsVoiceValue>(),
 
-  // Model selection (stores MANUAL, FILTERS, or CHARACTER_BASED)
-  modelSelection: jsonb("model_selection").$type<FavoriteModelSelection>(),
+  // Model selection (stores only currentSelection part: MANUAL, FILTERS, or CHARACTER_BASED)
+  // We reconstruct full FavoriteGetModelSelection with characterModelSelection on read
+  modelSelection:
+    jsonb("model_selection").$type<
+      FavoriteGetModelSelection["currentSelection"]
+    >(),
   position: integer("position").notNull(),
   color: text("color"),
 

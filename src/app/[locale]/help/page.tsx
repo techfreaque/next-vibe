@@ -14,8 +14,9 @@ import {
   TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/products/repository-client";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
@@ -58,14 +59,14 @@ export default async function ContactPage({
   const { locale } = await params;
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const userResponse = await UserRepository.getUserByAuth(
-    {
-      detailLevel: UserDetailLevel.STANDARD,
-    },
-    locale,
+
+  // Get JWT user for hooks
+  const jwtUser = await AuthRepository.getAuthMinimalUser(
+    [UserRole.PUBLIC, UserRole.CUSTOMER],
+    { platform: Platform.NEXT_PAGE, locale },
     logger,
   );
-  const user = userResponse.success ? userResponse.data : undefined;
+
   const supportEmail = contactClientRepository.getSupportEmail(locale);
 
   // Get pricing data
@@ -110,7 +111,7 @@ export default async function ContactPage({
         </Div>
 
         <Div className="grid md:grid-cols-2 gap-12 mb-16">
-          <ContactForm locale={locale} user={user} />
+          <ContactForm locale={locale} jwtUser={jwtUser} />
           <ContactInfo locale={locale} supportEmail={supportEmail} />
         </Div>
 

@@ -67,8 +67,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
+import { simpleT } from "@/i18n/core/shared";
+import type { TFunction } from "@/i18n/core/static-types";
 
-import type { ModelId } from "../agent/models/models";
+import { getModelById, type ModelId } from "../agent/models/models";
 import { ProductIds, productsRepository } from "../products/repository-client";
 import { payoutRequests } from "../referral/db";
 import { PayoutStatus } from "../referral/enum";
@@ -83,7 +85,6 @@ import {
   CreditPackType,
   type CreditPackTypeValue,
   CreditTransactionType,
-  type CreditTransactionTypeValue,
   CreditTypeIdentifier,
   type CreditTypeIdentifierValue,
 } from "./enum";
@@ -129,8 +130,7 @@ export interface CreditTransactionOutput {
   id: string;
   amount: number;
   balanceAfter: number;
-  type: CreditTransactionTypeValue;
-  modelId: ModelId | null;
+  type: string;
   messageId: string | null;
   createdAt: string;
 }
@@ -1475,10 +1475,10 @@ export class CreditRepository {
    * Max 20 free credits can be spent per pool per period
    * Uses database transaction with row locking to prevent race conditions
    */
-  static async deductCredits(
+  private static async deductCredits(
     identifier: CreditIdentifier,
     amount: number,
-    modelId: ModelId | null,
+    feature: ModelId | "tts" | "stt" | "search" | "stt-hotkey",
     messageId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
@@ -1642,13 +1642,13 @@ export class CreditRepository {
               amount: -deduction,
               balanceAfter: lockedWallet.balance,
               type: CreditTransactionType.USAGE,
-              modelId: modelId ?? undefined,
+              modelId: feature,
               messageId,
               freePeriodId: lockedWallet.freePeriodId,
               metadata: {
                 feature: "credit_usage",
                 cost: amount,
-                modelId: modelId ?? undefined,
+                modelId: feature,
                 messageId,
                 freeCreditsUsed: deduction,
                 packCreditsUsed: 0,
@@ -1720,14 +1720,14 @@ export class CreditRepository {
               amount: -deduction,
               balanceAfter: updatedWallet?.balance || 0,
               type: CreditTransactionType.USAGE,
-              modelId: modelId ?? undefined,
+              modelId: feature,
               messageId,
               packId: pack.id,
               freePeriodId: walletInfo?.freePeriodId || null,
               metadata: {
                 feature: "credit_usage",
                 cost: amount,
-                modelId: modelId ?? undefined,
+                modelId: feature,
                 messageId,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
@@ -1797,14 +1797,14 @@ export class CreditRepository {
               amount: -deduction,
               balanceAfter: updatedWallet?.balance || 0,
               type: CreditTransactionType.USAGE,
-              modelId: modelId ?? undefined,
+              modelId: feature,
               messageId,
               packId: pack.id,
               freePeriodId: walletInfo?.freePeriodId || null,
               metadata: {
                 feature: "credit_usage",
                 cost: amount,
-                modelId: modelId ?? undefined,
+                modelId: feature,
                 messageId,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
@@ -1875,14 +1875,14 @@ export class CreditRepository {
               amount: -deduction,
               balanceAfter: updatedWallet?.balance || 0,
               type: CreditTransactionType.USAGE,
-              modelId: modelId ?? undefined,
+              modelId: feature,
               messageId,
               packId: pack.id,
               freePeriodId: walletInfo?.freePeriodId || null,
               metadata: {
                 feature: "credit_usage",
                 cost: amount,
-                modelId: modelId ?? undefined,
+                modelId: feature,
                 messageId,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
@@ -1944,6 +1944,7 @@ export class CreditRepository {
     limit: number,
     offset: number,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       transactions: CreditTransactionOutput[];
@@ -2064,16 +2065,23 @@ export class CreditRepository {
 
       // Convert count to number (PostgreSQL count returns bigint as string)
       const totalCount = Number(count);
-
-      const result: CreditTransactionOutput[] = transactions.map((t) => ({
-        id: t.id,
-        amount: t.amount,
-        balanceAfter: t.balanceAfter,
-        type: t.type,
-        modelId: t.modelId,
-        messageId: t.messageId,
-        createdAt: t.createdAt.toISOString(),
-      }));
+      const { t } = simpleT(locale);
+      const result: CreditTransactionOutput[] = transactions.map(
+        (transaction) => ({
+          id: transaction.id,
+          amount: transaction.amount,
+          balanceAfter: transaction.balanceAfter,
+          type: transaction.modelId
+            ? `${t(transaction.type)} (${CreditRepository.getFetaureLabel(
+                transaction.modelId,
+                t,
+              )})`
+            : transaction.type,
+          modelId: transaction.modelId,
+          messageId: transaction.messageId,
+          createdAt: transaction.createdAt.toISOString(),
+        }),
+      );
 
       // Add summary entry for other leads' spending if > 0
       if (otherLeadsSpending > 0 && offset === 0) {
@@ -2081,8 +2089,7 @@ export class CreditRepository {
           id: "other-devices-summary",
           amount: -otherLeadsSpending,
           balanceAfter: updatedPool.userWallet.balance,
-          type: CreditTransactionType.OTHER_DEVICES,
-          modelId: null,
+          type: t(CreditTransactionType.OTHER_DEVICES),
           messageId: null,
           createdAt: new Date().toISOString(),
         });
@@ -2101,6 +2108,24 @@ export class CreditRepository {
     }
   }
 
+  private static getFetaureLabel(
+    feature: ModelId | "tts" | "stt" | "search" | "stt-hotkey",
+    t: TFunction,
+  ): string {
+    switch (feature) {
+      case "tts":
+        return t("app.api.credits.repository.tts");
+      case "stt":
+        return t("app.api.credits.repository.stt");
+      case "search":
+        return t("app.api.credits.repository.search");
+      case "stt-hotkey":
+        return t("app.api.credits.repository.sttHotkey");
+      default:
+        return getModelById(feature).name;
+    }
+  }
+
   /**
    * Get transaction history (unified method for route handler)
    * Handles both authenticated users and public users
@@ -2109,6 +2134,7 @@ export class CreditRepository {
     data: CreditsHistoryGetRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CreditsHistoryGetResponseOutput>> {
     const { page, limit } = data.paginationInfo;
     const offset = (page - 1) * limit;
@@ -2120,12 +2146,14 @@ export class CreditRepository {
           limit,
           offset,
           logger,
+          locale,
         )
       : await CreditRepository.getTransactionsByLeadId(
           user.leadId,
           limit,
           offset,
           logger,
+          locale,
         );
 
     if (!result.success) {
@@ -2141,8 +2169,8 @@ export class CreditRepository {
         paginationInfo: {
           page,
           limit,
-          total: result.data.totalCount,
-          totalPages,
+          totalCount: result.data.totalCount,
+          pageCount: totalPages,
         },
       },
       message: result.message,
@@ -2158,6 +2186,7 @@ export class CreditRepository {
     limit: number,
     offset: number,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       transactions: CreditTransactionOutput[];
@@ -2271,25 +2300,28 @@ export class CreditRepository {
 
       // Convert count to number (PostgreSQL count returns bigint as string)
       const totalCount = Number(count);
-
-      const result: CreditTransactionOutput[] = transactions.map((t) => ({
-        id: t.id,
-        amount: t.amount,
-        balanceAfter: t.balanceAfter,
-        type: t.type,
-        modelId: t.modelId,
-        messageId: t.messageId,
-        createdAt: t.createdAt.toISOString(),
-      }));
+      const { t } = simpleT(locale);
+      const result: CreditTransactionOutput[] = transactions.map(
+        (transaction) => ({
+          id: transaction.id,
+          amount: transaction.amount,
+          balanceAfter: transaction.balanceAfter,
+          type: transaction.modelId
+            ? `${t(transaction.type)} (${CreditRepository.getFetaureLabel(transaction.modelId, t)})`
+            : transaction.type,
+          messageId: transaction.messageId,
+          createdAt: transaction.createdAt.toISOString(),
+        }),
+      );
 
       // Add summary entry for other devices' spending if > 0
       if (otherDevicesSpending > 0 && offset === 0) {
+        const { t } = simpleT(locale);
         result.unshift({
           id: "other-devices-summary",
           amount: -otherDevicesSpending,
           balanceAfter: currentWallet.balance,
-          type: "app.api.credits.enums.transactionType.otherDevices",
-          modelId: null,
+          type: t("app.api.credits.enums.transactionType.otherDevices"),
           messageId: null,
           createdAt: new Date().toISOString(),
         });
@@ -2317,6 +2349,7 @@ export class CreditRepository {
     limit: number,
     offset: number,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       transactions: CreditTransactionOutput[];
@@ -2390,12 +2423,12 @@ export class CreditRepository {
 
       // Add summary entry for linked leads' spending if > 0
       if (linkedLeadsSpending > 0 && offset === 0) {
+        const { t } = simpleT(locale);
         result.unshift({
           id: "linked-leads-summary",
           amount: -linkedLeadsSpending,
           balanceAfter: pool.userWallet.balance,
-          type: CreditTransactionType.OTHER_DEVICES,
-          modelId: null,
+          type: t(CreditTransactionType.OTHER_DEVICES),
           messageId: null,
           createdAt: new Date().toISOString(),
         });
@@ -2567,7 +2600,7 @@ export class CreditRepository {
   static async deductCreditsForFeature(
     user: JwtPayloadType,
     cost: number,
-    feature: string,
+    feature: ModelId | "tts" | "stt" | "search" | "stt-hotkey",
     logger: EndpointLogger,
   ): Promise<{ success: boolean; messageId?: string }> {
     if (cost <= 0) {
@@ -2599,7 +2632,7 @@ export class CreditRepository {
       const result = await CreditRepository.deductCredits(
         identifier,
         cost,
-        null, // No specific model for feature-based credits
+        feature,
         creditMessageId,
         logger,
       );
@@ -2764,53 +2797,6 @@ export class CreditRepository {
       return false;
     }
     return balanceResult.data.total >= required;
-  }
-
-  /**
-   * Deduct credits with validation (repository-level business logic)
-   * Moved from BaseCreditHandler to enforce repository-first architecture
-   */
-  static async deductCreditsWithValidation(
-    identifier: CreditIdentifier,
-    amount: number,
-    modelId: ModelId | null,
-    logger: EndpointLogger,
-  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
-    if (!identifier.leadId && !identifier.userId) {
-      logger.error("Credit deduction requires leadId or userId");
-      return {
-        success: false,
-        error: "app.api.credits.errors.missingIdentifier",
-      };
-    }
-
-    const hasSufficient = await CreditRepository.hasSufficientCredits(
-      identifier,
-      amount,
-      logger,
-    );
-    if (!hasSufficient) {
-      return {
-        success: false,
-        error: "app.api.credits.errors.insufficientCredits",
-      };
-    }
-
-    const messageId = CreditRepository.generateMessageId();
-    const result = await CreditRepository.deductCredits(
-      identifier,
-      amount,
-      modelId,
-      messageId,
-      logger,
-    );
-    if (!result.success) {
-      return {
-        success: false,
-        error: "app.api.credits.errors.deductionFailed",
-      };
-    }
-    return { success: true, messageId };
   }
 
   /**

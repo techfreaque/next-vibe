@@ -4,11 +4,14 @@
 
 import { Box, Text } from "ink";
 import type { JSX } from "react";
-import type { z } from "zod";
 
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
-import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import type {
+  AnyChildrenConstrain,
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { PaginationWidgetConfig } from "./types";
@@ -19,19 +22,21 @@ export function PaginationWidgetInk<
   TUsage extends FieldUsageConfig,
   TSchemaType extends "object" | "object-optional" | "widget-object",
   TChildren extends {
-    page: UnifiedField<TKey, z.ZodTypeAny, FieldUsageConfig, any>; // oxlint-disable-line typescript/no-explicit-any;
-    limit: UnifiedField<TKey, z.ZodTypeAny, FieldUsageConfig, any>; // oxlint-disable-line typescript/no-explicit-any;
-    totalCount: UnifiedField<TKey, z.ZodTypeAny, FieldUsageConfig, any>; // oxlint-disable-line typescript/no-explicit-any;
-    pageCount?: UnifiedField<TKey, z.ZodTypeAny, FieldUsageConfig, any>; // oxlint-disable-line typescript/no-explicit-any;
-    offset?: UnifiedField<TKey, z.ZodTypeAny, FieldUsageConfig, any>; // oxlint-disable-line typescript/no-explicit-any;
+    page: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
+    limit: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
+    totalCount: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
+    pageCount?: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
+    offset?: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
   },
->({
-  context,
-}: InkWidgetProps<
-  TEndpoint,
-  PaginationWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
->): JSX.Element {
-  const { t } = context;
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- props not needed
+  _props: InkWidgetProps<
+    TEndpoint,
+    TUsage,
+    PaginationWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
+  >,
+): JSX.Element {
+  const t = useInkWidgetTranslation();
   return (
     <Box>
       <Text dimColor>

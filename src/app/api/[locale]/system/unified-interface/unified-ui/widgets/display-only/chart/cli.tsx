@@ -6,8 +6,11 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import {
+  useInkWidgetLocale,
+  useInkWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 import { simpleT } from "@/i18n/core/shared";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
@@ -22,15 +25,19 @@ export function ChartWidgetInk<
   props:
     | InkWidgetProps<
         TEndpoint,
+        TUsage,
         ChartWidgetConfig<TKey, never, TUsage, "widget">
       >
     | InkWidgetProps<
         TEndpoint,
+        TUsage,
         ChartWidgetConfig<TKey, ChartWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
-  const { field, context } = props;
-  const { t: globalT } = simpleT(context.locale);
+  const { field } = props;
+  const t = useInkWidgetTranslation();
+  const locale = useInkWidgetLocale();
+  const { t: globalT } = simpleT(locale);
   const {
     chartType = "line",
     label: labelKey,
@@ -39,8 +46,8 @@ export function ChartWidgetInk<
   } = field;
 
   const chartTitleKey = labelKey || titleKey;
-  const title = chartTitleKey ? context.t(chartTitleKey) : undefined;
-  const description = descriptionKey ? context.t(descriptionKey) : undefined;
+  const title = chartTitleKey ? t(chartTitleKey) : undefined;
+  const description = descriptionKey ? t(descriptionKey) : undefined;
 
   const chartData = extractChartData(field.value);
 
@@ -90,7 +97,7 @@ export function ChartWidgetInk<
         <Box flexDirection="column" paddingTop={1}>
           {pieData.map((d: ChartDataPoint, idx: number) => {
             const rawLabel = String(d.label ?? d.x ?? "");
-            const translatedLabel = context.t(rawLabel as TranslationKey);
+            const translatedLabel = t(rawLabel);
             const percentage = totalValue > 0 ? (d.y / totalValue) * 100 : 0;
             const barLength = Math.round((percentage / 100) * 30);
             const bar = "█".repeat(Math.max(1, barLength));
@@ -133,7 +140,7 @@ export function ChartWidgetInk<
             )}
             {series.data.map((d: ChartDataPoint, idx: number) => {
               const rawLabel = String(d.label ?? d.x ?? "");
-              const translatedLabel = context.t(rawLabel as TranslationKey);
+              const translatedLabel = t(rawLabel);
               const maxY = Math.max(...series.data.map((p) => p.y), 1);
               const barLength = Math.round((d.y / maxY) * 40);
               const bar =

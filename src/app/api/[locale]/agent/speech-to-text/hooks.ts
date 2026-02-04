@@ -10,6 +10,7 @@ import { useCallback, useRef, useState } from "react";
 
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -19,6 +20,7 @@ interface UseEdenAISpeechOptions {
   onTranscript?: (text: string) => void;
   onError?: (error: string) => void;
   locale: CountryLanguage;
+  user: JwtPayloadType;
   logger: EndpointLogger;
   deductCredits: (creditCost: number, feature: string) => void;
 }
@@ -47,6 +49,7 @@ export function useEdenAISpeech({
   onTranscript,
   onError,
   locale,
+  user,
   logger,
   deductCredits,
 }: UseEdenAISpeechOptions): UseEdenAISpeechReturn {
@@ -70,6 +73,7 @@ export function useEdenAISpeech({
       },
     },
     logger,
+    user,
   );
 
   // Cleanup function

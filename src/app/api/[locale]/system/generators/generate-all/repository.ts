@@ -178,6 +178,48 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         );
       }
 
+      // 1c. Client Route Handlers Generator - Generate route-handlers-client.ts with dynamic imports
+      if (!data.skipEndpoints) {
+        generatorPromises.push(
+          (async (): Promise<string | null> => {
+            try {
+              outputLines.push(
+                "📝 Generating client route handlers (dynamic imports)...",
+              );
+              const { ClientRoutesIndexGeneratorRepository } =
+                await import("../client-routes-index/repository");
+
+              const result =
+                await ClientRoutesIndexGeneratorRepository.generateClientRoutesIndex(
+                  {
+                    outputFile:
+                      "src/app/api/[locale]/system/generated/route-handlers-client.ts",
+                    dryRun: false,
+                  },
+                  logger,
+                );
+
+              if (result.success) {
+                outputLines.push(
+                  "✅ Client route handlers generated successfully",
+                );
+                generatorsRun++;
+                return "client-route-handlers";
+              }
+              outputLines.push(
+                `❌ Client route handlers generation failed: ${result.message || "Unknown error"}`,
+              );
+              return null;
+            } catch (error) {
+              outputLines.push(
+                `❌ Client route handlers generator failed: ${parseError(error).message}`,
+              );
+              return null;
+            }
+          })(),
+        );
+      }
+
       // 2. Seeds Generator - Generate seed index
       if (!data.skipSeeds) {
         generatorPromises.push(
@@ -423,7 +465,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
 
 export const generateAllRepository = new GenerateAllRepositoryImpl();
 
-if (import.meta.main && Bun.main === import.meta.path) {
+if (import.meta.main) {
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
   void generateAllRepository
     .generateAll(

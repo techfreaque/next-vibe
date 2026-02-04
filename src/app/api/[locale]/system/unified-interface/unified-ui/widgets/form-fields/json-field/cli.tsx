@@ -8,6 +8,11 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import {
+  useInkWidgetForm,
+  useInkWidgetResponse,
+  useInkWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { StringWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type { InkWidgetProps } from "../../_shared/cli-types";
@@ -17,21 +22,24 @@ import type { JsonFieldWidgetConfig } from "./types";
 export function JsonFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
+  TUsage extends FieldUsageConfig,
 >({
   field,
   fieldName,
-  context,
 }: InkWidgetProps<
   TEndpoint,
-  JsonFieldWidgetConfig<TKey, StringWidgetSchema, FieldUsageConfig>
+  TUsage,
+  JsonFieldWidgetConfig<TKey, StringWidgetSchema, TUsage>
 >): JSX.Element {
-  const { t } = context;
+  const t = useInkWidgetTranslation();
+  const form = useInkWidgetForm();
+  const response = useInkWidgetResponse();
   const [inputValue, setInputValue] = useState(
     field.value ? JSON.stringify(field.value, null, 2) : "",
   );
 
   // Response mode - just display the value
-  if (context.response) {
+  if (response) {
     const displayValue = field.value
       ? JSON.stringify(field.value, null, 2)
       : "—";
@@ -49,7 +57,7 @@ export function JsonFieldWidgetInk<
   }
 
   // Request mode - show interactive input
-  if (!context.form || !fieldName) {
+  if (!form || !fieldName) {
     return (
       <Box>
         <Text color="red">
@@ -62,7 +70,7 @@ export function JsonFieldWidgetInk<
   }
 
   const isRequired = !field.schema.isOptional();
-  const error = context.form.errors[fieldName];
+  const errorMessage = form?.errors?.[fieldName];
 
   return (
     <Box flexDirection="column" marginBottom={1}>
@@ -86,7 +94,7 @@ export function JsonFieldWidgetInk<
             setInputValue(newValue);
             try {
               const parsed = JSON.parse(newValue);
-              context.form?.setValue(fieldName, parsed);
+              form?.setValue(fieldName, parsed);
             } catch {
               // Invalid JSON, don't update form
             }
@@ -95,9 +103,9 @@ export function JsonFieldWidgetInk<
         />
       </Box>
 
-      {error && (
+      {errorMessage && (
         <Box marginTop={0}>
-          <Text color="red">{error}</Text>
+          <Text color="red">{errorMessage}</Text>
         </Box>
       )}
     </Box>

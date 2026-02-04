@@ -54,6 +54,7 @@ export function AIToolsModal({
     setEnabledTools,
     isToolsModalOpen: open,
     setToolsModalOpen: onOpenChange,
+    user,
   } = useChatContext();
 
   const { t } = simpleT(locale);
@@ -63,7 +64,7 @@ export function AIToolsModal({
   );
 
   // Use the proper hooks pattern to fetch tools
-  const toolsEndpoint = useAIToolsList(logger, {
+  const toolsEndpoint = useAIToolsList(user, logger, {
     enabled: open, // Only fetch when modal is open
   });
 

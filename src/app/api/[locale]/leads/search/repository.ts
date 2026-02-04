@@ -134,7 +134,7 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
     return success({
       response: {
         leads: transformedLeads,
-        total: searchResult.data.paginationInfo.total,
+        total: searchResult.data.paginationInfo.totalCount,
         hasMore,
       },
     });

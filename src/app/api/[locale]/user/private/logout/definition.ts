@@ -9,6 +9,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   responseField,
+  widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -37,33 +38,24 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.user.private.logout.response.title" as const,
-      description: "app.api.user.private.logout.response.description" as const,
+      title: "app.api.user.private.logout.title" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
     { response: true },
     {
-      success: responseField({
-        type: WidgetType.TEXT,
-        content: "app.api.user.private.logout.response.success" as const,
-        schema: z.boolean(),
-      }),
       message: responseField({
-        type: WidgetType.TEXT,
+        type: WidgetType.ALERT,
         content: "app.api.user.private.logout.response.message" as const,
         schema: z.string(),
       }),
-      sessionsCleaned: responseField({
-        type: WidgetType.TEXT,
-        content:
-          "app.api.user.private.logout.response.sessionsCleaned" as const,
-        schema: z.coerce.number(),
-      }),
-      nextSteps: responseField({
-        type: WidgetType.TEXT,
-        content: "app.api.user.private.logout.response.nextSteps" as const,
-        schema: z.array(z.string()),
+      submitButton: widgetField({
+        type: WidgetType.SUBMIT_BUTTON,
+        text: "app.api.user.private.logout.logoutButton" as const,
+        loadingText: "app.api.user.private.logout.loggingOut" as const,
+        icon: "log-out",
+        columns: 12,
+        usage: { response: true },
       }),
     },
   ),
@@ -128,24 +120,10 @@ const { POST } = createEndpoint({
   examples: {
     responses: {
       default: {
-        success: true,
         message: "You have been logged out successfully",
-        sessionsCleaned: 3,
-        nextSteps: [
-          "You can now close this browser tab",
-          "Log in again anytime to access your account",
-          "Consider clearing browser data for additional security",
-        ],
       },
       failed: {
-        success: false,
         message: "Logout failed, but you may already be logged out",
-        sessionsCleaned: 0,
-        nextSteps: [
-          "Try refreshing the page",
-          "Clear your browser cookies and cache",
-          "Contact support if issues persist",
-        ],
       },
     },
   },

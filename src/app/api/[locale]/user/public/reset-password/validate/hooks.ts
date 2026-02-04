@@ -9,6 +9,7 @@ import { useTranslation } from "@/i18n/core/client";
 
 import resetPasswordValidateEndpoint from "./definition";
 import { useApiQuery } from "../../../../system/unified-interface/react/hooks/use-api-query";
+import type { JwtPayloadType } from "../../../auth/types";
 
 /**
  * Hook for validating a password reset token
@@ -27,6 +28,7 @@ import { useApiQuery } from "../../../../system/unified-interface/react/hooks/us
 export function useResetPasswordValidate(
   logger: EndpointLogger,
   token: string,
+  user: JwtPayloadType,
 ): ReturnType<typeof useApiQuery<typeof resetPasswordValidateEndpoint.GET>> {
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -35,6 +37,7 @@ export function useResetPasswordValidate(
     endpoint: resetPasswordValidateEndpoint.GET,
     requestData: { tokenInput: { token } },
     logger,
+    user,
     options: {
       // Only run the query if we have a token
       enabled: !!token,

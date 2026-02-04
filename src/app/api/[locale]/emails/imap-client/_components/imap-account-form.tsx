@@ -7,6 +7,7 @@
 
 import type { JSX } from "react";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { ImapAccountCreateForm } from "./imap-account-create-form";
@@ -14,6 +15,7 @@ import { ImapAccountEditForm } from "./imap-account-edit-form";
 
 interface ImapAccountFormProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
   accountId?: string | null;
   onSuccess: () => void;
   onCancel: () => void;
@@ -25,6 +27,7 @@ interface ImapAccountFormProps {
  */
 export function ImapAccountForm({
   locale,
+  user,
   accountId,
   onSuccess,
   onCancel,
@@ -33,6 +36,7 @@ export function ImapAccountForm({
     return (
       <ImapAccountEditForm
         locale={locale}
+        user={user}
         accountId={accountId}
         onSuccess={onSuccess}
         onCancel={onCancel}
@@ -43,6 +47,7 @@ export function ImapAccountForm({
   return (
     <ImapAccountCreateForm
       locale={locale}
+      user={user}
       onSuccess={onSuccess}
       onCancel={onCancel}
     />

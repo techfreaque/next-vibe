@@ -8,6 +8,10 @@ import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
+import {
+  useInkWidgetLocale,
+  useInkWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import { formatIfDate } from "../text/shared";
@@ -28,14 +32,18 @@ export function TitleWidgetInk<
   props:
     | InkWidgetProps<
         TEndpoint,
+        TUsage,
         TitleWidgetConfig<TKey, never, TUsage, "widget">
       >
     | InkWidgetProps<
         TEndpoint,
+        TUsage,
         TitleWidgetConfig<TKey, TitleWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
-  const { field, context } = props;
+  const { field } = props;
+  const t = useInkWidgetTranslation();
+  const locale = useInkWidgetLocale();
   const { content, level: configLevel, fieldType } = field;
 
   // Level comes from field.ui (config), not from data
@@ -43,19 +51,19 @@ export function TitleWidgetInk<
 
   // Handle static content from UI config
   if (content) {
-    const translatedContent = context.t(content);
+    const translatedContent = t(content);
     return renderTitle(translatedContent, undefined, level);
   }
 
   // Handle date formatting if fieldType is DATE or DATETIME
-  const dateFormatted = formatIfDate(field.value, fieldType, context.locale);
+  const dateFormatted = formatIfDate(field.value, fieldType, locale);
   if (dateFormatted) {
     return renderTitle(dateFormatted, undefined, level);
   }
 
   // value is properly typed from schema - no assertions needed
   // Extract data using shared logic with translation context
-  const data = extractTitleData(field.value, context);
+  const data = extractTitleData(field.value, { t });
 
   // Handle null case
   if (!data) {

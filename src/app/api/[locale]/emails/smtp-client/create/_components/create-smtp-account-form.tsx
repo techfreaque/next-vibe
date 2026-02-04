@@ -18,24 +18,27 @@ import { Link } from "next-vibe-ui/ui/link";
 import React from "react";
 
 import createDefinition from "@/app/api/[locale]/emails/smtp-client/create/definition";
-import { useSmtpAccountCreateEndpoint } from "@/app/api/[locale]/emails/smtp-client/create/hooks";
+import { useSmtpAccountCreate } from "@/app/api/[locale]/emails/smtp-client/create/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface CreateSmtpAccountFormProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 export function CreateSmtpAccountForm({
   locale,
+  user,
 }: CreateSmtpAccountFormProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const router = useRouter();
 
   // Create logger and endpoint
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const endpoint = useSmtpAccountCreateEndpoint(logger);
+  const endpoint = useSmtpAccountCreate(user, logger);
 
   const handleSubmit = endpoint.create.onSubmit;
   const isLoading = endpoint.create.isSubmitting;

@@ -13,8 +13,8 @@ import type { RouteExecutionResult } from "../../../../cli/runtime/route-executo
 import type { InferJwtPayloadTypeFromRoles } from "../../../../shared/endpoints/route/handler";
 import type { EndpointLogger } from "../../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
+import { Platform } from "../../../../shared/types/platform";
 import type { WidgetData } from "../../../../shared/widgets/widget-data";
-import { InkEndpointRenderer } from "../CliEndpointRenderer";
 import { CliErrorFormatter } from "./error-formatter";
 import { renderToString as fastRenderToString } from "./fast-ink-renderer/renderer";
 
@@ -67,7 +67,7 @@ export class CliResultFormatter {
         default:
           // Render with Ink if endpoint available, else JSON fallback
           if (endpoint) {
-            output += CliResultFormatter.renderWithEndpoint(
+            output += await CliResultFormatter.renderWithEndpoint(
               result.data,
               endpoint,
               locale,
@@ -93,18 +93,20 @@ export class CliResultFormatter {
    * Render data using endpoint definition
    * Uses fast renderer with hook support
    */
-  private static renderWithEndpoint(
+  private static async renderWithEndpoint(
     data: WidgetData,
     endpoint: CreateApiEndpointAny,
     locale: CountryLanguage,
     logger: EndpointLogger,
     user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
-  ): string {
+  ): Promise<string> {
     try {
       const perfStart = performance.now();
 
       // Create component
       const createStart = performance.now();
+      const { InkEndpointRenderer } =
+        await import("@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer");
       const component = createElement(InkEndpointRenderer, {
         endpoint,
         locale,
@@ -113,6 +115,7 @@ export class CliResultFormatter {
         user,
         response: { success: true, data },
         responseOnly: true,
+        platform: Platform.CLI,
       });
       const componentTime = performance.now() - createStart;
 

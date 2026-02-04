@@ -39,26 +39,26 @@ const platform = {
 // Module registry for introspection
 export const envModules = {
   agent: { env: agentEnv, schema: agentEnvSchema },
-  serverSystem: { env: serverSystemEnv, schema: serverSystemEnvSchema },
-  cli: { env: cliEnv, schema: cliEnvSchema },
-  hosting: { env: hostingEnv, schema: hostingEnvSchema },
-  sms: { env: smsEnv, schema: smsEnvSchema },
-  leadsCampaigns: { env: leadsCampaignsEnv, schema: leadsCampaignsEnvSchema },
-  payment: { env: paymentEnv, schema: paymentEnvSchema },
   email: { env: emailEnv, schema: emailEnvSchema },
   imap: { env: imapClientEnv, schema: imapClientEnvSchema },
+  leadsCampaigns: { env: leadsCampaignsEnv, schema: leadsCampaignsEnvSchema },
+  payment: { env: paymentEnv, schema: paymentEnvSchema },
+  sms: { env: smsEnv, schema: smsEnvSchema },
+  hosting: { env: hostingEnv, schema: hostingEnvSchema },
+  serverSystem: { env: serverSystemEnv, schema: serverSystemEnvSchema },
+  cli: { env: cliEnv, schema: cliEnvSchema },
 } as const;
 
 // Combined schema using merge
 export const envSchema = agentEnvSchema
-  .merge(serverSystemEnvSchema)
-  .merge(cliEnvSchema)
-  .merge(hostingEnvSchema)
-  .merge(smsEnvSchema)
+  .merge(emailEnvSchema)
+  .merge(imapClientEnvSchema)
   .merge(leadsCampaignsEnvSchema)
   .merge(paymentEnvSchema)
-  .merge(emailEnvSchema)
-  .merge(imapClientEnvSchema);
+  .merge(smsEnvSchema)
+  .merge(hostingEnvSchema)
+  .merge(serverSystemEnvSchema)
+  .merge(cliEnvSchema);
 
 export type Env = z.infer<typeof envSchema>;
 

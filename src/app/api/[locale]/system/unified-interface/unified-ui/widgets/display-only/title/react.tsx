@@ -17,6 +17,12 @@ import {
   getTextSizeClassName,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import {
+  useWidgetLocale,
+  useWidgetLogger,
+  useWidgetResponse,
+  useWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import { formatIfDate } from "../text/shared";
@@ -71,14 +77,20 @@ export function TitleWidget<
   props:
     | ReactWidgetProps<
         TEndpoint,
-        TitleWidgetConfig<TKey, never, TUsage, "widget">
+        TUsage,
+        TitleWidgetConfig<TKey, TitleWidgetSchema, TUsage, "primitive">
       >
     | ReactWidgetProps<
         TEndpoint,
-        TitleWidgetConfig<TKey, TitleWidgetSchema, TUsage, "primitive">
+        TUsage,
+        TitleWidgetConfig<TKey, never, TUsage, "widget">
       >,
 ): JSX.Element {
-  const { field, context } = props;
+  const { field } = props;
+  const locale = useWidgetLocale();
+  const t = useWidgetTranslation();
+  const response = useWidgetResponse();
+  const logger = useWidgetLogger();
   const {
     content,
     level: configLevel,
@@ -87,6 +99,7 @@ export function TitleWidget<
     size,
     gap,
     subtitleGap,
+    getCount,
     className,
   } = field;
 
@@ -95,9 +108,25 @@ export function TitleWidget<
   const gapClass = getSpacingClassName("gap", gap);
   const subtitleGapClass = getSpacingClassName("margin", subtitleGap) || "mt-2";
 
+  // Calculate count if getCount function is provided
+  let countValue: number | undefined;
+  if (getCount && response) {
+    try {
+      // Pass response data which contains response fields like paginationInfo
+      countValue = getCount(response);
+    } catch (error) {
+      // Silently ignore errors in getCount
+      logger.warn(`Error in getCount function: ${error}`);
+    }
+  }
+
   // Handle static content from UI config
   if (content) {
-    const translatedContent = context.t(content);
+    const baseContent = t(content);
+    // Append count if available
+    const translatedContent =
+      countValue !== undefined ? `${baseContent} (${countValue})` : baseContent;
+
     const level = configLevel ?? 2;
     const alignmentClass = getAlignmentClass(textAlign);
 
@@ -122,7 +151,7 @@ export function TitleWidget<
   }
 
   // Handle date formatting if fieldType is DATE or DATETIME
-  const dateFormatted = formatIfDate(field.value, fieldType, context.locale);
+  const dateFormatted = formatIfDate(field.value, fieldType, locale);
   if (dateFormatted) {
     const level = configLevel ?? 2;
     const alignmentClass = getAlignmentClass(textAlign);
@@ -138,7 +167,7 @@ export function TitleWidget<
 
   // value is properly typed from schema - no assertions needed
   // Extract data using shared logic with translation context
-  const data = extractTitleData(field.value, context);
+  const data = extractTitleData(field.value, { t });
 
   if (!data) {
     return (

@@ -5,6 +5,7 @@
 import { useMemo } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type {
@@ -33,6 +34,7 @@ import { useApiQueryForm } from "./use-api-query-form";
 export function useEndpointFilter<TEndpoint extends CreateApiEndpointAny>(
   filterEndpoint: TEndpoint | null,
   logger: EndpointLogger,
+  user: JwtPayloadType,
   options: {
     formOptions?: ApiQueryFormOptions<TEndpoint["types"]["RequestOutput"]>;
     queryOptions?: ApiQueryOptions<
@@ -104,6 +106,7 @@ export function useEndpointFilter<TEndpoint extends CreateApiEndpointAny>(
     queryOptions: enhancedQueryOptions,
     formOptions: enhancedFormOptions,
     logger: logger,
+    user,
   });
 
   return queryFormResult;

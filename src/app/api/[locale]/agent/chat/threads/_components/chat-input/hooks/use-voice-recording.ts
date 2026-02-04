@@ -8,6 +8,7 @@ import { useCallback, useRef } from "react";
 
 import { useEdenAISpeech } from "@/app/api/[locale]/agent/speech-to-text/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 /** Voice input mode - determines what happens after recording stops */
@@ -24,6 +25,8 @@ interface UseVoiceRecordingOptions {
   onSubmitAudio?: (file: File) => void | Promise<void>;
   /** Callback for deducting credits */
   deductCredits: (amount: number, feature: string) => void;
+  /** User */
+  user: JwtPayloadType;
   /** Logger instance */
   logger: EndpointLogger;
   /** User locale */
@@ -67,6 +70,7 @@ export function useVoiceRecording({
   onSubmitText,
   onSubmitAudio,
   deductCredits,
+  user,
   logger,
   locale,
 }: UseVoiceRecordingOptions): UseVoiceRecordingReturn {
@@ -102,6 +106,7 @@ export function useVoiceRecording({
       logger.error("Voice input error", err);
     },
     locale,
+    user,
     logger,
     deductCredits,
   });

@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/i18n/core/client";
 
 import { useApiForm } from "../../../../system/unified-interface/react/hooks/use-api-mutation-form";
+import type { JwtPayloadType } from "../../../auth/types";
 import passwordEndpoints from "./definition";
 
 /**
@@ -13,6 +14,7 @@ import passwordEndpoints from "./definition";
  */
 export function useUpdatePassword(
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): ApiFormReturn<
   (typeof passwordEndpoints.POST)["types"]["RequestOutput"],
   (typeof passwordEndpoints.POST)["types"]["ResponseOutput"],
@@ -21,29 +23,24 @@ export function useUpdatePassword(
   const { toast } = useToast();
   const { t } = useTranslation();
 
-  return useApiForm(
-    passwordEndpoints.POST,
-    logger,
-    {},
-    {
-      onSuccess: () => {
-        toast({
-          title: t("app.api.user.private.me.password.update.success.title"),
-          description: t(
-            "app.api.user.private.me.password.update.success.description",
-          ),
-          variant: "default",
-        });
-      },
-      onError: ({ error }) => {
-        toast({
-          title: t(
-            "app.api.user.private.me.password.update.errors.unknown.title",
-          ),
-          description: error.message,
-          variant: "destructive",
-        });
-      },
+  return useApiForm(passwordEndpoints.POST, logger, user, undefined, {
+    onSuccess: () => {
+      toast({
+        title: t("app.api.user.private.me.password.update.success.title"),
+        description: t(
+          "app.api.user.private.me.password.update.success.description",
+        ),
+        variant: "default",
+      });
     },
-  );
+    onError: ({ error }) => {
+      toast({
+        title: t(
+          "app.api.user.private.me.password.update.errors.unknown.title",
+        ),
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 }

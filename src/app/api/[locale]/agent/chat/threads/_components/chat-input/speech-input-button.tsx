@@ -20,6 +20,7 @@ import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useEdenAISpeech } from "@/app/api/[locale]/agent/speech-to-text/hooks";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -28,6 +29,7 @@ interface SpeechInputButtonProps {
   onTranscript?: (text: string) => void;
   disabled?: boolean;
   locale: CountryLanguage;
+  user: JwtPayloadType;
   className?: string;
   logger: EndpointLogger;
   dataTour?: string;
@@ -37,6 +39,7 @@ export function SpeechInputButton({
   onTranscript: customOnTranscript,
   disabled = false,
   locale,
+  user,
   className,
   logger,
   dataTour,
@@ -70,6 +73,7 @@ export function SpeechInputButton({
       logger.error("app.chat.speech.error", err);
     },
     locale,
+    user,
     logger,
     deductCredits,
   });

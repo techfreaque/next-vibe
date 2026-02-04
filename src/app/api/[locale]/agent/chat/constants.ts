@@ -30,21 +30,14 @@ export const STORAGE_KEYS = {
  * Chat system constraints and limits
  */
 export const CHAT_CONSTANTS = {
-  /** Maximum message content length */
-  MAX_MESSAGE_LENGTH: 10000,
-
-  /** Maximum thread title length */
-  MAX_THREAD_TITLE_LENGTH: 200,
-
-  /** Maximum folder name length */
-  MAX_FOLDER_NAME_LENGTH: 100,
-
   /** Default thread title translation key */
   DEFAULT_THREAD_TITLE: "app.chat.common.newChat",
-
-  /** Maximum depth for message threading/branching */
-  MAX_MESSAGE_DEPTH: 10,
 } as const;
+
+/**
+ * Agent message content length limit
+ */
+export const AGENT_MESSAGE_LENGTH = 10000;
 
 /**
  * Default AI tools enabled for new chats

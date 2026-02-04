@@ -13,19 +13,25 @@ import {
 } from "next-vibe-ui/ui/table";
 import type { JSX } from "react";
 import { useState } from "react";
-import type { z } from "zod";
 
 import { simpleT } from "@/i18n/core/shared";
 
-import type { UnifiedField } from "../../../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
-import { WidgetRenderer } from "../../../renderers/react/WidgetRenderer";
+import type { WidgetData } from "../../../../shared/widgets/widget-data";
+import { MultiWidgetRenderer } from "../../../renderers/react/MultiWidgetRenderer";
+import { getFieldLabel } from "../../_shared/field-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
+import { hasChild } from "../../_shared/type-guards";
 import type {
   ArrayChildConstraint,
   ConstrainedChildUsage,
   FieldUsageConfig,
+  ObjectChildrenConstraint,
 } from "../../_shared/types";
+import {
+  useWidgetLocale,
+  useWidgetTranslation,
+} from "../../_shared/use-widget-context";
 import type { DataTableWidgetConfig } from "./types";
 
 /**
@@ -50,16 +56,20 @@ export const DataTableWidget = <
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "array" | "array-optional",
-  TChild extends ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>,
+  TSchemaType extends "array" | "array-optional" | "object" | "object-optional",
+  TChildOrChildren extends
+    | ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>
+    | ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>,
 >({
   field,
-  context,
+  fieldName,
 }: ReactWidgetProps<
   TEndpoint,
-  DataTableWidgetConfig<TKey, TUsage, TSchemaType, TChild>
+  DataTableWidgetConfig<TKey, TUsage, TSchemaType, TChildOrChildren>
 >): JSX.Element => {
-  const { t: globalT } = simpleT(context.locale);
+  const locale = useWidgetLocale();
+  const t = useWidgetTranslation();
+  const { t: globalT } = simpleT(locale);
   const { sorting } = field;
 
   const initialSort = sorting?.defaultSort?.[0];
@@ -68,7 +78,31 @@ export const DataTableWidget = <
     initialSort?.direction ?? "asc",
   );
 
-  if (!field.value.length) {
+  // Resolve field definitions and rows via guards
+  let fieldDefinitions: ObjectChildrenConstraint<
+    TKey,
+    ConstrainedChildUsage<TUsage>
+  > = {};
+  let rows: Array<Record<string, WidgetData>> = [];
+
+  if (hasChild(field)) {
+    const child = field.child;
+    if (
+      typeof child === "object" &&
+      child !== null &&
+      "children" in child &&
+      child.children &&
+      typeof child.children === "object"
+    ) {
+      fieldDefinitions = child.children;
+    }
+    rows = field.value.filter(
+      (row: WidgetData): row is Record<string, WidgetData> =>
+        Boolean(row) && typeof row === "object" && !Array.isArray(row),
+    );
+  }
+
+  if (!rows.length) {
     return (
       <Div className={cn("text-muted-foreground italic", field.className)}>
         {globalT(
@@ -76,18 +110,6 @@ export const DataTableWidget = <
         )}
       </Div>
     );
-  }
-
-  const rows = field.value;
-
-  let fieldDefinitions: Record<
-    string,
-    UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any> // oxlint-disable-line typescript/no-explicit-any
-  > = {};
-
-  const childField = field.child;
-  if (childField) {
-    fieldDefinitions = childField.children;
   }
 
   const handleSort = (columnKey: string): void => {
@@ -129,23 +151,7 @@ export const DataTableWidget = <
         <TableHeader className="bg-gray-50 dark:bg-gray-800">
           <TableRow>
             {Object.entries(fieldDefinitions).map(([key, fieldDef]) => {
-              let label = key;
-              if (fieldDef) {
-                if (typeof fieldDef.label === "string") {
-                  label = context.t(fieldDef.label);
-                } else if (
-                  "content" in fieldDef &&
-                  typeof fieldDef.content === "string"
-                ) {
-                  label = context.t(fieldDef.content);
-                } else if (
-                  "text" in fieldDef &&
-                  typeof fieldDef.text === "string"
-                ) {
-                  label = context.t(fieldDef.text);
-                }
-              }
-
+              const label = getFieldLabel(fieldDef, key, t);
               const isSortable = sorting?.enabled !== false;
 
               return (
@@ -191,37 +197,44 @@ export const DataTableWidget = <
           </TableRow>
         </TableHeader>
         <TableBody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
-          {sortedRows.map((row, rowIndex: number) => {
-            return (
-              <TableRow
-                key={rowIndex}
-                className="hover:bg-gray-50 dark:hover:bg-gray-800"
-              >
-                {Object.entries(fieldDefinitions).map(([key, fieldDef]) => {
-                  const cellValue = row[key];
+          <MultiWidgetRenderer
+            childrenSchema={hasChild(field) ? field.child : undefined}
+            value={sortedRows}
+            fieldName={fieldName}
+            renderItem={({ itemData, index }) => {
+              const row = itemData as Record<string, WidgetData>;
 
-                  return (
-                    <TableCell
-                      key={key}
-                      className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100"
-                    >
-                      {fieldDef ? (
-                        <WidgetRenderer
-                          data={cellValue}
-                          field={fieldDef}
-                          context={context}
-                        />
-                      ) : (
-                        <Span className="text-gray-600 dark:text-gray-400">
-                          {`${cellValue ?? "—"}`}
-                        </Span>
-                      )}
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            );
-          })}
+              return (
+                <TableRow
+                  key={index}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                >
+                  {Object.entries(fieldDefinitions).map(([key, fieldDef]) => {
+                    const cellValue = row[key];
+
+                    return (
+                      <TableCell
+                        key={key}
+                        className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100"
+                      >
+                        {fieldDef ? (
+                          <MultiWidgetRenderer
+                            childrenSchema={{ [key]: fieldDef }}
+                            value={row}
+                            fieldName={undefined}
+                          />
+                        ) : (
+                          <Span className="text-gray-600 dark:text-gray-400">
+                            {`${cellValue ?? "—"}`}
+                          </Span>
+                        )}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              );
+            }}
+          />
         </TableBody>
       </Table>
     </Div>

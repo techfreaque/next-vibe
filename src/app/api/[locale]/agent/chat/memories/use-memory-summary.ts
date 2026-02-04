@@ -4,6 +4,7 @@ import { useMemo } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { JwtPayloadType } from "../../../user/auth/types";
 import { formatMemorySummary } from "./formatter";
 import { useMemories } from "./hooks";
 
@@ -16,18 +17,18 @@ import { useMemories } from "./hooks";
  */
 export function useMemorySummary(params: {
   enabled: boolean;
-  userId: string | undefined;
+  user: JwtPayloadType;
   logger: EndpointLogger;
 }): {
   memorySummary: string;
   isLoading: boolean;
   error: string | null;
 } {
-  const { enabled, userId, logger } = params;
+  const { enabled, user, logger } = params;
 
   // Use proper endpoint hook - only fetches when enabled AND user is authenticated
-  const shouldFetch = enabled && !!userId;
-  const memoriesEndpoint = useMemories({ enabled: shouldFetch }, logger);
+  const shouldFetch = enabled && !user.isPublic;
+  const memoriesEndpoint = useMemories({ enabled: shouldFetch }, user, logger);
 
   // Format memories using shared formatter (DRY - same logic as backend)
   const memorySummary = useMemo(() => {

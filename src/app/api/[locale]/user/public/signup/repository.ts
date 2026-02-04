@@ -39,6 +39,7 @@ import type {
   SignupPostRequestOutput,
   SignupPostResponseOutput,
 } from "./definition";
+import type { NewUser } from "../../db";
 
 /**
  * Signup repository interface
@@ -89,14 +90,13 @@ export class SignupRepositoryImpl implements SignupRepository {
 
     try {
       // Extract fields from flat structure
-      const formCard = data.formCard;
-      const email = formCard.email;
-      const password = formCard.password;
-      const confirmPassword = formCard.confirmPassword;
-      const privateName = formCard.privateName;
-      const publicName = formCard.publicName;
-      const subscribeToNewsletter = formCard.subscribeToNewsletter ?? false;
-      const referralCode = formCard.referralCode;
+      const email = data.email;
+      const password = data.password;
+      const confirmPassword = data.confirmPassword;
+      const privateName = data.privateName;
+      const publicName = data.publicName;
+      const subscribeToNewsletter = data.subscribeToNewsletter ?? false;
+      const referralCode = data.referralCode;
 
       logger.debug("Registering new user", { email });
 
@@ -302,7 +302,7 @@ export class SignupRepositoryImpl implements SignupRepository {
         message: "app.api.user.public.signup.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
-          email: data.formCard?.email ?? "unknown",
+          email: data.email ?? "unknown",
           error: parsedError.message,
         },
       });
@@ -341,12 +341,14 @@ export class SignupRepositoryImpl implements SignupRepository {
       } = userInput;
 
       // Create user data object
-      const userData = {
+      const userData: NewUser = {
         email,
         password,
         privateName,
         publicName,
         locale,
+        marketingConsent: subscribeToNewsletter,
+        isActive: true,
       };
 
       // Create new user with generated ID
@@ -407,15 +409,6 @@ export class SignupRepositoryImpl implements SignupRepository {
         locale,
         logger,
       );
-
-      // Handle newsletter subscription if user opted in
-      if (subscribeToNewsletter) {
-        // Newsletter subscription temporarily disabled during repository migration
-        logger.debug(
-          "Newsletter subscription requested but temporarily disabled",
-          { email },
-        );
-      }
 
       return success(userResponse.data);
     } catch (error) {

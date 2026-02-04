@@ -8,14 +8,10 @@ import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { FieldUsageConfig } from "../../_shared/types";
-import {
-  extractBadgeData,
-  findEnumLabel,
-  getBadgeColor,
-  mapSemanticVariantToBadgeVariant,
-} from "./shared";
+import { extractBadgeData, findEnumLabel, getBadgeColor } from "./shared";
 import type { BadgeWidgetConfig, BadgeWidgetSchema } from "./types";
 
 /**
@@ -32,22 +28,23 @@ export function BadgeWidgetInk<
   props:
     | InkWidgetProps<
         TEndpoint,
+        TUsage,
         BadgeWidgetConfig<TKey, never, TUsage, "widget">
       >
     | InkWidgetProps<
         TEndpoint,
+        TUsage,
         BadgeWidgetConfig<TKey, BadgeWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
-  const { field, context } = props;
+  const { field } = props;
+  const t = useInkWidgetTranslation();
   const { text: staticText, enumOptions, variant: semanticVariant } = field;
 
   // Handle static text from UI config
   if (staticText) {
-    const translatedText = context.t(staticText);
-    const variant = semanticVariant
-      ? mapSemanticVariantToBadgeVariant(semanticVariant)
-      : "default";
+    const translatedText = t(staticText);
+    const variant = semanticVariant || "default";
     const color = getBadgeColor(variant);
 
     return <Text color={color}>{translatedText}</Text>;
@@ -55,11 +52,9 @@ export function BadgeWidgetInk<
 
   // Handle enum options - find matching label for value
   if (enumOptions) {
-    const enumLabel = findEnumLabel(field.value, enumOptions, context);
+    const enumLabel = findEnumLabel(field.value, enumOptions, t);
     if (enumLabel) {
-      const variant = semanticVariant
-        ? mapSemanticVariantToBadgeVariant(semanticVariant)
-        : "default";
+      const variant = semanticVariant || "default";
       const color = getBadgeColor(variant);
 
       return <Text color={color}>{enumLabel}</Text>;
@@ -67,7 +62,7 @@ export function BadgeWidgetInk<
   }
 
   // Extract data using shared logic with translation context
-  const data = extractBadgeData(field.value, context);
+  const data = extractBadgeData(field.value, { t });
 
   // Handle null/empty case
   if (!data) {
@@ -75,9 +70,7 @@ export function BadgeWidgetInk<
   }
 
   // Apply semantic variant if configured, otherwise use data variant
-  const variant = semanticVariant
-    ? mapSemanticVariantToBadgeVariant(semanticVariant)
-    : data.variant;
+  const variant = semanticVariant || data.variant;
   const color = getBadgeColor(variant);
 
   // Build badge text with icon if available

@@ -252,6 +252,24 @@ export function OverviewTab({
                 <Div className="flex justify-between p-2 rounded bg-accent">
                   <Span>
                     {t(
+                      "app.subscription.subscription.overview.costs.features.fetchUrlLabel",
+                    )}
+                  </Span>
+                  <Span className="font-mono">
+                    {t(
+                      "app.subscription.subscription.overview.costs.features.costFormat",
+                      {
+                        value: FEATURE_COSTS.FETCH_URL_CONTENT,
+                        unit: t(
+                          "app.subscription.subscription.overview.costs.features.creditsUnit",
+                        ),
+                      },
+                    )}
+                  </Span>
+                </Div>
+                <Div className="flex justify-between p-2 rounded bg-accent">
+                  <Span>
+                    {t(
                       "app.subscription.subscription.overview.costs.features.ttsLabel",
                     )}
                   </Span>

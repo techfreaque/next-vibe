@@ -4,10 +4,14 @@
  * Used for non-authenticated users
  */
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 
-import type { LocalStorageCallbacks } from "../../../system/unified-interface/react/hooks/endpoint-types";
-import { defaultModel } from "../../models/models";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "../../../user/auth/types";
+import { defaultModel, type ModelId } from "../../models/models";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import { DEFAULT_TOOL_CONFIRMATION_IDS, DEFAULT_TOOL_IDS } from "../constants";
 import { ViewMode } from "../enum";
@@ -15,7 +19,6 @@ import type {
   ChatSettingsGetResponseOutput,
   ChatSettingsUpdateRequestOutput,
 } from "./definition";
-import type settingsDefinition from "./definition";
 
 /**
  * Storage key for chat settings
@@ -28,22 +31,43 @@ const STORAGE_KEY = "chat-settings-v3";
  */
 export class ChatSettingsRepositoryClient {
   /**
-   * Static localStorage callbacks for useEndpoint hook
-   * Handles read (GET) and create (POST) operations for non-authenticated users
+   * Get settings (mirrors server getSettings)
    */
-  static readonly localStorageCallbacks: LocalStorageCallbacks<
-    typeof settingsDefinition
-  > = {
-    read: async () => {
-      const settings = ChatSettingsRepositoryClient.loadLocalSettings();
+  static async getSettings(
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ChatSettingsGetResponseOutput>> {
+    try {
+      const settings = this.loadLocalSettings();
+      logger.debug("Loaded settings from localStorage");
       return success(settings);
-    },
+    } catch (error) {
+      logger.error(
+        "Failed to load settings",
+        error instanceof Error ? error : new Error(String(error)),
+      );
+      return success(this.getDefaults());
+    }
+  }
 
-    create: async (params) => {
-      ChatSettingsRepositoryClient.updateLocalSettings(params.requestData);
+  /**
+   * Update settings (mirrors server updateSettings)
+   */
+  static async updateSettings(
+    data: ChatSettingsUpdateRequestOutput,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<never>> {
+    try {
+      this.updateLocalSettings(data);
+      logger.debug("Updated settings in localStorage");
       return success();
-    },
-  };
+    } catch (error) {
+      logger.error(
+        "Failed to update settings",
+        error instanceof Error ? error : new Error(String(error)),
+      );
+      return success();
+    }
+  }
 
   /**
    * Get default values - shared between client and server
@@ -178,5 +202,111 @@ export class ChatSettingsRepositoryClient {
       return;
     }
     localStorage.removeItem(STORAGE_KEY);
+  }
+
+  /**
+   * Select a favorite and update settings
+   * Handles optimistic updates for both settings and favorites list
+   */
+  static async selectFavorite(params: {
+    favoriteId: string;
+    modelId: ModelId | null;
+    characterId: string | null;
+    logger: EndpointLogger;
+    locale: CountryLanguage;
+    user: JwtPayloadType;
+  }): Promise<void> {
+    const { favoriteId, modelId, characterId, logger, locale, user } = params;
+
+    const { apiClient } =
+      await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+    const settingsDefinition = await import("./definition");
+    const favoritesDefinition = await import("../favorites/definition");
+
+    // Optimistic update 1: Update settings
+    apiClient.updateEndpointData(
+      settingsDefinition.default.GET,
+      logger,
+      (oldData) => {
+        if (!oldData?.success) {
+          return oldData;
+        }
+
+        const updatedData = {
+          ...oldData.data,
+          activeFavoriteId: favoriteId,
+        };
+
+        if (modelId) {
+          updatedData.selectedModel = modelId;
+        }
+        if (characterId) {
+          updatedData.selectedCharacter = characterId;
+        }
+
+        return {
+          success: true,
+          data: updatedData,
+        };
+      },
+      undefined,
+    );
+
+    // Optimistic update 2: Update favorites list to show new active badge
+    apiClient.updateEndpointData(
+      favoritesDefinition.default.GET,
+      logger,
+      (oldData) => {
+        if (!oldData?.success || !oldData.data?.favoritesList) {
+          return oldData;
+        }
+
+        // Update all favorites: remove active badge from others, add to selected one
+        const updatedList = oldData.data.favoritesList.map((fav) => ({
+          ...fav,
+          content: {
+            ...fav.content,
+            titleRow: {
+              ...fav.content.titleRow,
+              activeBadge:
+                fav.id === favoriteId
+                  ? ("app.chat.selector.active" as const)
+                  : null,
+            },
+          },
+        }));
+
+        return {
+          success: true,
+          data: {
+            favoritesList: updatedList,
+          },
+        };
+      },
+      undefined,
+    );
+
+    // Call the mutation to persist on server (or localStorage)
+    try {
+      await apiClient.mutate(
+        settingsDefinition.default.POST,
+        logger,
+        user,
+        {
+          activeFavoriteId: favoriteId,
+          ...(modelId && { selectedModel: modelId }),
+          ...(characterId && { selectedCharacter: characterId }),
+        },
+        undefined,
+        locale,
+      );
+    } catch (error) {
+      logger.error("Failed to update active favorite", {
+        errorMessage: error instanceof Error ? error.message : String(error),
+      });
+      // Revert optimistic updates on error
+      await apiClient.refetchEndpoint(settingsDefinition.default.GET, logger);
+      await apiClient.refetchEndpoint(favoritesDefinition.default.GET, logger);
+    }
   }
 }

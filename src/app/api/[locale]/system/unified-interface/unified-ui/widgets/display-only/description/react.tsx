@@ -11,6 +11,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { StringWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type { DescriptionWidgetConfig } from "./types";
@@ -42,11 +43,12 @@ export function DescriptionWidget<
   TUsage extends FieldUsageConfig,
 >({
   field,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   DescriptionWidgetConfig<TSchema, TUsage, "primitive">
 >): JSX.Element {
+  const t = useWidgetTranslation();
   const { textSize, spacing, lineClamp, className } = field;
 
   // Get classes from config (no hardcoding!)
@@ -85,7 +87,7 @@ export function DescriptionWidget<
         className,
       )}
     >
-      {context.t(field.value)}
+      {t(field.value)}
     </Div>
   );
 }

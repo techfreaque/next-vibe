@@ -45,20 +45,16 @@ export enum FieldUsage {
 export enum WidgetType {
   // Form widgets
   FORM_FIELD = "form_field",
-  FORM_GROUP = "form_group",
-  FORM_SECTION = "form_section",
 
   // Data display widgets
   DATA_TABLE = "data_table",
-  DATA_CARD = "data_card",
+  DATA_GRID = "data_grid",
   DATA_CARDS = "data_cards",
   DATA_LIST = "data_list",
-  DATA_GRID = "data_grid",
   GROUPED_LIST = "grouped_list",
   CODE_QUALITY_LIST = "code_quality_list",
   CODE_QUALITY_SUMMARY = "code_quality_summary",
   CODE_QUALITY_FILES = "code_quality_files",
-  METADATA_CARD = "metadata_card",
   KEY_VALUE = "key_value",
 
   // Layout widgets
@@ -82,33 +78,23 @@ export enum WidgetType {
   LINK_CARD = "link_card",
 
   // Specialized content widgets
-  FILE_PATH = "file_path",
-  LINE_NUMBER = "line_number",
-  COLUMN_NUMBER = "column_number",
-  CODE_RULE = "code_rule",
   CODE_OUTPUT = "code_output",
-  SEVERITY_BADGE = "severity_badge",
-  MESSAGE_TEXT = "message_text",
-  ISSUE_CARD = "issue_card",
   CREDIT_TRANSACTION_CARD = "credit_transaction_card",
   CREDIT_TRANSACTION_LIST = "credit_transaction_list",
   PAGINATION = "pagination",
-  MODEL_DISPLAY = "model_display",
 
   // Interactive widgets
   BUTTON = "button",
   NAVIGATE_BUTTON = "navigate_button",
-  BUTTON_GROUP = "button_group",
+  DRAG_HANDLE = "drag_handle",
 
   // Stats widgets
   STAT = "stat", // Simple stat display: number + label from field definition
   METRIC_CARD = "metric_card",
   CHART = "chart",
-  PROGRESS = "progress",
 
   // Status widgets
   LOADING = "loading",
-  ERROR = "error",
   EMPTY_STATE = "empty_state",
   STATUS_INDICATOR = "status_indicator",
   ALERT = "alert",
@@ -119,9 +105,6 @@ export enum WidgetType {
 
   // Form feedback widgets
   PASSWORD_STRENGTH = "password_strength",
-
-  // Custom widgets
-  CUSTOM = "custom",
 }
 
 /**
@@ -162,6 +145,7 @@ export enum FieldDataType {
   TEXT_ARRAY = "text_array",
   FILTER_PILLS = "filter_pills",
   RANGE_SLIDER = "range_slider",
+  MODEL_SELECTION = "model_selection",
 
   // Complex data types
   ARRAY = "array",
@@ -195,6 +179,7 @@ export enum LayoutType {
   COLLAPSIBLE = "collapsible",
   GRID_2_COLUMNS = "grid_2_columns",
   GRID_ITEM = "grid_item",
+  ACTIONS = "actions",
 }
 
 /**

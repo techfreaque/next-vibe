@@ -27,6 +27,7 @@ import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { definitionsRegistry } from "../../../unified-interface/shared/endpoints/definitions/registry";
+import { Methods } from "../../../unified-interface/shared/types/enums";
 import { Platform } from "../../../unified-interface/shared/types/platform";
 
 type GroupingMode = "category" | "tags" | "path";
@@ -78,31 +79,54 @@ function buildPathTree(endpoints: CreateApiEndpointAny[]): PathTreeNode {
 /**
  * Generate endpoint ID from endpoint (path_parts_METHOD)
  * Format: browser_handle-dialog_POST or system_setup_status_POST
+ * Uses underscore to join path segments and method
  */
 function getEndpointId(ep: CreateApiEndpointAny): string {
   return `${ep.path.join("_")}_${ep.method}`;
 }
 
 /**
- * Helper function to wrap an endpoint in the format expected by EndpointsPage
+ * Component to load and display all methods for a selected endpoint path
  */
-function wrapEndpoint(endpoint: CreateApiEndpointAny): {
-  GET?: CreateApiEndpointAny;
-  POST?: CreateApiEndpointAny;
-  DELETE?: CreateApiEndpointAny;
-} {
-  const method = endpoint.method;
-  if (method === "GET") {
-    return { GET: endpoint };
-  }
-  if (method === "POST") {
-    return { POST: endpoint };
-  }
-  if (method === "DELETE") {
-    return { DELETE: endpoint };
-  }
-  // Default to POST if method is not recognized
-  return { POST: endpoint };
+function SelectedEndpointPage({
+  selectedEndpoint,
+  currentMethod,
+  locale,
+  user,
+}: {
+  selectedEndpoint: {
+    GET?: CreateApiEndpointAny;
+    POST?: CreateApiEndpointAny;
+    PUT?: CreateApiEndpointAny;
+    PATCH?: CreateApiEndpointAny;
+    DELETE?: CreateApiEndpointAny;
+  };
+  currentMethod: Methods;
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+}): JSX.Element | null {
+  // Always render EndpointsPage - never return null
+  return selectedEndpoint ? (
+    <EndpointsPage
+      key={
+        selectedEndpoint[currentMethod]
+          ? getEndpointId(selectedEndpoint[currentMethod])
+          : "null"
+      }
+      endpoint={selectedEndpoint}
+      locale={locale}
+      user={user}
+      forceMethod={currentMethod}
+      endpointOptions={{
+        queryOptions: {
+          enabled:
+            currentMethod === Methods.GET || currentMethod === Methods.POST,
+          refetchOnWindowFocus: false,
+          staleTime: 5 * 60 * 1000, // 5 minutes
+        },
+      }}
+    />
+  ) : null;
 }
 
 /**
@@ -242,7 +266,7 @@ export function HelpInteractiveView({
     [locale],
   );
 
-  // Fetch endpoints server-side with user permissions
+  // Fetch endpoints for sidebar using registry
   const endpoints = useMemo(
     () =>
       user
@@ -273,6 +297,34 @@ export function HelpInteractiveView({
       }
     }
   }, [initialEndpointId, endpointMap, selectedEndpoint]);
+
+  // Build all methods for selected endpoint's path
+  const selectedEndpointAllMethods = useMemo(() => {
+    if (!selectedEndpoint) {
+      return undefined;
+    }
+
+    const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"] as const;
+    const pathKey = selectedEndpoint.path.join("_");
+    const result: {
+      GET?: CreateApiEndpointAny;
+      POST?: CreateApiEndpointAny;
+      PUT?: CreateApiEndpointAny;
+      PATCH?: CreateApiEndpointAny;
+      DELETE?: CreateApiEndpointAny;
+    } = {};
+
+    // For each method, get endpoint from map if it exists
+    for (const method of METHODS) {
+      const identifier = `${pathKey}_${method}`;
+      const ep = endpointMap.get(identifier);
+      if (ep) {
+        result[method as keyof typeof result] = ep;
+      }
+    }
+
+    return result;
+  }, [selectedEndpoint, endpointMap]);
 
   // Handle endpoint selection with URL update
   const handleSelectEndpoint = useCallback(
@@ -416,208 +468,198 @@ export function HelpInteractiveView({
   }, [filteredEndpoints, groupingMode]);
 
   return (
-    <Div className="min-h-screen bg-linear-to-b from-blue-50 to-white dark:from-gray-950 dark:to-gray-900 py-16 px-4">
-      <Div className="container max-w-7xl mx-auto">
-        <Div className="text-center mb-12">
-          <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-r from-cyan-500 to-blue-600">
-            {t("app.api.system.help.interactive.ui.title")}
-          </H1>
-          <P className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            {t("app.api.system.help.interactive.ui.description")}{" "}
-            {endpoints.length}{" "}
-            {t("app.api.system.help.interactive.ui.availableEndpoints")}
-          </P>
-        </Div>
+    <Div className="min-h-screen bg-linear-to-b from-blue-50 to-white dark:from-gray-950 dark:to-gray-900 py-16">
+      <Div className="text-center mb-12">
+        <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-r from-cyan-500 to-blue-600">
+          {t("app.api.system.help.interactive.ui.title")}
+        </H1>
+        <P className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          {t("app.api.system.help.interactive.ui.description")}{" "}
+          {endpoints.length}{" "}
+          {t("app.api.system.help.interactive.ui.availableEndpoints")}
+        </P>
+      </Div>
 
-        <Div className="relative flex flex-col lg:flex-row gap-6">
-          {/* Left sidebar - Endpoint list */}
-          <Div
-            className={`
+      <Div className="relative flex lg:flex-row">
+        {/* Left sidebar - Endpoint list */}
+        <Div
+          className={`
               transition-all duration-300 ease-in-out
               ${isSidebarCollapsed ? "w-0 lg:w-0 overflow-hidden" : "w-full lg:w-80 xl:w-96"}
             `}
-          >
-            <Card className="sticky top-4">
-              <CardContent className="mt-6">
-                <Div className="flex items-center justify-between mb-4">
-                  <P className="text-lg font-semibold">
-                    {t("app.api.system.help.interactive.ui.endpointsLabel")}
-                  </P>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setIsSidebarCollapsed(true)}
-                    aria-label="Close sidebar"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                </Div>
+        >
+          <Card className="sticky top-4">
+            <CardContent className="mt-6">
+              <Div className="flex items-center justify-between mb-4">
+                <P className="text-lg font-semibold">
+                  {t("app.api.system.help.interactive.ui.endpointsLabel")}
+                </P>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setIsSidebarCollapsed(true)}
+                  aria-label="Close sidebar"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+              </Div>
 
-                {/* Search */}
-                <Input
-                  type="text"
-                  placeholder="Search endpoints..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md mb-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                />
+              {/* Search */}
+              <Input
+                type="text"
+                placeholder="Search endpoints..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md mb-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+              />
 
-                {/* Grouping mode selector */}
-                <Div className="flex gap-1 mb-4">
-                  <Button
-                    size="sm"
-                    variant={groupingMode === "category" ? "default" : "ghost"}
-                    onClick={() => setGroupingMode("category")}
-                    className="text-xs"
-                  >
-                    {t("app.api.system.help.interactive.grouping.category")}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={groupingMode === "tags" ? "default" : "ghost"}
-                    onClick={() => setGroupingMode("tags")}
-                    className="text-xs"
-                  >
-                    {t("app.api.system.help.interactive.grouping.tags")}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={groupingMode === "path" ? "default" : "ghost"}
-                    onClick={() => setGroupingMode("path")}
-                    className="text-xs"
-                  >
-                    {t("app.api.system.help.interactive.grouping.path")}
-                  </Button>
-                </Div>
+              {/* Grouping mode selector */}
+              <Div className="flex gap-1 mb-4">
+                <Button
+                  size="sm"
+                  variant={groupingMode === "category" ? "default" : "ghost"}
+                  onClick={() => setGroupingMode("category")}
+                  className="text-xs"
+                >
+                  {t("app.api.system.help.interactive.grouping.category")}
+                </Button>
+                <Button
+                  size="sm"
+                  variant={groupingMode === "tags" ? "default" : "ghost"}
+                  onClick={() => setGroupingMode("tags")}
+                  className="text-xs"
+                >
+                  {t("app.api.system.help.interactive.grouping.tags")}
+                </Button>
+                <Button
+                  size="sm"
+                  variant={groupingMode === "path" ? "default" : "ghost"}
+                  onClick={() => setGroupingMode("path")}
+                  className="text-xs"
+                >
+                  {t("app.api.system.help.interactive.grouping.path")}
+                </Button>
+              </Div>
 
-                {/* Endpoint list with accordion */}
-                <Div className="max-h-150 overflow-y-auto">
-                  {groupingMode === "path" ? (
-                    /* Nested path tree view */
-                    <PathTreeAccordion
-                      node={pathTree}
-                      locale={locale}
-                      selectedEndpoint={selectedEndpoint}
-                      handleSelectEndpoint={handleSelectEndpoint}
-                    />
-                  ) : (
-                    /* Category/Tags flat accordion view */
-                    <Accordion
-                      type="multiple"
-                      defaultValue={[]}
-                      className="w-full"
-                    >
-                      {Object.entries(groupedEndpoints).map(([group, eps]) => (
-                        <AccordionItem
-                          key={group}
-                          value={group}
-                          className="border-b-0"
-                        >
-                          <AccordionTrigger className="py-2 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:no-underline">
-                            <Div className="flex items-center gap-2">
-                              <Span>
-                                {/* Both category and tags are translation keys */}
-                                {t(group as TranslationKey)}
-                              </Span>
-                              <Span className="text-xs font-normal text-gray-400 dark:text-gray-500">
-                                ({eps.length})
-                              </Span>
-                            </Div>
-                          </AccordionTrigger>
-                          <AccordionContent className="pb-2">
-                            <Div className="space-y-1 pl-2">
-                              {eps.map((ep) => {
-                                const endpointId = getEndpointId(ep);
-                                const toolName = ep.path.join("_");
-                                const isSelected =
-                                  selectedEndpoint &&
-                                  getEndpointId(selectedEndpoint) ===
-                                    endpointId;
+              {/* Endpoint list with accordion */}
+              <Div className="max-h-150 overflow-y-auto">
+                {groupingMode === "path" ? (
+                  /* Nested path tree view */
+                  <PathTreeAccordion
+                    node={pathTree}
+                    locale={locale}
+                    selectedEndpoint={selectedEndpoint}
+                    handleSelectEndpoint={handleSelectEndpoint}
+                  />
+                ) : (
+                  /* Category/Tags flat accordion view */
+                  <Accordion
+                    type="multiple"
+                    defaultValue={[]}
+                    className="w-full"
+                  >
+                    {Object.entries(groupedEndpoints).map(([group, eps]) => (
+                      <AccordionItem
+                        key={group}
+                        value={group}
+                        className="border-b-0"
+                      >
+                        <AccordionTrigger className="py-2 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:no-underline">
+                          <Div className="flex items-center gap-2">
+                            <Span>
+                              {/* Both category and tags are translation keys */}
+                              {t(group as TranslationKey)}
+                            </Span>
+                            <Span className="text-xs font-normal text-gray-400 dark:text-gray-500">
+                              ({eps.length})
+                            </Span>
+                          </Div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pb-2">
+                          <Div className="space-y-1 pl-2">
+                            {eps.map((ep) => {
+                              const endpointId = getEndpointId(ep);
+                              const toolName = ep.path.join("_");
+                              const isSelected =
+                                selectedEndpoint &&
+                                getEndpointId(selectedEndpoint) === endpointId;
 
-                                return (
-                                  <Link
-                                    key={endpointId}
-                                    href={`/${locale}/help/interactive/${encodeURIComponent(endpointId)}`}
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      handleSelectEndpoint(ep);
-                                    }}
-                                    className={`block w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                                      isSelected
-                                        ? "bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100"
-                                        : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
-                                    }`}
-                                  >
-                                    <Div className="font-mono text-xs text-gray-500 dark:text-gray-400">
-                                      {ep.method}
+                              return (
+                                <Link
+                                  key={endpointId}
+                                  href={`/${locale}/help/interactive/${encodeURIComponent(endpointId)}`}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleSelectEndpoint(ep);
+                                  }}
+                                  className={`block w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                                    isSelected
+                                      ? "bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100"
+                                      : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                                  }`}
+                                >
+                                  <Div className="font-mono text-xs text-gray-500 dark:text-gray-400">
+                                    {ep.method}
+                                  </Div>
+                                  <Div className="font-medium truncate">
+                                    {toolName.replaceAll("_", "/")}
+                                  </Div>
+                                  {ep.aliases && ep.aliases.length > 0 && (
+                                    <Div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                      {t(
+                                        "app.api.system.help.interactive.ui.aliasesLabel",
+                                      )}{" "}
+                                      {ep.aliases.join(", ")}
                                     </Div>
-                                    <Div className="font-medium truncate">
-                                      {toolName.replaceAll("_", "/")}
-                                    </Div>
-                                    {ep.aliases && ep.aliases.length > 0 && (
-                                      <Div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        {t(
-                                          "app.api.system.help.interactive.ui.aliasesLabel",
-                                        )}{" "}
-                                        {ep.aliases.join(", ")}
-                                      </Div>
-                                    )}
-                                  </Link>
-                                );
-                              })}
-                            </Div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  )}
-                </Div>
+                                  )}
+                                </Link>
+                              );
+                            })}
+                          </Div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                )}
+              </Div>
+            </CardContent>
+          </Card>
+        </Div>
+
+        {/* Right content - Endpoint details and execution */}
+        <Div className="flex-1 min-w-0">
+          {/* Toggle button for collapsed sidebar */}
+          {isSidebarCollapsed && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setIsSidebarCollapsed(false)}
+              className="mb-4"
+              aria-label="Open sidebar"
+            >
+              <ChevronRight className="h-4 w-4 mr-2" />
+              {t("app.api.system.help.interactive.ui.endpointsLabel")}
+            </Button>
+          )}
+
+          {!selectedEndpoint && (
+            <Card>
+              <CardContent className="mt-6 text-center py-12">
+                <P className="text-gray-500 dark:text-gray-400">
+                  {t("app.api.system.help.interactive.ui.selectEndpoint")}
+                </P>
               </CardContent>
             </Card>
-          </Div>
+          )}
 
-          {/* Right content - Endpoint details and execution */}
-          <Div className="flex-1 min-w-0">
-            {/* Toggle button for collapsed sidebar */}
-            {isSidebarCollapsed && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setIsSidebarCollapsed(false)}
-                className="mb-4"
-                aria-label="Open sidebar"
-              >
-                <ChevronRight className="h-4 w-4 mr-2" />
-                {t("app.api.system.help.interactive.ui.endpointsLabel")}
-              </Button>
-            )}
-
-            {!selectedEndpoint && (
-              <Card>
-                <CardContent className="mt-6 text-center py-12">
-                  <P className="text-gray-500 dark:text-gray-400">
-                    {t("app.api.system.help.interactive.ui.selectEndpoint")}
-                  </P>
-                </CardContent>
-              </Card>
-            )}
-
-            {selectedEndpoint && (
-              <EndpointsPage
-                key={getEndpointId(selectedEndpoint)}
-                endpoint={wrapEndpoint(selectedEndpoint)}
-                locale={locale}
-                user={user}
-                endpointOptions={{
-                  queryOptions: {
-                    enabled: selectedEndpoint.method.toUpperCase() === "GET",
-                    refetchOnWindowFocus: false,
-                    staleTime: 5 * 60 * 1000, // 5 minutes
-                  },
-                }}
-              />
-            )}
-          </Div>
+          {selectedEndpoint && selectedEndpointAllMethods && (
+            <SelectedEndpointPage
+              selectedEndpoint={selectedEndpointAllMethods}
+              currentMethod={selectedEndpoint.method}
+              locale={locale}
+              user={user}
+            />
+          )}
         </Div>
       </Div>
     </Div>

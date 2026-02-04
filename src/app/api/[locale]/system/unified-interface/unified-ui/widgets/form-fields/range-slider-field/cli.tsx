@@ -8,6 +8,7 @@ import type { z } from "zod";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { EnumWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
@@ -15,12 +16,13 @@ import type { RangeSliderFieldWidgetConfig } from "./types";
 
 export function RangeSliderFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
+  TUsage extends FieldUsageConfig,
   TKey extends string,
 >({
   field,
-  context,
 }: InkWidgetProps<
   TEndpoint,
+  TUsage,
   RangeSliderFieldWidgetConfig<
     TKey,
     z.ZodOptional<
@@ -29,10 +31,10 @@ export function RangeSliderFieldWidgetInk<
         max: z.ZodOptional<EnumWidgetSchema>;
       }>
     >,
-    FieldUsageConfig
+    TUsage
   >
 >): JSX.Element {
-  const { t } = context;
+  const t = useInkWidgetTranslation();
   const displayValue =
     field.value &&
     typeof field.value === "object" &&

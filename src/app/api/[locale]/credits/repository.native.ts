@@ -306,8 +306,8 @@ export class CreditRepository {
       paginationInfo: {
         page: number;
         limit: number;
-        total: number;
-        totalPages: number;
+        totalCount: number;
+        pageCount: number;
       };
     }>
   > {

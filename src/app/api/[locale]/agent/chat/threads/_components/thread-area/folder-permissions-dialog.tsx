@@ -18,6 +18,7 @@ import React, { useEffect } from "react";
 import folderPermissionsDefinitions from "@/app/api/[locale]/agent/chat/folders/[id]/permissions/definition";
 import { useFolderPermissions } from "@/app/api/[locale]/agent/chat/folders/[id]/permissions/hooks";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -27,6 +28,7 @@ interface FolderPermissionsDialogProps {
   folderId: string;
   folderName: string;
   locale: CountryLanguage;
+  user: JwtPayloadType;
   logger: EndpointLogger;
 }
 
@@ -36,6 +38,7 @@ export function FolderPermissionsDialog({
   folderId,
   folderName,
   locale,
+  user,
   logger,
 }: FolderPermissionsDialogProps): JSX.Element {
   const { t } = simpleT(locale);
@@ -45,6 +48,7 @@ export function FolderPermissionsDialog({
       folderId,
       enabled: open && !!folderId,
     },
+    user,
     logger,
   );
 

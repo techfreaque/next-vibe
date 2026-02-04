@@ -26,9 +26,11 @@ import {
   ImapMessageStatusFilter,
   ImapSyncStatus,
 } from "@/app/api/[locale]/emails/imap-client/enum";
-import { useImapMessagesListEndpoint } from "@/app/api/[locale]/emails/imap-client/messages/list/hooks";
+import { useImapMessagesList } from "@/app/api/[locale]/emails/imap-client/messages/list/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
+
+import type { JwtPayloadType } from "../../../user/auth/types";
 
 interface ImapMessagesListProps {
   accountId: string;
@@ -36,6 +38,7 @@ interface ImapMessagesListProps {
   searchQuery?: string;
   statusFilter?: string;
   dateRange?: string;
+  user: JwtPayloadType;
 }
 
 /**
@@ -91,6 +94,7 @@ export function ImapMessagesList({
   searchQuery,
   statusFilter,
   dateRange,
+  user,
 }: ImapMessagesListProps): React.JSX.Element {
   const { t, locale } = useTranslation();
   const router = useRouter();
@@ -102,7 +106,7 @@ export function ImapMessagesList({
   const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Use the IMAP messages list endpoint following leads pattern
-  const messagesEndpoint = useImapMessagesListEndpoint(logger);
+  const messagesEndpoint = useImapMessagesList(user, logger);
 
   // Set filter values in the form when props change
   React.useEffect(() => {

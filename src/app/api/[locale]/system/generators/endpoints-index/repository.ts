@@ -213,8 +213,21 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
   private formatPathArray(pathSegments: string[]): string {
     // eslint-disable-next-line i18next/no-literal-string
     const pathArrayElements = pathSegments.map((p) => `"${p}"`);
-    const pathArrayLiteral = pathArrayElements.join(", ");
-    return `[${pathArrayLiteral}]`;
+    const inlineLiteral = pathArrayElements.join(", ");
+    const inlineFormat = `[${inlineLiteral}]`;
+
+    // Check if the indented line would be too long for prettier's printWidth (80)
+    // The array is indented with 4 spaces, plus 1 trailing comma = 5 extra chars
+    const indentedLength = 4 + inlineFormat.length + 1;
+
+    if (indentedLength > 80) {
+      // eslint-disable-next-line i18next/no-literal-string
+      const multilineElements = pathArrayElements
+        .map((e) => `      ${e},`)
+        .join("\n");
+      return `[\n${multilineElements}\n    ]`;
+    }
+    return inlineFormat;
   }
 
   /**

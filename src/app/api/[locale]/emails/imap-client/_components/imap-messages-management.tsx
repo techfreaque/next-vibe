@@ -24,23 +24,30 @@ import {
   SortOrder,
 } from "@/app/api/[locale]/emails/imap-client/enum";
 import messagesListDefinitions from "@/app/api/[locale]/emails/imap-client/messages/list/definition";
-import { useImapMessagesListEndpoint } from "@/app/api/[locale]/emails/imap-client/messages/list/hooks";
+import { useImapMessagesList } from "@/app/api/[locale]/emails/imap-client/messages/list/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 
 import { ImapMessagesTable } from "./imap-messages-table";
+
+interface ImapMessagesManagementProps {
+  user: JwtPayloadType;
+}
 
 /**
  * IMAP Messages Management Component
  * Uses useEndpoint for all state management following leads/cron patterns
  */
-export function ImapMessagesManagement(): JSX.Element {
+export function ImapMessagesManagement({
+  user,
+}: ImapMessagesManagementProps): JSX.Element {
   const { t, locale } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Use endpoints for data management - no local useState
-  const messagesEndpoint = useImapMessagesListEndpoint(logger);
-  const accountsEndpoint = useImapAccountsListEndpoint(logger);
+  const messagesEndpoint = useImapMessagesList(user, logger);
+  const accountsEndpoint = useImapAccountsListEndpoint(user, logger);
 
   // Get data from endpoints
   const apiResponse = messagesEndpoint.read.response;

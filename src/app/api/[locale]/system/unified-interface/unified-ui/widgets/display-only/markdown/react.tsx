@@ -11,6 +11,7 @@ import { simpleT } from "@/i18n/core/shared";
 
 import type { StringWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type { FieldUsageConfig } from "../../_shared/types";
+import { useWidgetLocale } from "../../_shared/use-widget-context";
 import type { MarkdownWidgetConfig } from "./types";
 
 /**
@@ -53,15 +54,18 @@ export function MarkdownWidget<
   props:
     | ReactWidgetProps<
         TEndpoint,
+        TUsage,
         MarkdownWidgetConfig<TKey, never, TUsage, "widget">
       >
     | ReactWidgetProps<
         TEndpoint,
+        TUsage,
         MarkdownWidgetConfig<TKey, StringWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
-  const { field, context } = props;
-  const { t } = simpleT(context.locale);
+  const { field } = props;
+  const locale = useWidgetLocale();
+  const { t } = simpleT(locale);
 
   if (!field.value) {
     return (

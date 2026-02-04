@@ -8,6 +8,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import type React from "react";
 
 import { CronHistoryClient } from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/_components/cron-history-client";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -34,10 +35,12 @@ export default async function CronHistoryPage({
 }: CronHistoryPageProps): Promise<React.JSX.Element> {
   const { locale } = await params;
 
+  const user = await requireAdminUser(locale, `/${locale}/admin/cron/history`);
+
   return (
     <Div className="flex flex-col gap-6">
       {/* History Content */}
-      <CronHistoryClient locale={locale} />
+      <CronHistoryClient locale={locale} user={user} />
     </Div>
   );
 }

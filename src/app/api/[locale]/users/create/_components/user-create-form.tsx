@@ -23,19 +23,23 @@ import { useUsersCreateEndpoint } from "@/app/api/[locale]/users/create/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import type { JwtPayloadType } from "../../../user/auth/types";
+
 interface UserCreateFormProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 export function UserCreateForm({
   locale,
+  user,
 }: UserCreateFormProps): React.JSX.Element {
   const router = useRouter();
   const { t } = simpleT(locale);
 
   // Get endpoint for form handling
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const endpoint = useUsersCreateEndpoint(logger);
+  const endpoint = useUsersCreateEndpoint(logger, user);
 
   const handleSubmit = endpoint.create.onSubmit;
   const isSaving = endpoint.create.isSubmitting;

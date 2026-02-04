@@ -29,7 +29,6 @@ import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type { Platform } from "../../shared/types/platform";
 import type { WidgetData } from "../../shared/widgets/widget-data";
-import { renderInkEndpointPage } from "../../unified-ui/renderers/cli/CliEndpointPage";
 import { CliResultFormatter } from "../../unified-ui/renderers/cli/response/result-formatter";
 import { getCliUser } from "../auth/cli-user";
 import {
@@ -195,6 +194,8 @@ export class RouteDelegationHandler {
 
       // Interactive mode: Use Ink terminal UI
       if (options.interactive && endpoint) {
+        const { renderInkEndpointPage } =
+          await import("@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointPage");
         // Render interactive Ink UI - it handles form and submission
         renderInkEndpointPage({
           endpoint: { [endpoint.method]: endpoint },

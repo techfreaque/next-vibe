@@ -30,6 +30,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema } from "../../shared/types/common.schema";
 import { DefaultFolderId } from "../chat/config";
+import { AGENT_MESSAGE_LENGTH } from "../chat/constants";
 import { type ChatMessage, selectChatMessageSchema } from "../chat/db";
 import { ChatMessageRole, ChatMessageRoleOptions } from "../chat/enum";
 import { DEFAULT_TTS_VOICE, TtsVoice } from "../text-to-speech/enum";
@@ -173,7 +174,7 @@ const { POST } = createEndpoint({
         placeholder: "app.api.agent.chat.aiStream.post.content.placeholder",
         // Allow empty content for answer-as-ai operation (AI generates its own response)
         // For other operations, content must be at least 1 character
-        schema: z.string().max(10000),
+        schema: z.string().max(AGENT_MESSAGE_LENGTH),
       }),
       role: requestField({
         type: WidgetType.FORM_FIELD,

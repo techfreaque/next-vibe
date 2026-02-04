@@ -15,6 +15,10 @@ import {
   getTextSizeClassName,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import {
+  useWidgetLocale,
+  useWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import { extractTextData, formatIfDate, formatText } from "./shared";
@@ -100,14 +104,18 @@ export function TextWidget<
   props:
     | ReactWidgetProps<
         TEndpoint,
+        TUsage,
         TextWidgetConfig<TKey, never, TUsage, "widget">
       >
     | ReactWidgetProps<
         TEndpoint,
+        TUsage,
         TextWidgetConfig<TKey, TextWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
-  const { field, context } = props;
+  const { field } = props;
+  const locale = useWidgetLocale();
+  const t = useWidgetTranslation();
   const {
     content,
     fieldType,
@@ -122,9 +130,10 @@ export function TextWidget<
     size = "base",
     gap,
     padding,
-    className,
+    className: fieldClassName,
+    getClassName,
   } = field;
-  const label = labelKey ? context.t(labelKey) : undefined;
+  const label = labelKey ? t(labelKey) : undefined;
 
   // Text alignment classes
   const alignmentClass =
@@ -144,46 +153,27 @@ export function TextWidget<
   // Variant and emphasis styling classes
   const variantClass = variant ? getTextVariantClassName(variant) : "";
   const emphasisClass = emphasis ? getTextEmphasisClassName(emphasis) : "";
-  const styleClasses = cn(sizeClass, variantClass, emphasisClass);
 
-  // Handle static content from UI config
-  if (content) {
-    const translatedContent = context.t(content);
-    const displayText = formatText(translatedContent, maxLength);
+  // Apply dynamic className callback if present
+  const dynamicClassName = getClassName
+    ? getClassName(field.value, field.parentValue)
+    : "";
 
-    const textElement = multiline ? (
-      <Span className={cn("whitespace-pre-wrap", styleClasses)}>
-        {displayText}
-      </Span>
-    ) : (
-      <Span className={styleClasses}>{displayText}</Span>
-    );
-
-    if (label) {
-      return (
-        <Div
-          className={cn(
-            "flex flex-col",
-            gapClass || "gap-1.5",
-            alignmentClass,
-            className,
-          )}
-        >
-          <Label className=" font-medium">{label}</Label>
-          {textElement}
-        </Div>
-      );
-    }
-
-    return <Div className={cn(alignmentClass, className)}>{textElement}</Div>;
-  }
+  // Merge all className sources: field className, dynamic className, and external className
+  const styleClasses = cn(
+    sizeClass,
+    variantClass,
+    emphasisClass,
+    fieldClassName,
+    dynamicClassName,
+  );
 
   // Handle date formatting if fieldType is DATE or DATETIME
-  const dateFormatted = formatIfDate(field.value, fieldType, context.locale);
+  const dateFormatted = formatIfDate(field.value, fieldType, locale);
   if (dateFormatted) {
     const displayText = formatText(dateFormatted, maxLength);
     return (
-      <Div className={cn(alignmentClass, className)}>
+      <Div className={alignmentClass}>
         {label && <Label className=" font-medium">{label}</Label>}
         <Span className={cn("font-mono ", styleClasses)}>{displayText}</Span>
       </Div>
@@ -192,15 +182,15 @@ export function TextWidget<
 
   // Handle format="link" with href from field.ui config
   if (format === "link" && href && content) {
-    const linkText = context.t(content);
+    const linkText = t(content);
     const displayText = formatText(linkText, maxLength);
     // Prepend locale to href if it doesn't start with http
     const localizedHref = href.startsWith("http")
       ? href
-      : `/${context.locale}${href.startsWith("/") ? "" : "/"}${href}`;
+      : `/${locale}${href.startsWith("/") ? "" : "/"}${href}`;
 
     return (
-      <Div className={cn(paddingClass || "py-2", alignmentClass, className)}>
+      <Div className={cn("flex", paddingClass || "py-2", alignmentClass)}>
         <Link
           href={localizedHref as Route}
           className=" text-muted-foreground hover:text-primary underline-offset-4 hover:underline transition-colors"
@@ -213,21 +203,47 @@ export function TextWidget<
 
   // Extract data using shared logic with translation context
   // value is properly typed from schema - no assertions needed
-  const data = extractTextData(field.value, context);
+  const data = extractTextData(field.value, t);
 
   // No data - show empty placeholder
   if (!data) {
+    // Handle static content from UI config
+    if (content) {
+      const translatedContent = t(content);
+      const displayText = formatText(translatedContent, maxLength);
+
+      const textElement = multiline ? (
+        <Span className={cn("whitespace-pre-wrap", styleClasses)}>
+          {displayText}
+        </Span>
+      ) : (
+        <Span className={styleClasses}>{displayText}</Span>
+      );
+
+      if (label) {
+        return (
+          <Div
+            className={cn(
+              "flex flex-col",
+              gapClass || "gap-1.5",
+              alignmentClass,
+            )}
+          >
+            <Label className=" font-medium">{label}</Label>
+            {textElement}
+          </Div>
+        );
+      }
+
+      return <Div className={cn("flex", alignmentClass)}>{textElement}</Div>;
+    }
+
     const emptyElement = <Span className="text-muted-foreground">—</Span>;
 
     if (label) {
       return (
         <Div
-          className={cn(
-            "flex flex-col",
-            gapClass || "gap-1.5",
-            alignmentClass,
-            className,
-          )}
+          className={cn("flex flex-col", gapClass || "gap-1.5", alignmentClass)}
         >
           <Label className=" font-medium">{label}</Label>
           {emptyElement}
@@ -235,7 +251,7 @@ export function TextWidget<
       );
     }
 
-    return <Div className={cn(alignmentClass, className)}>{emptyElement}</Div>;
+    return <Div className={cn("flex", alignmentClass)}>{emptyElement}</Div>;
   }
 
   const { text, truncate, format: dataFormat } = data;
@@ -245,22 +261,33 @@ export function TextWidget<
   const formatClassName = getTextFormatClassName(normalizedFormat);
 
   const textElement = multiline ? (
-    <Span className={cn(formatClassName, styleClasses, "whitespace-pre-wrap")}>
+    <Span
+      className={cn(
+        "flex",
+        formatClassName,
+        styleClasses,
+        "whitespace-pre-wrap",
+      )}
+    >
       {displayText}
     </Span>
   ) : (
-    <Span className={cn(formatClassName, styleClasses)}>{displayText}</Span>
+    <Span
+      className={cn(
+        "flex",
+
+        formatClassName,
+        styleClasses,
+      )}
+    >
+      {displayText}
+    </Span>
   );
 
   if (label) {
     return (
       <Div
-        className={cn(
-          "flex flex-col",
-          gapClass || "gap-1.5",
-          alignmentClass,
-          className,
-        )}
+        className={cn("flex flex-col", gapClass || "gap-1.5", alignmentClass)}
       >
         <Label className=" font-medium">{label}</Label>
         {textElement}
@@ -268,7 +295,7 @@ export function TextWidget<
     );
   }
 
-  return <Div className={cn(alignmentClass, className)}>{textElement}</Div>;
+  return <Div className={alignmentClass}>{textElement}</Div>;
 }
 
 TextWidget.displayName = "TextWidget";

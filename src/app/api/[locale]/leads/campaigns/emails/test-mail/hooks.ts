@@ -11,6 +11,7 @@ import type {
 } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import definitions from "./definition";
 
@@ -18,8 +19,9 @@ import definitions from "./definition";
  * Hook for test email functionality with form capabilities
  */
 export function useTestEmailEndpoint(
+  user: JwtPayloadType,
   logger: EndpointLogger,
-  options?: UseEndpointOptions<typeof definitions>,
+  options: UseEndpointOptions<typeof definitions>,
 ): TestEmailEndpointHook {
   return useEndpoint(
     definitions,
@@ -30,6 +32,7 @@ export function useTestEmailEndpoint(
       ...options,
     },
     logger,
+    user,
   );
 }
 

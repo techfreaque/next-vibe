@@ -7,6 +7,7 @@ import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
@@ -15,14 +16,15 @@ import type { FileFieldWidgetConfig } from "./types";
 export function FileFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
+  TUsage extends FieldUsageConfig,
 >({
   field,
-  context,
 }: InkWidgetProps<
   TEndpoint,
-  FileFieldWidgetConfig<TKey, StringWidgetSchema, FieldUsageConfig>
+  TUsage,
+  FileFieldWidgetConfig<TKey, StringWidgetSchema, TUsage>
 >): JSX.Element {
-  const { t } = context;
+  const t = useInkWidgetTranslation();
   const displayValue = field.value ? field.value : "—";
 
   return (

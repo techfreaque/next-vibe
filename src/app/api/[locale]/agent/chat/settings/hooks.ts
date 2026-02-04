@@ -20,10 +20,9 @@ import type {
   ChatSettingsUpdateRequestOutput,
 } from "./definition";
 import settingsDefinition from "./definition";
-import { ChatSettingsRepositoryClient } from "./repository-client";
 
 interface UseChatSettingsOptions {
-  user: JwtPayloadType | undefined;
+  user: JwtPayloadType;
   logger: EndpointLogger;
 }
 
@@ -62,24 +61,17 @@ export function useChatSettings({
     [user],
   );
 
-  // Set up endpoint with conditional storage based on authentication
+  // Set up endpoint - automatically uses client routes for public users
   const endpoint = useEndpoint(
     settingsDefinition,
     {
-      read: {
-        queryOptions: {
-          enabled: true,
-          refetchOnWindowFocus: false,
-        },
+      queryOptions: {
+        enabled: true,
+        refetchOnWindowFocus: false,
       },
-      storage: !isAuthenticated
-        ? {
-            mode: "localStorage" as const,
-            callbacks: ChatSettingsRepositoryClient.localStorageCallbacks,
-          }
-        : undefined,
     },
     logger,
+    user,
   );
 
   // Extract settings

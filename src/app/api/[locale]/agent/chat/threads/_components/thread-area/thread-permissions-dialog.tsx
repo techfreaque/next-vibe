@@ -18,6 +18,7 @@ import React, { useEffect } from "react";
 import threadPermissionsDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/permissions/definition";
 import { useThreadPermissions } from "@/app/api/[locale]/agent/chat/threads/[threadId]/permissions/hooks";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -28,6 +29,7 @@ interface ThreadPermissionsDialogProps {
   threadTitle: string;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  user: JwtPayloadType;
 }
 
 export function ThreadPermissionsDialog({
@@ -37,6 +39,7 @@ export function ThreadPermissionsDialog({
   threadTitle,
   locale,
   logger,
+  user,
 }: ThreadPermissionsDialogProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -45,6 +48,7 @@ export function ThreadPermissionsDialog({
       threadId,
       enabled: open && !!threadId,
     },
+    user,
     logger,
   );
 

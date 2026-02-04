@@ -8,6 +8,7 @@ import type { JSX } from "react";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { SeparatorWidgetConfig } from "./types";
 
@@ -22,11 +23,12 @@ export function SeparatorWidget<
   TSchemaType extends "widget",
 >({
   field,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   SeparatorWidgetConfig<TKey, TUsage, TSchemaType>
 >): JSX.Element {
+  const t = useWidgetTranslation();
   const { spacingTop = "normal", spacingBottom = "normal", label } = field;
 
   const topSpacing =
@@ -42,7 +44,7 @@ export function SeparatorWidget<
         ? "mb-4"
         : "mb-6";
 
-  const translatedLabel = label ? context.t(label) : undefined;
+  const translatedLabel = label ? t(label) : undefined;
 
   if (translatedLabel) {
     return (

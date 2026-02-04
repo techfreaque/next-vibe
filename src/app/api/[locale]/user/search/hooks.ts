@@ -8,6 +8,7 @@ import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { JwtPayloadType } from "../auth/types";
 import userSearchEndpoints from "./definition";
 
 /**
@@ -18,6 +19,7 @@ import userSearchEndpoints from "./definition";
  */
 export function useUserSearchEndpoint(
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): EndpointReturn<typeof userSearchEndpoints> {
   return useEndpoint(
     userSearchEndpoints,
@@ -27,5 +29,6 @@ export function useUserSearchEndpoint(
       staleTime: 30000, // 30 seconds
     },
     logger,
+    user,
   );
 }

@@ -470,9 +470,9 @@ export function widgetField<
 export function widgetObjectField<
   TKey extends string,
   TUsage extends FieldUsageConfig,
-  TChildren extends Record<
-    string,
-    UnifiedField<TKey, z.ZodTypeAny, ConstrainedChildUsage<TUsage>, any>
+  TChildren extends ObjectChildrenConstraint<
+    TKey,
+    ConstrainedChildUsage<TUsage>
   >,
   const TUIConfig extends Omit<
     ObjectWidgetConfig<TKey, TUsage, "widget-object", TChildren>,
@@ -510,7 +510,7 @@ export function objectField<
   >,
   const TUIConfig extends Omit<
     ObjectWidgetConfig<TKey, TUsage, "object", TChildren>,
-    "children" | "usage" | "schemaType" | "getCount"
+    "children" | "usage" | "schemaType"
   >,
 >(
   uiConfig: TUIConfig,
@@ -570,17 +570,16 @@ export function scopedObjectField<
   ui: TUIConfig,
   usage: TUsage,
   children: TChildren,
-): ObjectWidgetConfig<
-  TScopedTranslation["ScopedTranslationKey"],
-  TUsage,
-  "object",
-  TChildren
-> {
+): TUIConfig & {
+  schemaType: "object";
+  children: TChildren;
+  usage: TUsage;
+} {
   return {
+    ...ui,
     schemaType: "object" as const,
     children,
     usage,
-    ...ui,
   };
 }
 
@@ -1039,25 +1038,27 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
         : F extends {
               type: "object-union";
               variants: infer TVariants;
-              usage: infer U;
+              usage: infer U extends FieldUsageConfig;
             }
-          ? TVariants extends UnionObjectWidgetConfigConstrain<
-              TKey,
-              ConstrainedChildUsage<U>
-            >
-            ? Usage extends FieldUsage.ResponseData
-              ? HasResponseUsage<U> extends true
-                ? InferUnionType<TKey, TVariants, Usage>
-                : never
-              : Usage extends FieldUsage.RequestData
-                ? HasRequestDataUsage<U> extends true
+          ? U extends FieldUsageConfig
+            ? TVariants extends UnionObjectWidgetConfigConstrain<
+                TKey,
+                ConstrainedChildUsage<U>
+              >
+              ? Usage extends FieldUsage.ResponseData
+                ? HasResponseUsage<U> extends true
                   ? InferUnionType<TKey, TVariants, Usage>
                   : never
-                : Usage extends FieldUsage.RequestUrlParams
-                  ? HasRequestUrlParamsUsage<U> extends true
+                : Usage extends FieldUsage.RequestData
+                  ? HasRequestDataUsage<U> extends true
                     ? InferUnionType<TKey, TVariants, Usage>
                     : never
-                  : never
+                  : Usage extends FieldUsage.RequestUrlParams
+                    ? HasRequestUrlParamsUsage<U> extends true
+                      ? InferUnionType<TKey, TVariants, Usage>
+                      : never
+                    : never
+              : never
             : never
           : F extends {
                 type: "object" | "object-optional";
@@ -1196,7 +1197,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       string,
       FieldUsageConfig,
       "object",
-      Record<string, UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>>
+      ObjectChildrenConstraint<string, FieldUsageConfig>
     >[];
     optional?: boolean;
   }
@@ -1607,9 +1608,13 @@ export function navigateButtonField<
     type: WidgetType.NAVIGATE_BUTTON,
     label: config.label,
     icon: config.icon,
-    variant: config.variant,
+    variant: config.variant ?? "outline",
     size: config.size,
     className: config.className,
+    inline: config.inline,
+    hidden: config.hidden,
+    order: config.order,
+    columns: config.columns,
     // Store navigation config in metadata for widget access
     metadata: {
       targetEndpoint: config.targetEndpoint,
@@ -1749,9 +1754,21 @@ export function backButton<TUsage extends FieldUsageConfig>(
     type: WidgetType.NAVIGATE_BUTTON,
     label: config?.label,
     icon: config?.icon ?? "arrow-left",
-    variant: config?.variant,
+    variant: config?.variant ?? "outline",
     size: config?.size,
     className: config?.className,
+    inline: config?.inline,
+    hidden: config?.hidden,
+    order: config?.order,
+    columns: config?.columns,
+    metadata: {
+      targetEndpoint: undefined,
+      extractParams: undefined,
+      prefillFromGet: false,
+      getEndpoint: undefined,
+      renderInModal: false,
+      popNavigationOnSuccess: undefined,
+    },
   };
 }
 

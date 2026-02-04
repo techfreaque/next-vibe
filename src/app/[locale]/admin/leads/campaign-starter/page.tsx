@@ -8,6 +8,7 @@ import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import { CampaignStarterForm } from "@/app/api/[locale]/leads/campaigns/campaign-starter/_components/campaign-starter-form";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -22,6 +23,7 @@ export default async function AdminCampaignStarterPage({
 }: AdminCampaignStarterPageProps): Promise<React.JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
+  const user = await requireAdminUser(locale);
 
   return (
     <Div className="flex flex-col gap-6">
@@ -33,7 +35,7 @@ export default async function AdminCampaignStarterPage({
       </Div>
 
       {/* Campaign Starter Settings Client Component */}
-      <CampaignStarterForm locale={locale} />
+      <CampaignStarterForm locale={locale} user={user} />
     </Div>
   );
 }

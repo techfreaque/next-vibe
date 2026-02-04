@@ -23,6 +23,7 @@ import type {
   EmailJourneyVariantValues,
 } from "@/app/api/[locale]/leads/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -35,6 +36,7 @@ interface EmailPreviewClientProps {
   companyName: string;
   companyEmail: string;
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 export function EmailPreviewClient({
@@ -44,6 +46,7 @@ export function EmailPreviewClient({
   companyName,
   companyEmail,
   locale,
+  user,
 }: EmailPreviewClientProps): React.JSX.Element {
   const { t } = useTranslation();
   const [isTestEmailOpen, setIsTestEmailOpen] = useState(false);
@@ -92,6 +95,7 @@ export function EmailPreviewClient({
               </DialogTrigger>
               <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                 <TestEmailForm
+                  user={user}
                   emailJourneyVariant={journeyVariant}
                   emailCampaignStage={stage}
                   onClose={() => setIsTestEmailOpen(false)}

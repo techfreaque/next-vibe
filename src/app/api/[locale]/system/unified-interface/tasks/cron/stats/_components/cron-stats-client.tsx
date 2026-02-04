@@ -38,6 +38,7 @@ import {
   CronTaskPriority,
   CronTaskStatus,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -61,6 +62,7 @@ enum JSWeekday {
 
 interface CronStatsClientProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 /**
@@ -139,10 +141,13 @@ function getWeekdayTranslation(day: JSWeekday): TranslationKey {
 const formatNumber = (num: number): string => num.toLocaleString();
 const formatPercentage = (num: number): string => `${num.toFixed(1)}%`;
 
-export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
+export function CronStatsClient({
+  locale,
+  user,
+}: CronStatsClientProps): JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const statsEndpoint = useCronStats(logger);
+  const statsEndpoint = useCronStats(user, logger);
 
   const apiResponse = statsEndpoint.read.response;
   const stats = apiResponse?.success ? apiResponse.data.data : null;

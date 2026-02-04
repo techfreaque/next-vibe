@@ -12,12 +12,13 @@ import type { ResponseType } from "@/app/api/[locale]/shared/types/response.sche
 import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { InkEndpointRenderer } from "../cli/CliEndpointRenderer";
 import { renderToString as fastRenderToString } from "../cli/response/fast-ink-renderer/renderer";
-import { McpEndpointRenderer } from "./McpEndpointRenderer";
 
 /**
  * Static class for formatting MCP results with fast rendering
@@ -71,13 +72,15 @@ export class McpResultFormatter {
 
       // Create component
       const createStart = performance.now();
-      const component = createElement(McpEndpointRenderer, {
+      const component = createElement(InkEndpointRenderer, {
         endpoint,
         locale,
         data,
         logger,
         user,
         response: { success: true, data },
+        responseOnly: true,
+        platform: Platform.MCP,
       });
       const componentTime = performance.now() - createStart;
 

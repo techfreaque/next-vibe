@@ -15,6 +15,7 @@ import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/h
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Countries, type CountryLanguage } from "@/i18n/core/config";
 
+import type { JwtPayloadType } from "../../user/auth/types";
 import type { UserStatsResponseOutput as UsersStatsResponseType } from "./definition";
 import definitions from "./definition";
 
@@ -24,6 +25,7 @@ import definitions from "./definition";
 export type UsersStatsEndpointReturn = EndpointReturn<typeof definitions>;
 export function useUsersStatsEndpoint(
   logger: EndpointLogger,
+  user: JwtPayloadType,
   params?: {
     enabled?: boolean;
   },
@@ -43,6 +45,7 @@ export function useUsersStatsEndpoint(
       queryOptions,
     },
     logger,
+    user,
   );
 }
 
@@ -53,8 +56,9 @@ export function useUsersStatsEndpoint(
 export function useUsersStats(
   locale: CountryLanguage,
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): UseUsersStatsReturn {
-  const endpoint = useUsersStatsEndpoint(logger);
+  const endpoint = useUsersStatsEndpoint(logger, user);
 
   /**
    * Refresh stats data

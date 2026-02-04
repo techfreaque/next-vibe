@@ -5,32 +5,35 @@
  * is not assignable to CreateApiEndpointAny
  */
 
-import type { z } from "zod";
+import { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type {
+  AnyChildrenConstrain,
+  FieldUsageConfig,
+} from "../../../unified-ui/widgets/_shared/types";
 import type {
   ApiEndpoint,
   CreateApiEndpoint,
   EndpointReadOptions,
 } from "../../endpoints/definition/create";
+import { objectField } from "../../field/utils";
+import { requestUrlPathParamsField } from "../../field/utils-new";
 import type {
-  CreateApiEndpointAny,
   ExamplesList,
   ExtractInput,
   ExtractOutput,
-  FieldUsageConfig,
   InferSchemaFromField,
-  ObjectField,
-  PrimitiveField,
   UnifiedField,
 } from "../../types/endpoint";
+import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import type {
   EndpointErrorTypes,
   FieldUsage,
   Methods,
 } from "../../types/enums";
-import type { WidgetConfig } from "../../widgets/configs";
+import { FieldDataType, WidgetType } from "../../types/enums";
 
 // ============================================================================
 // LEVEL 1: Test basic type parameter assignability
@@ -63,11 +66,18 @@ const test1_4: Test1_4_TupleExtends = "PASS";
 // ============================================================================
 
 // Test 2.1: ApiEndpoint with literal type parameters
+const test2_1_field = objectField(
+  { type: WidgetType.CONTAINER },
+  { request: "data" },
+  {},
+);
+
 type Test2_1_LiteralEndpoint = ApiEndpoint<
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   string,
-  UnifiedField<string, z.ZodTypeAny>
+  AnyChildrenConstrain<string, FieldUsageConfig>,
+  typeof test2_1_field
 >;
 
 // Test 2.2: Can it be assigned to ApiEndpoint with generic parameters?
@@ -76,7 +86,13 @@ type Test2_2_Result =
     Methods,
     readonly UserRoleValue[],
     string,
-    UnifiedField<string, z.ZodTypeAny>
+    AnyChildrenConstrain<string, FieldUsageConfig>,
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -88,7 +104,13 @@ type Test2_3_WithVariance =
     Methods,
     readonly UserRoleValue[],
     string,
-    UnifiedField<string, z.ZodTypeAny>
+    AnyChildrenConstrain<string, FieldUsageConfig>,
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -99,23 +121,24 @@ const test2_3: Test2_3_WithVariance = "PASS"; // Passes with 'out' variance!
 // ============================================================================
 
 // Test 3.1: CreateApiEndpoint with literal type parameters
+const test3_1_field = objectField(
+  { type: WidgetType.CONTAINER },
+  { request: "urlPathParams", response: true },
+  {
+    jobId: requestUrlPathParamsField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.UUID,
+      label: "Job ID",
+      schema: z.string().uuid(),
+    }),
+  },
+);
+
 type Test3_1_LiteralCreate = CreateApiEndpoint<
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   string,
-  ObjectField<
-    {
-      jobId: PrimitiveField<z.ZodUUID, { request: "urlPathParams" }>;
-    },
-    { request: "urlPathParams"; response: true },
-    string,
-    WidgetConfig<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      Record<string, UnifiedField<string, z.ZodTypeAny>>
-    >
-  >
+  typeof test3_1_field
 >;
 
 // Test 3.2: Can it be assigned to CreateApiEndpointAny?
@@ -124,44 +147,25 @@ type Test3_2_Result = Test3_1_LiteralCreate extends CreateApiEndpointAny
   : "FAIL";
 const test3_2: Test3_2_Result = "PASS"; // Fixed! CreateApiEndpoint now extends CreateApiEndpointAny
 
-// Test 3.3: Does the ObjectField extend UnifiedField?
+// Test 3.3: Does the objectField extend UnifiedField?
 type Test3_3_ObjectFieldExtendsUnified =
-  ObjectField<
-    {
-      jobId: PrimitiveField<z.ZodUUID, { request: "urlPathParams" }>;
-    },
-    { request: "urlPathParams"; response: true },
+  typeof test3_1_field extends UnifiedField<
     string,
-    WidgetConfig<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      Record<string, UnifiedField<string, z.ZodTypeAny>>
-    >
-  > extends UnifiedField<string, z.ZodTypeAny>
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "PASS"
     : "FAIL";
-const test3_3: Test3_3_ObjectFieldExtendsUnified = "PASS"; // ObjectField DOES extend UnifiedField
+const test3_3: Test3_3_ObjectFieldExtendsUnified = "PASS"; // objectField DOES extend UnifiedField
 
-// Test 3.4: Now test if CreateApiEndpoint with this ObjectField extends CreateApiEndpointAny
+// Test 3.4: Now test if CreateApiEndpoint with this objectField extends CreateApiEndpointAny
 type Test3_4_FullCheck =
   CreateApiEndpoint<
     Methods.POST,
     readonly ["app.api.user.userRoles.enums.userRole.admin"],
     string,
-    ObjectField<
-      {
-        jobId: PrimitiveField<z.ZodUUID, { request: "urlPathParams" }>;
-      },
-      { request: "urlPathParams"; response: true },
-      string,
-      WidgetConfig<
-        string,
-        z.ZodTypeAny,
-        FieldUsageConfig,
-        Record<string, UnifiedField<string, z.ZodTypeAny>>
-      >
-    >
+    typeof test3_1_field
   > extends CreateApiEndpointAny
     ? "PASS"
     : "FAIL";
@@ -170,19 +174,8 @@ const test3_4: Test3_4_FullCheck = "PASS"; // We WANT this to pass
 // Test 3.5: Check if the schema properties break variance
 // CreateApiEndpoint has: readonly requestSchema: InferSchemaFromField<TFields, FieldUsage.RequestData>
 // Let's test if this property type is compatible
-type TestObjectField = ObjectField<
-  {
-    jobId: PrimitiveField<z.ZodUUID, { request: "urlPathParams" }>;
-  },
-  { request: "urlPathParams"; response: true },
-  string,
-  WidgetConfig<
-    string,
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    Record<string, UnifiedField<string, z.ZodTypeAny>>
-  >
->;
+type TestObjectField = typeof test3_1_field;
+
 type Test3_5_SchemaCompat = {
   readonly requestSchema: InferSchemaFromField<
     TestObjectField,
@@ -190,7 +183,12 @@ type Test3_5_SchemaCompat = {
   >;
 } extends {
   readonly requestSchema: InferSchemaFromField<
-    UnifiedField<string, z.ZodTypeAny>,
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >,
     FieldUsage.RequestData
   >;
 }
@@ -206,7 +204,12 @@ type Test3_6_TypesCompat = {
   };
 } extends {
   readonly types: {
-    Fields: UnifiedField<string, z.ZodTypeAny>;
+    Fields: UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >;
   };
 }
   ? "PASS"
@@ -220,66 +223,62 @@ type Test3_7_ApiEndpointBase =
     Methods.POST,
     readonly ["app.api.user.userRoles.enums.userRole.admin"],
     string,
+    AnyChildrenConstrain<string, FieldUsageConfig>,
     TestObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
     string,
-    UnifiedField<string, z.ZodTypeAny>
+    AnyChildrenConstrain<string, FieldUsageConfig>,
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
 const test3_7: Test3_7_ApiEndpointBase = "PASS"; // We WANT ApiEndpoint with ObjectField to extend ApiEndpoint with UnifiedField
 
-// Test 3.8: Direct test - does ObjectField with WidgetConfig<string> extend UnifiedField<string>?
+// Test 3.8: Direct test - does TestObjectField extend UnifiedField?
 type Test3_8_Direct =
-  TestObjectField extends UnifiedField<string, z.ZodTypeAny> ? "PASS" : "FAIL";
-const test3_8: Test3_8_Direct = "PASS"; // We WANT ObjectField to extend UnifiedField
-
-// Test 3.9: Test if WidgetConfig<string> is the issue
-// When used in a property position, does it break variance?
-type Test3_9_WidgetConfigProp = {
-  readonly ui: WidgetConfig<
+  TestObjectField extends UnifiedField<
     string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    Record<string, UnifiedField<string, z.ZodTypeAny>>
-  >;
-} extends {
-  readonly ui: WidgetConfig<
-    string,
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    Record<string, UnifiedField<string, z.ZodTypeAny>>
-  >;
-}
-  ? "PASS"
-  : "FAIL";
-const test3_9: Test3_9_WidgetConfigProp = "PASS"; // We WANT this to pass
-
-// Test 3.10: Does a plain ObjectField (without nested fields) work?
-type SimpleObjectField = ObjectField<
-  Record<string, never>, // Empty children
-  { request: "data" },
-  string,
-  WidgetConfig<
-    string,
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    Record<string, UnifiedField<string, z.ZodTypeAny>>
+    AnyChildrenConstrain<string, FieldUsageConfig>
   >
->;
+    ? "PASS"
+    : "FAIL";
+const test3_8: Test3_8_Direct = "PASS"; // We WANT objectField to extend UnifiedField
+
+// Test 3.9: Test SimpleObjectField
+const simpleObjectFieldValue = objectField(
+  { type: WidgetType.CONTAINER },
+  { request: "data" },
+  {},
+);
+
+type SimpleObjectField = typeof simpleObjectFieldValue;
 type Test3_10_SimpleObject =
   ApiEndpoint<
     Methods.POST,
     readonly ["app.api.user.userRoles.enums.userRole.admin"],
     string,
+    AnyChildrenConstrain<string, FieldUsageConfig>,
     SimpleObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
     string,
-    UnifiedField<string, z.ZodTypeAny>
+    AnyChildrenConstrain<string, FieldUsageConfig>,
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -287,13 +286,23 @@ const test3_10: Test3_10_SimpleObject = "PASS"; // We WANT simple ObjectField to
 
 // Test 3.11: Test a minimal interface with just the fields property
 interface MinimalEndpoint<
-  out TFields extends UnifiedField<string, z.ZodTypeAny>,
+  out TFields extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >,
 > {
   readonly fields: TFields;
 }
 type Test3_11_Minimal =
   MinimalEndpoint<TestObjectField> extends MinimalEndpoint<
-    UnifiedField<string, z.ZodTypeAny>
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -301,7 +310,12 @@ const test3_11: Test3_11_Minimal = "PASS"; // We WANT minimal interface to work
 
 // Test 3.12: Test with a conditional type property (like exampleRequest in ApiEndpoint)
 interface ConditionalEndpoint<
-  out TFields extends UnifiedField<string, z.ZodTypeAny>,
+  out TFields extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >,
 > {
   readonly fields: TFields;
   readonly example: ExtractInput<
@@ -315,7 +329,12 @@ interface ConditionalEndpoint<
 }
 type Test3_12_Conditional =
   ConditionalEndpoint<TestObjectField> extends ConditionalEndpoint<
-    UnifiedField<string, z.ZodTypeAny>
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -324,20 +343,35 @@ const test3_12: Test3_12_Conditional = "PASS"; // Conditional properties work!
 // Test 3.13: Check what's actually different in ApiEndpoint that causes the failure
 // ApiEndpoint has many properties. Let me add them one by one.
 interface TestEndpointV1<
-  out TFields extends UnifiedField<string, z.ZodTypeAny>,
+  out TFields extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >,
 > {
   readonly fields: TFields;
 }
 interface TestEndpointV2<
   out TMethod extends Methods,
-  out TFields extends UnifiedField<string, z.ZodTypeAny>,
+  out TFields extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >,
 > extends TestEndpointV1<TFields> {
   readonly method: TMethod;
 }
 type Test3_13_V2 =
   TestEndpointV2<Methods.POST, TestObjectField> extends TestEndpointV2<
     Methods,
-    UnifiedField<string, z.ZodTypeAny>
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -350,12 +384,19 @@ type Test3_14_ActualApiEndpoint =
     Methods,
     readonly UserRoleValue[],
     string,
+    AnyChildrenConstrain<string, FieldUsageConfig>,
     SimpleObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
     string,
-    UnifiedField<string, z.ZodTypeAny>
+    AnyChildrenConstrain<string, FieldUsageConfig>,
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -365,7 +406,12 @@ const test3_14: Test3_14_ActualApiEndpoint = "PASS"; // We WANT ApiEndpoint with
 // This mimics the examples property: ExamplesList<InferFrom<TFields>, TExampleKey>
 interface TestCombined<
   TExampleKey extends string,
-  TFields extends UnifiedField<string, z.ZodTypeAny>,
+  TFields extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >,
 > {
   readonly fields: TFields;
   readonly examples: Record<
@@ -376,7 +422,12 @@ interface TestCombined<
 type Test3_15_Combined =
   TestCombined<"default", TestObjectField> extends TestCombined<
     string,
-    UnifiedField<string, z.ZodTypeAny>
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -390,7 +441,12 @@ const test3_16: Test3_16_RecordKey = "PASS"; // We WANT specific key Record to e
 // Test 3.17: Add the exact examples property from ApiEndpoint
 interface TestWithExamples<
   TExampleKey extends string,
-  TFields extends UnifiedField<string, z.ZodTypeAny>,
+  TFields extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >,
 > {
   readonly examples: ExamplesList<
     ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
@@ -400,7 +456,12 @@ interface TestWithExamples<
 type Test3_17_WithExamples =
   TestWithExamples<"default", TestObjectField> extends TestWithExamples<
     string,
-    UnifiedField<string, z.ZodTypeAny>
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -417,7 +478,12 @@ const test3_18: Test3_18_MappedType = "PASS"; // We WANT specific mapped type to
 // Test 3.19: Test the EXACT conditional structure from examples property
 interface TestConditionalExamples<
   TExampleKey extends string,
-  TFields extends UnifiedField<string, z.ZodTypeAny>,
+  TFields extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >,
 > {
   readonly examples: ExtractInput<
     InferSchemaFromField<TFields, FieldUsage.RequestData>
@@ -434,7 +500,15 @@ type Test3_19_ConditionalExamples =
   TestConditionalExamples<
     "default",
     TestObjectField
-  > extends TestConditionalExamples<string, UnifiedField<string, z.ZodTypeAny>>
+  > extends TestConditionalExamples<
+    string,
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
+  >
     ? "PASS"
     : "FAIL";
 const test3_19: Test3_19_ConditionalExamples = "PASS"; // We WANT the conditional examples structure to work
@@ -445,12 +519,19 @@ type Test3_20_OnlyExampleKeySpecific =
     Methods, // generic
     readonly UserRoleValue[], // generic
     string, // generic
+    AnyChildrenConstrain<string, FieldUsageConfig>,
     SimpleObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
     string,
-    UnifiedField<string, z.ZodTypeAny>
+    AnyChildrenConstrain<string, FieldUsageConfig>,
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -462,12 +543,19 @@ type Test3_21_OnlyMethodSpecific =
     Methods.POST, // SPECIFIC
     readonly UserRoleValue[], // generic
     string, // generic
+    AnyChildrenConstrain<string, FieldUsageConfig>,
     SimpleObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
     string,
-    UnifiedField<string, z.ZodTypeAny>
+    AnyChildrenConstrain<string, FieldUsageConfig>,
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -479,12 +567,19 @@ type Test3_22_OnlyRolesSpecific =
     Methods, // generic
     readonly ["app.api.user.userRoles.enums.userRole.admin"], // SPECIFIC tuple
     string, // generic
+    AnyChildrenConstrain<string, FieldUsageConfig>,
     SimpleObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
     string,
-    UnifiedField<string, z.ZodTypeAny>
+    AnyChildrenConstrain<string, FieldUsageConfig>,
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -514,7 +609,12 @@ const test3_24: Test3_24_NoInfer = "PASS"; // We WANT NoInfer to preserve varian
 interface MinimalApiEndpoint<
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
-  TFields extends UnifiedField<string, z.ZodTypeAny>,
+  TFields extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >,
 > {
   readonly method: TMethod;
   readonly allowedRoles: TUserRoleValue;
@@ -532,7 +632,12 @@ type Test3_25_MinimalApi =
   > extends MinimalApiEndpoint<
     Methods,
     readonly UserRoleValue[],
-    UnifiedField<string, z.ZodTypeAny>
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -542,7 +647,12 @@ const test3_25: Test3_25_MinimalApi = "PASS"; // With 'out' variance, interface 
 interface ApiEndpointWithOptions<
   out TMethod extends Methods,
   out TUserRoleValue extends readonly UserRoleValue[],
-  out TFields extends UnifiedField<string, z.ZodTypeAny>,
+  out TFields extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >,
 > extends MinimalApiEndpoint<TMethod, TUserRoleValue, TFields> {
   readonly options?: TMethod extends Methods.GET
     ? EndpointReadOptions<
@@ -562,7 +672,12 @@ type Test3_26_WithOptions =
   > extends ApiEndpointWithOptions<
     Methods,
     readonly UserRoleValue[],
-    UnifiedField<string, z.ZodTypeAny>
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -573,7 +688,12 @@ interface ApiEndpointWithErrorTypes<
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
-  TFields extends UnifiedField<string, z.ZodTypeAny>,
+  TFields extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >,
 > extends ApiEndpointWithOptions<TMethod, TUserRoleValue, TFields> {
   readonly errorTypes: Record<
     EndpointErrorTypes,
@@ -597,7 +717,12 @@ type Test3_27_WithErrorTypes =
     Methods,
     readonly UserRoleValue[],
     string,
-    UnifiedField<string, z.ZodTypeAny>
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -659,7 +784,12 @@ interface MinimalWithIndexExamples<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
-  TFields extends UnifiedField<string, z.ZodTypeAny>,
+  TFields extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >,
 > {
   readonly method: TMethod;
   readonly allowedRoles: TUserRoleValue;
@@ -676,7 +806,12 @@ type Test3_28e_Result =
     string,
     Methods,
     readonly UserRoleValue[],
-    UnifiedField<string, z.ZodTypeAny>
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -714,13 +849,20 @@ type Test3_31_SpecificApi = ApiEndpoint<
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   "app.api.someScope.title",
+  AnyChildrenConstrain<string, FieldUsageConfig>,
   SimpleObjectField
 >;
 type Test3_31_GenericApi = ApiEndpoint<
   Methods,
   readonly UserRoleValue[],
   string,
-  UnifiedField<string, z.ZodTypeAny>
+  AnyChildrenConstrain<string, FieldUsageConfig>,
+  UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
 >;
 type Test3_31_Result = Test3_31_SpecificApi extends Test3_31_GenericApi
   ? "PASS"
@@ -736,7 +878,12 @@ type Test4_1_GenericExample = CreateApiEndpoint<
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   string,
-  UnifiedField<string, z.ZodTypeAny>
+  UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
 >;
 type Test4_1_Result = Test4_1_GenericExample extends CreateApiEndpointAny
   ? "PASS"
@@ -748,7 +895,12 @@ type Test4_2_GenericMethod = CreateApiEndpoint<
   Methods, // Generic
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   string,
-  UnifiedField<string, z.ZodTypeAny>
+  UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
 >;
 type Test4_2_Result = Test4_2_GenericMethod extends CreateApiEndpointAny
   ? "PASS"
@@ -760,7 +912,12 @@ type Test4_3_GenericRoles = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[], // Generic
   string,
-  UnifiedField<string, z.ZodTypeAny>
+  UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
 >;
 type Test4_3_Result = Test4_3_GenericRoles extends CreateApiEndpointAny
   ? "PASS"
@@ -772,7 +929,12 @@ type Test4_4_OnlyRoleIssue = CreateApiEndpoint<
   Methods,
   readonly ["app.api.user.userRoles.enums.userRole.admin"], // Tuple
   string,
-  UnifiedField<string, z.ZodTypeAny>
+  UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
 >;
 type Test4_4_Result = Test4_4_OnlyRoleIssue extends CreateApiEndpointAny
   ? "PASS"
@@ -826,14 +988,26 @@ type Test6_1_WithOutVariance = ApiEndpoint<
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   string,
-  UnifiedField<string, z.ZodTypeAny>
+  AnyChildrenConstrain<string, FieldUsageConfig>,
+  UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
 >;
 type Test6_1_Result =
   Test6_1_WithOutVariance extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
     string,
-    UnifiedField<string, z.ZodTypeAny>
+    AnyChildrenConstrain<string, FieldUsageConfig>,
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -848,7 +1022,12 @@ type Test7_1_CreateWithOut = CreateApiEndpoint<
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   string,
-  UnifiedField<string, z.ZodTypeAny>
+  UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
 >;
 type Test7_1_Result = Test7_1_CreateWithOut extends CreateApiEndpointAny
   ? "PASS"
@@ -916,7 +1095,6 @@ export {
   test3_6,
   test3_7,
   test3_8,
-  test3_9,
   test3_10,
   test3_11,
   test3_12,

@@ -3,6 +3,7 @@
  * Displays a colored badge with text/status information
  */
 
+import type { BadgeVariant } from "next-vibe-ui/ui/badge";
 import type { z } from "zod";
 
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -11,6 +12,7 @@ import type {
   NumberWidgetSchema,
   StringWidgetSchema,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 
 import type {
   BasePrimitiveWidgetConfig,
@@ -18,38 +20,9 @@ import type {
 } from "../../_shared/types";
 
 /**
- * Semantic variants for badge styling
+ * Badge size variants
  */
-export type BadgeSemanticVariant =
-  | "default"
-  | "success"
-  | "warning"
-  | "error"
-  | "info";
-
-/**
- * Badge rich object schema - for badges with custom variant/icon
- */
-export type BadgeObjectSchema =
-  | z.ZodObject<{
-      text: z.ZodString;
-      variant: z.ZodOptional<z.ZodString>;
-      icon: z.ZodOptional<z.ZodString>;
-    }>
-  | z.ZodOptional<
-      z.ZodObject<{
-        text: z.ZodString;
-        variant: z.ZodOptional<z.ZodString>;
-        icon: z.ZodOptional<z.ZodString>;
-      }>
-    >
-  | z.ZodNullable<
-      z.ZodObject<{
-        text: z.ZodString;
-        variant: z.ZodOptional<z.ZodString>;
-        icon: z.ZodOptional<z.ZodString>;
-      }>
-    >;
+export type BadgeSize = "xs" | "sm" | "base" | "lg";
 
 /**
  * Badge schema constraint - accepts:
@@ -61,8 +34,7 @@ export type BadgeObjectSchema =
 export type BadgeWidgetSchema =
   | StringWidgetSchema
   | NumberWidgetSchema
-  | EnumWidgetSchema
-  | BadgeObjectSchema;
+  | EnumWidgetSchema;
 
 /**
  * Badge Widget Configuration
@@ -87,7 +59,16 @@ export interface BadgeWidgetConfig<
   enumOptions?: Array<BadgeEnumOption<TKey>>;
 
   /** Semantic variant for badge color */
-  variant?: BadgeSemanticVariant;
+  variant?: BadgeVariant;
+
+  /** Badge size */
+  size?: BadgeSize;
+
+  /**
+   * Dynamic className callback - receives field value and parent value
+   * Returns additional className to merge with static className
+   */
+  getClassName?: (value: z.output<TSchema>, parentValue?: WidgetData) => string;
 
   /** Schema constraint for the field value */
   schema: TSchema;

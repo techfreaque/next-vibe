@@ -12,8 +12,9 @@ import type { JSX } from "react";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
-import { findEnumLabel, mapSemanticVariantToBadgeVariant } from "./shared";
+import { findEnumLabel } from "./shared";
 import type { BadgeWidgetConfig, BadgeWidgetSchema } from "./types";
 
 /**
@@ -45,6 +46,23 @@ import type { BadgeWidgetConfig, BadgeWidgetSchema } from "./types";
  * - { text: string, variant?: string, icon?: string }: Full badge object
  * - null/undefined: Shows "—" placeholder
  */
+/**
+ * Get size className for badge
+ */
+function getBadgeSizeClass(size?: string): string {
+  switch (size) {
+    case "xs":
+      return "text-[10px] px-1.5 py-0";
+    case "sm":
+      return "text-[11px] px-2 py-0.5";
+    case "lg":
+      return "text-sm px-3 py-1";
+    case "base":
+    default:
+      return ""; // Use default badge styling
+  }
+}
+
 export function BadgeWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
@@ -53,46 +71,34 @@ export function BadgeWidget<
   props:
     | ReactWidgetProps<
         TEndpoint,
+        TUsage,
         BadgeWidgetConfig<TKey, never, TUsage, "widget">
       >
     | ReactWidgetProps<
         TEndpoint,
+        TUsage,
         BadgeWidgetConfig<TKey, BadgeWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
-  const { field, context } = props;
+  const { field } = props;
+  const t = useWidgetTranslation();
   const {
     text: staticText,
     enumOptions,
-    variant: semanticVariant,
+    variant: badgeVariant = "outline",
+    size,
     className,
   } = field;
 
-  // Handle static text from UI config
-  if (staticText) {
-    const translatedText = context.t(staticText);
-    const badgeVariant = semanticVariant
-      ? mapSemanticVariantToBadgeVariant(semanticVariant)
-      : "default";
-
-    return (
-      <Badge variant={badgeVariant} className={className}>
-        {translatedText}
-      </Badge>
-    );
-  }
+  const sizeClass = getBadgeSizeClass(size);
 
   // value is properly typed from schema - no assertions needed
   // Handle enum options - find matching label for value
   if (enumOptions) {
-    const enumLabel = findEnumLabel(field.value, enumOptions, context);
+    const enumLabel = findEnumLabel(field.value, enumOptions, t);
     if (enumLabel) {
-      const badgeVariant = semanticVariant
-        ? mapSemanticVariantToBadgeVariant(semanticVariant)
-        : "default";
-
       return (
-        <Badge variant={badgeVariant} className={className}>
+        <Badge variant={badgeVariant} className={cn(sizeClass, className)}>
           {enumLabel}
         </Badge>
       );
@@ -101,24 +107,40 @@ export function BadgeWidget<
 
   // Handle null/empty case
   if (!field.value) {
+    // Handle static text from UI config
+    if (staticText) {
+      const translatedText = t(staticText);
+
+      return (
+        <Badge variant={badgeVariant} className={cn(sizeClass, className)}>
+          {translatedText}
+        </Badge>
+      );
+    }
     return (
       <Badge
         variant="outline"
-        className={cn("text-muted-foreground", className)}
+        className={cn(sizeClass, "text-muted-foreground", className)}
       >
         —
       </Badge>
     );
   }
 
-  // Apply semantic variant if configured, otherwise use data variant
-  const badgeVariant = semanticVariant
-    ? mapSemanticVariantToBadgeVariant(semanticVariant)
-    : field.value.variant;
+  // Handle string value as translation key
+  if (typeof field.value === "string") {
+    const translatedText = t(field.value);
+
+    return (
+      <Badge variant={badgeVariant} className={cn(sizeClass, className)}>
+        {translatedText}
+      </Badge>
+    );
+  }
 
   return (
-    <Badge variant={badgeVariant} className={className}>
-      {field.value.text}
+    <Badge variant={badgeVariant} className={cn(sizeClass, className)}>
+      {field.value}
     </Badge>
   );
 }

@@ -35,7 +35,13 @@ export interface NavigateButtonWidgetConfig<
   metadata?: {
     targetEndpoint: TTargetEndpoint;
     extractParams?: TTargetEndpoint extends CreateApiEndpointAny
-      ? (source: Record<string, WidgetData>) => {
+      ? (source: {
+          // The parent item of an array (if any)
+          itemData: WidgetData | undefined;
+          requestData: WidgetData;
+          urlPathParams: WidgetData;
+          responseData: WidgetData;
+        }) => {
           urlPathParams?: Partial<
             TTargetEndpoint["types"]["UrlVariablesOutput"]
           >;

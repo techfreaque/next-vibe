@@ -5,14 +5,18 @@
  * Mirrors React widget architecture for consistency.
  */
 
-import type { z } from "zod";
+import type { FieldValues, UseFormReturn } from "react-hook-form";
+import type z from "zod";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
 import type { UnifiedField } from "../../../shared/widgets/configs";
 import type {
+  AnyChildrenConstrain,
   BaseWidgetContext,
   BaseWidgetProps,
+  ConstrainedChildUsage,
+  DispatchField,
   FieldUsageConfig,
 } from "./types";
 
@@ -21,6 +25,8 @@ export type { FieldUsageConfig };
 
 /**
  * Ink form state management (simplified version of UseFormReturn)
+ * Unlike React Hook Form which uses Path<T> branded types, this accepts plain strings
+ * for field names to keep CLI implementation simple.
  */
 export interface InkFormState<TFormData> {
   values: Partial<TFormData>;
@@ -41,37 +47,53 @@ export type InkWidgetContext<TEndpoint extends CreateApiEndpointAny> =
   };
 
 /**
- * Props for InkWidgetRenderer component
- * Receives fields WITHOUT values, will augment them internally
+ * Props for InkWidgetRenderer component.
+ * Receives fields WITH values already added by the endpoint renderer.
+ * field is DispatchField — UnifiedField union + value for switch-based dispatch.
+ * fieldName is `string` (not Path) — CLI forms use plain string keys, not
+ * react-hook-form branded paths.
  */
 export interface InkWidgetRendererProps<
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- TEndpoint needed for generic constraint
   TEndpoint extends CreateApiEndpointAny,
-  TWidgetConfig extends UnifiedField<
+> {
+  fieldName: string;
+  field: DispatchField<
     string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    // oxlint-disable-next-line typescript/no-explicit-any
-    any
-  >,
-> {
-  fieldName: string;
-  field: TWidgetConfig;
-  context: InkWidgetContext<TEndpoint>;
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
+  >;
 }
 
 /**
  * Ink-specific widget props. Uses BaseWidgetProps with InkWidgetContext.
  * Receives fields WITH values from the renderer
  */
-export interface InkWidgetProps<
+export type InkWidgetProps<
   TEndpoint extends CreateApiEndpointAny,
   TWidgetConfig extends UnifiedField<
     string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    // oxlint-disable-next-line typescript/no-explicit-any
-    any
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >,
-> extends BaseWidgetProps<TEndpoint, TWidgetConfig> {
-  context: InkWidgetContext<TEndpoint>;
+> = BaseWidgetProps<TEndpoint, TWidgetConfig>;
+
+/**
+ * Type guard to check if a form is InkFormState
+ */
+export function isInkFormState<TFormData extends FieldValues>(
+  form: InkFormState<TFormData> | UseFormReturn<TFormData> | null | undefined,
+): form is InkFormState<TFormData> {
+  return (
+    form !== null &&
+    form !== undefined &&
+    typeof form === "object" &&
+    "values" in form &&
+    "setValue" in form &&
+    "getValue" in form &&
+    "errors" in form &&
+    !("formState" in form)
+  );
 }

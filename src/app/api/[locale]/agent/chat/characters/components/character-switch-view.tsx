@@ -58,6 +58,11 @@ export function CharacterSwitchView({
 
       const updates: FavoriteUpdateRequestOutput = {
         characterId,
+        character: {
+          info: {
+            icon: editingFavorite.character.info.icon,
+          },
+        },
         voice: keepSettings ? editingFavorite.voice : undefined,
         modelSelection: editingFavorite.modelSelection,
       };
@@ -105,6 +110,7 @@ export function CharacterSwitchView({
       onBack={() => onViewChange("settings")}
       locale={locale}
       favorites={favorites}
+      user={user}
     />
   );
 }

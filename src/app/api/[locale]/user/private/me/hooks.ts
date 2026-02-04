@@ -84,6 +84,7 @@ export function useUser(
   } = useApiQuery({
     endpoint: meEndpoints.GET,
     logger,
+    user,
     options: {
       enabled: queryEnabled, // Enable immediately - server handles auth
     },
@@ -127,11 +128,12 @@ export function useUser(
  */
 export function useUpdateProfile(
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): EnhancedMutationResult<MePostResponseOutput, MePostRequestOutput, never> {
   const { toast } = useToast();
   const { t } = useTranslation();
 
-  return useApiMutation(meEndpoints.POST, logger, {
+  return useApiMutation(meEndpoints.POST, logger, user, {
     onSuccess: async () => {
       toast({
         title: t("app.api.user.notifications.profileUpdated.title"),
@@ -160,6 +162,7 @@ export function useUpdateProfile(
  */
 export function useDeleteAccount(
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): EnhancedMutationResult<
   MeDeleteResponseOutput,
   MeDeleteRequestOutput,
@@ -168,7 +171,7 @@ export function useDeleteAccount(
   const { toast } = useToast();
   const { t } = useTranslation();
 
-  return useApiMutation(meEndpoints.DELETE, logger, {
+  return useApiMutation(meEndpoints.DELETE, logger, user, {
     onSuccess: () => {
       toast({
         title: t("app.api.user.private.me.delete.success.title"),

@@ -113,7 +113,7 @@ const { GET } = createEndpoint({
         description:
           "app.api.agent.chat.threads.get.subFolderId.description" as const,
         columns: 6,
-        schema: z.uuid().optional().nullable(),
+        schema: z.string().uuid().or(z.literal("")).nullish(),
       }),
       status: requestField({
         type: WidgetType.FORM_FIELD,

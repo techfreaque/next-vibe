@@ -90,7 +90,7 @@ export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
 
         {/* Sidebar and Main Chat Area */}
         <ErrorBoundary locale={locale}>
-          <SidebarWrapper user={user} locale={locale} logger={logger}>
+          <SidebarWrapper locale={locale} logger={logger}>
             {/* Main Chat Area */}
             <ErrorBoundary locale={locale}>
               <ChatArea locale={locale} logger={logger} user={user} />

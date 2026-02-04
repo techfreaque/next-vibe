@@ -9,7 +9,7 @@ import { H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { useNewsletterManager } from "@/app/api/[locale]/newsletter/hooks";
-import type { MeGetResponseOutput } from "@/app/api/[locale]/user/private/me/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -18,9 +18,11 @@ import CountrySelector from "../../_components/country-selector";
 export function NewsletterSignupFooter({
   locale,
   user,
+  userEmail,
 }: {
   locale: CountryLanguage;
-  user: MeGetResponseOutput | undefined;
+  user: JwtPayloadType;
+  userEmail: string | undefined;
 }): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -36,7 +38,7 @@ export function NewsletterSignupFooter({
     unsubscribe,
     isSubscribed,
     handleEmailChange,
-  } = useNewsletterManager(user);
+  } = useNewsletterManager(user, userEmail);
 
   return (
     <Div>

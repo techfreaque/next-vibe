@@ -1,35 +1,37 @@
 /**
- * Favorites Repository Client
- * Shared logic for favorites management, localStorage operations, and display fields
- * This is a static class with pure functions - no React dependencies
- * Can be used on both client and server since it has no React/DOM dependencies
+ * Favorites Client Repository
+ * Client-side operations for favorites using localStorage
+ * Mirrors server repository structure but runs in browser
  */
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
-  type ResponseType,
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import type { LocalStorageCallbacks } from "../../../system/unified-interface/react/hooks/endpoint-types";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
+import { parseError } from "../../../shared/utils";
 import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { modelProviders } from "../../models/models";
 import type { TtsVoiceValue } from "../../text-to-speech/enum";
-import { DEFAULT_CHARACTERS } from "../characters/config";
+import {
+  DEFAULT_CHARACTERS,
+  toCleanModelSelection,
+} from "../characters/config";
 import { CharactersRepositoryClient } from "../characters/repository-client";
 import { STORAGE_KEYS } from "../constants";
+import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import type {
   FavoriteGetResponseOutput,
-  FavoriteUpdateResponseOutput,
+  FavoriteUpdateRequestOutput,
 } from "./[id]/definition";
-import type byIdDefinitions from "./[id]/definition";
-import type favoritesCreateDefinition from "./create/definition";
-import type {
-  FavoriteCreateRequestOutput,
-  FavoriteModelSelection,
-} from "./create/definition";
-import type { FavoriteCard } from "./definition";
-import type favoritesDefinition from "./definition";
+import type { FavoriteCreateRequestOutput } from "./create/definition";
+import type { FavoriteModelSelection } from "./create/definition";
+import type { FavoriteCard, FavoritesListResponseOutput } from "./definition";
+import type { FavoritesReorderRequestOutput } from "./reorder/definition";
 
 /**
  * Minimal favorite data stored in localStorage
@@ -41,249 +43,376 @@ interface StoredLocalFavorite {
   customName: string | null;
   customIcon: IconKey | null;
   voice: typeof TtsVoiceValue | null;
-  modelSelection: FavoriteModelSelection;
+  modelSelection: FavoriteModelSelection["currentSelection"];
   color: string | null;
   position: number;
   useCount: number;
 }
 
 /**
- * Fields that can be updated in localStorage favorites
+ * Chat Favorites Client Repository
+ * Mirrors ChatFavoritesRepository but uses localStorage
  */
-type StoredLocalFavoriteUpdate = Omit<StoredLocalFavorite, "id" | "useCount">;
-
-/**
- * Favorites Repository Client - Static class pattern
- * All methods are pure functions for client-side favorites management
- *
- * Internal Storage Format:
- * - Stores minimal StoredLocalFavorite in localStorage
- * - Enriches with DEFAULT_CHARACTERS data on read
- * - Computes modelId from modelSelection
- */
-export class FavoritesRepositoryClient {
+export class ChatFavoritesRepositoryClient {
   /**
-   * Static localStorage callbacks for useEndpoint hook (list operations)
-   * Handles read (GET) and create (POST) operations for non-authenticated users
-   * Enriches minimal stored data with DEFAULT_CHARACTERS
+   * Get all favorites (mirrors server getFavorites)
    */
-  static readonly localStorageListCallbacks: LocalStorageCallbacks<
-    typeof favoritesDefinition
-  > = {
-    read: async (): Promise<
-      ResponseType<{ favoritesList: FavoriteCard[] }>
-    > => {
+  static async getFavorites(
+    logger: EndpointLogger,
+  ): Promise<ResponseType<FavoritesListResponseOutput>> {
+    try {
+      logger.debug("Fetching client-side favorites from localStorage");
+
+      const settings = ChatSettingsRepositoryClient.loadLocalSettings();
+      const activeFavoriteId = settings.activeFavoriteId;
+
       // Load stored minimal configs
-      const storedConfigs =
-        FavoritesRepositoryClient.loadAllLocalFavoriteConfigs();
+      const storedConfigs = this.loadAllLocalFavorites();
 
-      // Enrich with DEFAULT_CHARACTERS data and compute modelId
+      // Enrich with DEFAULT_CHARACTERS data
       const cards = storedConfigs.map((config): FavoriteCard => {
-        // Find character from DEFAULT_CHARACTERS
-        const character = DEFAULT_CHARACTERS.find(
-          (c) => c.id === config.characterId,
-        );
-
-        if (!character) {
-          // Fallback for unknown character
-          return {
-            id: config.id,
-            characterId: config.characterId,
-            modelId: null,
-            icon: config.customIcon ?? ("user" as const),
-            content: {
-              titleRow: {
-                name:
-                  config.customName ??
-                  ("app.api.agent.chat.favorites.fallbacks.unknownCharacter" as const),
-                tagline:
-                  "app.api.agent.chat.favorites.fallbacks.noTagline" as const,
-              },
-              description:
-                "app.api.agent.chat.favorites.fallbacks.noDescription" as const,
-              modelRow: {
-                modelIcon: "sparkles" as const,
-                modelInfo:
-                  "app.api.agent.chat.favorites.fallbacks.unknown" as const,
-                modelProvider:
-                  "app.api.agent.chat.favorites.fallbacks.unknownProvider" as const,
-                creditCost:
-                  "app.api.agent.chat.favorites.fallbacks.zeroCredits" as const,
-              },
-            },
-          };
-        }
-
-        // Compute best model from favorite's modelSelection + character's modelSelection
-        const bestModel = CharactersRepositoryClient.getBestModelForFavorite(
-          config.modelSelection,
-          character.modelSelection,
-        );
-
-        return {
-          id: config.id,
-          characterId: config.characterId,
-          modelId: bestModel?.id ?? null,
-          icon: config.customIcon ?? character.icon ?? bestModel?.icon ?? "bot",
-          content: {
-            titleRow: {
-              name:
-                config.customName ??
-                character.name ??
-                bestModel?.name ??
-                ("app.api.agent.chat.favorites.fallbacks.unknownModel" as const),
-              tagline:
-                character.tagline ??
-                ("app.api.agent.chat.favorites.fallbacks.noTagline" as const),
-            },
-            description:
-              character.description ??
-              ("app.api.agent.chat.favorites.fallbacks.noDescription" as const),
-            modelRow: bestModel
-              ? {
-                  modelIcon: bestModel.icon,
-                  modelInfo: bestModel.name,
-                  modelProvider:
-                    bestModel.provider ??
-                    ("app.api.agent.chat.favorites.fallbacks.unknownProvider" as const),
-                  creditCost: `${bestModel.creditCost} credits`,
-                }
-              : {
-                  modelIcon: "sparkles" as const,
-                  modelInfo: "No model found",
-                  modelProvider:
-                    "app.api.agent.chat.favorites.fallbacks.unknownProvider" as const,
-                  creditCost:
-                    "app.api.agent.chat.favorites.fallbacks.zeroCredits" as const,
-                },
-          },
-        };
+        return this.computeFavoriteDisplayFields(config, activeFavoriteId);
       });
 
-      return success({ favoritesList: cards });
-    },
-  };
-  static readonly localStorageCreateCallbacks: LocalStorageCallbacks<
-    typeof favoritesCreateDefinition
-  > = {
-    create: async (params: {
-      requestData: FavoriteCreateRequestOutput;
-    }): Promise<ResponseType<{ id: string }>> => {
-      // Creates and stores as FavoriteGetResponseOutput internally
-      const newConfig = FavoritesRepositoryClient.createLocalFavorite(
-        params.requestData,
-      );
-      return success({ id: newConfig.id });
-    },
-  };
+      // Sort by position (ascending)
+      const sortedCards = cards.toSorted((a, b) => a.position - b.position);
+
+      return success({ favoritesList: sortedCards });
+    } catch (error) {
+      logger.error("Failed to load favorites", parseError(error));
+      return fail({
+        message: "Failed to load favorites from storage",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
 
   /**
-   * Static localStorage callbacks for individual favorite by ID operations
-   * Used for GET/PATCH/DELETE /favorites/[id] endpoints
-   * Internally stores and retrieves data as FavoriteGetResponseOutput
+   * Create a new favorite (mirrors server createFavorite)
    */
-  static readonly byIdCallbacks: LocalStorageCallbacks<typeof byIdDefinitions> =
-    {
-      // Get single favorite by ID - returns FavoriteGetResponseOutput directly
-      read: async (params: {
-        urlPathParams?: { id: string };
-      }): Promise<ResponseType<FavoriteGetResponseOutput>> => {
-        if (!params.urlPathParams?.id) {
-          return fail({
-            message:
-              "app.api.agent.chat.favorites.get.errors.validation.description",
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          });
+  static async createFavorite(
+    data: FavoriteCreateRequestOutput,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ id: string }>> {
+    try {
+      const id = `local-${Date.now()}`;
+      const currentConfigs = this.loadAllLocalFavorites();
+
+      const newConfig: StoredLocalFavorite = {
+        id,
+        characterId: data.characterId ?? "default",
+        customName: data.customName ?? null,
+        voice: data.voice ?? null,
+        modelSelection: data.modelSelection.currentSelection,
+        color: null,
+        customIcon: data.customIcon ?? null,
+        position: currentConfigs.length,
+        useCount: 0,
+      };
+
+      this.saveAllLocalFavorites([...currentConfigs, newConfig]);
+      logger.debug("Created favorite", { id });
+
+      return success({ id });
+    } catch (error) {
+      logger.error("Failed to create favorite", parseError(error));
+      return fail({
+        message: "Failed to create favorite",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Get single favorite by ID (mirrors server getFavoriteById)
+   */
+  static async getFavoriteById(
+    id: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<FavoriteGetResponseOutput>> {
+    try {
+      const config = this.loadLocalFavorite(id);
+      if (!config) {
+        return fail({
+          message: "Favorite not found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      const enriched = this.enrichLocalFavorite(config);
+      return success(enriched);
+    } catch (error) {
+      logger.error("Failed to get favorite", { ...parseError(error), id });
+      return fail({
+        message: "Failed to load favorite",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Update favorite (mirrors server updateFavorite)
+   */
+  static async updateFavorite(
+    id: string,
+    data: FavoriteUpdateRequestOutput,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ success: string }>> {
+    try {
+      const existing = this.loadLocalFavorite(id);
+      if (!existing) {
+        return fail({
+          message: "Favorite not found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      const characterId = data.characterId ?? existing.characterId;
+      const character = DEFAULT_CHARACTERS.find((c) => c.id === characterId);
+
+      // Extract icon from character.info.icon in request data
+      const iconFromRequest = data.character.info.icon;
+
+      // Only store customIcon if different from character default
+      const customIconToStore =
+        character && iconFromRequest === character.icon
+          ? null
+          : (iconFromRequest ?? null);
+
+      const updated: StoredLocalFavorite = {
+        ...existing,
+        characterId,
+        customName: existing.customName,
+        customIcon: customIconToStore,
+        voice: data.voice ?? null,
+        modelSelection: data.modelSelection.currentSelection,
+      };
+
+      this.updateLocalFavorite(id, updated);
+      logger.debug("Updated favorite", { id });
+
+      return success({
+        success: "app.api.agent.chat.favorites.id.patch.success.title",
+      });
+    } catch (error) {
+      logger.error("Failed to update favorite", { ...parseError(error), id });
+      return fail({
+        message: "Failed to update favorite",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Delete favorite (mirrors server deleteFavorite)
+   */
+  static async deleteFavorite(
+    id: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<never>> {
+    try {
+      this.deleteLocalFavorite(id);
+      logger.debug("Deleted favorite", { id });
+      return success();
+    } catch (error) {
+      logger.error("Failed to delete favorite", { ...parseError(error), id });
+      return fail({
+        message: "Failed to delete favorite",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Reorder favorites (mirrors server reorderFavorites)
+   */
+  static async reorderFavorites(
+    data: FavoritesReorderRequestOutput,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ success: boolean }>> {
+    try {
+      const allFavorites = this.loadAllLocalFavorites();
+
+      // Update positions
+      data.positions.forEach(({ id, position }) => {
+        const favorite = allFavorites.find((f) => f.id === id);
+        if (favorite) {
+          favorite.position = position;
         }
+      });
 
-        // Fetch from storage as FavoriteGetResponseOutput
-        const config = FavoritesRepositoryClient.fetchLocalFavoriteConfig(
-          params.urlPathParams.id,
-        );
-        if (!config) {
-          return fail({
-            message:
-              "app.api.agent.chat.favorites.get.errors.notFound.description",
-            errorType: ErrorResponseTypes.NOT_FOUND,
-          });
-        }
+      this.saveAllLocalFavorites(allFavorites);
+      logger.debug("Reordered favorites");
 
-        // Return FavoriteGetResponseOutput directly - no conversion needed
-        return success(config);
-      },
+      return success({ success: true });
+    } catch (error) {
+      logger.error("Failed to reorder favorites", parseError(error));
+      return fail({
+        message: "Failed to reorder favorites",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
 
-      // Update single favorite by ID - works with FavoriteGetResponseOutput
-      update: async (
-        params,
-      ): Promise<ResponseType<FavoriteUpdateResponseOutput>> => {
-        if (!params.urlPathParams?.id) {
-          return fail({
-            message:
-              "app.api.agent.chat.favorites.id.patch.errors.validation.description",
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          });
-        }
+  // ============================================================================
+  // PRIVATE HELPERS
+  // ============================================================================
 
-        const existing = FavoritesRepositoryClient.loadLocalFavoriteConfig(
-          params.urlPathParams.id,
-        );
-        if (!existing) {
-          return fail({
-            message:
-              "app.api.agent.chat.favorites.id.patch.errors.notFound.description",
-            errorType: ErrorResponseTypes.NOT_FOUND,
-          });
-        }
+  /**
+   * Compute display fields for a favorite
+   */
+  static computeFavoriteDisplayFields(
+    stored: StoredLocalFavorite,
+    activeFavoriteId: string | null,
+  ): FavoriteCard {
+    const character = DEFAULT_CHARACTERS.find(
+      (c) => c.id === stored.characterId,
+    );
 
-        // Update stored minimal subset - build full update object
-        const updates: StoredLocalFavoriteUpdate = {
-          characterId: params.requestData.characterId ?? existing.characterId,
-          customName: params.requestData.customName ?? null,
-          customIcon: params.requestData.customIcon ?? null,
-          voice: params.requestData.voice ?? null,
-          modelSelection: params.requestData.modelSelection,
-          color: params.requestData.color ?? null,
-          position: params.requestData.position ?? existing.position,
-        };
+    if (!character) {
+      return {
+        id: stored.id,
+        characterId: stored.characterId,
+        modelId: null,
+        position: stored.position,
+        icon: stored.customIcon ?? ("user" as const),
+        content: {
+          titleRow: {
+            name: stored.customName ?? "Unknown Character",
+            tagline: null,
+            activeBadge:
+              stored.id === activeFavoriteId
+                ? ("app.chat.selector.active" as const)
+                : null,
+          },
+          description: null,
+          modelRow: {
+            modelIcon: "sparkles" as const,
+            modelInfo: "Unknown",
+            modelProvider: "Unknown",
+            creditCost: "0 credits",
+          },
+        },
+      };
+    }
 
-        FavoritesRepositoryClient.updateLocalFavorite(
-          params.urlPathParams.id,
-          updates,
-        );
-        const updated = FavoritesRepositoryClient.fetchLocalFavoriteConfig(
-          params.urlPathParams.id,
-        );
-
-        if (!updated) {
-          return fail({
-            message:
-              "app.api.agent.chat.favorites.id.patch.errors.notFound.description",
-            errorType: ErrorResponseTypes.NOT_FOUND,
-          });
-        }
-
-        return success({ success: true });
-      },
-
-      // Delete single favorite by ID
-      delete: async (params) => {
-        if (!params.urlPathParams?.id) {
-          return fail({
-            message:
-              "app.api.agent.chat.favorites.id.delete.errors.validation.description",
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          });
-        }
-
-        FavoritesRepositoryClient.deleteLocalFavorite(params.urlPathParams.id);
-        return success();
-      },
+    const fullModelSelection: FavoriteGetResponseOutput["modelSelection"] = {
+      currentSelection: stored.modelSelection,
+      characterModelSelection: toCleanModelSelection(character.modelSelection),
     };
 
+    const bestModel =
+      CharactersRepositoryClient.getBestModelForFavorite(fullModelSelection);
+
+    return {
+      id: stored.id,
+      characterId: stored.characterId,
+      modelId: bestModel?.id ?? null,
+      position: stored.position,
+      icon: stored.customIcon ?? character.icon ?? bestModel?.icon ?? "bot",
+      content: {
+        titleRow: {
+          name:
+            stored.customName ?? character.name ?? bestModel?.name ?? "Unknown",
+          tagline: character.tagline ?? null,
+          activeBadge:
+            stored.id === activeFavoriteId
+              ? ("app.chat.selector.active" as const)
+              : null,
+        },
+        description: character.description ?? null,
+        modelRow: bestModel
+          ? {
+              modelIcon: bestModel.icon,
+              modelInfo: bestModel.name,
+              modelProvider:
+                modelProviders[bestModel.provider]?.name ?? "Unknown",
+
+              creditCost: `${bestModel.creditCost} credits`,
+            }
+          : {
+              modelIcon: "sparkles" as const,
+              modelInfo: "No model found",
+              modelProvider: "Unknown",
+              creditCost: "0 credits",
+            },
+      },
+    };
+  }
+
   /**
-   * Load all favorite configs from localStorage (minimal subset)
+   * Enrich minimal stored favorite with DEFAULT_CHARACTERS data
    */
-  private static loadAllLocalFavoriteConfigs(): StoredLocalFavorite[] {
+  static enrichLocalFavorite(
+    stored: StoredLocalFavorite,
+  ): FavoriteGetResponseOutput {
+    const character = DEFAULT_CHARACTERS.find(
+      (c) => c.id === stored.characterId,
+    );
+
+    if (!character) {
+      return {
+        id: stored.id,
+        characterId: stored.characterId,
+        character: {
+          info: {
+            icon: "user" as const,
+            info: {
+              titleRow: {
+                name: "Unknown Character",
+                tagline: "",
+              },
+              description: "",
+            },
+          },
+        },
+        customName: stored.customName,
+        customIcon: stored.customIcon,
+        voice: stored.voice,
+        modelSelection: {
+          currentSelection: stored.modelSelection,
+          characterModelSelection: undefined,
+        },
+        color: stored.color,
+        position: stored.position,
+        useCount: stored.useCount,
+      };
+    }
+
+    return {
+      id: stored.id,
+      characterId: stored.characterId,
+      character: {
+        info: {
+          icon: stored.customIcon ?? character.icon,
+          info: {
+            titleRow: {
+              name: character.name ?? "Unknown",
+              tagline: character.tagline ?? null,
+            },
+            description: character.description ?? null,
+          },
+        },
+      },
+      customName: stored.customName,
+      customIcon: stored.customIcon,
+      voice: stored.voice,
+      modelSelection: {
+        currentSelection: stored.modelSelection,
+        characterModelSelection: toCleanModelSelection(
+          character.modelSelection,
+        ),
+      },
+      color: stored.color,
+      position: stored.position,
+      useCount: stored.useCount,
+    };
+  }
+
+  /**
+   * Load all favorites from localStorage
+   */
+  private static loadAllLocalFavorites(): StoredLocalFavorite[] {
     if (typeof window === "undefined") {
       return [];
     }
@@ -301,11 +430,9 @@ export class FavoritesRepositoryClient {
   }
 
   /**
-   * Save all favorite configs to localStorage (minimal subset)
+   * Save all favorites to localStorage
    */
-  private static saveAllLocalFavoriteConfigs(
-    configs: StoredLocalFavorite[],
-  ): void {
+  private static saveAllLocalFavorites(configs: StoredLocalFavorite[]): void {
     if (typeof window === "undefined") {
       return;
     }
@@ -316,147 +443,33 @@ export class FavoritesRepositoryClient {
   }
 
   /**
-   * Load single favorite config by ID from localStorage
+   * Load single favorite by ID
    */
-  private static loadLocalFavoriteConfig(
-    id: string,
-  ): StoredLocalFavorite | null {
-    const configs = this.loadAllLocalFavoriteConfigs();
+  static loadLocalFavorite(id: string): StoredLocalFavorite | null {
+    const configs = this.loadAllLocalFavorites();
     return configs.find((config) => config.id === id) ?? null;
   }
 
   /**
-   * Create a localStorage favorite (stores minimal subset)
-   * Returns enriched FavoriteGetResponseOutput for response
-   */
-  private static createLocalFavorite(
-    request: FavoriteCreateRequestOutput,
-  ): FavoriteGetResponseOutput {
-    const id = `local-${Date.now()}`;
-    const currentConfigs = this.loadAllLocalFavoriteConfigs();
-
-    // Store minimal subset
-    const newConfig: StoredLocalFavorite = {
-      id,
-      characterId: request.characterId ?? "default",
-      customName: request.customName ?? null,
-      voice: request.voice ?? null,
-      modelSelection: request.modelSelection,
-      color: null,
-      customIcon: request.customIcon ?? null,
-      position: currentConfigs.length,
-      useCount: 0,
-    };
-
-    this.saveAllLocalFavoriteConfigs([...currentConfigs, newConfig]);
-
-    // Return enriched version with character data from DEFAULT_CHARACTERS
-    return this.enrichLocalFavorite(newConfig);
-  }
-
-  /**
-   * Enrich minimal stored favorite with DEFAULT_CHARACTERS data
-   */
-  private static enrichLocalFavorite(
-    stored: StoredLocalFavorite,
-  ): FavoriteGetResponseOutput {
-    const character = DEFAULT_CHARACTERS.find(
-      (c) => c.id === stored.characterId,
-    );
-
-    if (!character) {
-      // Fallback for unknown character
-      return {
-        id: stored.id,
-        characterId: stored.characterId,
-        character: {
-          info: {
-            icon: "user" as const,
-            info: {
-              titleRow: {
-                name: "app.api.agent.chat.favorites.fallbacks.unknownCharacter" as const,
-                tagline:
-                  "app.api.agent.chat.favorites.fallbacks.noTagline" as const,
-              },
-              description:
-                "app.api.agent.chat.favorites.fallbacks.noDescription" as const,
-            },
-          },
-        },
-        customName: stored.customName,
-        customIcon: stored.customIcon,
-        voice: stored.voice,
-        modelSelection: stored.modelSelection,
-        color: stored.color,
-        position: stored.position,
-        useCount: stored.useCount,
-      };
-    }
-
-    return {
-      id: stored.id,
-      characterId: stored.characterId,
-      character: {
-        info: {
-          icon: stored.customIcon ?? character.icon,
-          info: {
-            titleRow: {
-              name:
-                character.name ??
-                ("app.api.agent.chat.favorites.fallbacks.unknownCharacter" as const),
-              tagline:
-                character.tagline ??
-                ("app.api.agent.chat.favorites.fallbacks.noTagline" as const),
-            },
-            description:
-              character.description ??
-              ("app.api.agent.chat.favorites.fallbacks.noDescription" as const),
-          },
-        },
-      },
-      customName: stored.customName,
-      customIcon: stored.customIcon,
-      voice: stored.voice,
-      modelSelection: stored.modelSelection,
-      color: stored.color,
-      position: stored.position,
-      useCount: stored.useCount,
-    };
-  }
-
-  /**
-   * Update a localStorage favorite (minimal subset)
+   * Update a favorite in localStorage
    */
   private static updateLocalFavorite(
     id: string,
-    updates: StoredLocalFavoriteUpdate,
+    updated: StoredLocalFavorite,
   ): void {
-    const currentConfigs = this.loadAllLocalFavoriteConfigs();
+    const currentConfigs = this.loadAllLocalFavorites();
     const updatedConfigs = currentConfigs.map((config) =>
-      config.id === id ? { ...config, ...updates } : config,
+      config.id === id ? updated : config,
     );
-    this.saveAllLocalFavoriteConfigs(updatedConfigs);
+    this.saveAllLocalFavorites(updatedConfigs);
   }
 
   /**
-   * Delete a localStorage favorite
+   * Delete a favorite from localStorage
    */
   private static deleteLocalFavorite(id: string): void {
-    const currentConfigs = this.loadAllLocalFavoriteConfigs();
+    const currentConfigs = this.loadAllLocalFavorites();
     const newConfigs = currentConfigs.filter((config) => config.id !== id);
-    this.saveAllLocalFavoriteConfigs(newConfigs);
-  }
-
-  /**
-   * Fetch full favorite config from localStorage (enriched with DEFAULT_CHARACTERS)
-   */
-  private static fetchLocalFavoriteConfig(
-    id: string,
-  ): FavoriteGetResponseOutput | null {
-    const config = this.loadLocalFavoriteConfig(id);
-    if (!config) {
-      return null;
-    }
-    return this.enrichLocalFavorite(config);
+    this.saveAllLocalFavorites(newConfigs);
   }
 }

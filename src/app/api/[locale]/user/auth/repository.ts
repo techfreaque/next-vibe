@@ -14,12 +14,15 @@ import {
   success,
   throwErrorResponse,
 } from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+import { Environment, parseError } from "next-vibe/shared/utils";
 import { redirect } from "next-vibe-ui/lib/redirect";
 
 import { cliEnv } from "@/app/api/[locale]/system/unified-interface/cli/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
+import {
+  AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
+  LEAD_ID_COOKIE_NAME,
+} from "@/config/constants";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
@@ -117,15 +120,12 @@ export class AuthRepository {
 
     try {
       const { cookies } = await import("next/headers");
-      const { LEAD_ID_COOKIE_NAME } = await import("@/config/constants");
-      const { env } = await import("@/config/env");
-      const { Environment } = await import("next-vibe/shared/utils");
 
       const cookieStore = await cookies();
       cookieStore.set({
         name: LEAD_ID_COOKIE_NAME,
         value: leadId,
-        httpOnly: false, // Needs to be readable by client
+        httpOnly: true,
         path: "/",
         secure: env.NODE_ENV === Environment.PRODUCTION,
         sameSite: "lax" as const,
@@ -1118,7 +1118,7 @@ export class AuthRepository {
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
     try {
-      logger.debug("app.api.user.auth.debug.authenticatingCliUserWithPayload", {
+      logger.debug("Authenticating user with payload", {
         userId: jwtPayload.id,
         isPublic: jwtPayload.isPublic,
         leadId: jwtPayload.leadId,
@@ -1127,7 +1127,7 @@ export class AuthRepository {
       // This method is only called for private users (isPublic: false)
       // If somehow a public user reaches here, it's an error
       if (jwtPayload.isPublic || !jwtPayload.id) {
-        logger.error("app.api.user.auth.debug.publicUserInPrivateAuthMethod", {
+        logger.error("Public user in private auth method", {
           isPublic: jwtPayload.isPublic,
           hasId: !!jwtPayload.id,
         });

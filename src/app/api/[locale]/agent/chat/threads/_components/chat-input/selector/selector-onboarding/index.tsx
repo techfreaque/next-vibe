@@ -44,8 +44,7 @@ export function SelectorOnboarding({
   logger,
 }: SelectorOnboardingProps): JSX.Element {
   // Get chat context and characters
-  const chat = useChatContext();
-  const characters = chat.characters;
+  const { characters, setActiveFavorite, ttsVoice, user } = useChatContext();
 
   const [step, setStep] = useState<OnboardingStep>(initialStep);
   const [selectedId, setSelectedId] = useState<string | null>(
@@ -95,22 +94,27 @@ export function SelectorOnboarding({
       const createdId = await addFavorite({
         characterId: selectedId,
         modelSelection: {
-          selectionType: ModelSelectionType.CHARACTER_BASED,
+          currentSelection: {
+            selectionType: ModelSelectionType.CHARACTER_BASED,
+          },
         },
       });
 
       if (createdId) {
-        chat.setActiveFavorite(
-          createdId,
-          selectedId,
-          character.modelId,
-          chat.ttsVoice,
-        );
+        setActiveFavorite(createdId, selectedId, character.modelId, ttsVoice);
       }
     } finally {
       setIsSaving(false);
     }
-  }, [selectedId, changeStep, addFavorite, chat, characters, logger]);
+  }, [
+    selectedId,
+    changeStep,
+    addFavorite,
+    characters,
+    logger,
+    setActiveFavorite,
+    ttsVoice,
+  ]);
 
   const handleAddSpecialist = useCallback(
     async (characterId: string) => {
@@ -118,7 +122,9 @@ export function SelectorOnboarding({
       await addFavorite({
         characterId,
         modelSelection: {
-          selectionType: ModelSelectionType.CHARACTER_BASED,
+          currentSelection: {
+            selectionType: ModelSelectionType.CHARACTER_BASED,
+          },
         },
       });
     },
@@ -144,26 +150,23 @@ export function SelectorOnboarding({
       const createdId = await addFavorite({
         characterId: selectedId,
         modelSelection: {
-          selectionType: ModelSelectionType.CHARACTER_BASED,
+          currentSelection: {
+            selectionType: ModelSelectionType.CHARACTER_BASED,
+          },
         },
       });
 
       if (createdId) {
-        chat.setActiveFavorite(
-          createdId,
-          selectedId,
-          character.modelId,
-          chat.ttsVoice,
-        );
+        setActiveFavorite(createdId, selectedId, character.modelId, ttsVoice);
       }
     } else {
       const character = characters[selectedId];
       if (character) {
-        chat.setActiveFavorite(
+        setActiveFavorite(
           existingFavorite.id,
           selectedId,
           character.modelId,
-          chat.ttsVoice,
+          ttsVoice,
         );
       }
     }
@@ -174,9 +177,10 @@ export function SelectorOnboarding({
     favorites,
     characters,
     addFavorite,
-    chat,
     logger,
     onOnboardingComplete,
+    setActiveFavorite,
+    ttsVoice,
   ]);
 
   return (
@@ -212,6 +216,7 @@ export function SelectorOnboarding({
           characters={characters}
           locale={locale}
           logger={logger}
+          user={user}
         />
       )}
     </Div>

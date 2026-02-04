@@ -35,139 +35,133 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.user.other.login.auth.login.title",
-      description: "app.user.other.login.auth.login.subtitle",
       layoutType: LayoutType.STACKED,
-      noCard: true,
+      gap: "4",
     },
     { request: "data", response: true },
     {
-      // === FORM CARD (contains all form elements, button, and footer links) ===
-      formCard: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.STACKED,
-          gap: "4",
-          order: 1,
+      title: widgetField({
+        type: WidgetType.TITLE,
+        content: "app.api.user.public.login.title",
+        order: 0,
+        usage: { request: "data", response: true },
+      }),
+      subtitle: widgetField({
+        type: WidgetType.TEXT,
+        content: "app.api.user.public.login.description",
+        variant: "body-lg",
+        order: 1,
+        usage: { request: "data", response: true },
+      }),
+      email: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label: "app.api.user.public.login.fields.email.label",
+        description: "app.api.user.public.login.fields.email.description",
+        placeholder: "app.api.user.public.login.fields.email.placeholder",
+        columns: 12,
+        theme: {
+          style: "none",
         },
-        { request: "data" },
-        {
-          email: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.EMAIL,
-            label: "app.api.user.public.login.fields.email.label",
-            description: "app.api.user.public.login.fields.email.description",
-            placeholder: "app.api.user.public.login.fields.email.placeholder",
-            columns: 12,
-            helpText: "app.api.user.public.login.fields.email.description",
-            order: 1,
-            schema: z
-              .string({
-                error:
-                  "app.api.user.public.login.fields.email.validation.required" satisfies TranslationKey,
-              })
-              .min(1, {
-                message:
-                  "app.api.user.public.login.fields.email.validation.required" satisfies TranslationKey,
-              })
-              .email({
-                message:
-                  "app.api.user.public.login.fields.email.validation.invalid" satisfies TranslationKey,
-              })
-              .transform((val) => val.toLowerCase().trim()),
-          }),
+        helpText: "app.api.user.public.login.fields.email.description",
+        order: 2,
+        schema: z
+          .string({
+            error:
+              "app.api.user.public.login.fields.email.validation.required" satisfies TranslationKey,
+          })
+          .min(1, {
+            message:
+              "app.api.user.public.login.fields.email.validation.required" satisfies TranslationKey,
+          })
+          .email({
+            message:
+              "app.api.user.public.login.fields.email.validation.invalid" satisfies TranslationKey,
+          })
+          .transform((val) => val.toLowerCase().trim()),
+      }),
 
-          password: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.PASSWORD,
-            label: "app.api.user.public.login.fields.password.label",
-            description:
-              "app.api.user.public.login.fields.password.description",
-            placeholder:
-              "app.api.user.public.login.fields.password.placeholder",
-            columns: 12,
-            helpText: "app.api.user.public.login.fields.password.description",
-            order: 2,
-            schema: z
-              .string({
-                error:
-                  "app.api.user.public.login.fields.password.validation.required" satisfies TranslationKey,
-              })
-              .min(1, {
-                message:
-                  "app.api.user.public.login.fields.password.validation.required" satisfies TranslationKey,
-              }),
-          }),
-
-          rememberMe: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.user.public.login.fields.rememberMe.label",
-            columns: 12,
-            helpText: "app.api.user.public.login.fields.rememberMe.description",
-            order: 3,
-            schema: z.boolean().optional().default(true), // Default to true (30 days)
-          }),
-
-          // === FORM ALERT (shows validation and API errors) ===
-          formAlert: widgetField({
-            type: WidgetType.FORM_ALERT,
-            order: 4,
-            usage: { request: "data" },
-          }),
-
-          // === SUBMIT BUTTON (inside card) ===
-          submitButton: widgetField({
-            type: WidgetType.SUBMIT_BUTTON,
-            text: "app.api.user.public.login.actions.submit",
-            loadingText: "app.api.user.public.login.actions.submitting",
-            icon: "log-in",
-            variant: "default",
-            size: "default",
-            order: 5,
-            usage: { request: "data" },
-          }),
-
-          // === FOOTER LINKS (inside card, below button) ===
-          footerLinks: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              layoutType: LayoutType.STACKED,
-              gap: "2",
-              noCard: true,
-              order: 6,
-            },
-            { request: "data" },
-            {
-              forgotPassword: widgetField({
-                type: WidgetType.TEXT,
-                content: "app.api.user.public.login.footer.forgotPassword",
-                format: "link",
-                href: "/user/reset-password",
-                textAlign: "center",
-                columns: 12,
-                usage: { request: "data" },
-              }),
-              createAccount: widgetField({
-                type: WidgetType.TEXT,
-                content: "app.api.user.public.login.footer.createAccount",
-                format: "link",
-                href: "/user/signup",
-                textAlign: "center",
-                columns: 12,
-                usage: { request: "data" },
-              }),
-            },
-          ),
+      password: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.PASSWORD,
+        label: "app.api.user.public.login.fields.password.label",
+        description: "app.api.user.public.login.fields.password.description",
+        placeholder: "app.api.user.public.login.fields.password.placeholder",
+        columns: 12,
+        helpText: "app.api.user.public.login.fields.password.description",
+        order: 3,
+        theme: {
+          style: "none",
         },
-      ),
+        schema: z
+          .string({
+            error:
+              "app.api.user.public.login.fields.password.validation.required" satisfies TranslationKey,
+          })
+          .min(1, {
+            message:
+              "app.api.user.public.login.fields.password.validation.required" satisfies TranslationKey,
+          }),
+      }),
+
+      rememberMe: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.user.public.login.fields.rememberMe.label",
+        columns: 12,
+        helpText: "app.api.user.public.login.fields.rememberMe.description",
+        order: 4,
+        schema: z.boolean().optional().default(true), // Default to true (30 days)
+      }),
+
+      // === FORM ALERT (shows validation and API errors) ===
+      formAlert: widgetField({
+        type: WidgetType.FORM_ALERT,
+        order: 5,
+        usage: { request: "data" },
+      }),
 
       // === RESPONSE ALERT (outside card) ===
       message: responseField({
         type: WidgetType.ALERT,
         variant: "default",
-        order: 2,
+        order: 6,
         schema: z.string(),
+      }),
+
+      // === SUBMIT BUTTON (inside card) ===
+      submitButton: widgetField({
+        type: WidgetType.SUBMIT_BUTTON,
+        text: "app.api.user.public.login.actions.submit",
+        loadingText: "app.api.user.public.login.actions.submitting",
+        icon: "log-in",
+        variant: "default",
+        size: "default",
+        order: 7,
+        usage: { request: "data" },
+      }),
+
+      // === FOOTER LINKS (inside card, below button) ===
+
+      forgotPassword: widgetField({
+        type: WidgetType.LINK,
+        text: "app.api.user.public.login.footer.forgotPassword",
+        href: "/user/reset-password",
+        textAlign: "center",
+        external: false,
+        order: 8,
+        columns: 12,
+        usage: { request: "data" },
+      }),
+      createAccount: widgetField({
+        type: WidgetType.LINK,
+        text: "app.api.user.public.login.footer.createAccount",
+        href: "/user/signup",
+        textAlign: "center",
+        external: false,
+        order: 9,
+        columns: 12,
+        usage: { request: "data" },
       }),
     },
   ),
@@ -222,36 +216,24 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        formCard: {
-          email: "customer@example.com",
-          password: "password123",
-          rememberMe: true,
-          footerLinks: {},
-        },
+        email: "customer@example.com",
+        password: "password123",
+        rememberMe: true,
       },
       failed: {
-        formCard: {
-          email: "customer@example.com",
-          password: "wrongpassword",
-          rememberMe: true,
-          footerLinks: {},
-        },
+        email: "customer@example.com",
+        password: "wrongpassword",
+        rememberMe: true,
       },
       withAdvanced: {
-        formCard: {
-          email: "customer@example.com",
-          password: "password123",
-          rememberMe: false,
-          footerLinks: {},
-        },
+        email: "customer@example.com",
+        password: "password123",
+        rememberMe: false,
       },
       accountLocked: {
-        formCard: {
-          email: "customer@example.com",
-          password: "password123",
-          rememberMe: true,
-          footerLinks: {},
-        },
+        email: "customer@example.com",
+        password: "password123",
+        rememberMe: true,
       },
     },
     responses: {

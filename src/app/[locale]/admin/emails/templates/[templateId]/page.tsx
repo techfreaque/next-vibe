@@ -18,6 +18,7 @@ import {
   getTemplate,
   getTemplateMetadata,
 } from "@/app/api/[locale]/emails/registry/generated";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -42,6 +43,7 @@ export default async function EmailTemplatePreviewPage({
 }: EmailTemplatePreviewPageProps): Promise<React.JSX.Element> {
   const { locale, templateId } = await params;
   const { t } = simpleT(locale);
+  const user = await requireAdminUser(locale);
 
   // Get template metadata
   const templateMetadata = getTemplateMetadata(templateId);
@@ -157,6 +159,7 @@ export default async function EmailTemplatePreviewPage({
         templateName={translatedName}
         previewFields={previewFields}
         exampleProps={exampleProps as Record<string, string | number | boolean>}
+        user={user}
       />
     </Div>
   );

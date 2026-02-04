@@ -12,6 +12,7 @@ import {
 import { BuyCreditsTab } from "@/app/api/[locale]/subscription/_components/buy-credits-tab";
 import { OverviewTab } from "@/app/api/[locale]/subscription/_components/overview-tab";
 import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -19,12 +20,14 @@ interface StoryPricingSectionProps {
   locale: CountryLanguage;
   isAuthenticated: boolean;
   initialSubscription: SubscriptionGetResponseOutput | null;
+  user: JwtPayloadType;
 }
 
 export function StoryPricingSection({
   locale,
   isAuthenticated,
   initialSubscription,
+  user,
 }: StoryPricingSectionProps): JSX.Element {
   const { t } = useTranslation();
 
@@ -79,6 +82,7 @@ export function StoryPricingSection({
           yearlySubscriptionPrice={YEARLY_SUBSCRIPTION_PRICE}
           packPrice={PACK_PRICE}
           packCredits={PACK_CREDITS}
+          user={user}
         />
       </Div>
     </Container>

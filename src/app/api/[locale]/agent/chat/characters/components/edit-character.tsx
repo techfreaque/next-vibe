@@ -57,6 +57,11 @@ export function EditCharacter({
       if (editingFavoriteId && favoriteData) {
         await favoriteEndpoint.updateFavorite({
           characterId: newCharacterId,
+          character: {
+            info: {
+              icon: favoriteData.character.info.icon,
+            },
+          },
           modelSelection: favoriteData.modelSelection,
         });
       }
@@ -66,7 +71,7 @@ export function EditCharacter({
   );
 
   // Fetch full character data using domain hook
-  const characterEndpoint = useCharacter(characterId, logger);
+  const characterEndpoint = useCharacter(characterId, user, logger);
   const characterData = useMemo(() => {
     return characterEndpoint.read?.data;
   }, [characterEndpoint.read?.data]);

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Test to debug variance issue with CreateApiEndpointAny
-import type { z } from "zod";
+import { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
@@ -9,34 +9,44 @@ import type {
   FieldUsageConfig,
 } from "../../../unified-ui/widgets/_shared/types";
 import type { CreateApiEndpoint } from "../../endpoints/definition/create";
+import { objectField } from "../../field/utils";
+import { requestField } from "../../field/utils-new";
 import type { UnifiedField } from "../../widgets/configs";
 import type { CreateApiEndpointAny } from "../endpoint-base";
 import type { Methods } from "../enums";
+import { FieldDataType, WidgetType } from "../enums";
 
 // Simulate the exact structure from retry/stop endpoints
+const testEndpoint_field = objectField(
+  { type: WidgetType.CONTAINER },
+  { request: "data" },
+  {
+    jobId: requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.UUID,
+      label: "Job ID",
+      schema: z.string().uuid(),
+    }),
+    result: objectField(
+      { type: WidgetType.CONTAINER },
+      { request: "data" },
+      {
+        success: requestField({
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "Success",
+          schema: z.boolean(),
+        }),
+      },
+    ),
+  },
+);
+
 type TestEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   string,
-  ObjectField<
-    {
-      jobId: PrimitiveField<z.ZodUUID, FieldUsageConfig>;
-      result: ObjectField<
-        {
-          success: PrimitiveField<z.ZodBoolean, FieldUsageConfig>;
-        },
-        FieldUsageConfig,
-        string,
-        WidgetConfig<
-          string,
-          z.ZodTypeAny,
-          FieldUsageConfig,
-          Record<string, UnifiedField<string, z.ZodTypeAny>>
-        >
-      >;
-    },
-    FieldUsageConfig
-  >
+  typeof testEndpoint_field
 >;
 
 // Test if it's assignable

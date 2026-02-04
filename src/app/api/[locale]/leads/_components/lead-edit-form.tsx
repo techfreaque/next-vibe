@@ -38,7 +38,7 @@ export function LeadEditForm({
   const { t } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
 
-  const endpoint = useLeadByIdEndpoint(logger, {
+  const endpoint = useLeadByIdEndpoint(user, logger, {
     leadId,
     enabled: true,
   });

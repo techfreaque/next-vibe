@@ -2,27 +2,93 @@
 
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
+import { useMemo } from "react";
 import type { Path } from "react-hook-form";
 import type z from "zod";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 
-import {
-  isRequestField,
-  isResponseField,
-} from "../../widgets/_shared/type-guards";
-import { isPrimitiveField } from "../../widgets/_shared/type-guards";
+import { withValue } from "../../widgets/_shared/field-helpers";
 import type {
   AnyChildrenConstrain,
   ArrayChildConstraint,
-  BaseWidgetContext,
-  BaseWidgetFieldProps,
+  ConstrainedChildUsage,
   FieldUsageConfig,
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
 } from "../../widgets/_shared/types";
+import {
+  ChildrenDataRenderer,
+  type ProcessedChildren,
+} from "./ChildrenDataRenderer";
 import { WidgetRenderer } from "./WidgetRenderer";
+
+/**
+ * Get grid column span class from columns property
+ * Maps columns number to Tailwind col-span classes
+ * IMPORTANT: FULL class strings for Tailwind purge!
+ */
+function getColumnSpanClass(columns: number | undefined): string {
+  if (!columns || columns <= 0) {
+    return "";
+  }
+
+  // JIT-safe col-span classes mapping
+  const colSpanMap: Record<number, string> = {
+    1: "col-span-1",
+    2: "col-span-2",
+    3: "col-span-3",
+    4: "col-span-4",
+    5: "col-span-5",
+    6: "col-span-6",
+    7: "col-span-7",
+    8: "col-span-8",
+    9: "col-span-9",
+    10: "col-span-10",
+    11: "col-span-11",
+    12: "col-span-12",
+  };
+
+  return colSpanMap[columns] ?? "";
+}
+
+/**
+ * Render a processed child inline group as flex container
+ */
+function renderInlineGroup<TEndpoint extends CreateApiEndpointAny>(
+  group: ProcessedChildren["inlineGroups"] extends Map<string, infer G>
+    ? G
+    : never,
+  fieldName: string | undefined,
+): JSX.Element {
+  return (
+    <Div className="flex items-center gap-2">
+      {group.fields.map(({ name, field, data, columns }) => {
+        const childFieldName = fieldName ? `${fieldName}.${name}` : name;
+        const columnSpanClass = getColumnSpanClass(columns);
+
+        const element = (
+          <WidgetRenderer<TEndpoint>
+            key={name}
+            fieldName={
+              childFieldName as Path<TEndpoint["types"]["RequestOutput"]>
+            }
+            field={withValue(field, data, undefined)}
+          />
+        );
+
+        return columnSpanClass ? (
+          <Div key={name} className={columnSpanClass}>
+            {element}
+          </Div>
+        ) : (
+          element
+        );
+      })}
+    </Div>
+  );
+}
 
 /**
  * Props for rendering a Record of named fields
@@ -31,12 +97,10 @@ interface ObjectChildrenRendererProps<
   TKey extends string,
   TUsage extends FieldUsageConfig,
   TChildren extends ObjectChildrenConstraint<TKey, TUsage>,
-  TEndpoint extends CreateApiEndpointAny,
 > {
   childrenSchema: TChildren;
-  value: Record<string, z.ZodTypeAny> | null | undefined;
+  value: Record<string, WidgetData> | null | undefined;
   fieldName: string | undefined;
-  context: BaseWidgetContext<TEndpoint>;
 }
 
 /**
@@ -46,12 +110,17 @@ interface ArrayChildRendererProps<
   TKey extends string,
   TUsage extends FieldUsageConfig,
   TChild extends AnyChildrenConstrain<TKey, TUsage>,
-  TEndpoint extends CreateApiEndpointAny,
 > {
   childSchema: TChild;
-  value: Array<z.ZodTypeAny> | null | undefined;
+  value: Array<WidgetData> | null | undefined;
   fieldName: string | undefined;
-  context: BaseWidgetContext<TEndpoint>;
+  /** Optional render callback to customize how each item is rendered */
+  renderItem?: (props: {
+    itemData: WidgetData;
+    index: number;
+    itemFieldName: string;
+    childSchema: TChild;
+  }) => JSX.Element;
 }
 
 /**
@@ -61,14 +130,12 @@ interface UnionObjectRendererProps<
   TKey extends string,
   TUsage extends FieldUsageConfig,
   TVariants extends UnionObjectWidgetConfigConstrain<TKey, TUsage>,
-  TEndpoint extends CreateApiEndpointAny,
 > {
   variantSchemas: TVariants;
-  value: Record<string, z.ZodTypeAny> | null | undefined;
+  value: Record<string, WidgetData> | null | undefined;
   fieldName: string | undefined;
   discriminator: string | undefined;
   watchedDiscriminatorValue: string | undefined;
-  context: BaseWidgetContext<TEndpoint>;
 }
 
 /**
@@ -84,181 +151,83 @@ export function ObjectChildrenRenderer<
   childrenSchema,
   value,
   fieldName,
-  context,
-}: ObjectChildrenRendererProps<
-  TKey,
-  TUsage,
-  TChildren,
-  TEndpoint
->): JSX.Element {
-  if (!childrenSchema) {
+}: ObjectChildrenRendererProps<TKey, TUsage, TChildren>): JSX.Element {
+  const processed = useMemo(() => {
+    if (!childrenSchema) {
+      return undefined;
+    }
+    const extracted = ChildrenDataRenderer.extractChildren(
+      childrenSchema,
+      value,
+    );
+    const sorted = ChildrenDataRenderer.sortChildren(extracted);
+    const groupResult = ChildrenDataRenderer.groupInlineFields(sorted);
+    return {
+      children: sorted,
+      inlineGroups: groupResult.groups,
+      inlineGroupMembers: groupResult.members,
+    };
+  }, [childrenSchema, value]);
+
+  if (!processed || processed.children.length === 0) {
     return <></>;
   }
 
-  const childrenToRender = Object.entries(childrenSchema);
+  const result: JSX.Element[] = [];
 
-  const getChildData = (childName: string): z.ZodTypeAny | null => {
-    if (!value) {
-      return null;
-    }
-    return value[childName as keyof typeof value] ?? null;
-  };
-
-  const renderChildren = (): (JSX.Element | null)[] => {
-    const result: (JSX.Element | null)[] = [];
-    let inlineGroup: Array<{
-      name: string;
-      field: (typeof childrenToRender)[number][1];
-      data: ReturnType<typeof getChildData>;
-    }> = [];
-
-    const flushInlineGroup = (): void => {
-      if (inlineGroup.length === 0) {
-        return;
-      }
-
-      if (inlineGroup.length === 1) {
-        // Single inline field - render normally
-        const { name, field, data } = inlineGroup[0];
-        const childFieldName = fieldName ? `${fieldName}.${name}` : name;
-
-        result.push(
-          <WidgetRenderer
-            key={name}
-            fieldName={
-              childFieldName as Path<TEndpoint["types"]["RequestOutput"]>
-            }
-            field={
-              { ...field, value: data } as BaseWidgetFieldProps<typeof field>
-            }
-            context={context}
-          />,
-        );
-      } else {
-        // Multiple inline fields - wrap in flex container
-        result.push(
-          <Div
-            key={`inline-group-${inlineGroup[0].name}`}
-            className="flex items-center gap-2"
-          >
-            {inlineGroup.map(({ name, field, data }) => {
-              const childFieldName = fieldName ? `${fieldName}.${name}` : name;
-
-              return (
-                <WidgetRenderer
-                  key={name}
-                  fieldName={
-                    childFieldName as Path<TEndpoint["types"]["RequestOutput"]>
-                  }
-                  field={
-                    { ...field, value: data } as BaseWidgetFieldProps<
-                      typeof field
-                    >
-                  }
-                  context={context}
-                />
-              );
-            })}
-          </Div>,
-        );
-      }
-
-      inlineGroup = [];
-    };
-
-    for (const [childName, childField] of childrenToRender) {
-      // Type-safe checks on all union members via BaseWidgetConfig properties
-      const { hidden = false, inline = false, schemaType } = childField;
-
-      // Skip hidden fields
-      if (hidden) {
-        context.logger.debug(
-          `ObjectChildrenRenderer: Skipping hidden field "${childName}"`,
-        );
-        continue;
-      }
-
-      const childData = getChildData(childName);
-
-      // Check if this is a widget field or widget-only object container
-      const isWidgetField = schemaType === "widget";
-      const isWidgetOnlyObject =
-        schemaType === "widget-object" &&
-        "children" in childField &&
-        childField.children !== undefined &&
-        typeof childField.children === "object" &&
-        Object.values(childField.children).every(
-          (child) =>
-            child &&
-            typeof child === "object" &&
-            "schemaType" in child &&
-            child.schemaType === "widget",
-        );
-
-      // Skip response-only fields that don't have data
-      const hasRequest = isRequestField(childField);
-      if (
-        !isWidgetField &&
-        !isWidgetOnlyObject &&
-        isResponseField(childField) &&
-        !hasRequest &&
-        (childData === null || childData === undefined)
-      ) {
-        context.logger.debug(
-          `ObjectChildrenRenderer: Skipping response-only field without data "${childName}"`,
-        );
-        continue;
-      }
-
-      context.logger.debug(
-        `ObjectChildrenRenderer: Rendering child "${childName}"`,
+  for (const child of processed.children) {
+    // Skip if part of inline group (will be rendered as group)
+    if (processed.inlineGroupMembers.has(child.name)) {
+      // Only render once per group (at first child)
+      const group = [...processed.inlineGroups.values()].find((g) =>
+        g.fields.some((f) => f.name === child.name),
       );
-
-      // Check if this field should be inline
-      if (inline) {
-        // Add to inline group
-        inlineGroup.push({
-          name: childName,
-          field: childField,
-          data: childData,
-        });
-      } else {
-        // Flush any pending inline group
-        flushInlineGroup();
-
-        // Render this field normally
-        const childFieldName = fieldName
-          ? `${fieldName}.${childName}`
-          : childName;
-
-        // For NAVIGATE_BUTTON widgets, pass parent value
-        const dataToPass =
-          childField.type === WidgetType.NAVIGATE_BUTTON ? value : childData;
+      if (group && group.fields[0].name === child.name) {
+        const groupColumnSpanClass = getColumnSpanClass(group.totalColumns);
+        const groupElement = renderInlineGroup<TEndpoint>(group, fieldName);
 
         result.push(
-          <WidgetRenderer
-            key={childName}
-            fieldName={
-              childFieldName as Path<TEndpoint["types"]["RequestOutput"]>
-            }
-            field={
-              { ...childField, value: dataToPass } as BaseWidgetFieldProps<
-                typeof childField
-              >
-            }
-            context={context}
-          />,
+          groupColumnSpanClass ? (
+            <Div
+              key={`inline-group-${child.name}`}
+              className={groupColumnSpanClass}
+            >
+              {groupElement}
+            </Div>
+          ) : (
+            groupElement
+          ),
         );
       }
+      continue;
     }
 
-    // Flush any remaining inline group
-    flushInlineGroup();
+    // Regular non-inline child
+    const childFieldName = fieldName
+      ? `${fieldName}.${child.name}`
+      : child.name;
+    const columnSpanClass = getColumnSpanClass(child.columns);
 
-    return result;
-  };
+    const element = (
+      <WidgetRenderer<TEndpoint>
+        key={child.name}
+        fieldName={childFieldName as Path<TEndpoint["types"]["RequestOutput"]>}
+        field={withValue(child.field, child.data, value ?? undefined)}
+      />
+    );
 
-  return <Div className="flex flex-col gap-4">{renderChildren()}</Div>;
+    result.push(
+      columnSpanClass ? (
+        <Div key={child.name} className={columnSpanClass}>
+          {element}
+        </Div>
+      ) : (
+        element
+      ),
+    );
+  }
+
+  return <>{result}</>;
 }
 
 ObjectChildrenRenderer.displayName = "ObjectChildrenRenderer";
@@ -275,12 +244,33 @@ export function ArrayChildRenderer<
   childSchema,
   value,
   fieldName,
-  context,
-}: ArrayChildRendererProps<TKey, TUsage, TChild, TEndpoint>): JSX.Element {
+  renderItem,
+}: ArrayChildRendererProps<TKey, TUsage, TChild>): JSX.Element {
   if (!childSchema || !value || !Array.isArray(value)) {
     return <></>;
   }
 
+  // If custom renderItem provided, use it
+  if (renderItem) {
+    return (
+      <>
+        {value.map((itemData, index) => {
+          const itemFieldName = fieldName
+            ? `${fieldName}.${index}`
+            : String(index);
+
+          return renderItem({
+            itemData,
+            index,
+            itemFieldName,
+            childSchema,
+          });
+        })}
+      </>
+    );
+  }
+
+  // Default rendering
   return (
     <Div className="space-y-4">
       {value.map((itemData, index) => {
@@ -289,17 +279,12 @@ export function ArrayChildRenderer<
           : String(index);
 
         return (
-          <WidgetRenderer
+          <WidgetRenderer<TEndpoint>
             key={index}
             fieldName={
               itemFieldName as Path<TEndpoint["types"]["RequestOutput"]>
             }
-            field={
-              { ...childSchema, value: itemData } as BaseWidgetFieldProps<
-                typeof childSchema
-              >
-            }
-            context={context}
+            field={withValue(childSchema, itemData, null)}
           />
         );
       })}
@@ -317,15 +302,13 @@ export function UnionObjectRenderer<
   TKey extends string,
   TUsage extends FieldUsageConfig,
   TVariants extends UnionObjectWidgetConfigConstrain<TKey, TUsage>,
-  TEndpoint extends CreateApiEndpointAny,
 >({
   variantSchemas: variants,
   value,
   fieldName,
   discriminator,
-  context,
   watchedDiscriminatorValue,
-}: UnionObjectRendererProps<TKey, TUsage, TVariants, TEndpoint>): JSX.Element {
+}: UnionObjectRendererProps<TKey, TUsage, TVariants>): JSX.Element {
   if (!variants || variants.length === 0 || !discriminator) {
     return <></>;
   }
@@ -348,27 +331,32 @@ export function UnionObjectRenderer<
     }
 
     const variantDiscriminator = variant.children[discriminator];
+
     if (!variantDiscriminator) {
       return false;
     }
 
     // For primitive fields with literals, check the schema value
-    if (isPrimitiveField(variantDiscriminator)) {
-      // Type guard narrowed to primitive, check if it has schema property
-      const schemaOrUndefined = (
-        variantDiscriminator as { schema?: z.ZodTypeAny }
-      ).schema;
-      if (schemaOrUndefined !== undefined) {
-        const schema = schemaOrUndefined;
-        // Zod stores literal values in schema._def.values array
-        if ("_def" in schema && "values" in schema._def) {
-          const values = (schema._def as Record<string, z.ZodTypeAny>).values;
-          if (Array.isArray(values) && values.length > 0) {
-            const literalValue = values[0];
-            return literalValue === discriminatorValue;
-          }
+    if (
+      "schemaType" in variantDiscriminator &&
+      variantDiscriminator.schemaType === "primitive" &&
+      "schema" in variantDiscriminator
+    ) {
+      const schema = variantDiscriminator.schema as z.ZodTypeAny;
+
+      // Zod stores literal values in schema._def.values array for z.literal()
+      if ("_def" in schema && "values" in schema._def) {
+        const def = schema._def as {
+          values?: Array<string | number | bigint | boolean | null | undefined>;
+        };
+        if (def.values && def.values.length > 0) {
+          const literalValue = def.values[0];
+          const matches = literalValue === discriminatorValue;
+
+          return matches;
         }
       }
+
       return false;
     }
 
@@ -376,7 +364,10 @@ export function UnionObjectRenderer<
   });
 
   // Build children from selected variant or first variant (for discriminator)
-  const childrenToRender: ObjectChildrenConstraint<TKey, TUsage> = {};
+  const childrenToRender: ObjectChildrenConstraint<
+    TKey,
+    ConstrainedChildUsage<TUsage>
+  > = {};
 
   // Get reference variant for discriminator field
   const referenceVariant = selectedVariant || variants[0];
@@ -422,28 +413,32 @@ export function UnionObjectRenderer<
       childrenSchema={childrenToRender}
       value={value ?? undefined}
       fieldName={fieldName}
-      context={context}
     />
   );
 }
 
 UnionObjectRenderer.displayName = "UnionObjectRenderer";
 
-interface MultiWidgetRendererProps<
+export interface MultiWidgetRendererProps<
   TKey extends string,
   TUsage extends FieldUsageConfig,
-  TEndpoint extends CreateApiEndpointAny,
 > {
-  children:
+  childrenSchema:
     | ObjectChildrenConstraint<TKey, TUsage>
     | ArrayChildConstraint<TKey, TUsage>
     | UnionObjectWidgetConfigConstrain<TKey, TUsage>
     | undefined;
-  value: Record<string, z.ZodTypeAny> | Array<z.ZodTypeAny> | null | undefined;
+  value: WidgetData;
   fieldName: string | undefined;
-  context: BaseWidgetContext<TEndpoint>;
   discriminator?: string;
   watchedDiscriminatorValue?: string;
+  /** Optional render callback for array items to customize rendering */
+  renderItem?: (props: {
+    itemData: WidgetData;
+    index: number;
+    itemFieldName: string;
+    childSchema: ArrayChildConstraint<TKey, TUsage>;
+  }) => JSX.Element;
 }
 
 /**
@@ -489,54 +484,52 @@ function isArrayChild<TKey extends string, TUsage extends FieldUsageConfig>(
 export function MultiWidgetRenderer<
   TKey extends string,
   TUsage extends FieldUsageConfig,
-  TEndpoint extends CreateApiEndpointAny,
 >({
-  children,
+  childrenSchema,
   value,
   fieldName,
-  context,
   discriminator,
   watchedDiscriminatorValue,
-}: MultiWidgetRendererProps<TKey, TUsage, TEndpoint>): JSX.Element {
-  if (!children) {
+  renderItem,
+}: MultiWidgetRendererProps<TKey, TUsage>): JSX.Element {
+  if (!childrenSchema) {
     return <></>;
   }
 
   // Check for union variants first
-  if (isUnionVariants<TKey, TUsage>(children)) {
+  const isUnion = isUnionVariants<TKey, TUsage>(childrenSchema);
+
+  if (isUnion) {
     return (
       <UnionObjectRenderer
-        variantSchemas={children}
-        value={value as Record<string, z.ZodTypeAny> | null | undefined}
+        variantSchemas={childrenSchema}
+        value={value as Record<string, WidgetData> | null | undefined}
         fieldName={fieldName}
         discriminator={discriminator}
-        context={context}
         watchedDiscriminatorValue={watchedDiscriminatorValue}
       />
     );
   }
 
   // Check for array child constraint
-  if (isArrayChild<TKey, TUsage>(children)) {
+  if (isArrayChild<TKey, TUsage>(childrenSchema)) {
     return (
       <ArrayChildRenderer
-        childSchema={children}
-        value={value as Array<z.ZodTypeAny> | null | undefined}
+        childSchema={childrenSchema}
+        value={value as Array<WidgetData> | null | undefined}
         fieldName={fieldName}
-        context={context}
+        renderItem={renderItem}
       />
     );
   }
 
   // ObjectChildrenConstraint is a Record<string, ...>
-  // After checking for union variants and array child, remaining type must be ObjectChildrenConstraint
-  const objectChildren: ObjectChildrenConstraint<TKey, TUsage> = children;
+  const objectChildren: ObjectChildrenConstraint<TKey, TUsage> = childrenSchema;
   return (
     <ObjectChildrenRenderer
       childrenSchema={objectChildren}
-      value={value as Record<string, z.ZodTypeAny> | null | undefined}
+      value={value as Record<string, WidgetData> | null | undefined}
       fieldName={fieldName}
-      context={context}
     />
   );
 }

@@ -10,7 +10,6 @@ import React from "react";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatSidebar } from "@/app/api/[locale]/agent/chat/threads/_components/sidebar";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -22,14 +21,12 @@ const SIDEBAR_MAX_WIDTH_VW = 90; // Maximum 90vw
 interface SidebarWrapperProps {
   locale: CountryLanguage;
   logger: EndpointLogger;
-  user: JwtPayloadType | undefined;
   children?: React.ReactNode;
 }
 
 export function SidebarWrapper({
   locale,
   logger,
-  user,
   children,
 }: SidebarWrapperProps): JSX.Element {
   const { sidebarCollapsed: collapsed, setSidebarCollapsed } = useChatContext();
@@ -70,7 +67,7 @@ export function SidebarWrapper({
             )}
           >
             <Div className="h-full w-full bg-background">
-              <ChatSidebar user={user} locale={locale} logger={logger} />
+              <ChatSidebar locale={locale} logger={logger} />
             </Div>
           </Div>
         )}
@@ -109,7 +106,7 @@ export function SidebarWrapper({
               transition={{ duration: 0.4, ease: "easeInOut" }}
               className="h-full"
             >
-              <ChatSidebar user={user} locale={locale} logger={logger} />
+              <ChatSidebar locale={locale} logger={logger} />
             </MotionDiv>
           )}
         </AnimatePresence>

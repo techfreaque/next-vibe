@@ -15,6 +15,7 @@ import {
 } from "../../../../shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
+import { useWidgetTranslation } from "../../_shared/use-widget-context";
 import type { LoadingWidgetConfig } from "./types";
 
 /**
@@ -58,11 +59,12 @@ export function LoadingWidget<
   TUsage extends FieldUsageConfig,
 >({
   field,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   LoadingWidgetConfig<TKey, TUsage, "widget">
 >): JSX.Element {
+  const t = useWidgetTranslation();
   const {
     padding,
     gap,
@@ -94,7 +96,7 @@ export function LoadingWidget<
           : "h-2";
 
   // Get message from config or use default
-  const message = messageKey ? context.t(messageKey) : "Loading...";
+  const message = messageKey ? t(messageKey) : "Loading...";
   const indeterminate = true;
   const progress = undefined;
 
@@ -166,3 +168,5 @@ export function LoadingWidget<
 }
 
 LoadingWidget.displayName = "LoadingWidget";
+
+export default LoadingWidget;

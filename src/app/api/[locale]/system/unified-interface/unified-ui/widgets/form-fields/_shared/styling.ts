@@ -59,6 +59,8 @@ export function getFieldStyleClassName(
         "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
       ),
       descriptionClassName: "text-sm text-muted-foreground",
+      inlineDescriptionClassName:
+        "text-xs text-muted-foreground flex items-start gap-2 mt-1",
     };
   }
 
@@ -106,6 +108,11 @@ export function getFieldStyleClassName(
           "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
         ),
         descriptionClassName: cn("text-sm", colors.descriptionClassName),
+        inlineDescriptionClassName: cn(
+          "text-xs",
+          colors.descriptionClassName,
+          "flex items-start gap-2 mt-1 opacity-75",
+        ),
       };
     }
 
@@ -155,6 +162,11 @@ export function getFieldStyleClassName(
         "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
       ),
       descriptionClassName: cn("text-sm", colors.descriptionClassName),
+      inlineDescriptionClassName: cn(
+        "text-xs",
+        colors.descriptionClassName,
+        "flex items-start gap-2 mt-1 opacity-75",
+      ),
     };
   }
 
@@ -168,5 +180,7 @@ export function getFieldStyleClassName(
       "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
     ),
     descriptionClassName: "text-sm text-muted-foreground",
+    inlineDescriptionClassName:
+      "text-xs text-muted-foreground flex items-start gap-2 mt-1 opacity-75",
   };
 }

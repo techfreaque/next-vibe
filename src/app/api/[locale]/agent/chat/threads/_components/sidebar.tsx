@@ -30,7 +30,6 @@ import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import { type TFunction } from "@/i18n/core/static-types";
@@ -43,7 +42,6 @@ interface ChatSidebarProps {
   locale: CountryLanguage;
   logger: EndpointLogger;
   autoFocusSearch?: boolean;
-  user: JwtPayloadType | undefined;
 }
 
 const getButtonColorClasses = (color: string | null): string => {
@@ -70,7 +68,6 @@ export function ChatSidebar({
   locale,
   logger,
   autoFocusSearch = false,
-  user,
 }: ChatSidebarProps): JSX.Element {
   const { t } = simpleT(locale);
   const router = useRouter();
@@ -87,11 +84,12 @@ export function ChatSidebar({
     handleCreateThread,
     createFolder,
     searchThreads,
+    user,
   } = useChatContext();
 
   // Fetch credits with server-side initial data (disables initial fetch)
   // Hook handles null case internally - called unconditionally per React rules
-  const endpoint = useCredits(logger, initialCredits);
+  const endpoint = useCredits(user, logger, initialCredits);
   const readState = endpoint?.read;
   const credits = readState?.response?.success
     ? readState.response.data

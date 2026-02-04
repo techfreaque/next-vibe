@@ -131,6 +131,7 @@ export function ThreadedMessage({
     enabled: message.role === "assistant" && ttsAutoplay,
     isStreaming: isMessageStreaming,
     locale,
+    user,
     logger,
     deductCredits,
     voice: ttsVoice,

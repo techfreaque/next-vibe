@@ -239,6 +239,12 @@ export const translations = {
       label: "Custom Icon",
       description: "Custom icon for this favorite",
     },
+    changeCharacter: {
+      label: "Change Character",
+    },
+    modifyCharacter: {
+      label: "Modify Character",
+    },
     response: {
       success: {
         content: "Updated: {{value}}",

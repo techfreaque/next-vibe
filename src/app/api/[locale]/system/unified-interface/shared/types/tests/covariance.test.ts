@@ -11,7 +11,7 @@
  * 5. Type inference works through the entire chain
  */
 
-import type { z } from "zod";
+import { z } from "zod";
 
 import {
   type UserRole,
@@ -20,18 +20,31 @@ import {
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type {
+  AnyChildrenConstrain,
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+} from "../../../unified-ui/widgets/_shared/types";
+import type {
   ApiEndpoint,
   CreateApiEndpoint,
 } from "../../endpoints/definition/create";
-import type {
-  ArrayField,
-  CreateApiEndpointAny,
-  ObjectField,
-  PrimitiveField,
-  UnifiedField,
-} from "../../types/endpoint";
+import {
+  arrayOptionalField,
+  objectField,
+  objectOptionalField,
+  requestDataArrayField,
+  responseArrayField,
+} from "../../field/utils";
+import {
+  requestField,
+  requestResponseField,
+  requestUrlPathParamsField,
+  responseField,
+} from "../../field/utils-new";
+import type { UnifiedField } from "../../types/endpoint";
+import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import type { Methods } from "../../types/enums";
-import type { WidgetConfig } from "../../widgets/configs";
+import { FieldDataType, WidgetType } from "../../types/enums";
 
 // ============================================================================
 // LEVEL 1: Test basic field types
@@ -39,90 +52,95 @@ import type { WidgetConfig } from "../../widgets/configs";
 
 // Test 1.1: PrimitiveField extends UnifiedField (checked via Test1_2)
 // Test 1.2: ObjectField with record children extends UnifiedField
-type Test1_2_ObjectField = ObjectField<
-  Record<string, UnifiedField<TranslationKey, z.ZodTypeAny>>,
+const test1_2_field = objectField(
+  { type: WidgetType.CONTAINER },
   { request: "data" },
-  TranslationKey,
-  WidgetConfig<
-    TranslationKey,
-    z.ZodTypeAny,
-    { request: "data" },
-    Record<string, UnifiedField<TranslationKey, z.ZodTypeAny>>
-  >
->;
+  {},
+);
+
 type Test1_2_Result =
-  Test1_2_ObjectField extends UnifiedField<TranslationKey, z.ZodTypeAny>
+  typeof test1_2_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test1_2: Test1_2_Result = "✓ PASS";
 
 // Test 1.3: ObjectField with specific children extends UnifiedField
-type Test1_3_ObjectField = ObjectField<
-  {
-    name: PrimitiveField<z.ZodString, { request: "data" }, TranslationKey>;
-  },
+const test1_3_field = objectField(
+  { type: WidgetType.CONTAINER },
   { request: "data" },
-  TranslationKey,
-  WidgetConfig<
-    TranslationKey,
-    z.ZodTypeAny,
-    { request: "data" },
-    {
-      name: PrimitiveField<z.ZodString, { request: "data" }, TranslationKey>;
-    }
-  >
->;
+  {
+    nested: objectField(
+      { type: WidgetType.CONTAINER },
+      { request: "data" },
+      {},
+    ),
+  },
+);
+
 type Test1_3_Result =
-  Test1_3_ObjectField extends UnifiedField<TranslationKey, z.ZodTypeAny>
+  typeof test1_3_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test1_3: Test1_3_Result = "✓ PASS";
 
 // Test 1.4: ObjectField with flexible usage extends UnifiedField
-type Test1_4_ObjectField = ObjectField<
+const test1_4_field = objectField(
+  { type: WidgetType.CONTAINER },
+  { request: "data", response: true },
   {
-    name: PrimitiveField<z.ZodString, { request: "data" }, TranslationKey>;
+    nested: objectField(
+      { type: WidgetType.CONTAINER },
+      { request: "data", response: true },
+      {},
+    ),
   },
-  | { request: "data" }
-  | { response: true }
-  | { request: "data"; response: true },
-  TranslationKey,
-  WidgetConfig<
-    TranslationKey,
-    z.ZodTypeAny,
-    | { request: "data" }
-    | { response: true }
-    | { request: "data"; response: true },
-    {
-      name: PrimitiveField<
-        z.ZodString,
-        { request: "data" },
-        TranslationKey,
-        any
-      >;
-    }
-  >
->;
+);
+
 type Test1_4_Result =
-  Test1_4_ObjectField extends UnifiedField<TranslationKey, z.ZodTypeAny>
+  typeof test1_4_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test1_4: Test1_4_Result = "✓ PASS";
 
 // Test 1.5: ArrayField extends UnifiedField
-type Test1_5_ArrayField = ArrayField<
-  PrimitiveField<z.ZodString, { request: "data" }, TranslationKey>,
-  { request: "data" },
-  TranslationKey,
-  WidgetConfig<
-    TranslationKey,
-    z.ZodTypeAny,
+const test1_5_field = requestDataArrayField(
+  { type: WidgetType.DATA_LIST },
+  objectField(
+    { type: WidgetType.CONTAINER },
     { request: "data" },
-    PrimitiveField<z.ZodString, { request: "data" }>
-  >
->;
+    {
+      item: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "item.name",
+        schema: z.string(),
+      }),
+    },
+  ),
+);
+
 type Test1_5_Result =
-  Test1_5_ArrayField extends UnifiedField<TranslationKey, z.ZodTypeAny>
+  typeof test1_5_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test1_5: Test1_5_Result = "✓ PASS";
@@ -132,129 +150,47 @@ const test1_5: Test1_5_Result = "✓ PASS";
 // ============================================================================
 
 // Test 2.1: Nested ObjectField extends UnifiedField
-type Test2_1_NestedObjectField = ObjectField<
-  {
-    credentials: ObjectField<
-      {
-        email: PrimitiveField<z.ZodString, { request: "data" }, TranslationKey>;
-        password: PrimitiveField<
-          z.ZodString,
-          { request: "data" },
-          TranslationKey
-        >;
-      },
-      { request: "data" },
-      TranslationKey,
-      WidgetConfig<
-        TranslationKey,
-        z.ZodTypeAny,
-        { request: "data" },
-        {
-          email: PrimitiveField<
-            z.ZodString,
-            { request: "data" },
-            TranslationKey
-          >;
-          password: PrimitiveField<
-            z.ZodString,
-            { request: "data" },
-            TranslationKey
-          >;
-        }
-      >
-    >;
-    options: ObjectField<
-      {
-        rememberMe: PrimitiveField<
-          z.ZodBoolean,
-          { request: "data" },
-          TranslationKey
-        >;
-      },
-      { request: "data" },
-      TranslationKey,
-      WidgetConfig<
-        TranslationKey,
-        z.ZodTypeAny,
-        { request: "data" },
-        {
-          rememberMe: PrimitiveField<
-            z.ZodBoolean,
-            { request: "data" },
-            TranslationKey
-          >;
-        }
-      >
-    >;
-  },
+const test2_1_field = objectField(
+  { type: WidgetType.CONTAINER },
   { request: "data" },
-  TranslationKey,
-  WidgetConfig<
-    TranslationKey,
-    z.ZodTypeAny,
-    { request: "data" },
-    {
-      credentials: ObjectField<
-        {
-          email: PrimitiveField<
-            z.ZodString,
-            { request: "data" },
-            TranslationKey
-          >;
-          password: PrimitiveField<
-            z.ZodString,
-            { request: "data" },
-            TranslationKey
-          >;
-        },
-        { request: "data" },
-        TranslationKey,
-        WidgetConfig<
-          TranslationKey,
-          z.ZodTypeAny,
+  {
+    credentials: objectField(
+      { type: WidgetType.CONTAINER },
+      { request: "data" },
+      {
+        email: objectField(
+          { type: WidgetType.CONTAINER },
           { request: "data" },
-          {
-            email: PrimitiveField<
-              z.ZodString,
-              { request: "data" },
-              TranslationKey
-            >;
-            password: PrimitiveField<
-              z.ZodString,
-              { request: "data" },
-              TranslationKey
-            >;
-          }
-        >
-      >;
-      options: ObjectField<
-        {
-          rememberMe: PrimitiveField<
-            z.ZodBoolean,
-            { request: "data" },
-            TranslationKey
-          >;
-        },
-        { request: "data" },
-        TranslationKey,
-        WidgetConfig<
-          TranslationKey,
-          z.ZodTypeAny,
+          {},
+        ),
+        password: objectField(
+          { type: WidgetType.CONTAINER },
           { request: "data" },
-          {
-            rememberMe: PrimitiveField<
-              z.ZodBoolean,
-              { request: "data" },
-              TranslationKey
-            >;
-          }
-        >
-      >;
-    }
-  >
->;
+          {},
+        ),
+      },
+    ),
+    options: objectField(
+      { type: WidgetType.CONTAINER },
+      { request: "data" },
+      {
+        rememberMe: objectField(
+          { type: WidgetType.CONTAINER },
+          { request: "data" },
+          {},
+        ),
+      },
+    ),
+  },
+);
+
 type Test2_1_Result =
-  Test2_1_NestedObjectField extends UnifiedField<TranslationKey, z.ZodTypeAny>
+  typeof test2_1_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test2_1: Test2_1_Result = "✓ PASS";
@@ -264,35 +200,46 @@ const test2_1: Test2_1_Result = "✓ PASS";
 // ============================================================================
 
 // Test 3.1: Can we create an ApiEndpoint with specific ObjectField?
-type Test3_1_Endpoint = ApiEndpoint<
-  TranslationKey,
-  Methods.POST,
-  readonly UserRoleValue[],
-  "test",
-  ObjectField<
-    {
-      name: PrimitiveField<z.ZodString, { request: "data" }>;
-    },
-    { request: "data" },
-    TranslationKey,
-    WidgetConfig<
-      TranslationKey,
-      z.ZodTypeAny,
+const test3_1_field = objectField(
+  { type: WidgetType.CONTAINER },
+  { request: "data" },
+  {
+    name: objectField(
+      { type: WidgetType.CONTAINER },
       { request: "data" },
       {
-        name: PrimitiveField<z.ZodString, { request: "data" }>;
-      }
-    >
-  >
+        value: requestField({
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "name.value",
+          schema: z.string(),
+        }),
+      },
+    ),
+  },
+);
+
+type Test3_1_Endpoint = ApiEndpoint<
+  Methods.POST,
+  readonly UserRoleValue[],
+  string,
+  AnyChildrenConstrain<string, FieldUsageConfig>,
+  typeof test3_1_field
 >;
+
 // Just verify it's a valid ApiEndpoint type
 type Test3_1_Result =
   Test3_1_Endpoint extends ApiEndpoint<
-    TranslationKey,
     Methods,
     readonly UserRoleValue[],
     string,
-    any
+    AnyChildrenConstrain<string, FieldUsageConfig>,
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -300,19 +247,24 @@ const test3_1: Test3_1_Result = "✓ PASS";
 
 // Test 3.2: Can we create an ApiEndpoint with nested ObjectField?
 type Test3_2_Endpoint = ApiEndpoint<
-  TranslationKey,
-  Methods.POST,
+  Methods.PUT,
   readonly UserRoleValue[],
-  "test",
-  Test2_1_NestedObjectField
+  string,
+  AnyChildrenConstrain<string, FieldUsageConfig>,
+  typeof test2_1_field
 >;
 type Test3_2_Result =
   Test3_2_Endpoint extends ApiEndpoint<
-    TranslationKey,
     Methods,
     readonly UserRoleValue[],
     string,
-    any
+    AnyChildrenConstrain<string, FieldUsageConfig>,
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
+    >
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -322,61 +274,55 @@ const test3_2: Test3_2_Result = "✓ PASS";
 // LEVEL 4: Test CreateApiEndpoint type
 // ============================================================================
 
-// Test 4.1: CreateApiEndpoint with simple ObjectField
+// Test 4.1: CreateApiEndpoint with optional object field
+const test4_1_field = objectOptionalField(
+  { type: WidgetType.TABS },
+  { request: "data" },
+  {},
+);
+
 type Test4_1_CreateEndpoint = CreateApiEndpoint<
-  Methods.POST,
+  Methods.PATCH,
   readonly UserRoleValue[],
-  TranslationKey,
-  ObjectField<
-    {
-      name: PrimitiveField<
-        z.ZodString,
-        { request: "data" },
-        TranslationKey,
-        any
-      >;
-    },
-    { request: "data" },
-    TranslationKey,
-    WidgetConfig<
-      TranslationKey,
-      z.ZodTypeAny,
-      { request: "data" },
-      {
-        name: PrimitiveField<
-          z.ZodString,
-          { request: "data" },
-          TranslationKey,
-          any
-        >;
-      }
-    >
-  >
+  string,
+  typeof test4_1_field
 >;
 type Test4_1_Result =
   Test4_1_CreateEndpoint extends CreateApiEndpoint<
     Methods,
     readonly UserRoleValue[],
-    TranslationKey,
-    any
+    string,
+    typeof test4_1_field
   >
     ? "✓ PASS"
     : "✗ FAIL";
 const test4_1: Test4_1_Result = "✓ PASS";
 
 // Test 4.2: CreateApiEndpoint with nested ObjectField
+const test4_2_field = objectField(
+  { type: WidgetType.ACCORDION },
+  { request: "data" },
+  {
+    nested: objectField(
+      { type: WidgetType.DATA_LIST },
+      { request: "data" },
+      {},
+    ),
+  },
+);
+
 type Test4_2_CreateEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
-  TranslationKey,
-  Test2_1_NestedObjectField
+  string,
+  typeof test4_2_field
 >;
 type Test4_2_Result =
   Test4_2_CreateEndpoint extends CreateApiEndpoint<
     Methods,
     readonly UserRoleValue[],
-    TranslationKey,
-    any
+    string,
+    typeof test4_2_field
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -386,201 +332,209 @@ const test4_2: Test4_2_Result = "✓ PASS";
 // LEVEL 5: Test with actual login endpoint structure
 // ============================================================================
 
-// Test 5.1: Exact structure from login endpoint
-type Test5_1_LoginFields = ObjectField<
+// Test 5.1: Simple request-only field
+const test5_1_request_field = objectField(
+  { type: WidgetType.SECTION },
+  { request: "data" },
   {
-    credentials: ObjectField<
-      {
-        email: PrimitiveField<
-          z.ZodString,
-          { request: "data" },
-          TranslationKey,
-          any
-        >;
-        password: PrimitiveField<
-          z.ZodString,
-          { request: "data" },
-          TranslationKey,
-          any
-        >;
-      },
-      { request: "data" },
-      TranslationKey,
-      WidgetConfig<
-        TranslationKey,
-        z.ZodTypeAny,
-        { request: "data" },
-        {
-          email: PrimitiveField<
-            z.ZodString,
-            { request: "data" },
-            TranslationKey,
-            any
-          >;
-          password: PrimitiveField<
-            z.ZodString,
-            { request: "data" },
-            TranslationKey,
-            any
-          >;
-        }
-      >
-    >;
-    options: ObjectField<
-      {
-        rememberMe: PrimitiveField<
-          z.ZodBoolean,
-          { request: "data" },
-          TranslationKey,
-          any
-        >;
-      },
-      { request: "data" },
-      TranslationKey,
-      WidgetConfig<
-        TranslationKey,
-        z.ZodTypeAny,
-        { request: "data" },
-        {
-          rememberMe: PrimitiveField<
-            z.ZodBoolean,
-            { request: "data" },
-            TranslationKey,
-            any
-          >;
-        }
-      >
-    >;
-    leadId: PrimitiveField<
-      z.ZodString,
-      { request: "data" },
-      TranslationKey,
-      any
-    >;
+    name: requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "user.name",
+      schema: z.string(),
+    }),
   },
-  { request: "data"; response: true },
-  TranslationKey,
-  WidgetConfig<
-    TranslationKey,
-    z.ZodTypeAny,
-    { request: "data"; response: true },
-    {
-      credentials: ObjectField<
-        {
-          email: PrimitiveField<
-            z.ZodString,
-            { request: "data" },
-            TranslationKey,
-            any
-          >;
-          password: PrimitiveField<
-            z.ZodString,
-            { request: "data" },
-            TranslationKey,
-            any
-          >;
-        },
-        { request: "data" },
-        TranslationKey,
-        WidgetConfig<
-          TranslationKey,
-          z.ZodTypeAny,
-          { request: "data" },
-          {
-            email: PrimitiveField<
-              z.ZodString,
-              { request: "data" },
-              TranslationKey,
-              any
-            >;
-            password: PrimitiveField<
-              z.ZodString,
-              { request: "data" },
-              TranslationKey,
-              any
-            >;
-          }
-        >
-      >;
-      options: ObjectField<
-        {
-          rememberMe: PrimitiveField<
-            z.ZodBoolean,
-            { request: "data" },
-            TranslationKey,
-            any
-          >;
-        },
-        { request: "data" },
-        TranslationKey,
-        WidgetConfig<
-          TranslationKey,
-          z.ZodTypeAny,
-          { request: "data" },
-          {
-            rememberMe: PrimitiveField<
-              z.ZodBoolean,
-              { request: "data" },
-              TranslationKey,
-              any
-            >;
-          }
-        >
-      >;
-      leadId: PrimitiveField<
-        z.ZodString,
-        { request: "data" },
-        TranslationKey,
-        any
-      >;
-    }
-  >
->;
+);
 
+// Test 5.1b: Response-only array field
+const test5_1_response_field = responseArrayField(
+  { type: WidgetType.DATA_TABLE },
+  objectField(
+    { type: WidgetType.DATA_LIST },
+    { response: true },
+    {
+      id: responseField({
+        type: WidgetType.TEXT,
+        schema: z.string(),
+      }),
+    },
+  ),
+);
+
+// Test 5.1c: Optional login history
+const test5_1_optional_field = arrayOptionalField(
+  { response: true },
+  { type: WidgetType.DATA_CARDS },
+  objectField(
+    { type: WidgetType.CREDIT_TRANSACTION_CARD },
+    { response: true },
+    {
+      amount: responseField({
+        type: WidgetType.TEXT,
+        schema: z.number(),
+      }),
+    },
+  ),
+);
+
+// Test 5.1d: Request data with optional settings
+const test5_1_request_optional = objectOptionalField(
+  { type: WidgetType.LINK_CARD },
+  { request: "data" },
+  {
+    url: requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.URL,
+      label: "settings.url",
+      schema: z.string().url(),
+    }),
+  },
+);
+
+// Test 5.1e: Mixed request/response structure with nested fields
+const test5_1_field = objectField(
+  { type: WidgetType.SECTION },
+  { request: "data", response: true },
+  {
+    login: objectField(
+      { type: WidgetType.TABS },
+      { request: "data" },
+      {
+        username: requestField({
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "login.username",
+          schema: z.string(),
+        }),
+      },
+    ),
+    preferences: objectOptionalField(
+      { type: WidgetType.ACCORDION },
+      { request: "data" },
+      {
+        theme: requestField({
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "preferences.theme",
+          schema: z.string(),
+        }),
+      },
+    ),
+    results: responseArrayField(
+      { type: WidgetType.DATA_CARDS },
+      objectField(
+        { type: WidgetType.METRIC_CARD },
+        { response: true },
+        {
+          value: responseField({
+            type: WidgetType.TEXT,
+            schema: z.number(),
+          }),
+        },
+      ),
+    ),
+  },
+);
+
+// Test 5.1: Request field extends UnifiedField
 type Test5_1_Result =
-  Test5_1_LoginFields extends UnifiedField<TranslationKey, z.ZodTypeAny>
+  typeof test5_1_request_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test5_1: Test5_1_Result = "✓ PASS";
 
-// Test 5.1b: Does UnifiedField<TranslationKey, z.ZodTypeAny> extend UnifiedField<string, z.ZodTypeAny>?
+// Test 5.1b: Response array field extends UnifiedField
 type Test5_1b_Result =
-  Test5_1_LoginFields extends UnifiedField<string, z.ZodTypeAny>
+  typeof test5_1_response_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test5_1b: Test5_1b_Result = "✓ PASS";
 
-// Test 5.2: CreateApiEndpoint with login fields
-type Test5_2_LoginEndpoint = CreateApiEndpoint<
+// Test 5.1c: Optional array field extends UnifiedField
+type Test5_1c_Result =
+  typeof test5_1_optional_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
+    ? "✓ PASS"
+    : "✗ FAIL";
+const test5_1c: Test5_1c_Result = "✓ PASS";
+void test5_1c;
+
+// Test 5.1d: Optional object field extends UnifiedField
+type Test5_1d_Result =
+  typeof test5_1_request_optional extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
+    ? "✓ PASS"
+    : "✗ FAIL";
+const test5_1d: Test5_1d_Result = "✓ PASS";
+void test5_1d;
+
+// Test 5.1e: Mixed field extends UnifiedField
+type Test5_1e_Result =
+  typeof test5_1_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
+    ? "✓ PASS"
+    : "✗ FAIL";
+const test5_1e: Test5_1e_Result = "✓ PASS";
+void test5_1e;
+
+// Test 5.2: CreateApiEndpoint with mixed request/response field
+type Test5_2_MixedEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
-  TranslationKey,
-  Test5_1_LoginFields
+  string,
+  typeof test5_1_field
 >;
 
 type Test5_2_Result =
-  Test5_2_LoginEndpoint extends CreateApiEndpoint<
+  Test5_2_MixedEndpoint extends CreateApiEndpoint<
     Methods,
     readonly UserRoleValue[],
-    TranslationKey,
-    any
+    string,
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
+    >
   >
     ? "✓ PASS"
     : "✗ FAIL";
 const test5_2: Test5_2_Result = "✓ PASS";
 
-// Test 5.2b: Does Test5_2_LoginEndpoint extend CreateApiEndpointAny?
-type Test5_2b_Result = Test5_2_LoginEndpoint extends CreateApiEndpointAny
+// Test 5.2b: Does Test5_2_MixedEndpoint extend CreateApiEndpointAny?
+type Test5_2b_Result = Test5_2_MixedEndpoint extends CreateApiEndpointAny
   ? "✓ PASS"
   : "✗ FAIL";
 const test5_2b: Test5_2b_Result = "✓ PASS";
 
-// Test 5.2c: Breaking down - does the TFields parameter work?
+// Test 5.2c: Breaking down - does the TFields parameter work with test5_1_field?
 type Test5_2c_GenericEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   string,
-  Test5_1_LoginFields
+  typeof test5_1_field
 >;
 type Test5_2c_Result = Test5_2c_GenericEndpoint extends CreateApiEndpointAny
   ? "✓ PASS"
@@ -592,7 +546,12 @@ type Test5_2d_MatchingTKeys = CreateApiEndpoint<
   Methods,
   readonly UserRoleValue[],
   TranslationKey, // Specific translation key
-  UnifiedField<TranslationKey, z.ZodTypeAny> // Matching TKey in fields
+  UnifiedField<
+    TranslationKey,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<TranslationKey, FieldUsageConfig>
+  > // Matching TKey in fields
 >;
 type Test5_2d_Result = Test5_2d_MatchingTKeys extends CreateApiEndpointAny
   ? "✓ PASS"
@@ -603,13 +562,39 @@ const test5_2d: Test5_2d_Result = "✓ PASS";
 // LEVEL 6: Test constraint checking in different positions
 // ============================================================================
 
+// Create a login fields structure for testing
+const test6_loginFields = objectField(
+  { type: WidgetType.CONTAINER },
+  { request: "data", response: true },
+  {
+    credentials: objectField(
+      { type: WidgetType.CONTAINER },
+      { request: "data" },
+      {},
+    ),
+    options: objectField(
+      { type: WidgetType.CONTAINER },
+      { request: "data" },
+      {},
+    ),
+  },
+);
+
 // Test 6.1: Direct constraint check
-type Test6_1_DirectCheck<T extends UnifiedField<TranslationKey, z.ZodTypeAny>> =
-  T;
-type Test6_1_Result =
-  Test6_1_DirectCheck<Test5_1_LoginFields> extends UnifiedField<
+type Test6_1_DirectCheck<
+  T extends UnifiedField<
     TranslationKey,
-    z.ZodTypeAny
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<TranslationKey, FieldUsageConfig>
+  >,
+> = T;
+type Test6_1_Result =
+  Test6_1_DirectCheck<typeof test6_loginFields> extends UnifiedField<
+    TranslationKey,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<TranslationKey, FieldUsageConfig>
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -617,17 +602,29 @@ const test6_1: Test6_1_Result = "✓ PASS";
 
 // Test 6.2: Constraint in function parameter position
 type Test6_2_FunctionParam = <
-  T extends UnifiedField<TranslationKey, z.ZodTypeAny>,
+  T extends UnifiedField<
+    TranslationKey,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<TranslationKey, FieldUsageConfig>
+  >,
 >(
   fields: T,
 ) => T;
 type Test6_2_Result = Test6_2_FunctionParam extends (
-  fields: Test5_1_LoginFields,
+  fields: typeof test6_loginFields,
 ) => any
   ? "✓ PASS"
   : "✗ FAIL";
-// This might fail - let's see
 const test6_2: Test6_2_Result = "✓ PASS";
+
+// Create endpoint for test 6.3
+type Test6_3_LoginEndpoint = CreateApiEndpoint<
+  Methods.POST,
+  readonly UserRoleValue[],
+  string,
+  typeof test6_loginFields
+>;
 
 // Test 6.3: Constraint in nested generic
 type Test6_3_NestedGeneric<
@@ -638,8 +635,8 @@ type Test6_3_NestedGeneric<
 
 type Test6_3_Result =
   Test6_3_NestedGeneric<
-    Test5_1_LoginFields,
-    Test5_2_LoginEndpoint
+    typeof test6_loginFields,
+    Test6_3_LoginEndpoint
   > extends CreateApiEndpointAny
     ? "✓ PASS"
     : "✗ FAIL";
@@ -649,6 +646,14 @@ const test6_3: Test6_3_Result = "✓ PASS";
 // LEVEL 7: Test the exact pattern used in useApiForm
 // ============================================================================
 
+// Create login endpoint for level 7 tests
+type Test7_LoginEndpoint = CreateApiEndpoint<
+  Methods.POST,
+  readonly UserRoleValue[],
+  string,
+  typeof test5_1_field
+>;
+
 // Test 7.1: Simplified useApiForm signature (with any instead of UnifiedField)
 type Test7_1_UseApiForm = <TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
@@ -656,7 +661,7 @@ type Test7_1_UseApiForm = <TEndpoint extends CreateApiEndpointAny>(
 
 // Can we call it with the login endpoint?
 type Test7_1_Result = Test7_1_UseApiForm extends (
-  endpoint: Test5_2_LoginEndpoint,
+  endpoint: Test7_LoginEndpoint,
 ) => void
   ? "✓ PASS"
   : "✗ FAIL";
@@ -668,13 +673,18 @@ type Test7_2_AcceptsAnyEndpoint = (
     Methods,
     readonly UserRoleValue[],
     TranslationKey,
-    UnifiedField<TranslationKey, z.ZodTypeAny>
+    UnifiedField<
+      TranslationKey,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      AnyChildrenConstrain<TranslationKey, FieldUsageConfig>
+    >
   >,
 ) => void;
 
 // Can we pass the login endpoint to it?
 type Test7_2_Result =
-  Test5_2_LoginEndpoint extends Parameters<Test7_2_AcceptsAnyEndpoint>[0]
+  Test7_LoginEndpoint extends Parameters<Test7_2_AcceptsAnyEndpoint>[0]
     ? "✓ PASS"
     : "✗ FAIL";
 const test7_2: Test7_2_Result = "✗ FAIL";
@@ -689,14 +699,14 @@ type Test8_1_UseApiFormCurrent = <TEndpoint extends CreateApiEndpointAny>(
 ) => void;
 
 type Test8_1_Result = Test8_1_UseApiFormCurrent extends (
-  endpoint: Test5_2_LoginEndpoint,
+  endpoint: Test7_LoginEndpoint,
 ) => void
   ? "✓ PASS"
   : "✗ FAIL";
 const test8_1: Test8_1_Result = "✓ PASS";
 
 // Test 8.2: Test that we can infer types from the endpoint
-type Test8_2_InferredRequest = Test5_2_LoginEndpoint["types"]["RequestOutput"];
+type Test8_2_InferredRequest = Test7_LoginEndpoint["types"]["RequestOutput"];
 
 // Check that inferred types are not 'never'
 type Test8_2_RequestResult = Test8_2_InferredRequest extends never
@@ -708,366 +718,157 @@ const test8_2: Test8_2_RequestResult = "✓ PASS";
 // LEVEL 9: Test type inference through the entire chain
 // ============================================================================
 
-// Test 9.1: Test that ObjectField children are preserved
-type Test9_1_FieldsFromEndpoint = Test5_2_LoginEndpoint["fields"];
-type Test9_1_Result =
-  Test9_1_FieldsFromEndpoint extends ObjectField<
-    {
-      credentials: any;
-      options: any;
-      leadId: any;
-    },
-    any,
-    TranslationKey,
-    any
-  >
-    ? "✓ PASS"
-    : "✗ FAIL";
+// Test 9.1: Test that endpoint fields match the original field type
+type Test9_1_FieldsFromEndpoint = Test7_LoginEndpoint["fields"];
+type Test9_1_Result = Test9_1_FieldsFromEndpoint extends typeof test5_1_field
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test9_1: Test9_1_Result = "✓ PASS";
 
-// Test 9.2: Test that we can access nested field types
-type Test9_2_CredentialsField =
-  Test9_1_FieldsFromEndpoint extends ObjectField<
-    infer C,
-    any,
-    TranslationKey,
-    any
-  >
-    ? C extends { credentials: infer Cred }
-      ? Cred
-      : never
-    : never;
-type Test9_2_Result =
-  Test9_2_CredentialsField extends ObjectField<any, TranslationKey>
+// Test 9.2: Test that children structure is accessible
+type Test9_2_HasChildren = Test9_1_FieldsFromEndpoint extends {
+  children: infer C;
+}
+  ? C extends { login: any; preferences: any; results: any }
     ? "✓ PASS"
-    : "✗ FAIL";
-const test9_2: Test9_2_Result = "✓ PASS";
+    : "✗ FAIL"
+  : "✗ FAIL";
+const test9_2: Test9_2_HasChildren = "✓ PASS";
 
 // ============================================================================
 // LEVEL 10: Test edge cases and complex scenarios
 // ============================================================================
 
-// Test 10.1: ArrayField with ObjectField children
-type Test10_1_ArrayOfObjects = ArrayField<
-  ObjectField<
+// Test 10.1: Array with nested object children with id and name fields
+const test10_1_field = requestDataArrayField(
+  { type: WidgetType.DATA_LIST },
+  objectField(
+    { type: WidgetType.CONTAINER },
+    { request: "data" },
     {
-      id: PrimitiveField<z.ZodString, { request: "data" }, TranslationKey>;
-      name: PrimitiveField<
-        z.ZodString,
-        { request: "data" },
-        TranslationKey,
-        any
-      >;
+      id: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "ID",
+        schema: z.string(),
+      }),
+      name: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "Name",
+        schema: z.string(),
+      }),
     },
-    { request: "data" },
-    TranslationKey,
-    WidgetConfig<
-      TranslationKey,
-      z.ZodTypeAny,
-      { request: "data" },
-      {
-        id: PrimitiveField<
-          z.ZodString,
-          { request: "data" },
-          TranslationKey,
-          any
-        >;
-        name: PrimitiveField<
-          z.ZodString,
-          { request: "data" },
-          TranslationKey,
-          any
-        >;
-      }
-    >
-  >,
-  { request: "data" },
-  TranslationKey,
-  WidgetConfig<
-    TranslationKey,
-    z.ZodTypeAny,
-    { request: "data" },
-    ObjectField<
-      {
-        id: PrimitiveField<
-          z.ZodString,
-          { request: "data" },
-          TranslationKey,
-          any
-        >;
-        name: PrimitiveField<
-          z.ZodString,
-          { request: "data" },
-          TranslationKey,
-          any
-        >;
-      },
-      { request: "data" },
-      TranslationKey,
-      WidgetConfig<
-        TranslationKey,
-        z.ZodTypeAny,
-        { request: "data" },
-        {
-          id: PrimitiveField<
-            z.ZodString,
-            { request: "data" },
-            TranslationKey,
-            any
-          >;
-          name: PrimitiveField<
-            z.ZodString,
-            { request: "data" },
-            TranslationKey,
-            any
-          >;
-        }
-      >
-    >
-  >
->;
+  ),
+);
+
 type Test10_1_Result =
-  Test10_1_ArrayOfObjects extends UnifiedField<TranslationKey, z.ZodTypeAny>
+  typeof test10_1_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test10_1: Test10_1_Result = "✓ PASS";
 
 // Test 10.2: Deeply nested ObjectFields (3 levels)
-type Test10_2_DeeplyNested = ObjectField<
-  {
-    level1: ObjectField<
-      {
-        level2: ObjectField<
-          {
-            level3: PrimitiveField<
-              z.ZodString,
-              { request: "data" },
-              TranslationKey,
-              any
-            >;
-          },
-          { request: "data" },
-          TranslationKey,
-          WidgetConfig<
-            TranslationKey,
-            z.ZodTypeAny,
-            { request: "data" },
-            {
-              level3: PrimitiveField<
-                z.ZodString,
-                { request: "data" },
-                TranslationKey,
-                any
-              >;
-            }
-          >
-        >;
-      },
-      { request: "data" },
-      TranslationKey,
-      WidgetConfig<
-        TranslationKey,
-        z.ZodTypeAny,
-        { request: "data" },
-        {
-          level2: ObjectField<
-            {
-              level3: PrimitiveField<
-                z.ZodString,
-                { request: "data" },
-                TranslationKey,
-                any
-              >;
-            },
-            { request: "data" },
-            TranslationKey,
-            WidgetConfig<
-              TranslationKey,
-              z.ZodTypeAny,
-              { request: "data" },
-              {
-                level3: PrimitiveField<
-                  z.ZodString,
-                  { request: "data" },
-                  TranslationKey,
-                  any
-                >;
-              }
-            >
-          >;
-        }
-      >
-    >;
-  },
+const test10_2_field = objectField(
+  { type: WidgetType.CONTAINER },
   { request: "data" },
-  TranslationKey,
-  WidgetConfig<
-    TranslationKey,
-    z.ZodTypeAny,
-    { request: "data" },
-    {
-      level1: ObjectField<
-        {
-          level2: ObjectField<
-            {
-              level3: PrimitiveField<
-                z.ZodString,
-                { request: "data" },
-                TranslationKey,
-                any
-              >;
-            },
-            { request: "data" },
-            TranslationKey,
-            WidgetConfig<
-              TranslationKey,
-              z.ZodTypeAny,
-              { request: "data" },
-              {
-                level3: PrimitiveField<
-                  z.ZodString,
-                  { request: "data" },
-                  TranslationKey,
-                  any
-                >;
-              }
-            >
-          >;
-        },
-        { request: "data" },
-        TranslationKey,
-        WidgetConfig<
-          TranslationKey,
-          z.ZodTypeAny,
+  {
+    level1: objectField(
+      { type: WidgetType.CONTAINER },
+      { request: "data" },
+      {
+        level2: objectField(
+          { type: WidgetType.CONTAINER },
           { request: "data" },
           {
-            level2: ObjectField<
-              {
-                level3: PrimitiveField<
-                  z.ZodString,
-                  { request: "data" },
-                  TranslationKey,
-                  any
-                >;
-              },
-              { request: "data" },
-              TranslationKey,
-              WidgetConfig<
-                TranslationKey,
-                z.ZodTypeAny,
-                { request: "data" },
-                {
-                  level3: PrimitiveField<
-                    z.ZodString,
-                    { request: "data" },
-                    TranslationKey,
-                    any
-                  >;
-                }
-              >
-            >;
-          }
-        >
-      >;
-    }
-  >
->;
+            level3: requestField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "Level 3",
+              schema: z.string(),
+            }),
+          },
+        ),
+      },
+    ),
+  },
+);
+
 type Test10_2_Result =
-  Test10_2_DeeplyNested extends UnifiedField<TranslationKey, z.ZodTypeAny>
+  typeof test10_2_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test10_2: Test10_2_Result = "✓ PASS";
 
 // Test 10.3: Mixed usage configurations
-type Test10_3_MixedUsage = ObjectField<
+const test10_3_field = objectField(
+  { type: WidgetType.CONTAINER },
+  { request: "data", response: true },
   {
-    requestOnly: PrimitiveField<
-      z.ZodString,
-      { request: "data" },
-      TranslationKey,
-      any
-    >;
-    responseOnly: PrimitiveField<
-      z.ZodString,
-      { response: true },
-      TranslationKey,
-      any
-    >;
-    both: PrimitiveField<
-      z.ZodString,
-      { request: "data"; response: true },
-      TranslationKey,
-      any
-    >;
+    requestOnly: requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "Request Only",
+      schema: z.string(),
+    }),
+    responseOnly: responseField({
+      type: WidgetType.TEXT,
+      content: "Response Only",
+      schema: z.string(),
+    }),
+    both: requestResponseField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "Both",
+      schema: z.string(),
+    }),
   },
-  { request: "data"; response: true },
-  TranslationKey,
-  WidgetConfig<
-    TranslationKey,
-    z.ZodTypeAny,
-    { request: "data"; response: true },
-    {
-      requestOnly: PrimitiveField<
-        z.ZodString,
-        { request: "data" },
-        TranslationKey,
-        any
-      >;
-      responseOnly: PrimitiveField<
-        z.ZodString,
-        { response: true },
-        TranslationKey,
-        any
-      >;
-      both: PrimitiveField<
-        z.ZodString,
-        { request: "data"; response: true },
-        TranslationKey,
-        any
-      >;
-    }
-  >
->;
+);
+
 type Test10_3_Result =
-  Test10_3_MixedUsage extends UnifiedField<TranslationKey, z.ZodTypeAny>
+  typeof test10_3_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test10_3: Test10_3_Result = "✓ PASS";
 
-// Test 10.4: ArrayField with nested arrays
-type Test10_4_NestedArrays = ArrayField<
-  ArrayField<
-    PrimitiveField<z.ZodString, { request: "data" }, TranslationKey>,
-    { request: "data" },
-    TranslationKey,
-    WidgetConfig<
-      TranslationKey,
-      z.ZodTypeAny,
-      { request: "data" },
-      PrimitiveField<z.ZodString, { request: "data" }, TranslationKey>
-    >
-  >,
-  { request: "data" },
-  TranslationKey,
-  WidgetConfig<
-    TranslationKey,
-    z.ZodTypeAny,
-    { request: "data" },
-    ArrayField<
-      PrimitiveField<z.ZodString, { request: "data" }, TranslationKey>,
-      { request: "data" },
-      TranslationKey,
-      WidgetConfig<
-        TranslationKey,
-        z.ZodTypeAny,
-        { request: "data" },
-        PrimitiveField<z.ZodString, { request: "data" }, TranslationKey>
-      >
-    >
-  >
->;
+// Test 10.4: Nested arrays (array of arrays)
+const test10_4_innerArray = requestDataArrayField(
+  { type: WidgetType.DATA_LIST },
+  requestField({
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.TEXT,
+    label: "String",
+    schema: z.string(),
+  }),
+);
+
+const test10_4_field = requestDataArrayField(
+  { type: WidgetType.DATA_LIST },
+  test10_4_innerArray,
+);
+
 type Test10_4_Result =
-  Test10_4_NestedArrays extends UnifiedField<TranslationKey, z.ZodTypeAny>
+  typeof test10_4_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test10_4: Test10_4_Result = "✓ PASS";
@@ -1078,23 +879,20 @@ const test10_4: Test10_4_Result = "✓ PASS";
 
 // Test 11.1: Record of endpoints with different methods
 
+// Create GET endpoint field for test 11
+const test11_1_getField = objectField(
+  { type: WidgetType.CONTAINER },
+  { response: true },
+  {},
+);
+
 interface Test11_1_LoginEndpoints {
-  POST: Test5_2_LoginEndpoint;
+  POST: Test6_3_LoginEndpoint;
   GET: CreateApiEndpoint<
     Methods.GET,
     readonly UserRoleValue[],
     TranslationKey,
-    ObjectField<
-      Record<string, never>,
-      { response: true },
-      TranslationKey,
-      WidgetConfig<
-        TranslationKey,
-        z.ZodTypeAny,
-        { response: true },
-        Record<string, never>
-      >
-    >
+    typeof test11_1_getField
   >;
 }
 
@@ -1125,99 +923,42 @@ const test11_2: Test11_2_Result = "✓ PASS";
 // ============================================================================
 
 // Test 12.1: Verify that removing constraints allows any field structure
-type Test12_1_CustomField = ObjectField<
-  {
-    customProp1: PrimitiveField<
-      z.ZodString,
-      { request: "data" },
-      TranslationKey,
-      any
-    >;
-    customProp2: PrimitiveField<
-      z.ZodNumber,
-      { request: "data" },
-      TranslationKey,
-      any
-    >;
-    nested: ObjectField<
-      {
-        deep: PrimitiveField<
-          z.ZodBoolean,
-          { request: "data" },
-          TranslationKey,
-          any
-        >;
-      },
-      { request: "data" },
-      TranslationKey,
-      WidgetConfig<
-        TranslationKey,
-        z.ZodTypeAny,
-        { request: "data" },
-        {
-          deep: PrimitiveField<
-            z.ZodBoolean,
-            { request: "data" },
-            TranslationKey,
-            any
-          >;
-        }
-      >
-    >;
-  },
+const test12_1_field = objectField(
+  { type: WidgetType.CONTAINER },
   { request: "data" },
-  TranslationKey,
-  WidgetConfig<
-    TranslationKey,
-    z.ZodTypeAny,
-    { request: "data" },
-    {
-      customProp1: PrimitiveField<
-        z.ZodString,
-        { request: "data" },
-        TranslationKey,
-        any
-      >;
-      customProp2: PrimitiveField<
-        z.ZodNumber,
-        { request: "data" },
-        TranslationKey,
-        any
-      >;
-      nested: ObjectField<
-        {
-          deep: PrimitiveField<
-            z.ZodBoolean,
-            { request: "data" },
-            TranslationKey,
-            any
-          >;
-        },
-        { request: "data" },
-        TranslationKey,
-        WidgetConfig<
-          TranslationKey,
-          z.ZodTypeAny,
-          { request: "data" },
-          {
-            deep: PrimitiveField<
-              z.ZodBoolean,
-              { request: "data" },
-              TranslationKey,
-              any
-            >;
-          }
-        >
-      >;
-    }
-  >
->;
+  {
+    customProp1: requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "Custom Prop 1",
+      schema: z.string(),
+    }),
+    customProp2: requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.NUMBER,
+      label: "Custom Prop 2",
+      schema: z.number(),
+    }),
+    nested: objectField(
+      { type: WidgetType.CONTAINER },
+      { request: "data" },
+      {
+        deep: requestField({
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "Deep",
+          schema: z.boolean(),
+        }),
+      },
+    ),
+  },
+);
 
 type Test12_1_CustomEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   TranslationKey,
-  Test12_1_CustomField
+  typeof test12_1_field
 >;
 
 type Test12_1_Result =
@@ -1247,45 +988,32 @@ const test12_2: Test12_2_Result = "✓ PASS";
 // ============================================================================
 
 // Test 13.1: Optional fields in ObjectField
-type Test13_1_OptionalFields = ObjectField<
-  {
-    required: PrimitiveField<
-      z.ZodString,
-      { request: "data" },
-      TranslationKey,
-      any
-    >;
-    optional: PrimitiveField<
-      z.ZodOptional<z.ZodString>,
-      { request: "data" },
-      TranslationKey,
-      any
-    >;
-  },
+const test13_1_field = objectField(
+  { type: WidgetType.CONTAINER },
   { request: "data" },
-  TranslationKey,
-  WidgetConfig<
-    TranslationKey,
-    z.ZodTypeAny,
-    { request: "data" },
-    {
-      required: PrimitiveField<
-        z.ZodString,
-        { request: "data" },
-        TranslationKey,
-        any
-      >;
-      optional: PrimitiveField<
-        z.ZodOptional<z.ZodString>,
-        { request: "data" },
-        TranslationKey,
-        any
-      >;
-    }
-  >
->;
+  {
+    required: requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "Required",
+      schema: z.string(),
+    }),
+    optional: requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "Optional",
+      schema: z.string().optional(),
+    }),
+  },
+);
+
 type Test13_1_Result =
-  Test13_1_OptionalFields extends UnifiedField<TranslationKey, z.ZodTypeAny>
+  typeof test13_1_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test13_1: Test13_1_Result = "✓ PASS";
@@ -1295,7 +1023,7 @@ type Test13_2_OptionalEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   TranslationKey,
-  Test13_1_OptionalFields
+  typeof test13_1_field
 >;
 type Test13_2_Request = Test13_2_OptionalEndpoint["types"]["RequestOutput"];
 type Test13_2_Result = Test13_2_Request extends {
@@ -1311,36 +1039,25 @@ const test13_2: Test13_2_Result = "✓ PASS";
 // ============================================================================
 
 // Test 14.1: GET endpoint with response-only fields
+const test14_1_field = objectField(
+  { type: WidgetType.CONTAINER },
+  { response: true },
+  {
+    data: responseField({
+      type: WidgetType.TEXT,
+      content: "Response Data",
+      schema: z.string(),
+    }),
+  },
+);
+
 type Test14_1_GetEndpoint = CreateApiEndpoint<
   Methods.GET,
   readonly UserRoleValue[],
   TranslationKey,
-  ObjectField<
-    {
-      data: PrimitiveField<
-        z.ZodString,
-        { response: true },
-        TranslationKey,
-        any
-      >;
-    },
-    { response: true },
-    TranslationKey,
-    WidgetConfig<
-      TranslationKey,
-      z.ZodTypeAny,
-      { response: true },
-      {
-        data: PrimitiveField<
-          z.ZodString,
-          { response: true },
-          TranslationKey,
-          any
-        >;
-      }
-    >
-  >
+  typeof test14_1_field
 >;
+
 type Test14_1_Result =
   Test14_1_GetEndpoint extends CreateApiEndpoint<
     Methods,
@@ -1353,36 +1070,26 @@ type Test14_1_Result =
 const test14_1: Test14_1_Result = "✓ PASS";
 
 // Test 14.2: DELETE endpoint
+const test14_2_field = objectField(
+  { type: WidgetType.CONTAINER },
+  { request: "urlPathParams" },
+  {
+    id: requestUrlPathParamsField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "ID",
+      schema: z.string(),
+    }),
+  },
+);
+
 type Test14_2_DeleteEndpoint = CreateApiEndpoint<
   Methods.DELETE,
   readonly [typeof UserRole.ADMIN],
   TranslationKey,
-  ObjectField<
-    {
-      id: PrimitiveField<
-        z.ZodString,
-        { request: "urlPathParams" },
-        TranslationKey,
-        any
-      >;
-    },
-    { request: "urlPathParams" },
-    TranslationKey,
-    WidgetConfig<
-      TranslationKey,
-      z.ZodTypeAny,
-      { request: "urlPathParams" },
-      {
-        id: PrimitiveField<
-          z.ZodString,
-          { request: "urlPathParams" },
-          TranslationKey,
-          any
-        >;
-      }
-    >
-  >
+  typeof test14_2_field
 >;
+
 type Test14_2_Result =
   Test14_2_DeleteEndpoint extends CreateApiEndpoint<
     Methods,
@@ -1399,339 +1106,134 @@ const test14_2: Test14_2_Result = "✓ PASS";
 // ============================================================================
 
 // Test 15.1: Pagination with filters
-type Test15_1_PaginationFields = ObjectField<
+const test15_1_field = objectField(
+  { type: WidgetType.CONTAINER },
+  { request: "data", response: true },
   {
-    page: PrimitiveField<z.ZodNumber, { request: "data" }, TranslationKey>;
-    pageSize: PrimitiveField<
-      z.ZodNumber,
+    page: requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.NUMBER,
+      label: "Page",
+      schema: z.number(),
+    }),
+    pageSize: requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.NUMBER,
+      label: "Page Size",
+      schema: z.number(),
+    }),
+    filters: objectField(
+      { type: WidgetType.CONTAINER },
       { request: "data" },
-      TranslationKey,
-      any
-    >;
-    filters: ObjectField<
       {
-        search: PrimitiveField<
-          z.ZodString,
-          { request: "data" },
-          TranslationKey,
-          any
-        >;
-        status: PrimitiveField<
-          z.ZodString,
-          { request: "data" },
-          TranslationKey,
-          any
-        >;
+        search: requestField({
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "Search",
+          schema: z.string(),
+        }),
+        status: requestField({
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "Status",
+          schema: z.string(),
+        }),
       },
-      { request: "data" },
-      TranslationKey,
-      WidgetConfig<
-        TranslationKey,
-        z.ZodTypeAny,
-        { request: "data" },
+    ),
+    results: responseArrayField(
+      { type: WidgetType.DATA_LIST },
+      objectField(
+        { type: WidgetType.CONTAINER },
+        { response: true },
         {
-          search: PrimitiveField<
-            z.ZodString,
-            { request: "data" },
-            TranslationKey,
-            any
-          >;
-          status: PrimitiveField<
-            z.ZodString,
-            { request: "data" },
-            TranslationKey,
-            any
-          >;
-        }
-      >
-    >;
-    results: ArrayField<
-      ObjectField<
-        {
-          id: PrimitiveField<
-            z.ZodString,
-            { response: true },
-            TranslationKey,
-            any
-          >;
-          name: PrimitiveField<
-            z.ZodString,
-            { response: true },
-            TranslationKey,
-            any
-          >;
+          id: responseField({
+            type: WidgetType.TEXT,
+            content: "ID",
+            schema: z.string(),
+          }),
+          name: responseField({
+            type: WidgetType.TEXT,
+            content: "Name",
+            schema: z.string(),
+          }),
         },
-        { response: true },
-        TranslationKey,
-        WidgetConfig<
-          TranslationKey,
-          z.ZodTypeAny,
-          { response: true },
-          {
-            id: PrimitiveField<
-              z.ZodString,
-              { response: true },
-              TranslationKey,
-              any
-            >;
-            name: PrimitiveField<
-              z.ZodString,
-              { response: true },
-              TranslationKey,
-              any
-            >;
-          }
-        >
-      >,
-      { response: true },
-      TranslationKey,
-      WidgetConfig<
-        TranslationKey,
-        z.ZodTypeAny,
-        { response: true },
-        ObjectField<
-          {
-            id: PrimitiveField<
-              z.ZodString,
-              { response: true },
-              TranslationKey,
-              any
-            >;
-            name: PrimitiveField<
-              z.ZodString,
-              { response: true },
-              TranslationKey,
-              any
-            >;
-          },
-          { response: true },
-          TranslationKey,
-          WidgetConfig<
-            TranslationKey,
-            z.ZodTypeAny,
-            { response: true },
-            {
-              id: PrimitiveField<
-                z.ZodString,
-                { response: true },
-                TranslationKey,
-                any
-              >;
-              name: PrimitiveField<
-                z.ZodString,
-                { response: true },
-                TranslationKey,
-                any
-              >;
-            }
-          >
-        >
-      >
-    >;
+      ),
+    ),
   },
-  { request: "data"; response: true },
-  TranslationKey,
-  WidgetConfig<
-    TranslationKey,
-    z.ZodTypeAny,
-    { request: "data"; response: true },
-    {
-      page: PrimitiveField<
-        z.ZodNumber,
-        { request: "data" },
-        TranslationKey,
-        any
-      >;
-      pageSize: PrimitiveField<
-        z.ZodNumber,
-        { request: "data" },
-        TranslationKey,
-        any
-      >;
-      filters: ObjectField<
-        {
-          search: PrimitiveField<
-            z.ZodString,
-            { request: "data" },
-            TranslationKey,
-            any
-          >;
-          status: PrimitiveField<
-            z.ZodString,
-            { request: "data" },
-            TranslationKey,
-            any
-          >;
-        },
-        { request: "data" },
-        TranslationKey,
-        WidgetConfig<
-          TranslationKey,
-          z.ZodTypeAny,
-          { request: "data" },
-          {
-            search: PrimitiveField<
-              z.ZodString,
-              { request: "data" },
-              TranslationKey,
-              any
-            >;
-            status: PrimitiveField<
-              z.ZodString,
-              { request: "data" },
-              TranslationKey,
-              any
-            >;
-          }
-        >
-      >;
-      results: ArrayField<
-        ObjectField<
-          {
-            id: PrimitiveField<
-              z.ZodString,
-              { response: true },
-              TranslationKey,
-              any
-            >;
-            name: PrimitiveField<
-              z.ZodString,
-              { response: true },
-              TranslationKey,
-              any
-            >;
-          },
-          { response: true },
-          TranslationKey,
-          WidgetConfig<
-            TranslationKey,
-            z.ZodTypeAny,
-            { response: true },
-            {
-              id: PrimitiveField<
-                z.ZodString,
-                { response: true },
-                TranslationKey,
-                any
-              >;
-              name: PrimitiveField<
-                z.ZodString,
-                { response: true },
-                TranslationKey,
-                any
-              >;
-            }
-          >
-        >,
-        { response: true },
-        TranslationKey,
-        WidgetConfig<
-          TranslationKey,
-          z.ZodTypeAny,
-          { response: true },
-          ObjectField<
-            {
-              id: PrimitiveField<
-                z.ZodString,
-                { response: true },
-                TranslationKey,
-                any
-              >;
-              name: PrimitiveField<
-                z.ZodString,
-                { response: true },
-                TranslationKey,
-                any
-              >;
-            },
-            { response: true },
-            TranslationKey,
-            WidgetConfig<
-              TranslationKey,
-              z.ZodTypeAny,
-              { response: true },
-              {
-                id: PrimitiveField<
-                  z.ZodString,
-                  { response: true },
-                  TranslationKey,
-                  any
-                >;
-                name: PrimitiveField<
-                  z.ZodString,
-                  { response: true },
-                  TranslationKey,
-                  any
-                >;
-              }
-            >
-          >
-        >
-      >;
-    }
-  >
->;
+);
+
 type Test15_1_Result =
-  Test15_1_PaginationFields extends UnifiedField<TranslationKey, z.ZodTypeAny>
+  typeof test15_1_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test15_1: Test15_1_Result = "✓ PASS";
 
 // Test 15.2: File upload with metadata
-type Test15_2_FileUploadFields = ObjectField<
+const test15_2_field = objectField(
+  { type: WidgetType.CONTAINER },
+  { request: "data", response: true },
   {
-    file: PrimitiveField<z.ZodAny, { request: "data" }, TranslationKey>;
-    metadata: ObjectField<
-      {
-        filename: PrimitiveField<
-          z.ZodString,
-          { request: "data" },
-          TranslationKey,
-          any
-        >;
-        size: PrimitiveField<
-          z.ZodNumber,
-          { request: "data" },
-          TranslationKey,
-          any
-        >;
-        mimeType: PrimitiveField<
-          z.ZodString,
-          { request: "data" },
-          TranslationKey,
-          any
-        >;
-      },
+    file: requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.FILE,
+      label: "File",
+      schema: z.any(),
+    }),
+    metadata: objectField(
+      { type: WidgetType.CONTAINER },
       { request: "data" },
-      TranslationKey,
-      any
-    >;
-    uploadResult: ObjectField<
       {
-        url: PrimitiveField<
-          z.ZodString,
-          { response: true },
-          TranslationKey,
-          any
-        >;
-        id: PrimitiveField<
-          z.ZodString,
-          { response: true },
-          TranslationKey,
-          any
-        >;
+        filename: requestField({
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "Filename",
+          schema: z.string(),
+        }),
+        size: requestField({
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "Size",
+          schema: z.number(),
+        }),
+        mimeType: requestField({
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "MIME Type",
+          schema: z.string(),
+        }),
       },
+    ),
+    uploadResult: objectField(
+      { type: WidgetType.CONTAINER },
       { response: true },
-      TranslationKey,
-      any
-    >;
+      {
+        url: responseField({
+          type: WidgetType.TEXT,
+          content: "URL",
+          schema: z.string(),
+        }),
+        id: responseField({
+          type: WidgetType.TEXT,
+          content: "ID",
+          schema: z.string(),
+        }),
+      },
+    ),
   },
-  { request: "data"; response: true },
-  TranslationKey,
-  any
->;
+);
+
 type Test15_2_Result =
-  Test15_2_FileUploadFields extends UnifiedField<TranslationKey, z.ZodTypeAny>
+  typeof test15_2_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test15_2: Test15_2_Result = "✓ PASS";
@@ -1757,7 +1259,7 @@ type Test16_1_UseApiFormSignature = <
 
 // Verify we can call it with login endpoint
 type Test16_1_CanCall = Parameters<Test16_1_UseApiFormSignature>[0];
-type Test16_1_Result = Test5_2_LoginEndpoint extends Test16_1_CanCall
+type Test16_1_Result = Test6_3_LoginEndpoint extends Test16_1_CanCall
   ? "✓ PASS"
   : "✗ FAIL";
 const test16_1: Test16_1_Result = "✓ PASS";
@@ -1765,13 +1267,19 @@ const test16_1: Test16_1_Result = "✓ PASS";
 // Test 16.2: useEndpoint with Record of endpoints
 
 // Create a test record
+const test16_2_logoutField = objectField(
+  { type: WidgetType.CONTAINER },
+  { response: true },
+  {},
+);
+
 interface Test16_2_TestRecord {
-  login: Test5_2_LoginEndpoint;
+  login: Test6_3_LoginEndpoint;
   logout: CreateApiEndpoint<
     Methods.POST,
     readonly UserRoleValue[],
     TranslationKey,
-    ObjectField<Record<string, never>, { response: true }, TranslationKey>
+    typeof test16_2_logoutField
   >;
 }
 
@@ -1786,7 +1294,7 @@ const test16_2: Test16_2_Result = "✓ PASS";
 // ============================================================================
 
 // Test 17.1: Verify request type has expected properties
-type Test17_1_LoginRequest = Test5_2_LoginEndpoint["types"]["RequestOutput"];
+type Test17_1_LoginRequest = Test6_3_LoginEndpoint["types"]["RequestOutput"];
 type Test17_1_Result = Test17_1_LoginRequest extends {
   credentials: any;
   options: any;
@@ -1796,7 +1304,7 @@ type Test17_1_Result = Test17_1_LoginRequest extends {
 const test17_1: Test17_1_Result = "✓ PASS";
 
 // Test 17.2: Verify response type is not never
-type Test17_2_LoginResponse = Test5_2_LoginEndpoint["types"]["ResponseOutput"];
+type Test17_2_LoginResponse = Test6_3_LoginEndpoint["types"]["ResponseOutput"];
 type Test17_2_HasUser = Test17_2_LoginResponse extends never
   ? "✗ FAIL"
   : "✓ PASS";
@@ -1807,20 +1315,20 @@ const test17_2: Test17_2_HasUser = "✓ PASS";
 // ============================================================================
 
 // Test 18.1: Readonly array types are preserved
-type Test18_1_RolesType = Test5_2_LoginEndpoint["allowedRoles"];
+type Test18_1_RolesType = Test6_3_LoginEndpoint["allowedRoles"];
 type Test18_1_IsReadonly = Test18_1_RolesType extends readonly any[]
   ? "✓ PASS"
   : "✗ FAIL";
 const test18_1: Test18_1_IsReadonly = "✓ PASS";
 
 // Test 18.2: Readonly object properties are preserved
-type Test18_2_FieldsType = Test5_2_LoginEndpoint["fields"];
+type Test18_2_FieldsType = Test6_3_LoginEndpoint["fields"];
 type Test18_2_HasChildren =
-  Test18_2_FieldsType extends ObjectField<
-    infer TChildren,
-    any,
-    TranslationKey,
-    any
+  Test18_2_FieldsType extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    infer TChildren
   >
     ? TChildren extends { credentials: any }
       ? "✓ PASS"
@@ -1833,63 +1341,80 @@ const test18_2: Test18_2_HasChildren = "✓ PASS";
 // ============================================================================
 
 // Test 19.1: Empty object field
-type Test19_1_EmptyField = ObjectField<
-  Record<string, never>,
+const test19_1_field = objectField(
+  { type: WidgetType.CONTAINER },
   { response: true },
-  TranslationKey,
-  any
->;
+  {},
+);
+
 type Test19_1_Result =
-  Test19_1_EmptyField extends UnifiedField<TranslationKey, z.ZodTypeAny>
+  typeof test19_1_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test19_1: Test19_1_Result = "✓ PASS";
 
-// Test 19.2: Deeply nested arrays
-type Test19_2_DeepArray = ArrayField<
-  ArrayField<
-    ArrayField<
-      PrimitiveField<z.ZodString, { response: true }, TranslationKey>,
-      { response: true },
-      TranslationKey,
-      any
-    >,
-    { response: true },
-    TranslationKey,
-    any
-  >,
-  { response: true },
-  TranslationKey,
-  any
->;
+// Test 19.2: Deeply nested arrays (3 levels)
+const test19_2_level3 = responseArrayField(
+  { type: WidgetType.DATA_LIST },
+  responseField({
+    type: WidgetType.TEXT,
+    content: "String",
+    schema: z.string(),
+  }),
+);
+
+const test19_2_level2 = responseArrayField(
+  { type: WidgetType.DATA_LIST },
+  test19_2_level3,
+);
+
+const test19_2_field = responseArrayField(
+  { type: WidgetType.DATA_LIST },
+  test19_2_level2,
+);
+
 type Test19_2_Result =
-  Test19_2_DeepArray extends UnifiedField<TranslationKey, z.ZodTypeAny>
+  typeof test19_2_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test19_2: Test19_2_Result = "✓ PASS";
 
 // Test 19.3: Mixed usage configs
-type Test19_3_MixedField = ObjectField<
+const test19_3_field = objectField(
+  { type: WidgetType.CONTAINER },
+  { request: "data", response: true },
   {
-    input: PrimitiveField<
-      z.ZodString,
-      { request: "data" },
-      TranslationKey,
-      any
-    >;
-    output: PrimitiveField<
-      z.ZodString,
-      { response: true },
-      TranslationKey,
-      any
-    >;
+    input: requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "Input",
+      schema: z.string(),
+    }),
+    output: responseField({
+      type: WidgetType.TEXT,
+      content: "Output",
+      schema: z.string(),
+    }),
   },
-  { request: "data"; response: true },
-  TranslationKey,
-  any
->;
+);
+
 type Test19_3_Result =
-  Test19_3_MixedField extends UnifiedField<TranslationKey, z.ZodTypeAny>
+  typeof test19_3_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "✓ PASS"
     : "✗ FAIL";
 const test19_3: Test19_3_Result = "✓ PASS";
@@ -1899,48 +1424,56 @@ const test19_3: Test19_3_Result = "✓ PASS";
 // ============================================================================
 
 // Test 20.1: Multiple endpoints in a record (like actual definition files)
+const test20_1_defaultField = objectField(
+  { type: WidgetType.CONTAINER },
+  { request: "data" },
+  {
+    email: requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.EMAIL,
+      label: "Email",
+      schema: z.string().email(),
+    }),
+  },
+);
+
+const test20_1_verifyField = objectField(
+  { type: WidgetType.CONTAINER },
+  { request: "data" },
+  {
+    code: requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "Code",
+      schema: z.string(),
+    }),
+  },
+);
+
+const test20_1_resendField = objectField(
+  { type: WidgetType.CONTAINER },
+  { response: true },
+  {},
+);
+
 interface Test20_1_MultiEndpoint {
   default: CreateApiEndpoint<
     Methods.POST,
     readonly UserRoleValue[],
     TranslationKey,
-    ObjectField<
-      {
-        email: PrimitiveField<
-          z.ZodString,
-          { request: "data" },
-          TranslationKey,
-          any
-        >;
-      },
-      { request: "data" },
-      TranslationKey,
-      any
-    >
+    typeof test20_1_defaultField
   >;
   verify: CreateApiEndpoint<
     Methods.POST,
     readonly UserRoleValue[],
     TranslationKey,
-    ObjectField<
-      {
-        code: PrimitiveField<
-          z.ZodString,
-          { request: "data" },
-          TranslationKey,
-          any
-        >;
-      },
-      { request: "data" },
-      TranslationKey,
-      any
-    >
+    typeof test20_1_verifyField
   >;
   resend: CreateApiEndpoint<
     Methods.POST,
     readonly UserRoleValue[],
     TranslationKey,
-    ObjectField<Record<string, never>, { response: true }, TranslationKey>
+    typeof test20_1_resendField
   >;
 }
 

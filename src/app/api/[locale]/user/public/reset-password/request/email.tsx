@@ -222,12 +222,12 @@ export const renderResetPasswordMail: EmailFunctionType<
   UndefinedType
 > = async ({ requestData, t, locale, logger }) => {
   logger.debug("Rendering password reset email", {
-    email: requestData.emailInput.email,
+    email: requestData.email,
   });
 
   try {
     const userResponse = await UserRepository.getUserByEmail(
-      requestData.emailInput.email,
+      requestData.email,
       UserDetailLevel.STANDARD,
       locale,
       logger,
@@ -237,7 +237,7 @@ export const renderResetPasswordMail: EmailFunctionType<
       return fail({
         message: "app.api.emails.errors.no_email",
         errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: { email: requestData.emailInput.email },
+        messageParams: { email: requestData.email },
         cause: userResponse,
       });
     }
@@ -246,7 +246,7 @@ export const renderResetPasswordMail: EmailFunctionType<
 
     // Create a reset token
     const tokenResponse = await PasswordRepository.createResetToken(
-      requestData.emailInput.email,
+      requestData.email,
       locale,
       logger,
     );
@@ -254,7 +254,7 @@ export const renderResetPasswordMail: EmailFunctionType<
       return fail({
         message: "app.api.emails.errors.email_generation_failed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { email: requestData.emailInput.email },
+        messageParams: { email: requestData.email },
         cause: tokenResponse,
       });
     }
@@ -271,7 +271,7 @@ export const renderResetPasswordMail: EmailFunctionType<
     const translatedAppName = t("config.appName");
 
     return success({
-      toEmail: requestData.emailInput.email,
+      toEmail: requestData.email,
       toName: user.publicName,
       subject: t("app.api.user.public.resetPassword.request.email.subject", {
         appName: translatedAppName,
@@ -280,7 +280,7 @@ export const renderResetPasswordMail: EmailFunctionType<
         props: templateProps,
         t,
         locale,
-        recipientEmail: requestData.emailInput.email,
+        recipientEmail: requestData.email,
         tracking: createTrackingContext(locale, undefined, user.id),
       }),
     });
@@ -291,7 +291,7 @@ export const renderResetPasswordMail: EmailFunctionType<
       message: "app.api.emails.errors.email_generation_failed",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
-        email: requestData.emailInput.email,
+        email: requestData.email,
         errorMessage: parsedError.message,
       },
     });

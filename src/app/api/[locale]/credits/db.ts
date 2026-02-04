@@ -287,7 +287,9 @@ export const creditTransactions = pgTable(
     }).notNull(),
 
     // Context for usage transactions
-    modelId: text("model_id").$type<ModelId>(),
+    modelId: text("model_id").$type<
+      ModelId | "tts" | "stt" | "search" | "stt-hotkey"
+    >(),
     messageId: uuid("message_id"),
 
     // Reference to credit pack (for pack-specific transactions)

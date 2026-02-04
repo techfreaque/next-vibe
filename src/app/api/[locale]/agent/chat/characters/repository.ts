@@ -19,7 +19,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { defaultModel } from "../../models/models";
+import { defaultModel, modelProviders } from "../../models/models";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import type {
   CharacterDeleteResponseOutput,
@@ -356,8 +356,34 @@ export class CharactersRepository {
 
       logger.debug("Updating custom character", { userId, characterId });
 
+      // Get existing character to compare icon
+      const [existingCharacter] = await db
+        .select()
+        .from(customCharacters)
+        .where(
+          and(
+            eq(customCharacters.id, characterId),
+            eq(customCharacters.userId, userId),
+          ),
+        )
+        .limit(1);
+
+      if (!existingCharacter) {
+        return fail({
+          message:
+            "app.api.agent.chat.characters.id.patch.errors.notFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      // Only update icon if it's different from existing, otherwise set to null
+      const iconToUpdate =
+        data.icon && data.icon !== existingCharacter.icon ? data.icon : null;
+
       const updateValues = Object.fromEntries(
-        Object.entries(data).filter(([, value]) => value !== undefined),
+        Object.entries({ ...data, icon: iconToUpdate }).filter(
+          ([, value]) => value !== undefined,
+        ),
       );
 
       const [updated] = await db
@@ -479,7 +505,7 @@ export class CharactersRepository {
       ? {
           modelIcon: bestModel.icon,
           modelInfo: bestModel.name,
-          modelProvider: bestModel.provider,
+          modelProvider: modelProviders[bestModel.provider].name,
           creditCost: CharactersRepositoryClient.formatCreditCost(
             bestModel.creditCost,
             t,
@@ -512,7 +538,7 @@ export class CharactersRepository {
         tagline:
           char.tagline ??
           ("app.api.agent.chat.characters.fallbacks.noTagline" as const),
-        modelRow,
+        ...modelRow,
       },
     };
   }

@@ -8,6 +8,7 @@ import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { SeparatorWidgetConfig } from "./types";
@@ -23,13 +24,13 @@ export function SeparatorWidgetInk<
   TUsage extends FieldUsageConfig,
 >({
   field,
-  context,
 }: InkWidgetProps<
   TEndpoint,
+  TUsage,
   SeparatorWidgetConfig<TKey, TUsage, "widget">
 >): JSX.Element {
+  const t = useInkWidgetTranslation();
   const { label: labelKey } = field;
-  const { t } = context;
 
   const label = labelKey ? t(labelKey) : undefined;
 

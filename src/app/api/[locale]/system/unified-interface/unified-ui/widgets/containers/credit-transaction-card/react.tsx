@@ -14,6 +14,10 @@ import type {
   FieldUsageConfig,
   ObjectChildrenConstraint,
 } from "../../_shared/types";
+import {
+  useWidgetLocale,
+  useWidgetTranslation,
+} from "../../_shared/use-widget-context";
 import type { CreditTransactionCardWidgetConfig } from "./types";
 
 /**
@@ -23,19 +27,24 @@ export function CreditTransactionCardWidget<
   TKey extends string,
   TEndpoint extends CreateApiEndpointAny,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "object" | "object-optional" | "widget-object",
   TChildren extends ObjectChildrenConstraint<
     TKey,
     ConstrainedChildUsage<TUsage>
   >,
 >({
   field,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
-  CreditTransactionCardWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
+  CreditTransactionCardWidgetConfig<
+    TKey,
+    TUsage,
+    "object" | "object-optional" | "widget-object",
+    TChildren
+  >
 >): JSX.Element {
-  const { t: globalT } = simpleT(context.locale);
+  const locale = useWidgetLocale();
+  const t = useWidgetTranslation();
+  const { t: globalT } = simpleT(locale);
   const leftFields = field.leftFields || [];
   const rightFields = field.rightFields || [];
 
@@ -58,13 +67,13 @@ export function CreditTransactionCardWidget<
 
           const displayValue =
             key === "type" && typeof val === "string"
-              ? context.t(val)
-              : key === "createdAt" && val instanceof Date
-                ? formatSimpleDate(val, context.locale)
+              ? t(val)
+              : key === "createdAt"
+                ? formatSimpleDate(val, locale)
                 : val;
 
           return (
-            <Div key={key} className="text-sm">
+            <Div key={String(key)} className="text-sm">
               {displayValue}
             </Div>
           );
@@ -85,7 +94,7 @@ export function CreditTransactionCardWidget<
 
           return (
             <Div
-              key={key}
+              key={String(key)}
               className={cn(
                 key === "amount" && "text-lg font-bold",
                 key === "amount" &&

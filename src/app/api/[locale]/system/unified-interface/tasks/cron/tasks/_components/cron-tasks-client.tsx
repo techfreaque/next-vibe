@@ -15,6 +15,7 @@ import { useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useCronTasksList } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/hooks";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -23,16 +24,18 @@ import { CronTasksTable } from "./cron-tasks-table";
 
 interface CronTasksClientProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 export function CronTasksClient({
   locale,
+  user,
 }: CronTasksClientProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const tasksEndpoint = useCronTasksList(logger);
+  const tasksEndpoint = useCronTasksList(user, logger);
 
   return (
     <Div className="flex flex-col gap-6">
@@ -70,6 +73,7 @@ export function CronTasksClient({
             loading={tasksEndpoint.read.isLoading}
             locale={locale}
             onTaskUpdated={tasksEndpoint.read.refetch}
+            user={user}
           />
         </CardContent>
       </Card>
@@ -80,6 +84,7 @@ export function CronTasksClient({
         onClose={() => setCreateDialogOpen(false)}
         onTaskCreated={tasksEndpoint.read.refetch}
         locale={locale}
+        user={user}
       />
     </Div>
   );

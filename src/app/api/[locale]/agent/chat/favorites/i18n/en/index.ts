@@ -49,6 +49,16 @@ export const translations = {
       balanced: "Balanced",
       thorough: "Thorough",
     },
+    sortField: {
+      intelligence: "Intelligence",
+      speed: "Speed",
+      price: "Price",
+      content: "Content",
+    },
+    sortDirection: {
+      asc: "Low to High",
+      desc: "High to Low",
+    },
   },
   get: {
     title: "Get Favorites",

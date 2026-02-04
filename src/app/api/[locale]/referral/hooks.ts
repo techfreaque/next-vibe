@@ -7,8 +7,8 @@
 
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useTranslation } from "@/i18n/core/client";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import codesListDefinitions from "./codes/list/definition";
 import definitions from "./definition";
@@ -20,10 +20,10 @@ import statsDefinitions from "./stats/definition";
  * Hook for creating referral codes
  * Provides mutation (POST) operations for creating new referral codes
  */
-export function useReferralCreate(): EndpointReturn<typeof definitions> {
-  const { locale } = useTranslation();
-  const logger = createEndpointLogger(false, Date.now(), locale);
-
+export function useReferralCreate(
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {
@@ -38,6 +38,7 @@ export function useReferralCreate(): EndpointReturn<typeof definitions> {
       },
     },
     logger,
+    user,
   );
 }
 
@@ -45,12 +46,10 @@ export function useReferralCreate(): EndpointReturn<typeof definitions> {
  * Hook for listing user's referral codes
  * Provides query (GET) operations for fetching referral codes with stats
  */
-export function useReferralCodesList(): EndpointReturn<
-  typeof codesListDefinitions
-> {
-  const { locale } = useTranslation();
-  const logger = createEndpointLogger(false, Date.now(), locale);
-
+export function useReferralCodesList(
+  user: JwtPayloadType,
+  logger: EndpointLogger,
+): EndpointReturn<typeof codesListDefinitions> {
   return useEndpoint(
     codesListDefinitions,
     {
@@ -61,6 +60,7 @@ export function useReferralCodesList(): EndpointReturn<
       },
     },
     logger,
+    user,
   );
 }
 
@@ -68,23 +68,21 @@ export function useReferralCodesList(): EndpointReturn<
  * Hook for linking referral code to lead
  * Provides mutation (POST) operations for linking referral codes to leads
  */
-export function useReferralLinkToLead(): EndpointReturn<
-  typeof linkToLeadDefinitions
-> {
-  const { locale } = useTranslation();
-  const logger = createEndpointLogger(false, Date.now(), locale);
-
-  return useEndpoint(linkToLeadDefinitions, {}, logger);
+export function useReferralLinkToLead(
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+): EndpointReturn<typeof linkToLeadDefinitions> {
+  return useEndpoint(linkToLeadDefinitions, undefined, logger, user);
 }
 
 /**
  * Hook for fetching referral statistics
  * Provides query (GET) operations for fetching user's referral stats
  */
-export function useReferralStats(): EndpointReturn<typeof statsDefinitions> {
-  const { locale } = useTranslation();
-  const logger = createEndpointLogger(false, Date.now(), locale);
-
+export function useReferralStats(
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+): EndpointReturn<typeof statsDefinitions> {
   return useEndpoint(
     statsDefinitions,
     {
@@ -95,6 +93,7 @@ export function useReferralStats(): EndpointReturn<typeof statsDefinitions> {
       },
     },
     logger,
+    user,
   );
 }
 
@@ -102,13 +101,14 @@ export function useReferralStats(): EndpointReturn<typeof statsDefinitions> {
  * Hook for fetching referral earnings
  * Provides query (GET) operations for fetching user's referral earnings with pagination
  */
-export function useReferralEarnings(params?: {
-  limit?: number;
-  offset?: number;
-}): EndpointReturn<typeof earningsListDefinitions> {
-  const { locale } = useTranslation();
-  const logger = createEndpointLogger(false, Date.now(), locale);
-
+export function useReferralEarnings(
+  user: JwtPayloadType,
+  logger: EndpointLogger,
+  params?: {
+    limit?: number;
+    offset?: number;
+  },
+): EndpointReturn<typeof earningsListDefinitions> {
   return useEndpoint(
     earningsListDefinitions,
     {
@@ -123,5 +123,6 @@ export function useReferralEarnings(params?: {
       },
     },
     logger,
+    user,
   );
 }

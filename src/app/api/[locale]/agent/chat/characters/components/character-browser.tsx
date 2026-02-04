@@ -24,6 +24,7 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useIsMobile } from "@/hooks/use-media-query";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -40,6 +41,7 @@ interface CharacterBrowserProps {
   /** Favorites list to track which characters are already added */
   favorites?: FavoriteCard[];
   logger: EndpointLogger;
+  user: JwtPayloadType;
 }
 
 /**
@@ -137,29 +139,22 @@ export function CharacterListItem({
 
         {/* Model row - model info, provider, credits */}
         <Div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
-          {character.content.modelRow?.modelInfo && (
+          {character.content.modelInfo && (
             <>
-              <Icon
-                icon={character.content.modelRow.modelIcon as never}
-                className="h-4 w-4"
-              />
-              <Span className="truncate">
-                {character.content.modelRow.modelInfo}
-              </Span>
+              <Icon icon={character.content.modelIcon} className="h-4 w-4" />
+              <Span className="truncate">{character.content.modelInfo}</Span>
               <Span className="text-muted-foreground/40">•</Span>
             </>
           )}
-          {character.content.modelRow?.modelProvider && (
+          {character.content.modelProvider && (
             <>
               <Span className="shrink-0">
-                {modelProviders[character.content.modelRow.modelProvider]?.name}
+                {modelProviders[character.content.modelProvider]?.name}
               </Span>
               <Span className="text-muted-foreground/40">•</Span>
             </>
           )}
-          <Span className="shrink-0">
-            {character.content.modelRow?.creditCost}
-          </Span>
+          <Span className="shrink-0">{character.content.creditCost}</Span>
         </Div>
       </Div>
     </Div>
@@ -249,6 +244,7 @@ interface CharacterBrowserCoreProps {
   searchQuery?: string;
   hideCompanions?: boolean;
   logger: EndpointLogger;
+  user: JwtPayloadType;
 }
 
 /**
@@ -262,6 +258,7 @@ export function CharacterBrowserCore({
   searchQuery = "",
   hideCompanions = false,
   logger,
+  user,
 }: CharacterBrowserCoreProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -270,7 +267,7 @@ export function CharacterBrowserCore({
   >(new Set());
 
   // Fetch characters from API
-  const charactersEndpoint = useCharacters(logger);
+  const charactersEndpoint = useCharacters(user, logger);
 
   // Calculate which characters are already added to favorites (non-customized)
   const addedCharacterIds = useMemo(
@@ -527,6 +524,7 @@ export function CharacterBrowser({
   locale,
   favorites = [],
   logger,
+  user,
 }: CharacterBrowserProps): JSX.Element {
   const { t } = simpleT(locale);
   const [searchQuery, setSearchQuery] = useState("");
@@ -583,6 +581,7 @@ export function CharacterBrowser({
           locale={locale}
           searchQuery={searchQuery}
           logger={logger}
+          user={user}
         />
       </Div>
     </Div>

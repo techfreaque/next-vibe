@@ -27,6 +27,7 @@ import {
   LeadStatus,
 } from "@/app/api/[locale]/leads/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import {
   getCountryFromLocale,
@@ -34,12 +35,14 @@ import {
 } from "@/i18n/core/language-utils";
 
 interface TestEmailFormProps {
+  user: JwtPayloadType;
   emailJourneyVariant: typeof EmailJourneyVariantValues;
   emailCampaignStage: typeof EmailCampaignStageValues;
   onClose?: () => void;
 }
 
 export function TestEmailForm({
+  user,
   emailJourneyVariant,
   emailCampaignStage,
   onClose,
@@ -51,7 +54,7 @@ export function TestEmailForm({
   const currentCountry = getCountryFromLocale(locale);
   const currentLanguage = getLanguageFromLocale(locale);
 
-  const endpoint = useTestEmailEndpoint(logger, {
+  const endpoint = useTestEmailEndpoint(user, logger, {
     defaultValues: {
       testEmail: "test@example.com",
       // Prefill SMTP account criteria based on template context

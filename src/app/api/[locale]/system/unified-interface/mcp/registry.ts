@@ -9,6 +9,7 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { McpResultFormatter } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -19,7 +20,6 @@ import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
 import { RouteExecutionExecutor } from "../shared/endpoints/route/executor";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
-import { McpResultFormatter } from "../unified-ui/renderers/mcp/McpResultFormatter";
 import type {
   MCPExecutionContext,
   MCPToolCallResult,
@@ -297,7 +297,10 @@ export class MCPRegistry implements IMCPRegistry {
       );
       logger.debug("[MCP Registry] Tool execution successful", {
         toolName,
-        formattedData,
+        formattedDataLength: formattedData.length,
+        formattedDataPreview: formattedData.slice(0, 200),
+        hasEndpoint: !!endpoint,
+        dataKeys: Object.keys(result.data),
       });
 
       return {

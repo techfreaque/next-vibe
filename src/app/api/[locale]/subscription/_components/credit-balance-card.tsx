@@ -26,6 +26,8 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { JwtPayloadType } from "../../user/auth/types";
+
 /**
  * Format credit amount for display
  * Shows decimals only when needed
@@ -41,12 +43,14 @@ interface CreditBalanceCardProps {
   locale: CountryLanguage;
   initialCredits: CreditsGetResponseOutput | null;
   freeCredits: number;
+  user: JwtPayloadType;
 }
 
 export function CreditBalanceCard({
   locale,
   initialCredits,
   freeCredits,
+  user,
 }: CreditBalanceCardProps): JSX.Element {
   const { t } = useTranslation();
 
@@ -59,7 +63,7 @@ export function CreditBalanceCard({
   // Fetch credits data with server-side initial data (disables initial fetch)
   // Will refetch on window focus to keep data fresh
   // Hook handles null case internally - called unconditionally per React rules
-  const creditsEndpoint = useCredits(logger, initialCredits ?? null);
+  const creditsEndpoint = useCredits(user, logger, initialCredits ?? null);
   const credits =
     creditsEndpoint?.read?.response?.success &&
     creditsEndpoint.read.response.data

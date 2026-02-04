@@ -115,7 +115,7 @@ export function DatePicker({
                 {value ? value.toLocaleDateString() : "No date selected"}
               </UIText>
               <UIText className="text-xs text-muted-foreground text-center mt-2">
-                {/* eslint-disable-next-line i18next/no-literal-string -- Placeholder text */}
+                {/* eslint-disable-next-line i18next/no-literal-string, oxlint-plugin-i18n/no-literal-string -- Placeholder text */}
                 Calendar picker - requires native implementation
               </UIText>
             </View>

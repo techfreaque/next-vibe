@@ -8,6 +8,7 @@ import { useEffect, useMemo } from "react";
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { deepMerge } from "./endpoint-utils";
 import type {
@@ -36,6 +37,7 @@ import { useApiForm } from "./use-api-mutation-form";
 export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
   primaryEndpoint: TEndpoint | null,
   logger: EndpointLogger,
+  user: JwtPayloadType,
   options: {
     formOptions?: ApiFormOptions<TEndpoint["types"]["RequestOutput"]>;
     mutationOptions?: ApiMutationOptions<
@@ -89,28 +91,28 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
   ]);
 
   const mergedMutationOptions = useMemo(() => {
-    return deepMerge(
-      (primaryEndpoint.options?.mutationOptions ?? {}) as ApiMutationOptions<
-        TEndpoint["types"]["RequestOutput"],
-        TEndpoint["types"]["ResponseOutput"],
-        TEndpoint["types"]["UrlVariablesOutput"]
-      >,
-      (options.mutationOptions ?? {}) as ApiMutationOptions<
-        TEndpoint["types"]["RequestOutput"],
-        TEndpoint["types"]["ResponseOutput"],
-        TEndpoint["types"]["UrlVariablesOutput"]
-      >,
-    ) as ApiMutationOptions<
-      TEndpoint["types"]["RequestOutput"],
-      TEndpoint["types"]["ResponseOutput"],
-      TEndpoint["types"]["UrlVariablesOutput"]
-    >;
+    const endpointMutOpts = primaryEndpoint.options?.mutationOptions as
+      | ApiMutationOptions<
+          TEndpoint["types"]["RequestOutput"],
+          TEndpoint["types"]["ResponseOutput"],
+          TEndpoint["types"]["UrlVariablesOutput"]
+        >
+      | undefined;
+    const hookMutOpts = options.mutationOptions as
+      | ApiMutationOptions<
+          TEndpoint["types"]["RequestOutput"],
+          TEndpoint["types"]["ResponseOutput"],
+          TEndpoint["types"]["UrlVariablesOutput"]
+        >
+      | undefined;
+    return deepMerge(endpointMutOpts, hookMutOpts);
   }, [primaryEndpoint.options, options.mutationOptions]);
 
   // Use the existing mutation form hook with merged options
   const formResult = useApiForm(
     primaryEndpoint,
     logger,
+    user,
     mergedFormOptions,
     mergedMutationOptions,
   );

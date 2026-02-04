@@ -38,235 +38,252 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.user.public.signup.form.title",
-      description: "app.api.user.public.signup.form.description",
       layoutType: LayoutType.STACKED,
-      noCard: true,
+      gap: "4",
     },
     { request: "data", response: true },
     {
-      // === FORM CARD (contains all form elements, button, and footer links) ===
-      formCard: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.GRID,
-          gap: "4",
-          order: 1,
+      title: widgetField({
+        type: WidgetType.TITLE,
+        content: "app.api.user.public.signup.form.title",
+        order: 0,
+        usage: { request: "data", response: true },
+      }),
+      subtitle: widgetField({
+        type: WidgetType.TEXT,
+        content: "app.api.user.public.signup.form.description",
+        variant: "body-lg",
+        order: 1,
+        usage: { request: "data", response: true },
+      }),
+
+      privateName: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.user.public.signup.fields.privateName.label",
+        description:
+          "app.api.user.public.signup.fields.privateName.description",
+        placeholder:
+          "app.api.user.public.signup.fields.privateName.placeholder",
+        theme: {
+          descriptionStyle: "inline",
         },
-        { request: "data" },
-        {
-          privateName: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "app.api.user.public.signup.fields.privateName.label",
-            description:
-              "app.api.user.public.signup.fields.privateName.description",
-            placeholder:
-              "app.api.user.public.signup.fields.privateName.placeholder",
-            columns: 6,
-            order: 1,
-            schema: z
-              .string({
-                error:
-                  "app.api.user.public.signup.fields.privateName.validation.required" satisfies TranslationKey,
-              })
-              .min(2, {
-                message:
-                  "app.api.user.public.signup.fields.privateName.validation.minLength" satisfies TranslationKey,
-              })
-              .max(100, {
-                message:
-                  "app.api.user.public.signup.fields.privateName.validation.maxLength" satisfies TranslationKey,
-              }),
+        columns: 6,
+        order: 3,
+        schema: z
+          .string({
+            error:
+              "app.api.user.public.signup.fields.privateName.validation.required" satisfies TranslationKey,
+          })
+          .min(2, {
+            message:
+              "app.api.user.public.signup.fields.privateName.validation.minLength" satisfies TranslationKey,
+          })
+          .max(100, {
+            message:
+              "app.api.user.public.signup.fields.privateName.validation.maxLength" satisfies TranslationKey,
           }),
+      }),
 
-          publicName: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "app.api.user.public.signup.fields.publicName.label",
-            description:
-              "app.api.user.public.signup.fields.publicName.description",
-            placeholder:
-              "app.api.user.public.signup.fields.publicName.placeholder",
-            columns: 6,
-            order: 2,
-            schema: z
-              .string({
-                error:
-                  "app.api.user.public.signup.fields.publicName.validation.required" satisfies TranslationKey,
-              })
-              .min(2, {
-                message:
-                  "app.api.user.public.signup.fields.publicName.validation.minLength" satisfies TranslationKey,
-              })
-              .max(100, {
-                message:
-                  "app.api.user.public.signup.fields.publicName.validation.maxLength" satisfies TranslationKey,
-              }),
-          }),
-
-          email: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.EMAIL,
-            label: "app.api.user.public.signup.fields.email.label",
-            description: "app.api.user.public.signup.fields.email.description",
-            placeholder: "app.api.user.public.signup.fields.email.placeholder",
-            columns: 12,
-            order: 3,
-            schema: z
-              .string({
-                error:
-                  "app.api.user.public.signup.fields.email.validation.required" satisfies TranslationKey,
-              })
-              .min(1, {
-                message:
-                  "app.api.user.public.signup.fields.email.validation.required" satisfies TranslationKey,
-              })
-              .email({
-                message:
-                  "app.api.user.public.signup.fields.email.validation.invalid" satisfies TranslationKey,
-              })
-              .transform((val) => val.toLowerCase().trim()),
-          }),
-
-          password: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.PASSWORD,
-            label: "app.api.user.public.signup.fields.password.label",
-            description:
-              "app.api.user.public.signup.fields.password.description",
-            placeholder:
-              "app.api.user.public.signup.fields.password.placeholder",
-            columns: 6,
-            order: 4,
-            schema: z
-              .string({
-                error:
-                  "app.api.user.public.signup.fields.password.validation.required" satisfies TranslationKey,
-              })
-              .min(8, {
-                message:
-                  "app.api.user.public.signup.fields.password.validation.minLength" satisfies TranslationKey,
-              })
-              .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
-                message:
-                  "app.api.user.public.signup.fields.password.validation.complexity" satisfies TranslationKey,
-              }),
-          }),
-
-          confirmPassword: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.PASSWORD,
-            label: "app.api.user.public.signup.fields.confirmPassword.label",
-            description:
-              "app.api.user.public.signup.fields.confirmPassword.description",
-            placeholder:
-              "app.api.user.public.signup.fields.confirmPassword.placeholder",
-            columns: 6,
-            order: 5,
-            schema: z
-              .string({
-                error:
-                  "app.api.user.public.signup.fields.confirmPassword.validation.required" satisfies TranslationKey,
-              })
-              .min(8, {
-                message:
-                  "app.api.user.public.signup.fields.confirmPassword.validation.minLength" satisfies TranslationKey,
-              }),
-          }),
-
-          // === PASSWORD STRENGTH INDICATOR ===
-          passwordStrength: widgetField({
-            type: WidgetType.PASSWORD_STRENGTH,
-            watchField: "formCard.password",
-            columns: 12,
-            order: 5.5,
-            usage: { request: "data" },
-          }),
-
-          subscribeToNewsletter: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.BOOLEAN,
-            label:
-              "app.api.user.public.signup.fields.subscribeToNewsletter.label",
-            columns: 12,
-            order: 6,
-            schema: z.boolean().optional().default(false),
-          }),
-
-          acceptTerms: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.user.public.signup.fields.acceptTerms.label",
-            description:
-              "app.api.user.public.signup.fields.acceptTerms.description",
-            columns: 12,
-            order: 7,
-            schema: z.boolean().refine((val) => val === true, {
-              message:
-                "app.api.user.public.signup.fields.acceptTerms.validation.required" satisfies TranslationKey,
-            }),
-          }),
-
-          referralCode: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "app.api.user.public.signup.fields.referralCode.label",
-            description:
-              "app.api.user.public.signup.fields.referralCode.description",
-            placeholder:
-              "app.api.user.public.signup.fields.referralCode.placeholder",
-            columns: 12,
-            order: 8,
-            // Show as readonly card when prefilled from server (only if value unchanged)
-            prefillDisplay: {
-              variant: "card",
-              labelKey: "app.api.user.public.signup.fields.referralCode.label",
-            },
-            schema: z.string().optional(),
-          }),
-
-          // === FORM ALERT (shows validation and API errors) ===
-          formAlert: widgetField({
-            type: WidgetType.FORM_ALERT,
-            columns: 12,
-            order: 9,
-            usage: { request: "data" },
-          }),
-
-          // === SUBMIT BUTTON (inside card) ===
-          submitButton: widgetField({
-            type: WidgetType.SUBMIT_BUTTON,
-            text: "app.api.user.public.signup.actions.submit",
-            loadingText: "app.api.user.public.signup.actions.submitting",
-            icon: "user-plus",
-            variant: "default",
-            size: "default",
-            columns: 12,
-            order: 10,
-            usage: { request: "data" },
-          }),
-
-          // === FOOTER LINK (inside card, below button) ===
-          alreadyHaveAccount: widgetField({
-            type: WidgetType.TEXT,
-            content: "app.api.user.public.signup.footer.alreadyHaveAccount",
-            format: "link",
-            href: "/user/login",
-            textAlign: "center",
-            columns: 12,
-            order: 11,
-            usage: { request: "data" },
-          }),
+      publicName: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.user.public.signup.fields.publicName.label",
+        description: "app.api.user.public.signup.fields.publicName.description",
+        placeholder: "app.api.user.public.signup.fields.publicName.placeholder",
+        columns: 6,
+        order: 5,
+        theme: {
+          descriptionStyle: "inline",
         },
-      ),
+        schema: z
+          .string({
+            error:
+              "app.api.user.public.signup.fields.publicName.validation.required" satisfies TranslationKey,
+          })
+          .min(2, {
+            message:
+              "app.api.user.public.signup.fields.publicName.validation.minLength" satisfies TranslationKey,
+          })
+          .max(100, {
+            message:
+              "app.api.user.public.signup.fields.publicName.validation.maxLength" satisfies TranslationKey,
+          }),
+      }),
 
-      // === RESPONSE ALERT (outside card) ===
+      email: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label: "app.api.user.public.signup.fields.email.label",
+        description: "app.api.user.public.signup.fields.email.description",
+        placeholder: "app.api.user.public.signup.fields.email.placeholder",
+        columns: 12,
+        theme: {
+          descriptionStyle: "inline",
+        },
+        order: 7,
+        schema: z
+          .string({
+            error:
+              "app.api.user.public.signup.fields.email.validation.required" satisfies TranslationKey,
+          })
+          .min(1, {
+            message:
+              "app.api.user.public.signup.fields.email.validation.required" satisfies TranslationKey,
+          })
+          .email({
+            message:
+              "app.api.user.public.signup.fields.email.validation.invalid" satisfies TranslationKey,
+          })
+          .transform((val) => val.toLowerCase().trim()),
+      }),
+
+      password: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.PASSWORD,
+        label: "app.api.user.public.signup.fields.password.label",
+        description: "app.api.user.public.signup.fields.password.description",
+        placeholder: "app.api.user.public.signup.fields.password.placeholder",
+        columns: 6,
+        order: 9,
+        theme: {
+          descriptionStyle: "inline",
+        },
+        schema: z
+          .string({
+            error:
+              "app.api.user.public.signup.fields.password.validation.required" satisfies TranslationKey,
+          })
+          .min(8, {
+            message:
+              "app.api.user.public.signup.fields.password.validation.minLength" satisfies TranslationKey,
+          })
+          .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
+            message:
+              "app.api.user.public.signup.fields.password.validation.complexity" satisfies TranslationKey,
+          }),
+      }),
+
+      // === PASSWORD STRENGTH INDICATOR ===
+      passwordStrength: widgetField({
+        type: WidgetType.PASSWORD_STRENGTH,
+        watchField: "password",
+        columns: 12,
+        order: 10,
+        usage: { request: "data" },
+      }),
+
+      confirmPassword: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.PASSWORD,
+        label: "app.api.user.public.signup.fields.confirmPassword.label",
+        columns: 6,
+        order: 11,
+        theme: {
+          descriptionStyle: "inline",
+        },
+        schema: z
+          .string({
+            error:
+              "app.api.user.public.signup.fields.confirmPassword.validation.required" satisfies TranslationKey,
+          })
+          .min(8, {
+            message:
+              "app.api.user.public.signup.fields.confirmPassword.validation.minLength" satisfies TranslationKey,
+          }),
+      }),
+
+      subscribeToNewsletter: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.user.public.signup.fields.subscribeToNewsletter.label",
+        description:
+          "app.api.user.public.signup.fields.subscribeToNewsletter.description",
+        columns: 12,
+        theme: {
+          descriptionStyle: "inline",
+        },
+        order: 13,
+        schema: z.boolean().optional().default(true),
+      }),
+
+      acceptTerms: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.user.public.signup.fields.acceptTerms.label",
+        description:
+          "app.api.user.public.signup.fields.acceptTerms.description",
+        columns: 12,
+        theme: {
+          descriptionStyle: "inline",
+        },
+        order: 15,
+        schema: z.boolean().refine((val) => val === true, {
+          message:
+            "app.api.user.public.signup.fields.acceptTerms.validation.required" satisfies TranslationKey,
+        }),
+      }),
+
+      referralCode: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.user.public.signup.fields.referralCode.label",
+        description:
+          "app.api.user.public.signup.fields.referralCode.description",
+        placeholder:
+          "app.api.user.public.signup.fields.referralCode.placeholder",
+        columns: 12,
+        order: 17,
+        theme: {
+          descriptionStyle: "inline",
+        },
+        // Show as readonly card when prefilled from server (only if value unchanged)
+        prefillDisplay: {
+          variant: "card",
+          labelKey: "app.api.user.public.signup.fields.referralCode.label",
+        },
+        schema: z.string().optional(),
+      }),
+
+      // === FORM ALERT (shows validation and API errors) ===
+      formAlert: widgetField({
+        type: WidgetType.FORM_ALERT,
+        columns: 12,
+        order: 18,
+        usage: { request: "data" },
+      }),
+
       message: responseField({
         type: WidgetType.ALERT,
         variant: "default",
-        order: 2,
+        order: 19,
         schema: z.string(),
+      }),
+
+      // === SUBMIT BUTTON (inside card) ===
+      submitButton: widgetField({
+        type: WidgetType.SUBMIT_BUTTON,
+        text: "app.api.user.public.signup.actions.submit",
+        loadingText: "app.api.user.public.signup.actions.submitting",
+        icon: "user-plus",
+        variant: "default",
+        size: "default",
+        className: "w-full",
+        columns: 12,
+        order: 21,
+        usage: { request: "data" },
+      }),
+
+      // === FOOTER LINK (inside card, below button) ===
+      alreadyHaveAccount: widgetField({
+        type: WidgetType.LINK,
+        text: "app.api.user.public.signup.footer.alreadyHaveAccount",
+        href: "/user/login",
+        textAlign: "center",
+        external: false,
+        columns: 12,
+        order: 23,
+        usage: { request: "data" },
       }),
     },
   ),
@@ -321,15 +338,13 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        formCard: {
-          privateName: "John Doe",
-          publicName: "John D.",
-          email: "john.doe@example.com",
-          password: "SecurePass123",
-          confirmPassword: "SecurePass123",
-          acceptTerms: true,
-          subscribeToNewsletter: true,
-        },
+        privateName: "John Doe",
+        publicName: "John D.",
+        email: "john.doe@example.com",
+        password: "SecurePass123",
+        confirmPassword: "SecurePass123",
+        acceptTerms: true,
+        subscribeToNewsletter: true,
       },
     },
     responses: {

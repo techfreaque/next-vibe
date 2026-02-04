@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next-vibe-ui/lib/redirect";
+import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
@@ -72,14 +73,23 @@ export default async function ResetPasswordPage({
     locale,
     logger,
   );
+  const user = verifiedUserResponse.success
+    ? verifiedUserResponse.data
+    : undefined;
 
   // Redirect to dashboard if already authenticated
-  if (
-    verifiedUserResponse.success &&
-    verifiedUserResponse.data &&
-    !verifiedUserResponse.data.isPublic
-  ) {
+  if (user && !user.isPublic) {
     redirect(`/${locale}/`);
+  }
+
+  if (!user) {
+    return (
+      <Div>
+        {verifiedUserResponse.success
+          ? t("app.common.errors.unknown")
+          : t(verifiedUserResponse.message, verifiedUserResponse.messageParams)}
+      </Div>
+    );
   }
 
   return (
@@ -92,7 +102,7 @@ export default async function ResetPasswordPage({
         {t("app.user.common.backToHome")}
       </Link>
 
-      <ResetPasswordForm locale={locale} />
+      <ResetPasswordForm locale={locale} user={user} />
     </>
   );
 }

@@ -7,6 +7,7 @@ import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { JwtPayloadType } from "../../../user/auth/types";
 import definitions from "./definition";
 
 /**
@@ -19,6 +20,7 @@ export function useUserByIdEndpoint(
     userId: string;
     enabled?: boolean;
   },
+  user: JwtPayloadType,
   logger: EndpointLogger,
 ): UserByIdEndpointHook {
   return useEndpoint(
@@ -32,6 +34,7 @@ export function useUserByIdEndpoint(
       persistenceKey: `user-edit-${params.userId}-form`, // eslint-disable-line i18next/no-literal-string -- Form persistence key
     },
     logger,
+    user,
   );
 }
 

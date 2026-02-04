@@ -9,6 +9,7 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
+import type { IconSchemaType } from "@/app/api/[locale]/shared/types/common.schema";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import {
   getBorderRadiusClassName,
@@ -17,9 +18,12 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import {
+  Icon,
+  type IconKey,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 
-import type { IconWidgetConfig, IconWidgetSchema } from "./types";
+import type { IconWidgetConfig } from "./types";
 
 /**
  * Icon Widget - React component
@@ -28,13 +32,14 @@ import type { IconWidgetConfig, IconWidgetSchema } from "./types";
  */
 export function IconWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TSchema extends IconWidgetSchema,
+  TSchema extends IconSchemaType,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive",
 >({
   field,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   IconWidgetConfig<TSchema, TUsage, TSchemaType>
 >): JSX.Element {
   const {
@@ -43,8 +48,18 @@ export function IconWidget<
     borderRadius,
     noHover,
     justifyContent = "center",
-    className,
+    className: fieldClassName,
+    icon: staticIcon,
+    getClassName,
   } = field;
+
+  const icon: IconKey | undefined = field.value || staticIcon;
+
+  // Apply dynamic className callback if present
+  const dynamicClassName = getClassName
+    ? getClassName(field.value, field.parentValue)
+    : "";
+  const mergedClassName = cn(fieldClassName, dynamicClassName);
 
   // Get classes from config
   const iconSizeClass = getIconSizeClassName(iconSize);
@@ -61,20 +76,20 @@ export function IconWidget<
   };
   const justifyClass = justifyClassMap[justifyContent] ?? "justify-center";
 
-  if (!field.value) {
+  if (!icon) {
     return <></>;
   }
-  if (typeof field.value !== "string") {
+  if (typeof icon !== "string") {
     // oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Error indicator character
-    return <Div className={className}>!</Div>;
+    return <Div className={mergedClassName}>!</Div>;
   }
 
   // If no containerSize, render icon without wrapper
   if (!containerSize) {
     return (
       <Icon
-        icon={field.value}
-        className={cn(iconSizeClass || "h-5 w-5", className)}
+        icon={icon}
+        className={cn("flex", iconSizeClass || "h-5 w-5", mergedClassName)}
       />
     );
   }
@@ -87,10 +102,10 @@ export function IconWidget<
         "bg-muted flex items-center shrink-0",
         justifyClass,
         !noHover && "bg-primary/10 group-hover:bg-primary/20 transition-colors",
-        className,
+        mergedClassName,
       )}
     >
-      <Icon icon={field.value} className={iconSizeClass || "h-5 w-5"} />
+      <Icon icon={icon} className={iconSizeClass || "h-5 w-5"} />
     </Div>
   );
 }

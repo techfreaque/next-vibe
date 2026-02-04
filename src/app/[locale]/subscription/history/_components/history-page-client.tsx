@@ -117,6 +117,7 @@ export function HistoryPageClient({
         locale={locale}
         initialCredits={initialCredits}
         freeCredits={freeCredits}
+        user={user}
       />
 
       {/* Subscription Status Card */}

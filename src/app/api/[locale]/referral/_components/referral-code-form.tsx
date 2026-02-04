@@ -15,18 +15,24 @@ import React from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import type { EndpointLogger } from "../../system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "../../user/auth/types";
 import referralDefinitions from "../definition";
 import { useReferralCreate } from "../hooks";
 
 interface ReferralCodeFormProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
+  logger: EndpointLogger;
 }
 
 export function ReferralCodeForm({
   locale,
+  user,
+  logger,
 }: ReferralCodeFormProps): React.JSX.Element {
   const { t } = simpleT(locale);
-  const endpoint = useReferralCreate();
+  const endpoint = useReferralCreate(logger, user);
 
   const { form, submitForm, isSubmitting } = endpoint.create;
 

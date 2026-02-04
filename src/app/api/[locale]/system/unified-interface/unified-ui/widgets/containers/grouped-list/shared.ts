@@ -5,6 +5,7 @@
  */
 
 import type { WidgetData } from "../../../../shared/widgets/widget-data";
+import { isObject as checkIsObject } from "../../_shared/type-guards";
 
 /**
  * Individual item in a grouped list
@@ -75,9 +76,15 @@ function sortGroupedItems(
 ): GroupedListItem[] {
   return items.toSorted((a, b) => {
     if (sortBy === "severity") {
-      const severityOrder = { error: 0, warning: 1, info: 2 };
-      const aOrder = severityOrder[a.severityeverityOrder] ?? 3;
-      const bOrder = severityOrder[b.severityeverityOrder] ?? 3;
+      const severityOrder: Record<string, number> = {
+        error: 0,
+        warning: 1,
+        info: 2,
+      };
+      const aSeverity = typeof a.severity === "string" ? a.severity : "info";
+      const bSeverity = typeof b.severity === "string" ? b.severity : "info";
+      const aOrder = severityOrder[aSeverity] ?? 3;
+      const bOrder = severityOrder[bSeverity] ?? 3;
       if (aOrder !== bOrder) {
         return aOrder - bOrder;
       }
@@ -259,8 +266,17 @@ export function extractGroupedListData(
 
       const groupKey = "key" in group ? String(group.key) : "";
       const groupLabel = "label" in group ? String(group.label) : "";
-      const groupItems = Array.isArray(group.items) ? group.items : [];
-      const groupSummary = isObject(group.summary) ? group.summary : undefined;
+
+      // Type assertion needed since WidgetData is a union type
+      const maybeGroup = group as { items?: WidgetData; summary?: WidgetData };
+      const groupItems = Array.isArray(maybeGroup.items)
+        ? maybeGroup.items
+        : [];
+
+      const groupSummary =
+        maybeGroup.summary && checkIsObject(maybeGroup.summary)
+          ? maybeGroup.summary
+          : undefined;
 
       // Filter items to only valid objects
       const validItems = groupItems.filter(

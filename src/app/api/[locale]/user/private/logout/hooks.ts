@@ -16,6 +16,7 @@ import { useTranslation } from "@/i18n/core/client";
 
 import { useApiMutation } from "../../../system/unified-interface/react/hooks/use-api-mutation";
 import { authClientRepository } from "../../auth/repository-client";
+import type { JwtPayloadType } from "../../auth/types";
 import logoutEndpoints from "./definition";
 
 /****************************
@@ -33,12 +34,15 @@ import logoutEndpoints from "./definition";
  *
  * @returns Logout function
  */
-export function useLogout(logger: EndpointLogger): () => void {
+export function useLogout(
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+): () => void {
   const { toast } = useToast();
   const router = useRouter();
   const { t, locale } = useTranslation();
 
-  const logout = useApiMutation(logoutEndpoints.POST, logger, {
+  const logout = useApiMutation(logoutEndpoints.POST, logger, user, {
     onSuccess: async () => {
       toast({
         title: t("app.api.user.private.logout.success.title"),

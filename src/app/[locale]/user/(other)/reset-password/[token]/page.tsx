@@ -4,7 +4,6 @@ import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
 import { Div } from "next-vibe-ui/ui/div";
 import { AlertCircle } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
-import { Suspense } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -86,6 +85,10 @@ export default async function ResetPasswordConfirmPage({
     redirect(`/${locale}`);
   }
 
+  const user = verifiedUserResponse.success
+    ? verifiedUserResponse.data
+    : undefined;
+
   // Validate token on the server side
   const tokenValidationResponse = await PasswordRepository.verifyResetToken(
     token,
@@ -104,17 +107,20 @@ export default async function ResetPasswordConfirmPage({
     </Alert>
   );
 
+  if (!user) {
+    return errorFallback;
+  }
+
   return (
     <ErrorBoundary fallback={errorFallback} locale={locale}>
-      <Suspense fallback={<Div>{t("app.user.common.loading")}</Div>}>
-        <Div className="max-w-md mx-auto">
-          <ResetPasswordConfirmForm
-            locale={locale}
-            token={token}
-            tokenValidationResponse={tokenValidationResponse}
-          />
-        </Div>
-      </Suspense>
+      <Div className="max-w-md mx-auto">
+        <ResetPasswordConfirmForm
+          user={user}
+          locale={locale}
+          token={token}
+          tokenValidationResponse={tokenValidationResponse}
+        />
+      </Div>
     </ErrorBoundary>
   );
 }

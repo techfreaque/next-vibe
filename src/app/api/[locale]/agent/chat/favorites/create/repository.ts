@@ -52,6 +52,14 @@ export class FavoritesCreateRepository {
         characterId: data.characterId,
       });
 
+      // Validate characterId is not empty
+      if (!data.characterId || data.characterId.trim() === "") {
+        return fail({
+          message: "app.api.agent.chat.favorites.post.errors.validation.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
+
       // Get character to compare defaults
       let character = null;
       if (data.characterId) {
@@ -73,6 +81,15 @@ export class FavoritesCreateRepository {
       const voiceToStore =
         character && data.voice === character.voice ? null : data.voice;
 
+      // Extract only currentSelection from modelSelection (don't store character defaults)
+      // If CHARACTER_BASED, store null to indicate "use character defaults"
+      const currentSelection = data.modelSelection.currentSelection;
+      const modelSelectionToStore =
+        currentSelection.selectionType !==
+        "app.api.agent.chat.favorites.enums.selectionType.characterBased"
+          ? currentSelection
+          : null;
+
       // Get current max position using database aggregation
       const [maxPositionResult] = await db
         .select({ maxPosition: max(chatFavorites.position) })
@@ -86,10 +103,16 @@ export class FavoritesCreateRepository {
         .values({
           userId,
           characterId: data.characterId,
-          customName: data.customName,
+          customName: data.customName ?? null,
+          customIcon:
+            data.customIcon === character?.icon
+              ? null
+              : (data.customIcon ?? null),
           voice: voiceToStore,
-          modelSelection: data.modelSelection,
+          modelSelection: modelSelectionToStore,
           position: nextPosition,
+          color: null,
+          useCount: 0,
         })
         .returning();
 

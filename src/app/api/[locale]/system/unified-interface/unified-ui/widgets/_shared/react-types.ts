@@ -1,6 +1,6 @@
 import type React from "react";
 import type { UseFormReturn } from "react-hook-form";
-import type { ZodType } from "zod";
+import type z from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -14,6 +14,7 @@ import type {
   AnyChildrenConstrain,
   BaseWidgetContext,
   BaseWidgetProps,
+  ConstrainedChildUsage,
   FieldUsageConfig,
 } from "./types";
 
@@ -34,18 +35,18 @@ export type ReactWidgetContext<TEndpoint extends CreateApiEndpointAny> =
 /**
  * React-specific widget props. Uses BaseWidgetProps with ReactWidgetContext.
  * TWidgetConfig constraint is inherited from BaseWidgetProps.
+ * Accepts any usage that extends FieldUsageConfig for variance compatibility.
  */
-export interface ReactWidgetProps<
+export type ReactWidgetProps<
   TEndpoint extends CreateApiEndpointAny,
+  TUsage extends FieldUsageConfig,
   TWidgetConfig extends UnifiedField<
     string,
-    ZodType,
-    FieldUsageConfig,
-    AnyChildrenConstrain<string, FieldUsageConfig>
+    z.ZodTypeAny,
+    TUsage,
+    AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
   >,
-> extends BaseWidgetProps<TEndpoint, TWidgetConfig> {
-  context: ReactWidgetContext<TEndpoint>;
-}
+> = BaseWidgetProps<TEndpoint, TUsage, TWidgetConfig>;
 
 export interface WidgetErrorBoundaryProps {
   children: React.ReactNode;

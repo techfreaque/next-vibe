@@ -9,6 +9,7 @@ import type {
 } from "next-vibe/shared/types/response.schema";
 import type { FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
@@ -157,11 +158,13 @@ export interface ApiMutationOptions<TRequest, TResponse, TUrlVariables> {
     requestData: TRequest;
     pathParams: TUrlVariables;
     responseData: TResponse;
+    logger: EndpointLogger;
   }) => ErrorResponseType | void | Promise<ErrorResponseType | void>;
   onError?: (data: {
     error: ErrorResponseType;
     requestData: TRequest;
     pathParams: TUrlVariables;
+    logger: EndpointLogger;
   }) => void | Promise<void>;
   invalidateQueries?: string[]; // List of queries to invalidate after mutation
 }

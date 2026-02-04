@@ -6,7 +6,6 @@ import { NewsletterPage } from "@/app/api/[locale]/newsletter/subscribe/_compone
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
-import { UserProfileRepository } from "@/app/api/[locale]/user/private/me/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -65,12 +64,6 @@ export default async function NewsletterWithEmail({
     logger,
   );
 
-  const userResponse = authUser
-    ? await UserProfileRepository.getProfile(authUser, locale, logger)
-    : undefined;
-
-  const user = userResponse?.success ? userResponse.data : undefined;
-
   // Decode the email parameter
   const decodedEmail = decodeURIComponent(email);
 
@@ -80,6 +73,11 @@ export default async function NewsletterWithEmail({
   }
 
   return (
-    <NewsletterPage locale={locale} prefilledEmail={decodedEmail} user={user} />
+    <NewsletterPage
+      locale={locale}
+      prefilledEmail={decodedEmail}
+      user={authUser}
+      userEmail={decodedEmail}
+    />
   );
 }

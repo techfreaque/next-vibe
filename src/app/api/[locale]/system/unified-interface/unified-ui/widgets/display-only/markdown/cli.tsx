@@ -26,10 +26,12 @@ export function MarkdownWidgetInk<
   props:
     | InkWidgetProps<
         TEndpoint,
+        TUsage,
         MarkdownWidgetConfig<TKey, never, TUsage, "widget">
       >
     | InkWidgetProps<
         TEndpoint,
+        TUsage,
         MarkdownWidgetConfig<TKey, StringWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {

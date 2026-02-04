@@ -8,6 +8,7 @@ import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { ImapOverviewDashboard } from "@/app/api/[locale]/emails/imap-client/_components/imap-overview-dashboard";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -25,6 +26,7 @@ export default async function ImapOverviewPage({
 }: ImapOverviewPageProps): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
+  const user = await requireAdminUser(locale);
 
   return (
     <Div className="container mx-auto py-6 flex flex-col gap-6">
@@ -37,7 +39,7 @@ export default async function ImapOverviewPage({
         </P>
       </Div>
 
-      <ImapOverviewDashboard />
+      <ImapOverviewDashboard user={user} />
     </Div>
   );
 }

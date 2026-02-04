@@ -23,6 +23,7 @@ import type { JSX } from "react";
 
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -34,6 +35,7 @@ import { ImapSyncStatus, type ImapSyncStatusValue } from "../enum";
 
 interface ImapAccountsListProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 /**
@@ -42,6 +44,7 @@ interface ImapAccountsListProps {
  */
 export function ImapAccountsList({
   locale,
+  user,
 }: ImapAccountsListProps): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
@@ -64,8 +67,14 @@ export function ImapAccountsList({
       },
     },
     logger,
+    user,
   );
-  const testEndpoint = useEndpoint(imapAccountTestDefinition, {}, logger);
+  const testEndpoint = useEndpoint(
+    imapAccountTestDefinition,
+    undefined,
+    logger,
+    user,
+  );
 
   // Access data through the read operation following leads pattern
   // Discriminated union allows TypeScript to infer read is defined

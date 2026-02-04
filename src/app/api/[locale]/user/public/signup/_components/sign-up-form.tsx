@@ -33,9 +33,7 @@ export default function SignUpForm({
         create: {
           autoPrefillData: initialReferralCode
             ? {
-                formCard: {
-                  referralCode: initialReferralCode,
-                },
+                referralCode: initialReferralCode,
               }
             : undefined,
           mutationOptions: {

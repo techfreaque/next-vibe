@@ -55,11 +55,20 @@ export default async function Newsletter({
     logger,
   );
 
-  const userResponse = authUser
-    ? await UserProfileRepository.getProfile(authUser, locale, logger)
-    : undefined;
+  // Get user email if authenticated and not public
+  let userEmail: string | undefined;
+  if (!authUser.isPublic) {
+    const userProfileResponse = await UserProfileRepository.getProfile(
+      authUser,
+      locale,
+      logger,
+    );
+    if (userProfileResponse.success && !userProfileResponse.data.isPublic) {
+      userEmail = userProfileResponse.data.email;
+    }
+  }
 
-  const user = userResponse?.success ? userResponse.data : undefined;
-
-  return <NewsletterPage locale={locale} user={user} />;
+  return (
+    <NewsletterPage locale={locale} user={authUser} userEmail={userEmail} />
+  );
 }

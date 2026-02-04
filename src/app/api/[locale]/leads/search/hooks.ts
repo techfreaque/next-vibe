@@ -7,6 +7,7 @@ import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { JwtPayloadType } from "../../user/auth/types";
 import leadSearchEndpoints from "./definition";
 
 /**
@@ -16,6 +17,7 @@ import leadSearchEndpoints from "./definition";
  */
 export function useLeadSearchEndpoint(
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): EndpointReturn<typeof leadSearchEndpoints> {
   return useEndpoint(
     leadSearchEndpoints,
@@ -25,5 +27,6 @@ export function useLeadSearchEndpoint(
       staleTime: 30000, // 30 seconds
     },
     logger,
+    user,
   );
 }

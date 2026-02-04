@@ -130,10 +130,10 @@ export async function createLeadId(
   response.cookies.set({
     name: LEAD_ID_COOKIE_NAME,
     value: result.leadId,
-    httpOnly: false, // Needs to be readable by client
+    httpOnly: true,
     path: "/",
     secure: env.NODE_ENV === Environment.PRODUCTION,
-    sameSite: "lax",
+    sameSite: "lax" as const,
     maxAge: 365 * 24 * 60 * 60 * 10, // 10 years (effectively permanent)
   });
 

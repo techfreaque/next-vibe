@@ -33,7 +33,12 @@ import {
 } from "@/packages/next-vibe-ui/web/ui/form/form";
 
 import type { FieldUsageConfig } from "../../_shared/types";
-import { DEFAULT_THEME } from "../_shared/constants";
+import {
+  useWidgetForm,
+  useWidgetLocale,
+  useWidgetTranslation,
+} from "../../_shared/use-widget-context";
+import { getTheme } from "../_shared/constants";
 import { renderPrefillDisplay } from "../_shared/prefill";
 import { getFieldStyleClassName } from "../_shared/styling";
 import { getFieldValidationState } from "../_shared/validation";
@@ -47,14 +52,15 @@ export function FileFieldWidget<
 >({
   field,
   fieldName,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   FileFieldWidgetConfig<TKey, TSchema, TUsage>
 >): JSX.Element {
-  const { t } = context;
-
-  if (!context.form || !fieldName) {
+  const t = useWidgetTranslation();
+  const locale = useWidgetLocale();
+  const form = useWidgetForm();
+  if (!form || !fieldName) {
     return (
       <Div>
         {t(
@@ -64,13 +70,14 @@ export function FileFieldWidget<
     );
   }
 
-  const { t: globalT } = simpleT(context.locale);
-  const theme = field.theme || DEFAULT_THEME;
+  const { t: globalT } = simpleT(locale);
+  const theme = getTheme(field.theme);
+  const descriptionStyle = theme.descriptionStyle;
   const isRequired = !field.schema.isOptional();
 
   return (
     <FormField
-      control={context.form.control}
+      control={form.control}
       name={fieldName}
       render={({ field: formField, fieldState }) => {
         const validationState = getFieldValidationState(
@@ -85,44 +92,55 @@ export function FileFieldWidget<
           <FormItem
             className={cn(styleClassName.containerClassName, field.className)}
           >
-            <Div className="flex flex-row items-start gap-2">
-              <FormLabel
-                className={cn(
-                  styleClassName.labelClassName,
-                  "flex items-center gap-1.5",
-                )}
-              >
-                <Span>{field.label && t(field.label)}</Span>
-                {field.label && style === "asterisk" && isRequired && (
-                  <Span className="text-blue-600 dark:text-blue-400 font-bold">
-                    *
-                  </Span>
-                )}
-                {field.description && (
-                  <TooltipProvider delayDuration={300}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          type="button"
-                          className="cursor-help inline-flex"
-                        >
-                          <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-[250px]">
-                        <Span className="text-sm">{t(field.description)}</Span>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-              </FormLabel>
-              {style === "badge" && isRequired && (
-                <Badge
-                  variant="secondary"
-                  className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
+            <Div className="flex flex-col gap-1">
+              <Div className="flex flex-row items-start gap-2">
+                <FormLabel
+                  className={cn(
+                    styleClassName.labelClassName,
+                    "flex items-center gap-1.5",
+                  )}
                 >
-                  {globalT("packages.nextVibeUi.web.common.required")}
-                </Badge>
+                  <Span>{field.label && t(field.label)}</Span>
+                  {field.label && style === "asterisk" && isRequired && (
+                    <Span className="text-blue-600 dark:text-blue-400 font-bold">
+                      *
+                    </Span>
+                  )}
+                  {field.description && descriptionStyle === "tooltip" && (
+                    <TooltipProvider delayDuration={300}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            className="cursor-help inline-flex"
+                            variant={"ghost"}
+                          >
+                            <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-[250px]">
+                          <Span className="text-sm">
+                            {t(field.description)}
+                          </Span>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </FormLabel>
+                {style === "badge" && isRequired && (
+                  <Badge
+                    variant="secondary"
+                    className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
+                  >
+                    {globalT("packages.nextVibeUi.web.common.required")}
+                  </Badge>
+                )}
+              </Div>
+              {field.description && descriptionStyle === "inline" && (
+                <Div className={styleClassName.inlineDescriptionClassName}>
+                  <Info className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
+                  <Span>{t(field.description)}</Span>
+                </Div>
               )}
             </Div>
 

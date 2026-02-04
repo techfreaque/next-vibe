@@ -9,23 +9,28 @@ import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import definitions from "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 /**
  * Hook for fetching cron statistics
  */
 export function useCronStats(
+  user: JwtPayloadType,
   logger: EndpointLogger,
 ): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {
-      queryOptions: {
-        enabled: true,
-        refetchOnWindowFocus: false,
-        staleTime: 30 * 1000, // 30 seconds
+      read: {
+        queryOptions: {
+          enabled: true,
+          refetchOnWindowFocus: false,
+          staleTime: 30 * 1000,
+        },
       },
     },
     logger,
+    user,
   );
 }
 

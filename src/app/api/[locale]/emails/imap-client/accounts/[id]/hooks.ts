@@ -8,6 +8,7 @@
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import definitions from "./definition";
 
@@ -19,6 +20,7 @@ export function useImapAccountById(
     accountId: string;
     enabled?: boolean;
   },
+  user: JwtPayloadType,
   logger: EndpointLogger,
 ): ImapAccountByIdEndpointReturn {
   return useEndpoint(
@@ -33,6 +35,7 @@ export function useImapAccountById(
       persistenceKey: `imap-account-${params.accountId}-form`,
     },
     logger,
+    user,
   );
 }
 

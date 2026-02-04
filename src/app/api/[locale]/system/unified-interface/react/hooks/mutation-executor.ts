@@ -27,6 +27,7 @@ export interface MutationExecutorOptions<TRequest, TResponse, TUrlVariables> {
     requestData: TRequest;
     urlPathParams: TUrlVariables;
     responseData: TResponse;
+    logger: EndpointLogger;
   }) => void | ErrorResponseType | Promise<void | ErrorResponseType>;
 
   /** Callback when mutation fails */
@@ -34,6 +35,7 @@ export interface MutationExecutorOptions<TRequest, TResponse, TUrlVariables> {
     error: ErrorResponseType;
     requestData: TRequest;
     urlPathParams: TUrlVariables;
+    logger: EndpointLogger;
   }) => void | Promise<void>;
 }
 
@@ -124,6 +126,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
           paramName,
           endpoint: endpoint.path.join("/"),
           availableParams: pathParams ? Object.keys(pathParams) : [],
+          pathParamsFullObject: pathParams,
         });
 
         const errorResponse = fail({
@@ -139,6 +142,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
             error: errorResponse,
             requestData,
             urlPathParams: pathParams,
+            logger,
           });
         }
 
@@ -174,6 +178,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
         requestData,
         urlPathParams: pathParams,
         responseData: response.data,
+        logger,
       });
 
       // If callback returns an error, return it
@@ -214,6 +219,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
         error: errorResponse,
         requestData,
         urlPathParams: pathParams,
+        logger,
       });
     }
 

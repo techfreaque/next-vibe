@@ -33,10 +33,15 @@ import React, { useState } from "react";
 import messageDefinitions from "@/app/api/[locale]/emails/imap-client/messages/[id]/definition";
 import { useImapMessageById } from "@/app/api/[locale]/emails/imap-client/messages/[id]/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useTranslation } from "@/i18n/core/client";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
+import type { JwtPayloadType } from "../../../user/auth/types";
 
 interface ImapMessageDetailProps {
   messageId: string;
+  locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 /**
@@ -52,8 +57,10 @@ function formatDate(dateString: string): string {
  */
 export function ImapMessageDetail({
   messageId,
+  locale,
+  user,
 }: ImapMessageDetailProps): JSX.Element {
-  const { t, locale } = useTranslation();
+  const { t } = simpleT(locale);
   const router = useRouter();
   const [isEditMode, setIsEditMode] = useState(false);
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -64,6 +71,7 @@ export function ImapMessageDetail({
       messageId,
       enabled: true,
     },
+    user,
     logger,
   );
 

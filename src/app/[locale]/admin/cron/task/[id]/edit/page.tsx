@@ -32,7 +32,10 @@ export default async function CronTaskEditPage({
   const { t } = simpleT(locale);
 
   // Require admin user authentication
-  await requireAdminUser(locale, `/${locale}/admin/cron/task/${id}/edit`);
+  const user = await requireAdminUser(
+    locale,
+    `/${locale}/admin/cron/task/${id}/edit`,
+  );
 
   // TODO: Fetch task data from API endpoint
   // For now, create stub data to demonstrate the structure
@@ -77,6 +80,7 @@ export default async function CronTaskEditPage({
         taskId={id}
         locale={locale}
         initialData={taskWithComputedFields}
+        user={user}
       />
     </Div>
   );

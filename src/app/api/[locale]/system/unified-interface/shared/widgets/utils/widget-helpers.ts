@@ -79,7 +79,7 @@ export function getLayoutClassName(config: LayoutConfig): string {
       return `grid ${gapClass} ${gridColsClass}`;
     }
     case "flex":
-      return `flex ${alignItemsClass} ${gapClass}`;
+      return `flex flex-row ${alignItemsClass} ${gapClass}`;
     case "stack":
     default:
       return `flex flex-col ${gapClass}`;

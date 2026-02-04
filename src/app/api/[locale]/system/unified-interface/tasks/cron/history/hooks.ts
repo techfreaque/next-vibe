@@ -9,16 +9,19 @@ import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import endpoints from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 
 /**
  * Hook for fetching task execution history
  */
-export function useTaskHistory(): EndpointReturn<typeof endpoints> {
+export function useTaskHistory(
+  user: JwtPayloadType,
+): EndpointReturn<typeof endpoints> {
   const { locale } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
 
-  return useEndpoint(endpoints, {}, logger);
+  return useEndpoint(endpoints, undefined, logger, user);
 }
 
 export type CronHistoryEndpointReturn = EndpointReturn<typeof endpoints>;

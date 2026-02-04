@@ -10,6 +10,7 @@ import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import type {
@@ -63,18 +64,19 @@ export function StatusIndicatorWidget<
   TSchemaType extends "primitive",
 >({
   field,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   StatusIndicatorWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
 >): JSX.Element {
+  const t = useWidgetTranslation();
   const { status, label, className } = field;
 
   const badgeVariant = mapStatusToBadgeVariant(status);
 
   // Use label if provided, otherwise use the value itself
   const displayText = label
-    ? context.t(label)
+    ? t(label)
     : typeof field.value === "string"
       ? field.value
       : status;

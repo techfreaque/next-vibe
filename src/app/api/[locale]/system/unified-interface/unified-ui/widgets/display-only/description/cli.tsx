@@ -8,6 +8,7 @@ import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { StringWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type { FieldUsageConfig } from "../../_shared/types";
@@ -25,11 +26,13 @@ export function DescriptionWidgetInk<
   TSchemaType extends "primitive",
 >({
   field,
-  context,
 }: InkWidgetProps<
   TEndpoint,
+  TUsage,
   DescriptionWidgetConfig<TSchema, TUsage, TSchemaType>
 >): JSX.Element {
+  const t = useInkWidgetTranslation();
+
   // Handle null case
   if (!field.value) {
     return (
@@ -41,7 +44,7 @@ export function DescriptionWidgetInk<
 
   return (
     <Box>
-      <Text dimColor>{context.t(field.value)}</Text>
+      <Text dimColor>{t(field.value)}</Text>
     </Box>
   );
 }

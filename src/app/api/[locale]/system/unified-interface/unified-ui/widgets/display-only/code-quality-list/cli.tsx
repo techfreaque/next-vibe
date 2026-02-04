@@ -11,8 +11,14 @@ import { useMemo } from "react";
 import terminalLink from "terminal-link";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import {
+  useInkWidgetLocale,
+  useInkWidgetPlatform,
+  useInkWidgetResponse,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 import { CliIcon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/cli-icons";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -46,23 +52,22 @@ export function CodeQualityListWidgetInk<
   TSchema extends CodeQualityListSchema,
   TUsage extends FieldUsageConfig,
 >({
-  context,
   field,
 }: InkWidgetProps<
   TEndpoint,
+  TUsage,
   CodeQualityListWidgetConfig<TSchema, TUsage, "primitive">
 >): JSX.Element {
   const value = field.value;
-  const { t } = simpleT(context.locale);
+  const locale = useInkWidgetLocale();
+  const platform = useInkWidgetPlatform();
+  const response = useInkWidgetResponse();
+  const { t } = simpleT(locale);
 
   // Get editor URI scheme from response data if field key is provided
   const editorUriScheme = useMemo(() => {
-    if (
-      field.editorUriSchemaFieldKey &&
-      context.response?.success &&
-      context.response?.data
-    ) {
-      const responseData = context.response.data;
+    if (field.editorUriSchemaFieldKey && response?.success && response?.data) {
+      const responseData = response.data;
       const scheme =
         responseData &&
         typeof responseData === "object" &&
@@ -75,7 +80,7 @@ export function CodeQualityListWidgetInk<
     }
     // Default to vscode://file/ if not provided
     return "vscode://file/";
-  }, [field.editorUriSchemaFieldKey, context.response]);
+  }, [field.editorUriSchemaFieldKey, response]);
 
   // Group items by file
   const groupedItems = useMemo(() => {
@@ -150,7 +155,53 @@ export function CodeQualityListWidgetInk<
     return lines;
   }, [groupedItems, editorUriScheme]);
 
-  if (field.value.length === 0) {
+  // MCP uses plain text without chalk/terminal-links
+  if (platform === Platform.MCP) {
+    if (!value || value.length === 0) {
+      return (
+        <Text>
+          {t(
+            "app.api.system.unifiedInterface.widgets.codeQualityList.noIssues",
+          )}
+        </Text>
+      );
+    }
+
+    const mcpGrouped = new Map<string, CodeQualityItem[]>();
+    for (const item of value) {
+      const existing = mcpGrouped.get(item.file) ?? [];
+      existing.push(item);
+      mcpGrouped.set(item.file, existing);
+    }
+
+    const mcpLines: string[] = [];
+    for (const [file, items] of mcpGrouped.entries()) {
+      const sorted = sortBySeverity(items);
+      mcpLines.push(
+        `● ${file} (${items.length} item${items.length !== 1 ? "s" : ""})`,
+      );
+      for (const item of sorted) {
+        const icon =
+          item.severity === "error"
+            ? "❌"
+            : item.severity === "warning"
+              ? "⚠️ "
+              : "ℹ️ ";
+        mcpLines.push(
+          `  ${item.line ?? 1}:${item.column ?? 1} ${icon} ${item.severity} ${item.message}${item.rule ? ` [${item.rule}]` : ""}`,
+        );
+      }
+      mcpLines.push("");
+    }
+
+    return (
+      <Box flexDirection="column">
+        <Text wrap="end">{mcpLines.join("\n")}</Text>
+      </Box>
+    );
+  }
+
+  if (!value || value.length === 0) {
     return (
       <Box>
         <CliIcon icon="check-circle" color="green" />

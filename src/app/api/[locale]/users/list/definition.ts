@@ -34,6 +34,10 @@ import {
   UserStatusFilterOptions,
 } from "../enum";
 
+interface TotalCount {
+  response: { paginationInfo: { totalCount: number } };
+}
+
 /**
  * Get Users List Endpoint (GET)
  * Retrieves a paginated list of users with filtering
@@ -55,7 +59,8 @@ const { GET } = createEndpoint({
       title: "app.api.users.list.get.form.title" as const,
       description: "app.api.users.list.get.form.description" as const,
       layoutType: LayoutType.STACKED,
-      getCount: (data) => data.paginationInfo?.totalCount,
+      getCount: (data: TotalCount) =>
+        data?.response?.paginationInfo?.totalCount,
       submitButton: {
         text: "app.api.users.list.get.actions.refresh" as const,
         loadingText: "app.api.users.list.get.actions.refreshing" as const,

@@ -47,7 +47,7 @@ export function useDebugSystemPrompt(params: {
   }, [selectedModel, characterId, getCallMode]);
 
   // Fetch character data if characterId is provided (for custom characters)
-  const characterEndpoint = useCharacter(characterId || "", logger);
+  const characterEndpoint = useCharacter(characterId || "", user, logger);
 
   // Get character prompt from fetched data
   const characterPrompt = useMemo(() => {
@@ -66,7 +66,7 @@ export function useDebugSystemPrompt(params: {
   // Fetch memories ONLY when this component is rendered (i.e., debug mode active)
   const { memorySummary } = useMemorySummary({
     enabled: true, // Always enabled since component only renders in debug mode
-    userId: user.id,
+    user,
     logger,
   });
   return useMemo(() => {

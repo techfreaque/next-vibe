@@ -33,6 +33,7 @@ import { useEffect, useState } from "react";
 import { useImapAccountsList } from "@/app/api/[locale]/emails/imap-client/accounts/list/hooks";
 import { useImapHealth } from "@/app/api/[locale]/emails/imap-client/health/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 
 const getStatusIcon = (status: string): JSX.Element => {
@@ -120,20 +121,26 @@ const getStatusBadge = (
   }
 };
 
+interface ImapOverviewDashboardProps {
+  user: JwtPayloadType;
+}
+
 /**
  * IMAP Overview Dashboard Component
  * Consolidated component that replaces separate health, status, and overview components
  */
-export function ImapOverviewDashboard(): JSX.Element {
+export function ImapOverviewDashboard({
+  user,
+}: ImapOverviewDashboardProps): JSX.Element {
   const { t, locale } = useTranslation();
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Use real health monitoring API endpoint
-  const healthEndpoint = useImapHealth(logger);
+  const healthEndpoint = useImapHealth(user, logger);
 
   // Use real accounts list API endpoint
-  const accountsEndpoint = useImapAccountsList(logger);
+  const accountsEndpoint = useImapAccountsList(user, logger);
 
   const healthResponse = healthEndpoint.read.response;
   const accountsResponse = accountsEndpoint.read.response;

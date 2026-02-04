@@ -17,6 +17,13 @@ import {
 } from "../../../../shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
+import {
+  useWidgetForm,
+  useWidgetIsSubmitting,
+  useWidgetLocale,
+  useWidgetOnSubmit,
+  useWidgetTranslation,
+} from "../../_shared/use-widget-context";
 import type { SubmitButtonWidgetConfig } from "./types";
 
 /**
@@ -29,12 +36,17 @@ export function SubmitButtonWidget<
   TSchemaType extends "widget",
 >({
   field,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   SubmitButtonWidgetConfig<TKey, TUsage, TSchemaType>
 >): JSX.Element {
-  const { t: globalT } = simpleT(context.locale);
+  const locale = useWidgetLocale();
+  const t = useWidgetTranslation();
+  const form = useWidgetForm();
+  const onSubmit = useWidgetOnSubmit();
+  const isSubmitting = useWidgetIsSubmitting();
+  const { t: globalT } = simpleT(locale);
   const {
     text: textKey,
     loadingText: loadingTextKey,
@@ -53,26 +65,26 @@ export function SubmitButtonWidget<
   const buttonIcon = icon ? (icon as IconKey) : undefined;
 
   const buttonText = textKey
-    ? context.t(textKey)
+    ? t(textKey)
     : globalT(
         "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submit",
       );
 
   const loadingText = loadingTextKey
-    ? context.t(loadingTextKey)
+    ? t(loadingTextKey)
     : globalT(
         "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting",
       );
 
   return (
     <Button
-      type="submit"
+      type="button"
       onClick={(): void => {
-        if (context.form && context.onSubmit) {
-          void context.form.handleSubmit(context.onSubmit)();
+        if (form && onSubmit) {
+          void form.handleSubmit(onSubmit)();
         }
       }}
-      disabled={context.isSubmitting}
+      disabled={isSubmitting}
       variant={variant === "primary" ? "default" : variant}
       size={size}
       className={className}
@@ -83,7 +95,7 @@ export function SubmitButtonWidget<
           className={cn(iconSizeClass || "h-4 w-4", iconSpacingClass || "mr-2")}
         />
       )}
-      {context.isSubmitting ? loadingText : buttonText}
+      {isSubmitting ? loadingText : buttonText}
     </Button>
   );
 }

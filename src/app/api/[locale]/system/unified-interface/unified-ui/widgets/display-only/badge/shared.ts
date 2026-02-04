@@ -3,26 +3,14 @@
  * Platform-agnostic data extraction and processing for badge widget
  */
 
+import type { BadgeVariant } from "next-vibe-ui/ui/badge";
 import type z from "zod";
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TParams } from "@/i18n/core/static-types";
 
-import type {
-  BadgeEnumOption,
-  BadgeSemanticVariant,
-  BadgeWidgetSchema,
-} from "./types";
-
-/**
- * Badge variants for component rendering
- * Must match the actual Badge component variants
- */
-export type BadgeVariant =
-  | "default"
-  | "destructive"
-  | "notification"
-  | "outline"
-  | "secondary";
+import type { BadgeEnumOption, BadgeWidgetSchema } from "./types";
 
 /**
  * Processed badge data structure
@@ -31,27 +19,6 @@ export interface ProcessedBadge {
   text: string;
   variant: BadgeVariant;
   icon?: IconKey;
-}
-
-/**
- * Maps semantic widget variants to Badge component variants
- */
-export function mapSemanticVariantToBadgeVariant(
-  variant: BadgeSemanticVariant,
-): BadgeVariant {
-  switch (variant) {
-    case "error":
-      return "destructive";
-    case "info":
-      return "notification";
-    case "success":
-      return "secondary"; // Use secondary for success (closest match)
-    case "warning":
-      return "outline";
-    case "default":
-    default:
-      return "default";
-  }
 }
 
 /**
@@ -83,9 +50,7 @@ export function extractBadgeData(
   if (typeof value === "object") {
     const obj = value;
     const text = obj.text ? (context ? context.t(obj.text) : obj.text) : "";
-    const variant = obj.variant
-      ? mapSemanticVariantToBadgeVariant(obj.variant)
-      : "outline";
+    const variant = obj.variant || "outline";
     const icon = obj.icon;
 
     return {
@@ -104,11 +69,11 @@ export function extractBadgeData(
 export function findEnumLabel(
   value: z.output<BadgeWidgetSchema>,
   enumOptions: BadgeEnumOption<string>[],
-  context: { t: (key: string) => string },
+  t: <K extends string>(key: K, params?: TParams) => TranslatedKeyType,
 ): string | null {
   for (const option of enumOptions) {
     if (option.value === value) {
-      return context.t(option.label);
+      return t(option.label);
     }
   }
 

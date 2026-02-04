@@ -4,14 +4,17 @@
  * Consolidated type guards for:
  * - Widget config shapes (object, array, union widgets)
  * - UnifiedField variants (primitive, object, array, union fields)
- * - Widget data runtime checks (objects, arrays, nullish values)
+ * - Runtime value narrowing helpers
  *
- * These helpers enable safe property access on discriminated union types
- * and allow TypeScript to narrow types to specific shapes.
+ * All guards use discriminated union properties directly via schemaType.
+ *
+ * hasChildren / hasChild accept structural `{ schemaType: SchemaTypes }`
+ * so that BaseWidgetFieldProps<TWidgetConfig> (an intersection that always
+ * carries schemaType from BaseWidgetConfig) satisfies the input in generic
+ * context — unlike UnifiedField which requires resolved conditional types.
  */
 
 import type z from "zod";
-import type { ZodTypeAny } from "zod";
 
 import type { UnifiedField } from "../../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
@@ -21,9 +24,11 @@ import type {
   BaseArrayWidgetConfig,
   BaseObjectUnionWidgetConfig,
   BaseObjectWidgetConfig,
+  BaseWidgetConfig,
   BaseWidgetContext,
   ConstrainedChildUsage,
   FieldUsageConfig,
+  SchemaTypes,
   UnionObjectWidgetConfigConstrain,
 } from "./types";
 
@@ -32,54 +37,43 @@ import type {
 // ============================================================================
 
 /**
- * Check if field is used for response (display output)
+ * Check if field is used for response (display output).
+ * Accepts any field with a usage property.
  */
-export function isResponseField<TKey extends string>(
-  field: UnifiedField<
-    TKey,
-    ZodTypeAny,
-    FieldUsageConfig,
-    AnyChildrenConstrain<TKey, FieldUsageConfig>
-  >,
+export function isResponseField(
+  field:
+    | BaseWidgetConfig<FieldUsageConfig, SchemaTypes>
+    | UnifiedField<
+        string,
+        z.ZodTypeAny,
+        FieldUsageConfig,
+        AnyChildrenConstrain<string, FieldUsageConfig>
+      >
+    | AnyChildrenConstrain<string, FieldUsageConfig>,
 ): boolean {
-  if (
-    "usage" in field &&
-    field.usage &&
-    typeof field.usage === "object" &&
-    "response" in field.usage &&
-    field.usage.response === true
-  ) {
-    return true;
-  }
-  return false;
+  return "usage" in field && field.usage.response === true;
 }
 
 /**
- * Check if field has request usage (either exclusively or along with response)
+ * Check if field has request usage (either exclusively or along with response).
  */
-export function isRequestField<TKey extends string>(
-  field: UnifiedField<
-    TKey,
-    ZodTypeAny,
-    FieldUsageConfig,
-    AnyChildrenConstrain<TKey, FieldUsageConfig>
-  >,
+export function isRequestField(
+  field:
+    | BaseWidgetConfig<FieldUsageConfig, SchemaTypes>
+    | UnifiedField<
+        string,
+        z.ZodTypeAny,
+        FieldUsageConfig,
+        AnyChildrenConstrain<string, FieldUsageConfig>
+      >
+    | AnyChildrenConstrain<string, FieldUsageConfig>,
 ): boolean {
-  if (
-    "usage" in field &&
-    field.usage &&
-    typeof field.usage === "object" &&
-    "request" in field.usage &&
-    field.usage.request !== undefined
-  ) {
-    return true;
-  }
-  return false;
+  return "usage" in field && field.usage.request !== undefined;
 }
 
 /**
- * Type predicate to check if config is an object widget (with children)
- * Narrows TConfig from discriminated union
+ * Type predicate to check if config is an object widget (with children).
+ * Narrows TConfig from discriminated union via schemaType.
  */
 export function isObjectWidget<
   TKey extends string,
@@ -116,43 +110,9 @@ export function isObjectWidget<
     Record<string, AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>>
   > {
   return (
-    config &&
-    typeof config === "object" &&
-    "schemaType" in config &&
-    "children" in config &&
-    (config.schemaType === "object" ||
-      config.schemaType === "object-optional" ||
-      config.schemaType === "widget-object")
-  );
-}
-
-/**
- * Type guard for widget config objects with children property
- * Used when checking variant configs from unions
- */
-export function isConfigWithChildren<
-  TKey extends string,
-  TUsage extends FieldUsageConfig,
->(
-  config: { [key: string]: WidgetData } | WidgetData,
-): config is {
-  schemaType: "object" | "object-optional" | "widget-object";
-  children: Record<
-    string,
-    AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>
-  >;
-} & { [key: string]: WidgetData } {
-  return (
-    config !== null &&
-    typeof config === "object" &&
-    "schemaType" in config &&
-    (config.schemaType === "object" ||
-      config.schemaType === "object-optional" ||
-      config.schemaType === "widget-object") &&
-    "children" in config &&
-    config.children !== undefined &&
-    typeof config.children === "object" &&
-    !Array.isArray(config.children)
+    config.schemaType === "object" ||
+    config.schemaType === "object-optional" ||
+    config.schemaType === "widget-object"
   );
 }
 
@@ -161,7 +121,7 @@ export function isConfigWithChildren<
 // ============================================================================
 
 /**
- * Type guard for ObjectUnionField - has discriminator and variants
+ * Type guard for ObjectUnionField — narrows to schemaType: "object-union"
  */
 export function isObjectUnionField<TKey extends string>(
   field: UnifiedField<
@@ -188,7 +148,7 @@ export function isObjectUnionField<TKey extends string>(
 }
 
 /**
- * Type guard for PrimitiveField - has schema property
+ * Type guard for PrimitiveField — narrows to schemaType: "primitive"
  */
 export function isPrimitiveField<TKey extends string>(
   field: UnifiedField<
@@ -210,32 +170,38 @@ export function isPrimitiveField<TKey extends string>(
 }
 
 /**
- * Combined type guard for fields with children (object or object-optional)
- * Properly constrains children to ObjectChildrenConstraint for type safety
+ * Type guard for fields with children (object, object-optional, or widget-object).
+ *
+ * Structural input: accepts any T.
+ * This lets BaseWidgetFieldProps<TWidgetConfig> (which intersects BaseWidgetConfig
+ * carrying schemaType) satisfy the guard in generic context without needing
+ * resolved conditional types.
+ *
+ * Narrows both the structural shape (children Record) and the value type
+ * to Record<string, WidgetData> for type-safe property access.
+ *
+ * IMPORTANT: This preserves ALL properties from T using intersection (&).
+ * Custom widget properties (like getClassName in DataCards) are retained.
+ *
+ * The children type must extend Record to enable Object.entries() access.
  */
-export function hasChildren<
-  TKey extends string,
-  TUsage extends FieldUsageConfig = FieldUsageConfig,
->(
-  field: UnifiedField<
-    TKey,
-    z.ZodTypeAny,
-    TUsage,
-    AnyChildrenConstrain<TKey, TUsage>
-  >,
-): field is UnifiedField<
-  TKey,
-  z.ZodTypeAny,
-  TUsage,
-  AnyChildrenConstrain<TKey, TUsage>
-> & {
+export function hasChildren<T>(field: T): field is T & {
   schemaType: "object" | "object-optional" | "widget-object";
   children: Record<
     string,
-    UnifiedField<TKey, z.ZodTypeAny, TUsage, AnyChildrenConstrain<TKey, TUsage>>
+    | UnifiedField<
+        string,
+        z.ZodTypeAny,
+        FieldUsageConfig,
+        AnyChildrenConstrain<string, FieldUsageConfig>
+      >
+    | AnyChildrenConstrain<string, FieldUsageConfig>
   >;
+  value: Record<string, WidgetData>;
 } {
   return (
+    typeof field === "object" &&
+    field !== null &&
     "schemaType" in field &&
     (field.schemaType === "object" ||
       field.schemaType === "object-optional" ||
@@ -244,43 +210,40 @@ export function hasChildren<
 }
 
 /**
- * Type guard for fields with child (array or array-optional)
+ * Type guard for fields with child (array or array-optional).
+ *
+ * Structural input: accepts any T with `schemaType: SchemaTypes`.
+ * Narrows to include `child` config and `value: WidgetData[]`.
+ *
+ * `child.children?` is included because array item templates may be object
+ * widgets (with sub-fields). Consumers check `child.children` truthiness to
+ * determine if items have structured sub-fields vs. simple values.
+ *
+ * The child type must be compatible with withValue() input constraints.
  */
-export function hasChild<TKey extends string>(
-  field: UnifiedField<
-    TKey,
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    AnyChildrenConstrain<TKey, FieldUsageConfig>
-  >,
-): field is UnifiedField<
-  TKey,
-  z.ZodTypeAny,
-  FieldUsageConfig,
-  AnyChildrenConstrain<TKey, FieldUsageConfig>
-> & {
+export function hasChild<T extends { schemaType: SchemaTypes }>(
+  field: T,
+): field is T & {
   schemaType: "array" | "array-optional";
-  child: UnifiedField<
-    string,
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    AnyChildrenConstrain<string, FieldUsageConfig>
-  >;
+  child:
+    | UnifiedField<
+        string,
+        z.ZodTypeAny,
+        FieldUsageConfig,
+        AnyChildrenConstrain<string, FieldUsageConfig>
+      >
+    | AnyChildrenConstrain<string, FieldUsageConfig>;
+  value: WidgetData[];
 } {
-  return (
-    "schemaType" in field &&
-    (field.schemaType === "array" || field.schemaType === "array-optional")
-  );
+  return field.schemaType === "array" || field.schemaType === "array-optional";
 }
 
 // ============================================================================
-// RUNTIME VALUE TYPE GUARDS
+// RUNTIME VALUE HELPERS
 // ============================================================================
 
 /**
- * Type guard for value arrays
- * Useful in widget implementations to guard array access
- * Uses generic type parameter to preserve element type
+ * Check if value is an array.
  */
 export function isArrayValue<T extends WidgetData>(
   value: WidgetData,
@@ -289,8 +252,7 @@ export function isArrayValue<T extends WidgetData>(
 }
 
 /**
- * Type guard for plain objects (excludes arrays, primitives, null, undefined)
- * Useful for safely narrowing to object type
+ * Check if value is a plain object (excludes arrays, primitives, null, undefined).
  */
 export function isObject(
   value: WidgetData,
@@ -299,31 +261,32 @@ export function isObject(
 }
 
 /**
- * Type guard for boolean values
+ * Check if value is a boolean.
  */
 export function isBoolean(value: WidgetData): value is boolean {
   return typeof value === "boolean";
 }
 
 /**
- * Type guard for null/undefined values
+ * Check if value is null or undefined.
  */
 export function isNullish(value: WidgetData): value is null | undefined {
   return value === null || value === undefined;
 }
 
 /**
- * Type guard for string values
+ * Translate a value if it's a string key, otherwise return null.
+ * Not a type guard — use for conditional translation in widgets.
  */
 export function isString(
   value: WidgetData,
-  context: BaseWidgetContext<CreateApiEndpointAny>,
-): null | string {
-  return typeof value === "string" ? context.t(value) : null;
+  t: BaseWidgetContext<CreateApiEndpointAny>["t"],
+): string | null {
+  return typeof value === "string" ? t(value) : null;
 }
 
 /**
- * Type guard for number values
+ * Check if value is a number.
  */
 export function isNumber(value: WidgetData): value is number {
   return typeof value === "number";

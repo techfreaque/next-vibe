@@ -98,18 +98,18 @@ export type AccordionWidgetConfig<
   TChildOrChildren extends
     | ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>
     | ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>,
-> = TSchemaType extends "array" | "array-optional"
-  ? TChildOrChildren extends ArrayChildConstraint<
+> =
+  | AccordionArrayWidgetConfig<
       TKey,
-      ConstrainedChildUsage<TUsage>
+      TUsage,
+      // @ts-expect-error -- TSchemaType is the full union; array variant resolves only when "array"|"array-optional" is passed
+      TSchemaType,
+      TChildOrChildren
     >
-    ? AccordionArrayWidgetConfig<TKey, TUsage, TSchemaType, TChildOrChildren>
-    : never
-  : TSchemaType extends "object" | "object-optional" | "widget-object"
-    ? TChildOrChildren extends ObjectChildrenConstraint<
-        TKey,
-        ConstrainedChildUsage<TUsage>
-      >
-      ? AccordionObjectWidgetConfig<TKey, TUsage, TSchemaType, TChildOrChildren>
-      : never
-    : never;
+  | AccordionObjectWidgetConfig<
+      TKey,
+      TUsage,
+      // @ts-expect-error -- TSchemaType is the full union; object variant resolves only when "object"|"object-optional"|"widget-object" is passed
+      TSchemaType,
+      TChildOrChildren
+    >;

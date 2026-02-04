@@ -7,6 +7,7 @@
 
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import definitions from "./definition";
 
@@ -17,6 +18,7 @@ import definitions from "./definition";
  * - Authenticated users: can create/edit custom characters
  */
 export function useCharacters(
+  user: JwtPayloadType,
   logger: EndpointLogger,
 ): ReturnType<typeof useEndpoint<typeof definitions>> {
   return useEndpoint(
@@ -28,5 +30,6 @@ export function useCharacters(
       },
     },
     logger,
+    user,
   );
 }

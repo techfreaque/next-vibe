@@ -9,7 +9,6 @@ import type { FavoriteCreateRequestOutput } from "@/app/api/[locale]/agent/chat/
 import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface BrowserViewProps {
@@ -17,7 +16,6 @@ interface BrowserViewProps {
   onBack: () => void;
   locale: CountryLanguage;
   logger: EndpointLogger;
-  user: JwtPayloadType;
   onEditingCharacterIdChange: (characterId: string | null) => void;
   onEditingFavoriteIdChange: (favoriteId: string | null) => void;
   onViewChange: (view: "settings" | "favorites") => void;
@@ -29,19 +27,16 @@ export function BrowserView({
   onBack,
   locale,
   logger,
-  user,
   onEditingCharacterIdChange,
   onEditingFavoriteIdChange,
   onViewChange,
   addFavorite,
 }: BrowserViewProps): JSX.Element {
   // Get characters from chat context (already fetched by useChat)
-  const chat = useChatContext();
-  const characters = chat.characters;
+  const { characters, user } = useChatContext();
 
   // Fetch favorites for display
   const { favorites } = useChatFavorites({
-    user,
     logger,
     characters,
   });
@@ -55,10 +50,13 @@ export function BrowserView({
         return;
       }
 
+      // Server will populate characterModelSelection from the character
       const favoriteData: FavoriteCreateRequestOutput = {
         characterId: newCharacterId,
         modelSelection: {
-          selectionType: ModelSelectionType.CHARACTER_BASED,
+          currentSelection: {
+            selectionType: ModelSelectionType.CHARACTER_BASED,
+          },
         },
       };
 
@@ -86,6 +84,7 @@ export function BrowserView({
       locale={locale}
       favorites={favorites}
       logger={logger}
+      user={user}
     />
   );
 }

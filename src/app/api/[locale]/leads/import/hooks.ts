@@ -8,6 +8,7 @@ import React from "react";
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { DivDragEvent } from "@/packages/next-vibe-ui/web/ui/div";
 import type { InputChangeEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
@@ -17,6 +18,7 @@ import definitions from "./definition";
  * Hook for CSV import with file handling logic
  */
 export function useLeadsImportEndpoint(
+  user: JwtPayloadType,
   logger: EndpointLogger,
   params?: { enabled?: boolean },
 ): EndpointReturn<typeof definitions> & {
@@ -47,6 +49,7 @@ export function useLeadsImportEndpoint(
       },
     },
     logger,
+    user,
   );
 
   // File processing function

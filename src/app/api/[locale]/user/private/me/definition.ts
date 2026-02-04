@@ -50,8 +50,7 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.user.private.me.get.response.title" as const,
       description: "app.api.user.private.me.get.response.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
+      layoutType: LayoutType.STACKED,
     },
     { response: true },
     "isPublic",
@@ -63,8 +62,7 @@ const { GET } = createEndpoint({
           title: "app.api.user.private.me.get.response.user.title" as const,
           description:
             "app.api.user.private.me.get.response.user.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -87,8 +85,7 @@ const { GET } = createEndpoint({
           title: "app.api.user.private.me.get.response.user.title" as const,
           description:
             "app.api.user.private.me.get.response.user.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -282,8 +279,7 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.user.private.me.update.title" as const,
       description: "app.api.user.private.me.update.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {

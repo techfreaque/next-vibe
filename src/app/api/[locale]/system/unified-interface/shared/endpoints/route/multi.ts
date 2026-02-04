@@ -13,10 +13,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { NextHandlerReturnType } from "../../../next-api/handler";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import { Methods } from "../../types/enums";
-import type {
-  GenericHandlerReturnType as GenericHandlerReturnTypeImport,
-  MethodHandlerConfig,
-} from "./handler";
+import type { GenericHandlerReturnType, MethodHandlerConfig } from "./handler";
 import { endpointHandler } from "./single";
 
 /**
@@ -55,7 +52,7 @@ export type EndpointHandlerConfig<T extends EndpointDefinitionsConstraint> = {
  */
 export type ToolsObject<T extends EndpointDefinitionsConstraint> = {
   [K in keyof T]: T[K] extends CreateApiEndpointAny
-    ? GenericHandlerReturnTypeImport<
+    ? GenericHandlerReturnType<
         T[K]["types"]["RequestOutput"],
         T[K]["types"]["ResponseOutput"],
         T[K]["types"]["UrlVariablesOutput"],
@@ -119,7 +116,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       >
     | Record<
         string,
-        GenericHandlerReturnTypeImport<
+        GenericHandlerReturnType<
           Record<string, string | number | boolean>,
           ResponseType<Record<string, string | number | boolean>>,
           Record<string, string> & { locale: CountryLanguage },
@@ -129,7 +126,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
   > & {
     tools: Record<
       string,
-      GenericHandlerReturnTypeImport<
+      GenericHandlerReturnType<
         Record<string, string | number | boolean>,
         ResponseType<Record<string, string | number | boolean>>,
         Record<string, string> & { locale: CountryLanguage },

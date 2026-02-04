@@ -5,15 +5,9 @@
 
 import { z } from "zod";
 
-import {
-  ModelId,
-  ModelIdOptions,
-} from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
-  objectUnionField,
-  requestDataRangeField,
   submitButton,
   widgetField,
   widgetObjectField,
@@ -31,10 +25,10 @@ import {
   SpacingSize,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { modelSelectionSchemaWithCharacter } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../../shared/types/common.schema";
-import { ModelUtility, ModelUtilityOptions } from "../../../models/enum";
 import { TtsVoiceDB, TtsVoiceOptions } from "../../../text-to-speech/enum";
 import type {
   FiltersModelSelection,
@@ -47,12 +41,6 @@ import {
   PriceLevel,
   SpeedLevel,
 } from "../../characters/enum";
-import {
-  CONTENT_DISPLAY,
-  INTELLIGENCE_DISPLAY,
-  PRICE_DISPLAY,
-  SPEED_DISPLAY,
-} from "../../characters/enum";
 
 /**
  * Create Favorite Endpoint (POST)
@@ -62,6 +50,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["agent", "chat", "favorites", "create"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 
   title: "app.api.agent.chat.favorites.post.title" as const,
   description: "app.api.agent.chat.favorites.post.description" as const,
@@ -159,250 +148,17 @@ const { POST } = createEndpoint({
         schema: z.enum(TtsVoiceDB).nullable().optional(),
       }),
 
-      modelSelection: objectUnionField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.agent.chat.favorites.post.modelSelection.title" as const,
-          description:
-            "app.api.agent.chat.favorites.post.modelSelection.description" as const,
-          layoutType: LayoutType.STACKED,
-          border: false,
-          showSubmitButton: false,
-        },
-        { request: "data" },
-        "selectionType",
-        [
-          // Variant 1: Character-based selection
-          objectField(
-            {
-              type: WidgetType.CONTAINER,
-              layoutType: LayoutType.STACKED,
-            },
-            { request: "data" },
-            {
-              selectionType: requestField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.FILTER_PILLS,
-                label:
-                  "app.api.agent.chat.favorites.post.selectionType.label" as const,
-                options: [
-                  {
-                    value: ModelSelectionType.CHARACTER_BASED,
-                    label:
-                      "app.api.agent.chat.favorites.enums.selectionType.characterBased" as const,
-                  },
-                  {
-                    value: ModelSelectionType.MANUAL,
-                    label:
-                      "app.api.agent.chat.favorites.enums.selectionType.manual" as const,
-                  },
-                  {
-                    value: ModelSelectionType.FILTERS,
-                    label:
-                      "app.api.agent.chat.favorites.enums.selectionType.filters" as const,
-                  },
-                ],
-                columns: 12,
-                schema: z.literal(ModelSelectionType.CHARACTER_BASED),
-              }),
-              modelDisplay: widgetField({
-                type: WidgetType.MODEL_DISPLAY,
-                columns: 12,
-                usage: { request: "data" },
-              }),
-            },
-          ),
-          // Variant 2: Manual model selection
-          objectField(
-            {
-              type: WidgetType.CONTAINER,
-              layoutType: LayoutType.STACKED,
-            },
-            { request: "data" },
-            {
-              selectionType: requestField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.FILTER_PILLS,
-                label:
-                  "app.api.agent.chat.favorites.post.selectionType.label" as const,
-                options: [
-                  {
-                    value: ModelSelectionType.CHARACTER_BASED,
-                    label:
-                      "app.api.agent.chat.favorites.enums.selectionType.characterBased" as const,
-                  },
-                  {
-                    value: ModelSelectionType.MANUAL,
-                    label:
-                      "app.api.agent.chat.favorites.enums.selectionType.manual" as const,
-                  },
-                  {
-                    value: ModelSelectionType.FILTERS,
-                    label:
-                      "app.api.agent.chat.favorites.enums.selectionType.filters" as const,
-                  },
-                ],
-                columns: 12,
-                schema: z.literal(ModelSelectionType.MANUAL),
-              }),
-              modelDisplay: widgetField({
-                type: WidgetType.MODEL_DISPLAY,
-                columns: 12,
-                usage: { request: "data" },
-              }),
-              manualModelId: requestField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.SELECT,
-                label:
-                  "app.api.agent.chat.favorites.post.manualModelId.label" as const,
-                description:
-                  "app.api.agent.chat.favorites.post.manualModelId.description" as const,
-                options: ModelIdOptions,
-                columns: 12,
-                schema: z.enum(ModelId),
-              }),
-            },
-          ),
-          // Variant 3: Filter-based selection
-          objectField(
-            {
-              type: WidgetType.CONTAINER,
-              layoutType: LayoutType.STACKED,
-            },
-            { request: "data" },
-            {
-              selectionType: requestField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.FILTER_PILLS,
-                label:
-                  "app.api.agent.chat.favorites.post.selectionType.label" as const,
-                options: [
-                  {
-                    value: ModelSelectionType.MANUAL,
-                    label:
-                      "app.api.agent.chat.favorites.enums.selectionType.manual" as const,
-                  },
-                  {
-                    value: ModelSelectionType.FILTERS,
-                    label:
-                      "app.api.agent.chat.favorites.enums.selectionType.filters" as const,
-                  },
-                ],
-                columns: 12,
-                schema: z.literal(ModelSelectionType.FILTERS),
-              }),
-              modelDisplay: widgetField({
-                type: WidgetType.MODEL_DISPLAY,
-                columns: 12,
-                usage: { request: "data" },
-              }),
-              intelligenceRange: requestDataRangeField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.RANGE_SLIDER,
-                label:
-                  "app.api.agent.chat.favorites.post.intelligenceRange.label" as const,
-                description:
-                  "app.api.agent.chat.favorites.post.intelligenceRange.description" as const,
-                options: INTELLIGENCE_DISPLAY.map((tier) => ({
-                  label: tier.label,
-                  value: tier.value,
-                  icon: tier.icon,
-                  description: tier.description,
-                })),
-                minLabel:
-                  "app.api.agent.chat.favorites.post.intelligenceRange.minLabel" as const,
-                maxLabel:
-                  "app.api.agent.chat.favorites.post.intelligenceRange.maxLabel" as const,
-                columns: 12,
-                schema: z.enum(IntelligenceLevel),
-              }),
-              priceRange: requestDataRangeField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.RANGE_SLIDER,
-                label:
-                  "app.api.agent.chat.favorites.post.priceRange.label" as const,
-                description:
-                  "app.api.agent.chat.favorites.post.priceRange.description" as const,
-                options: PRICE_DISPLAY.map((tier) => ({
-                  label: tier.label,
-                  value: tier.value,
-                  icon: tier.icon,
-                  description: tier.description,
-                })),
-                minLabel:
-                  "app.api.agent.chat.favorites.post.priceRange.minLabel" as const,
-                maxLabel:
-                  "app.api.agent.chat.favorites.post.priceRange.maxLabel" as const,
-                columns: 12,
-                schema: z.enum(PriceLevel),
-              }),
-              contentRange: requestDataRangeField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.RANGE_SLIDER,
-                label:
-                  "app.api.agent.chat.favorites.post.contentRange.label" as const,
-                description:
-                  "app.api.agent.chat.favorites.post.contentRange.description" as const,
-                options: CONTENT_DISPLAY.map((tier) => ({
-                  label: tier.label,
-                  value: tier.value,
-                  icon: tier.icon,
-                  description: tier.description,
-                })),
-                minLabel:
-                  "app.api.agent.chat.favorites.post.contentRange.minLabel" as const,
-                maxLabel:
-                  "app.api.agent.chat.favorites.post.contentRange.maxLabel" as const,
-                columns: 12,
-                schema: z.enum(ContentLevel),
-              }),
-              speedRange: requestDataRangeField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.RANGE_SLIDER,
-                label:
-                  "app.api.agent.chat.favorites.post.speedRange.label" as const,
-                description:
-                  "app.api.agent.chat.favorites.post.speedRange.description" as const,
-                options: SPEED_DISPLAY.map((tier) => ({
-                  label: tier.label,
-                  value: tier.value,
-                  icon: tier.icon,
-                  description: tier.description,
-                })),
-                minLabel:
-                  "app.api.agent.chat.favorites.post.speedRange.minLabel" as const,
-                maxLabel:
-                  "app.api.agent.chat.favorites.post.speedRange.maxLabel" as const,
-                columns: 12,
-                schema: z.enum(SpeedLevel),
-              }),
-              preferredStrengths: requestField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.MULTISELECT,
-                label:
-                  "app.api.agent.chat.favorites.post.preferredStrengths.label" as const,
-                description:
-                  "app.api.agent.chat.favorites.post.preferredStrengths.description" as const,
-                options: ModelUtilityOptions,
-                columns: 6,
-                schema: z.array(z.enum(ModelUtility)).nullable().optional(),
-              }),
-              ignoredWeaknesses: requestField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.MULTISELECT,
-                label:
-                  "app.api.agent.chat.favorites.post.ignoredWeaknesses.label" as const,
-                description:
-                  "app.api.agent.chat.favorites.post.ignoredWeaknesses.description" as const,
-                options: ModelUtilityOptions,
-                columns: 6,
-                schema: z.array(z.enum(ModelUtility)).nullable().optional(),
-              }),
-            },
-          ),
-        ],
-      ),
+      modelSelection: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MODEL_SELECTION,
+        label:
+          "app.api.agent.chat.favorites.post.modelSelection.title" as const,
+        description:
+          "app.api.agent.chat.favorites.post.modelSelection.description" as const,
+        includeCharacterBased: true,
+        columns: 12,
+        schema: modelSelectionSchemaWithCharacter,
+      }),
 
       // === RESPONSE ===
       id: responseField({
@@ -478,25 +234,44 @@ const { POST } = createEndpoint({
         characterId: "thea",
         customName: "Thea (Smart)",
         modelSelection: {
-          selectionType: ModelSelectionType.FILTERS,
-          intelligenceRange: {
-            min: IntelligenceLevel.SMART,
-            max: IntelligenceLevel.BRILLIANT,
+          currentSelection: {
+            selectionType: ModelSelectionType.FILTERS,
+            intelligenceRange: {
+              min: IntelligenceLevel.SMART,
+              max: IntelligenceLevel.BRILLIANT,
+            },
+            priceRange: {
+              min: PriceLevel.CHEAP,
+              max: PriceLevel.STANDARD,
+            },
+            contentRange: {
+              min: ContentLevel.OPEN,
+              max: ContentLevel.UNCENSORED,
+            },
+            speedRange: {
+              min: SpeedLevel.FAST,
+              max: SpeedLevel.THOROUGH,
+            },
           },
-          priceRange: {
-            min: PriceLevel.CHEAP,
-            max: PriceLevel.STANDARD,
+          characterModelSelection: {
+            selectionType: ModelSelectionType.FILTERS,
+            intelligenceRange: {
+              min: IntelligenceLevel.SMART,
+              max: IntelligenceLevel.BRILLIANT,
+            },
+            priceRange: {
+              min: PriceLevel.CHEAP,
+              max: PriceLevel.STANDARD,
+            },
+            contentRange: {
+              min: ContentLevel.MAINSTREAM,
+              max: ContentLevel.UNCENSORED,
+            },
+            speedRange: {
+              min: SpeedLevel.FAST,
+              max: SpeedLevel.THOROUGH,
+            },
           },
-          contentRange: {
-            min: ContentLevel.OPEN,
-            max: ContentLevel.UNCENSORED,
-          },
-          speedRange: {
-            min: SpeedLevel.FAST,
-            max: SpeedLevel.THOROUGH,
-          },
-          preferredStrengths: null,
-          ignoredWeaknesses: null,
         },
       },
     },
@@ -515,28 +290,35 @@ export type FavoriteCreateResponseInput = typeof POST.types.ResponseInput;
 export type FavoriteCreateResponseOutput = typeof POST.types.ResponseOutput;
 
 // Favorite field type alias for model selection (from POST request)
+// This is the full structure with currentSelection and characterModelSelection
 export type FavoriteModelSelection =
   FavoriteCreateRequestOutput["modelSelection"];
 
 export type FavoriteFiltersModelSelection = Extract<
-  FavoriteModelSelection,
+  FavoriteModelSelection["currentSelection"],
   { selectionType: typeof ModelSelectionType.FILTERS }
 >;
 
 export type FavoriteManualModelSelection = Extract<
-  FavoriteModelSelection,
+  FavoriteModelSelection["currentSelection"],
   { selectionType: typeof ModelSelectionType.MANUAL }
 >;
 
 export type FavoriteCharacterBasedModelSelection = Extract<
-  FavoriteModelSelection,
-  { selectionType: typeof ModelSelectionType.CHARACTER_BASED }
+  FavoriteModelSelection["currentSelection"],
+  {
+    selectionType: typeof ModelSelectionType.CHARACTER_BASED;
+  }
 >;
 
 export function isCharacterBasedModelSelection(
   sel: FavoriteModelSelection,
-): sel is FavoriteCharacterBasedModelSelection {
-  return sel.selectionType === ModelSelectionType.CHARACTER_BASED;
+): sel is {
+  currentSelection: FavoriteCharacterBasedModelSelection;
+} & FavoriteModelSelection {
+  return (
+    sel.currentSelection.selectionType === ModelSelectionType.CHARACTER_BASED
+  );
 }
 
 const definitions = { POST } as const;

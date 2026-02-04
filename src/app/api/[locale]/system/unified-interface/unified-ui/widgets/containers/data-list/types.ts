@@ -175,10 +175,13 @@ export type DataListWidgetConfig<
     | ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>,
   TTargetEndpoint extends CreateApiEndpointAny | undefined = undefined,
 > =
+  // Each union member only resolves when TSchemaType/TChildOrChildren match the variant constraint.
+  // Inference at definition sites requires the full union — narrowing happens via hasChild/hasChildren guards at render time.
   | DataListArrayWidgetConfig<
       TKey,
       TUsage,
       TTargetEndpoint,
+      // @ts-expect-error -- TChildOrChildren is the full union; array variant resolves only when ArrayChildConstraint is passed
       TChildOrChildren,
       TSchemaType
     >
@@ -186,6 +189,7 @@ export type DataListWidgetConfig<
       TKey,
       TUsage,
       TTargetEndpoint,
+      // @ts-expect-error -- TChildOrChildren is the full union; object variant resolves only when ObjectChildrenConstraint is passed
       TChildOrChildren,
       TSchemaType
     >;

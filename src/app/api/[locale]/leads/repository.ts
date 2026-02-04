@@ -5,14 +5,14 @@
 
 import type { SQL } from "drizzle-orm";
 import { and, count, desc, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
+
+import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-
+} from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
 import type { DbId } from "@/app/api/[locale]/system/db/types";
 import { withTransaction } from "@/app/api/[locale]/system/db/utils/repository-helpers";
@@ -620,7 +620,7 @@ export class LeadsRepository {
         resultsCount: leadsList.length,
       });
 
-      return success({
+      return success<LeadListResponseType>({
         response: {
           leads: leadsList.map((lead) =>
             LeadsRepository.formatLeadResponse(lead),
@@ -629,8 +629,8 @@ export class LeadsRepository {
         paginationInfo: {
           page,
           limit,
-          total,
-          totalPages,
+          totalCount: total,
+          pageCount: totalPages,
         },
       });
     } catch (error) {

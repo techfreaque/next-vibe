@@ -15,8 +15,16 @@ import {
   getSpacingClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
-import { isObject } from "../../_shared/type-guards";
 import type { FieldUsageConfig } from "../../_shared/types";
+import {
+  useWidgetEndpoint,
+  useWidgetForm,
+  useWidgetLogger,
+  useWidgetNavigation,
+  useWidgetResponse,
+  useWidgetTranslation,
+  useWidgetUser,
+} from "../../_shared/use-widget-context";
 import type { NavigateButtonWidgetConfig } from "./types";
 
 /**
@@ -38,11 +46,18 @@ export function NavigateButtonWidget<
   TTargetEndpoint extends CreateApiEndpointAny | undefined,
 >({
   field,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   NavigateButtonWidgetConfig<TKey, TUsage, TSchemaType, TTargetEndpoint>
 >): JSX.Element {
+  const t = useWidgetTranslation();
+  const navigation = useWidgetNavigation();
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
+  const response = useWidgetResponse();
+  const endpoint = useWidgetEndpoint();
+  const form = useWidgetForm();
   const {
     label,
     icon,
@@ -58,7 +73,7 @@ export function NavigateButtonWidget<
   const iconSpacingClass = getSpacingClassName("margin", iconSpacing);
 
   const buttonIcon = icon ? (icon as IconKey) : undefined;
-  const buttonText = label ? context.t(label) : undefined;
+  const buttonText = label ? t(label) : undefined;
 
   // Don't render if no metadata
   if (!metadata) {
@@ -66,15 +81,18 @@ export function NavigateButtonWidget<
   }
 
   // Back navigation
-  if (metadata.targetEndpoint === null) {
+  if (
+    metadata.targetEndpoint === null ||
+    metadata.targetEndpoint === undefined
+  ) {
     // Don't render back button if there's nothing to navigate back to
-    if (!context.navigation || !context.navigation.canGoBack) {
+    if (!navigation || !navigation.canGoBack) {
       return <></>;
     }
 
     const handleClick = (e: ButtonMouseEvent): void => {
       e.stopPropagation();
-      context.navigation?.pop();
+      navigation?.pop();
     };
 
     return (
@@ -98,9 +116,13 @@ export function NavigateButtonWidget<
     );
   }
 
-  // Forward navigation - check if extractParams exists and targetEndpoint is not null
-  if (!metadata.extractParams || metadata.targetEndpoint === null) {
-    context.logger.error(
+  // Forward navigation - check if extractParams exists and targetEndpoint is not null/undefined
+  if (
+    !metadata.extractParams ||
+    metadata.targetEndpoint === null ||
+    metadata.targetEndpoint === undefined
+  ) {
+    logger.error(
       "NavigateButtonWidget: Forward navigation without extractParams or targetEndpoint",
     );
     return <></>;
@@ -112,12 +134,18 @@ export function NavigateButtonWidget<
     return <></>;
   }
 
-  const userRoles = context.user.roles;
-  const allowedRoles = targetEndpoint.allowedRoles;
+  const userRoles = user.roles;
+  const allowedRoles = targetEndpoint.allowedRoles || [];
+  const allowedClientRoles = targetEndpoint.allowedClientRoles || [];
 
-  // If target endpoint has role restrictions, check if user has any of the allowed roles
-  if (allowedRoles.length > 0) {
-    const hasPermission = userRoles.some((role) => allowedRoles.includes(role));
+  // Combine both server and client roles for permission check
+  const allAllowedRoles = [...allowedRoles, ...allowedClientRoles];
+
+  // If there are any role restrictions, check if user has permission
+  if (allAllowedRoles.length > 0) {
+    const hasPermission = userRoles.some((role) =>
+      allAllowedRoles.includes(role),
+    );
     if (!hasPermission) {
       // User doesn't have permission - don't render the button
       return <></>;
@@ -129,42 +157,50 @@ export function NavigateButtonWidget<
     e.stopPropagation();
 
     if (
-      !context.navigation ||
+      !navigation ||
       !metadata.extractParams ||
       metadata.targetEndpoint === null
     ) {
-      context.logger.warn(
+      logger.warn(
         "NavigateButtonWidget: No navigation context, extractParams, or targetEndpoint",
       );
       return;
     }
 
-    // Extract params - use response.data as fallback if local value is empty (nested buttons)
-    let sourceData = isObject(field.value) ? field.value : {};
+    // Build structured source data for extractParams
+    // requestData: current form values
+    // urlPathParams: URL path params from current navigation entry
+    // responseData: response data from GET request (for PATCH forms)
+    // itemData: parent array item data (if inside array)
+    const requestData = form?.getValues() ?? {};
+    const responseData =
+      response?.success && response.data ? response.data : {};
+    const urlPathParams = navigation?.current?.params?.urlPathParams ?? {};
+    const itemData = field.value; // For array items
 
-    // If sourceData is empty and we have response data in context, use response.data
-    // This handles nested buttons that don't have access to their parent data
-    if (
-      Object.keys(sourceData).length === 0 &&
-      context.response?.success &&
-      context.response.data
-    ) {
-      sourceData = isObject(context.response.data) ? context.response.data : {};
-    }
+    const source = {
+      itemData,
+      requestData,
+      urlPathParams,
+      responseData,
+    };
 
-    const params = metadata.extractParams(sourceData);
-    context.logger.debug("NavigateButtonWidget: extracted params", {
-      sourceData,
+    logger.debug("NavigateButtonWidget: calling extractParams with source", {
+      source,
+    });
+
+    const params = metadata.extractParams(source);
+    logger.debug("NavigateButtonWidget: extracted params", {
       params,
     });
 
     // If prefillFromGet is true but no getEndpoint provided, use current endpoint if it's a GET
     let effectiveGetEndpoint = metadata.getEndpoint;
-    if (metadata.prefillFromGet && !effectiveGetEndpoint && context.endpoint) {
+    if (metadata.prefillFromGet && !effectiveGetEndpoint && endpoint) {
       // Check if current endpoint is a GET endpoint
-      if (context.endpoint.method === "GET") {
-        effectiveGetEndpoint = context.endpoint;
-        context.logger.debug(
+      if (endpoint.method === "GET") {
+        effectiveGetEndpoint = endpoint;
+        logger.debug(
           "NavigateButtonWidget: Using current GET endpoint for prefill",
         );
       }
@@ -174,7 +210,7 @@ export function NavigateButtonWidget<
     const clickX = e.clientX ?? 0;
     const clickY = e.clientY ?? 0;
 
-    context.navigation.push(
+    navigation.push(
       targetEndpoint,
       params,
       metadata.prefillFromGet,

@@ -10,6 +10,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -26,6 +27,7 @@ interface UseTTSAudioOptions {
   locale: CountryLanguage;
   voice?: typeof TtsVoiceValue; // Voice to use for TTS (defaults to MALE if not provided)
   onError?: (error: string) => void;
+  user: JwtPayloadType;
   logger: EndpointLogger;
   deductCredits: (creditCost: number, feature: string) => void;
 }
@@ -46,6 +48,7 @@ export function useTTSAudio({
   locale,
   voice,
   onError,
+  user,
   logger,
   deductCredits,
 }: UseTTSAudioOptions): UseTTSAudioReturn {
@@ -76,6 +79,7 @@ export function useTTSAudio({
       },
     },
     logger,
+    user,
   );
 
   // Get loading state directly from the mutation

@@ -3,8 +3,9 @@
  */
 
 import type { WidgetType } from "../../../../shared/types/enums";
+import type { StringWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type {
-  BasePrimitiveDisplayOnlyWidgetConfig,
+  BasePrimitiveWidgetConfig,
   FieldUsageConfig,
 } from "../../_shared/types";
 
@@ -14,7 +15,9 @@ import type {
 export interface AvatarWidgetConfig<
   TKey extends string,
   TUsage extends FieldUsageConfig,
-> extends BasePrimitiveDisplayOnlyWidgetConfig<TUsage, "widget"> {
+  TSchemaType extends "widget" | "primitive",
+  TSchema extends StringWidgetSchema,
+> extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {
   type: WidgetType.AVATAR;
   src?: string;
   alt?: NoInfer<TKey>;

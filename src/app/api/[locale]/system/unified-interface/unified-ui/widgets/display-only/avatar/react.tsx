@@ -8,6 +8,7 @@ import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-bas
 import { getTextSizeClassName } from "../../../../shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
+import { useWidgetTranslation } from "../../_shared/use-widget-context";
 import type { AvatarWidgetConfig } from "./types";
 
 /**
@@ -53,8 +54,12 @@ export default function AvatarWidget<
   TUsage extends FieldUsageConfig,
 >({
   field,
-  context,
-}: ReactWidgetProps<TEndpoint, AvatarWidgetConfig<TKey, TUsage>>): JSX.Element {
+}: ReactWidgetProps<
+  TEndpoint,
+  TUsage,
+  AvatarWidgetConfig<TKey, TUsage, "widget", never>
+>): JSX.Element {
+  const t = useWidgetTranslation();
   const {
     src: configSrc,
     alt: altKey,
@@ -85,7 +90,7 @@ export default function AvatarWidget<
   // Use config values as fallback, then data values
   const src = avatarData?.src || configSrc;
   const fallback = avatarData?.fallback || configFallback || "?";
-  const alt = altKey ? context.t(altKey) : avatarData?.alt || "Avatar";
+  const alt = altKey ? t(altKey) : avatarData?.alt || "Avatar";
 
   return (
     <Avatar className={cn(avatarSizeClass, className)}>

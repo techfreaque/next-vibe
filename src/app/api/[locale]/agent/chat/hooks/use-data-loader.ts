@@ -112,11 +112,13 @@ async function loadThreadsFromServer(
     | DefaultFolderId.SHARED
     | DefaultFolderId.PUBLIC,
   addThread: (thread: ChatThread) => void,
+  user: JwtPayloadType,
 ): Promise<void> {
   try {
     const threadsResponse = await apiClient.fetch(
       threadsDefinition.GET,
       logger,
+      user,
       {
         page: 1,
         limit: 100,
@@ -191,11 +193,13 @@ async function loadFoldersFromServer(
     | DefaultFolderId.SHARED
     | DefaultFolderId.PUBLIC,
   addFolder: (folder: ChatFolder) => void,
+  user: JwtPayloadType,
 ): Promise<void> {
   try {
     const foldersResponse = await apiClient.fetch(
       foldersDefinition.GET,
       logger,
+      user,
       {
         rootFolderId,
       },
@@ -257,7 +261,6 @@ async function loadFoldersFromServer(
  * NOTE: Root folder permissions are now computed server-side and passed as props
  */
 export function useDataLoader(
-  user: JwtPayloadType | undefined,
   locale: CountryLanguage,
   logger: EndpointLogger,
   currentRootFolderId: DefaultFolderId,
@@ -265,6 +268,7 @@ export function useDataLoader(
   addMessage: (message: ChatMessage) => void,
   addFolder: (folder: ChatFolder) => void,
   setDataLoaded: (loaded: boolean) => void,
+  user: JwtPayloadType,
 ): void {
   const dataLoadedRef = useRef(false);
 
@@ -303,8 +307,20 @@ export function useDataLoader(
 
       // TypeScript now knows currentRootFolderId is PRIVATE | SHARED | PUBLIC
       await Promise.all([
-        loadThreadsFromServer(logger, locale, currentRootFolderId, addThread),
-        loadFoldersFromServer(logger, locale, currentRootFolderId, addFolder),
+        loadThreadsFromServer(
+          logger,
+          locale,
+          currentRootFolderId,
+          addThread,
+          user,
+        ),
+        loadFoldersFromServer(
+          logger,
+          locale,
+          currentRootFolderId,
+          addFolder,
+          user,
+        ),
       ]);
 
       // Mark data as loaded

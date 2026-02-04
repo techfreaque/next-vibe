@@ -100,17 +100,19 @@ export function extractNestedPath(
     throw new Error(`Could not find ${startMarker} in path: ${filePath}`);
   }
 
-  // If no end marker provided, auto-detect definition.ts or route.ts
+  // If no end marker provided, auto-detect definition.ts, route.ts, or route-client.ts
   let actualEndMarker = endMarker;
   if (!actualEndMarker) {
     if (pathParts.includes("definition.ts")) {
       actualEndMarker = "definition.ts";
     } else if (pathParts.includes("route.ts")) {
       actualEndMarker = "route.ts";
+    } else if (pathParts.includes("route-client.ts")) {
+      actualEndMarker = "route-client.ts";
     } else {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
       throw new Error(
-        `Could not auto-detect end marker (definition.ts or route.ts) in path: ${filePath}`,
+        `Could not auto-detect end marker (definition.ts, route.ts, or route-client.ts) in path: ${filePath}`,
       );
     }
   }

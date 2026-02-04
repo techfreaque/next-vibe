@@ -16,6 +16,10 @@ import {
 } from "../../../../shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
+import {
+  useWidgetContext,
+  useWidgetTranslation,
+} from "../../_shared/use-widget-context";
 import type { ButtonWidgetConfig } from "./types";
 
 /**
@@ -29,11 +33,14 @@ export function ButtonWidget<
   TSchemaType extends "widget",
 >({
   field,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   ButtonWidgetConfig<TKey, TUsage, TSchemaType>
 >): JSX.Element {
+  const t = useWidgetTranslation();
+  const context = useWidgetContext();
+
   const {
     text: textKey,
     icon,
@@ -42,18 +49,31 @@ export function ButtonWidget<
     iconSize,
     iconSpacing,
     className,
+    hidden,
   } = field;
+
+  // Check if button should be hidden
+  if (hidden) {
+    const itemData = field.parentValue ?? field.value;
+    const shouldHide = typeof hidden === "function" ? hidden(itemData) : hidden;
+    if (shouldHide) {
+      return <></>;
+    }
+  }
 
   // Get classes from config (no hardcoding!)
   const iconSizeClass = getIconSizeClassName(iconSize);
   const iconSpacingClass = getSpacingClassName("margin", iconSpacing);
 
   const buttonIcon = icon ? (icon as IconKey) : undefined;
-  const buttonText = textKey ? context.t(textKey) : "Action";
+  const buttonText = textKey ? t(textKey) : undefined;
 
-  const handleClick = (): void => {
+  const handleClick = (e: { stopPropagation: () => void }): void => {
+    e.stopPropagation(); // Prevent card click when clicking action buttons
     if (field.onClick) {
-      field.onClick();
+      // Use parentValue if available (from actions container), otherwise field.value
+      const itemData = field.parentValue ?? field.value;
+      field.onClick(itemData, context);
     }
   };
 
@@ -68,7 +88,10 @@ export function ButtonWidget<
       {buttonIcon && (
         <Icon
           icon={buttonIcon}
-          className={cn(iconSizeClass || "h-4 w-4", iconSpacingClass || "mr-2")}
+          className={cn(
+            iconSizeClass || "h-4 w-4",
+            buttonText && (iconSpacingClass || "mr-2"),
+          )}
         />
       )}
       {buttonText}

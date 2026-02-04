@@ -40,7 +40,7 @@ interface SidebarFooterProps {
     earned: number;
     expiresAt?: string | number | Date | null;
   } | null;
-  user: JwtPayloadType | undefined;
+  user: JwtPayloadType;
   logger: EndpointLogger;
 }
 

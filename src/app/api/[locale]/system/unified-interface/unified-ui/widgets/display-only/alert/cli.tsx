@@ -8,6 +8,7 @@ import type { JSX } from "react";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { AlertWidgetConfig, AlertWidgetSchema } from "./types";
 
@@ -19,17 +20,20 @@ export function AlertWidgetInk<
   props:
     | InkWidgetProps<
         TEndpoint,
+        TUsage,
         AlertWidgetConfig<TKey, never, TUsage, "widget">
       >
     | InkWidgetProps<
         TEndpoint,
+        TUsage,
         AlertWidgetConfig<TKey, AlertWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
-  const { field, context } = props;
+  const { field } = props;
+  const t = useInkWidgetTranslation();
   const { content, variant = "default" } = field;
 
-  const message = content ? context.t(content) : field.value;
+  const message = content ? t(content) : field.value;
 
   // Determine color based on variant
   let color: string;

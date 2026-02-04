@@ -18,22 +18,23 @@ import { Span } from "next-vibe-ui/ui/span";
 import type React from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { UserGetResponseOutput } from "@/app/api/[locale]/users/user/[id]/definition";
 import userByIdEndpoints from "@/app/api/[locale]/users/user/[id]/definition";
 import { useUserByIdEndpoint } from "@/app/api/[locale]/users/user/[id]/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import type { JwtPayloadType } from "../../../user/auth/types";
+
 interface UserEditFormProps {
-  user: UserGetResponseOutput;
+  user: JwtPayloadType;
   locale: CountryLanguage;
   userId: string;
 }
 
 export function UserEditForm({
-  user,
   locale,
   userId,
+  user,
 }: UserEditFormProps): React.JSX.Element {
   const router = useRouter();
   const { t } = simpleT(locale);
@@ -45,11 +46,13 @@ export function UserEditForm({
       userId,
       enabled: true,
     },
+    user,
     logger,
   );
 
   const handleSubmit = endpoint.create.onSubmit;
   const isLoading = endpoint.read.isLoading;
+  const editingUser = endpoint.read.data;
   const isSaving = endpoint.create.isSubmitting;
 
   const handleBack = (): void => {
@@ -80,7 +83,7 @@ export function UserEditForm({
           <CardTitle className="flex items-center flex flex-row gap-2">
             <Span>{t("app.admin.users.actions.editUser")}</Span>
             <Span className="text-lg font-normal text-gray-500">
-              - {user.email}
+              - {editingUser?.email}
             </Span>
           </CardTitle>
         </CardHeader>

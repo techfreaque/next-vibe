@@ -30,6 +30,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { AGENT_MESSAGE_LENGTH } from "../../../constants";
 import { CallModeIndicator } from "./call-mode-indicator";
 import { FileUploadButton } from "./file-upload-button";
 import { useCallMode } from "./hooks/use-call-mode";
@@ -89,6 +90,7 @@ export function ChatInput({
 
   // Voice recording state
   const voice = useVoiceRecording({
+    user,
     currentValue: input,
     onValueChange: setInput,
     onSubmitText: submitWithContent,
@@ -172,6 +174,7 @@ export function ChatInput({
             className="px-0 text-base pl-3"
             variant="ghost"
             rows={2}
+            maxLength={AGENT_MESSAGE_LENGTH}
             title={canPost ? undefined : noPermissionReason}
           />
 

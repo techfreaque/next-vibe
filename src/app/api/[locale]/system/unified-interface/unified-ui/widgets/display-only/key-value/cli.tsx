@@ -8,6 +8,10 @@ import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
+import {
+  useInkWidgetLocale,
+  useInkWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { KeyValueWidgetConfig, KeyValueWidgetSchema } from "./types";
@@ -25,13 +29,14 @@ export function KeyValueWidgetInk<
   TSchemaType extends "primitive",
 >({
   field,
-  context,
 }: InkWidgetProps<
   TEndpoint,
+  TUsage,
   KeyValueWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
 >): JSX.Element {
+  const t = useInkWidgetTranslation();
+  const locale = useInkWidgetLocale();
   const { label: labelKey } = field;
-  const { t } = context;
 
   const label = labelKey ? t(labelKey) : undefined;
 
@@ -79,9 +84,7 @@ export function KeyValueWidgetInk<
         // Try to translate key, fallback to raw key
         const translatedKey = key.startsWith("app.") ? t(key) : key;
         const displayValue =
-          typeof val === "number"
-            ? val.toLocaleString(context.locale)
-            : String(val);
+          typeof val === "number" ? val.toLocaleString(locale) : String(val);
 
         return (
           <Box key={key}>

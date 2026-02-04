@@ -4,13 +4,14 @@
 
 import { Box, Text } from "ink";
 import type { JSX } from "react";
-import type { z } from "zod";
-
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { InkWidgetProps } from "../../_shared/cli-types";
-import type { FieldUsageConfig } from "../../_shared/types";
+import type {
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+  ObjectChildrenConstraint,
+} from "../../_shared/types";
 import type { CreditTransactionCardWidgetConfig } from "./types";
 
 export function CreditTransactionCardWidgetInk<
@@ -18,20 +19,28 @@ export function CreditTransactionCardWidgetInk<
   TKey extends string,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "object" | "object-optional" | "widget-object",
-  TChildren extends Record<
-    string,
-    UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any> // oxlint-disable-line typescript/no-explicit-any
+  TChildren extends ObjectChildrenConstraint<
+    TKey,
+    ConstrainedChildUsage<TUsage>
   >,
 >({
   field,
 }: InkWidgetProps<
   TEndpoint,
+  TUsage,
   CreditTransactionCardWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
 >): JSX.Element {
-  // value type is InferChildrenOutput<TChildren>
-  // leftFields and rightFields are (keyof TChildren)[], which are valid keys for value
   const leftFields = field.leftFields || [];
   const rightFields = field.rightFields || [];
+
+  // Card displays object fields — value must be a non-array object
+  if (!field.value) {
+    return (
+      <Box>
+        <Text dimColor>—</Text>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -43,14 +52,14 @@ export function CreditTransactionCardWidgetInk<
       <Box justifyContent="space-between">
         <Box flexDirection="column">
           {leftFields.map((fieldKey) => (
-            <Box key={fieldKey}>
+            <Box key={String(fieldKey)}>
               <Text>{field.value[fieldKey] ?? "—"}</Text>
             </Box>
           ))}
         </Box>
         <Box flexDirection="column" alignItems="flex-end">
           {rightFields.map((fieldKey) => (
-            <Box key={fieldKey}>
+            <Box key={String(fieldKey)}>
               <Text>{field.value[fieldKey] ?? "—"}</Text>
             </Box>
           ))}

@@ -76,6 +76,7 @@ export function MessageEditor({
 
   // Voice recording state
   const voice = useVoiceRecording({
+    user,
     currentValue: editor.content,
     onValueChange: editor.setContent,
     onSubmitAudio: async (file: File) => {

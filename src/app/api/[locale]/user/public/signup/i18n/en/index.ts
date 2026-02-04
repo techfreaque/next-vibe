@@ -6,31 +6,20 @@ export const translations = {
   description: "User registration endpoint",
   tag: "Authentication",
   form: {
-    title: "Create Your Account",
-    description: "Join the community for uncensored AI conversations",
+    title: "Welcome to Uncensored AI",
+    description:
+      "Help build uncensored, privacy-first, and truly independent AI. unbottled.ai is open source and community-driven, your signup supports the development of AI technology that respects your freedom.",
   },
   actions: {
     submit: "Create Account",
     submitting: "Creating Account...",
   },
   fields: {
-    firstName: {
-      label: "First Name",
-      description: "User's first name",
-      placeholder: "Enter first name",
-      help: "Enter your first name as it should appear on your profile",
-    },
-    lastName: {
-      label: "Last Name",
-      description: "User's last name",
-      placeholder: "Enter last name",
-      help: "Enter your last name as it should appear on your profile",
-    },
     privateName: {
-      label: "Private Name",
-      description: "Your full name (visible only to you)",
+      label: "Your Private Name",
+      description:
+        "How the AI will address you in private conversations. This stays between you and the AI - completely private.",
       placeholder: "Enter your name",
-      help: "Enter your private name for internal use",
       validation: {
         required: "Private name is required",
         minLength: "Name must be at least 2 characters",
@@ -38,10 +27,10 @@ export const translations = {
       },
     },
     publicName: {
-      label: "Display Name",
-      description: "Your public display name",
+      label: "Your Public Name",
+      description:
+        "Your identity in public chats and forums. Other users and AIs will see this name. Choose wisely - it represents you in the community.",
       placeholder: "Enter display name",
-      help: "Enter your public name as it will be displayed to others",
       validation: {
         required: "Display name is required",
         minLength: "Display name must be at least 2 characters",
@@ -49,8 +38,9 @@ export const translations = {
       },
     },
     email: {
-      label: "Email",
-      description: "Your email address",
+      label: "Your Email",
+      description:
+        "Your login credentials and contact method. Kept private - never shared with other users or AIs.",
       placeholder: "Enter email address",
       help: "This will be your login email and primary contact method",
       validation: {
@@ -59,10 +49,10 @@ export const translations = {
       },
     },
     password: {
-      label: "Password",
-      description: "Create a secure password",
+      label: "Your Password",
+      description:
+        "Strong passwords protect your account. We're implementing end-to-end encryption soon - at that point, password resets will clear your message history since only you hold the decryption key. Save it somewhere safe.",
       placeholder: "Enter password",
-      help: "Password must be at least 8 characters with uppercase, lowercase, and number",
       validation: {
         required: "Password is required",
         minLength: "Password must be at least 8 characters",
@@ -70,94 +60,33 @@ export const translations = {
       },
     },
     confirmPassword: {
-      label: "Confirm Password",
-      description: "Confirm your password",
-      placeholder: "Re-enter password",
-      help: "Re-enter your password to confirm it matches",
+      label: "Confirm Your Password",
       validation: {
         required: "Please confirm your password",
         minLength: "Password must be at least 8 characters",
         mismatch: "Passwords do not match",
       },
     },
-    phone: {
-      label: "Phone Number",
-      description: "User's phone number",
-      placeholder: "Enter phone number",
-      help: "Phone number for account recovery and notifications (optional)",
-    },
-    company: {
-      label: "Company",
-      description: "User's company name",
-      placeholder: "Enter company name",
-      help: "Your company or organization name (optional)",
-    },
-    leadId: {
-      label: "Lead ID",
-      description: "Lead identifier for tracking",
-      placeholder: "Enter lead ID",
-      help: "Internal lead identifier (optional)",
-    },
-    preferredContactMethod: {
-      label: "Preferred Contact Method",
-      description: "How you prefer to be contacted",
-      placeholder: "Select contact method",
-      help: "Choose how you'd like us to reach you",
+    subscribeToNewsletter: {
+      label: "Subscribe to Newsletter",
+      description:
+        "Occasional updates about new models and features. No spam, just what matters.",
     },
     acceptTerms: {
-      label: "Accept Terms",
-      description: "Accept our terms and conditions",
-      placeholder: "I accept the terms and conditions",
-      help: "Please review and accept our terms and conditions to continue",
+      label: "Accept Terms & Conditions",
+      description: "Our terms and conditions respect your freedom and privacy.",
       validation: {
         required: "You must accept the terms and conditions to continue",
       },
     },
-    subscribeToNewsletter: {
-      label: "Subscribe to Newsletter",
-      description: "Receive updates and news via email",
-      placeholder: "Subscribe to our newsletter",
-      help: "Get the latest updates, tips, and exclusive offers delivered to your inbox",
-    },
-    imageUrl: {
-      label: "Profile Image URL",
-      description: "URL for your profile picture",
-      placeholder: "Enter image URL",
-      help: "Optional: Provide a URL for your profile picture",
-    },
     referralCode: {
-      label: "Referral Code",
-      description: "Optional referral code from a friend",
+      label: "Referral Code (optional)",
+      description:
+        "Have a friend on unbottled.ai? Enter their code to support them. They get rewarded for bringing you in.",
       placeholder: "Enter referral code (optional)",
-      help: "If you have a referral code, enter it here to get started",
     },
   },
-  groups: {
-    personalInfo: {
-      title: "Personal Information",
-      description: "Enter your personal details",
-    },
-    security: {
-      title: "Security",
-      description: "Set up your account security",
-    },
-    businessInfo: {
-      title: "Business Information",
-      description: "Enter your business details",
-    },
-    preferences: {
-      title: "Preferences",
-      description: "Set your communication preferences",
-    },
-    consent: {
-      title: "Terms and Consent",
-      description: "Review and accept our terms and conditions",
-    },
-    advanced: {
-      title: "Advanced Options",
-      description: "Additional configuration options",
-    },
-  },
+
   footer: {
     alreadyHaveAccount: "Already have an account? Sign in",
   },

@@ -6,6 +6,7 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { EnumWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type { InkWidgetProps } from "../../_shared/cli-types";
@@ -15,17 +16,25 @@ import type { FilterPillsFieldWidgetConfig } from "./types";
 export function FilterPillsFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
+  TUsage extends FieldUsageConfig,
 >({
   field,
-  context,
 }: InkWidgetProps<
   TEndpoint,
-  FilterPillsFieldWidgetConfig<TKey, EnumWidgetSchema, FieldUsageConfig>
+  TUsage,
+  FilterPillsFieldWidgetConfig<TKey, EnumWidgetSchema, TUsage>
 >): JSX.Element {
-  const { t } = context;
+  const t = useInkWidgetTranslation();
 
   // Find selected option
-  const selectedOption = field.options.find((opt) => opt.value === field.value);
+  const selectedOption = field.options.find(
+    (opt: {
+      label: TKey;
+      value: string | number;
+      icon?: string;
+      description?: TKey;
+    }) => opt.value === field.value,
+  );
   const displayValue = selectedOption ? t(selectedOption.label) : "—";
 
   return (

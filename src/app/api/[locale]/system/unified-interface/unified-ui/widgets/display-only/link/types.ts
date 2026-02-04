@@ -81,6 +81,9 @@ export interface LinkWidgetConfig<
   /** Opens in new tab if true */
   external?: boolean;
 
+  /** Text alignment */
+  textAlign?: "left" | "center" | "right";
+
   /** Text size */
   size?: "xs" | "sm" | "base" | "lg";
 

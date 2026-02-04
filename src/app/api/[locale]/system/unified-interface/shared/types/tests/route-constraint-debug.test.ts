@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Route Constraint Tests
  *
@@ -14,10 +13,10 @@ import type {
   FieldUsageConfig,
 } from "../../../unified-ui/widgets/_shared/types";
 import type { CreateApiEndpoint } from "../../endpoints/definition/create";
-import type {
-  RequestResponseWidgetConfig,
-  UnifiedField,
-} from "../../widgets/configs";
+import { objectField } from "../../field/utils";
+import type { UnifiedField } from "../../types/endpoint";
+import { WidgetType } from "../../types/enums";
+import type { RequestResponseWidgetConfig } from "../../widgets/configs";
 import type { CreateApiEndpointAny } from "../endpoint-base";
 import type { Methods } from "../enums";
 
@@ -42,7 +41,7 @@ type Test2_1_WidgetConfigVariance =
     z.ZodTypeAny,
     FieldUsageConfig,
     never
-  > extends UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>
+  > extends UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, never>
     ? "PASS"
     : "FAIL";
 const test2_1: Test2_1_WidgetConfigVariance = "PASS";
@@ -58,7 +57,7 @@ type Test3_1_PrimitiveFieldVariance =
     z.ZodString,
     FieldUsageConfig,
     "primitive"
-  > extends UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>
+  > extends UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, never>
     ? "PASS"
     : "FAIL";
 const test3_1: Test3_1_PrimitiveFieldVariance = "PASS";
@@ -68,32 +67,45 @@ const test3_1: Test3_1_PrimitiveFieldVariance = "PASS";
 // ============================================================================
 
 // Test 4.1: ObjectField with specific TKey extends UnifiedField<string, z.ZodTypeAny>
+// Tests that an objectField with specific literal TKey extends generic UnifiedField
+const test4_1_field = objectField(
+  { type: WidgetType.CONTAINER },
+  { request: "data" },
+  {},
+);
+
 type Test4_1_ObjectFieldVariance =
-  ObjectField<
-    {
-      field1: PrimitiveField<
-        z.ZodString,
-        FieldUsageConfig,
-        "app.test",
-        WidgetConfig<"app.test", z.ZodTypeAny>
-      >;
-    },
+  typeof test4_1_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
     FieldUsageConfig,
-    "app.test",
-    WidgetConfig<"app.test", z.ZodTypeAny>
-  > extends UnifiedField<string, z.ZodTypeAny>
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "PASS"
     : "FAIL";
 const test4_1: Test4_1_ObjectFieldVariance = "PASS";
 
-// Test 4.2: ObjectField with generic string TKey extends UnifiedField<string, z.ZodTypeAny>
+// Test 4.2: ObjectField with children extends UnifiedField<string, z.ZodTypeAny>
+// Tests that an objectField containing nested fields extends the generic UnifiedField constraint
+const test4_2_field = objectField(
+  { type: WidgetType.CONTAINER },
+  { request: "data" },
+  {
+    nested: objectField(
+      { type: WidgetType.CONTAINER },
+      { request: "data" },
+      {},
+    ),
+  },
+);
+
 type Test4_2_ObjectFieldGeneric =
-  ObjectField<
-    {
-      field1: PrimitiveField<z.ZodString, FieldUsageConfig>;
-    },
-    FieldUsageConfig
-  > extends UnifiedField<string, z.ZodTypeAny>
+  typeof test4_2_field extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >
     ? "PASS"
     : "FAIL";
 const test4_2: Test4_2_ObjectFieldGeneric = "PASS";
@@ -193,6 +205,8 @@ export {
   test1_1,
   test2_1,
   test3_1,
+  test4_1,
+  test4_2,
   test5_1,
   test5_2,
   test5_3,

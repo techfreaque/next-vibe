@@ -27,9 +27,57 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { iconSchema } from "../../../shared/types/common.schema";
+import type { CreateApiEndpointAny } from "../../../system/unified-interface/shared/types/endpoint-base";
+import type { ReactWidgetContext } from "../../../system/unified-interface/unified-ui/widgets/_shared/react-types";
 import { ModelId } from "../../models/models";
+import charactersDefinitions from "../characters/definition";
 import favoriteDefinition from "./[id]/definition";
-import createDefinitions from "./create/definition";
+
+/**
+ * Type for parent value in favorite card callbacks
+ * Used to access activeBadge for conditional styling
+ */
+interface FavoriteCardParent {
+  content: {
+    titleRow: {
+      activeBadge: string | null;
+    };
+  };
+}
+
+/**
+ * Type for titleRow parent value
+ * activeBadge is a sibling field in titleRow
+ */
+interface TitleRowParent {
+  activeBadge: string | null;
+}
+
+/**
+ * Favorite Card type - manually defined to avoid circular reference
+ * This represents a single favorite card in the favorites list
+ */
+export interface FavoriteCard {
+  id: string;
+  characterId: string | null;
+  modelId: ModelId | null;
+  position: number;
+  icon: z.infer<typeof iconSchema>;
+  content: {
+    titleRow: {
+      name: TranslationKey;
+      tagline: TranslationKey | null;
+      activeBadge: TranslationKey | null;
+    };
+    description: TranslationKey | null;
+    modelRow: {
+      modelIcon: z.infer<typeof iconSchema>;
+      modelInfo: string;
+      modelProvider: string;
+      creditCost: string;
+    };
+  };
+}
 
 /**
  * Get Favorites List Endpoint (GET)
@@ -39,6 +87,7 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "chat", "favorites"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 
   title: "app.api.agent.chat.favorites.get.title" as const,
   description: "app.api.agent.chat.favorites.get.description" as const,
@@ -52,6 +101,7 @@ const { GET } = createEndpoint({
       layoutType: LayoutType.STACKED,
       noCard: true,
       gap: "6",
+      className: "p-6",
     },
     { response: true },
     {
@@ -73,13 +123,13 @@ const { GET } = createEndpoint({
             usage: { response: true },
           }),
           createButton: navigateButtonField({
-            targetEndpoint: createDefinitions.POST,
+            targetEndpoint: charactersDefinitions.GET,
             extractParams: () => ({}),
             prefillFromGet: false,
             label:
               "app.api.agent.chat.favorites.get.createButton.label" as const,
             icon: "plus",
-            variant: "ghost",
+            variant: "outline",
             className: "ml-auto",
             usage: { response: true },
           }),
@@ -90,7 +140,102 @@ const { GET } = createEndpoint({
       favoritesList: responseArrayField(
         {
           type: WidgetType.DATA_CARDS,
-          layout: { type: LayoutType.GRID, columns: 1, spacing: "normal" },
+          className: "overflow-y-auto max-h-[70dvh]",
+          columns: 1,
+          getClassName: (item: FavoriteCardParent) => {
+            const activeClass = item.content?.titleRow?.activeBadge
+              ? "bg-primary/5 border-primary/20"
+              : "";
+            return `group relative ${activeClass}`;
+          },
+          metadata: {
+            enableDragDrop: true,
+            onReorder: async (
+              items: FavoriteCard[],
+              context: ReactWidgetContext<CreateApiEndpointAny>,
+            ) => {
+              // Import apiClient and reorder definition
+              const { apiClient } =
+                await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+
+              const { logger, locale, user } = context;
+
+              // Update positions in all items
+              const updatedItems = items.map((item, index) => ({
+                ...item,
+                position: index,
+              }));
+
+              // Optimistic update: Update favorites list with new positions
+              apiClient.updateEndpointData(
+                GET,
+                logger,
+                (oldData) => {
+                  if (!oldData?.success) {
+                    return oldData;
+                  }
+
+                  return {
+                    success: true,
+                    data: {
+                      favoritesList: updatedItems,
+                    },
+                  };
+                },
+                undefined,
+              );
+
+              // Persist position changes via batch reorder endpoint
+              try {
+                const reorderDefinition = await import("./reorder/definition");
+
+                await apiClient.mutate(
+                  reorderDefinition.default.POST,
+                  logger,
+                  user,
+                  {
+                    positions: updatedItems.map((item, index) => ({
+                      id: item.id,
+                      position: index,
+                    })),
+                  },
+                  undefined,
+                  locale,
+                );
+
+                logger.info("Favorites positions updated successfully");
+              } catch (error) {
+                logger.error("Failed to update favorite positions", {
+                  errorMessage:
+                    error instanceof Error ? error.message : String(error),
+                });
+                // Refetch to revert optimistic update
+                await apiClient.refetchEndpoint(GET, logger);
+              }
+            },
+            onCardClick: {
+              isClickable: (item: FavoriteCard) =>
+                !item.content.titleRow.activeBadge,
+              onClick: async (
+                item: FavoriteCard,
+                context: ReactWidgetContext<CreateApiEndpointAny>,
+              ) => {
+                const { ChatSettingsRepositoryClient } =
+                  await import("../settings/repository-client");
+
+                const { logger, locale, user } = context;
+
+                await ChatSettingsRepositoryClient.selectFavorite({
+                  favoriteId: item.id,
+                  modelId: item.modelId,
+                  characterId: item.characterId,
+                  logger,
+                  locale,
+                  user,
+                });
+              },
+            },
+          },
         },
         objectField(
           {
@@ -99,7 +244,6 @@ const { GET } = createEndpoint({
             gap: "4",
             alignItems: "start",
             noCard: true,
-            className: "group",
           },
           { response: true },
           {
@@ -118,12 +262,26 @@ const { GET } = createEndpoint({
               hidden: true,
               schema: z.enum(ModelId).nullable(),
             }),
+            position: responseField({
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.number().int(),
+            }),
             icon: responseField({
               type: WidgetType.ICON,
               containerSize: "lg",
-              iconSize: "base",
+              iconSize: "lg",
               borderRadius: "lg",
               schema: iconSchema,
+              getClassName: (
+                // oxlint-disable-next-line no-unused-vars
+                value: undefined,
+                parent?: FavoriteCardParent,
+              ) => {
+                return parent?.content?.titleRow?.activeBadge
+                  ? "bg-primary/15 text-primary"
+                  : "bg-primary/10 group-hover:bg-primary/20";
+              },
             }),
             content: objectField(
               {
@@ -148,11 +306,28 @@ const { GET } = createEndpoint({
                       size: "base",
                       emphasis: "bold",
                       schema: z.string() as z.ZodType<TranslationKey>,
+                      getClassName: (
+                        // oxlint-disable-next-line no-unused-vars
+                        value: undefined,
+                        parentValue?: TitleRowParent,
+                      ) => {
+                        const parent = parentValue;
+                        const hasActive = parent?.activeBadge;
+                        return hasActive ? "text-primary" : "";
+                      },
                     }),
                     tagline: responseField({
                       type: WidgetType.TEXT,
                       size: "sm",
                       variant: "muted",
+                      schema: z
+                        .string()
+                        .nullable() as z.ZodType<TranslationKey | null>,
+                    }),
+                    activeBadge: responseField({
+                      type: WidgetType.BADGE,
+                      variant: "default",
+                      size: "xs",
                       schema: z
                         .string()
                         .nullable() as z.ZodType<TranslationKey | null>,
@@ -220,30 +395,64 @@ const { GET } = createEndpoint({
                 ),
               },
             ),
-            editButton: navigateButtonField({
-              icon: "pencil",
-              variant: "ghost",
-              size: "sm",
-              targetEndpoint: favoriteDefinition.PATCH,
-              extractParams: (favorite) => ({
-                urlPathParams: { id: String(favorite.id) },
-              }),
-              prefillFromGet: true,
-              getEndpoint: favoriteDefinition.GET,
-              usage: { response: true },
-            }),
-            deleteButton: navigateButtonField({
-              icon: "trash",
-              variant: "ghost",
-              size: "sm",
-              targetEndpoint: favoriteDefinition.DELETE,
-              extractParams: (favorite) => ({
-                urlPathParams: { id: String(favorite.id) },
-              }),
-              prefillFromGet: false,
-              renderInModal: true,
-              usage: { response: true },
-            }),
+            actions: widgetObjectField(
+              {
+                type: WidgetType.CONTAINER,
+                layoutType: LayoutType.ACTIONS,
+                noCard: true,
+              },
+              { response: true },
+              {
+                dragHandle: widgetField({
+                  type: WidgetType.DRAG_HANDLE,
+                  icon: "grip",
+                  usage: { response: true },
+                }),
+                selectButton: widgetField({
+                  type: WidgetType.BUTTON,
+                  icon: "zap",
+                  variant: "ghost",
+                  size: "sm",
+                  className: "text-primary",
+                  usage: { response: true },
+                  hidden: (value: FavoriteCard) =>
+                    Boolean(value.content.titleRow.activeBadge),
+                  onClick: async (
+                    item: FavoriteCard,
+                    context: ReactWidgetContext<CreateApiEndpointAny>,
+                  ) => {
+                    const { ChatSettingsRepositoryClient } =
+                      await import("../settings/repository-client");
+
+                    const { logger, locale, user } = context;
+
+                    await ChatSettingsRepositoryClient.selectFavorite({
+                      favoriteId: item.id,
+                      modelId: item.modelId,
+                      characterId: item.characterId,
+                      logger,
+                      locale,
+                      user,
+                    });
+                  },
+                }),
+                editButton: navigateButtonField({
+                  icon: "pencil",
+                  variant: "ghost",
+                  size: "sm",
+                  targetEndpoint: favoriteDefinition.PATCH,
+                  extractParams: (source) => ({
+                    urlPathParams: {
+                      id: String((source.itemData as { id: string }).id),
+                    },
+                  }),
+                  prefillFromGet: true,
+                  getEndpoint: favoriteDefinition.GET,
+                  popNavigationOnSuccess: 1, // Pop once to go back to favorites list after save
+                  usage: { response: true },
+                }),
+              },
+            ),
           },
         ),
       ),
@@ -315,11 +524,13 @@ const { GET } = createEndpoint({
             id: "550e8400-e29b-41d4-a716-446655440000",
             characterId: "default",
             modelId: ModelId.CLAUDE_SONNET_4_5,
+            position: 0,
             icon: "sparkles",
             content: {
               titleRow: {
                 name: "Thea",
                 tagline: "Greek goddess of light",
+                activeBadge: "app.chat.selector.active",
               },
               description: "Devoted companion with ancient wisdom",
               modelRow: {
@@ -341,9 +552,6 @@ export type FavoritesListRequestInput = typeof GET.types.RequestInput;
 export type FavoritesListRequestOutput = typeof GET.types.RequestOutput;
 export type FavoritesListResponseInput = typeof GET.types.ResponseInput;
 export type FavoritesListResponseOutput = typeof GET.types.ResponseOutput;
-
-// Individual favorite card type from GET response (display fields only)
-export type FavoriteCard = FavoritesListResponseOutput["favoritesList"][number];
 
 const definitions = { GET } as const;
 export default definitions;

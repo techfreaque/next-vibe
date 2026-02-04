@@ -3,8 +3,8 @@ import { translations as _componentsTranslations } from "../../_components/i18n/
 
 export const translations = {
   _components: _componentsTranslations,
-  title: "Login",
-  description: "User login endpoint",
+  title: "Welcome Back",
+  description: "Access uncensored AI models and your conversation history.",
   tag: "Authentication",
   options: optionsTranslations,
   actions: {
@@ -13,18 +13,17 @@ export const translations = {
   },
   fields: {
     email: {
-      label: "Email",
-      description: "User email address",
+      label: "Your Email",
+      description: "The email you signed up with.",
       placeholder: "Enter your email",
-      help: "Enter the email address associated with your account",
       validation: {
         required: "Email is required",
         invalid: "Please enter a valid email address",
       },
     },
     password: {
-      label: "Password",
-      description: "User password",
+      label: "Your Password",
+      description: "Enter the password you set during signup.",
       placeholder: "Enter your password",
       help: "Enter your account password",
       validation: {
@@ -33,16 +32,7 @@ export const translations = {
       },
     },
     rememberMe: {
-      label: "Remember Me",
-      description: "Keep me logged in",
-      placeholder: "Remember me",
-      help: "Stay logged in on this device for easier access",
-    },
-    leadId: {
-      label: "Lead ID",
-      description: "Optional lead identifier",
-      placeholder: "Enter lead ID",
-      help: "Optional lead identifier for tracking",
+      label: "Keep me logged in",
     },
   },
   groups: {

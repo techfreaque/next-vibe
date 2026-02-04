@@ -99,6 +99,7 @@ export const translations = {
     showAllModels: "Show all models",
     showLess: "Show less",
     showMore: "Show {{remaining}} more",
+    showLegacyModels: "Show {{count}} Legacy Models",
     noMatchingModels: "No matching models",
     noModelsWarning: "No models match your filters",
     useOnce: "Use Once",

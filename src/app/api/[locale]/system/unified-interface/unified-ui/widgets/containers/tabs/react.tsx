@@ -2,23 +2,23 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
-import { Pre } from "next-vibe-ui/ui/pre";
 import { Span } from "next-vibe-ui/ui/span";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import {
-  getBorderRadiusClassName,
   getSpacingClassName,
   getTextSizeClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
+import { MultiWidgetRenderer } from "../../../renderers/react/MultiWidgetRenderer";
 import type { ReactWidgetProps } from "../../_shared/react-types";
 import type {
   ConstrainedChildUsage,
   FieldUsageConfig,
   ObjectChildrenConstraint,
 } from "../../_shared/types";
+import { useWidgetTranslation } from "../../_shared/use-widget-context";
 import type { TabsWidgetConfig } from "./types";
 
 /**
@@ -62,26 +62,26 @@ export function TabsWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "object",
+  TSchemaType extends "widget-object" | "object" | "object-optional",
   TChildren extends ObjectChildrenConstraint<
     TKey,
     ConstrainedChildUsage<TUsage>
   >,
 >({
   field,
-  context,
+  fieldName,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   TabsWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
 >): JSX.Element {
+  const t = useWidgetTranslation();
   const {
     emptyPadding,
     triggerGap,
     iconSize,
     contentMargin,
     contentTextSize,
-    prePadding,
-    preBorderRadius,
     className,
   } = field;
 
@@ -90,13 +90,9 @@ export function TabsWidget<
   const triggerGapClass = getSpacingClassName("gap", triggerGap);
   const contentMarginClass = getSpacingClassName("margin", contentMargin);
   const contentTextSizeClass = getTextSizeClassName(contentTextSize);
-  const prePaddingClass = getSpacingClassName("padding", prePadding);
 
   // Get classes from helper functions (no hardcoding!)
   const iconSizeClass = getTextSizeClassName(iconSize);
-  const preBorderRadiusClass = getBorderRadiusClassName(
-    preBorderRadius || "lg",
-  );
 
   const tabs = Array.isArray(field.value?.tabs) ? field.value.tabs : [];
   const activeTab = field.value?.activeTab;
@@ -110,7 +106,7 @@ export function TabsWidget<
           className,
         )}
       >
-        {context.t("system.ui.widgets.tabs.empty")}
+        {t("system.ui.widgets.tabs.empty")}
       </Div>
     );
   }
@@ -144,44 +140,65 @@ export function TabsWidget<
         )}
       </TabsList>
 
-      {tabs.map((tab: { id: string; content?: string | null }) => (
-        <TabsContent
-          key={tab.id}
-          value={tab.id}
-          className={contentMarginClass || "mt-4"}
-        >
-          {tab.content !== null && tab.content !== undefined ? (
-            typeof tab.content === "string" ? (
-              <Div className={contentTextSizeClass || "text-sm"}>
-                {tab.content}
-              </Div>
-            ) : (
-              <Div className={contentTextSizeClass || "text-sm"}>
-                <Pre
+      <MultiWidgetRenderer
+        childrenSchema={field.children}
+        value={tabs}
+        fieldName={fieldName}
+        renderItem={({ itemData, itemFieldName, childSchema }) => {
+          // itemData should be an object with id and optional content
+          if (
+            typeof itemData !== "object" ||
+            itemData === null ||
+            Array.isArray(itemData)
+          ) {
+            return <></>;
+          }
+
+          const tabId =
+            typeof itemData["id"] === "string"
+              ? itemData["id"]
+              : String(itemData["id"] || "");
+          const tabContent = itemData["content"];
+
+          const childrenSchema =
+            "children" in childSchema ? childSchema.children : undefined;
+
+          return (
+            <TabsContent
+              key={tabId}
+              value={tabId}
+              className={contentMarginClass || "mt-4"}
+            >
+              {tabContent !== null && tabContent !== undefined ? (
+                <Div className={contentTextSizeClass || "text-sm"}>
+                  <MultiWidgetRenderer
+                    childrenSchema={
+                      childrenSchema && "content" in childrenSchema
+                        ? { content: childrenSchema.content }
+                        : undefined
+                    }
+                    value={itemData}
+                    fieldName={itemFieldName}
+                  />
+                </Div>
+              ) : (
+                <Div
                   className={cn(
-                    "bg-muted overflow-x-auto",
-                    prePaddingClass || "p-4",
-                    preBorderRadiusClass,
+                    "text-center text-muted-foreground italic",
+                    emptyPaddingClass || "py-8",
                   )}
                 >
-                  {JSON.stringify(tab.content, null, 2)}
-                </Pre>
-              </Div>
-            )
-          ) : (
-            <Div
-              className={cn(
-                "text-center text-muted-foreground italic",
-                emptyPaddingClass || "py-8",
+                  {t("system.ui.widgets.tabs.noContent")}
+                </Div>
               )}
-            >
-              {context.t("system.ui.widgets.tabs.noContent")}
-            </Div>
-          )}
-        </TabsContent>
-      ))}
+            </TabsContent>
+          );
+        }}
+      />
     </Tabs>
   );
 }
 
 TabsWidget.displayName = "TabsWidget";
+
+export default TabsWidget;

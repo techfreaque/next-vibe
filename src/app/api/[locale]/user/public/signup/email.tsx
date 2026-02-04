@@ -329,7 +329,7 @@ export const renderRegisterMail: EmailFunctionType<
   Record<string, string>
 > = async ({ requestData, locale, t, logger }) => {
   const userResponse = await UserRepository.getUserByEmail(
-    requestData.formCard.email,
+    requestData.email,
     UserDetailLevel.STANDARD,
     locale,
     logger,
@@ -338,7 +338,7 @@ export const renderRegisterMail: EmailFunctionType<
     return fail({
       message: "app.api.user.errors.not_found",
       errorType: ErrorResponseTypes.NOT_FOUND,
-      messageParams: { email: requestData.formCard.email },
+      messageParams: { email: requestData.email },
       cause: userResponse,
     });
   }
@@ -682,7 +682,7 @@ export const renderAdminSignupNotification: EmailFunctionType<
   Record<string, string>
 > = async ({ requestData, locale, t, logger }) => {
   const userResponse = await UserRepository.getUserByEmail(
-    requestData.formCard.email,
+    requestData.email,
     UserDetailLevel.STANDARD,
     locale,
     logger,
@@ -691,7 +691,7 @@ export const renderAdminSignupNotification: EmailFunctionType<
     return fail({
       message: "app.api.user.errors.not_found",
       errorType: ErrorResponseTypes.NOT_FOUND,
-      messageParams: { email: requestData.formCard.email },
+      messageParams: { email: requestData.email },
       cause: userResponse,
     });
   }
@@ -709,7 +709,7 @@ export const renderAdminSignupNotification: EmailFunctionType<
       contactClientRepository.getSupportEmail(locale),
       user,
       {
-        subscribeToNewsletter: requestData.formCard.subscribeToNewsletter,
+        subscribeToNewsletter: requestData.subscribeToNewsletter,
       },
     ),
   });

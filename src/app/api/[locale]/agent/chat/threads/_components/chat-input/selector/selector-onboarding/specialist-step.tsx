@@ -10,6 +10,7 @@ import { CharacterBrowserCore } from "@/app/api/[locale]/agent/chat/characters/c
 import type { CharacterListItem } from "@/app/api/[locale]/agent/chat/characters/definition";
 import type { FavoriteCard } from "@/app/api/[locale]/agent/chat/favorites/definition";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -22,6 +23,7 @@ interface SpecialistStepProps {
   characters: Record<string, CharacterListItem>;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  user: JwtPayloadType;
 }
 
 export function SpecialistStep({
@@ -33,6 +35,7 @@ export function SpecialistStep({
   characters,
   locale,
   logger,
+  user,
 }: SpecialistStepProps): JSX.Element {
   const { t } = simpleT(locale);
   const character = characters[selectedCharacterId];
@@ -70,6 +73,7 @@ export function SpecialistStep({
           locale={locale}
           hideCompanions={true}
           logger={logger}
+          user={user}
         />
       </Div>
 

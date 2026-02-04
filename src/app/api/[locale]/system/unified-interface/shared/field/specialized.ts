@@ -7,10 +7,11 @@
 
 import { z } from "zod";
 
+import type { MultiSelectFieldWidgetConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/multiselect-field/types";
+import type { SelectFieldWidgetConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/types";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { FieldDataType, WidgetType } from "../types/enums";
-import { requestField } from "./utils-new";
 
 // ============================================================================
 // CURRENCY UTILITIES
@@ -78,30 +79,142 @@ export const CURRENCY_OPTIONS = [
 
 export type CurrencyCode = (typeof CURRENCY_OPTIONS)[number]["value"];
 
-/**
- * Creates a currency selection field
- */
+const CURRENCY_VALUES = [
+  "USD",
+  "EUR",
+  "GBP",
+  "JPY",
+  "CHF",
+  "CAD",
+  "AUD",
+  "CNY",
+  "INR",
+  "BRL",
+] as const;
+
+const currencyEnumSchema = z.enum(CURRENCY_VALUES);
+const currencyArraySchema = z.array(currencyEnumSchema);
+
+type CurrencySelectSchemaRequired = typeof currencyEnumSchema;
+type CurrencySelectSchemaOptional = z.ZodOptional<typeof currencyEnumSchema>;
+type CurrencyMultiSelectSchemaRequired = typeof currencyArraySchema;
+type CurrencyMultiSelectSchemaOptional = z.ZodOptional<
+  typeof currencyArraySchema
+>;
+
+// Overload 1: multiple=true, required=true
 export function currencyField(
   label: TranslationKey,
   description: TranslationKey,
   placeholder: TranslationKey,
-  required = false,
-  multiple = false,
-) {
-  const schema = multiple
-    ? z.array(z.enum(CURRENCY_OPTIONS.map((c) => c.value)))
-    : z.enum(CURRENCY_OPTIONS.map((c) => c.value));
+  required: true,
+  multiple: true,
+): MultiSelectFieldWidgetConfig<
+  TranslationKey,
+  CurrencyMultiSelectSchemaRequired,
+  { request: "data"; response?: never }
+> & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
 
-  return requestField({
+// Overload 2: multiple=true, required=false
+export function currencyField(
+  label: TranslationKey,
+  description: TranslationKey,
+  placeholder: TranslationKey,
+  required: false,
+  multiple: true,
+): MultiSelectFieldWidgetConfig<
+  TranslationKey,
+  CurrencyMultiSelectSchemaOptional,
+  { request: "data"; response?: never }
+> & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
+
+// Overload 3: multiple=false, required=true
+export function currencyField(
+  label: TranslationKey,
+  description: TranslationKey,
+  placeholder: TranslationKey,
+  required: true,
+  multiple?: false,
+): SelectFieldWidgetConfig<
+  TranslationKey,
+  CurrencySelectSchemaRequired,
+  { request: "data"; response?: never }
+> & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
+
+// Overload 4: multiple=false, required=false (DEFAULT)
+export function currencyField(
+  label: TranslationKey,
+  description: TranslationKey,
+  placeholder: TranslationKey,
+  required?: false,
+  multiple?: false,
+): SelectFieldWidgetConfig<
+  TranslationKey,
+  CurrencySelectSchemaOptional,
+  { request: "data"; response?: never }
+> & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
+
+// Implementation
+export function currencyField(
+  label: TranslationKey,
+  description: TranslationKey,
+  placeholder: TranslationKey,
+  required?: boolean,
+  multiple?: boolean,
+):
+  | (MultiSelectFieldWidgetConfig<
+      TranslationKey,
+      CurrencyMultiSelectSchemaRequired | CurrencyMultiSelectSchemaOptional,
+      { request: "data"; response?: never }
+    > & {
+      usage: { request: "data"; response?: never };
+      schemaType: "primitive";
+    })
+  | (SelectFieldWidgetConfig<
+      TranslationKey,
+      CurrencySelectSchemaRequired | CurrencySelectSchemaOptional,
+      { request: "data"; response?: never }
+    > & {
+      usage: { request: "data"; response?: never };
+      schemaType: "primitive";
+    }) {
+  if (multiple) {
+    const schema = required
+      ? currencyArraySchema
+      : currencyArraySchema.optional();
+    return {
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.MULTISELECT,
+      label,
+      description,
+      placeholder,
+      options: CURRENCY_OPTIONS.map((opt) => ({
+        value: opt.value,
+        label: opt.label,
+      })),
+      required,
+      schema,
+      usage: { request: "data" as const },
+      schemaType: "primitive" as const,
+    };
+  }
+
+  const schema = required ? currencyEnumSchema : currencyEnumSchema.optional();
+  return {
     type: WidgetType.FORM_FIELD,
-    fieldType: multiple ? FieldDataType.MULTISELECT : FieldDataType.SELECT,
+    fieldType: FieldDataType.SELECT,
     label,
     description,
     placeholder,
-    options: CURRENCY_OPTIONS,
+    options: CURRENCY_OPTIONS.map((opt) => ({
+      value: opt.value,
+      label: opt.label,
+    })),
     required,
-    schema: required ? schema : schema.optional(),
-  });
+    schema,
+    usage: { request: "data" as const },
+    schemaType: "primitive" as const,
+  };
 }
 
 // ============================================================================
@@ -129,69 +242,145 @@ export const LANGUAGE_OPTIONS = [
 
 export type LanguageCode = (typeof LANGUAGE_OPTIONS)[number]["value"];
 
-/**
- * Creates a language selection field
- */
+const LANGUAGE_VALUES = [
+  "en",
+  "de",
+  "fr",
+  "es",
+  "it",
+  "pt",
+  "nl",
+  "ru",
+  "zh",
+  "ja",
+  "ko",
+  "ar",
+  "hi",
+] as const;
+
+const languageEnumSchema = z.enum(LANGUAGE_VALUES);
+const languageArraySchema = z.array(languageEnumSchema);
+
+type LanguageSelectSchemaRequired = typeof languageEnumSchema;
+type LanguageSelectSchemaOptional = z.ZodOptional<typeof languageEnumSchema>;
+type LanguageMultiSelectSchemaRequired = typeof languageArraySchema;
+type LanguageMultiSelectSchemaOptional = z.ZodOptional<
+  typeof languageArraySchema
+>;
+
+// Overload 1: multiple=true, required=true
 export function languageField(
   label: TranslationKey,
   description: TranslationKey,
   placeholder: TranslationKey,
-  required = false,
-  multiple = false,
-) {
+  required: true,
+  multiple: true,
+): MultiSelectFieldWidgetConfig<
+  TranslationKey,
+  LanguageMultiSelectSchemaRequired,
+  { request: "data"; response?: never }
+> & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
+
+// Overload 2: multiple=true, required=false
+export function languageField(
+  label: TranslationKey,
+  description: TranslationKey,
+  placeholder: TranslationKey,
+  required: false,
+  multiple: true,
+): MultiSelectFieldWidgetConfig<
+  TranslationKey,
+  LanguageMultiSelectSchemaOptional,
+  { request: "data"; response?: never }
+> & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
+
+// Overload 3: multiple=false, required=true
+export function languageField(
+  label: TranslationKey,
+  description: TranslationKey,
+  placeholder: TranslationKey,
+  required: true,
+  multiple?: false,
+): SelectFieldWidgetConfig<
+  TranslationKey,
+  LanguageSelectSchemaRequired,
+  { request: "data"; response?: never }
+> & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
+
+// Overload 4: multiple=false, required=false (DEFAULT)
+export function languageField(
+  label: TranslationKey,
+  description: TranslationKey,
+  placeholder: TranslationKey,
+  required?: false,
+  multiple?: false,
+): SelectFieldWidgetConfig<
+  TranslationKey,
+  LanguageSelectSchemaOptional,
+  { request: "data"; response?: never }
+> & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
+
+// Implementation
+export function languageField(
+  label: TranslationKey,
+  description: TranslationKey,
+  placeholder: TranslationKey,
+  required?: boolean,
+  multiple?: boolean,
+):
+  | (MultiSelectFieldWidgetConfig<
+      TranslationKey,
+      LanguageMultiSelectSchemaRequired | LanguageMultiSelectSchemaOptional,
+      { request: "data"; response?: never }
+    > & {
+      usage: { request: "data"; response?: never };
+      schemaType: "primitive";
+    })
+  | (SelectFieldWidgetConfig<
+      TranslationKey,
+      LanguageSelectSchemaRequired | LanguageSelectSchemaOptional,
+      { request: "data"; response?: never }
+    > & {
+      usage: { request: "data"; response?: never };
+      schemaType: "primitive";
+    }) {
   if (multiple) {
-    if (required) {
-      const schema = z.array(z.enum(LANGUAGE_OPTIONS.map((l) => l.value)));
-      return requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.MULTISELECT,
-        label,
-        description,
-        placeholder,
-        options: [...LANGUAGE_OPTIONS],
-        required,
-        schema,
-      });
-    }
-    const schema = z
-      .array(z.enum(LANGUAGE_OPTIONS.map((l) => l.value)))
-      .optional();
-    return requestField({
+    const schema = required
+      ? languageArraySchema
+      : languageArraySchema.optional();
+    return {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.MULTISELECT,
       label,
       description,
       placeholder,
-      options: [...LANGUAGE_OPTIONS],
+      options: LANGUAGE_OPTIONS.map((opt) => ({
+        value: opt.value,
+        label: opt.label,
+      })),
       required,
       schema,
-    });
+      usage: { request: "data" as const },
+      schemaType: "primitive" as const,
+    };
   }
 
-  if (required) {
-    const schema = z.enum(LANGUAGE_OPTIONS.map((l) => l.value));
-    return requestField({
-      type: WidgetType.FORM_FIELD,
-      fieldType: FieldDataType.SELECT,
-      label,
-      description,
-      placeholder,
-      options: [...LANGUAGE_OPTIONS],
-      required,
-      schema,
-    });
-  }
-  const schema = z.enum(LANGUAGE_OPTIONS.map((l) => l.value)).optional();
-  return requestField({
+  const schema = required ? languageEnumSchema : languageEnumSchema.optional();
+  return {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
     label,
     description,
     placeholder,
-    options: [...LANGUAGE_OPTIONS],
+    options: LANGUAGE_OPTIONS.map((opt) => ({
+      value: opt.value,
+      label: opt.label,
+    })),
     required,
     schema,
-  });
+    usage: { request: "data" as const },
+    schemaType: "primitive" as const,
+  };
 }
 
 // ============================================================================
@@ -233,69 +422,156 @@ export const COUNTRY_OPTIONS = [
 
 export type CountryCode = (typeof COUNTRY_OPTIONS)[number]["value"];
 
-/**
- * Creates a country selection field
- */
+const COUNTRY_VALUES = [
+  "US",
+  "CA",
+  "GB",
+  "DE",
+  "FR",
+  "IT",
+  "ES",
+  "NL",
+  "CH",
+  "AT",
+  "BE",
+  "SE",
+  "NO",
+  "DK",
+  "FI",
+  "AU",
+  "NZ",
+  "JP",
+  "KR",
+  "CN",
+  "IN",
+  "BR",
+  "MX",
+  "AR",
+] as const;
+
+const countryEnumSchema = z.enum(COUNTRY_VALUES);
+const countryArraySchema = z.array(countryEnumSchema);
+
+type CountrySelectSchemaRequired = typeof countryEnumSchema;
+type CountrySelectSchemaOptional = z.ZodOptional<typeof countryEnumSchema>;
+type CountryMultiSelectSchemaRequired = typeof countryArraySchema;
+type CountryMultiSelectSchemaOptional = z.ZodOptional<
+  typeof countryArraySchema
+>;
+
+// Overload 1: multiple=true, required=true
 export function countryField(
   label: TranslationKey,
   description: TranslationKey,
   placeholder: TranslationKey,
-  required = false,
-  multiple = false,
-) {
+  required: true,
+  multiple: true,
+): MultiSelectFieldWidgetConfig<
+  TranslationKey,
+  CountryMultiSelectSchemaRequired,
+  { request: "data"; response?: never }
+> & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
+
+// Overload 2: multiple=true, required=false
+export function countryField(
+  label: TranslationKey,
+  description: TranslationKey,
+  placeholder: TranslationKey,
+  required: false,
+  multiple: true,
+): MultiSelectFieldWidgetConfig<
+  TranslationKey,
+  CountryMultiSelectSchemaOptional,
+  { request: "data"; response?: never }
+> & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
+
+// Overload 3: multiple=false, required=true
+export function countryField(
+  label: TranslationKey,
+  description: TranslationKey,
+  placeholder: TranslationKey,
+  required: true,
+  multiple?: false,
+): SelectFieldWidgetConfig<
+  TranslationKey,
+  CountrySelectSchemaRequired,
+  { request: "data"; response?: never }
+> & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
+
+// Overload 4: multiple=false, required=false (DEFAULT)
+export function countryField(
+  label: TranslationKey,
+  description: TranslationKey,
+  placeholder: TranslationKey,
+  required?: false,
+  multiple?: false,
+): SelectFieldWidgetConfig<
+  TranslationKey,
+  CountrySelectSchemaOptional,
+  { request: "data"; response?: never }
+> & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
+
+// Implementation
+export function countryField(
+  label: TranslationKey,
+  description: TranslationKey,
+  placeholder: TranslationKey,
+  required?: boolean,
+  multiple?: boolean,
+):
+  | (MultiSelectFieldWidgetConfig<
+      TranslationKey,
+      CountryMultiSelectSchemaRequired | CountryMultiSelectSchemaOptional,
+      { request: "data"; response?: never }
+    > & {
+      usage: { request: "data"; response?: never };
+      schemaType: "primitive";
+    })
+  | (SelectFieldWidgetConfig<
+      TranslationKey,
+      CountrySelectSchemaRequired | CountrySelectSchemaOptional,
+      { request: "data"; response?: never }
+    > & {
+      usage: { request: "data"; response?: never };
+      schemaType: "primitive";
+    }) {
   if (multiple) {
-    if (required) {
-      const schema = z.array(z.enum(COUNTRY_OPTIONS.map((c) => c.value)));
-      return requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.MULTISELECT,
-        label,
-        description,
-        placeholder,
-        options: [...COUNTRY_OPTIONS],
-        required,
-        schema,
-      });
-    }
-    const schema = z
-      .array(z.enum(COUNTRY_OPTIONS.map((c) => c.value)))
-      .optional();
-    return requestField({
+    const schema = required
+      ? countryArraySchema
+      : countryArraySchema.optional();
+    return {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.MULTISELECT,
       label,
       description,
       placeholder,
-      options: [...COUNTRY_OPTIONS],
+      options: COUNTRY_OPTIONS.map((opt) => ({
+        value: opt.value,
+        label: opt.label,
+      })),
       required,
       schema,
-    });
+      usage: { request: "data" as const },
+      schemaType: "primitive" as const,
+    };
   }
 
-  if (required) {
-    const schema = z.enum(COUNTRY_OPTIONS.map((c) => c.value));
-    return requestField({
-      type: WidgetType.FORM_FIELD,
-      fieldType: FieldDataType.SELECT,
-      label,
-      description,
-      placeholder,
-      options: [...COUNTRY_OPTIONS],
-      required,
-      schema,
-    });
-  }
-  const schema = z.enum(COUNTRY_OPTIONS.map((c) => c.value)).optional();
-  return requestField({
+  const schema = required ? countryEnumSchema : countryEnumSchema.optional();
+  return {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
     label,
     description,
     placeholder,
-    options: [...COUNTRY_OPTIONS],
+    options: COUNTRY_OPTIONS.map((opt) => ({
+      value: opt.value,
+      label: opt.label,
+    })),
     required,
     schema,
-  });
+    usage: { request: "data" as const },
+    schemaType: "primitive" as const,
+  };
 }
 
 // ============================================================================
@@ -379,67 +655,148 @@ export const TIMEZONE_OPTIONS = [
 
 export type TimezoneCode = (typeof TIMEZONE_OPTIONS)[number]["value"];
 
-/**
- * Creates a timezone selection field
- */
+const TIMEZONE_VALUES = [
+  "UTC",
+  "America/New_York",
+  "America/Chicago",
+  "America/Denver",
+  "America/Los_Angeles",
+  "Europe/London",
+  "Europe/Paris",
+  "Europe/Berlin",
+  "Europe/Rome",
+  "Europe/Madrid",
+  "Europe/Amsterdam",
+  "Europe/Zurich",
+  "Asia/Tokyo",
+  "Asia/Shanghai",
+  "Asia/Seoul",
+  "Asia/Mumbai",
+  "Australia/Sydney",
+  "Pacific/Auckland",
+] as const;
+
+const timezoneEnumSchema = z.enum(TIMEZONE_VALUES);
+const timezoneArraySchema = z.array(timezoneEnumSchema);
+
+type TimezoneSelectSchemaRequired = typeof timezoneEnumSchema;
+type TimezoneSelectSchemaOptional = z.ZodOptional<typeof timezoneEnumSchema>;
+type TimezoneMultiSelectSchemaRequired = typeof timezoneArraySchema;
+type TimezoneMultiSelectSchemaOptional = z.ZodOptional<
+  typeof timezoneArraySchema
+>;
+
+// Overload 1: multiple=true, required=true
 export function timezoneField(
   label: TranslationKey,
   description: TranslationKey,
   placeholder: TranslationKey,
-  required = false,
-  multiple = false,
-) {
+  required: true,
+  multiple: true,
+): MultiSelectFieldWidgetConfig<
+  TranslationKey,
+  TimezoneMultiSelectSchemaRequired,
+  { request: "data"; response?: never }
+> & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
+
+// Overload 2: multiple=true, required=false
+export function timezoneField(
+  label: TranslationKey,
+  description: TranslationKey,
+  placeholder: TranslationKey,
+  required: false,
+  multiple: true,
+): MultiSelectFieldWidgetConfig<
+  TranslationKey,
+  TimezoneMultiSelectSchemaOptional,
+  { request: "data"; response?: never }
+> & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
+
+// Overload 3: multiple=false, required=true
+export function timezoneField(
+  label: TranslationKey,
+  description: TranslationKey,
+  placeholder: TranslationKey,
+  required: true,
+  multiple?: false,
+): SelectFieldWidgetConfig<
+  TranslationKey,
+  TimezoneSelectSchemaRequired,
+  { request: "data"; response?: never }
+> & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
+
+// Overload 4: multiple=false, required=false (DEFAULT)
+export function timezoneField(
+  label: TranslationKey,
+  description: TranslationKey,
+  placeholder: TranslationKey,
+  required?: false,
+  multiple?: false,
+): SelectFieldWidgetConfig<
+  TranslationKey,
+  TimezoneSelectSchemaOptional,
+  { request: "data"; response?: never }
+> & { usage: { request: "data"; response?: never }; schemaType: "primitive" };
+
+// Implementation
+export function timezoneField(
+  label: TranslationKey,
+  description: TranslationKey,
+  placeholder: TranslationKey,
+  required?: boolean,
+  multiple?: boolean,
+):
+  | (MultiSelectFieldWidgetConfig<
+      TranslationKey,
+      TimezoneMultiSelectSchemaRequired | TimezoneMultiSelectSchemaOptional,
+      { request: "data"; response?: never }
+    > & {
+      usage: { request: "data"; response?: never };
+      schemaType: "primitive";
+    })
+  | (SelectFieldWidgetConfig<
+      TranslationKey,
+      TimezoneSelectSchemaRequired | TimezoneSelectSchemaOptional,
+      { request: "data"; response?: never }
+    > & {
+      usage: { request: "data"; response?: never };
+      schemaType: "primitive";
+    }) {
   if (multiple) {
-    if (required) {
-      const schema = z.array(z.enum(TIMEZONE_OPTIONS.map((t) => t.value)));
-      return requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.MULTISELECT,
-        label,
-        description,
-        placeholder,
-        options: [...TIMEZONE_OPTIONS],
-        required,
-        schema,
-      });
-    }
-    const schema = z
-      .array(z.enum(TIMEZONE_OPTIONS.map((t) => t.value)))
-      .optional();
-    return requestField({
+    const schema = required
+      ? timezoneArraySchema
+      : timezoneArraySchema.optional();
+    return {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.MULTISELECT,
       label,
       description,
       placeholder,
-      options: [...TIMEZONE_OPTIONS],
+      options: TIMEZONE_OPTIONS.map((opt) => ({
+        value: opt.value,
+        label: opt.label,
+      })),
       required,
       schema,
-    });
+      usage: { request: "data" as const },
+      schemaType: "primitive" as const,
+    };
   }
 
-  if (required) {
-    const schema = z.enum(TIMEZONE_OPTIONS.map((t) => t.value));
-    return requestField({
-      type: WidgetType.FORM_FIELD,
-      fieldType: FieldDataType.SELECT,
-      label,
-      description,
-      placeholder,
-      options: [...TIMEZONE_OPTIONS],
-      required,
-      schema,
-    });
-  }
-  const schema = z.enum(TIMEZONE_OPTIONS.map((t) => t.value)).optional();
-  return requestField({
+  const schema = required ? timezoneEnumSchema : timezoneEnumSchema.optional();
+  return {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
     label,
     description,
     placeholder,
-    options: [...TIMEZONE_OPTIONS],
+    options: TIMEZONE_OPTIONS.map((opt) => ({
+      value: opt.value,
+      label: opt.label,
+    })),
     required,
     schema,
-  });
+    usage: { request: "data" as const },
+    schemaType: "primitive" as const,
+  };
 }

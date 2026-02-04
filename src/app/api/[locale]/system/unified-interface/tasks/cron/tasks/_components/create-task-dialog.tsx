@@ -28,6 +28,7 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import taskDefinition from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition";
 import { useCreateCronTask } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/hooks";
 import { formatCronSchedule } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
@@ -37,6 +38,7 @@ interface CreateTaskDialogProps {
   onClose: () => void;
   onTaskCreated: () => void;
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 export function CreateTaskDialog({
@@ -44,10 +46,11 @@ export function CreateTaskDialog({
   onClose,
   onTaskCreated,
   locale,
+  user,
 }: CreateTaskDialogProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const endpoint = useCreateCronTask(logger);
+  const endpoint = useCreateCronTask(user, logger);
 
   const handleSubmit = async (): Promise<void> => {
     await endpoint.create.onSubmit();

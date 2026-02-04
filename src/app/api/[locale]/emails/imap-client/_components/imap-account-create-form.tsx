@@ -16,11 +16,13 @@ import type { JSX } from "react";
 import imapCreateDefinitions from "@/app/api/[locale]/emails/imap-client/accounts/create/definition";
 import { useImapAccountCreateEndpoint } from "@/app/api/[locale]/emails/imap-client/accounts/create/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ImapAccountCreateFormProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -31,12 +33,13 @@ interface ImapAccountCreateFormProps {
  */
 export function ImapAccountCreateForm({
   locale,
+  user,
   onSuccess,
   onCancel,
 }: ImapAccountCreateFormProps): JSX.Element {
   const { t } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const endpoint = useImapAccountCreateEndpoint(logger);
+  const endpoint = useImapAccountCreateEndpoint(user, logger);
 
   // Handle form submission
   const handleSubmit = async (): Promise<void> => {

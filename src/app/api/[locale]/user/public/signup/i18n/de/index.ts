@@ -4,30 +4,18 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   _components: _componentsTranslations,
   title: "Benutzerregistrierung",
-  description: "Benutzerregistrierungs-Endpunkt",
+  description: "Endpunkt zur Benutzerregistrierung",
   tag: "Authentifizierung",
   actions: {
     submit: "Konto erstellen",
     submitting: "Konto wird erstellt...",
   },
   fields: {
-    firstName: {
-      label: "Vorname",
-      description: "Vorname des Benutzers",
-      placeholder: "Vorname eingeben",
-      help: "Geben Sie Ihren Vornamen ein, wie er in Ihrem Profil erscheinen soll",
-    },
-    lastName: {
-      label: "Nachname",
-      description: "Nachname des Benutzers",
-      placeholder: "Nachname eingeben",
-      help: "Geben Sie Ihren Nachnamen ein, wie er in Ihrem Profil erscheinen soll",
-    },
     privateName: {
-      label: "Privater Name",
-      description: "Privater Name des Benutzers",
-      placeholder: "Privaten Namen eingeben",
-      help: "Geben Sie Ihren privaten Namen für interne Zwecke ein",
+      label: "Dein privater Name",
+      description:
+        "Wie die KI dich in privaten Gesprächen ansprechen wird. Das bleibt zwischen dir und der KI – komplett privat.",
+      placeholder: "Gib deinen Namen ein",
       validation: {
         required: "Privater Name ist erforderlich",
         minLength: "Name muss mindestens 2 Zeichen lang sein",
@@ -35,31 +23,32 @@ export const translations: typeof enTranslations = {
       },
     },
     publicName: {
-      label: "Öffentlicher Name",
-      description: "Öffentlicher Name des Benutzers",
-      placeholder: "Öffentlichen Namen eingeben",
-      help: "Geben Sie Ihren öffentlichen Namen ein, wie er anderen angezeigt wird",
+      label: "Dein öffentlicher Name",
+      description:
+        "Deine Identität in öffentlichen Chats und Foren. Andere User und KIs werden diesen Namen sehen. Wähle weise – er repräsentiert dich in der Community.",
+      placeholder: "Gib deinen Anzeigenamen ein",
       validation: {
-        required: "Öffentlicher Name ist erforderlich",
+        required: "Anzeigename ist erforderlich",
         minLength: "Anzeigename muss mindestens 2 Zeichen lang sein",
         maxLength: "Anzeigename darf nicht länger als 100 Zeichen sein",
       },
     },
     email: {
-      label: "E-Mail",
-      description: "E-Mail-Adresse des Benutzers",
+      label: "Deine E-Mail",
+      description:
+        "Deine Login-Zugangsdaten und Kontaktmethode. Bleibt privat – wird niemals mit anderen Usern oder KIs geteilt.",
       placeholder: "E-Mail-Adresse eingeben",
-      help: "Dies wird Ihre Login-E-Mail und primäre Kontaktmethode sein",
+      help: "Dies wird deine Login-E-Mail und primäre Kontaktmethode sein",
       validation: {
         required: "E-Mail ist erforderlich",
-        invalid: "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+        invalid: "Bitte gib eine gültige E-Mail-Adresse ein",
       },
     },
     password: {
-      label: "Passwort",
-      description: "Benutzerpasswort",
+      label: "Dein Passwort",
+      description:
+        "Starke Passwörter schützen dein Konto. Wir implementieren bald Ende-zu-Ende-Verschlüsselung – ab diesem Zeitpunkt werden Passwort-Resets deinen Nachrichtenverlauf löschen, da nur du den Entschlüsselungsschlüssel besitzt. Speichere es also sicher ab.",
       placeholder: "Passwort eingeben",
-      help: "Passwort muss mindestens 8 Zeichen haben",
       validation: {
         required: "Passwort ist erforderlich",
         minLength: "Passwort muss mindestens 8 Zeichen lang sein",
@@ -69,101 +58,43 @@ export const translations: typeof enTranslations = {
     },
     confirmPassword: {
       label: "Passwort bestätigen",
-      description: "Passwort bestätigen",
-      placeholder: "Passwort erneut eingeben",
-      help: "Geben Sie Ihr Passwort erneut ein, um es zu bestätigen",
       validation: {
-        required: "Bitte bestätigen Sie Ihr Passwort",
+        required: "Bitte bestätige dein Passwort",
         minLength: "Passwort muss mindestens 8 Zeichen lang sein",
         mismatch: "Passwörter stimmen nicht überein",
       },
     },
-    phone: {
-      label: "Telefonnummer",
-      description: "Telefonnummer des Benutzers",
-      placeholder: "Telefonnummer eingeben",
-      help: "Telefonnummer für Kontowiederherstellung und Benachrichtigungen (optional)",
-    },
-    company: {
-      label: "Firma",
-      description: "Firmenname des Benutzers",
-      placeholder: "Firmenname eingeben",
-      help: "Ihr Unternehmen oder Organisationsname (optional)",
-    },
-    leadId: {
-      label: "Lead-ID",
-      description: "Lead-Identifikator für die Verfolgung",
-      placeholder: "Lead-ID eingeben",
-      help: "Interne Lead-Identifikation (optional)",
-    },
-    preferredContactMethod: {
-      label: "Bevorzugte Kontaktmethode",
-      description: "Wie Sie kontaktiert werden möchten",
-      placeholder: "Kontaktmethode auswählen",
-      help: "Wählen Sie, wie wir Sie erreichen sollen",
-    },
+
     acceptTerms: {
-      label: "Nutzungsbedingungen akzeptieren",
-      description: "Akzeptieren Sie unsere Nutzungsbedingungen",
-      placeholder: "Ich akzeptiere die Nutzungsbedingungen",
-      help: "Bitte lesen und akzeptieren Sie unsere Nutzungsbedingungen, um fortzufahren",
+      label: "AGB akzeptieren",
+      description:
+        "Unsere Bedingungen respektieren deine Freiheit und Privatsphäre.",
       validation: {
-        required:
-          "Sie müssen die Nutzungsbedingungen akzeptieren, um fortzufahren",
+        required: "Du musst die AGB akzeptieren, um fortzufahren",
       },
     },
     subscribeToNewsletter: {
       label: "Newsletter abonnieren",
-      description: "Erhalten Sie Updates und Neuigkeiten per E-Mail",
-      placeholder: "Unseren Newsletter abonnieren",
-      help: "Erhalten Sie die neuesten Updates, Tipps und exklusive Angebote in Ihrem Postfach",
+      description:
+        "Gelegentliche Updates über neue Modelle und Features. Kein Spam, nur was zählt.",
     },
-    imageUrl: {
-      label: "Profilbild-URL",
-      description: "URL für Ihr Profilbild",
-      placeholder: "Bild-URL eingeben",
-      help: "Optional: Geben Sie eine URL für Ihr Profilbild an",
-    },
+
     referralCode: {
-      label: "Empfehlungscode",
-      description: "Optionaler Empfehlungscode von einem Freund",
+      label: "Empfehlungscode (optional)",
+      description:
+        "Hast du einen Freund auf unbottled.ai? Gib seinen Code ein, um ihn zu unterstützen. Er wird dafür belohnt, dass er dich mitgebracht hat.",
       placeholder: "Empfehlungscode eingeben (optional)",
-      help: "Wenn Sie einen Empfehlungscode haben, geben Sie ihn hier ein",
     },
   },
   form: {
-    title: "Konto erstellen",
-    description: "Treten Sie der Community für unzensierte KI-Gespräche bei",
+    title: "Willkommen bei Uncensored AI",
+    description:
+      "Hilf mit, unzensierte, privatsphäre-orientierte und wirklich unabhängige KI aufzubauen. unbottled.ai ist Open Source und Community-getrieben – deine Registrierung unterstützt die Entwicklung von KI-Technologie, die deine Freiheit respektiert.",
   },
   footer: {
     alreadyHaveAccount: "Haben Sie bereits ein Konto? Anmelden",
   },
-  groups: {
-    personalInfo: {
-      title: "Persönliche Informationen",
-      description: "Geben Sie Ihre persönlichen Daten ein",
-    },
-    security: {
-      title: "Sicherheit",
-      description: "Richten Sie Ihre Kontosicherheit ein",
-    },
-    businessInfo: {
-      title: "Geschäftsinformationen",
-      description: "Geben Sie Ihre Geschäftsdaten ein",
-    },
-    preferences: {
-      title: "Einstellungen",
-      description: "Legen Sie Ihre Kommunikationseinstellungen fest",
-    },
-    consent: {
-      title: "Nutzungsbedingungen und Einverständnis",
-      description: "Überprüfen und akzeptieren Sie unsere Nutzungsbedingungen",
-    },
-    advanced: {
-      title: "Erweiterte Optionen",
-      description: "Zusätzliche Konfigurationsoptionen",
-    },
-  },
+
   errors: {
     title: "Anmeldefehler",
     validation: {
@@ -185,7 +116,7 @@ export const translations: typeof enTranslations = {
     },
     conflict: {
       title: "Kontokonflikt",
-      description: "Konto existiert bereits",
+      description: "Ein Konto mit dieser E-Mail existiert bereits",
     },
     forbidden: {
       title: "Zugriff verweigert",
@@ -356,8 +287,8 @@ export const translations: typeof enTranslations = {
     nextSteps: "Nächste Schritte",
   },
   success: {
-    title: "Anmeldung erfolgreich",
-    description: "Ihr Konto wurde erfolgreich erstellt",
+    title: "Registrierung erfolgreich",
+    description: "Dein Konto wurde erfolgreich erstellt",
   },
   admin_notification: {
     title: "Neue Benutzeranmeldung",

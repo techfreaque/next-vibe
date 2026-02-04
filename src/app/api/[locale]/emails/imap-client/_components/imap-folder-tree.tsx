@@ -24,6 +24,7 @@ import { useState } from "react";
 import type { ImapFoldersListResponseOutput } from "@/app/api/[locale]/emails/imap-client/folders/list/definition";
 import { useImapFoldersList } from "@/app/api/[locale]/emails/imap-client/folders/list/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -46,6 +47,7 @@ interface FolderNode {
 interface ImapFolderTreeProps {
   accountId: string;
   logger: EndpointLogger;
+  user: JwtPayloadType;
 }
 
 interface FolderTreeNodeProps {
@@ -261,12 +263,13 @@ function FolderTreeNode({
 export function ImapFolderTree({
   accountId,
   logger,
+  user,
 }: ImapFolderTreeProps): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
 
   // Use the IMAP folders list endpoint
-  const foldersEndpoint = useImapFoldersList(accountId, logger);
+  const foldersEndpoint = useImapFoldersList(user, accountId, logger);
 
   // Access data through the read operation following leads pattern
   const apiResponse = foldersEndpoint.read?.response;

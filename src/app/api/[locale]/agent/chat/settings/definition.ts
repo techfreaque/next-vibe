@@ -35,6 +35,7 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "chat", "settings"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedClientRoles: [UserRole.PUBLIC] as const,
 
   title: "app.api.agent.chat.settings.get.title" as const,
   description: "app.api.agent.chat.settings.get.description" as const,
@@ -179,6 +180,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["agent", "chat", "settings"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedClientRoles: [UserRole.PUBLIC] as const,
 
   title: "app.api.agent.chat.settings.post.title" as const,
   description: "app.api.agent.chat.settings.post.description" as const,

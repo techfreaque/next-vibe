@@ -6,7 +6,6 @@ import { UnsubscribePage } from "@/app/api/[locale]/newsletter/unsubscribe/_comp
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
-import { UserProfileRepository } from "@/app/api/[locale]/user/private/me/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -72,12 +71,6 @@ export default async function NewsletterUnsubscribeWithEmail({
     logger,
   );
 
-  const userResponse = authUser
-    ? await UserProfileRepository.getProfile(authUser, locale, logger)
-    : undefined;
-
-  const user = userResponse?.success ? userResponse.data : undefined;
-
   // Decode the email parameter
   const decodedEmail = decodeURIComponent(email);
 
@@ -90,7 +83,7 @@ export default async function NewsletterUnsubscribeWithEmail({
     <UnsubscribePage
       locale={locale}
       prefilledEmail={decodedEmail}
-      user={user}
+      user={authUser}
     />
   );
 }

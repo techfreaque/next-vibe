@@ -17,7 +17,6 @@ import type { ObjectWidgetConfig } from "../widgets/configs";
 
 // Re-export UnifiedField from configs.ts where it's now defined
 export type { UnifiedField } from "../widgets/configs";
-import type { WidgetData } from "../widgets/widget-data";
 import type { CreateApiEndpointAny } from "./endpoint-base";
 import type { FieldUsage } from "./enums";
 
@@ -232,9 +231,20 @@ export interface NavigateButtonConfig<
    * Return: Partial urlPathParams (for navigation) and partial data (for prefilling)
    */
   extractParams: TTargetEndpoint extends CreateApiEndpointAny
-    ? (source: Record<string, WidgetData>) => {
+    ? (source: {
+        // The parent item of an array (if any)
+        // oxlint-disable-next-line typescript/no-explicit-any
+        itemData: any | undefined;
+        // oxlint-disable-next-line typescript/no-explicit-any
+        requestData: any;
+        // oxlint-disable-next-line typescript/no-explicit-any
+        urlPathParams: any;
+        // oxlint-disable-next-line typescript/no-explicit-any
+        responseData: any;
+      }) => {
         urlPathParams?: Partial<TTargetEndpoint["types"]["UrlVariablesOutput"]>;
         data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
+        response?: Partial<TTargetEndpoint["types"]["ResponseOutput"]>;
       }
     : never;
   /** Prefetch GET data before showing PATCH/PUT form */

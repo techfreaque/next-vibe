@@ -35,6 +35,7 @@ import type { EmailStatsGetResponseTypeOutput } from "@/app/api/[locale]/emails/
 import { useEmailMessagesStats } from "@/app/api/[locale]/emails/messages/stats/hooks";
 import { ActivityType } from "@/app/api/[locale]/leads/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -46,6 +47,7 @@ import {
 
 interface EmailsStatsClientProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 // Format percentage with 2 decimal places
@@ -60,6 +62,7 @@ function formatNumber(value: number): string {
 
 export function EmailsStatsClient({
   locale,
+  user,
 }: EmailsStatsClientProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -68,7 +71,7 @@ export function EmailsStatsClient({
     () => createEndpointLogger(false, Date.now(), locale),
     [locale],
   );
-  const endpoint = useEmailMessagesStats(logger);
+  const endpoint = useEmailMessagesStats(logger, user);
 
   const stats = endpoint.read.response as
     | EmailStatsGetResponseTypeOutput

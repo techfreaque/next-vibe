@@ -8,7 +8,6 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import {
@@ -17,6 +16,10 @@ import {
 } from "../../../../shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
+import {
+  useWidgetLocale,
+  useWidgetTranslation,
+} from "../../_shared/use-widget-context";
 import { type ChartDataPoint, extractChartData } from "./shared";
 import type { ChartWidgetConfig, ChartWidgetSchema } from "./types";
 
@@ -61,15 +64,19 @@ export function ChartWidget<
   props:
     | ReactWidgetProps<
         TEndpoint,
+        TUsage,
         ChartWidgetConfig<TKey, never, TUsage, "widget">
       >
     | ReactWidgetProps<
         TEndpoint,
+        TUsage,
         ChartWidgetConfig<TKey, ChartWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
-  const { field, context } = props;
-  const { t: globalT } = simpleT(context.locale);
+  const { field } = props;
+  const locale = useWidgetLocale();
+  const t = useWidgetTranslation();
+  const { t: globalT } = simpleT(locale);
   const {
     chartType = "line",
     label: labelKey,
@@ -101,8 +108,8 @@ export function ChartWidget<
 
   // Support both 'label' and 'title' for backwards compatibility (label takes precedence)
   const chartTitleKey = labelKey || titleKey;
-  const title = chartTitleKey ? context.t(chartTitleKey) : undefined;
-  const description = descriptionKey ? context.t(descriptionKey) : undefined;
+  const title = chartTitleKey ? t(chartTitleKey) : undefined;
+  const description = descriptionKey ? t(descriptionKey) : undefined;
 
   // Extract chart data using shared logic
   const chartData = extractChartData(field.value);
@@ -161,9 +168,9 @@ export function ChartWidget<
         firstSeries?.data
           .filter((d: ChartDataPoint) => d.y > 0) // Filter out zero values for pie chart
           .map((d: ChartDataPoint) => {
-            // Translate labels - context.t() returns original string if key not found
+            // Translate labels - t() returns original string if key not found
             const rawLabel = String(d.label ?? d.x ?? "Unknown");
-            const translatedLabel = context.t(rawLabel as TranslationKey);
+            const translatedLabel = t(rawLabel);
 
             // Store color if available
             if (typeof d.color === "string") {
@@ -252,7 +259,7 @@ export function ChartWidget<
       const allDates = chartData.data[0]?.data.map((d) => String(d.x)) ?? [];
       xTickLabels = allDates.map((dateStr) => {
         const date = new Date(dateStr);
-        return date.toLocaleDateString(context.locale, {
+        return date.toLocaleDateString(locale, {
           month: "short",
           day: "numeric",
         });
@@ -260,9 +267,7 @@ export function ChartWidget<
     } else {
       // Categorical data - translate labels
       const allXValues = chartData.data.flatMap((series) =>
-        series.data.map((d) =>
-          String(context.t(String(d.label ?? d.x ?? "") as TranslationKey)),
-        ),
+        series.data.map((d) => (d.label ? t(d.label) : (d.x ?? ""))),
       );
       xTickLabels = [...new Set(allXValues)];
     }
@@ -352,9 +357,7 @@ export function ChartWidget<
           const data = isTimeSeries
             ? series.data.map((d, idx) => ({ x: idx, y: d.y }))
             : series.data.map((d) => ({
-                x: String(
-                  context.t(String(d.label ?? d.x ?? "") as TranslationKey),
-                ),
+                x: d.label ? t(d.label) : (d.x ?? ""),
                 y: d.y,
               }));
 

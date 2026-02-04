@@ -12,6 +12,7 @@ import type {
 
 /**
  * Exact schema for code quality files data (array of file summaries)
+ * Both errors and warnings are required fields (always present, may be 0)
  */
 export type CodeQualityFilesSchema = z.ZodArray<
   z.ZodObject<{

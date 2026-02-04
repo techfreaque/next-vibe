@@ -8,6 +8,7 @@ import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import type {
@@ -51,18 +52,19 @@ export function StatusIndicatorWidgetInk<
   TSchemaType extends "primitive",
 >({
   field,
-  context,
 }: InkWidgetProps<
   TEndpoint,
+  TUsage,
   StatusIndicatorWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
 >): JSX.Element {
+  const t = useInkWidgetTranslation();
   const { status, label } = field;
 
   const color = getStatusColor(status);
 
   // Use label if provided, otherwise use the value itself
   const displayText = label
-    ? context.t(label)
+    ? t(label)
     : typeof field.value === "string"
       ? field.value
       : status;

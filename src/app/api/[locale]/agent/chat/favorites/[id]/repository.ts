@@ -75,28 +75,31 @@ export class SingleFavoriteRepository {
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
+
       const characterResult = await CharactersRepository.getCharacterById(
         { id: favorite.characterId },
         user,
         logger,
       );
 
-      const character = characterResult.success ? characterResult.data : null;
-
-      if (!character) {
-        logger.error("Character not found", {
+      if (!characterResult.success) {
+        logger.error("Character not found for favorite", {
           characterId: favorite.characterId,
           favoriteId: urlPathParams.id,
           userId,
         });
+        return fail({
+          message: "app.api.agent.chat.favorites.id.get.errors.notFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
-      // Use favorite values, fallback to character values when null/undefined
-      const voice = favorite.voice ?? character?.voice ?? null;
-      const modelSelection =
-        favorite.modelSelection ?? character?.modelSelection;
 
-      if (!modelSelection) {
-        logger.error("No modelSelection found", {
+      const character = characterResult.data;
+      const voice = favorite.voice ?? character?.voice ?? null;
+
+      // Validate character has modelSelection
+      if (!character?.modelSelection) {
+        logger.error("No character modelSelection found", {
           favoriteId: urlPathParams.id,
           characterId: favorite.characterId,
           hasFavoriteModelSelection: !!favorite.modelSelection,
@@ -108,12 +111,33 @@ export class SingleFavoriteRepository {
         });
       }
 
+      // Build modelSelection response
+      // DB stores only currentSelection, we need to add characterModelSelection
+      const modelSelection: FavoriteGetResponseOutput["modelSelection"] =
+        favorite.modelSelection
+          ? // Has custom MANUAL or FILTERS selection - wrap with character defaults
+            {
+              currentSelection: favorite.modelSelection,
+              characterModelSelection: character.modelSelection,
+            }
+          : {
+              // Default to CHARACTER_BASED (use character's model selection)
+              currentSelection: {
+                selectionType:
+                  "app.api.agent.chat.favorites.enums.selectionType.characterBased" as const,
+              },
+              characterModelSelection: character.modelSelection,
+            };
+
+      // Merge customIcon with character icon (customIcon takes precedence)
+      const displayIcon = favorite.customIcon ?? character?.icon ?? "bot";
+
       return success<FavoriteGetResponseOutput>({
         id: favorite.id,
         characterId: favorite.characterId,
         character: {
           info: {
-            icon: character?.icon ?? "bot",
+            icon: displayIcon,
             info: {
               titleRow: {
                 name:
@@ -133,8 +157,8 @@ export class SingleFavoriteRepository {
         customIcon: favorite.customIcon ?? character?.icon ?? null,
         voice,
         modelSelection,
-        position: favorite.position,
         color: favorite.color,
+        position: favorite.position,
         useCount: favorite.useCount,
       });
     } catch (error) {
@@ -168,6 +192,15 @@ export class SingleFavoriteRepository {
     try {
       const favoriteId = urlPathParams.id;
       logger.debug("Updating favorite", { userId, favoriteId });
+
+      // Validate characterId if provided
+      if (data.characterId && data.characterId.trim() === "") {
+        return fail({
+          message:
+            "app.api.agent.chat.favorites.id.patch.errors.validation.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
 
       // First, get the existing favorite
       const [existing] = await db
@@ -206,16 +239,33 @@ export class SingleFavoriteRepository {
       const voiceToStore =
         character && data.voice === character.voice ? null : data.voice;
 
+      // Only store customIcon if different from character default
+      const customIconToStore =
+        character && data.character?.info?.icon === character.icon
+          ? null
+          : data.character?.info?.icon;
+
+      // Store only currentSelection (not characterModelSelection)
+      // If CHARACTER_BASED, store null to indicate "use character defaults"
+      let modelSelectionToStore = null;
+      if ("currentSelection" in data.modelSelection) {
+        const currentSelection = data.modelSelection.currentSelection;
+        // Only store if not CHARACTER_BASED
+        if (
+          currentSelection.selectionType !==
+          "app.api.agent.chat.favorites.enums.selectionType.characterBased"
+        ) {
+          modelSelectionToStore = currentSelection;
+        }
+      }
+
       const [updated] = await db
         .update(chatFavorites)
         .set({
           characterId: data.characterId,
-          customName: data.customName,
-          customIcon: data.customIcon,
+          customIcon: customIconToStore,
           voice: voiceToStore,
-          modelSelection: data.modelSelection,
-          color: data.color,
-          position: data.position,
+          modelSelection: modelSelectionToStore,
           updatedAt: new Date(),
         })
         .where(
@@ -233,7 +283,30 @@ export class SingleFavoriteRepository {
         });
       }
 
-      return success({ success: true });
+      // Fetch character data for response
+      const updatedCharacterResult =
+        await CharactersRepository.getCharacterById(
+          { id: updated.characterId },
+          user,
+          logger,
+        );
+
+      const updatedCharacter = updatedCharacterResult.success
+        ? updatedCharacterResult.data
+        : null;
+
+      if (!updatedCharacter) {
+        logger.error("Character not found after update", {
+          characterId: updated.characterId,
+          favoriteId,
+          userId,
+        });
+      }
+
+      return success({
+        success:
+          "app.api.agent.chat.favorites.id.patch.response.success.content",
+      });
     } catch (error) {
       logger.error("Failed to update favorite", parseError(error));
       return fail({

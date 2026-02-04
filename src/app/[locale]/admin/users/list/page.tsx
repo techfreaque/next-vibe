@@ -7,6 +7,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import { UsersListClient } from "@/app/api/[locale]/users/list/_components/users-list-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -19,6 +20,8 @@ export default async function UsersListPage({
   const { locale } = await params;
   const { t } = simpleT(locale);
 
+  const user = await requireAdminUser(locale, `/${locale}/admin/users/list`);
+
   return (
     <Div className="flex flex-col gap-6">
       {/* Page Description */}
@@ -29,7 +32,7 @@ export default async function UsersListPage({
       </Div>
 
       {/* Client Component handles all interactions */}
-      <UsersListClient locale={locale} />
+      <UsersListClient locale={locale} user={user} />
     </Div>
   );
 }

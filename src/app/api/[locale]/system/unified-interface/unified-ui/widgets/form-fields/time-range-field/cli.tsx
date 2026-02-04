@@ -6,6 +6,7 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { InkWidgetProps } from "../../_shared/cli-types";
@@ -14,15 +15,16 @@ import type { TimeRangeFieldWidgetConfig } from "./types";
 
 export function TimeRangeFieldWidgetInk<
   TKey extends string,
+  TUsage extends FieldUsageConfig,
   TEndpoint extends CreateApiEndpointAny,
 >({
   field,
-  context,
 }: InkWidgetProps<
   TEndpoint,
-  TimeRangeFieldWidgetConfig<TKey, StringWidgetSchema, FieldUsageConfig>
+  TUsage,
+  TimeRangeFieldWidgetConfig<TKey, StringWidgetSchema, TUsage>
 >): JSX.Element {
-  const { t } = context;
+  const t = useInkWidgetTranslation();
   const displayValue = field.value ? field.value : "—";
 
   return (

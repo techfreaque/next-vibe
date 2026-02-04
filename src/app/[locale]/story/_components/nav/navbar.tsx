@@ -14,6 +14,7 @@ import { TooltipProvider } from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { StandardUserType } from "@/app/api/[locale]/user/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -28,7 +29,8 @@ import { NavSingleItem } from "./nav-single-item";
 import { UserMenu } from "./user-menu";
 
 interface NavbarProps {
-  user: StandardUserType | undefined;
+  user: JwtPayloadType;
+  userProfile: StandardUserType | undefined;
   locale: CountryLanguage;
   hasSubscription: boolean;
   navigationItems: NavItemType[];
@@ -36,6 +38,7 @@ interface NavbarProps {
 
 export function Navbar({
   user,
+  userProfile,
   locale,
   hasSubscription,
   navigationItems,
@@ -198,6 +201,7 @@ export function Navbar({
           {user ? (
             <UserMenu
               user={user}
+              userProfile={userProfile}
               locale={locale}
               hasSubscription={hasSubscription}
             />

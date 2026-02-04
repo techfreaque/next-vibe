@@ -8,6 +8,7 @@ import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { MetadataWidgetConfig, MetadataWidgetSchema } from "./types";
@@ -25,16 +26,18 @@ export function MetadataWidgetInk<
   props:
     | InkWidgetProps<
         TEndpoint,
+        TUsage,
         MetadataWidgetConfig<TKey, never, TUsage, "widget">
       >
     | InkWidgetProps<
         TEndpoint,
+        TUsage,
         MetadataWidgetConfig<TKey, MetadataWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
-  const { field, context } = props;
+  const t = useInkWidgetTranslation();
+  const { field } = props;
   const { title: titleKey } = field;
-  const { t } = context;
 
   const title = titleKey ? t(titleKey) : "Metadata";
 

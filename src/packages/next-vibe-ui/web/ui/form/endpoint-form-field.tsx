@@ -27,6 +27,7 @@ import type {
 } from "@/app/api/[locale]/system/unified-interface/shared/field-config/field-config-types";
 import { getFieldConfig } from "@/app/api/[locale]/system/unified-interface/shared/field-config/infer-field-config";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import { getTheme } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/_shared/constants";
 import {
   Icon,
   type IconKey,
@@ -79,14 +80,6 @@ import {
   FormLabel,
   FormMessage,
 } from "./form";
-
-// Default theme for required fields
-const DEFAULT_THEME: RequiredFieldTheme = {
-  style: "highlight",
-  showAllRequired: false,
-  requiredColor: "blue",
-  completedColor: "green",
-};
 
 // Constants
 const OPTION_KEY_PREFIX = "option-";
@@ -168,6 +161,7 @@ function getFieldStyleClassName(
         "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
       ),
       descriptionClassName: "text-sm text-muted-foreground",
+      inlineDescriptionClassName: "text-sm text-muted-foreground",
     };
   }
 
@@ -215,6 +209,7 @@ function getFieldStyleClassName(
           "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
         ),
         descriptionClassName: cn("text-sm", colors.descriptionClassName),
+        inlineDescriptionClassName: "text-sm text-muted-foreground",
       };
     }
     // Required field without value - enhanced blueish highlight
@@ -263,6 +258,7 @@ function getFieldStyleClassName(
         "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
       ),
       descriptionClassName: cn("text-sm", colors.descriptionClassName),
+      inlineDescriptionClassName: "text-sm text-muted-foreground",
     };
   }
 
@@ -276,6 +272,7 @@ function getFieldStyleClassName(
       "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
     ),
     descriptionClassName: "text-sm text-muted-foreground",
+    inlineDescriptionClassName: "text-sm text-muted-foreground",
   };
 }
 
@@ -769,7 +766,7 @@ export interface EndpointFormFieldProps<
   config?: FieldConfig<TKey>; // Optional - override of endpoint-based field settings
   control: Control<TFieldValues>; // Properly typed form control from useEndpoint
   endpoint: TEndpoint; // Required - provides schema, scopedT, and endpointFields
-  theme?: RequiredFieldTheme;
+  theme?: Partial<RequiredFieldTheme>;
   className?: string;
   /**
    * Current locale for translations (defaults to "en-GLOBAL" if not provided)
@@ -798,7 +795,7 @@ export function EndpointFormField<
   config: providedConfig,
   control,
   endpoint,
-  theme = DEFAULT_THEME,
+  theme: _theme,
   className,
   locale,
 }: EndpointFormFieldProps<TKey, TFieldValues, TName, TEndpoint>): JSX.Element {
@@ -809,6 +806,8 @@ export function EndpointFormField<
     requestSchema: schema,
   } = endpoint;
   const { scopedT } = scopedTranslation;
+
+  const theme = getTheme(_theme);
 
   // Use scoped translation from endpoint.scopedTranslation.scopedT
   const { t } = scopedT(locale);

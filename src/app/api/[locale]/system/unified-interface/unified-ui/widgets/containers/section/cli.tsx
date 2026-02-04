@@ -13,8 +13,13 @@ import type {
   FieldUsageConfig,
   ObjectChildrenConstraint,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import {
+  useInkWidgetResponseOnly,
+  useInkWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
+import { withValue } from "../../_shared/field-helpers";
 import { isResponseField } from "../../_shared/type-guards";
 import type { SectionWidgetConfig } from "./types";
 
@@ -34,13 +39,14 @@ export function SectionWidgetInk<
   >,
 >({
   field,
-  context,
 }: InkWidgetProps<
   TEndpoint,
+  TUsage,
   SectionWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
 >): JSX.Element {
+  const t = useInkWidgetTranslation();
+  const responseOnly = useInkWidgetResponseOnly();
   const { title: titleKey, description: descriptionKey } = field;
-  const { t } = context;
 
   const title = titleKey ? t(titleKey) : undefined;
   const description = descriptionKey ? t(descriptionKey) : undefined;
@@ -52,7 +58,7 @@ export function SectionWidgetInk<
   // Filter children based on responseOnly mode
   const filteredChildren = childEntries.filter(([name, childField]) => {
     // In responseOnly mode, only show response fields with data
-    if (context.responseOnly) {
+    if (responseOnly) {
       if (!isResponseField(childField)) {
         return false;
       }
@@ -91,9 +97,8 @@ export function SectionWidgetInk<
           return (
             <InkWidgetRenderer
               key={name}
-              field={{ ...childField, value: childValue }}
+              field={withValue(childField, childValue, field.value)}
               fieldName={name}
-              context={context}
             />
           );
         })}

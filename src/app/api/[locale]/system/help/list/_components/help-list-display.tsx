@@ -33,7 +33,7 @@ export function HelpListDisplay({
   const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Use mutation to fetch the list immediately on mount
-  const mutation = useApiMutation(helpListEndpoints.POST, logger);
+  const mutation = useApiMutation(helpListEndpoints.POST, logger, user);
   const hasFetched = useRef(false);
 
   // eslint-disable-next-line react-compiler/react-compiler -- Mount-only effect with ref guard, mutation object changes on every render

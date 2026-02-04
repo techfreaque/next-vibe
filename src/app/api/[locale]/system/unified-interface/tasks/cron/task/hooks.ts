@@ -9,12 +9,14 @@ import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import endpoints from "@/app/api/[locale]/system/unified-interface/tasks/cron/task/[id]/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 /**
  * Hook for individual task operations (GET, PUT, DELETE)
  * Provides form handling and mutation capabilities for a single task
  */
 export function useCronTask(
+  user: JwtPayloadType,
   params: {
     taskId: string;
     enabled?: boolean;
@@ -25,13 +27,16 @@ export function useCronTask(
     endpoints,
     {
       urlPathParams: { id: params.taskId },
-      queryOptions: {
-        enabled: params.enabled ?? true,
-        refetchOnWindowFocus: false,
-        staleTime: 30 * 1000, // 30 seconds
+      read: {
+        queryOptions: {
+          enabled: params.enabled ?? true,
+          refetchOnWindowFocus: false,
+          staleTime: 30 * 1000,
+        },
       },
     },
     logger,
+    user,
   );
 }
 

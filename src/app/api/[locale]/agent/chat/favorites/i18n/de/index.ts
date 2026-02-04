@@ -50,6 +50,16 @@ export const translations: typeof enTranslations = {
       balanced: "Ausgewogen",
       thorough: "Gründlich",
     },
+    sortField: {
+      intelligence: "Intelligenz",
+      speed: "Geschwindigkeit",
+      price: "Preis",
+      content: "Inhalt",
+    },
+    sortDirection: {
+      asc: "Niedrig bis Hoch",
+      desc: "Hoch bis Niedrig",
+    },
   },
   get: {
     title: "Favoriten abrufen",

@@ -11,6 +11,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { envClient } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
 
@@ -22,7 +23,7 @@ import definitions, { type BatchOperationScope } from "./definition";
  * Hook for batch updating leads
  * Provides form-based batch operations with preview capability
  */
-export function useBatchUpdateEndpoint(): EndpointReturn<{
+export function useBatchUpdateEndpoint(user: JwtPayloadType): EndpointReturn<{
   PATCH: typeof definitions.PATCH;
 }> {
   const { locale } = useTranslation();
@@ -42,6 +43,7 @@ export function useBatchUpdateEndpoint(): EndpointReturn<{
       },
     },
     logger,
+    user,
   );
 }
 
@@ -49,7 +51,7 @@ export function useBatchUpdateEndpoint(): EndpointReturn<{
  * Hook for batch deleting leads
  * Provides form-based batch delete operations with preview capability
  */
-export function useBatchDeleteEndpoint(): EndpointReturn<{
+export function useBatchDeleteEndpoint(user: JwtPayloadType): EndpointReturn<{
   DELETE: typeof definitions.DELETE;
 }> {
   const { locale } = useTranslation();
@@ -71,6 +73,7 @@ export function useBatchDeleteEndpoint(): EndpointReturn<{
       },
     },
     logger,
+    user,
   );
 }
 
@@ -156,6 +159,7 @@ interface BatchOperationsReturn {
  * Manages selection state and batch operations workflow
  */
 export function useBatchOperations(
+  user: JwtPayloadType,
   onOperationComplete?: () => void,
 ): BatchOperationsReturn {
   // Initialize client logger
@@ -190,8 +194,8 @@ export function useBatchOperations(
   >([]);
 
   // Batch endpoints
-  const batchUpdateEndpoint = useBatchUpdateEndpoint();
-  const batchDeleteEndpoint = useBatchDeleteEndpoint();
+  const batchUpdateEndpoint = useBatchUpdateEndpoint(user);
+  const batchDeleteEndpoint = useBatchDeleteEndpoint(user);
 
   // Watch for responses and auto-open modal
   useEffect(() => {

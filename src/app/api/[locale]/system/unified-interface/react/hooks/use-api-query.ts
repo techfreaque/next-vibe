@@ -8,6 +8,7 @@ import { success } from "next-vibe/shared/types/response.schema";
 import { useCallback, useMemo } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
@@ -40,9 +41,11 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
   urlPathParams,
   options,
   logger,
+  user,
 }: {
   endpoint: TEndpoint;
   logger: EndpointLogger;
+  user: JwtPayloadType;
 } & (TEndpoint["types"]["RequestOutput"] extends never
   ? { requestData?: never }
   : {
@@ -130,12 +133,13 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
         queryKeyString: JSON.stringify(queryKey),
       });
 
-      const response = await executeQuery({
-        endpoint: endpoint as never,
+      const response = await executeQuery<TEndpoint>({
+        endpoint,
         logger,
-        requestData: currentRequestData as never,
-        pathParams: urlPathParams as never,
+        requestData: currentRequestData,
+        pathParams: urlPathParams,
         locale,
+        user,
         options: {
           onSuccess: onSuccess
             ? (

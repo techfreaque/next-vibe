@@ -18,6 +18,7 @@ import { useMemo, useState } from "react";
 
 import { useEmailPreviewSendTest } from "@/app/api/[locale]/emails/preview/send-test/hooks/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
@@ -25,12 +26,14 @@ import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 interface TestEmailFormProps {
   locale: CountryLanguage;
   templateId: string;
+  user: JwtPayloadType;
   onSuccess?: () => void;
 }
 
 export function TestEmailForm({
   locale,
   templateId,
+  user,
   onSuccess,
 }: TestEmailFormProps): ReactElement {
   const { t } = useTranslation();
@@ -42,7 +45,7 @@ export function TestEmailForm({
 
   const { language, country } = getLanguageAndCountryFromLocale(locale);
 
-  const sendTestEndpoint = useEmailPreviewSendTest(logger);
+  const sendTestEndpoint = useEmailPreviewSendTest(logger, user);
 
   const emptyProps = useMemo(() => ({}), []);
 

@@ -14,10 +14,14 @@ import React from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import type { EndpointLogger } from "../../system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "../../user/auth/types";
 import { useReferralStats } from "../hooks";
 
 interface ReferralStatsProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
+  logger: EndpointLogger;
 }
 
 /**
@@ -35,9 +39,11 @@ function formatCreditsAsUSD(credits: number): string {
 
 export function ReferralStats({
   locale,
+  user,
+  logger,
 }: ReferralStatsProps): React.JSX.Element {
   const { t } = simpleT(locale);
-  const endpoint = useReferralStats();
+  const endpoint = useReferralStats(logger, user);
 
   if (endpoint.read.isLoading) {
     return (

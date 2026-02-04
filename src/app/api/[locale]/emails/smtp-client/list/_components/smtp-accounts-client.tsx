@@ -35,6 +35,7 @@ import type { SmtpAccountsListGETResponseOutput } from "@/app/api/[locale]/email
 import smtpListDefinitions from "@/app/api/[locale]/emails/smtp-client/list/definition";
 import { useSmtpAccountsListEndpoint } from "@/app/api/[locale]/emails/smtp-client/list/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -42,14 +43,16 @@ import { SmtpAccountsTable } from "./smtp-accounts-table";
 
 interface SmtpAccountsClientProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 export function SmtpAccountsClient({
   locale,
+  user,
 }: SmtpAccountsClientProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const smtpAccountsEndpoint = useSmtpAccountsListEndpoint(logger);
+  const smtpAccountsEndpoint = useSmtpAccountsListEndpoint(user, logger);
   const [viewMode, setViewMode] = useState<"list" | "table">("list");
 
   const apiResponse = smtpAccountsEndpoint.read?.response;

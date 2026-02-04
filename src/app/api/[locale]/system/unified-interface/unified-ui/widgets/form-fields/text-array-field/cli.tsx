@@ -6,6 +6,7 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type { ArrayWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { InkWidgetProps } from "../../_shared/cli-types";
@@ -14,15 +15,16 @@ import type { TextArrayFieldWidgetConfig } from "./types";
 
 export function TextArrayFieldWidgetInk<
   TKey extends string,
+  TUsage extends FieldUsageConfig,
   TEndpoint extends CreateApiEndpointAny,
 >({
   field,
-  context,
 }: InkWidgetProps<
   TEndpoint,
-  TextArrayFieldWidgetConfig<TKey, ArrayWidgetSchema, FieldUsageConfig>
+  TUsage,
+  TextArrayFieldWidgetConfig<TKey, ArrayWidgetSchema, TUsage>
 >): JSX.Element {
-  const { t } = context;
+  const t = useInkWidgetTranslation();
   const items = field.value;
   const displayValue = items?.length ? items.join(", ") : "—";
 

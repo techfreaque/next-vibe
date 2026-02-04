@@ -13,6 +13,8 @@ import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import React from "react";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage, Currencies } from "@/i18n/core/config";
 import { currencyByCountry } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
@@ -23,15 +25,19 @@ import { useReferralCodesList } from "../hooks";
 
 interface ReferralCodesListProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
+  logger: EndpointLogger;
 }
 
 export function ReferralCodesList({
   locale,
+  user,
+  logger,
 }: ReferralCodesListProps): React.JSX.Element {
   const { t } = simpleT(locale);
-  const endpoint = useReferralCodesList();
+  const endpoint = useReferralCodesList(user, logger);
   const country = getCountryFromLocale(locale);
-  const currency = currencyByCountry[country] as Currencies;
+  const currency: Currencies = currencyByCountry[country];
 
   const [copiedCode, setCopiedCode] = React.useState<string | null>(null);
 

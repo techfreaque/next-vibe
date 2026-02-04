@@ -32,8 +32,8 @@ export function LeadsImportClient({
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
 
-  const importEndpoint = useLeadsImportEndpoint(logger);
-  const statusEndpoint = useImportJobsStatusEndpoint(logger);
+  const importEndpoint = useLeadsImportEndpoint(user, logger);
+  const statusEndpoint = useImportJobsStatusEndpoint(user, logger);
 
   const handleImportSubmit = (): void => {
     // After successful import, refetch the status list

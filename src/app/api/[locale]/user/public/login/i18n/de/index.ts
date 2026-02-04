@@ -5,8 +5,9 @@ import { translations as _componentsTranslations } from "../../_components/i18n/
 
 export const translations: typeof enTranslations = {
   _components: _componentsTranslations,
-  title: "Anmeldung",
-  description: "Benutzeranmeldung Endpunkt",
+  title: "Willkommen zurück",
+  description:
+    "Greife auf unzensierte KI-Modelle und deine Gesprächsverläufe zu.",
   tag: "Authentifizierung",
   options: optionsTranslations,
   actions: {
@@ -15,20 +16,20 @@ export const translations: typeof enTranslations = {
   },
   fields: {
     email: {
-      label: "E-Mail",
-      description: "Benutzer E-Mail-Adresse",
+      label: "Deine E-Mail",
+      description: "Die E-Mail, mit der du dich registriert hast.",
       placeholder: "E-Mail eingeben",
-      help: "Geben Sie die E-Mail-Adresse ein, die mit Ihrem Konto verknüpft ist",
       validation: {
         required: "E-Mail ist erforderlich",
-        invalid: "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+        invalid: "Bitte gib eine gültige E-Mail-Adresse ein",
       },
     },
     password: {
-      label: "Passwort",
-      description: "Benutzerpasswort",
+      label: "Dein Passwort",
+      description:
+        "Gib das Passwort ein, das du bei der Registrierung festgelegt hast.",
       placeholder: "Passwort eingeben",
-      help: "Geben Sie Ihr Kontopasswort ein",
+      help: "Gib dein Kontopasswort ein",
       validation: {
         required: "Passwort ist erforderlich",
         minLength: "Passwort muss mindestens 8 Zeichen lang sein",
@@ -36,15 +37,6 @@ export const translations: typeof enTranslations = {
     },
     rememberMe: {
       label: "Angemeldet bleiben",
-      description: "Mich angemeldet lassen",
-      placeholder: "Angemeldet bleiben",
-      help: "Auf diesem Gerät angemeldet bleiben für einfacheren Zugang",
-    },
-    leadId: {
-      label: "Lead-ID",
-      description: "Optionale Lead-Kennung",
-      placeholder: "Lead-ID eingeben",
-      help: "Optionale Lead-Kennung für Tracking",
     },
   },
   groups: {
@@ -148,9 +140,9 @@ export const translations: typeof enTranslations = {
     },
   },
   success: {
-    title: "Anmeldung erfolgreich",
-    description: "Sie wurden erfolgreich angemeldet",
-    message: "Willkommen zurück! Sie haben sich erfolgreich angemeldet.",
+    title: "Login erfolgreich",
+    description: "Du bist jetzt eingeloggt",
+    message: "Willkommen zurück! Du hast dich erfolgreich eingeloggt.",
   },
   token: {
     save: {

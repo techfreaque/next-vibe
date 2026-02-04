@@ -38,7 +38,7 @@ export default async function UserCreatePage({
   const { t } = simpleT(locale);
 
   // Require admin user authentication
-  await requireAdminUser(locale, `/${locale}/admin/users/create`);
+  const user = await requireAdminUser(locale, `/${locale}/admin/users/create`);
 
   return (
     <Div className="container mx-auto py-6 flex flex-col gap-6">
@@ -53,7 +53,7 @@ export default async function UserCreatePage({
       </Div>
 
       {/* Create Form */}
-      <UserCreateForm locale={locale} />
+      <UserCreateForm locale={locale} user={user} />
     </Div>
   );
 }

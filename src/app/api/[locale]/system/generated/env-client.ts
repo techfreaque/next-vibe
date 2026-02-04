@@ -10,11 +10,11 @@ import type { z } from "zod";
 
 import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
 
+// Import client env modules
 import {
   contactClientEnv,
   contactClientEnvSchema,
 } from "../../contact/env-client";
-// Import client env modules
 import {
   paymentClientEnv,
   paymentClientEnvSchema,
@@ -34,16 +34,16 @@ const platform = {
 
 // Module registry for introspection
 export const envClientModules = {
-  payment: { env: paymentClientEnv, schema: paymentClientEnvSchema },
   contact: { env: contactClientEnv, schema: contactClientEnvSchema },
+  payment: { env: paymentClientEnv, schema: paymentClientEnvSchema },
 } as const;
 
 // Export platform for external use
 export { platform };
 
 // Combined client schema
-export const envClientSchema = paymentClientEnvSchema.merge(
-  contactClientEnvSchema,
+export const envClientSchema = contactClientEnvSchema.merge(
+  paymentClientEnvSchema,
 );
 
 export type EnvClient = z.infer<typeof envClientSchema>;

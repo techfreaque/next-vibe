@@ -24,6 +24,7 @@ import type {
   ResetPasswordConfirmPostResponseOutput,
 } from "./definition";
 import resetPasswordConfirmEndpoints from "./definition";
+import type { JwtPayloadType } from "../../../auth/types";
 
 /**
  * Hook for confirming a password reset
@@ -47,6 +48,7 @@ export function useResetPasswordConfirm(
   token: string,
   tokenValidationResponse: ResponseType<ResetPasswordValidateGetResponseOutput>,
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): {
   form: ApiFormReturn<
     (typeof resetPasswordConfirmEndpoints.POST)["types"]["RequestOutput"],
@@ -72,6 +74,7 @@ export function useResetPasswordConfirm(
   const formResult = useApiForm(
     resetPasswordConfirmEndpoints.POST,
     logger,
+    user,
     {
       defaultValues: {
         verification: {

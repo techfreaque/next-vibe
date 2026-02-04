@@ -7,12 +7,13 @@ import chalk from "chalk";
 import { Box, Text } from "ink";
 import type { JSX } from "react";
 
+import type { IconSchemaType } from "@/app/api/[locale]/shared/types/common.schema";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import { getCliIcon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/cli-icons";
 
-import type { IconWidgetConfig, IconWidgetSchema } from "./types";
+import type { IconWidgetConfig } from "./types";
 
 /**
  * Icon Widget - Ink functional component
@@ -21,14 +22,15 @@ import type { IconWidgetConfig, IconWidgetSchema } from "./types";
  */
 export function IconWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TSchema extends IconWidgetSchema,
+  TSchema extends IconSchemaType,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "primitive",
 >({
   field,
 }: InkWidgetProps<
   TEndpoint,
-  IconWidgetConfig<TSchema, TUsage, TSchemaType>
+  TUsage,
+  | IconWidgetConfig<never, TUsage, "widget">
+  | IconWidgetConfig<TSchema, TUsage, "primitive">
 >): JSX.Element {
   if (!field.value) {
     return (

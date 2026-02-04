@@ -115,6 +115,7 @@ const {
   Globe,
   GraduationCap,
   Grid3x3,
+  Grip,
   GripVertical,
   Handshake,
   Hash,

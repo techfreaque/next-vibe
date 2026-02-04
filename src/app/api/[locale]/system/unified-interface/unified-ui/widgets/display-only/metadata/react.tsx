@@ -7,6 +7,7 @@ import type { JSX } from "react";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { MetadataWidgetConfig, MetadataWidgetSchema } from "./types";
 
@@ -36,21 +37,24 @@ export function MetadataWidget<
   props:
     | ReactWidgetProps<
         TEndpoint,
+        TUsage,
         MetadataWidgetConfig<TKey, never, TUsage, "widget">
       >
     | ReactWidgetProps<
         TEndpoint,
+        TUsage,
         MetadataWidgetConfig<TKey, MetadataWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
-  const { field, context } = props;
+  const t = useWidgetTranslation();
+  const { field } = props;
   // Handle string values
   if (typeof field.value === "string") {
     return (
       <Span
         className={cn("text-[11px] text-muted-foreground/70", field.className)}
       >
-        {context.t(field.value)}
+        {t(field.value)}
       </Span>
     );
   }

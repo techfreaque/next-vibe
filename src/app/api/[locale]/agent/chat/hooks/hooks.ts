@@ -327,13 +327,13 @@ export function useChat(
 
   // Get credits hook with deduct/refetch methods
   // initialCredits is required in useChat, so creditsHook is guaranteed to be non-null
-  const creditsHook = useCredits(logger, initialCredits)!;
+  const creditsHook = useCredits(user, logger, initialCredits)!;
 
   // Get AI stream hook
   const aiStream = useAIStream(locale, logger, t);
 
   // Fetch characters
-  const charactersEndpoint = useCharacters(logger);
+  const charactersEndpoint = useCharacters(user, logger);
 
   // Local state
   const [input, setInput] = useState("");
@@ -405,7 +405,6 @@ export function useChat(
 
   // Use modular hooks
   useDataLoader(
-    user,
     locale,
     logger,
     currentRootFolderId,
@@ -413,6 +412,7 @@ export function useChat(
     addMessage,
     addFolder,
     setDataLoaded,
+    user,
   );
 
   useMessageLoader(

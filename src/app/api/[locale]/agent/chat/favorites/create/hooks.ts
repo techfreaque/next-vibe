@@ -6,7 +6,7 @@
 
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
@@ -14,13 +14,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import favoritesGetDefinition from "../definition";
-import { FavoritesRepositoryClient } from "../repository-client";
 import favoritesDefinition, {
   type FavoriteCreateRequestOutput,
 } from "./definition";
 
 interface UseFavoriteCreateOptions {
-  user: JwtPayloadType | undefined;
+  user: JwtPayloadType;
   logger: EndpointLogger;
 }
 
@@ -38,24 +37,7 @@ export function useFavoriteCreate({
   user,
   logger,
 }: UseFavoriteCreateOptions): UseFavoriteCreateReturn {
-  const isAuthenticated = useMemo(
-    () => user !== undefined && !user.isPublic,
-    [user],
-  );
-
-  const endpointOptions = useMemo(
-    () => ({
-      storage: isAuthenticated
-        ? undefined
-        : {
-            mode: "localStorage" as const,
-            callbacks: FavoritesRepositoryClient.localStorageCreateCallbacks,
-          },
-    }),
-    [isAuthenticated],
-  );
-
-  const endpoint = useEndpoint(favoritesDefinition, endpointOptions, logger);
+  const endpoint = useEndpoint(favoritesDefinition, undefined, logger, user);
 
   // Create operation
   const addFavorite = useCallback(

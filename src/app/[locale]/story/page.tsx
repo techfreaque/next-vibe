@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Div } from "next-vibe-ui/ui/div";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { ThreadsRepository } from "@/app/api/[locale]/agent/chat/threads/repository";
@@ -19,6 +20,7 @@ import { languageConfig } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import { metadataGenerator } from "@/i18n/core/metadata";
+import { simpleT } from "@/i18n/core/shared";
 
 import CallToAction from "./_components/call-to-action";
 import Features from "./_components/features";
@@ -87,25 +89,35 @@ export default async function HomePage({
     logger,
   );
 
+  const user = userResponse.success ? userResponse.data : undefined;
+
+  if (!user) {
+    const { t } = simpleT(locale);
+    return (
+      <Div>
+        <Div className="flex items-center justify-center min-h-screen p-4">
+          <Div className="max-w-md text-center">
+            <P className="text-lg font-semibold mb-2">
+              {t("app.shared.error.title")}
+            </P>
+            <P className="text-sm text-muted-foreground">
+              {t("app.shared.error.userError")}
+            </P>
+          </Div>
+        </Div>
+      </Div>
+    );
+  }
+
   // Check if user is authenticated (not public)
-  const isAuthenticated =
-    userResponse?.success &&
-    userResponse.data &&
-    !userResponse.data.isPublic &&
-    "id" in userResponse.data &&
-    !!userResponse.data.id;
+  const isAuthenticated = user !== undefined && !user.isPublic;
 
   // For authenticated users, fetch subscription data
   let subscription: SubscriptionGetResponseOutput | null = null;
 
-  if (
-    isAuthenticated &&
-    userResponse.data &&
-    "id" in userResponse.data &&
-    userResponse.data.id
-  ) {
+  if (isAuthenticated) {
     const subscriptionResponse = await SubscriptionRepository.getSubscription(
-      userResponse.data.id,
+      user.id,
       logger,
       locale,
     );
@@ -166,6 +178,7 @@ export default async function HomePage({
         locale={locale}
         isAuthenticated={isAuthenticated}
         initialSubscription={subscription}
+        user={user}
       />
 
       {/* Call to Action */}

@@ -9,27 +9,34 @@ import { useState } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
+import {
+  useInkWidgetForm,
+  useInkWidgetResponse,
+  useInkWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
-import type { InkWidgetProps } from "../../_shared/cli-types";
+import { type InkWidgetProps, isInkFormState } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { EmailFieldWidgetConfig } from "./types";
 
 export function EmailFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
+  TUsage extends FieldUsageConfig,
 >({
   field,
   fieldName,
-  context,
 }: InkWidgetProps<
   TEndpoint,
-  EmailFieldWidgetConfig<TKey, StringWidgetSchema, FieldUsageConfig>
+  TUsage,
+  EmailFieldWidgetConfig<TKey, StringWidgetSchema, TUsage>
 >): JSX.Element {
-  const { t } = context;
+  const t = useInkWidgetTranslation();
+  const form = useInkWidgetForm();
   const [inputValue, setInputValue] = useState(field.value ? field.value : "");
 
   // Response mode - just display the value
-  if (context.response) {
+  if (useInkWidgetResponse()) {
     const displayValue = field.value ? field.value : "—";
     return (
       <Box flexDirection="column">
@@ -45,7 +52,7 @@ export function EmailFieldWidgetInk<
   }
 
   // Request mode - show interactive input
-  if (!context.form || !fieldName) {
+  if (!form || !fieldName) {
     return (
       <Box>
         <Text color="red">
@@ -57,8 +64,21 @@ export function EmailFieldWidgetInk<
     );
   }
 
+  // Type guard to ensure we have InkFormState
+  if (!isInkFormState(form)) {
+    return (
+      <Box>
+        <Text color="red">
+          {t(
+            "app.api.system.unifiedInterface.cli.widgets.formField.invalidFormType",
+          )}
+        </Text>
+      </Box>
+    );
+  }
+
   const isRequired = !field.schema.isOptional();
-  const error = context.form.errors[fieldName];
+  const errorMessage = form.errors[fieldName];
 
   return (
     <Box flexDirection="column" marginBottom={1}>
@@ -80,15 +100,17 @@ export function EmailFieldWidgetInk<
           value={inputValue}
           onChange={(newValue) => {
             setInputValue(newValue);
-            context.form?.setValue(fieldName, newValue);
+            if (form) {
+              form.setValue(fieldName, newValue);
+            }
           }}
           placeholder={field.placeholder ? t(field.placeholder) : undefined}
         />
       </Box>
 
-      {error && (
+      {errorMessage && (
         <Box marginTop={0}>
-          <Text color="red">{error}</Text>
+          <Text color="red">{errorMessage}</Text>
         </Box>
       )}
     </Box>

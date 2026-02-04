@@ -28,7 +28,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "server", "dev"],
-  aliases: ["dev", "server:dev"],
+  aliases: ["dev", "d"],
   title: "app.api.system.server.dev.post.title",
   description: "app.api.system.server.dev.post.description",
   category: "app.api.system.server.category",

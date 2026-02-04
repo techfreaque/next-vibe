@@ -15,7 +15,7 @@ import {
   type FormAlertState,
 } from "next-vibe-ui/ui/form/form-alert";
 import { H1, P } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
+import React, { type JSX } from "react";
 import type { Path } from "react-hook-form";
 import { useWatch } from "react-hook-form";
 
@@ -33,8 +33,10 @@ import {
   getTextSizeClassName,
   type LayoutConfig,
 } from "../../../../shared/widgets/utils/widget-helpers";
+import type { WidgetData } from "../../../../shared/widgets/widget-data";
 import { MultiWidgetRenderer } from "../../../renderers/react/MultiWidgetRenderer";
 import type { ReactWidgetProps } from "../../_shared/react-types";
+import { hasChild, hasChildren } from "../../_shared/type-guards";
 import type {
   ArrayChildConstraint,
   ConstrainedChildUsage,
@@ -42,12 +44,19 @@ import type {
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
 } from "../../_shared/types";
-import type {
-  ContainerArrayWidgetConfig,
-  ContainerObjectWidgetConfig,
-  ContainerUnionWidgetConfig,
-  ContainerWidgetConfig,
-} from "./types";
+import {
+  useWidgetCancelButton,
+  useWidgetForm,
+  useWidgetIsSubmitting,
+  useWidgetLocale,
+  useWidgetOnCancel,
+  useWidgetOnSubmit,
+  useWidgetResponse,
+  useWidgetSubmitButton,
+  useWidgetTranslation,
+} from "../../_shared/use-widget-context";
+import { ContainerActionsWidget } from "./actions";
+import type { ContainerWidgetConfig } from "./types";
 
 /**
  * Container Widget - Displays container layouts with nested fields
@@ -81,20 +90,33 @@ export function ContainerWidget<
     | "object-optional"
     | "object-union"
     | "array"
-    | "array-optional",
+    | "array-optional"
+    | "widget-object",
   TChildren extends
     | ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
     | UnionObjectWidgetConfigConstrain<TKey, ConstrainedChildUsage<TUsage>>
     | ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>,
 >({
   field,
-  context,
   fieldName,
+  inlineButtonInfo,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   ContainerWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
 >): JSX.Element {
-  const { t: globalT } = simpleT(context.locale);
+  // Get context from hooks
+  const locale = useWidgetLocale();
+  const t = useWidgetTranslation();
+  const form = useWidgetForm();
+  const onSubmit = useWidgetOnSubmit();
+  const onCancel = useWidgetOnCancel();
+  const isSubmitting = useWidgetIsSubmitting() ?? false;
+  const submitButton = useWidgetSubmitButton();
+  const cancelButton = useWidgetCancelButton();
+  const response = useWidgetResponse();
+
+  const { t: globalT } = simpleT(locale);
 
   const {
     layoutType: layoutTypeRaw = LayoutType.STACKED,
@@ -107,7 +129,6 @@ export function ContainerWidget<
     title: titleKey,
     description: descriptionKey,
     noCard = false,
-    getCount,
     submitButton: submitButtonConfig,
     // Auto-features: default to true, can be disabled
     showFormAlert = true,
@@ -119,55 +140,52 @@ export function ContainerWidget<
     buttonGap,
     iconSize,
     iconSpacing,
-    contentPadding,
     headerGap,
     spacing = "normal",
     className,
   } = field;
 
-  // Extract properties based on field type using schemaType discriminator
-  type ChildrenType =
-    | ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
-    | UnionObjectWidgetConfigConstrain<TKey, ConstrainedChildUsage<TUsage>>
-    | ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>
-    | undefined;
-
-  let childrenForRenderer: ChildrenType;
-  let discriminator: string | undefined;
-
-  // Type-safe extraction using schemaType discriminator
-  if (field.schemaType === "object-union") {
-    const unionField = field as ContainerUnionWidgetConfig<
-      TKey,
-      TUsage,
-      UnionObjectWidgetConfigConstrain<TKey, ConstrainedChildUsage<TUsage>>
-    >;
-    childrenForRenderer = unionField.variants;
-    discriminator = unionField.discriminator as string | undefined;
-  } else if (
-    field.schemaType === "object" ||
-    field.schemaType === "object-optional" ||
-    field.schemaType === "widget-object"
-  ) {
-    const objectField = field as ContainerObjectWidgetConfig<
-      TKey,
-      TUsage,
-      "object" | "object-optional" | "widget-object",
-      ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
-    >;
-    childrenForRenderer = objectField.children;
-  } else if (
-    field.schemaType === "array" ||
-    field.schemaType === "array-optional"
-  ) {
-    const arrayField = field as ContainerArrayWidgetConfig<
-      TKey,
-      TUsage,
-      "array" | "array-optional",
-      ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>
-    >;
-    childrenForRenderer = arrayField.child;
+  // Helper to extract field data based on narrowed type
+  interface FieldData {
+    childrenForRenderer:
+      | ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
+      | UnionObjectWidgetConfigConstrain<TKey, ConstrainedChildUsage<TUsage>>
+      | ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>
+      | undefined;
+    discriminator: string | undefined;
+    fieldValue: WidgetData;
   }
+  const extractFieldData = (): FieldData => {
+    if (hasChildren(field)) {
+      const { children, value } = field;
+      return {
+        childrenForRenderer: children,
+        fieldValue: value,
+        discriminator: undefined,
+      } satisfies FieldData;
+    }
+    if (hasChild(field)) {
+      const { child, value } = field;
+      return {
+        childrenForRenderer: child,
+        fieldValue: value,
+        discriminator: undefined,
+      } satisfies FieldData;
+    }
+    return {
+      childrenForRenderer: undefined,
+      fieldValue: undefined,
+      discriminator: undefined,
+    } satisfies FieldData;
+  };
+
+  const { childrenForRenderer, discriminator, fieldValue } = extractFieldData();
+
+  // Calculate count from field data if getCount function is provided
+  // This is accessed on the container config itself, not passed to children
+  const countFromField = field.getCount
+    ? field.getCount(fieldValue)
+    : undefined;
 
   // Call useWatch unconditionally (React hooks rule) - disabled when not needed
   const watchPath =
@@ -175,10 +193,69 @@ export function ContainerWidget<
       ? `${fieldName}.${discriminator}`
       : (discriminator ?? "");
   const watchedDiscriminator = useWatch({
-    control: context.form?.control,
+    control: form?.control,
     name: watchPath as Path<TEndpoint["types"]["RequestOutput"]>,
-    disabled: !discriminator || !context.form || !fieldName,
+    disabled: !discriminator || !form || !fieldName,
   }) as string | undefined;
+
+  // Check if this is the ROOT container (first in the chain)
+  // Only root container can have inlineButtonInfo prop
+  const isRootContainer = inlineButtonInfo !== undefined;
+
+  // Check if we're in loading/response state (no form inputs)
+  const hasFormInputs = onSubmit && form;
+
+  // Explicit submitButton config (only in root container, only if not loading)
+  const showHeaderButton =
+    isRootContainer &&
+    hasFormInputs &&
+    submitButtonConfig?.position === "header";
+  const showBottomButton =
+    isRootContainer &&
+    hasFormInputs &&
+    submitButtonConfig?.position === "bottom";
+
+  // Auto SubmitButton logic:
+  // 1. Only ROOT container (has inlineButtonInfo prop)
+  // 2. Only if showSubmitButton is enabled (default true)
+  // 3. Only if there's NO explicit submitButton config
+  // 4. Only if there are NO inline buttons already defined in the field tree
+  // 5. Only if form context exists (not in loading/response-only state)
+  const shouldShowAutoSubmitButton =
+    isRootContainer &&
+    showSubmitButton &&
+    !submitButtonConfig &&
+    !(inlineButtonInfo?.hasSubmitButton ?? false) &&
+    hasFormInputs;
+
+  // Auto FormAlert logic: only in root container
+  const shouldShowAutoFormAlert =
+    isRootContainer &&
+    showFormAlert &&
+    !(inlineButtonInfo?.hasFormAlert ?? false);
+
+  // Find backButton field in children if it exists (for explicit submitButton config)
+  let hasBackButton = false;
+  let backButtonFieldName: string | undefined;
+
+  if (!Array.isArray(childrenForRenderer) && childrenForRenderer) {
+    if (
+      typeof childrenForRenderer === "object" &&
+      childrenForRenderer !== null &&
+      "backButton" in childrenForRenderer
+    ) {
+      backButtonFieldName = "backButton";
+      hasBackButton = true;
+    }
+  }
+
+  // Button state is tracked by context provider
+  // This prevents nested containers from rendering duplicate buttons
+
+  // Handle ACTIONS layout type with separate component (after all hooks are called)
+  if (layoutTypeRaw === LayoutType.ACTIONS && hasChildren(field)) {
+    return <ContainerActionsWidget field={field} fieldName={fieldName} />;
+  }
 
   const layoutTypeStr = layoutTypeRaw;
 
@@ -192,10 +269,6 @@ export function ContainerWidget<
       gridColumns = columns;
     } else if (layoutTypeStr === "grid_2_columns") {
       gridColumns = 2;
-    } else if (layoutTypeStr === "grid_3_columns") {
-      gridColumns = 3;
-    } else if (layoutTypeStr === "grid_4_columns") {
-      gridColumns = 4;
     }
   } else if (
     layoutTypeStr === "flex" ||
@@ -215,33 +288,16 @@ export function ContainerWidget<
   const layoutClass = getLayoutClassName(layoutConfig);
 
   // Translate title and description early (before any early returns)
-  const title = titleKey ? context.t(titleKey) : undefined;
-  const description = descriptionKey ? context.t(descriptionKey) : undefined;
+  const title = titleKey ? t(titleKey) : undefined;
+  const description = descriptionKey ? t(descriptionKey) : undefined;
 
   let displayTitle: string | undefined = title;
-  if (getCount && field.value && displayTitle) {
-    const count = getCount(field.value);
-    if (count !== undefined) {
-      displayTitle = `${displayTitle} (${count})`;
-    }
+  if (countFromField !== undefined && displayTitle) {
+    displayTitle = `${displayTitle} (${countFromField})`;
   }
 
-  const isSubmitting = context.isSubmitting ?? false;
-  const onCancel = undefined; // Not provided in context
-  const submitButton = context.submitButton;
-  const cancelButton = context.cancelButton;
-
-  const showHeaderButton =
-    submitButtonConfig?.position === "header" &&
-    context.onSubmit &&
-    context.form;
-  const showBottomButton =
-    submitButtonConfig?.position === "bottom" &&
-    context.onSubmit &&
-    context.form;
-
-  const buttonIcon = submitButtonConfig?.icon
-    ? (submitButtonConfig.icon as IconKey)
+  const buttonIcon: IconKey | undefined = submitButtonConfig?.icon
+    ? submitButtonConfig.icon
     : undefined;
 
   // Get classes from config (no hardcoding!)
@@ -264,17 +320,16 @@ export function ContainerWidget<
   const buttonGapClass = getSpacingClassName("gap", buttonGap);
   const iconSizeClass = getIconSizeClassName(iconSize);
   const iconSpacingClass = getSpacingClassName("margin", iconSpacing);
-  const contentPaddingClass = getSpacingClassName("padding", contentPadding);
   const headerGapClass = getSpacingClassName("gap", headerGap);
 
   const buttonText = submitButtonConfig?.text
-    ? context.t(submitButtonConfig.text)
+    ? t(submitButtonConfig.text)
     : globalT(
         "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submit",
       );
 
   const loadingText = submitButtonConfig?.loadingText
-    ? context.t(submitButtonConfig.loadingText)
+    ? t(submitButtonConfig.loadingText)
     : globalT(
         "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting",
       );
@@ -295,7 +350,7 @@ export function ContainerWidget<
 
     return (
       <Card className={className}>
-        <CardContent>
+        <CardContent className="pt-6">
           <P className="italic text-muted-foreground">
             {globalT(
               "app.api.system.unifiedInterface.react.widgets.container.noContent",
@@ -306,35 +361,14 @@ export function ContainerWidget<
     );
   }
 
-  // Check if there are any actual form input fields
-  // For now, use a simple heuristic - check if any are form fields
-  const hasFormInputFields = true; // Assume true for now, MultiWidgetRenderer handles the filtering
-
-  // Check if container or any nested child has explicit FORM_ALERT or SUBMIT_BUTTON widgets
-  const hasExplicitFormAlert = false; // TODO: implement if needed
-  const hasExplicitSubmitButton = false; // TODO: implement if needed
-
-  // Determine if we should show auto-features
-  // Auto FormAlert: only show if enabled AND has form input fields AND no explicit FormAlert anywhere in subtree
-  const shouldShowAutoFormAlert =
-    showFormAlert && hasFormInputFields && !hasExplicitFormAlert;
-  // Auto SubmitButton: only show if enabled AND has form input fields AND no explicit config AND no explicit widget in subtree AND form context exists
-  const shouldShowAutoSubmitButton =
-    showSubmitButton &&
-    hasFormInputFields &&
-    !submitButtonConfig &&
-    !hasExplicitSubmitButton &&
-    context.onSubmit &&
-    context.form;
-
-  // Build FormAlert state from context.response
+  // Build FormAlert state from response
   let formAlertState: FormAlertState | null = null;
-  if (context.response && context.response.success === false) {
+  if (response && response.success === false) {
     formAlertState = {
       variant: "destructive",
       message: {
-        message: context.response.message as TranslationKey,
-        messageParams: context.response.messageParams,
+        message: response.message as TranslationKey,
+        messageParams: response.messageParams,
       },
     };
   }
@@ -345,31 +379,6 @@ export function ContainerWidget<
   const autoSubmitLoadingText = globalT(
     "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting",
   );
-
-  // Find backButton field in children if it exists
-  let hasBackButton = false;
-  let backButtonEntry:
-    | [
-        string,
-        typeof childrenForRenderer extends Record<string, infer V> ? V : never,
-      ]
-    | undefined;
-
-  if (
-    Array.isArray(childrenForRenderer) &&
-    !("children" in childrenForRenderer[0] || false)
-  ) {
-    // Not a union, safe to check
-  } else if (!Array.isArray(childrenForRenderer) && childrenForRenderer) {
-    if (
-      typeof childrenForRenderer === "object" &&
-      childrenForRenderer !== null &&
-      "backButton" in childrenForRenderer
-    ) {
-      backButtonEntry = ["backButton", childrenForRenderer.backButton];
-      hasBackButton = true;
-    }
-  }
 
   // If noCard is true, render without Card wrapper
   if (noCard) {
@@ -406,11 +415,9 @@ export function ContainerWidget<
         {shouldShowAutoFormAlert && <FormAlert alert={formAlertState} />}
         <Div className={layoutClass}>
           <MultiWidgetRenderer
-            children={childrenForRenderer}
-            value={field.value}
+            childrenSchema={childrenForRenderer}
+            value={fieldValue}
             fieldName={fieldName}
-            layoutConfig={layoutConfig}
-            context={context}
             discriminator={discriminator}
             watchedDiscriminatorValue={watchedDiscriminator}
           />
@@ -419,24 +426,20 @@ export function ContainerWidget<
         {showBottomButton && (
           <Div className="flex gap-2">
             {/* Back button (left side) */}
-            {hasBackButton && backButtonEntry && (
-              <>
-                <MultiWidgetRenderer
-                  key={backButtonEntry[0]}
-                  children={undefined}
-                  value={null}
-                  fieldName={backButtonEntry[0]}
-                  layoutConfig={undefined}
-                  context={context}
-                />
-              </>
+            {hasBackButton && backButtonFieldName && (
+              <MultiWidgetRenderer
+                key={backButtonFieldName}
+                childrenSchema={undefined}
+                value={null}
+                fieldName={backButtonFieldName}
+              />
             )}
             {/* Submit button (right side) */}
             <Button
               type="button"
               onClick={(): void => {
-                if (context.onSubmit) {
-                  context.onSubmit();
+                if (onSubmit) {
+                  onSubmit();
                 }
               }}
               disabled={isSubmitting}
@@ -483,8 +486,8 @@ export function ContainerWidget<
             <Button
               type="button"
               onClick={(): void => {
-                if (context.onSubmit) {
-                  context.onSubmit();
+                if (onSubmit) {
+                  onSubmit();
                 }
               }}
               disabled={isSubmitting}
@@ -515,9 +518,8 @@ export function ContainerWidget<
               <Button
                 type="button"
                 onClick={(): void => {
-                  if (context.form && context.onSubmit) {
-                    const onSubmit = context.onSubmit;
-                    void context.form.handleSubmit(() => {
+                  if (form && onSubmit) {
+                    void form.handleSubmit(() => {
                       onSubmit();
                     })();
                   }
@@ -547,27 +549,31 @@ export function ContainerWidget<
       )}
       {/* Auto FormAlert at top */}
       {shouldShowAutoFormAlert && (
-        <CardContent className="pb-0">
+        <CardContent
+          className={
+            (displayTitle ?? description ?? showHeaderButton)
+              ? "pb-0"
+              : "pb-0 pt-6"
+          }
+        >
           <FormAlert alert={formAlertState} />
         </CardContent>
       )}
       <CardContent
         className={
-          !displayTitle &&
-          !description &&
-          !showHeaderButton &&
-          !shouldShowAutoFormAlert
-            ? contentPaddingClass || "pt-6"
-            : ""
+          (displayTitle ??
+          description ??
+          showHeaderButton ??
+          shouldShowAutoFormAlert)
+            ? ""
+            : "pt-6"
         }
       >
         <Div className={layoutClass}>
           <MultiWidgetRenderer
-            children={childrenForRenderer}
-            value={field.value}
+            childrenSchema={childrenForRenderer}
+            value={fieldValue}
             fieldName={fieldName}
-            layoutConfig={layoutConfig}
-            context={context}
             discriminator={discriminator}
             watchedDiscriminatorValue={watchedDiscriminator}
           />
@@ -575,27 +581,27 @@ export function ContainerWidget<
       </CardContent>
       {/* Explicit submitButton config at bottom position */}
       {showBottomButton && (
-        <CardContent className="pt-0">
+        <CardContent
+          className={
+            (displayTitle ?? description ?? showHeaderButton) ? "" : "pt-6"
+          }
+        >
           <Div className="flex gap-2">
             {/* Back button (left side) */}
-            {hasBackButton && backButtonEntry && (
-              <>
-                <MultiWidgetRenderer
-                  key={backButtonEntry[0]}
-                  children={undefined}
-                  value={null}
-                  fieldName={backButtonEntry[0]}
-                  layoutConfig={undefined}
-                  context={context}
-                />
-              </>
+            {hasBackButton && backButtonFieldName && (
+              <MultiWidgetRenderer
+                key={backButtonFieldName}
+                childrenSchema={undefined}
+                value={null}
+                fieldName={backButtonFieldName}
+              />
             )}
             {/* Submit button (right side) */}
             <Button
               type="button"
               onClick={(): void => {
-                if (context.onSubmit) {
-                  context.onSubmit();
+                if (onSubmit) {
+                  onSubmit();
                 }
               }}
               disabled={isSubmitting}
@@ -623,7 +629,11 @@ export function ContainerWidget<
       )}
       {/* Auto SubmitButton when no explicit config */}
       {shouldShowAutoSubmitButton && (
-        <CardContent className="pt-0">
+        <CardContent
+          className={
+            (displayTitle ?? description ?? showHeaderButton) ? "" : "pt-6"
+          }
+        >
           <Div className={cn("flex", buttonGapClass || "gap-2")}>
             {onCancel && (
               <Button
@@ -641,8 +651,8 @@ export function ContainerWidget<
             <Button
               type="button"
               onClick={(): void => {
-                if (context.onSubmit) {
-                  context.onSubmit();
+                if (onSubmit) {
+                  onSubmit();
                 }
               }}
               disabled={isSubmitting}

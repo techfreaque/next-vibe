@@ -101,6 +101,7 @@ export const translations: typeof enTranslations = {
     showAllModels: "Alle Modelle anzeigen",
     showLess: "Weniger anzeigen",
     showMore: "{{remaining}} weitere anzeigen",
+    showLegacyModels: "{{count}} Legacy-Modelle anzeigen",
     noMatchingModels: "Keine passenden Modelle",
     noModelsWarning: "Keine Modelle entsprechen Ihren Filtern",
     useOnce: "Einmal verwenden",

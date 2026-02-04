@@ -209,8 +209,8 @@ const { PATCH } = createEndpoint({
           deleteButton: deleteButton({
             label: "app.api.leads.lead.id.patch.deleteButton.label",
             targetEndpoint: DELETE,
-            extractParams: (data) => ({
-              urlPathParams: { id: (data as { id: string }).id },
+            extractParams: (source) => ({
+              urlPathParams: { id: source.urlPathParams.id },
             }),
             icon: "trash",
             variant: "destructive",
@@ -915,10 +915,9 @@ const { GET } = createEndpoint({
           // Edit button - uses self-referencing GET endpoint for prefill
           editButton: navigateButtonField({
             targetEndpoint: PATCH,
-            extractParams: (data) => ({
+            extractParams: (source) => ({
               urlPathParams: {
-                id: (data as { lead: { basicInfo: { id: string } } }).lead
-                  .basicInfo.id,
+                id: source.responseData.lead.basicInfo.id,
               },
             }),
             prefillFromGet: true,
@@ -932,10 +931,9 @@ const { GET } = createEndpoint({
           // Delete button
           deleteButton: deleteButton({
             targetEndpoint: DELETE,
-            extractParams: (data) => ({
+            extractParams: (source) => ({
               urlPathParams: {
-                id: (data as { lead: { basicInfo: { id: string } } }).lead
-                  .basicInfo.id,
+                id: source.responseData.lead.basicInfo.id,
               },
             }),
             label: "app.api.leads.lead.id.get.deleteButton.label",

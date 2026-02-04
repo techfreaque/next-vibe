@@ -134,6 +134,7 @@ export function SubscriptionClientContent({
 
       {/* Credit Balance Overview Card */}
       <CreditBalanceCard
+        user={user}
         locale={locale}
         initialCredits={initialCredits}
         freeCredits={FREE_CREDITS}
@@ -192,6 +193,7 @@ export function SubscriptionClientContent({
             yearlySubscriptionPrice={YEARLY_SUBSCRIPTION_PRICE}
             packPrice={PACK_PRICE}
             packCredits={PACK_CREDITS}
+            user={user}
           />
         </TabsContent>
 

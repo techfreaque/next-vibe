@@ -9,6 +9,7 @@ import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { JwtPayloadType } from "../../user/auth/types";
 import definitions from "./definition";
 
 /**
@@ -17,8 +18,9 @@ import definitions from "./definition";
  */
 export function useCustomerPortal(
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): EndpointReturn<typeof definitions> {
-  return useEndpoint(definitions, {}, logger);
+  return useEndpoint(definitions, undefined, logger, user);
 }
 
 export type CustomerPortalEndpointReturn = EndpointReturn<typeof definitions>;

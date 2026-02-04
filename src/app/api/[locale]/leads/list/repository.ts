@@ -57,8 +57,8 @@ export class LeadsListRepositoryImpl implements LeadsListRepository {
           paginationInfo: {
             page: paginationData.page,
             limit: paginationData.limit,
-            total: paginationData.total,
-            totalPages: paginationData.totalPages,
+            totalCount: paginationData.totalCount,
+            pageCount: paginationData.pageCount,
           },
         },
       } satisfies ResponseType<LeadListGetResponseTypeOutput>;

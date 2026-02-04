@@ -10,6 +10,7 @@ import {
   objectField,
   requestField,
   responseField,
+  widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -44,14 +45,20 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.system.check.typecheck.container.title",
-      description: "app.api.system.check.typecheck.container.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
+      title: widgetField({
+        type: WidgetType.TITLE,
+        content: "app.api.system.check.typecheck.container.title",
+        level: 1,
+        columns: 12,
+        usage: { request: "data" },
+      }),
+
       path: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -155,8 +162,8 @@ const { POST } = createEndpoint({
           .array(
             z.object({
               file: z.string(),
-              errors: z.number().optional(),
-              warnings: z.number().optional(),
+              errors: z.number(),
+              warnings: z.number(),
               total: z.number(),
             }),
           )

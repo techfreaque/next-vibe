@@ -39,12 +39,19 @@ import { ImapSyncStatus } from "@/app/api/[locale]/emails/imap-client/enum";
 import imapSyncDefinition from "@/app/api/[locale]/emails/imap-client/sync/definition";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
+
+interface ImapSyncOperationsProps {
+  user: JwtPayloadType;
+}
 
 /**
  * IMAP Sync Operations Component
  */
-export function ImapSyncOperations(): JSX.Element {
+export function ImapSyncOperations({
+  user,
+}: ImapSyncOperationsProps): JSX.Element {
   const { t, locale } = useTranslation();
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -60,6 +67,7 @@ export function ImapSyncOperations(): JSX.Element {
       enabled: true,
     },
     logger,
+    user,
   );
 
   // Use sync endpoint for triggering sync operations
@@ -69,6 +77,7 @@ export function ImapSyncOperations(): JSX.Element {
       enabled: false,
     },
     logger,
+    user,
   );
 
   // Extract sync status from accounts data

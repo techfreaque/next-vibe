@@ -49,13 +49,24 @@ export default async function NewsletterUnsubscribe({
     logger,
   );
 
-  const userResponse = authUser
-    ? await UserProfileRepository.getProfile(authUser, locale, logger)
-    : undefined;
-
-  const user = userResponse?.success ? userResponse.data : undefined;
+  // Get user email if authenticated and not public
+  let prefilledEmail: string | undefined;
+  if (!authUser.isPublic) {
+    const userProfileResponse = await UserProfileRepository.getProfile(
+      authUser,
+      locale,
+      logger,
+    );
+    if (userProfileResponse.success && !userProfileResponse.data.isPublic) {
+      prefilledEmail = userProfileResponse.data.email;
+    }
+  }
 
   return (
-    <UnsubscribePage locale={locale} prefilledEmail={undefined} user={user} />
+    <UnsubscribePage
+      locale={locale}
+      prefilledEmail={prefilledEmail}
+      user={authUser}
+    />
   );
 }

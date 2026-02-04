@@ -9,6 +9,7 @@ import type {
 import { useCallback, useMemo, useState } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint-base";
@@ -110,6 +111,7 @@ export type EnhancedMutationResult<TResponse, TRequest, TUrlVariables> = Omit<
 export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
   logger: EndpointLogger,
+  user: JwtPayloadType,
   options: ApiMutationOptions<
     TEndpoint["types"]["RequestOutput"],
     TEndpoint["types"]["ResponseOutput"],
@@ -153,12 +155,13 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
           : ({} as TEndpoint["types"]["UrlVariablesOutput"]);
 
       // Call mutation executor
-      const response = await executeMutation({
-        endpoint: endpoint as never,
+      const response = await executeMutation<TEndpoint>({
+        endpoint,
         logger,
-        requestData: requestData as never,
-        pathParams: urlPathParams as never,
+        requestData,
+        pathParams: urlPathParams,
         locale,
+        user,
         options: {
           onSuccess: options.onSuccess
             ? (
@@ -168,6 +171,7 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
                   requestData: context.requestData,
                   pathParams: context.urlPathParams,
                   responseData: context.responseData,
+                  logger: context.logger,
                 })
             : undefined,
           onError: options.onError
@@ -176,6 +180,7 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
                   error: context.error,
                   requestData: context.requestData,
                   pathParams: context.urlPathParams,
+                  logger: context.logger,
                 })
             : undefined,
         },

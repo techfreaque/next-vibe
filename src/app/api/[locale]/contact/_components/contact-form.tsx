@@ -12,12 +12,14 @@ import type { JSX } from "react";
 import contactDefinitions from "@/app/api/[locale]/contact/definition";
 import { useContactWithEngagement } from "@/app/api/[locale]/contact/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { StandardUserType } from "@/app/api/[locale]/user/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface ContactFormProps {
   locale: CountryLanguage;
+  jwtUser: JwtPayloadType;
   user: StandardUserType | undefined;
 }
 
@@ -27,10 +29,11 @@ interface ContactFormProps {
  */
 export default function ContactForm({
   locale,
+  jwtUser,
   user,
 }: ContactFormProps): JSX.Element {
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const contactResult = useContactWithEngagement(logger, user);
+  const contactResult = useContactWithEngagement(jwtUser, logger, user);
   const { t } = simpleT(locale);
 
   // Type assertion: contactResult.create is always defined because definition has POST

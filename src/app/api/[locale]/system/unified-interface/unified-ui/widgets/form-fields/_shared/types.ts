@@ -20,12 +20,11 @@ import type { IconKey } from "../icon-field/icons";
  */
 export interface BaseFormFieldWidgetConfig<
   out TKey extends string,
-  TUsage extends FieldUsageConfig,
+  out TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive",
   TSchema extends z.ZodTypeAny,
-  TFieldType extends WidgetType.FORM_FIELD = WidgetType.FORM_FIELD,
 > extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {
-  type: TFieldType;
+  type: WidgetType.FORM_FIELD;
   label?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
   placeholder?: NoInfer<TKey>;
@@ -46,7 +45,7 @@ export interface BaseFormFieldWidgetConfig<
   /**
    * Theme for required field styling
    */
-  theme?: RequiredFieldTheme;
+  theme?: Partial<RequiredFieldTheme>;
 }
 
 /**

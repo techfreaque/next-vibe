@@ -14,6 +14,7 @@ import {
   EndpointErrorTypes,
   Methods as MethodsEnum,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -93,6 +94,7 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
   requestData: initialRequestData,
   pathParams,
   locale,
+  user,
   options = {},
 }: {
   endpoint: TEndpoint;
@@ -100,6 +102,7 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
   requestData: TEndpoint["types"]["RequestOutput"];
   pathParams: TEndpoint["types"]["UrlVariablesOutput"];
   locale: CountryLanguage;
+  user: JwtPayloadType;
   options?: QueryExecutorOptions<
     TEndpoint["types"]["RequestOutput"],
     TEndpoint["types"]["ResponseOutput"],
@@ -309,7 +312,16 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
       }
     }
 
-    const response = await callApi(endpoint, endpointUrl, postBody, logger);
+    const response = await callApi(
+      endpoint,
+      endpointUrl,
+      postBody,
+      logger,
+      user,
+      locale,
+      initialRequestData,
+      pathParams,
+    );
 
     if (!response.success) {
       // Call onError callback if provided

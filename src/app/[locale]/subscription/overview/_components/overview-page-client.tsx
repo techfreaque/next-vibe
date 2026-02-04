@@ -15,6 +15,7 @@ import { SubscriptionHeader } from "@/app/api/[locale]/subscription/_components/
 import { SubscriptionStatusCard } from "@/app/api/[locale]/subscription/_components/subscription-status-card";
 import { SubscriptionTabsNav } from "@/app/api/[locale]/subscription/_components/subscription-tabs-nav";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -28,6 +29,7 @@ interface OverviewPageClientProps {
   packPrice: number;
   packCredits: number;
   freeCredits: number;
+  user: JwtPayloadType;
 }
 
 export function OverviewPageClient({
@@ -40,6 +42,7 @@ export function OverviewPageClient({
   packPrice,
   packCredits,
   freeCredits,
+  user,
 }: OverviewPageClientProps): JSX.Element {
   const { t } = simpleT(locale);
   const router = useRouter();
@@ -119,6 +122,7 @@ export function OverviewPageClient({
         locale={locale}
         initialCredits={initialCredits}
         freeCredits={freeCredits}
+        user={user}
       />
 
       {/* Subscription Status Card */}

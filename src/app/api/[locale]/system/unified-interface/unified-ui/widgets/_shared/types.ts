@@ -14,9 +14,11 @@ import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
 import type { FieldUsage, WidgetType } from "../../../shared/types/enums";
 import type { Platform } from "../../../shared/types/platform";
 import type {
+  DisplayOnlyWidgetConfig,
   ObjectWidgetConfig,
   UnifiedField,
 } from "../../../shared/widgets/configs";
+import type { WidgetData } from "../../../shared/widgets/widget-data";
 
 /**
  * Base widget renderer props (before value is added to field)
@@ -24,13 +26,14 @@ import type {
  */
 export interface BaseWidgetRendererProps<
   TEndpoint extends CreateApiEndpointAny,
+  TUsage extends FieldUsageConfig,
 > {
   fieldName: string;
   field: UnifiedField<
     string,
     z.ZodTypeAny,
-    FieldUsageConfig,
-    AnyChildrenConstrain<string, FieldUsageConfig>
+    TUsage,
+    AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
   >;
   context: BaseWidgetContext<TEndpoint>;
 }
@@ -42,16 +45,26 @@ export interface BaseWidgetRendererProps<
  */
 export interface BaseWidgetProps<
   TEndpoint extends CreateApiEndpointAny,
+  TUsage extends FieldUsageConfig,
   TWidgetConfig extends UnifiedField<
     string,
     z.ZodTypeAny,
-    FieldUsageConfig,
-    AnyChildrenConstrain<string, FieldUsageConfig>
+    TUsage,
+    AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
   >,
 > {
   fieldName: Path<TEndpoint["types"]["RequestOutput"]>;
-  field: BaseWidgetFieldProps<TWidgetConfig>;
-  context: BaseWidgetContext<TEndpoint>;
+  field: BaseWidgetFieldProps<TUsage, TWidgetConfig>;
+  /**
+   * Inline button info (only set on ROOT container by EndpointRenderer)
+   * Indicates if buttons/alerts are already defined inline in the field tree
+   * Used by root container to decide if auto-buttons should be rendered
+   */
+  inlineButtonInfo?: {
+    hasSubmitButton: boolean;
+    hasBackButton: boolean;
+    hasFormAlert: boolean;
+  };
 }
 
 /**
@@ -59,26 +72,55 @@ export interface BaseWidgetProps<
  * The `widgetType` field acts as the discriminator for the union.
  * Value type is inferred from the field's schema for type safety.
  */
+/**
+ * Distributive conditional — each union member of TWidgetConfig
+ * gets its own value type, enabling schemaType-based narrowing
+ * via hasChild/hasChildren guards.
+ */
 export type BaseWidgetFieldProps<
+  TUsage extends FieldUsageConfig,
   TWidgetConfig extends UnifiedField<
     string,
     z.ZodTypeAny,
-    FieldUsageConfig,
-    AnyChildrenConstrain<string, FieldUsageConfig>
+    TUsage,
+    AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
   >,
-> = TWidgetConfig & {
-  value: TWidgetConfig extends { schema: z.ZodTypeAny }
-    ? z.output<TWidgetConfig["schema"]>
-    : TWidgetConfig extends { children: infer TChildren }
-      ? InferChildrenOutput<TChildren>
-      : TWidgetConfig extends { child: infer TChild }
-        ? InferChildOutput<TChild>
-        : TWidgetConfig extends {
-              variants: infer TVariants;
-            }
-          ? InferUnionType<TVariants>
-          : never;
-};
+> = TWidgetConfig &
+  BaseWidgetConfig<TUsage, SchemaTypes> & {
+    value: TWidgetConfig extends { schema: z.ZodTypeAny }
+      ? z.output<TWidgetConfig["schema"]>
+      : TWidgetConfig extends { children: infer TChildren }
+        ? InferChildrenOutput<TChildren>
+        : TWidgetConfig extends { child: infer TChild }
+          ? InferChildOutput<TChild>[]
+          : TWidgetConfig extends {
+                variants: infer TVariants;
+              }
+            ? InferUnionType<TVariants>
+            : undefined;
+    parentValue?: WidgetData;
+  };
+
+/**
+ * Dispatch-level field type for renderer entry points.
+ * Distributive conditional that maps each UnifiedField member to itself + value/parentValue.
+ * This preserves discriminated union narrowing in switch statements.
+ */
+export type DispatchField<
+  TKey extends string,
+  TSchema extends z.ZodTypeAny,
+  TUsage extends FieldUsageConfig,
+  TChildren extends AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>,
+> =
+  UnifiedField<TKey, TSchema, TUsage, TChildren> extends infer UF extends
+    UnifiedField<
+      string,
+      z.ZodTypeAny,
+      TUsage,
+      AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
+    >
+    ? BaseWidgetFieldProps<TUsage, UF>
+    : never;
 
 export interface BaseWidgetContext<TEndpoint extends CreateApiEndpointAny> {
   locale: CountryLanguage;
@@ -140,6 +182,15 @@ export interface BaseWidgetContext<TEndpoint extends CreateApiEndpointAny> {
    * When true, container widgets should filter out request fields
    */
   responseOnly?: boolean;
+  /**
+   * Button rendering state - tracks if submit/back buttons have been rendered
+   * Used to prevent duplicate buttons in nested containers
+   * Containers check and set these flags to coordinate button rendering
+   */
+  buttonState?: {
+    hasRenderedSubmitButton: boolean;
+    hasRenderedBackButton: boolean;
+  };
 }
 
 export type SchemaTypes =
@@ -170,15 +221,15 @@ export type FieldUsageConfig =
  * TKey allows using either global TranslationKey or scoped translation keys
  */
 
-interface BaseWidgetConfig<
-  TUsage extends FieldUsageConfig,
+export interface BaseWidgetConfig<
+  out TUsage extends FieldUsageConfig,
   TSchemaType extends SchemaTypes,
 > {
   type: WidgetType;
   className?: string;
   order?: number;
   /** Hide this field from rendering */
-  hidden?: boolean;
+  hidden?: boolean | ((data: WidgetData) => boolean);
   /** Render inline with next sibling that also has inline: true */
   inline?: boolean;
   /** Number of columns for grid layout */
@@ -188,7 +239,7 @@ interface BaseWidgetConfig<
 }
 
 export interface BasePrimitiveWidgetConfig<
-  TUsage extends FieldUsageConfig,
+  out TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive" | "widget",
   TSchema extends z.ZodTypeAny,
 > extends BaseWidgetConfig<TUsage, TSchemaType> {
@@ -210,9 +261,9 @@ export type BaseObjectWidgetConfig<
   TKey extends string,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "object" | "object-optional" | "widget-object",
-  TChildren extends Record<
-    string,
-    AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>
+  TChildren extends ObjectChildrenConstraint<
+    TKey,
+    ConstrainedChildUsage<TUsage>
   >,
 > = BaseWidgetConfig<TUsage, TSchemaType> & {
   children: TChildren;
@@ -318,31 +369,29 @@ export type AnyChildrenConstrain<
   TKey extends string,
   TUsage extends FieldUsageConfig,
 > =
-  // oxlint-disable-next-line typescript/no-explicit-any
-  | BasePrimitiveWidgetConfig<ConstrainedChildUsage<TUsage>, "primitive", any>
-  | BasePrimitiveDisplayOnlyWidgetConfig<
-      ConstrainedChildUsage<TUsage>,
-      "widget"
-    >
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for schema covariance
+  | BasePrimitiveWidgetConfig<TUsage, "primitive", z.ZodTypeAny>
+  | BasePrimitiveDisplayOnlyWidgetConfig<TUsage, "widget">
+  | DisplayOnlyWidgetConfig<TKey, TUsage, "widget">
   | BaseArrayWidgetConfig<
       TKey,
-      ConstrainedChildUsage<TUsage>,
+      TUsage,
       "array" | "array-optional",
-      // oxlint-disable-next-line typescript/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for children covariance
       any
     >
   | BaseObjectWidgetConfig<
       TKey,
-      ConstrainedChildUsage<TUsage>,
+      TUsage,
       "object" | "object-optional" | "widget-object",
-      // oxlint-disable-next-line typescript/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for children covariance
       any
     >
   | BaseObjectUnionWidgetConfig<
       TKey,
-      ConstrainedChildUsage<TUsage>,
+      TUsage,
       SchemaTypes,
-      // oxlint-disable-next-line typescript/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for variants covariance
       any
     >
   | never;
@@ -399,50 +448,41 @@ type InferFieldOutput<
     string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<string, FieldUsageConfig>
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >,
   TUsage extends FieldUsage = FieldUsage.ResponseData,
 > = z.output<InferSchemaFromField<TField, TUsage>>;
 
 /**
  * Infer output type from children field
+ * Returns WidgetData-compatible object type
  */
-type InferChildrenOutput<TChildren> =
-  // For Record of fields -> object output
+export type InferChildrenOutput<TChildren> =
+  // For Record of fields -> object output (structural: any value with BaseWidgetConfig shape)
   TChildren extends Record<
     string,
-    UnifiedField<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      AnyChildrenConstrain<string, FieldUsageConfig>
-    >
+    BaseWidgetConfig<FieldUsageConfig, SchemaTypes>
   >
     ? {
-        [K in keyof TChildren]: InferFieldOutput<TChildren[K]>;
+        [K in keyof TChildren]: InferChildOutput<TChildren[K]>;
       }
-    : // For single UnifiedField -> array of that field's output
-      TChildren extends UnifiedField<
-          string,
-          z.ZodTypeAny,
-          FieldUsageConfig,
-          AnyChildrenConstrain<string, FieldUsageConfig>
-        >
-      ? InferFieldOutput<TChildren>[]
-      : never;
+    : never;
 
 /**
- * Infer output type from single child field
+ * Infer output type from single child field (structural matching)
+ * Returns WidgetData-compatible types
  */
-type InferChildOutput<TChild> =
-  TChild extends UnifiedField<
-    string,
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    AnyChildrenConstrain<string, FieldUsageConfig>
-  >
-    ? InferFieldOutput<TChild>
-    : never;
+export type InferChildOutput<TChild> =
+  // Primitive field with schema
+  TChild extends { schema: infer TSchema extends z.ZodTypeAny }
+    ? z.output<TSchema>
+    : // Object field with children
+      TChild extends { children: infer TChildren }
+      ? InferChildrenOutput<TChildren>
+      : // Array field with child
+        TChild extends { child: infer TGrandChild }
+        ? Array<InferChildOutput<TGrandChild>>
+        : never;
 
 /**
  * Infer output type from union/variant field
@@ -454,7 +494,7 @@ type InferUnionType<TVariants> =
       string,
       z.ZodTypeAny,
       FieldUsageConfig,
-      AnyChildrenConstrain<string, FieldUsageConfig>
+      AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
     >
   >
     ? InferFieldOutput<TVariants[keyof TVariants]>

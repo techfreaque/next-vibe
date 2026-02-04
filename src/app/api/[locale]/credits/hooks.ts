@@ -15,6 +15,7 @@ import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 
 import definitions, { type CreditsGetResponseOutput } from "./definition";
@@ -49,10 +50,12 @@ export interface UseCreditsReturn extends EndpointReturn<typeof definitions> {
  * Hook for fetching current user's credit balance with optimistic updates
  * Optimized with 10-second cache to reduce excessive API calls
  *
+ * @param user - JWT payload for the current user
  * @param logger - Endpoint logger for tracking requests
  * @param initialData - Initial credit data from server, or null if not available (hook disabled when null)
  */
 export function useCredits(
+  user: JwtPayloadType,
   logger: EndpointLogger,
   // Pass null when credits should not be fetched (e.g., unauthenticated users)
   initialData: CreditsGetResponseOutput | null,
@@ -75,6 +78,7 @@ export function useCredits(
       },
     },
     logger,
+    user,
   );
 
   /**
@@ -181,6 +185,7 @@ export function useCredits(
  * Hook for fetching credit transaction history
  */
 export function useCreditHistory(
+  user: JwtPayloadType,
   logger: EndpointLogger,
 ): EndpointReturn<typeof historyDefinitions> {
   return useEndpoint(
@@ -193,6 +198,7 @@ export function useCreditHistory(
       },
     },
     logger,
+    user,
   );
 }
 
@@ -201,6 +207,7 @@ export function useCreditHistory(
  * Provides full endpoint interface with form controls and automatic Stripe redirect
  */
 export function useCreditPurchase(
+  user: JwtPayloadType,
   logger: EndpointLogger,
 ): EndpointReturn<typeof purchaseDefinitions> {
   const { toast } = useToast();
@@ -279,5 +286,6 @@ export function useCreditPurchase(
       },
     },
     logger,
+    user,
   );
 }

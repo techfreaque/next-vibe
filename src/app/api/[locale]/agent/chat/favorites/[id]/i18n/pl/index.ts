@@ -240,6 +240,12 @@ export const translations: typeof enTranslations = {
       label: "Niestandardowa ikona",
       description: "Niestandardowa ikona dla tego ulubionego",
     },
+    changeCharacter: {
+      label: "Zmień postać",
+    },
+    modifyCharacter: {
+      label: "Modyfikuj postać",
+    },
     response: {
       success: {
         content: "Zaktualizowano: {{value}}",

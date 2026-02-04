@@ -19,21 +19,22 @@ import type { JSX } from "react";
 import { useEffect, useRef } from "react";
 
 import { useNewsletterManager } from "@/app/api/[locale]/newsletter/hooks";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import type { MeGetResponseOutput } from "../../../user/private/me/definition";
 
 interface NewsletterPageProps {
   locale: CountryLanguage;
   prefilledEmail?: string;
-  user: MeGetResponseOutput | undefined;
+  user: JwtPayloadType;
+  userEmail: string | undefined;
 }
 
 export function NewsletterPage({
   locale,
   prefilledEmail,
   user,
+  userEmail,
 }: NewsletterPageProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -50,7 +51,7 @@ export function NewsletterPage({
     unsubscribe,
     isSubscribed,
     handleEmailChange,
-  } = useNewsletterManager(user);
+  } = useNewsletterManager(user, userEmail);
 
   // Track if we've already set the prefilled email to prevent infinite loops
   const hasSetPrefilledEmail = useRef(false);

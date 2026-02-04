@@ -14,11 +14,11 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
 import type { InputChangeEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
-import type { MeGetResponseOutput } from "../user/private/me/definition";
 import statusEndpoints from "./status/definition";
 import subscribeEndpoints from "./subscribe/definition";
 import unsubscribeEndpoints from "./unsubscribe/definition";
@@ -41,10 +41,13 @@ const showConfirmUnsubscribeKey = createCustomStateKey<boolean>(
 /**
  * Hook for newsletter status
  */
-export function useNewsletterStatus(params: {
-  email: string;
-  enabled?: boolean;
-}): EndpointReturn<typeof statusEndpoints> {
+export function useNewsletterStatus(
+  user: JwtPayloadType,
+  params: {
+    email: string;
+    enabled?: boolean;
+  },
+): EndpointReturn<typeof statusEndpoints> {
   const { locale } = useTranslation();
   const logger = useMemo(
     () => createEndpointLogger(false, Date.now(), locale),
@@ -60,15 +63,16 @@ export function useNewsletterStatus(params: {
       },
     },
     logger,
+    user,
   );
 }
 
 /**
  * Hook for newsletter subscription
  */
-export function useNewsletterSubscription(): EndpointReturn<
-  typeof subscribeEndpoints
-> {
+export function useNewsletterSubscription(
+  user: JwtPayloadType,
+): EndpointReturn<typeof subscribeEndpoints> {
   const { locale } = useTranslation();
   const logger = useMemo(
     () => createEndpointLogger(false, Date.now(), locale),
@@ -87,15 +91,16 @@ export function useNewsletterSubscription(): EndpointReturn<
       },
     },
     logger,
+    user,
   );
 }
 
 /**
  * Hook for newsletter unsubscription
  */
-export function useNewsletterUnsubscription(): EndpointReturn<
-  typeof unsubscribeEndpoints
-> {
+export function useNewsletterUnsubscription(
+  user: JwtPayloadType,
+): EndpointReturn<typeof unsubscribeEndpoints> {
   const { locale } = useTranslation();
   const logger = useMemo(
     () => createEndpointLogger(false, Date.now(), locale),
@@ -112,6 +117,7 @@ export function useNewsletterUnsubscription(): EndpointReturn<
       },
     },
     logger,
+    user,
   );
 }
 
@@ -146,7 +152,8 @@ interface NewsletterManagerResult {
  * Supports both logged-in users (auto-fill email) and non-logged-in users (manual input)
  */
 export function useNewsletterManager(
-  user: MeGetResponseOutput | undefined,
+  user: JwtPayloadType,
+  userEmail: string | undefined,
 ): NewsletterManagerResult {
   const { locale } = useTranslation();
   const logger = useMemo(
@@ -162,7 +169,7 @@ export function useNewsletterManager(
   );
 
   // Use user email if logged in (and private user), otherwise use manual input
-  const email: string = user && !user.isPublic ? user.email : manualEmail;
+  const email: string = userEmail || manualEmail;
 
   // Improved email validation
   const isValidEmail = useCallback((emailToValidate: string): boolean => {
@@ -173,8 +180,18 @@ export function useNewsletterManager(
   const isCurrentEmailValid = email ? isValidEmail(email) : false;
 
   // Hooks for newsletter operations
-  const subscriptionEndpoint = useEndpoint(subscribeEndpoints, {}, logger);
-  const unsubscribeEndpoint = useEndpoint(unsubscribeEndpoints, {}, logger);
+  const subscriptionEndpoint = useEndpoint(
+    subscribeEndpoints,
+    undefined,
+    logger,
+    user,
+  );
+  const unsubscribeEndpoint = useEndpoint(
+    unsubscribeEndpoints,
+    undefined,
+    logger,
+    user,
+  );
 
   // Handle email change - only allow changes when not logged in
   const handleEmailChange = useCallback(
@@ -198,7 +215,7 @@ export function useNewsletterManager(
   ]);
 
   // Check status when we have a valid email
-  const statusEndpoint = useNewsletterStatus({
+  const statusEndpoint = useNewsletterStatus(user, {
     email: email || "",
     enabled:
       isCurrentEmailValid &&

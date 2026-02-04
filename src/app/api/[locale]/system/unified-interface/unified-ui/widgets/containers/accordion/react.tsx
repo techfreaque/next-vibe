@@ -9,19 +9,20 @@ import {
 } from "next-vibe-ui/ui/accordion";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
-import type { Path } from "react-hook-form";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import { getSpacingClassName } from "../../../../shared/widgets/utils/widget-helpers";
-import { WidgetRenderer } from "../../../renderers/react/WidgetRenderer";
+import { MultiWidgetRenderer } from "../../../renderers/react/MultiWidgetRenderer";
 import type { ReactWidgetProps } from "../../_shared/react-types";
-import { isArrayValue, isObjectWidget } from "../../_shared/type-guards";
+import { hasChild } from "../../_shared/type-guards";
 import type {
-  ArrayChildConstraint,
+  BaseObjectWidgetConfig,
   ConstrainedChildUsage,
   FieldUsageConfig,
+  ObjectChildrenConstraint,
 } from "../../_shared/types";
-import type { AccordionWidgetConfig } from "./types";
+import { useWidgetTranslation } from "../../_shared/use-widget-context";
+import type { AccordionArrayWidgetConfig } from "./types";
 
 /**
  * Accordion Widget - Displays collapsible accordion panels with expand/collapse
@@ -50,7 +51,7 @@ import type { AccordionWidgetConfig } from "./types";
  * Data Format:
  * - object: { items: Array<{ title: string, content: any, expanded?: boolean }>, variant?: string }
  *   - items: Array of accordion items
- *     - title: Item title (translated via context.t)
+ *     - title: Item title (translated via t)
  *     - content: Item content (any widget data)
  *     - expanded: Whether item is initially expanded
  *   - variant: Visual variant style
@@ -65,16 +66,25 @@ export function AccordionWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "array" | "array-optional",
-  TChild extends ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>,
+  TChild extends BaseObjectWidgetConfig<
+    TKey,
+    ConstrainedChildUsage<TUsage>,
+    "object" | "object-optional" | "widget-object",
+    ObjectChildrenConstraint<
+      TKey,
+      ConstrainedChildUsage<ConstrainedChildUsage<TUsage>>
+    >
+  >,
 >({
   field,
-  context,
   fieldName,
 }: ReactWidgetProps<
   TEndpoint,
-  AccordionWidgetConfig<TKey, TUsage, TSchemaType, TChild>
+  TUsage,
+  AccordionArrayWidgetConfig<TKey, TUsage, "array" | "array-optional", TChild>
 >): JSX.Element {
+  const t = useWidgetTranslation();
+
   const {
     allowMultiple = false,
     collapsible = true,
@@ -91,24 +101,19 @@ export function AccordionWidget<
   const itemPaddingClass = getSpacingClassName("padding", itemPadding);
   const contentPaddingClass = getSpacingClassName("padding", contentPadding);
 
-  // Runtime guard: verify value is an array and child is an object widget
-  if (!Array.isArray(field.value)) {
+  if (!hasChild(field)) {
     return (
-      <Div className="text-center text-muted-foreground py-8">
-        {context.t("system.ui.widgets.accordion.error-type")}
+      <Div
+        className={cn(
+          "text-center text-muted-foreground",
+          emptyPaddingClass || "py-8",
+        )}
+      >
+        {t("system.ui.widgets.accordion.empty")}
       </Div>
     );
   }
 
-  if (!("children" in field.child)) {
-    return (
-      <Div className="text-center text-muted-foreground py-8">
-        {context.t("system.ui.widgets.accordion.error-child")}
-      </Div>
-    );
-  }
-
-  // Now TypeScript narrows field.value to array and field.child to object widget
   if (field.value.length === 0) {
     return (
       <Div
@@ -117,7 +122,7 @@ export function AccordionWidget<
           emptyPaddingClass || "py-8",
         )}
       >
-        {context.t("system.ui.widgets.accordion.empty")}
+        {t("system.ui.widgets.accordion.empty")}
       </Div>
     );
   }
@@ -135,39 +140,16 @@ export function AccordionWidget<
         variant === "separated" && "space-y-2",
       )}
     >
-      {(() => {
-        // Type guard narrows field.value to array and field.child to object widget
-        if (!isArrayValue(field.value) || !isObjectWidget(field.child)) {
-          return null;
-        }
-
-        // Now we know field.value is array and field.child.children exists
-        const items = field.value;
-        const { trigger: triggerField, content: contentField } =
-          field.child.children;
-
-        return items.map((itemData, index) => {
-          // Runtime guard: verify item is object with trigger/content
-          if (
-            itemData === null ||
-            typeof itemData !== "object" ||
-            !("trigger" in itemData) ||
-            !("content" in itemData)
-          ) {
-            return null;
-          }
-
-          const triggerData = itemData.trigger;
-          const contentData = itemData.content;
-
+      <MultiWidgetRenderer
+        childrenSchema={hasChild(field) ? field.child : undefined}
+        value={field.value}
+        fieldName={fieldName}
+        renderItem={({ itemData, index, itemFieldName, childSchema }) => {
           const itemId = `item-${index}`;
-          const baseFieldName = fieldName || "";
-          const triggerFieldName = baseFieldName
-            ? `${baseFieldName}.${index}.trigger`
-            : `${index}.trigger`;
-          const contentFieldName = baseFieldName
-            ? `${baseFieldName}.${index}.content`
-            : `${index}.content`;
+
+          // Get children from child schema if it has them
+          const childrenSchema =
+            "children" in childSchema ? childSchema.children : undefined;
 
           return (
             <AccordionItem
@@ -188,36 +170,38 @@ export function AccordionWidget<
                 <Div
                   className={cn("flex items-center", titleGapClass || "gap-2")}
                 >
-                  <WidgetRenderer
-                    fieldName={
-                      triggerFieldName as Path<
-                        TEndpoint["types"]["RequestOutput"]
-                      >
+                  <MultiWidgetRenderer
+                    childrenSchema={
+                      childrenSchema && "trigger" in childrenSchema
+                        ? { trigger: childrenSchema.trigger }
+                        : undefined
                     }
-                    field={{ ...triggerField, value: triggerData }}
-                    context={context}
+                    value={itemData}
+                    fieldName={itemFieldName}
                   />
                 </Div>
               </AccordionTrigger>
               <AccordionContent
                 className={cn(variant === "separated" && contentPaddingClass)}
               >
-                <WidgetRenderer
-                  fieldName={
-                    contentFieldName as Path<
-                      TEndpoint["types"]["RequestOutput"]
-                    >
+                <MultiWidgetRenderer
+                  childrenSchema={
+                    childrenSchema && "content" in childrenSchema
+                      ? { content: childrenSchema.content }
+                      : undefined
                   }
-                  field={{ ...contentField, value: contentData }}
-                  context={context}
+                  value={itemData}
+                  fieldName={itemFieldName}
                 />
               </AccordionContent>
             </AccordionItem>
           );
-        });
-      })()}
+        }}
+      />
     </Accordion>
   );
 }
 
 AccordionWidget.displayName = "AccordionWidget";
+
+export default AccordionWidget;

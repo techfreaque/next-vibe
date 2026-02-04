@@ -15,6 +15,7 @@ import { SubscriptionHeader } from "@/app/api/[locale]/subscription/_components/
 import { SubscriptionStatusCard } from "@/app/api/[locale]/subscription/_components/subscription-status-card";
 import { SubscriptionTabsNav } from "@/app/api/[locale]/subscription/_components/subscription-tabs-nav";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -29,6 +30,7 @@ interface BuyCreditsPageClientProps {
   packCredits: number;
   freeCredits: number;
   yearlySubscriptionPrice: number;
+  user: JwtPayloadType;
 }
 
 export function BuyCreditsPageClient({
@@ -42,6 +44,7 @@ export function BuyCreditsPageClient({
   packCredits,
   freeCredits,
   yearlySubscriptionPrice,
+  user,
 }: BuyCreditsPageClientProps): JSX.Element {
   const { t } = simpleT(locale);
   const router = useRouter();
@@ -119,6 +122,7 @@ export function BuyCreditsPageClient({
       {/* Credit Balance Overview Card */}
       <CreditBalanceCard
         locale={locale}
+        user={user}
         initialCredits={initialCredits}
         freeCredits={freeCredits}
       />
@@ -144,6 +148,7 @@ export function BuyCreditsPageClient({
         packPrice={packPrice}
         packCredits={packCredits}
         yearlySubscriptionPrice={yearlySubscriptionPrice}
+        user={user}
       />
     </Container>
   );

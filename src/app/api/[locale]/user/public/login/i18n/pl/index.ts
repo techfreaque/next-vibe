@@ -4,8 +4,9 @@ import { translations as _componentsTranslations } from "../../_components/i18n/
 
 export const translations: typeof enTranslations = {
   _components: _componentsTranslations,
-  title: "Logowanie",
-  description: "Endpoint logowania użytkownika",
+  title: "Witaj ponownie",
+  description:
+    "Uzyskaj dostęp do niecenzurowanych modeli AI i historii rozmów.",
   tag: "Uwierzytelnianie",
   options: optionsTranslations,
   actions: {
@@ -14,20 +15,19 @@ export const translations: typeof enTranslations = {
   },
   fields: {
     email: {
-      label: "E-mail",
-      description: "Adres e-mail użytkownika",
-      placeholder: "Wprowadź e-mail",
-      help: "Wprowadź adres e-mail powiązany z Twoim kontem",
+      label: "Twój e-mail",
+      description: "E-mail, którego użyłeś do rejestracji.",
+      placeholder: "Wpisz e-mail",
       validation: {
         required: "E-mail jest wymagany",
-        invalid: "Proszę wprowadzić prawidłowy adres e-mail",
+        invalid: "Wpisz prawidłowy adres e-mail",
       },
     },
     password: {
-      label: "Hasło",
-      description: "Hasło użytkownika",
-      placeholder: "Wprowadź hasło",
-      help: "Wprowadź hasło do swojego konta",
+      label: "Twoje hasło",
+      description: "Wpisz hasło, które ustaliłeś podczas rejestracji.",
+      placeholder: "Wpisz hasło",
+      help: "Wpisz hasło do swojego konta",
       validation: {
         required: "Hasło jest wymagane",
         minLength: "Hasło musi mieć co najmniej 8 znaków",
@@ -35,15 +35,6 @@ export const translations: typeof enTranslations = {
     },
     rememberMe: {
       label: "Zapamiętaj mnie",
-      description: "Zostaw mnie zalogowanego",
-      placeholder: "Zapamiętaj mnie",
-      help: "Pozostań zalogowany na tym urządzeniu dla łatwiejszego dostępu",
-    },
-    leadId: {
-      label: "ID Lead",
-      description: "Opcjonalny identyfikator lead",
-      placeholder: "Wprowadź ID lead",
-      help: "Opcjonalny identyfikator lead dla śledzenia",
     },
   },
   groups: {
@@ -146,9 +137,9 @@ export const translations: typeof enTranslations = {
     },
   },
   success: {
-    title: "Logowanie pomyślne",
-    description: "Zostałeś zalogowany",
-    message: "Witaj ponownie! Pomyślnie się zalogowałeś.",
+    title: "Zalogowano pomyślnie",
+    description: "Jesteś teraz zalogowany",
+    message: "Witaj ponownie! Zalogowałeś się pomyślnie.",
   },
   token: {
     save: {

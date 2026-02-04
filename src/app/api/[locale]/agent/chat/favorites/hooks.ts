@@ -13,16 +13,13 @@ import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { UseEndpointOptions } from "../../../system/unified-interface/react/hooks/endpoint-types";
 import type { FavoriteCreateRequestOutput } from "./create/definition";
 import favoritesCreateDefinition from "./create/definition";
 import favoritesDefinition, { type FavoriteCard } from "./definition";
-import { FavoritesRepositoryClient } from "./repository-client";
 
 interface UseChatFavoritesOptions {
-  user: JwtPayloadType | undefined;
   logger: EndpointLogger;
   characters: Record<string, CharacterListItem>;
 }
@@ -42,11 +39,10 @@ export interface UseChatFavoritesReturn {
  * - Non-authenticated users: localStorage via callbacks
  */
 export function useChatFavorites({
-  user,
   logger,
   characters,
 }: UseChatFavoritesOptions): UseChatFavoritesReturn {
-  const { activeFavoriteId } = useChatContext();
+  const { activeFavoriteId, user } = useChatContext();
   const isAuthenticated = useMemo(
     () => user !== undefined && !user.isPublic,
     [user],
@@ -66,37 +62,22 @@ export function useChatFavorites({
               staleTime: 60 * 1000,
             },
           },
-          storage: isAuthenticated
-            ? undefined
-            : {
-                mode: "localStorage" as const,
-                callbacks: FavoritesRepositoryClient.localStorageListCallbacks,
-              },
         }) satisfies UseEndpointOptions<typeof favoritesDefinition>,
-      [hasCharacters, isAuthenticated],
+      [hasCharacters],
     );
 
-  const endpoint = useEndpoint(favoritesDefinition, endpointOptions, logger);
-
-  // Create endpoint for adding favorites
-  const createEndpointOptions: UseEndpointOptions<
-    typeof favoritesCreateDefinition
-  > = useMemo(
-    () => ({
-      storage: isAuthenticated
-        ? undefined
-        : {
-            mode: "localStorage" as const,
-            callbacks: FavoritesRepositoryClient.localStorageCreateCallbacks,
-          },
-    }),
-    [isAuthenticated],
+  const endpoint = useEndpoint(
+    favoritesDefinition,
+    endpointOptions,
+    logger,
+    user,
   );
 
   const createEndpoint = useEndpoint(
     favoritesCreateDefinition,
-    createEndpointOptions,
+    undefined,
     logger,
+    user,
   );
 
   // Extract favorites from flat array

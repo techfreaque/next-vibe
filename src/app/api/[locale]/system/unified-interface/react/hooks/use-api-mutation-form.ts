@@ -17,6 +17,7 @@ import { useForm, type UseFormProps } from "react-hook-form";
 
 import { extractSchemaDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { buildKey } from "./query-key-builder";
@@ -48,6 +49,7 @@ import { useApiMutation } from "./use-api-mutation";
 export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
   logger: EndpointLogger,
+  user: JwtPayloadType,
   options: ApiFormOptions<TEndpoint["types"]["RequestOutput"]> = {},
   mutationOptions: ApiMutationOptions<
     TEndpoint["types"]["RequestOutput"],
@@ -63,7 +65,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   const formId = getFormId(endpoint);
 
   // Use React Query-based mutation hook
-  const mutation = useApiMutation(endpoint, logger, mutationOptions);
+  const mutation = useApiMutation(endpoint, logger, user, mutationOptions);
 
   // Get form state from Zustand (forms state remains in Zustand)
   const formState = useApiStore((state) => state.forms[formId]) ?? {

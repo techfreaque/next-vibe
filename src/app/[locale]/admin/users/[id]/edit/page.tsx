@@ -9,7 +9,9 @@ import { H1, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { UserEditForm } from "@/app/api/[locale]/users/user/_components/user-edit-form";
 import { UserByIdRepository } from "@/app/api/[locale]/users/user/[id]/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -27,18 +29,26 @@ export default async function UserEditPage({
 }: UserEditPageProps): Promise<React.JSX.Element> {
   const { locale, id } = await params;
   const { t } = simpleT(locale);
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
-  // Require admin user authentication
-  const user = await requireAdminUser(
-    locale,
-    `/${locale}/admin/users/${id}/edit`,
+  // Get JWT user for client components
+  const jwtUser = await AuthRepository.getAuthMinimalUser(
+    [UserRole.ADMIN],
+    { platform: Platform.NEXT_PAGE, locale },
+    logger,
   );
 
-  // Fetch user data
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  // Verify admin access (will redirect if not admin)
+  if (jwtUser.isPublic || !jwtUser.roles.includes(UserRole.ADMIN)) {
+    redirect(
+      `/${locale}/user/login?callbackUrl=${encodeURIComponent(`/${locale}/admin/users/${id}/edit`)}`,
+    );
+  }
+
+  // Fetch user data being edited
   const userResponse = await UserByIdRepository.getUserById(
     { id },
-    user,
+    jwtUser,
     logger,
   );
 
@@ -60,7 +70,7 @@ export default async function UserEditPage({
       </Div>
 
       {/* Edit Form */}
-      <UserEditForm locale={locale} userId={id} user={userResponse.data} />
+      <UserEditForm locale={locale} userId={id} user={jwtUser} />
     </Div>
   );
 }

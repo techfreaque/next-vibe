@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { StandardUserType } from "../user/types";
 import definitions from "./definition";
@@ -19,6 +20,7 @@ import { ContactSubject } from "./enum";
  * Hook for contact form with modern useEndpoint pattern
  */
 export function useContactEndpoint(
+  user: JwtPayloadType,
   logger: EndpointLogger,
   params?: {
     enabled?: boolean;
@@ -38,6 +40,7 @@ export function useContactEndpoint(
       },
     },
     logger,
+    user,
   );
 }
 
@@ -46,11 +49,12 @@ export function useContactEndpoint(
  * Server gets leadId from JWT payload (user.leadId)
  */
 export function useContactWithEngagement(
+  jwtUser: JwtPayloadType,
   logger: EndpointLogger,
   user: StandardUserType | undefined,
 ): EndpointReturn<typeof definitions> {
   // Get the base endpoint
-  const formResult = useContactEndpoint(logger);
+  const formResult = useContactEndpoint(jwtUser, logger);
 
   // Set default values based on user data
   useEffect(() => {

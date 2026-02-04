@@ -18,12 +18,12 @@ import {
 } from "../../../../shared/widgets/utils/widget-helpers";
 import type { WidgetData } from "../../../../shared/widgets/widget-data";
 import type { ReactWidgetProps } from "../../_shared/react-types";
-import { isString } from "../../_shared/type-guards";
 import type {
   ArrayChildConstraint,
   ConstrainedChildUsage,
   FieldUsageConfig,
 } from "../../_shared/types";
+import { useWidgetLocale } from "../../_shared/use-widget-context";
 import {
   extractGroupedListData,
   getDisplayItems,
@@ -77,11 +77,11 @@ export function GroupedListWidget<
   TChild extends ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>,
 >({
   field,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
-  GroupedListWidgetConfig<TKey, TUsage, TChild, TSchemaType>
+  GroupedListWidgetConfig<TKey, TUsage, TSchemaType, TChild>
 >): JSX.Element {
+  const locale = useWidgetLocale();
   const {
     groupBy,
     sortBy,
@@ -122,7 +122,7 @@ export function GroupedListWidget<
   const itemSizeClass = getTextSizeClassName(itemSize);
   const buttonSizeClass = getTextSizeClassName(buttonSize);
 
-  const { t } = simpleT(context.locale);
+  const { t } = simpleT(locale);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const config =
     field.schemaType === "array" && groupBy ? { groupBy, sortBy } : undefined;
@@ -166,7 +166,8 @@ export function GroupedListWidget<
     <Div className={cn("flex flex-col", gapClass || "gap-4", className)}>
       {groups.map((group) => {
         const groupKey = group.key;
-        const groupLabel = isString(group.label, context);
+        const groupLabel =
+          typeof group.label === "string" ? t(group.label) : "";
         const groupItems = group.items;
         const groupSummary = group.summary;
 
@@ -237,7 +238,7 @@ export function GroupedListWidget<
                   className={cn("flex flex-wrap", summaryGapClass || "gap-4")}
                 >
                   {Object.entries(groupSummary).map(([key, value]) => {
-                    const translatedKey = isString(key, context);
+                    const translatedKey = typeof key === "string" ? t(key) : "";
                     return (
                       <Div
                         key={key}
@@ -275,7 +276,8 @@ export function GroupedListWidget<
                         )}
                       >
                         {Object.entries(item).map(([key, value]) => {
-                          const translatedKey = isString(key, context);
+                          const translatedKey =
+                            typeof key === "string" ? t(key) : "";
                           return (
                             <Div
                               key={key}

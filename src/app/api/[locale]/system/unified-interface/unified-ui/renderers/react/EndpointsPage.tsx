@@ -109,7 +109,7 @@ export function EndpointsPage<
   endpoint,
   locale,
   description,
-  endpointOptions = {},
+  endpointOptions,
   submitButton,
   debug,
   className,
@@ -177,12 +177,14 @@ export function EndpointsPage<
           responseData,
           requestData,
           pathParams,
+          logger,
         }): void | ErrorResponseType | Promise<void | ErrorResponseType> => {
           // Call existing onSuccess first
           const existingResult = existingMutationOptions?.onSuccess?.({
             responseData,
             requestData,
             pathParams,
+            logger,
           });
 
           // Navigate to GET endpoint with ID from response
@@ -213,21 +215,31 @@ export function EndpointsPage<
 
   // Merge navigation-aware mutation options into endpoint options
   const finalEndpointOptions = useMemo(() => {
+    const baseOptions = {
+      ...endpointOptions,
+      user,
+    };
+
     if (!mutationOptionsWithNav) {
-      return endpointOptions;
+      return baseOptions;
     }
 
     return {
-      ...endpointOptions,
+      ...baseOptions,
       create: {
         ...endpointOptions?.create,
         mutationOptions: mutationOptionsWithNav,
       },
     };
-  }, [endpointOptions, mutationOptionsWithNav]);
+  }, [endpointOptions, mutationOptionsWithNav, user]);
 
   // Use the endpoint hook for base endpoint
-  const endpointState = useEndpoint(endpoint, finalEndpointOptions, logger);
+  const endpointState = useEndpoint(
+    endpoint,
+    finalEndpointOptions,
+    logger,
+    user,
+  );
 
   // Extract response and data based on endpoint type
   let response;
@@ -262,6 +274,8 @@ export function EndpointsPage<
         readResponse?.success === true ? readResponse.data : undefined;
       if (readData) {
         responseData = readData;
+        // CRITICAL: Also set response to the GET response so widgets have access to it in context
+        response = readResponse;
       }
     }
   } else if (isDeleteEndpoint && endpointState.delete) {

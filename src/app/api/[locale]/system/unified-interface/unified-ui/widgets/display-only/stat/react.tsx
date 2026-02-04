@@ -16,6 +16,10 @@ import {
 } from "../../../../shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
+import {
+  useWidgetLocale,
+  useWidgetTranslation,
+} from "../../_shared/use-widget-context";
 import { Icon } from "../../form-fields/icon-field/icons";
 import { formatStatValue } from "./shared";
 import type { StatWidgetConfig } from "./types";
@@ -89,11 +93,13 @@ export function StatWidget<
   TSchemaType extends "primitive",
 >({
   field,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   StatWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
 >): JSX.Element {
+  const locale = useWidgetLocale();
+  const t = useWidgetTranslation();
   const {
     label: labelKey,
     format,
@@ -116,7 +122,7 @@ export function StatWidget<
   } = field;
 
   // Translate label from UI config - no assertion needed
-  const label = labelKey ? context.t(labelKey) : "—";
+  const label = labelKey ? t(labelKey) : "—";
 
   // Get classes from config (no hardcoding!)
   const paddingClass = getSpacingClassName("padding", padding);
@@ -131,21 +137,6 @@ export function StatWidget<
   const labelSpacingClass = getSpacingClassName("margin", labelSpacing);
 
   // Size defaults based on size prop
-  const sizeDefaults = {
-    sm: { value: "text-lg", label: "text-xs", icon: "h-4 w-4", padding: "p-3" },
-    md: {
-      value: "text-2xl",
-      label: "text-xs",
-      icon: "h-5 w-5",
-      padding: "p-4",
-    },
-    lg: {
-      value: "text-3xl",
-      label: "text-sm",
-      icon: "h-6 w-6",
-      padding: "p-5",
-    },
-  };
   const sizeDefault = sizeDefaults[size] || sizeDefaults.md;
 
   // Handle non-numeric values
@@ -174,7 +165,7 @@ export function StatWidget<
   }
 
   // Format the value
-  const formattedValue = formatStatValue(field.value, format, context.locale);
+  const formattedValue = formatStatValue(field.value, format, locale);
 
   // Get variant class
   const variantClass =
@@ -261,3 +252,19 @@ export function StatWidget<
 StatWidget.displayName = "StatWidget";
 
 export default StatWidget;
+
+const sizeDefaults = {
+  sm: { value: "text-lg", label: "text-xs", icon: "h-4 w-4", padding: "p-3" },
+  md: {
+    value: "text-2xl",
+    label: "text-xs",
+    icon: "h-5 w-5",
+    padding: "p-4",
+  },
+  lg: {
+    value: "text-3xl",
+    label: "text-sm",
+    icon: "h-6 w-6",
+    padding: "p-5",
+  },
+} as const;

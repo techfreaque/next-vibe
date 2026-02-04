@@ -97,7 +97,7 @@ export class LoginRepository {
     platform: Platform,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     // Extract data from request
-    const { email, password, rememberMe } = data.formCard;
+    const { email, password, rememberMe } = data;
 
     // Get leadId from user prop (JWT payload) - always present
     const leadId = user.leadId;

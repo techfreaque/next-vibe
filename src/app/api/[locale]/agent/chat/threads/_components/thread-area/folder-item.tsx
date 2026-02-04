@@ -99,6 +99,7 @@ export function FolderItem({
     deleteFolder,
     handleReorderFolder,
     handleMoveFolderToParent,
+    user,
   } = useChatContext();
 
   // Compute if this folder should be expanded (pure computation, no state)
@@ -539,6 +540,7 @@ export function FolderItem({
       />
 
       <FolderPermissionsDialog
+        user={user}
         open={permissionsDialogOpen}
         onOpenChange={setPermissionsDialogOpen}
         folderId={folder.id}

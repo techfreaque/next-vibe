@@ -17,6 +17,7 @@ import type React from "react";
 import type { EmailsListResponseType } from "@/app/api/[locale]/emails/messages/list/definition";
 import { useEmailMessagesList } from "@/app/api/[locale]/emails/messages/list/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -26,14 +27,16 @@ import { EmailsListTable } from "./emails-list-table";
 
 interface EmailsListClientProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 export function EmailsListClient({
   locale,
+  user,
 }: EmailsListClientProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const emailsEndpoint = useEmailMessagesList(logger);
+  const emailsEndpoint = useEmailMessagesList(user, logger);
 
   const apiResponse = emailsEndpoint.read?.response;
   const emails: EmailsListResponseType["emails"] = apiResponse?.success

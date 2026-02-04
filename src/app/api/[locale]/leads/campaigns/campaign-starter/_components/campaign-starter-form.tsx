@@ -23,19 +23,22 @@ import type { JSX } from "react";
 import campaignStarterDefinitions from "@/app/api/[locale]/leads/campaigns/campaign-starter/campaign-starter-config/definition";
 import { useCampaignStarterConfigEndpoint } from "@/app/api/[locale]/leads/campaigns/campaign-starter/campaign-starter-config/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { CountryLanguageValues } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 export function CampaignStarterForm({
   locale,
+  user,
 }: {
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }): JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
 
-  const endpoint = useCampaignStarterConfigEndpoint(logger, {
+  const endpoint = useCampaignStarterConfigEndpoint(user, logger, {
     enabled: true,
   });
 

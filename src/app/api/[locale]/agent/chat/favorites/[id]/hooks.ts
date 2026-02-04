@@ -17,7 +17,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import favoritesListDefinition from "../definition";
-import { FavoritesRepositoryClient } from "../repository-client";
 import type { FavoriteUpdateRequestOutput } from "./definition";
 import definitions from "./definition";
 
@@ -35,13 +34,9 @@ export function useFavorite(
   user: JwtPayloadType,
   logger: EndpointLogger,
 ): UseFavoriteReturn {
-  const isAuthenticated = useMemo(
-    () => user !== undefined && !user.isPublic,
-    [user],
-  );
-
   const endpointOptions: UseEndpointOptions<typeof definitions> = useMemo(
     () => ({
+      user,
       read: {
         queryOptions: {
           enabled: !!favoriteId,
@@ -50,17 +45,11 @@ export function useFavorite(
         },
       },
       urlPathParams: favoriteId ? { id: favoriteId } : undefined,
-      storage: isAuthenticated
-        ? undefined
-        : {
-            mode: "localStorage" as const,
-            callbacks: FavoritesRepositoryClient.byIdCallbacks,
-          },
     }),
-    [favoriteId, isAuthenticated],
+    [favoriteId, user],
   );
 
-  const endpoint = useEndpoint(definitions, endpointOptions, logger);
+  const endpoint = useEndpoint(definitions, endpointOptions, logger, user);
 
   const updateFavorite = useCallback(
     async (updates: FavoriteUpdateRequestOutput): Promise<void> => {

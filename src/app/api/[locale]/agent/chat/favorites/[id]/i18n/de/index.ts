@@ -246,6 +246,12 @@ export const translations: typeof enTranslations = {
       label: "Benutzerdefiniertes Symbol",
       description: "Benutzerdefiniertes Symbol für diesen Favoriten",
     },
+    changeCharacter: {
+      label: "Charakter wechseln",
+    },
+    modifyCharacter: {
+      label: "Charakter bearbeiten",
+    },
     response: {
       success: {
         content: "Aktualisiert: {{value}}",

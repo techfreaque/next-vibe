@@ -8,6 +8,7 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { SmtpAccountsClient } from "@/app/api/[locale]/emails/smtp-client/list/_components/smtp-accounts-client";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -18,6 +19,7 @@ export default async function SmtpAccountsPage({
 }): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
+  const user = await requireAdminUser(locale);
 
   return (
     <Div className="flex flex-col gap-6">
@@ -29,7 +31,7 @@ export default async function SmtpAccountsPage({
       </Div>
 
       {/* Client Component handles all interactions */}
-      <SmtpAccountsClient locale={locale} />
+      <SmtpAccountsClient locale={locale} user={user} />
     </Div>
   );
 }

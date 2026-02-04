@@ -9,6 +9,7 @@ import "server-only";
 import type { NextRequest } from "next/server";
 import type { z } from "zod";
 
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { emailHandlingRepository } from "@/app/api/[locale]/emails/smtp-client/email-handling/repository";
 import type { EmailHandleRequestOutput } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
@@ -358,7 +359,13 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       const deductResult = await CreditRepository.deductCreditsForFeature(
         user,
         endpoint.credits,
-        `${endpoint.path.join("/")}/${endpoint.method}`,
+        (endpoint.aliases?.[0] ||
+          `${endpoint.path.join("/")}/${endpoint.method}`) as
+          | ModelId
+          | "tts"
+          | "stt"
+          | "search"
+          | "stt-hotkey",
         logger,
       );
 

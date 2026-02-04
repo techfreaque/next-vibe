@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import {
@@ -18,6 +19,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
+import { simpleT } from "@/i18n/core/shared";
 
 import { OverviewPageClient } from "./_components/overview-page-client";
 
@@ -50,6 +52,7 @@ export default async function OverviewPage({
   params,
 }: OverviewPageProps): Promise<JSX.Element> {
   const { locale } = await params;
+  const { t } = simpleT(locale);
 
   // Check authentication
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -128,6 +131,10 @@ export default async function OverviewPage({
   const PACK_CREDITS = products[ProductIds.CREDIT_PACK].credits;
   const FREE_CREDITS = products[ProductIds.FREE_TIER].credits;
 
+  if (!userResponse.success) {
+    return <Div>{t("app.subscription.overview.errors.failedToLoadUser")}</Div>;
+  }
+
   return (
     <OverviewPageClient
       locale={locale}
@@ -139,6 +146,7 @@ export default async function OverviewPage({
       packPrice={PACK_PRICE}
       packCredits={PACK_CREDITS}
       freeCredits={FREE_CREDITS}
+      user={userResponse.data}
     />
   );
 }

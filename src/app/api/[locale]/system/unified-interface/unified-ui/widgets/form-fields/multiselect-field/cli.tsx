@@ -5,6 +5,8 @@
 import { Box, Text } from "ink";
 import type { JSX } from "react";
 
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { ArrayWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type { InkWidgetProps } from "../../_shared/cli-types";
@@ -13,24 +15,41 @@ import type { MultiSelectFieldWidgetConfig } from "./types";
 
 export function MultiSelectFieldWidgetInk<
   TKey extends string,
+  TUsage extends FieldUsageConfig,
   TEndpoint extends CreateApiEndpointAny,
 >({
   field,
-  context,
 }: InkWidgetProps<
   TEndpoint,
-  MultiSelectFieldWidgetConfig<TKey, ArrayWidgetSchema, FieldUsageConfig>
+  TUsage,
+  MultiSelectFieldWidgetConfig<TKey, ArrayWidgetSchema, TUsage>
 >): JSX.Element {
-  const { t } = context;
+  const t = useInkWidgetTranslation();
 
   // value is array of selected values
   const selectedValues = field.value;
-  const selectedOptions = field.options.filter((opt) =>
-    selectedValues?.includes(opt.value),
+  const selectedOptions = field.options.filter(
+    (opt: {
+      value: string | number;
+      label: string;
+      labelParams?: Record<string, string | number>;
+      disabled?: boolean;
+      icon?: string;
+    }) => selectedValues?.includes(opt.value),
   );
   const displayValue =
     selectedOptions.length > 0
-      ? selectedOptions.map((opt) => t(opt.label)).join(", ")
+      ? selectedOptions
+          .map(
+            (opt: {
+              value: string | number;
+              label: string;
+              labelParams?: Record<string, string | number>;
+              disabled?: boolean;
+              icon?: string;
+            }) => t(opt.label),
+          )
+          .join(", ")
       : "—";
 
   return (

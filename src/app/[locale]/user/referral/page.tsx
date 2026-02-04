@@ -48,6 +48,11 @@ export default async function ReferralPage({
   );
   const isAuthenticated = !minimalUser.isPublic && !!minimalUser.id;
   return (
-    <ReferralPageClient locale={locale} isAuthenticated={isAuthenticated} />
+    <ReferralPageClient
+      locale={locale}
+      isAuthenticated={isAuthenticated}
+      user={minimalUser}
+      logger={logger}
+    />
   );
 }

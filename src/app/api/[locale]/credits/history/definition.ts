@@ -46,7 +46,8 @@ const { GET } = createEndpoint({
     title: "app.api.agent.chat.credits.history.get.container.title",
     description: "app.api.agent.chat.credits.history.get.container.description",
     layoutType: LayoutType.STACKED,
-    getCount: (data) => data.response?.paginationInfo?.total,
+    getCount: (data: { paginationInfo?: { total?: number } }) =>
+      data.paginationInfo?.total,
     submitButton: {
       text: "app.api.leads.list.get.actions.refresh",
       loadingText: "app.api.leads.list.get.actions.refreshing",
@@ -89,11 +90,7 @@ const { GET } = createEndpoint({
               content: "app.api.agent.chat.credits.history.get.type" as const,
               schema: z.string().optional(),
             }),
-            modelId: responseField({
-              type: WidgetType.BADGE,
-              text: "app.api.agent.chat.credits.history.get.modelId" as const,
-              schema: z.enum(ModelId).nullable(),
-            }),
+
             messageId: responseField({
               type: WidgetType.TEXT,
               content:
@@ -101,7 +98,8 @@ const { GET } = createEndpoint({
               schema: z.string().nullable(),
             }),
             createdAt: responseField({
-              type: WidgetType.TEXT,
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.DATE,
               content:
                 "app.api.agent.chat.credits.history.get.createdAt" as const,
               schema: dateSchema,
@@ -125,13 +123,13 @@ const { GET } = createEndpoint({
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number().optional().default(50),
           }),
-          total: responseField({
+          totalCount: responseField({
             type: WidgetType.TEXT,
             content:
               "app.api.agent.chat.credits.history.get.paginationInfo.total" as const,
             schema: z.coerce.number(),
           }),
-          totalPages: responseField({
+          pageCount: responseField({
             type: WidgetType.TEXT,
             content:
               "app.api.agent.chat.credits.history.get.paginationInfo.totalPages" as const,
@@ -215,8 +213,7 @@ const { GET } = createEndpoint({
             id: "123e4567-e89b-12d3-a456-426614174000",
             amount: -5,
             balanceAfter: 1495,
-            type: CreditTransactionType.USAGE,
-            modelId: ModelId.GPT_5_MINI,
+            type: `${CreditTransactionType.USAGE} (${ModelId.GPT_5_MINI})`,
             messageId: "msg-123e4567-e89b-12d3-a456-426614174000",
             createdAt: "2025-10-16T12:00:00.000Z",
           },
@@ -225,7 +222,6 @@ const { GET } = createEndpoint({
             amount: 500,
             balanceAfter: 1500,
             type: CreditTransactionType.PURCHASE,
-            modelId: null,
             messageId: null,
             createdAt: "2025-10-15T10:00:00.000Z",
           },
@@ -233,8 +229,8 @@ const { GET } = createEndpoint({
         paginationInfo: {
           page: 1,
           limit: 50,
-          total: 2,
-          totalPages: 1,
+          totalCount: 2,
+          pageCount: 1,
         },
       },
     },

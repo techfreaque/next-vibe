@@ -15,6 +15,7 @@ import { useApiForm } from "@/app/api/[locale]/system/unified-interface/react/ho
 import { useTranslation } from "@/i18n/core/client";
 
 import resetPasswordRequestEndpoint from "./definition";
+import type { JwtPayloadType } from "../../../auth/types";
 
 /****************************
  * FORM HOOKS
@@ -36,7 +37,10 @@ import resetPasswordRequestEndpoint from "./definition";
  * @param logger - Endpoint logger for tracking operations
  * @returns Enhanced form and submission handler for requesting a password reset
  */
-export function useResetPasswordRequest(logger: EndpointLogger): ApiFormReturn<
+export function useResetPasswordRequest(
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+): ApiFormReturn<
   (typeof resetPasswordRequestEndpoint.POST)["types"]["RequestOutput"],
   (typeof resetPasswordRequestEndpoint.POST)["types"]["ResponseOutput"],
   (typeof resetPasswordRequestEndpoint.POST)["types"]["UrlVariablesOutput"]
@@ -51,11 +55,10 @@ export function useResetPasswordRequest(logger: EndpointLogger): ApiFormReturn<
   const formResult = useApiForm(
     resetPasswordRequestEndpoint.POST,
     logger,
+    user,
     {
       defaultValues: {
-        emailInput: {
-          email: "",
-        },
+        email: "",
       },
       persistForm: false, // Disable persistence to avoid conflicts with old data structure
     },

@@ -90,6 +90,7 @@ export const translations = {
         features: {
           title: "Features",
           searchLabel: "Brave Search (per search)",
+          fetchUrlLabel: "Get Website as Text (per fetch)",
           ttsLabel: "Text-to-Speech (per 1000 characters)",
           sttLabel: "Speech-to-Text (per minute)",
           costFormat: "{{value}} {{unit}}",

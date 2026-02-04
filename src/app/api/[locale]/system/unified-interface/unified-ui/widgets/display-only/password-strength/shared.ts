@@ -11,6 +11,14 @@ export interface PasswordStrengthResult {
   level: "weak" | "fair" | "good" | "strong";
   /** Width percentage for progress bar (20-100) */
   widthPercentage: number;
+  /** Missing requirements */
+  missing: {
+    minLength: boolean;
+    uppercase: boolean;
+    lowercase: boolean;
+    number: boolean;
+    special: boolean;
+  };
 }
 
 /**
@@ -25,13 +33,27 @@ export function calculatePasswordStrength(
       strength: 0,
       level: "weak",
       widthPercentage: 0,
+      missing: {
+        minLength: true,
+        uppercase: true,
+        lowercase: true,
+        number: true,
+        special: true,
+      },
     };
   }
 
   let strength = 0;
 
+  // Check requirements
+  const hasMinLength = password.length >= 8;
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecial = /[^A-Za-z0-9]/.test(password);
+
   // Length checks
-  if (password.length >= 8) {
+  if (hasMinLength) {
     strength += 1;
   }
   if (password.length >= 10) {
@@ -39,13 +61,13 @@ export function calculatePasswordStrength(
   }
 
   // Character type checks
-  if (/[A-Z]/.test(password)) {
+  if (hasUppercase) {
     strength += 1;
   }
-  if (/[0-9]/.test(password)) {
+  if (hasNumber) {
     strength += 1;
   }
-  if (/[^A-Za-z0-9]/.test(password)) {
+  if (hasSpecial) {
     strength += 1;
   }
 
@@ -68,5 +90,12 @@ export function calculatePasswordStrength(
     strength,
     level,
     widthPercentage,
+    missing: {
+      minLength: !hasMinLength,
+      uppercase: !hasUppercase,
+      lowercase: !hasLowercase,
+      number: !hasNumber,
+      special: !hasSpecial,
+    },
   };
 }

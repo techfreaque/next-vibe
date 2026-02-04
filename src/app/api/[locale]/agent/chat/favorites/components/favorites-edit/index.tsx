@@ -38,6 +38,11 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type {
+  FiltersModelSelection,
+  ManualModelSelection,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -55,9 +60,9 @@ interface QuickSettingsPanelProps {
   onCharacterSwitch: (characterId: string, keepSettings: boolean) => void;
   /** Characters fetched from API - compact cards for display */
   characters: Record<string, CharacterListItem>;
-  isAuthenticated: boolean;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  user: JwtPayloadType;
 }
 
 type SaveMode = "temporary" | "update" | "new";
@@ -69,9 +74,9 @@ export function QuickSettingsPanel({
   onDelete,
   onEditCharacter,
   characters,
-  isAuthenticated,
   locale,
   logger,
+  user,
 }: QuickSettingsPanelProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -83,61 +88,39 @@ export function QuickSettingsPanel({
   }, [favorite.characterId, characters]);
 
   // Fetch full character details for CHARACTER_BASED mode
-  const characterEndpoint = useCharacter(favorite.characterId ?? "", logger);
+  const characterEndpoint = useCharacter(
+    favorite.characterId ?? "",
+    user,
+    logger,
+  );
   const fullCharacter = characterEndpoint.read?.data;
   const isLoadingCharacter = characterEndpoint.read?.isLoading;
 
   const isModelOnly = favorite.characterId === NO_CHARACTER_ID;
 
-  type FiltersModelSelection = Extract<
-    FavoriteGetResponseOutput["modelSelection"],
-    { selectionType: typeof ModelSelectionType.FILTERS }
-  >;
-  type CharacterBasedSelection = Extract<
-    FavoriteGetResponseOutput["modelSelection"],
-    { selectionType: typeof ModelSelectionType.CHARACTER_BASED }
-  >;
-
-  // Extract initial state from favorite's model selection
   const initialState = ((): {
     intelligenceRange: FiltersModelSelection["intelligenceRange"];
     priceRange: FiltersModelSelection["priceRange"];
     contentRange: FiltersModelSelection["contentRange"];
     speedRange: FiltersModelSelection["speedRange"];
-    preferredStrengths: FiltersModelSelection["preferredStrengths"];
-    ignoredWeaknesses: FiltersModelSelection["ignoredWeaknesses"];
   } => {
     const sel = favorite.modelSelection;
-    if (sel.selectionType === ModelSelectionType.FILTERS) {
-      const filtersSel = sel as FiltersModelSelection;
+    const currentSel = sel.currentSelection;
+
+    if (currentSel.selectionType === ModelSelectionType.FILTERS) {
       return {
-        intelligenceRange: filtersSel.intelligenceRange,
-        priceRange: filtersSel.priceRange,
-        contentRange: filtersSel.contentRange,
-        speedRange: filtersSel.speedRange,
-        preferredStrengths: filtersSel.preferredStrengths,
-        ignoredWeaknesses: filtersSel.ignoredWeaknesses,
+        intelligenceRange: currentSel.intelligenceRange,
+        priceRange: currentSel.priceRange,
+        contentRange: currentSel.contentRange,
+        speedRange: currentSel.speedRange,
       };
     }
-    if (sel.selectionType === ModelSelectionType.CHARACTER_BASED) {
-      // CHARACTER_BASED has soft preferences but no ranges
-      const charSel = sel as CharacterBasedSelection;
-      return {
-        intelligenceRange: undefined,
-        priceRange: undefined,
-        contentRange: undefined,
-        speedRange: undefined,
-        preferredStrengths: charSel.preferredStrengths,
-        ignoredWeaknesses: charSel.ignoredWeaknesses,
-      };
-    }
+
     return {
       intelligenceRange: undefined,
       priceRange: undefined,
       contentRange: undefined,
       speedRange: undefined,
-      preferredStrengths: null,
-      ignoredWeaknesses: null,
     };
   })();
 
@@ -181,18 +164,19 @@ export function QuickSettingsPanel({
   const initialMode = useMemo(() => {
     if (
       isModelOnly &&
-      favorite.modelSelection.selectionType ===
+      favorite.modelSelection.currentSelection.selectionType ===
         ModelSelectionType.CHARACTER_BASED
     ) {
       return ModelSelectionType.FILTERS;
     }
-    return favorite.modelSelection.selectionType;
-  }, [favorite.modelSelection.selectionType, isModelOnly]);
+    return favorite.modelSelection.currentSelection.selectionType;
+  }, [favorite.modelSelection.currentSelection.selectionType, isModelOnly]);
 
   const [mode, setMode] = useState(initialMode);
   const [manualModelId, setManualModelId] = useState<ModelId | undefined>(
-    favorite.modelSelection.selectionType === ModelSelectionType.MANUAL
-      ? favorite.modelSelection.manualModelId
+    favorite.modelSelection.currentSelection.selectionType ===
+      ModelSelectionType.MANUAL
+      ? favorite.modelSelection.currentSelection.manualModelId
       : undefined,
   );
   const [previousMode, setPreviousMode] = useState(initialMode);
@@ -292,18 +276,9 @@ export function QuickSettingsPanel({
       priceRange,
       contentRange,
       speedRange,
-      preferredStrengths: initialState.preferredStrengths,
-      ignoredWeaknesses: initialState.ignoredWeaknesses,
     };
     return CharactersRepositoryClient.getBestModelForCharacter(modelSelection);
-  }, [
-    intelligenceRange,
-    priceRange,
-    contentRange,
-    speedRange,
-    initialState.preferredStrengths,
-    initialState.ignoredWeaknesses,
-  ]);
+  }, [intelligenceRange, priceRange, contentRange, speedRange]);
 
   // Preview model - shown in top preview card
   const bestModel = useMemo(() => {
@@ -329,27 +304,18 @@ export function QuickSettingsPanel({
   }, [mode, manualModelId, fullCharacter, bestFilteredModel]);
 
   const filteredModels = useMemo(() => {
-    const modelSelection: FavoriteGetResponseOutput["modelSelection"] = {
+    const modelSelection: FiltersModelSelection = {
       selectionType: ModelSelectionType.FILTERS,
       intelligenceRange,
       priceRange,
       contentRange,
       speedRange,
-      preferredStrengths: initialState.preferredStrengths,
-      ignoredWeaknesses: initialState.ignoredWeaknesses,
     };
 
     return CharactersRepositoryClient.getFilteredModelsForCharacter(
       modelSelection,
     );
-  }, [
-    intelligenceRange,
-    priceRange,
-    contentRange,
-    speedRange,
-    initialState.preferredStrengths,
-    initialState.ignoredWeaknesses,
-  ]);
+  }, [intelligenceRange, priceRange, contentRange, speedRange]);
 
   const modelsToShow = showUnfilteredModels
     ? Object.values(modelOptions)
@@ -368,34 +334,41 @@ export function QuickSettingsPanel({
 
   const handleSaveWithMode = useCallback(
     (saveMode: SaveMode) => {
-      let modelSelection: FavoriteGetResponseOutput["modelSelection"];
+      const charModelSel = favorite.modelSelection.characterModelSelection;
+
+      let currentSelection:
+        | FiltersModelSelection
+        | ManualModelSelection
+        | { selectionType: typeof ModelSelectionType.CHARACTER_BASED };
 
       if (mode === ModelSelectionType.MANUAL && manualModelId) {
-        modelSelection = {
+        currentSelection = {
           selectionType: ModelSelectionType.MANUAL,
           manualModelId,
         };
       } else if (mode === ModelSelectionType.CHARACTER_BASED) {
-        modelSelection = {
+        currentSelection = {
           selectionType: ModelSelectionType.CHARACTER_BASED,
-          preferredStrengths: initialState.preferredStrengths,
-          ignoredWeaknesses: initialState.ignoredWeaknesses,
         };
       } else {
-        modelSelection = {
+        currentSelection = {
           selectionType: ModelSelectionType.FILTERS,
           intelligenceRange,
           priceRange,
           contentRange,
           speedRange,
-          preferredStrengths: initialState.preferredStrengths,
-          ignoredWeaknesses: initialState.ignoredWeaknesses,
         };
       }
+
+      const modelSelection: FavoriteGetResponseOutput["modelSelection"] = {
+        currentSelection,
+        characterModelSelection: charModelSel,
+      };
 
       onSave(modelSelection, saveMode);
     },
     [
+      favorite.modelSelection.characterModelSelection,
       onSave,
       mode,
       manualModelId,
@@ -403,8 +376,6 @@ export function QuickSettingsPanel({
       priceRange,
       contentRange,
       speedRange,
-      initialState.preferredStrengths,
-      initialState.ignoredWeaknesses,
     ],
   );
 
@@ -498,7 +469,7 @@ export function QuickSettingsPanel({
                   {t("app.chat.selector.characterSetup")}
                 </Span>
               </Div>
-              {isAuthenticated && onEditCharacter && character && (
+              {!user.isPublic && onEditCharacter && character && (
                 <Button
                   type="button"
                   variant="ghost"

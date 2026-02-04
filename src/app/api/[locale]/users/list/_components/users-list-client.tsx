@@ -31,19 +31,25 @@ import { useUsersListEndpoint } from "@/app/api/[locale]/users/list/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import type { JwtPayloadType } from "../../../user/auth/types";
 import { UsersPagination } from "./users-pagination";
 import { UsersTable } from "./users-table";
 
 interface UsersListClientProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 export function UsersListClient({
   locale,
+  user,
 }: UsersListClientProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const usersEndpoint: UsersListEndpointReturn = useUsersListEndpoint(logger);
+  const usersEndpoint: UsersListEndpointReturn = useUsersListEndpoint(
+    logger,
+    user,
+  );
   const [viewMode, setViewMode] = useState<"list" | "table">("table");
 
   type UserType = UserListResponseOutput["response"]["users"][number];

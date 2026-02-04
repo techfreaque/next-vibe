@@ -280,12 +280,18 @@ export type RequiredFieldStyle =
   | "badge" // Show "Required" badge
   | "none"; // No special styling for required fields
 
+// Description display style for form fields
+export type DescriptionStyle =
+  | "tooltip" // Show description in tooltip (default)
+  | "inline"; // Show description inline below label with icon
+
 // Form styling theme for required fields
 export interface RequiredFieldTheme {
   style: RequiredFieldStyle;
-  showAllRequired?: boolean; // If true, show required styling even when all fields are required
-  requiredColor?: "amber" | "red" | "blue" | "green"; // Color theme for required field highlighting
-  completedColor?: "green" | "blue" | "purple"; // Color theme for completed required fields
+  showAllRequired: boolean; // If true, show required styling even when all fields are required
+  requiredColor: "amber" | "red" | "blue" | "green"; // Color theme for required field highlighting
+  completedColor: "green" | "blue" | "purple"; // Color theme for completed required fields
+  descriptionStyle: DescriptionStyle; // How to display field descriptions (default: "tooltip")
 }
 
 // Field validation state
@@ -303,4 +309,5 @@ export interface FieldStyleClassName {
   inputClassName: string;
   errorClassName: string;
   descriptionClassName: string;
+  inlineDescriptionClassName: string;
 }

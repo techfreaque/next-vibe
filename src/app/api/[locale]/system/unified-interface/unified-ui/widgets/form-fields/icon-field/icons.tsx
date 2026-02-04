@@ -225,6 +225,7 @@ const ICON_LOADERS: Record<IconLibraryName, IconLoader> = {
     await import("@/packages/next-vibe-ui/web/ui/icons/GraduationCap"),
   Grid3x3: async () =>
     await import("@/packages/next-vibe-ui/web/ui/icons/Grid3x3"),
+  Grip: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Grip"),
   GripVertical: async () =>
     await import("@/packages/next-vibe-ui/web/ui/icons/GripVertical"),
   Handshake: async () =>
@@ -516,11 +517,38 @@ const ICON_LOADERS: Record<IconLibraryName, IconLoader> = {
 /* eslint-disable i18next/no-literal-string -- Emoji icons are universal symbols */
 const createEmojiIcon = (emoji: string): IconComponent => {
   const EmojiIcon: IconComponent = ({ className = "" }) => (
-    <Span className={cn("text-base leading-none", className)}>{emoji}</Span>
+    <Span className={cn("text-base leading-none", getFontSizeClass(className))}>
+      {emoji}
+    </Span>
   );
   return EmojiIcon;
 };
 /* eslint-enable i18next/no-literal-string */
+
+function getFontSizeClass(classes: string): string {
+  const match = classes.match(/[wh]-(\d+)/g);
+  if (!match || match.length === 0) {
+    return "";
+  }
+
+  const numbers = match.map((cls) => parseInt(cls.match(/\d+/)![0]));
+  const avg = Math.round(numbers.reduce((a, b) => a + b, 0) / numbers.length);
+
+  const sizeMap: Record<number, string> = {
+    1: "text-xs",
+    2: "text-sm",
+    3: "text-base",
+    4: "text-lg",
+    5: "text-xl",
+    6: "text-2xl",
+    7: "text-3xl",
+    8: "text-4xl",
+    9: "text-5xl",
+    10: "text-6xl",
+  };
+
+  return sizeMap[avg] || "text-base";
+}
 
 /**
  * Special 1A icon component
@@ -765,6 +793,7 @@ export const ICON_REGISTRY = {
   "more-horizontal": "MoreHorizontal",
   "more-vertical": "MoreVertical",
   "mouse-pointer": "MousePointer",
+  grip: "Grip",
   "grip-vertical": "GripVertical",
   "grid-3x3": "Grid3x3",
   "log-out": "LogOut",
@@ -1385,6 +1414,7 @@ export const ICON_CATEGORIES = {
       "cross-2-icon",
       "dash-icon",
       "dot-filled-icon",
+      "grip",
       "grip-vertical",
       "panel-left",
       "layout",

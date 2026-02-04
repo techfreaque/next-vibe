@@ -26,6 +26,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useEmailPreviewRender } from "@/app/api/[locale]/emails/preview/render/hooks/hooks";
 import type { PreviewFieldConfig } from "@/app/api/[locale]/emails/registry/types";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
@@ -39,6 +40,7 @@ interface EmailPreviewClientProps {
   templateName: string;
   previewFields?: Record<string, PreviewFieldConfig>;
   exampleProps: Record<string, string | number | boolean>;
+  user: JwtPayloadType;
 }
 
 export function EmailPreviewClient({
@@ -47,6 +49,7 @@ export function EmailPreviewClient({
   templateName,
   previewFields,
   exampleProps,
+  user,
 }: EmailPreviewClientProps): ReactElement {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -67,7 +70,7 @@ export function EmailPreviewClient({
     initialLanguageCountry.country,
   );
 
-  const previewEndpoint = useEmailPreviewRender(logger);
+  const previewEndpoint = useEmailPreviewRender(user, logger);
 
   const [currentProps, setCurrentProps] = useState<
     Record<string, string | number | boolean>
@@ -221,6 +224,7 @@ export function EmailPreviewClient({
                 <TestEmailForm
                   locale={locale}
                   templateId={templateId}
+                  user={user}
                   onSuccess={() => {
                     setIsModalOpen(false);
                   }}

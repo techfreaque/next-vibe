@@ -19,16 +19,23 @@ import { Plus } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 
 import { ImapAccountCreateForm } from "./imap-account-create-form";
 import { ImapAccountsList } from "./imap-accounts-list";
 
+interface ImapAccountsManagementProps {
+  user: JwtPayloadType;
+}
+
 /**
  * IMAP Accounts Management Component
  * Uses useEndpoint for all state management following leads/cron patterns
  */
-export function ImapAccountsManagement(): JSX.Element {
+export function ImapAccountsManagement({
+  user,
+}: ImapAccountsManagementProps): JSX.Element {
   const { t, locale } = useTranslation();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
 
@@ -61,7 +68,7 @@ export function ImapAccountsManagement(): JSX.Element {
         </CardHeader>
         <CardContent>
           {/* Accounts List - all state managed through useEndpoint */}
-          <ImapAccountsList locale={locale} />
+          <ImapAccountsList locale={locale} user={user} />
         </CardContent>
       </Card>
 
@@ -75,6 +82,7 @@ export function ImapAccountsManagement(): JSX.Element {
           </DialogHeader>
           <ImapAccountCreateForm
             locale={locale}
+            user={user}
             onSuccess={handleCreateSuccess}
             onCancel={handleCreateCancel}
           />

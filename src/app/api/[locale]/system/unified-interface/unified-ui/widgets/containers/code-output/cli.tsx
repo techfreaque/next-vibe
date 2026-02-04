@@ -9,6 +9,7 @@ import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-int
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { CodeOutputWidgetConfig } from "./types";
 
@@ -20,20 +21,23 @@ export function CodeOutputWidgetInk<
   props:
     | InkWidgetProps<
         TEndpoint,
+        TUsage,
         CodeOutputWidgetConfig<TKey, never, TUsage, "widget">
       >
     | InkWidgetProps<
         TEndpoint,
+        TUsage,
         CodeOutputWidgetConfig<TKey, StringWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
-  const { field, context } = props;
+  const t = useInkWidgetTranslation();
+  const { field } = props;
   const code = field.value;
 
   if (!code) {
     return (
       <Box>
-        <Text dimColor>{context.t("app.common.noData")}</Text>
+        <Text dimColor>{t("app.common.noData")}</Text>
       </Box>
     );
   }

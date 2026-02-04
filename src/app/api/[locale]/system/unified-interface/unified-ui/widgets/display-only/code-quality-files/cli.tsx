@@ -13,6 +13,7 @@ import type { z } from "zod";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import { useInkWidgetLocale } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 import { simpleT } from "@/i18n/core/shared";
 
 import type {
@@ -31,14 +32,15 @@ export function CodeQualityFilesWidgetInk<
   TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive",
 >({
-  context,
   field,
 }: InkWidgetProps<
   TEndpoint,
+  TUsage,
   CodeQualityFilesWidgetConfig<TSchema, TUsage, TSchemaType>
 >): JSX.Element {
   const value = field.value;
-  const { t } = simpleT(context.locale);
+  const locale = useInkWidgetLocale();
+  const { t } = simpleT(locale);
   // Build file list output as ANSI-encoded strings
   const fileLines = useMemo(() => {
     if (!value || value.length === 0) {

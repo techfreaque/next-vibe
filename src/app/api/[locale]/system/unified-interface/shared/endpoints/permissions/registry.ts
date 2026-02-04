@@ -120,21 +120,18 @@ class PermissionsRegistry implements IPermissionsRegistry {
       };
     }
 
-    // Check platform-specific _OFF restrictions
-    const platformStr = String(platform).toLowerCase();
-
-    switch (platformStr) {
-      case "cli":
+    switch (platform) {
+      case Platform.CLI:
         if (platformMarkers.includes(PlatformMarker.CLI_OFF)) {
           return {
             allowed: false,
-            reason: `Endpoint is not accessible via ${platformStr.toUpperCase()} platform`,
+            reason: `Endpoint is not accessible via ${Platform.CLI} platform`,
             blockedByRole: PlatformMarker.CLI_OFF,
           };
         }
         break;
 
-      case "mcp":
+      case Platform.MCP:
         // MCP uses opt-in model: only endpoints with MCP_ON marker are accessible
         if (
           !platformMarkers.includes(PlatformMarker.MCP_ON) ||
@@ -142,13 +139,13 @@ class PermissionsRegistry implements IPermissionsRegistry {
         ) {
           return {
             allowed: false,
-            reason: `Endpoint is not accessible via ${platformStr.toUpperCase()} platform (requires MCP_ON marker)`,
+            reason: `Endpoint is not accessible via ${Platform.MCP} platform (requires MCP_ON marker)`,
             blockedByRole: PlatformMarker.MCP_ON,
           };
         }
         break;
 
-      case "cli-package":
+      case Platform.CLI_PACKAGE:
         // CLI_PACKAGE can only access endpoints with CLI_AUTH_BYPASS marker
         // This restricts npm package users to unauthenticated endpoints only
         if (platformMarkers.includes(PlatformMarker.CLI_OFF)) {
@@ -168,19 +165,24 @@ class PermissionsRegistry implements IPermissionsRegistry {
         }
         break;
 
-      case "ai":
-        if (platformMarkers.includes(PlatformMarker.AI_TOOL_OFF)) {
+      case Platform.AI:
+        if (
+          platformMarkers.includes(PlatformMarker.AI_TOOL_OFF) ||
+          platformMarkers.includes(PlatformMarker.WEB_OFF)
+        ) {
           return {
             allowed: false,
             reason: "Endpoint is not accessible via AI tools",
-            blockedByRole: PlatformMarker.AI_TOOL_OFF,
+            blockedByRole: platformMarkers.includes(PlatformMarker.AI_TOOL_OFF)
+              ? PlatformMarker.AI_TOOL_OFF
+              : PlatformMarker.WEB_OFF,
           };
         }
         break;
 
-      case "web":
-      case "next":
-      case "trpc":
+      case Platform.NEXT_PAGE:
+      case Platform.NEXT_API:
+      case Platform.TRPC:
         if (platformMarkers.includes(PlatformMarker.WEB_OFF)) {
           return {
             allowed: false,
@@ -189,17 +191,9 @@ class PermissionsRegistry implements IPermissionsRegistry {
           };
         }
         break;
-
-      case "mobile":
-      case "native":
-        // Mobile follows web rules for now
-        if (platformMarkers.includes(PlatformMarker.WEB_OFF)) {
-          return {
-            allowed: false,
-            reason: "Endpoint is not accessible via Mobile platform",
-            blockedByRole: PlatformMarker.WEB_OFF,
-          };
-        }
+      default:
+        const _exhaustiveCheck: never = platform;
+        void _exhaustiveCheck;
         break;
     }
 
@@ -406,6 +400,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
    * Uses OPT-OUT logic:
    * - Endpoint is accessible by default if user has the required role
    * - Endpoint can opt-out of specific platforms using CLI_OFF, AI_TOOL_OFF, WEB_OFF
+   * - Also checks allowedClientRoles for client-side access
    */
   private hasEndpointPermission(
     endpoint: CreateApiEndpointAny,
@@ -445,11 +440,33 @@ class PermissionsRegistry implements IPermissionsRegistry {
 
     // Check if user has any of the required roles
     // User roles come from JWT payload which was populated from DB during login/signup
-    const userRoles = user.roles || [];
+    const userRoles: readonly UserRoleValue[] = user.roles;
 
     const hasRequiredRole = effectiveAllowedRoles.some((requiredRole) =>
       userRoles.includes(requiredRole),
     );
+
+    // If server route permission failed, check if user has permission via client route
+    if (!hasRequiredRole && endpoint.allowedClientRoles) {
+      const effectiveClientRoles = endpoint.allowedClientRoles.filter(
+        (role: UserRoleValue[number]) => !this.isOptOutRole(role),
+      );
+      const clientPermissionRoles =
+        filterUserPermissionRoles(effectiveClientRoles);
+
+      // Check PUBLIC role for client routes
+      if (
+        user.isPublic &&
+        clientPermissionRoles.includes(UserPermissionRole.PUBLIC)
+      ) {
+        return true;
+      }
+
+      // Check if user has any of the required client roles
+      return effectiveClientRoles.some((requiredRole) =>
+        userRoles.includes(requiredRole),
+      );
+    }
 
     return hasRequiredRole;
   }

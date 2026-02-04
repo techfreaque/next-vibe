@@ -6,6 +6,7 @@
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { JwtPayloadType } from "../../user/auth/types";
 import { SortOrder, UserSortField } from "../enum";
 import definitions from "./definition";
 
@@ -16,6 +17,7 @@ import definitions from "./definition";
  */
 export function useUsersListEndpoint(
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): ReturnType<typeof useEndpoint<typeof definitions>> {
   return useEndpoint(
     definitions,
@@ -44,6 +46,7 @@ export function useUsersListEndpoint(
       },
     },
     logger,
+    user,
   );
 }
 

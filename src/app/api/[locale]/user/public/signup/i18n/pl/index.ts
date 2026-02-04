@@ -11,55 +11,44 @@ export const translations: typeof enTranslations = {
     submitting: "Tworzenie konta...",
   },
   fields: {
-    firstName: {
-      label: "Imię",
-      description: "Imię użytkownika",
-      placeholder: "Wprowadź imię",
-      help: "Wprowadź swoje imię, jak ma się pojawić w profilu",
-    },
-    lastName: {
-      label: "Nazwisko",
-      description: "Nazwisko użytkownika",
-      placeholder: "Wprowadź nazwisko",
-      help: "Wprowadź swoje nazwisko, jak ma się pojawić w profilu",
-    },
     privateName: {
-      label: "Nazwa Prywatna",
-      description: "Prywatna nazwa użytkownika",
-      placeholder: "Wprowadź nazwę prywatną",
-      help: "Wprowadź swoją prywatną nazwę do użytku wewnętrznego",
+      label: "Twoja prywatna nazwa",
+      description:
+        "Jak AI będzie się do Ciebie zwracać w prywatnych rozmowach. To zostaje między Tobą a AI – całkowicie prywatne.",
+      placeholder: "Wpisz swoje imię",
       validation: {
-        required: "Nazwa prywatna jest wymagana",
+        required: "Prywatna nazwa jest wymagana",
         minLength: "Nazwa musi mieć co najmniej 2 znaki",
         maxLength: "Nazwa nie może być dłuższa niż 100 znaków",
       },
     },
     publicName: {
-      label: "Nazwa Publiczna",
-      description: "Publiczna nazwa użytkownika",
-      placeholder: "Wprowadź nazwę publiczną",
-      help: "Wprowadź swoją publiczną nazwę, jak będzie wyświetlana innym",
+      label: "Twoja publiczna nazwa",
+      description:
+        "Twoja tożsamość w publicznych czatach i na forach. Inni użytkownicy i AI zobaczą tę nazwę. Wybierz mądrze – ona reprezentuje Cię w społeczności.",
+      placeholder: "Wpisz nazwę wyświetlaną",
       validation: {
-        required: "Nazwa publiczna jest wymagana",
+        required: "Nazwa wyświetlana jest wymagana",
         minLength: "Nazwa wyświetlana musi mieć co najmniej 2 znaki",
         maxLength: "Nazwa wyświetlana nie może być dłuższa niż 100 znaków",
       },
     },
     email: {
-      label: "E-mail",
-      description: "Adres e-mail użytkownika",
-      placeholder: "Wprowadź adres e-mail",
-      help: "To będzie Twój e-mail logowania i główny sposób kontaktu",
+      label: "Twój e-mail",
+      description:
+        "Twoje dane logowania i metoda kontaktu. Pozostaje prywatny – nigdy nie będzie udostępniony innym użytkownikom ani AI.",
+      placeholder: "Wpisz adres e-mail",
+      help: "To będzie Twój e-mail do logowania i główna metoda kontaktu",
       validation: {
         required: "E-mail jest wymagany",
-        invalid: "Proszę wprowadzić prawidłowy adres e-mail",
+        invalid: "Wpisz prawidłowy adres e-mail",
       },
     },
     password: {
-      label: "Hasło",
-      description: "Hasło użytkownika",
-      placeholder: "Wprowadź hasło",
-      help: "Hasło musi mieć co najmniej 8 znaków",
+      label: "Twoje hasło",
+      description:
+        "Silne hasła chronią Twoje konto. Wkrótce wdrożymy szyfrowanie end-to-end – od tego momentu reset hasła usunie Twoją historię wiadomości, ponieważ tylko Ty posiadasz klucz deszyfrujący. Zapisz je w bezpiecznym miejscu.",
+      placeholder: "Wpisz hasło",
       validation: {
         required: "Hasło jest wymagane",
         minLength: "Hasło musi mieć co najmniej 8 znaków",
@@ -67,100 +56,41 @@ export const translations: typeof enTranslations = {
       },
     },
     confirmPassword: {
-      label: "Potwierdź Hasło",
-      description: "Potwierdź swoje hasło",
-      placeholder: "Wprowadź hasło ponownie",
-      help: "Wprowadź ponownie hasło, aby je potwierdzić",
+      label: "Potwierdź hasło",
       validation: {
-        required: "Proszę potwierdzić hasło",
+        required: "Potwierdź swoje hasło",
         minLength: "Hasło musi mieć co najmniej 8 znaków",
-        mismatch: "Hasła nie są zgodne",
+        mismatch: "Hasła nie pasują do siebie",
       },
     },
-    phone: {
-      label: "Numer Telefonu",
-      description: "Numer telefonu użytkownika",
-      placeholder: "Wprowadź numer telefonu",
-      help: "Numer telefonu do odzyskiwania konta i powiadomień (opcjonalny)",
-    },
-    company: {
-      label: "Firma",
-      description: "Nazwa firmy użytkownika",
-      placeholder: "Wprowadź nazwę firmy",
-      help: "Nazwa Twojej firmy lub organizacji (opcjonalna)",
-    },
-    leadId: {
-      label: "ID Leada",
-      description: "Identyfikator leada do śledzenia",
-      placeholder: "Wprowadź ID leada",
-      help: "Wewnętrzny identyfikator leada (opcjonalny)",
-    },
-    preferredContactMethod: {
-      label: "Preferowana Metoda Kontaktu",
-      description: "W jaki sposób chcesz być kontaktowany",
-      placeholder: "Wybierz metodę kontaktu",
-      help: "Wybierz, jak chcesz, żebyśmy się z Tobą skontaktowali",
-    },
+
     acceptTerms: {
-      label: "Akceptuj Regulamin",
-      description: "Zaakceptuj nasz regulamin i warunki",
-      placeholder: "Akceptuję regulamin i warunki",
-      help: "Proszę przeczytaj i zaakceptuj nasz regulamin, aby kontynuować",
+      label: "Akceptuj regulamin",
+      description: "Nasz regulamin szanuje Twoją wolność i prywatność.",
       validation: {
         required: "Musisz zaakceptować regulamin, aby kontynuować",
       },
     },
     subscribeToNewsletter: {
-      label: "Subskrybuj Newsletter",
-      description: "Otrzymuj aktualizacje i nowości e-mailem",
-      placeholder: "Subskrybuj nasz newsletter",
-      help: "Otrzymuj najnowsze aktualizacje, wskazówki i ekskluzywne oferty na skrzynkę",
+      label: "Subskrybuj newsletter",
+      description:
+        "Sporadyczne aktualizacje o nowych modelach i funkcjach. Bez spamu, tylko to co ważne.",
     },
-    imageUrl: {
-      label: "URL Zdjęcia Profilowego",
-      description: "URL dla Twojego zdjęcia profilowego",
-      placeholder: "Wprowadź URL zdjęcia",
-      help: "Opcjonalnie: Podaj URL dla swojego zdjęcia profilowego",
-    },
+
     referralCode: {
-      label: "Kod polecający",
-      description: "Opcjonalny kod polecający od znajomego",
-      placeholder: "Wprowadź kod polecający (opcjonalnie)",
-      help: "Jeśli masz kod polecający, wprowadź go tutaj",
+      label: "Kod polecający (opcjonalnie)",
+      description:
+        "Masz znajomego na unbottled.ai? Wpisz jego kod, żeby go wesprzeć. Dostanie nagrodę za to, że Cię tu przyprowadził.",
+      placeholder: "Wpisz kod polecający (opcjonalnie)",
     },
   },
   form: {
-    title: "Utwórz swoje konto",
-    description: "Dołącz do społeczności dla nieocenzurowanych rozmów z AI",
+    title: "Witamy w Uncensored AI",
+    description:
+      "Pomóż budować niecenzurowaną, prywatną i naprawdę niezależną AI. unbottled.ai to open source i projekt społecznościowy – Twoja rejestracja wspiera rozwój technologii AI, która szanuje Twoją wolność.",
   },
   footer: {
     alreadyHaveAccount: "Masz już konto? Zaloguj się",
-  },
-  groups: {
-    personalInfo: {
-      title: "Informacje Osobiste",
-      description: "Wprowadź swoje dane osobowe",
-    },
-    security: {
-      title: "Bezpieczeństwo",
-      description: "Skonfiguruj bezpieczeństwo konta",
-    },
-    businessInfo: {
-      title: "Informacje Biznesowe",
-      description: "Wprowadź dane biznesowe",
-    },
-    preferences: {
-      title: "Preferencje",
-      description: "Ustaw swoje preferencje komunikacyjne",
-    },
-    consent: {
-      title: "Regulamin i Zgoda",
-      description: "Przejrzyj i zaakceptuj nasz regulamin i warunki",
-    },
-    advanced: {
-      title: "Opcje Zaawansowane",
-      description: "Dodatkowe opcje konfiguracji",
-    },
   },
   errors: {
     title: "Błąd rejestracji",
@@ -181,8 +111,8 @@ export const translations: typeof enTranslations = {
       description: "Wystąpił nieoczekiwany błąd",
     },
     conflict: {
-      title: "Konflikt Konta",
-      description: "Konto już istnieje",
+      title: "Konflikt konta",
+      description: "Konto z tym adresem e-mail już istnieje",
     },
     forbidden: {
       title: "Dostęp Zabroniony",
@@ -352,7 +282,7 @@ export const translations: typeof enTranslations = {
     nextSteps: "Następne Kroki",
   },
   success: {
-    title: "Rejestracja zakończona pomyślnie",
+    title: "Rejestracja udana",
     description: "Twoje konto zostało pomyślnie utworzone",
   },
   admin_notification: {

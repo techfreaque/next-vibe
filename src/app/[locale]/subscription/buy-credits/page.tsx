@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Div } from "next-vibe-ui/ui/div";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import {
@@ -18,6 +20,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
+import { simpleT } from "@/i18n/core/shared";
 
 import { BuyCreditsPageClient } from "./_components/buy-credits-page-client";
 
@@ -63,13 +66,25 @@ export default async function BuyCreditsPage({
     locale,
     logger,
   );
+  const user = userResponse?.success ? userResponse.data : undefined;
 
-  const isAuthenticated =
-    userResponse?.success &&
-    userResponse.data &&
-    !userResponse.data.isPublic &&
-    "id" in userResponse.data &&
-    !!userResponse.data.id;
+  if (!user) {
+    const { t } = simpleT(locale);
+    return (
+      <Div className="flex items-center justify-center min-h-[100vh]">
+        <Div className="max-w-md text-center">
+          <P className="text-lg font-semibold mb-2">
+            {t("app.subscription.buyCredits.error.title")}
+          </P>
+          <P className="text-sm text-muted-foreground">
+            {t("app.subscription.buyCredits.error.message")}
+          </P>
+        </Div>
+      </Div>
+    );
+  }
+
+  const isAuthenticated = user !== undefined && !user.isPublic;
 
   // Fetch data
   let credits: CreditBalance;
@@ -139,6 +154,7 @@ export default async function BuyCreditsPage({
 
   return (
     <BuyCreditsPageClient
+      user={user}
       locale={locale}
       isAuthenticated={isAuthenticated}
       initialCredits={credits}

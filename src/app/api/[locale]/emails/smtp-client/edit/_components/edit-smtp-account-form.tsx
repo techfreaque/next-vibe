@@ -21,17 +21,20 @@ import type React from "react";
 import editDefinition from "@/app/api/[locale]/emails/smtp-client/edit/[id]/definition";
 import { useSmtpAccountById } from "@/app/api/[locale]/emails/smtp-client/edit/[id]/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface EditSmtpAccountFormProps {
   locale: CountryLanguage;
   accountId: string;
+  user: JwtPayloadType;
 }
 
 export function EditSmtpAccountForm({
   locale,
   accountId,
+  user,
 }: EditSmtpAccountFormProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const router = useRouter();
@@ -42,6 +45,7 @@ export function EditSmtpAccountForm({
       enabled: true,
     },
     logger,
+    user,
   );
 
   const isLoading = endpoint.read.isLoading;

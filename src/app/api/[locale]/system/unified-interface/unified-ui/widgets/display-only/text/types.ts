@@ -14,6 +14,7 @@ import type {
   NumberWidgetSchema,
   StringWidgetSchema,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 
 import type {
   BasePrimitiveWidgetConfig,
@@ -137,6 +138,12 @@ export interface TextWidgetConfig<
 
   /** Padding around text */
   padding?: SpacingSize;
+
+  /**
+   * Dynamic className callback - receives field value and parent value
+   * Returns additional className to merge with static className
+   */
+  getClassName?: (value: z.output<TSchema>, parentValue?: WidgetData) => string;
 
   /** Schema constraint for the field value */
   schema: TSchema;

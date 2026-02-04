@@ -361,15 +361,15 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     fileStats: Map<string, { errors: number; warnings: number; total: number }>,
   ): Array<{
     file: string;
-    errors?: number;
-    warnings?: number;
+    errors: number;
+    warnings: number;
     total: number;
   }> {
     return [...fileStats.entries()]
       .map(([file, stats]) => ({
         file,
-        ...(stats.errors !== stats.total && { errors: stats.errors }),
-        ...(stats.warnings > 0 && { warnings: stats.warnings }),
+        errors: stats.errors,
+        warnings: stats.warnings,
         total: stats.total,
       }))
       .toSorted((a, b) => a.file.localeCompare(b.file));
@@ -383,6 +383,37 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     data: OxlintRequestOutput,
     skipFiles = false,
   ): OxlintResponseOutput {
+    // When summaryOnly is true, skip filtering and pagination to show total counts
+    if (data.summaryOnly) {
+      const summary = calculateFilteredSummary(
+        allIssues,
+        allIssues,
+        allIssues,
+        1,
+        allIssues.length,
+      );
+
+      let files:
+        | Array<{
+            file: string;
+            errors: number;
+            warnings: number;
+            total: number;
+          }>
+        | undefined;
+
+      if (!skipFiles) {
+        const fileStats = this.buildFileStats(allIssues);
+        files = this.formatFileStats(fileStats);
+      }
+
+      return {
+        items: undefined,
+        files,
+        summary,
+      };
+    }
+
     // Apply filtering
     const filteredIssues = filterIssues(allIssues, data.filter);
 
@@ -406,8 +437,8 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     let files:
       | Array<{
           file: string;
-          errors?: number;
-          warnings?: number;
+          errors: number;
+          warnings: number;
           total: number;
         }>
       | undefined;

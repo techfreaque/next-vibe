@@ -99,6 +99,7 @@ export { GitFork } from "./GitFork";
 export { Globe } from "./Globe";
 export { GraduationCap } from "./GraduationCap";
 export { Grid3x3 } from "./Grid3x3";
+export { Grip } from "./Grip";
 export { GripVertical } from "./GripVertical";
 export { Handshake } from "./Handshake";
 export { Hash } from "./Hash";

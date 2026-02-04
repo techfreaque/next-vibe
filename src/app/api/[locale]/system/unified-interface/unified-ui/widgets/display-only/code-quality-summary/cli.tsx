@@ -8,9 +8,15 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import {
+  useInkWidgetLocale,
+  useInkWidgetPlatform,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 import { CliIcon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/cli-icons";
+import { simpleT } from "@/i18n/core/shared";
 
 import type {
   CodeQualitySummarySchema,
@@ -26,13 +32,17 @@ export function CodeQualitySummaryWidgetInk<
   TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive",
 >({
-  context,
   field,
 }: InkWidgetProps<
   TEndpoint,
+  TUsage,
   CodeQualitySummaryWidgetConfig<TSchema, TUsage, TSchemaType>
 >): JSX.Element {
   const value = field.value;
+  const platform = useInkWidgetPlatform();
+  const locale = useInkWidgetLocale();
+  const { t: globalT } = simpleT(locale);
+
   if (!value) {
     return <Box />;
   }
@@ -47,13 +57,50 @@ export function CodeQualitySummaryWidgetInk<
 
   const filesDisplay =
     displayedFiles < totalFiles
-      ? `${displayedFiles} ${context.t("app.api.system.unifiedInterface.widgets.codeQualitySummary.of")} ${totalFiles}`
+      ? `${displayedFiles} ${globalT("app.api.system.unifiedInterface.widgets.codeQualitySummary.of")} ${totalFiles}`
       : totalFiles;
 
   const issuesDisplay =
     displayedIssues < totalIssues
-      ? `${displayedIssues} ${context.t("app.api.system.unifiedInterface.widgets.codeQualitySummary.of")} ${totalIssues}`
+      ? `${displayedIssues} ${globalT("app.api.system.unifiedInterface.widgets.codeQualitySummary.of")} ${totalIssues}`
       : totalIssues;
+
+  // MCP uses plain text without icons/colors
+  if (platform === Platform.MCP) {
+    return (
+      <Box flexDirection="column" marginTop={1} paddingX={1}>
+        <Text>
+          {globalT(
+            "app.api.system.unifiedInterface.widgets.codeQualitySummary.summary",
+          )}
+        </Text>
+        {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Separator decoration */}
+        <Text>──────────────────────────────────────────────────</Text>
+        <Box flexDirection="column">
+          <Text>
+            {globalT(
+              "app.api.system.unifiedInterface.widgets.codeQualitySummary.files",
+            )}
+            : {filesDisplay}
+          </Text>
+          <Text>
+            {globalT(
+              "app.api.system.unifiedInterface.widgets.codeQualitySummary.issues",
+            )}
+            : {issuesDisplay}
+          </Text>
+          {totalErrors > 0 && (
+            <Text>
+              {globalT(
+                "app.api.system.unifiedInterface.widgets.codeQualitySummary.errors",
+              )}
+              : {totalErrors}
+            </Text>
+          )}
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box flexDirection="column" marginTop={1} paddingX={1}>
@@ -61,7 +108,7 @@ export function CodeQualitySummaryWidgetInk<
         <CliIcon icon="bar-chart" />
         <Text bold>
           {" "}
-          {context.t(
+          {globalT(
             "app.api.system.unifiedInterface.widgets.codeQualitySummary.summary",
           )}
         </Text>
@@ -73,7 +120,7 @@ export function CodeQualitySummaryWidgetInk<
           <CliIcon icon="folder" />
           <Text>
             {" "}
-            {context.t(
+            {globalT(
               "app.api.system.unifiedInterface.widgets.codeQualitySummary.files",
             )}
             : {filesDisplay}
@@ -83,7 +130,7 @@ export function CodeQualitySummaryWidgetInk<
           <CliIcon icon="alert" />
           <Text>
             {"  "}
-            {context.t(
+            {globalT(
               "app.api.system.unifiedInterface.widgets.codeQualitySummary.issues",
             )}
             : {issuesDisplay}
@@ -94,7 +141,7 @@ export function CodeQualitySummaryWidgetInk<
             <CliIcon icon="x-circle" color="red" />
             <Text color="red">
               {" "}
-              {context.t(
+              {globalT(
                 "app.api.system.unifiedInterface.widgets.codeQualitySummary.errors",
               )}
               : {totalErrors}

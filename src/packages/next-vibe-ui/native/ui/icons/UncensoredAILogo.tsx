@@ -25,6 +25,7 @@ export function UncensoredAILogo({
         uri: `${envClient.NEXT_PUBLIC_APP_URL}/images/providers/uncensored.ai.png`,
       }}
       style={{ width, height }}
+      // oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Non-translatable string
       accessibilityLabel="Uncensored AI"
     />
   );

@@ -31,6 +31,7 @@ import {
   useToggleCronTask,
 } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/hooks";
 import { formatCronSchedule } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
@@ -41,15 +42,17 @@ interface TaskToggleSwitchProps {
   task: CronTaskResponseType;
   onTaskUpdated: () => void;
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 function TaskToggleSwitch({
   task,
   onTaskUpdated,
   locale,
+  user,
 }: TaskToggleSwitchProps): React.JSX.Element {
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const toggleHook = useToggleCronTask(task.id, logger);
+  const toggleHook = useToggleCronTask(user, task.id, logger);
 
   const handleToggle = async (): Promise<void> => {
     try {
@@ -73,16 +76,18 @@ interface TaskDeleteButtonProps {
   taskId: string;
   onTaskUpdated: () => void;
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 function TaskDeleteButton({
   taskId,
   onTaskUpdated,
   locale,
+  user,
 }: TaskDeleteButtonProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const deleteHook = useDeleteCronTask(taskId, logger);
+  const deleteHook = useDeleteCronTask(user, taskId, logger);
 
   const handleDelete = async (): Promise<void> => {
     if (!window.confirm(t("app.admin.cron.buttons.confirmDelete"))) {
@@ -114,6 +119,7 @@ interface InlineEditFormProps {
   locale: CountryLanguage;
   onCancel: () => void;
   onSuccess: () => void;
+  user: JwtPayloadType;
 }
 
 function InlineEditForm({
@@ -121,10 +127,12 @@ function InlineEditForm({
   locale,
   onCancel,
   onSuccess,
+  user,
 }: InlineEditFormProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
   const endpoint = useCronTaskEndpoint(
+    user,
     {
       taskId: task.id,
       enabled: true,
@@ -159,6 +167,7 @@ interface CronTasksTableProps {
   loading: boolean;
   locale: CountryLanguage;
   onTaskUpdated: () => void;
+  user: JwtPayloadType;
 }
 
 export function CronTasksTable({
@@ -166,6 +175,7 @@ export function CronTasksTable({
   loading,
   locale,
   onTaskUpdated,
+  user,
 }: CronTasksTableProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
@@ -300,6 +310,7 @@ export function CronTasksTable({
                     task={task}
                     onTaskUpdated={onTaskUpdated}
                     locale={locale}
+                    user={user}
                   />
                 </TableCell>
                 <TableCell>
@@ -325,6 +336,7 @@ export function CronTasksTable({
                       taskId={task.id}
                       onTaskUpdated={onTaskUpdated}
                       locale={locale}
+                      user={user}
                     />
                   </Div>
                 </TableCell>
@@ -337,6 +349,7 @@ export function CronTasksTable({
                     <InlineEditForm
                       task={task}
                       locale={locale}
+                      user={user}
                       onCancel={() => setEditingTaskId(null)}
                       onSuccess={() => {
                         setEditingTaskId(null);

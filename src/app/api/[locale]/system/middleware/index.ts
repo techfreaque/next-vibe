@@ -12,7 +12,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { LanguageMiddlewareOptions } from "./language";
 import { detectLocale } from "./language";
 import { checkLeadId, createLeadId, LeadIdCheckResult } from "./lead-id";
-import { checkSession, clearSessionToken, SessionCheckResult } from "./session";
 import { extractLocaleFromPath, shouldSkipPath } from "./utils";
 
 /**
@@ -60,15 +59,6 @@ export async function middleware(
   // Step 2: Extract locale from path for leadId middleware
   const locale =
     (extractLocaleFromPath(path) as CountryLanguage) || options.defaultLocale;
-
-  // Step 3: Handle session validation FIRST and clear invalid tokens
-  // This must happen before leadId check so we can clear the token before any redirects
-  const sessionCheck = await checkSession(request);
-
-  if (sessionCheck === SessionCheckResult.INVALID) {
-    // Session token is invalid, clear it and continue to next step
-    return clearSessionToken(request);
-  }
 
   // Step 4: Handle leadId tracking
   const leadIdCheck = await checkLeadId(request);

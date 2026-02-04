@@ -21,7 +21,6 @@ import {
   EndpointErrorTypes,
   LayoutType,
   Methods,
-  SpacingSize,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -53,7 +52,7 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       layoutType: LayoutType.STACKED,
       noCard: true,
-      gap: "6",
+      gap: "2",
     },
     { response: true },
     {
@@ -63,6 +62,7 @@ const { GET } = createEndpoint({
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.INLINE,
           gap: "2",
+          className: "p-6",
           noCard: true,
         },
         { response: true },
@@ -75,26 +75,18 @@ const { GET } = createEndpoint({
             label:
               "app.api.agent.chat.characters.get.createButton.label" as const,
             icon: "plus",
-            variant: "default",
             className: "ml-auto",
             usage: { response: true },
           }),
         },
       ),
 
-      // Separator between buttons and content (widget field - pure UI)
-      separator: widgetField({
-        type: WidgetType.SEPARATOR,
-        spacingTop: SpacingSize.RELAXED,
-        spacingBottom: SpacingSize.RELAXED,
-        usage: { response: true },
-      }),
-
       // Sections array
       sections: responseArrayField(
         {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.STACKED,
+          className: "border-t border-border p-6 overflow-y-auto max-h-[70dvh]",
           noCard: true,
           gap: "6",
         },
@@ -130,6 +122,7 @@ const { GET } = createEndpoint({
                 }),
                 count: responseField({
                   type: WidgetType.BADGE,
+
                   schema: z.number(),
                 }),
               },
@@ -137,12 +130,9 @@ const { GET } = createEndpoint({
             characters: responseArrayField(
               {
                 type: WidgetType.DATA_CARDS,
-                layout: {
-                  type: LayoutType.GRID,
-                  columns: 1,
-                  spacing: "normal",
-                },
-                maxItems: 3,
+                layoutType: LayoutType.STACKED,
+                columns: 1,
+                spacing: "normal",
                 metadata: {
                   onCardClick: {
                     targetEndpoint: characterSingleDefinitions.GET,
@@ -159,6 +149,7 @@ const { GET } = createEndpoint({
                   gap: "4",
                   alignItems: "start",
                   noCard: true,
+                  className: "group relative",
                 },
                 { response: true },
                 {
@@ -172,17 +163,17 @@ const { GET } = createEndpoint({
                     hidden: true,
                     schema: z.enum(CharacterCategoryDB),
                   }),
+                  modelId: responseField({
+                    type: WidgetType.TEXT,
+                    hidden: true,
+                    schema: z.enum(ModelId),
+                  }),
                   icon: responseField({
                     type: WidgetType.ICON,
                     containerSize: "lg",
                     iconSize: "base",
                     borderRadius: "lg",
                     schema: iconSchema,
-                  }),
-                  modelId: responseField({
-                    type: WidgetType.TEXT,
-                    hidden: true,
-                    schema: z.enum(ModelId),
                   }),
                   content: objectField(
                     {
@@ -197,6 +188,14 @@ const { GET } = createEndpoint({
                         type: WidgetType.TEXT,
                         size: "base",
                         emphasis: "bold",
+                        inline: true,
+                        schema: z.string() as z.ZodType<TranslationKey>,
+                      }),
+                      tagline: responseField({
+                        type: WidgetType.TEXT,
+                        size: "xs",
+                        variant: "muted",
+                        inline: true,
                         schema: z.string() as z.ZodType<TranslationKey>,
                       }),
                       description: responseField({
@@ -205,87 +204,89 @@ const { GET } = createEndpoint({
                         variant: "muted",
                         schema: z.string() as z.ZodType<TranslationKey>,
                       }),
-                      tagline: responseField({
+
+                      modelIcon: responseField({
+                        type: WidgetType.ICON,
+                        iconSize: "xs",
+                        inline: true,
+                        noHover: true,
+                        schema: iconSchema,
+                      }),
+                      modelInfo: responseField({
+                        type: WidgetType.TEXT,
+                        size: "xs",
+                        inline: true,
+                        variant: "muted",
+                        schema: z.string(),
+                      }),
+                      separator1: widgetField({
                         type: WidgetType.TEXT,
                         size: "xs",
                         variant: "muted",
-                        schema: z.string() as z.ZodType<TranslationKey>,
+                        inline: true,
+                        content:
+                          "app.api.agent.chat.characters.get.response.characters.character.separator.content" as const,
+                        usage: { response: true },
                       }),
-                      modelRow: objectField(
-                        {
-                          type: WidgetType.CONTAINER,
-                          layoutType: LayoutType.INLINE,
-                          gap: "1",
-                          noCard: true,
-                        },
-                        { response: true },
-                        {
-                          modelIcon: responseField({
-                            type: WidgetType.ICON,
-                            iconSize: "xs",
-                            noHover: true,
-                            schema: iconSchema,
-                          }),
-                          modelInfo: responseField({
-                            type: WidgetType.TEXT,
-                            size: "xs",
-                            variant: "muted",
-                            schema: z.string(),
-                          }),
-                          separator1: widgetField({
-                            type: WidgetType.TEXT,
-                            size: "xs",
-                            variant: "muted",
-                            content:
-                              "app.api.agent.chat.characters.get.response.characters.character.separator.content" as const,
-                            usage: { response: true },
-                          }),
-                          modelProvider: responseField({
-                            type: WidgetType.TEXT,
-                            size: "xs",
-                            variant: "muted",
-                            schema: z.string(),
-                          }),
-                          separator2: widgetField({
-                            type: WidgetType.TEXT,
-                            size: "xs",
-                            variant: "muted",
-                            content:
-                              "app.api.agent.chat.characters.get.response.characters.character.separator.content" as const,
-                            usage: { response: true },
-                          }),
-                          creditCost: responseField({
-                            type: WidgetType.TEXT,
-                            size: "xs",
-                            variant: "muted",
-                            schema: z.string(),
-                          }),
-                        },
-                      ),
+                      modelProvider: responseField({
+                        type: WidgetType.TEXT,
+                        size: "xs",
+                        variant: "muted",
+                        inline: true,
+                        schema: z.string(),
+                      }),
+                      separator2: widgetField({
+                        type: WidgetType.TEXT,
+                        size: "xs",
+                        variant: "muted",
+                        inline: true,
+                        content:
+                          "app.api.agent.chat.characters.get.response.characters.character.separator.content" as const,
+                        usage: { response: true },
+                      }),
+                      creditCost: responseField({
+                        type: WidgetType.TEXT,
+                        size: "xs",
+                        variant: "muted",
+                        inline: true,
+                        schema: z.string(),
+                      }),
                     },
                   ),
-                  editButton: navigateButtonField({
-                    targetEndpoint: characterSingleDefinitions.PATCH,
-                    extractParams: (character) => ({
-                      urlPathParams: { id: String(character.id) },
-                    }),
-                    prefillFromGet: true,
-                    getEndpoint: characterSingleDefinitions.GET,
-                    icon: "pencil",
-                    variant: "ghost",
-                    usage: { response: true },
-                  }),
-                  deleteButton: navigateButtonField({
-                    targetEndpoint: characterSingleDefinitions.DELETE,
-                    extractParams: (character) => ({
-                      urlPathParams: { id: String(character.id) },
-                    }),
-                    prefillFromGet: false,
-                    icon: "trash",
-                    variant: "ghost",
-                    renderInModal: true,
-                    usage: { response: true },
-                  }),
+                  actions: widgetObjectField(
+                    {
+                      type: WidgetType.CONTAINER,
+                      layoutType: LayoutType.ACTIONS,
+                      noCard: true,
+                    },
+                    { response: true },
+                    {
+                      editButton: navigateButtonField({
+                        targetEndpoint: characterSingleDefinitions.PATCH,
+                        extractParams: (source) => ({
+                          urlPathParams: { id: String(source.itemData.id) },
+                        }),
+                        prefillFromGet: true,
+                        getEndpoint: characterSingleDefinitions.GET,
+                        icon: "pencil",
+                        variant: "ghost",
+                        size: "sm",
+                        usage: { response: true },
+                      }),
+                      deleteButton: navigateButtonField({
+                        targetEndpoint: characterSingleDefinitions.DELETE,
+                        extractParams: (source) => ({
+                          urlPathParams: { id: String(source.itemData.id) },
+                        }),
+                        prefillFromGet: false,
+                        icon: "trash",
+                        variant: "ghost",
+                        size: "sm",
+                        renderInModal: true,
+                        usage: { response: true },
+                      }),
+                    },
+                  ),
                 },
               ),
             ),
@@ -375,12 +376,10 @@ const { GET } = createEndpoint({
                   tagline: "app.api.agent.chat.characters.default.tagline",
                   description:
                     "app.api.agent.chat.characters.default.description",
-                  modelRow: {
-                    modelIcon: "sparkles",
-                    modelInfo: "Claude Sonnet 4.5",
-                    modelProvider: "Anthropic",
-                    creditCost: "1.5 credits",
-                  },
+                  modelIcon: "sparkles",
+                  modelInfo: "Claude Sonnet 4.5",
+                  modelProvider: "Anthropic",
+                  creditCost: "1.5 credits",
                 },
               },
             ],
@@ -402,12 +401,10 @@ const { GET } = createEndpoint({
                   tagline: "app.api.agent.chat.characters.custom.tagline",
                   description:
                     "app.api.agent.chat.characters.custom.description",
-                  modelRow: {
-                    modelIcon: "sparkles",
-                    modelInfo: "GPT-5",
-                    modelProvider: "OpenAI",
-                    creditCost: "3 credits",
-                  },
+                  modelIcon: "sparkles",
+                  modelInfo: "GPT-5",
+                  modelProvider: "OpenAI",
+                  creditCost: "3 credits",
                 },
               },
             ],
@@ -428,5 +425,5 @@ export type CharacterListResponseOutput = typeof GET.types.ResponseOutput;
 export type CharacterListItem =
   CharacterListResponseOutput["sections"][number]["characters"][number];
 
-const definitions = { GET } as const;
-export default definitions;
+const charactersDefinitions = { GET } as const;
+export default charactersDefinitions;

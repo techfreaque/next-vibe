@@ -10,6 +10,7 @@ import { create } from "zustand";
 import { generateStorageKey } from "@/app/api/[locale]/system/unified-interface/react/utils/storage-storage-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -154,18 +155,8 @@ export interface ApiStore {
     endpoint: TEndpoint,
     logger: EndpointLogger,
     updater: (
-      oldData:
-        | {
-            success: boolean;
-            data: TEndpoint["types"]["ResponseOutput"];
-          }
-        | undefined,
-    ) =>
-      | {
-          success: boolean;
-          data: TEndpoint["types"]["ResponseOutput"];
-        }
-      | undefined,
+      oldData: ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined,
+    ) => ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined,
     urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
   ) => void;
 }
@@ -292,34 +283,22 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     endpoint: TEndpoint,
     logger: EndpointLogger,
     updater: (
-      oldData:
-        | {
-            success: boolean;
-            data: TEndpoint["types"]["ResponseOutput"];
-          }
-        | undefined,
-    ) =>
-      | {
-          success: boolean;
-          data: TEndpoint["types"]["ResponseOutput"];
-        }
-      | undefined,
+      oldData: ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined,
+    ) => ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined,
     urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
   ): void => {
     // buildKey returns string, wrap in array for React Query
     const builtKey = buildKey("query", endpoint, urlPathParams, logger);
     const stateKey = [builtKey];
 
-    type CachedData =
-      | {
-          success: boolean;
-          data: TEndpoint["types"]["ResponseOutput"];
-        }
-      | undefined;
-
-    queryClient.setQueryData(stateKey, (oldData: CachedData) => {
-      return updater(oldData);
-    });
+    queryClient.setQueryData(
+      stateKey,
+      (
+        oldData: ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined,
+      ) => {
+        return updater(oldData);
+      },
+    );
   },
 }));
 
@@ -372,6 +351,7 @@ export const apiClient = {
   fetch: async <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
     logger: EndpointLogger,
+    user: JwtPayloadType,
     requestData: TEndpoint["types"]["RequestOutput"] extends never
       ? undefined
       : TEndpoint["types"]["RequestOutput"],
@@ -431,6 +411,7 @@ export const apiClient = {
       requestData: requestData as never,
       pathParams: pathParams as never,
       locale,
+      user,
       options: {
         onSuccess: options.onSuccess,
         onError: options.onError,
@@ -446,8 +427,13 @@ export const apiClient = {
   mutate: async <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
     logger: EndpointLogger,
-    requestData: TEndpoint["types"]["RequestOutput"],
-    pathParams: TEndpoint["types"]["UrlVariablesOutput"],
+    user: JwtPayloadType,
+    requestData: TEndpoint["types"]["RequestOutput"] extends never
+      ? undefined
+      : TEndpoint["types"]["RequestOutput"],
+    pathParams: TEndpoint["types"]["UrlVariablesOutput"] extends never
+      ? undefined
+      : TEndpoint["types"]["UrlVariablesOutput"],
     locale: CountryLanguage,
     options: ApiMutationOptions<
       TEndpoint["types"]["RequestOutput"],
@@ -463,6 +449,7 @@ export const apiClient = {
       requestData: requestData as never,
       pathParams: pathParams as never,
       locale,
+      user,
       options: {
         onSuccess: options.onSuccess
           ? (context) =>
@@ -470,6 +457,7 @@ export const apiClient = {
                 requestData: context.requestData,
                 pathParams: context.urlPathParams,
                 responseData: context.responseData,
+                logger: context.logger,
               })
           : undefined,
         onError: options.onError
@@ -478,6 +466,7 @@ export const apiClient = {
                 error: context.error,
                 requestData: context.requestData,
                 pathParams: context.urlPathParams,
+                logger: context.logger,
               })
           : undefined,
       },
@@ -557,18 +546,8 @@ export const apiClient = {
     endpoint: TEndpoint,
     logger: EndpointLogger,
     updater: (
-      oldData:
-        | {
-            success: boolean;
-            data: TEndpoint["types"]["ResponseOutput"];
-          }
-        | undefined,
-    ) =>
-      | {
-          success: boolean;
-          data: TEndpoint["types"]["ResponseOutput"];
-        }
-      | undefined,
+      oldData: ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined,
+    ) => ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined,
     urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
   ): void => {
     useApiStore

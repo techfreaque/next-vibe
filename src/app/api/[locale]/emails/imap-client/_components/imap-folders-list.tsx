@@ -21,12 +21,13 @@ import {
 import type { JSX } from "react";
 
 import { useImapFoldersList } from "@/app/api/[locale]/emails/imap-client/folders/list/hooks";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 
 interface ImapFoldersListProps {
   accountId: string;
-  logger: EndpointLogger;
+  user: JwtPayloadType;
 }
 
 /**
@@ -34,13 +35,14 @@ interface ImapFoldersListProps {
  */
 export function ImapFoldersList({
   accountId,
-  logger,
+  user,
 }: ImapFoldersListProps): JSX.Element {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const router = useRouter();
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Use the IMAP folders list endpoint
-  const foldersEndpoint = useImapFoldersList(accountId, logger);
+  const foldersEndpoint = useImapFoldersList(user, accountId, logger);
 
   // Access data through the read operation following leads pattern
   const apiResponse = foldersEndpoint.read?.response;

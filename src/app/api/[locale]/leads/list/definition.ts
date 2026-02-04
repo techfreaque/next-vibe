@@ -16,7 +16,6 @@ import {
   responseArrayField,
   responseField,
   widgetField,
-  widgetObjectField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -76,48 +75,46 @@ const { GET } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.leads.list.get.form.title" as const,
-      description: "app.api.leads.list.get.form.description" as const,
       layoutType: LayoutType.STACKED,
-      getCount: (data: {
-        response?: { paginationInfo?: { total?: number } };
-      }) => data.response?.paginationInfo?.total,
-      submitButton: {
-        text: "app.api.leads.list.get.actions.refresh" as const,
-        loadingText: "app.api.leads.list.get.actions.refreshing" as const,
-        position: "header",
-        icon: "refresh-cw",
-        variant: "ghost",
-        size: "sm",
-      },
     },
     { request: "data", response: true },
     {
-      // Top action buttons container
-      topActions: widgetObjectField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.INLINE,
-          gap: "2",
-          noCard: true,
-        },
-        { request: "data", response: true },
-        {
-          backButton: backButton({
-            usage: { request: "data", response: true },
-          }),
-          createButton: navigateButtonField({
-            targetEndpoint: createLeadDefinitions.POST,
-            extractParams: () => ({}),
-            prefillFromGet: false,
-            label: "app.api.leads.list.get.createButton.label" as const,
-            icon: "plus",
-            variant: "default",
-            className: "ml-auto",
-            usage: { request: "data", response: true },
-          }),
-        },
-      ),
+      title: widgetField({
+        type: WidgetType.TITLE,
+        content: "app.api.leads.list.get.title" as const,
+        getCount: (responseData: {
+          data?: { paginationInfo?: { total?: number } };
+        }) => responseData?.data?.paginationInfo?.total,
+        className: "mr-auto",
+        usage: { request: "data", response: true },
+        inline: true,
+      }),
+
+      backButton: backButton({
+        usage: { request: "data", response: true },
+        inline: true,
+      }),
+      createButton: navigateButtonField({
+        targetEndpoint: createLeadDefinitions.POST,
+        extractParams: () => ({}),
+        prefillFromGet: false,
+        label: "app.api.leads.list.get.createButton.label" as const,
+        icon: "plus",
+        variant: "default",
+        className: "ml-auto",
+        inline: true,
+        usage: { request: "data", response: true },
+      }),
+      submitButton: widgetField({
+        type: WidgetType.SUBMIT_BUTTON,
+        text: "app.api.leads.list.get.actions.refresh" as const,
+        loadingText: "app.api.leads.list.get.actions.refreshing" as const,
+        icon: "refresh-cw",
+        variant: "ghost",
+        size: "sm",
+        inline: true,
+        usage: { request: "data", response: true },
+      }),
 
       // Separator between buttons and content
       separator: widgetField({
@@ -135,7 +132,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.leads.list.get.statusFilters.description" as const,
           layoutType: LayoutType.GRID,
-          columns: 3,
+          columns: 6,
           order: 1,
           showSubmitButton: false,
         },
@@ -147,7 +144,7 @@ const { GET } = createEndpoint({
             label: "app.api.leads.list.get.search.label" as const,
             description: "app.api.leads.list.get.search.description" as const,
             placeholder: "app.api.leads.list.get.search.placeholder" as const,
-            columns: 12,
+            columns: 6,
             schema: z.string().optional(),
           }),
           status: requestField({
@@ -157,7 +154,7 @@ const { GET } = createEndpoint({
             description: "app.api.leads.list.get.status.description" as const,
             placeholder: "app.api.leads.list.get.status.placeholder" as const,
             options: LeadStatusFilterOptions,
-            columns: 6,
+            columns: 3,
             schema: z.array(z.enum(LeadStatusFilter)).optional(),
           }),
           currentCampaignStage: requestField({
@@ -169,7 +166,7 @@ const { GET } = createEndpoint({
             placeholder:
               "app.api.leads.list.get.currentCampaignStage.placeholder" as const,
             options: EmailCampaignStageFilterOptions,
-            columns: 6,
+            columns: 3,
             schema: z.array(z.enum(EmailCampaignStageFilter)).optional(),
           }),
           source: requestField({
@@ -179,7 +176,7 @@ const { GET } = createEndpoint({
             description: "app.api.leads.list.get.source.description" as const,
             placeholder: "app.api.leads.list.get.source.placeholder" as const,
             options: LeadSourceFilterOptions,
-            columns: 12,
+            columns: 6,
             schema: z.array(z.enum(LeadSourceFilter)).optional(),
           }),
         },
@@ -192,7 +189,8 @@ const { GET } = createEndpoint({
           title: "app.api.leads.list.get.locationFilters.title" as const,
           description:
             "app.api.leads.list.get.locationFilters.description" as const,
-          layoutType: LayoutType.GRID_2_COLUMNS,
+          layoutType: LayoutType.GRID,
+          columns: 2,
           order: 2,
           showSubmitButton: false,
         },
@@ -205,7 +203,6 @@ const { GET } = createEndpoint({
             description: "app.api.leads.list.get.country.description" as const,
             placeholder: "app.api.leads.list.get.country.placeholder" as const,
             options: CountriesOptions,
-            columns: 6,
             schema: z.array(z.enum(Countries)).optional(),
           }),
           language: requestField({
@@ -215,7 +212,6 @@ const { GET } = createEndpoint({
             description: "app.api.leads.list.get.language.description" as const,
             placeholder: "app.api.leads.list.get.language.placeholder" as const,
             options: LanguagesOptions,
-            columns: 6,
             schema: z.array(z.enum(Languages)).optional(),
           }),
         },
@@ -228,7 +224,8 @@ const { GET } = createEndpoint({
           title: "app.api.leads.list.get.sortingOptions.title" as const,
           description:
             "app.api.leads.list.get.sortingOptions.description" as const,
-          layoutType: LayoutType.GRID_2_COLUMNS,
+          layoutType: LayoutType.GRID,
+          columns: 2,
           order: 3,
           showSubmitButton: false,
         },
@@ -241,7 +238,6 @@ const { GET } = createEndpoint({
             description: "app.api.leads.list.get.sortBy.description" as const,
             placeholder: "app.api.leads.list.get.sortBy.placeholder" as const,
             options: LeadSortFieldOptions,
-            columns: 6,
             schema: z
               .enum(LeadSortField)
               .optional()
@@ -256,7 +252,6 @@ const { GET } = createEndpoint({
             placeholder:
               "app.api.leads.list.get.sortOrder.placeholder" as const,
             options: SortOrderOptions,
-            columns: 6,
             schema: z.enum(SortOrder).optional().default(SortOrder.DESC),
           }),
         },
@@ -426,6 +421,39 @@ const { GET } = createEndpoint({
                   hidden: true,
                   schema: z.string(),
                 }),
+                // Action buttons
+                viewButton: navigateButtonField({
+                  targetEndpoint: leadSingleDefinitions.GET,
+                  extractParams: (source) => ({
+                    urlPathParams: { id: String(source.itemData.id) },
+                  }),
+                  prefillFromGet: false,
+                  icon: "eye",
+                  variant: "ghost",
+                  usage: { response: true },
+                }),
+                editButton: navigateButtonField({
+                  targetEndpoint: leadSingleDefinitions.PATCH,
+                  extractParams: (source) => ({
+                    urlPathParams: { id: String(source.itemData.id) },
+                  }),
+                  prefillFromGet: true,
+                  getEndpoint: leadSingleDefinitions.GET,
+                  icon: "pencil",
+                  variant: "ghost",
+                  usage: { response: true },
+                }),
+                deleteButton: navigateButtonField({
+                  targetEndpoint: leadSingleDefinitions.DELETE,
+                  extractParams: (source) => ({
+                    urlPathParams: { id: String(source.itemData.id) },
+                  }),
+                  prefillFromGet: false,
+                  icon: "trash",
+                  variant: "ghost",
+                  renderInModal: true,
+                  usage: { response: true },
+                }),
               },
             ),
           ),
@@ -450,12 +478,12 @@ const { GET } = createEndpoint({
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number().optional().default(20),
           }),
-          total: responseField({
+          totalCount: responseField({
             type: WidgetType.TEXT,
             content: "app.api.leads.list.get.response.total" as const,
             schema: z.coerce.number(),
           }),
-          totalPages: responseField({
+          pageCount: responseField({
             type: WidgetType.TEXT,
             content: "app.api.leads.list.get.response.totalPages" as const,
             schema: z.coerce.number(),
@@ -581,10 +609,10 @@ const { GET } = createEndpoint({
           ],
         },
         paginationInfo: {
-          total: 100,
+          totalCount: 100,
           page: 1,
           limit: 20,
-          totalPages: 5,
+          pageCount: 5,
         },
       },
       filtered: {
@@ -592,10 +620,10 @@ const { GET } = createEndpoint({
           leads: [],
         },
         paginationInfo: {
-          total: 0,
+          totalCount: 0,
           page: 1,
           limit: 10,
-          totalPages: 0,
+          pageCount: 0,
         },
       },
       customSorting: {
@@ -631,10 +659,10 @@ const { GET } = createEndpoint({
           ],
         },
         paginationInfo: {
-          total: 25,
+          totalCount: 25,
           page: 1,
           limit: 50,
-          totalPages: 1,
+          pageCount: 1,
         },
       },
     },

@@ -13,11 +13,9 @@ import {
 } from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import type { z } from "zod";
 
 import { simpleT } from "@/i18n/core/shared";
 
-import type { UnifiedField } from "../../../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import {
   getIconSizeClassName,
@@ -25,7 +23,15 @@ import {
   getTextSizeClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
-import type { FieldUsageConfig } from "../../_shared/types";
+import type {
+  AnyChildrenConstrain,
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+} from "../../_shared/types";
+import {
+  useWidgetForm,
+  useWidgetLocale,
+} from "../../_shared/use-widget-context";
 import type { PaginationWidgetConfig } from "./types";
 
 /**
@@ -38,20 +44,22 @@ export function PaginationWidget<
   TUsage extends FieldUsageConfig,
   TSchemaType extends "object" | "object-optional" | "widget-object",
   TChildren extends {
-    page: UnifiedField<TKey, z.ZodTypeAny, FieldUsageConfig, any>; // oxlint-disable-line typescript/no-explicit-any;
-    limit: UnifiedField<TKey, z.ZodTypeAny, FieldUsageConfig, any>; // oxlint-disable-line typescript/no-explicit-any;
-    totalCount: UnifiedField<TKey, z.ZodTypeAny, FieldUsageConfig, any>; // oxlint-disable-line typescript/no-explicit-any;
-    pageCount?: UnifiedField<TKey, z.ZodTypeAny, FieldUsageConfig, any>; // oxlint-disable-line typescript/no-explicit-any;
-    offset?: UnifiedField<TKey, z.ZodTypeAny, FieldUsageConfig, any>; // oxlint-disable-line typescript/no-explicit-any;
+    page: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
+    limit: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
+    totalCount: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
+    pageCount?: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
+    offset?: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
   },
 >({
   field,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   PaginationWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
 >): JSX.Element {
-  const { t } = simpleT(context.locale);
+  const locale = useWidgetLocale();
+  const form = useWidgetForm();
+  const { t } = simpleT(locale);
   const {
     showBorder = true,
     padding,
@@ -84,27 +92,28 @@ export function PaginationWidget<
   }
 
   const pagination = field.value;
-  const page = pagination.page ?? 1;
-  const limit = pagination.limit ?? 50;
-  const total = pagination.total ?? 0;
-  const totalPages = pagination.totalPages ?? 1;
+  const page = typeof pagination.page === "number" ? pagination.page : 1;
+  const limit = typeof pagination.limit === "number" ? pagination.limit : 50;
+  const total = typeof pagination.total === "number" ? pagination.total : 0;
+  const totalPages =
+    typeof pagination.totalPages === "number" ? pagination.totalPages : 1;
 
   const canGoPrevious = page > 1;
   const canGoNext = page < totalPages;
 
   const handlePageChange = (newPage: number): void => {
     // Pagination is auto-refreshed via onChange action in field definition
-    if (context.form) {
-      context.form.setValue("paginationInfo.page", newPage);
+    if (form) {
+      form.setValue("paginationInfo.page", newPage);
     }
   };
 
   const handleLimitChange = (newLimit: string): void => {
     const limitValue = Number.parseInt(newLimit, 10);
     // Pagination is auto-refreshed via onChange action in field definition
-    if (context.form) {
-      context.form.setValue("paginationInfo.limit", limitValue);
-      context.form.setValue("paginationInfo.page", 1); // Reset to page 1
+    if (form) {
+      form.setValue("paginationInfo.limit", limitValue);
+      form.setValue("paginationInfo.page", 1); // Reset to page 1
     }
   };
 

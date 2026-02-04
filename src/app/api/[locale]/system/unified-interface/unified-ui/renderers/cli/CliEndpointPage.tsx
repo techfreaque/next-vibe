@@ -17,6 +17,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { Platform } from "../../../shared/types/platform";
 import type { WidgetData } from "../../../shared/widgets/widget-data";
 import { InkEndpointRenderer } from "./CliEndpointRenderer";
 
@@ -136,6 +137,7 @@ export function InkEndpointPage<
           isSubmitting={isSubmitting}
           logger={logger}
           user={user}
+          platform={Platform.CLI}
           onSubmit={(): void => {
             void handleSubmit(responseData ?? {});
           }}
@@ -166,6 +168,7 @@ export function InkEndpointPage<
               isSubmitting={false}
               logger={logger}
               user={user}
+              platform={Platform.CLI}
               response={response}
             />
           )}

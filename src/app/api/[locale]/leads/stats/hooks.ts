@@ -15,6 +15,7 @@ import type {
   EndpointReturn,
   FormAlertState,
 } from "../../system/unified-interface/react/hooks/endpoint-types";
+import type { JwtPayloadType } from "../../user/auth/types";
 import type { LeadsStatsResponseOutput } from "./definition";
 import definitions from "./definition";
 
@@ -24,6 +25,7 @@ import definitions from "./definition";
 export type LeadsStatsEndpointReturn = EndpointReturn<typeof definitions>;
 export function useLeadsStatsEndpoint(
   logger: EndpointLogger,
+  user: JwtPayloadType,
   enabled = true,
 ): LeadsStatsEndpointReturn {
   const queryOptions = useMemo(
@@ -33,11 +35,12 @@ export function useLeadsStatsEndpoint(
         refetchOnWindowFocus: false,
         staleTime: 30 * 1000, // 30 seconds
       },
+      user,
     }),
-    [enabled],
+    [enabled, user],
   );
 
-  return useEndpoint(definitions, queryOptions, logger);
+  return useEndpoint(definitions, queryOptions, logger, user);
 }
 
 /**
@@ -47,8 +50,9 @@ export function useLeadsStatsEndpoint(
 export function useLeadsStats(
   locale: CountryLanguage,
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): UseLeadsStatsReturn {
-  const endpoint = useLeadsStatsEndpoint(logger);
+  const endpoint = useLeadsStatsEndpoint(logger, user);
 
   /**
    * Refresh stats data

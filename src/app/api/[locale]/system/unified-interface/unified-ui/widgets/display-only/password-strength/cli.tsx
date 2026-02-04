@@ -7,6 +7,10 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import {
+  useInkWidgetForm,
+  useInkWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { FieldUsageConfig, InkWidgetProps } from "../../_shared/cli-types";
 import { calculatePasswordStrength } from "./shared";
@@ -17,16 +21,21 @@ export function PasswordStrengthWidgetInk<
   TUsage extends FieldUsageConfig,
 >({
   field,
-  context,
 }: InkWidgetProps<
   TEndpoint,
+  TUsage,
   PasswordStrengthWidgetConfig<TUsage, "widget", TEndpoint>
 >): JSX.Element | null {
-  const { t } = context;
+  const t = useInkWidgetTranslation();
+  const form = useInkWidgetForm();
   const { watchField } = field;
 
   // Get password value from form
-  const password = context.form?.getValue<string>(watchField);
+  const watchedValue = form?.getValue(watchField);
+  const password =
+    typeof watchedValue === "string"
+      ? watchedValue
+      : String(watchedValue || "");
 
   if (!password) {
     return null;

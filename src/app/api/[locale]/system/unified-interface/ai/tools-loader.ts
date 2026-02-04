@@ -18,7 +18,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
-import { RouteExecutionExecutor } from "../shared/endpoints/route/executor";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
 import { endpointToToolName, getPreferredToolName } from "../shared/utils/path";
@@ -134,6 +133,8 @@ function createToolFromEndpoint(
       // Execute using shared generic handler
       // toolName must be in full path format: "agent.brave-search.GET"
       // Platform.AI is valid for tool execution, type restriction is overly specific
+      const { RouteExecutionExecutor } =
+        await import("@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor");
       const result = await RouteExecutionExecutor.executeGenericHandler({
         toolName,
         data,

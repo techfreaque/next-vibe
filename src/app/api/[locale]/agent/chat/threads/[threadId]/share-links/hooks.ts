@@ -8,6 +8,7 @@
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import definitions from "./definition";
 
@@ -29,6 +30,7 @@ export function useThreadShareLinks(
     threadId: string;
     enabled?: boolean;
   },
+  user: JwtPayloadType,
   logger: EndpointLogger,
 ): EndpointReturn<typeof definitions> {
   return useEndpoint(
@@ -45,6 +47,7 @@ export function useThreadShareLinks(
       },
     },
     logger,
+    user,
   );
 }
 

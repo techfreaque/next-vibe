@@ -357,29 +357,57 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
       },
     );
 
+    // Sort modules by import path for consistent output
+    const sortedModules = [...modules].toSorted((a, b) =>
+      getRelativeImportPath(a.filePath, outputFile).localeCompare(
+        getRelativeImportPath(b.filePath, outputFile),
+      ),
+    );
+
     // Generate imports
     const imports: string[] = [];
-    for (const mod of modules) {
+    for (const mod of sortedModules) {
       const relativePath = getRelativeImportPath(mod.filePath, outputFile);
-      imports.push(
-        `import { ${mod.exportName}, ${mod.schemaExportName} } from "${relativePath}";`,
-      );
+      const singleLineImport = `import { ${mod.exportName}, ${mod.schemaExportName} } from "${relativePath}";`;
+      if (singleLineImport.length > 80) {
+        // Split across multiple lines
+        imports.push(
+          `import {\n  ${mod.exportName},\n  ${mod.schemaExportName},\n} from "${relativePath}";`,
+        );
+      } else {
+        imports.push(singleLineImport);
+      }
     }
 
     // Generate module names for registry
-    const moduleEntries = modules
+    const moduleEntries = sortedModules
       .map(
         (m) =>
-          `  "${m.moduleName}": { env: ${m.exportName}, schema: ${m.schemaExportName} },`,
+          `  ${m.moduleName}: { env: ${m.exportName}, schema: ${m.schemaExportName} },`,
       )
       .join("\n");
 
-    // Generate schema merge chain
-    const schemaChain = modules
+    // Generate schema merge chain for server - check full single line length first
+    const singleLineServerChain = sortedModules
       .map((m, i) =>
         i === 0 ? `${m.schemaExportName}` : `.merge(${m.schemaExportName})`,
       )
-      .join("\n  ");
+      .join("");
+    const fullServerDeclaration = `export const envSchema = ${singleLineServerChain}`;
+
+    let serverSchemaChain: string;
+    if (fullServerDeclaration.length > 80 && sortedModules.length > 1) {
+      // Use multiline format with newlines before each merge
+      serverSchemaChain = sortedModules
+        .map((m, i) =>
+          i === 0
+            ? `${m.schemaExportName}`
+            : `\n  .merge(${m.schemaExportName})`,
+        )
+        .join("");
+    } else {
+      serverSchemaChain = singleLineServerChain;
+    }
 
     // eslint-disable-next-line i18next/no-literal-string
     return `${header}
@@ -387,7 +415,7 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
 import "server-only";
 
 import { validateEnv } from "next-vibe/shared/utils/env-util";
-import { z } from "zod";
+import type { z } from "zod";
 
 import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
 
@@ -407,7 +435,7 @@ ${moduleEntries}
 } as const;
 
 // Combined schema using merge
-export const envSchema = ${schemaChain || "z.object({})"};
+export const envSchema = ${serverSchemaChain || "z.object({})"};
 
 export type Env = z.infer<typeof envSchema>;
 
@@ -461,35 +489,63 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
       },
     );
 
+    // Sort modules by import path for consistent output
+    const sortedModules = [...modules].toSorted((a, b) =>
+      getRelativeImportPath(a.filePath, outputFile).localeCompare(
+        getRelativeImportPath(b.filePath, outputFile),
+      ),
+    );
+
     // Generate imports
     const imports: string[] = [];
-    for (const mod of modules) {
+    for (const mod of sortedModules) {
       const relativePath = getRelativeImportPath(mod.filePath, outputFile);
-      imports.push(
-        `import { ${mod.exportName}, ${mod.schemaExportName} } from "${relativePath}";`,
-      );
+      const singleLineImport = `import { ${mod.exportName}, ${mod.schemaExportName} } from "${relativePath}";`;
+      if (singleLineImport.length > 80) {
+        // Split across multiple lines
+        imports.push(
+          `import {\n  ${mod.exportName},\n  ${mod.schemaExportName},\n} from "${relativePath}";`,
+        );
+      } else {
+        imports.push(singleLineImport);
+      }
     }
 
     // Generate module names for registry
-    const moduleEntries = modules
+    const moduleEntries = sortedModules
       .map(
         (m) =>
-          `  "${m.moduleName}": { env: ${m.exportName}, schema: ${m.schemaExportName} },`,
+          `  ${m.moduleName}: { env: ${m.exportName}, schema: ${m.schemaExportName} },`,
       )
       .join("\n");
 
-    // Generate schema merge chain
-    const schemaChain = modules
+    // Generate schema merge chain for client - check full single line length first
+    const singleLineClientChain = sortedModules
       .map((m, i) =>
         i === 0 ? `${m.schemaExportName}` : `.merge(${m.schemaExportName})`,
       )
-      .join("\n  ");
+      .join("");
+    const fullClientDeclaration = `export const envClientSchema = ${singleLineClientChain}`;
+
+    let schemaChain: string;
+    if (fullClientDeclaration.length > 80 && sortedModules.length > 1) {
+      // Use multiline format with arguments on separate lines
+      schemaChain = sortedModules
+        .map((m, i) =>
+          i === 0
+            ? `${m.schemaExportName}`
+            : `.merge(\n  ${m.schemaExportName},\n)`,
+        )
+        .join("");
+    } else {
+      schemaChain = singleLineClientChain;
+    }
 
     // eslint-disable-next-line i18next/no-literal-string
     return `${header}
 
 import { validateEnv } from "next-vibe/shared/utils/env-util";
-import { z } from "zod";
+import type { z } from "zod";
 
 import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
 
@@ -499,7 +555,8 @@ ${imports.join("\n")}
 // Platform detection (will be set at runtime)
 const isServer = typeof window === "undefined";
 const isReactNative = false;
-const isBrowser = !isServer && typeof window !== "undefined" && !!window.document;
+const isBrowser =
+  !isServer && typeof window !== "undefined" && !!window.document;
 
 const platform = {
   isServer,

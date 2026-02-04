@@ -8,16 +8,19 @@
  * - getFilteredModels(): Get all models matching model selection
  */
 
+import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 import type { ModelOption } from "@/app/api/[locale]/agent/models/models";
 import { modelOptions } from "@/app/api/[locale]/agent/models/models";
+import type {
+  FiltersModelSelection,
+  ManualModelSelection,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
+import {
+  ModelSortDirection,
+  ModelSortField,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import type {
-  FavoriteCharacterBasedModelSelection,
-  FavoriteFiltersModelSelection,
-  FavoriteManualModelSelection,
-  FavoriteModelSelection,
-} from "../favorites/create/definition";
 import {
   ContentLevelDB,
   IntelligenceLevelDB,
@@ -77,12 +80,43 @@ export class CharactersRepositoryClient {
   }
 
   /**
-   * Apply hard filter constraints to models (range checks only)
+   * Get sort value for a model based on sort field
+   */
+  private static getSortValue(
+    model: ModelOption,
+    sortBy: string | undefined,
+  ): number {
+    if (!sortBy) {
+      return 0;
+    }
+
+    switch (sortBy) {
+      case ModelSortField.INTELLIGENCE: {
+        const idx = IntelligenceLevelDB.indexOf(model.intelligence);
+        return idx === -1 ? 0 : idx;
+      }
+      case ModelSortField.SPEED: {
+        const idx = SpeedLevelDB.indexOf(model.speed);
+        return idx === -1 ? 0 : idx;
+      }
+      case ModelSortField.PRICE:
+        return model.creditCost;
+      case ModelSortField.CONTENT: {
+        const idx = ContentLevelDB.indexOf(model.content);
+        return idx === -1 ? 0 : idx;
+      }
+      default:
+        return 0;
+    }
+  }
+
+  /**
+   * Apply hard filter constraints to models (range checks only) and sort
    */
   private static applyHardFilters(
-    filters: FavoriteFiltersModelSelection,
+    filters: FiltersModelSelection,
   ): ModelOption[] {
-    return Object.values(modelOptions).filter((model) => {
+    const filtered = Object.values(modelOptions).filter((model) => {
       const modelPrice = this.getModelPriceLevel(model.creditCost);
 
       return (
@@ -104,112 +138,61 @@ export class CharactersRepositoryClient {
         this.meetsRangeConstraint(model.speed, filters.speedRange, SpeedLevelDB)
       );
     });
-  }
 
-  /**
-   * Score a model based on soft preferences
-   */
-  private static scoreModelBySoftPreferences(
-    model: ModelOption,
-    filters: FavoriteFiltersModelSelection,
-  ): number {
-    let score = 0;
+    // Apply sorting if specified
+    if (filters.sortBy) {
+      return filtered.toSorted((a, b) => {
+        const aVal = this.getSortValue(a, filters.sortBy);
+        const bVal = this.getSortValue(b, filters.sortBy);
 
-    // Score based on preferred strengths
-    if (filters.preferredStrengths) {
-      for (const utility of filters.preferredStrengths) {
-        if (model.utilities.includes(utility)) {
-          score += 10;
-        }
-      }
+        // Default to DESC if no direction specified
+        const direction = filters.sortDirection ?? ModelSortDirection.DESC;
+
+        return direction === ModelSortDirection.ASC ? aVal - bVal : bVal - aVal;
+      });
     }
 
-    // Penalize weaknesses (unless ignored)
-    if (model.weaknesses && filters.preferredStrengths) {
-      for (const weakness of model.weaknesses) {
-        if (
-          !filters.ignoredWeaknesses?.includes(weakness) &&
-          filters.preferredStrengths.includes(weakness)
-        ) {
-          score -= 5;
-        }
-      }
-    }
-
-    return score;
+    return filtered;
   }
 
-  /**
-   * Internal shared logic for MANUAL and FILTERS model selection
-   * Does not handle CHARACTER_BASED
-   */
   private static getFilteredModelsInternal(
-    modelSelection:
-      | FavoriteFiltersModelSelection
-      | FavoriteManualModelSelection,
+    modelSelection: FiltersModelSelection | ManualModelSelection,
   ): ModelOption[] {
-    // Handle MANUAL selection
     if (modelSelection.selectionType === ModelSelectionType.MANUAL) {
       const model = modelOptions[modelSelection.manualModelId];
       return model ? [model] : [];
     }
 
-    // Handle FILTERS - apply hard filters
-    const candidates = this.applyHardFilters(modelSelection);
-    if (
-      !modelSelection.preferredStrengths &&
-      !modelSelection.ignoredWeaknesses
-    ) {
-      return candidates;
-    }
-
-    return candidates
-      .map((model) => ({
-        model,
-        score: this.scoreModelBySoftPreferences(model, modelSelection),
-      }))
-      .toSorted((a, b) => b.score - a.score)
-      .map(({ model }) => model);
+    return this.applyHardFilters(modelSelection);
   }
 
-  /**
-   * PUBLIC API: Get all models for favorites
-   * Handles CHARACTER_BASED, MANUAL, and FILTERS
-   * Requires character's modelSelection when favorite uses CHARACTER_BASED
-   */
   static getFilteredModelsForFavorite(
-    favoriteModelSelection: FavoriteModelSelection,
-    characterModelSelection: Exclude<
-      FavoriteModelSelection,
-      FavoriteCharacterBasedModelSelection
-    >,
+    favoriteModelSelection: FavoriteGetModelSelection,
   ): ModelOption[] {
-    // Handle CHARACTER_BASED - use character's modelSelection
     if (
-      favoriteModelSelection.selectionType ===
-      ModelSelectionType.CHARACTER_BASED
+      !favoriteModelSelection.currentSelection ||
+      favoriteModelSelection.currentSelection.selectionType ===
+        ModelSelectionType.CHARACTER_BASED
     ) {
-      return this.getFilteredModelsInternal(characterModelSelection);
+      // characterModelSelection should always be present when CHARACTER_BASED, but handle fallback
+      if (!favoriteModelSelection.characterModelSelection) {
+        return [];
+      }
+      return this.getFilteredModelsInternal(
+        favoriteModelSelection.characterModelSelection,
+      );
     }
 
-    return this.getFilteredModelsInternal(favoriteModelSelection);
+    return this.getFilteredModelsInternal(
+      favoriteModelSelection.currentSelection,
+    );
   }
 
-  /**
-   * PUBLIC API: Get best model for favorites
-   * Handles CHARACTER_BASED, MANUAL, and FILTERS
-   * Requires character's modelSelection when favorite uses CHARACTER_BASED
-   */
   static getBestModelForFavorite(
-    favoriteModelSelection: FavoriteModelSelection,
-    characterModelSelection: Exclude<
-      FavoriteModelSelection,
-      FavoriteCharacterBasedModelSelection
-    >,
+    favoriteModelSelection: FavoriteGetModelSelection,
   ): ModelOption | null {
     const candidates = this.getFilteredModelsForFavorite(
       favoriteModelSelection,
-      characterModelSelection,
     );
     return candidates.length > 0 ? candidates[0] : null;
   }
@@ -219,23 +202,13 @@ export class CharactersRepositoryClient {
    * Only handles MANUAL and FILTERS (characters never have CHARACTER_BASED)
    */
   static getFilteredModelsForCharacter(
-    characterModelSelection: Exclude<
-      FavoriteModelSelection,
-      FavoriteCharacterBasedModelSelection
-    >,
+    characterModelSelection: FiltersModelSelection | ManualModelSelection,
   ): ModelOption[] {
     return this.getFilteredModelsInternal(characterModelSelection);
   }
 
-  /**
-   * PUBLIC API: Get best model for characters
-   * Only handles MANUAL and FILTERS (characters never have CHARACTER_BASED)
-   */
   static getBestModelForCharacter(
-    characterModelSelection: Exclude<
-      FavoriteModelSelection,
-      FavoriteCharacterBasedModelSelection
-    >,
+    characterModelSelection: FiltersModelSelection | ManualModelSelection,
   ): ModelOption | null {
     const candidates = this.getFilteredModelsForCharacter(
       characterModelSelection,

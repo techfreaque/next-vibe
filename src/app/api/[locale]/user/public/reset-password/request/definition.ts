@@ -16,8 +16,8 @@ import {
 import {
   objectField,
   requestField,
-  responseArrayField,
   responseField,
+  widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 
 import { UserRole } from "../../../user-roles/enum";
@@ -37,77 +37,100 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.user.public.resetPassword.request.title" as const,
-      description:
-        "app.api.user.public.resetPassword.request.description" as const,
-      layoutType: LayoutType.GRID,
+      layoutType: LayoutType.STACKED,
       columns: 12,
     },
     { request: "data", response: true },
     {
-      // === EMAIL INPUT ===
-      emailInput: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.public.resetPassword.request.groups.emailInput.title" as const,
-          description:
-            "app.api.user.public.resetPassword.request.groups.emailInput.description" as const,
-          layoutType: LayoutType.VERTICAL,
-        },
-        { request: "data" },
-        {
-          email: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.EMAIL,
-            label:
-              "app.api.user.public.resetPassword.request.fields.email.label" as const,
-            description:
-              "app.api.user.public.resetPassword.request.fields.email.description" as const,
-            placeholder:
-              "app.api.user.public.resetPassword.request.fields.email.placeholder" as const,
-            helpText:
-              "app.api.user.public.resetPassword.request.fields.email.help" as const,
-            schema: z
-              .string()
-              .email({
-                message:
-                  "app.api.user.public.resetPassword.request.fields.email.validation.invalid",
-              })
-              .transform((val) => val.toLowerCase().trim()),
-          }),
-        },
-      ),
+      icon: widgetField({
+        type: WidgetType.ICON,
+        icon: "mail",
+        containerSize: "base",
+        iconSize: "base",
+        borderRadius: "full",
+        inline: true,
+        order: 0,
+        usage: { request: "data", response: true },
+      }),
+      title: widgetField({
+        type: WidgetType.TITLE,
+        content: "app.user.other.resetPassword.auth.resetPassword.title",
+        level: 3,
+        order: 1,
+        inline: true,
+        usage: { request: "data", response: true },
+      }),
+      subtitle: widgetField({
+        type: WidgetType.TEXT,
+        content: "app.user.other.resetPassword.auth.resetPassword.subtitle",
+        order: 2,
+        usage: { request: "data", response: true },
+      }),
 
-      // === RESPONSE FIELDS ===
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.public.resetPassword.request.response.title" as const,
-          description:
-            "app.api.user.public.resetPassword.request.response.description" as const,
-          layoutType: LayoutType.VERTICAL,
-        },
-        { response: true },
-        {
-          success: responseField({
-            type: WidgetType.BADGE,
-            text: "app.api.user.public.resetPassword.request.success.title" as const,
-            schema: z
-              .boolean()
-              .describe("Whether the reset request was processed successfully"),
-          }),
-          message: responseField({
-            type: WidgetType.TEXT,
-            content:
-              "app.api.user.public.resetPassword.request.response.success.message" as const,
-            schema: z
-              .string()
-              .describe("Human-readable status message explaining the result"),
-          }),
-        },
-      ),
+      email: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label:
+          "app.api.user.public.resetPassword.request.fields.email.label" as const,
+        description:
+          "app.api.user.public.resetPassword.request.fields.email.description" as const,
+        placeholder:
+          "app.api.user.public.resetPassword.request.fields.email.placeholder" as const,
+        helpText:
+          "app.api.user.public.resetPassword.request.fields.email.help" as const,
+        // theme: {
+        //   style: "none",
+        // },
+        order: 4,
+        schema: z
+          .string()
+          .email({
+            message:
+              "app.api.user.public.resetPassword.request.fields.email.validation.invalid",
+          })
+          .transform((val) => val.toLowerCase().trim()),
+      }),
+
+      formAlert: widgetField({
+        type: WidgetType.FORM_ALERT,
+        order: 5,
+        usage: { request: "data" },
+      }),
+
+      message: responseField({
+        type: WidgetType.ALERT,
+        content:
+          "app.api.user.public.resetPassword.request.response.success.message" as const,
+        order: 6,
+        schema: z
+          .string()
+          .describe("Human-readable status message explaining the result"),
+      }),
+      // === SUBMIT BUTTON (inside card) ===
+      submitButton: widgetField({
+        type: WidgetType.SUBMIT_BUTTON,
+        text: "app.user.other.resetPassword.auth.resetPassword.sendResetLink",
+        loadingText:
+          "app.api.user.public.resetPassword.request.actions.submitting",
+        icon: "mail",
+        variant: "default",
+        size: "default",
+        columns: 12,
+        order: 10,
+        usage: { request: "data" },
+      }),
+
+      // === FOOTER LINK (inside card, below button) ===
+      alreadyHaveAccount: widgetField({
+        type: WidgetType.LINK,
+        text: "app.api.user.public.signup.footer.alreadyHaveAccount",
+        href: "/user/login",
+        textAlign: "center",
+        external: false,
+        columns: 12,
+        order: 11,
+        usage: { request: "data" },
+      }),
     },
   ),
 
@@ -180,39 +203,24 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        emailInput: {
-          email: "user@example.com",
-        },
+        email: "user@example.com",
       },
       invalidEmail: {
-        emailInput: {
-          email: "invalid-email",
-        },
+        email: "invalid-email",
       },
       rateLimited: {
-        emailInput: {
-          email: "user@example.com",
-        },
+        email: "user@example.com",
       },
     },
     responses: {
       default: {
-        response: {
-          success: true,
-          message: "Password reset link sent successfully",
-        },
+        message: "Password reset link sent successfully",
       },
       invalidEmail: {
-        response: {
-          success: false,
-          message: "No account found with this email address",
-        },
+        message: "No account found with this email address",
       },
       rateLimited: {
-        response: {
-          success: false,
-          message: "Too many reset requests. Please wait before trying again.",
-        },
+        message: "Too many reset requests. Please wait before trying again.",
       },
     },
   },

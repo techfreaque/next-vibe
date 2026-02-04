@@ -3,6 +3,7 @@ import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 
 import loginEndpoints from "./definition";
+import type { JwtPayloadType } from "../../../auth/types";
 
 /**
  * Hook to fetch login options from the API
@@ -11,6 +12,7 @@ import loginEndpoints from "./definition";
  */
 export function useLoginOptions(
   logger: EndpointLogger,
+  user: JwtPayloadType,
 ): EndpointReturn<typeof loginEndpoints> {
-  return useEndpoint(loginEndpoints, {}, logger);
+  return useEndpoint(loginEndpoints, undefined, logger, user);
 }

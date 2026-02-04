@@ -8,24 +8,32 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import type { DateWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
+import {
+  useInkWidgetForm,
+  useInkWidgetResponse,
+  useInkWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
-import type { InkWidgetProps } from "../../_shared/cli-types";
+import { type InkWidgetProps, isInkFormState } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { TimeFieldWidgetConfig } from "./types";
 
 export function TimeFieldWidgetInk<
   TKey extends string,
+  TUsage extends FieldUsageConfig,
   TEndpoint extends CreateApiEndpointAny,
 >({
   field,
   fieldName,
-  context,
 }: InkWidgetProps<
   TEndpoint,
-  TimeFieldWidgetConfig<TKey, DateWidgetSchema, FieldUsageConfig>
+  TUsage,
+  TimeFieldWidgetConfig<TKey, DateWidgetSchema, TUsage>
 >): JSX.Element {
-  const { t } = context;
+  const t = useInkWidgetTranslation();
+  const form = useInkWidgetForm();
+  const response = useInkWidgetResponse();
   const [inputValue, setInputValue] = useState(
     field.value instanceof Date
       ? `${String(field.value.getHours()).padStart(2, "0")}:${String(field.value.getMinutes()).padStart(2, "0")}`
@@ -33,7 +41,7 @@ export function TimeFieldWidgetInk<
   );
 
   // Response mode - just display the value
-  if (context.response) {
+  if (response) {
     const displayValue =
       field.value instanceof Date
         ? `${String(field.value.getHours()).padStart(2, "0")}:${String(field.value.getMinutes()).padStart(2, "0")}`
@@ -52,7 +60,7 @@ export function TimeFieldWidgetInk<
   }
 
   // Request mode - show interactive input
-  if (!context.form || !fieldName) {
+  if (!form || !fieldName) {
     return (
       <Box>
         <Text color="red">
@@ -64,8 +72,20 @@ export function TimeFieldWidgetInk<
     );
   }
 
+  if (!isInkFormState(form)) {
+    return (
+      <Box>
+        <Text color="red">
+          {t(
+            "app.api.system.unifiedInterface.cli.widgets.formField.invalidFormType",
+          )}
+        </Text>
+      </Box>
+    );
+  }
+
   const isRequired = !field.schema.isOptional();
-  const error = context.form.errors[fieldName];
+  const errorMessage = form.errors[fieldName];
 
   return (
     <Box flexDirection="column" marginBottom={1}>
@@ -91,16 +111,18 @@ export function TimeFieldWidgetInk<
             if (!Number.isNaN(hours) && !Number.isNaN(minutes)) {
               const date = new Date();
               date.setHours(hours, minutes, 0, 0);
-              context.form?.setValue(fieldName, date);
+              if (form) {
+                form.setValue(fieldName, date);
+              }
             }
           }}
           placeholder={field.placeholder ? t(field.placeholder) : "HH:MM"}
         />
       </Box>
 
-      {error && (
+      {errorMessage && (
         <Box marginTop={0}>
-          <Text color="red">{error}</Text>
+          <Text color="red">{errorMessage}</Text>
         </Box>
       )}
     </Box>

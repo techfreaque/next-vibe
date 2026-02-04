@@ -66,7 +66,6 @@ export function SelectorContent({
     endpoint,
     addFavorite,
   } = useChatFavorites({
-    user,
     logger,
     characters,
   });
@@ -216,7 +215,6 @@ export function SelectorContent({
         <EditFavorite
           editingFavoriteId={editingFavoriteId}
           editingCharacterId={editingCharacterId}
-          isAuthenticated={!!(user && !user.isPublic)}
           locale={locale}
           characterId={characterId}
           isOnboardingActive={isOnboardingActive}
@@ -240,7 +238,6 @@ export function SelectorContent({
           onBack={() => setView("favorites")}
           locale={locale}
           logger={logger}
-          user={user}
           onEditingCharacterIdChange={setEditingCharacterId}
           onEditingFavoriteIdChange={setEditingFavoriteId}
           onViewChange={(view) =>

@@ -22,23 +22,25 @@ import { useState } from "react";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
-import { WidgetType } from "../../../../shared/types/enums";
 import {
   getIconSizeClassName,
   getLayoutClassName,
   getTextSizeClassName,
   type LayoutConfig,
 } from "../../../../shared/widgets/utils/widget-helpers";
-import type { WidgetData } from "../../../../shared/widgets/widget-data";
 import { WidgetRenderer } from "../../../renderers/react/WidgetRenderer";
+import { withValue } from "../../_shared/field-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
-import { hasChildren, isObject } from "../../_shared/type-guards";
+import { hasChildren } from "../../_shared/type-guards";
 import type {
   ConstrainedChildUsage,
   FieldUsageConfig,
   ObjectChildrenConstraint,
 } from "../../_shared/types";
-import { extractSectionData } from "./shared";
+import {
+  useWidgetLocale,
+  useWidgetTranslation,
+} from "../../_shared/use-widget-context";
 import type { SectionWidgetConfig } from "./types";
 
 /**
@@ -80,13 +82,14 @@ export function SectionWidget<
   >,
 >({
   field,
-  context,
   fieldName,
 }: ReactWidgetProps<
   TEndpoint,
   SectionWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
 >): JSX.Element {
-  const { t } = simpleT(context.locale);
+  const locale = useWidgetLocale();
+  const widgetT = useWidgetTranslation();
+  const { t } = simpleT(locale);
   const {
     emptyTextSize,
     chevronIconSize,
@@ -113,16 +116,29 @@ export function SectionWidget<
           ? "h-10 w-10"
           : "h-8 w-8";
 
-  // Check if this is a form section (has children) or display section (has content in data)
-  const isFormSection = hasChildren(field);
-
   // State for collapsible sections - must be called before any early returns
   const [isExpanded, setIsExpanded] = useState(!uiDefaultCollapsed);
 
-  // For form sections, render children
-  if (isFormSection && hasChildren(field)) {
-    const title = titleKey ? context.t(titleKey) : undefined;
-    const description = descriptionKey ? context.t(descriptionKey) : undefined;
+  // Section widget always has children (extends BaseObjectWidgetConfig)
+  if (!hasChildren(field)) {
+    // This should never happen - section widget requires object schema with children
+    return (
+      <Card className={field.className}>
+        <CardContent>
+          <Div
+            className={cn("text-muted-foreground italic", emptyTextSizeClass)}
+          >
+            {t("app.api.system.unifiedInterface.react.widgets.section.noData")}
+          </Div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Render children
+  {
+    const title = titleKey ? widgetT(titleKey) : undefined;
+    const description = descriptionKey ? widgetT(descriptionKey) : undefined;
 
     // Map spacing to gap value
     const gapValue =
@@ -136,62 +152,64 @@ export function SectionWidget<
     };
     const layoutClass = getLayoutClassName(layoutConfig);
 
-    // Get child data from value
-    const getChildData = (childName: string): WidgetData => {
-      return field.value[childName];
-    };
+    // Render children - delegate to MultiWidgetRenderer for proper type handling
+    let childrenElements: JSX.Element | undefined;
+    if ("children" in field && "value" in field) {
+      const childrenEntries = Object.entries(field.children);
+      childrenElements = (
+        <Div className={layoutClass}>
+          {childrenEntries.map(([childName, childField]) => {
+            const childData =
+              "value" in field ? field.value[childName] : undefined;
+            const childColumns = childField.columns || 12;
 
-    // Render children
-    const childrenElements = Object.entries(field.children).map(
-      ([childName, childField]) => {
-        const childData = getChildData(childName);
-        const childColumns = childField.columns || 12;
+            const childFieldName = fieldName
+              ? `${fieldName}.${childName}`
+              : childName;
 
-        // Construct nested field name for proper field config resolution
-        // e.g., if section is "contactInfo" and child is "email", pass "contactInfo.email"
-        const childFieldName = fieldName
-          ? `${fieldName}.${childName}`
-          : childName;
+            const gridStyle =
+              layoutConfig.type === "grid"
+                ? { gridColumn: `span ${childColumns} / span ${childColumns}` }
+                : undefined;
 
-        const gridStyle =
-          layoutConfig.type === "grid"
-            ? { gridColumn: `span ${childColumns} / span ${childColumns}` }
-            : undefined;
-
-        return (
-          <Div
-            key={childName}
-            {...(gridStyle
-              ? { style: gridStyle }
-              : {
-                  className: cn({
-                    [`col-span-${childColumns}`]: layoutConfig.type === "grid",
-                  }),
-                })}
-          >
-            <WidgetRenderer
-              fieldName={childFieldName}
-              field={{ ...childField, value: childData }}
-              context={context}
-            />
-          </Div>
-        );
-      },
-    );
+            return (
+              <Div
+                key={childName}
+                {...(gridStyle
+                  ? { style: gridStyle }
+                  : {
+                      className: cn({
+                        [`col-span-${childColumns}`]:
+                          layoutConfig.type === "grid",
+                      }),
+                    })}
+              >
+                <WidgetRenderer
+                  fieldName={childFieldName}
+                  field={withValue(
+                    childField,
+                    childData,
+                    "value" in field ? field.value : undefined,
+                  )}
+                />
+              </Div>
+            );
+          })}
+        </Div>
+      );
+    }
 
     // Render non-collapsible form section
     if (!uiCollapsible) {
       return (
-        <Card className={field.className}>
+        <Card className={"className" in field ? field.className : ""}>
           {(title || description) && (
             <CardHeader>
               {title && <CardTitle>{title}</CardTitle>}
               {description && <CardDescription>{description}</CardDescription>}
             </CardHeader>
           )}
-          <CardContent>
-            <Div className={layoutClass}>{childrenElements}</Div>
-          </CardContent>
+          <CardContent>{childrenElements}</CardContent>
         </Card>
       );
     }
@@ -201,7 +219,7 @@ export function SectionWidget<
       <Collapsible
         open={isExpanded}
         onOpenChange={setIsExpanded}
-        className={field.className}
+        className={"className" in field ? field.className : ""}
       >
         <Card>
           <CollapsibleTrigger asChild>
@@ -240,112 +258,6 @@ export function SectionWidget<
       </Collapsible>
     );
   }
-
-  // Display section (legacy format with content in data)
-  const data = extractSectionData(field.value);
-
-  // Extract values with defaults for hooks (hooks must be called unconditionally)
-  const { title, content, description, collapsible } = data ?? {
-    title: "",
-    content: null,
-    description: undefined,
-    collapsible: false,
-  };
-
-  // Handle null case
-  if (!data) {
-    return (
-      <Card className={field.className}>
-        <CardContent>
-          <Div
-            className={cn("text-muted-foreground italic", emptyTextSizeClass)}
-          >
-            {t("app.api.system.unifiedInterface.react.widgets.section.noData")}
-          </Div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Render content - can be a widget config or raw data
-  const renderContent = (): JSX.Element => {
-    // Check if content is a widget configuration
-    if (isObject(content)) {
-      const contentType =
-        typeof content.type === "string" ? content.type : WidgetType.TEXT;
-      const contentData = "data" in content ? content.data : content;
-
-      // Always use parent field - field definitions come from schema, not data
-      const contentField = field;
-
-      return (
-        <WidgetRenderer
-          field={{ ...contentField, value: contentData }}
-          context={context}
-        />
-      );
-    }
-
-    // Fallback: render as text
-    return (
-      <WidgetRenderer field={{ ...field, value: content }} context={context} />
-    );
-  };
-
-  // Render non-collapsible section
-  if (!collapsible) {
-    return (
-      <Card className={field.className}>
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-          {description && <CardDescription>{description}</CardDescription>}
-        </CardHeader>
-        <CardContent>{renderContent()}</CardContent>
-      </Card>
-    );
-  }
-
-  // Render collapsible section
-  return (
-    <Collapsible
-      open={isExpanded}
-      onOpenChange={setIsExpanded}
-      className={field.className}
-    >
-      <Card>
-        <CollapsibleTrigger asChild>
-          <CardHeader className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
-            <Div className="flex items-center justify-between">
-              <Div className="flex-1">
-                <CardTitle>{title}</CardTitle>
-                {description && (
-                  <CardDescription>{description}</CardDescription>
-                )}
-              </Div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(chevronButtonSizeClass, "p-0")}
-                type="button"
-              >
-                <ChevronDown
-                  className={cn(
-                    "text-gray-500 transition-transform",
-                    chevronIconSizeClass || "h-5 w-5",
-                    isExpanded && "rotate-180",
-                  )}
-                />
-              </Button>
-            </Div>
-          </CardHeader>
-        </CollapsibleTrigger>
-
-        <CollapsibleContent>
-          <CardContent>{renderContent()}</CardContent>
-        </CollapsibleContent>
-      </Card>
-    </Collapsible>
-  );
 }
 
 SectionWidget.displayName = "SectionWidget";

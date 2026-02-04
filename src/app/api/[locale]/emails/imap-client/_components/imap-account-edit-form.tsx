@@ -16,12 +16,14 @@ import type { JSX } from "react";
 import imapAccountDefinitions from "@/app/api/[locale]/emails/imap-client/accounts/[id]/definition";
 import { useImapAccountByIdEndpoint } from "@/app/api/[locale]/emails/imap-client/accounts/[id]/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ImapAccountEditFormProps {
   accountId: string;
   locale: CountryLanguage;
+  user: JwtPayloadType;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -33,6 +35,7 @@ interface ImapAccountEditFormProps {
 export function ImapAccountEditForm({
   accountId,
   locale,
+  user,
   onSuccess,
   onCancel,
 }: ImapAccountEditFormProps): JSX.Element {
@@ -43,6 +46,7 @@ export function ImapAccountEditForm({
       accountId,
       enabled: true,
     },
+    user,
     logger,
   );
 

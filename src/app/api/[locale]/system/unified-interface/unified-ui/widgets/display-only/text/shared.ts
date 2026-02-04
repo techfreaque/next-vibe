@@ -37,7 +37,7 @@ export interface ProcessedText {
  */
 export function extractTextData(
   value: z.output<TextWidgetSchema>,
-  context?: BaseWidgetContext<CreateApiEndpointAny>,
+  t: BaseWidgetContext<CreateApiEndpointAny>["t"],
 ): ProcessedText | null {
   // Handle null/undefined
   if (isNullish(value)) {
@@ -45,7 +45,7 @@ export function extractTextData(
   }
 
   // Handle string value with translation
-  const stringValue = context ? isString(value, context) : null;
+  const stringValue = isString(value, t);
   if (stringValue) {
     return {
       text: stringValue,
@@ -93,7 +93,7 @@ export function extractTextData(
     }
 
     // Translate text if context provided
-    const finalText = context ? context.t(text) : text;
+    const finalText = t(text);
 
     return {
       text: finalText,

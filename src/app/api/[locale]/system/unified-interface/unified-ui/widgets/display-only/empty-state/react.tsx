@@ -15,6 +15,10 @@ import {
 } from "../../../../shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
+import {
+  useWidgetLogger,
+  useWidgetTranslation,
+} from "../../_shared/use-widget-context";
 import { Icon } from "../../form-fields/icon-field/icons";
 import type { EmptyStateWidgetConfig } from "./types";
 
@@ -57,11 +61,13 @@ export default function EmptyStateWidget<
   TUsage extends FieldUsageConfig,
 >({
   field,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   EmptyStateWidgetConfig<TKey, TUsage, "widget">
 >): JSX.Element {
+  const t = useWidgetTranslation();
+  const logger = useWidgetLogger();
   const {
     title: titleKey,
     message: messageKey,
@@ -78,8 +84,8 @@ export default function EmptyStateWidget<
   } = field;
 
   // Get translated content from field config
-  const title = context.t(titleKey);
-  const description = messageKey ? context.t(messageKey) : undefined;
+  const title = t(titleKey);
+  const description = messageKey ? t(messageKey) : undefined;
 
   // Get classes from config (no hardcoding!)
   const paddingClass = getSpacingClassName("padding", padding);
@@ -159,10 +165,10 @@ export default function EmptyStateWidget<
             size="sm"
             onClick={() => {
               // Action handling would be passed from parent
-              context.logger.debug("Empty state action:", actionConfig.text);
+              logger.debug("Empty state action:", actionConfig.text);
             }}
           >
-            {context.t(actionConfig.text)}
+            {t(actionConfig.text)}
           </Button>
         )}
       </CardContent>

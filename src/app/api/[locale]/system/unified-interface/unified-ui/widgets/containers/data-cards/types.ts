@@ -8,20 +8,23 @@ import type {
   SpacingSize,
   WidgetType,
 } from "../../../../shared/types/enums";
+import type { WidgetData } from "../../../../shared/widgets/widget-data";
+import type { ReactWidgetContext } from "../../_shared/react-types";
 import type {
   ArrayChildConstraint,
   BaseArrayWidgetConfig,
   BaseObjectWidgetConfig,
   ConstrainedChildUsage,
   FieldUsageConfig,
+  InferChildOutput,
   ObjectChildrenConstraint,
 } from "../../_shared/types";
 
 /**
- * Card click metadata configuration
+ * Card click metadata configuration - Navigation variant
  * Infers the urlPathParams return type from the targetEndpoint
  */
-export interface CardClickMetadata<
+export interface CardClickNavigationMetadata<
   TItemData,
   TEndpoint extends CreateApiEndpointAny,
 > {
@@ -32,9 +35,37 @@ export interface CardClickMetadata<
 }
 
 /**
+ * Card click metadata configuration - Callback variant
+ * Allows custom click handler function
+ * Context (including logger, locale, etc.) is passed from widget context
+ */
+export interface CardClickCallbackMetadata<TItemData> {
+  onClick: (
+    item: TItemData,
+    context: ReactWidgetContext<CreateApiEndpointAny>,
+  ) => void | Promise<void>;
+  isClickable?: (item: TItemData) => boolean;
+}
+
+/**
+ * Union type for card click metadata - supports both navigation and callback
+ */
+export type CardClickMetadata<
+  TItemData,
+  TEndpoint extends CreateApiEndpointAny,
+> =
+  | CardClickNavigationMetadata<TItemData, TEndpoint>
+  | CardClickCallbackMetadata<TItemData>;
+
+/**
  * Base Data Cards Widget Configuration (shared properties)
  */
-interface BaseDataCardsConfig<TKey extends string, TItemData> {
+interface BaseDataCardsConfig<
+  TKey extends string,
+  TChildOrChildren extends
+    | ArrayChildConstraint<TKey, ConstrainedChildUsage<FieldUsageConfig>>
+    | ObjectChildrenConstraint<TKey, ConstrainedChildUsage<FieldUsageConfig>>,
+> {
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
   // Card field mapping - these are field names from child objects to display in card layout
@@ -75,8 +106,21 @@ interface BaseDataCardsConfig<TKey extends string, TItemData> {
   badgeBorderRadius?: "none" | "sm" | "base" | "lg" | "xl" | "2xl" | "full"; // Badge border radius
   // Metadata for card interactions
   metadata?: {
-    onCardClick?: CardClickMetadata<TItemData, CreateApiEndpointAny>;
+    onCardClick?: CardClickMetadata<
+      InferChildOutput<TChildOrChildren>,
+      CreateApiEndpointAny
+    >;
+    /** Enable drag and drop reordering */
+    enableDragDrop?: boolean;
+    /** Callback when items are reordered via drag and drop */
+    onReorder?: (
+      items: InferChildOutput<TChildOrChildren>[],
+      context: ReactWidgetContext<CreateApiEndpointAny>,
+    ) => void | Promise<void>;
   };
+  // Dynamic className callback for each card
+  // Receives item data and parent value for context
+  getClassName?: (item: WidgetData, parentValue?: WidgetData) => string;
 }
 
 /**
@@ -87,11 +131,10 @@ export interface DataCardsArrayWidgetConfig<
   TUsage extends FieldUsageConfig,
   TSchemaType extends "array" | "array-optional",
   TChild extends ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>,
-  TItemData,
 >
   extends
     BaseArrayWidgetConfig<TKey, TUsage, TSchemaType, TChild>,
-    BaseDataCardsConfig<TKey, TItemData> {
+    BaseDataCardsConfig<TKey, TChild> {
   type: WidgetType.DATA_CARDS;
 }
 
@@ -106,11 +149,10 @@ export interface DataCardsObjectWidgetConfig<
     TKey,
     ConstrainedChildUsage<TUsage>
   >,
-  TItemData,
 >
   extends
     BaseObjectWidgetConfig<TKey, TUsage, TSchemaType, TChildren>,
-    BaseDataCardsConfig<TKey, TItemData> {
+    BaseDataCardsConfig<TKey, TChildren> {
   type: WidgetType.DATA_CARDS;
 }
 
@@ -134,19 +176,20 @@ export type DataCardsWidgetConfig<
   TChildOrChildren extends
     | ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>
     | ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>,
-  TItemData,
 > =
+  // Each union member only resolves when TSchemaType/TChildOrChildren match the variant constraint.
+  // Inference at definition sites requires the full union — narrowing happens via hasChild/hasChildren guards at render time.
   | DataCardsArrayWidgetConfig<
       TKey,
       TUsage,
+      // @ts-expect-error -- TSchemaType is the full union; array variant resolves only when "array"|"array-optional" is passed
       TSchemaType,
-      TChildOrChildren,
-      TItemData
+      TChildOrChildren
     >
   | DataCardsObjectWidgetConfig<
       TKey,
       TUsage,
+      // @ts-expect-error -- TSchemaType is the full union; object variant resolves only when "object"|"object-optional" is passed
       TSchemaType,
-      TChildOrChildren,
-      TItemData
+      TChildOrChildren
     >;

@@ -2,11 +2,9 @@
  * Pagination Widget Type Definitions
  */
 
-import type { z } from "zod";
-
-import type { UnifiedField } from "../../../../shared/types/endpoint";
 import type { SpacingSize, WidgetType } from "../../../../shared/types/enums";
 import type {
+  AnyChildrenConstrain,
   BaseObjectWidgetConfig,
   ConstrainedChildUsage,
   FieldUsageConfig,
@@ -32,29 +30,11 @@ export interface PaginationWidgetConfig<
   TUsage extends FieldUsageConfig,
   TSchemaType extends "object" | "object-optional" | "widget-object",
   TChildren extends {
-    page: UnifiedField<TKey, z.ZodTypeAny, ConstrainedChildUsage<TUsage>, any>; // oxlint-disable-line typescript/no-explicit-any;
-    limit: UnifiedField<TKey, z.ZodTypeAny, ConstrainedChildUsage<TUsage>, any>; // oxlint-disable-line typescript/no-explicit-any;
-    totalCount: UnifiedField<
-      TKey,
-      z.ZodTypeAny,
-      ConstrainedChildUsage<TUsage>,
-      // oxlint-disable-next-line typescript/no-explicit-any
-      any
-    >;
-    pageCount?: UnifiedField<
-      TKey,
-      z.ZodTypeAny,
-      ConstrainedChildUsage<TUsage>,
-      // oxlint-disable-next-line typescript/no-explicit-any
-      any
-    >;
-    offset?: UnifiedField<
-      TKey,
-      z.ZodTypeAny,
-      ConstrainedChildUsage<TUsage>,
-      // oxlint-disable-next-line typescript/no-explicit-any
-      any
-    >;
+    page: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
+    limit: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
+    totalCount: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
+    pageCount?: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
+    offset?: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
   },
 > extends BaseObjectWidgetConfig<TKey, TUsage, TSchemaType, TChildren> {
   type: WidgetType.PAGINATION;

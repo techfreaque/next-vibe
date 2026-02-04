@@ -105,7 +105,7 @@ export class WebAuthHandler extends BaseAuthHandler {
       cookieStore.set({
         name: LEAD_ID_COOKIE_NAME,
         value: leadId,
-        httpOnly: false, // Needs to be readable by client
+        httpOnly: true,
         path: "/",
         secure: env.NODE_ENV === Environment.PRODUCTION,
         sameSite: "lax" as const,

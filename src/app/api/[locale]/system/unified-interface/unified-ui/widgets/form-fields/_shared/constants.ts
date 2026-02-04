@@ -9,10 +9,17 @@ import type { RequiredFieldTheme } from "@/app/api/[locale]/system/unified-inter
  */
 export const DEFAULT_THEME: RequiredFieldTheme = {
   style: "highlight",
-  showAllRequired: false,
+  showAllRequired: true,
   requiredColor: "blue",
   completedColor: "green",
+  descriptionStyle: "tooltip",
 };
+
+export function getTheme(
+  theme: undefined | Partial<RequiredFieldTheme>,
+): RequiredFieldTheme {
+  return { ...DEFAULT_THEME, ...theme };
+}
 
 /**
  * Prefix for option keys to ensure uniqueness

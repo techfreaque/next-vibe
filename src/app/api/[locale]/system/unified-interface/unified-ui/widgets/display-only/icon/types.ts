@@ -5,7 +5,9 @@
 
 import type { z } from "zod";
 
+import type { IconSchemaType } from "@/app/api/[locale]/shared/types/common.schema";
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 
 import type {
@@ -14,20 +16,18 @@ import type {
 } from "../../_shared/types";
 
 /**
- * Icon widget schema - must be a valid icon key
- */
-export type IconWidgetSchema = z.ZodType<IconKey>;
-
-/**
  * Icon Widget Configuration
  * Displays an icon with customizable size, container, and style
  */
 export interface IconWidgetConfig<
-  TSchema extends IconWidgetSchema,
+  TSchema extends IconSchemaType,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "primitive",
+  TSchemaType extends "primitive" | "widget",
 > extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {
   type: WidgetType.ICON;
+
+  /** Static icon key - use for fixed icons */
+  icon?: IconKey;
 
   /** Container size */
   containerSize?: "xs" | "sm" | "base" | "lg" | "xl";
@@ -43,6 +43,12 @@ export interface IconWidgetConfig<
 
   /** Icon horizontal alignment within container (start = left, center = centered, end = right) */
   justifyContent?: "start" | "center" | "end";
+
+  /**
+   * Dynamic className callback - receives field value and parent value
+   * Returns additional className to merge with static className
+   */
+  getClassName?: (value: z.output<TSchema>, parentValue?: WidgetData) => string;
 
   /** Schema constraint for the field value */
   schema: TSchema;

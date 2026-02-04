@@ -69,31 +69,38 @@ export function IconPicker({
   // Button size classes
   const sizeClasses = {
     sm: "h-8 w-8 p-0",
-    default: "h-10 w-10 p-0",
-    lg: "h-12 w-12 p-0",
+    default: "h-12 w-12 p-0",
+    lg: "h-16 w-16 p-0",
   };
 
   const iconSizeClasses = {
-    sm: "h-4 w-4",
-    default: "h-5 w-5",
-    lg: "h-6 w-6",
+    sm: "h-4 w-4 text-primary",
+    default: "h-7 w-7 text-primary",
+    lg: "h-10 w-10 text-primary",
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className={cn(sizeClasses[size], className)}
+        <button
+          type="button"
+          className={cn(
+            sizeClasses[size],
+            "rounded-lg bg-primary/20 hover:bg-primary/30 transition-colors flex items-center justify-center shrink-0 cursor-pointer relative group border-none outline-none",
+            className,
+          )}
           title={t("app.ui.iconPicker.selectIcon")}
         >
           {value ? (
             <Icon icon={value} className={iconSizeClasses[size]} />
           ) : (
             // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Non-translatable placeholder icon
-            <Span className="text-muted-foreground text-xs">?</Span>
+            <Span className="text-primary text-xs">?</Span>
           )}
-        </Button>
+          <Div className="absolute bottom-1 right-1 bg-primary text-primary-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            <Icon icon="pencil" className="h-3 w-3" />
+          </Div>
+        </button>
       </DialogTrigger>
       <DialogContent className="max-w-[600px] max-h-[80vh] p-0 flex flex-col m-4">
         {/* Scrollable content wrapper */}

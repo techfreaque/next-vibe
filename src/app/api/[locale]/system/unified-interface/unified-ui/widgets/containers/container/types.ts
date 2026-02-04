@@ -12,6 +12,7 @@ import type {
   LayoutType,
   WidgetType,
 } from "../../../../shared/types/enums";
+import type { WidgetData } from "../../../../shared/widgets/widget-data";
 import type {
   ArrayChildConstraint,
   BaseArrayWidgetConfig,
@@ -117,6 +118,11 @@ interface BaseContainerProps<TKey extends string> {
    * @default true
    */
   showSubmitButton?: boolean;
+  /**
+   * Dynamic className callback - receives field value and parent value
+   * Returns additional className to merge with static className
+   */
+  getClassName?: (value: WidgetData, parentValue?: WidgetData) => string;
 }
 
 /**
@@ -171,10 +177,12 @@ export interface ContainerObjectWidgetConfig<
    * Receives the full output object inferred from children
    */
   getCount?: (
-    data: z.output<
-      InferSchemaFromField<
-        BaseObjectWidgetConfig<TKey, TUsage, TSchemaType, TChildren>,
-        FieldUsage.ResponseData
+    data: NoInfer<
+      z.output<
+        InferSchemaFromField<
+          ContainerObjectWidgetConfig<TKey, TUsage, TSchemaType, TChildren>,
+          FieldUsage.ResponseData
+        >
       >
     >,
   ) => number | undefined;
@@ -201,10 +209,12 @@ export interface ContainerUnionWidgetConfig<
    * Receives the full output object inferred from variants
    */
   getCount?: (
-    data: z.output<
-      InferSchemaFromField<
-        BaseObjectUnionWidgetConfig<TKey, TUsage, "object-union", TVariants>,
-        FieldUsage.ResponseData
+    data: NoInfer<
+      z.output<
+        InferSchemaFromField<
+          BaseObjectUnionWidgetConfig<TKey, TUsage, "object-union", TVariants>,
+          FieldUsage.ResponseData
+        >
       >
     >,
   ) => number | undefined;
@@ -232,6 +242,25 @@ export type ContainerWidgetConfig<
     | UnionObjectWidgetConfigConstrain<TKey, ConstrainedChildUsage<TUsage>>
     | ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>,
 > =
-  | ContainerArrayWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
-  | ContainerUnionWidgetConfig<TKey, TUsage, TChildren>
-  | ContainerObjectWidgetConfig<TKey, TUsage, TSchemaType, TChildren>;
+  // Each union member only resolves when TSchemaType/TChildren match the variant constraint.
+  // Inference at definition sites requires the full union — narrowing happens via hasChild/hasChildren guards at render time.
+  | ContainerArrayWidgetConfig<
+      TKey,
+      TUsage,
+      // @ts-expect-error -- TSchemaType is the full union; array variant resolves only when "array"|"array-optional" is passed
+      TSchemaType,
+      TChildren
+    >
+  | ContainerUnionWidgetConfig<
+      TKey,
+      TUsage,
+      // @ts-expect-error -- TChildren is the full union; union variant resolves only when UnionObjectWidgetConfigConstrain is passed
+      TChildren
+    >
+  | ContainerObjectWidgetConfig<
+      TKey,
+      TUsage,
+      // @ts-expect-error -- TSchemaType is the full union; object variant resolves only when "object"|"object-optional"|"widget-object" is passed
+      TSchemaType,
+      TChildren
+    >;

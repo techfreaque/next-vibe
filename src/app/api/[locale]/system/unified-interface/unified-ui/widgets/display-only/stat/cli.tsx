@@ -9,6 +9,10 @@ import type { JSX } from "react";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { NumberWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
+import {
+  useInkWidgetLocale,
+  useInkWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import { formatStatValue } from "./shared";
@@ -26,13 +30,14 @@ export function StatWidgetInk<
   TUsage extends FieldUsageConfig,
 >({
   field,
-  context,
 }: InkWidgetProps<
   TEndpoint,
+  TUsage,
   StatWidgetConfig<TKey, TSchema, TUsage, "primitive">
 >): JSX.Element {
+  const t = useInkWidgetTranslation();
+  const locale = useInkWidgetLocale();
   const { label: labelKey, format, trend, trendValue } = field;
-  const { t } = context;
 
   const label = labelKey ? t(labelKey) : undefined;
 
@@ -47,7 +52,7 @@ export function StatWidgetInk<
   }
 
   // Format the value using shared logic
-  const displayValue = formatStatValue(field.value, format, context.locale);
+  const displayValue = formatStatValue(field.value, format, locale);
 
   // Determine color based on trend
   const trendColor =

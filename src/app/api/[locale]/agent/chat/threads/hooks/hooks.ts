@@ -8,6 +8,7 @@
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import definitions from "../definition";
 
@@ -20,6 +21,7 @@ import definitions from "../definition";
  * - Sorting (createdAt, updatedAt, title)
  */
 export function useThreadsList(
+  user: JwtPayloadType,
   logger: EndpointLogger,
 ): EndpointReturn<typeof definitions> {
   return useEndpoint(
@@ -32,6 +34,7 @@ export function useThreadsList(
       },
     },
     logger,
+    user,
   );
 }
 
@@ -42,6 +45,7 @@ export function useThreadsList(
  * Auto-refetches thread list on success
  */
 export function useCreateThread(
+  user: JwtPayloadType,
   logger: EndpointLogger,
 ): EndpointReturn<typeof definitions> {
   return useEndpoint(
@@ -52,6 +56,7 @@ export function useCreateThread(
       },
     },
     logger,
+    user,
   );
 }
 

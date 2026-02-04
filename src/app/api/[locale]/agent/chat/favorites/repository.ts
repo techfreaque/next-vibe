@@ -21,12 +21,13 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import { defaultModel } from "../../models/models";
+import { defaultModel, modelProviders } from "../../models/models";
 import type { CharacterGetResponseOutput } from "../characters/[id]/definition";
-import { NO_CHARACTER_ID } from "../characters/config";
-import { ModelSelectionType } from "../characters/enum";
+import { NO_CHARACTER_ID, toCleanModelSelection } from "../characters/config";
 import { CharactersRepository } from "../characters/repository";
 import { CharactersRepositoryClient } from "../characters/repository-client";
+import { ChatSettingsRepository } from "../settings/repository";
+import type { FavoriteGetResponseOutput } from "./[id]/definition";
 import { type ChatFavorite, chatFavorites } from "./db";
 import type { FavoriteCard, FavoritesListResponseOutput } from "./definition";
 
@@ -52,11 +53,20 @@ export class ChatFavoritesRepository {
     try {
       logger.debug("Fetching favorites", { userId });
 
+      // Get active favorite ID from settings
+      const settingsResult = await ChatSettingsRepository.getSettings(
+        user,
+        logger,
+      );
+      const activeFavoriteId = settingsResult.success
+        ? settingsResult.data.activeFavoriteId
+        : null;
+
       const favorites = await db
         .select()
         .from(chatFavorites)
         .where(eq(chatFavorites.userId, userId))
-        .orderBy(asc(chatFavorites.createdAt));
+        .orderBy(asc(chatFavorites.position));
 
       // Compute display fields for all favorites
       const favoritesCards = await Promise.all(
@@ -66,6 +76,7 @@ export class ChatFavoritesRepository {
             user,
             logger,
             locale,
+            activeFavoriteId,
           );
         }),
       );
@@ -88,12 +99,14 @@ export class ChatFavoritesRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage,
+    activeFavoriteId: string | null = null,
   ): Promise<FavoriteCard> {
     const { t } = simpleT(locale);
 
     // Get character if favorite has one
     let character: CharacterGetResponseOutput | null = null;
-    if (favorite.characterId) {
+    // Only fetch character if characterId is valid (not empty string)
+    if (favorite.characterId && favorite.characterId.trim() !== "") {
       const characterResult = await CharactersRepository.getCharacterById(
         { id: favorite.characterId },
         user,
@@ -101,12 +114,41 @@ export class ChatFavoritesRepository {
       );
       if (characterResult.success) {
         character = characterResult.data;
+      } else {
+        logger.error("Failed to get character for favorite", {
+          favoriteId: favorite.id,
+          characterId: favorite.characterId,
+        });
       }
     }
 
-    // Use favorite's modelSelection, fallback to character's if null
-    const favoriteModelSelection =
-      favorite.modelSelection ?? character?.modelSelection;
+    let favoriteModelSelection:
+      | FavoriteGetResponseOutput["modelSelection"]
+      | null;
+
+    // Build modelSelection for display
+    // DB stores only currentSelection, we need to add characterModelSelection
+    if (favorite.modelSelection && character?.modelSelection) {
+      favoriteModelSelection = {
+        currentSelection: favorite.modelSelection,
+        characterModelSelection: toCleanModelSelection(
+          character.modelSelection,
+        ),
+      };
+    } else if (character?.modelSelection) {
+      // Default to CHARACTER_BASED when no stored modelSelection
+      favoriteModelSelection = {
+        currentSelection: {
+          selectionType:
+            "app.api.agent.chat.favorites.enums.selectionType.characterBased" as const,
+        },
+        characterModelSelection: toCleanModelSelection(
+          character.modelSelection,
+        ),
+      };
+    } else {
+      favoriteModelSelection = null;
+    }
 
     if (!favoriteModelSelection) {
       // Should never happen in production - all characters have modelSelection
@@ -115,12 +157,17 @@ export class ChatFavoritesRepository {
         id: favorite.id,
         characterId: favorite.characterId,
         modelId: defaultModel,
+        position: favorite.position,
         icon: "alert-circle",
         content: {
           titleRow: {
             name: "app.api.agent.chat.favorites.fallbacks.noModelConfiguration" as const,
             tagline:
               "app.api.agent.chat.favorites.fallbacks.configurationMissing" as const,
+            activeBadge:
+              favorite.id === activeFavoriteId
+                ? ("app.chat.selector.active" as const)
+                : null,
           },
           description:
             "app.api.agent.chat.favorites.fallbacks.noDescription" as const,
@@ -136,20 +183,9 @@ export class ChatFavoritesRepository {
       };
     }
 
-    // Resolve model for this favorite
-    const resolvedModel =
-      favoriteModelSelection.selectionType ===
-        ModelSelectionType.CHARACTER_BASED && character?.modelSelection
-        ? CharactersRepositoryClient.getBestModelForFavorite(
-            favoriteModelSelection,
-            character.modelSelection,
-          )
-        : favoriteModelSelection.selectionType !==
-            ModelSelectionType.CHARACTER_BASED
-          ? CharactersRepositoryClient.getBestModelForCharacter(
-              favoriteModelSelection,
-            )
-          : null;
+    const resolvedModel = CharactersRepositoryClient.getBestModelForFavorite(
+      favoriteModelSelection,
+    );
 
     // Check if this is a model-only favorite (NO_CHARACTER_ID)
     const isModelOnly = favorite.characterId === NO_CHARACTER_ID;
@@ -184,7 +220,8 @@ export class ChatFavoritesRepository {
           modelInfo: isModelOnly
             ? ("app.api.agent.chat.favorites.fallbacks.noDescription" as const)
             : resolvedModel.name,
-          modelProvider: resolvedModel.provider,
+          modelProvider:
+            modelProviders[resolvedModel.provider]?.name ?? "Unknown",
           creditCost: CharactersRepositoryClient.formatCreditCost(
             resolvedModel.creditCost,
             t,
@@ -203,11 +240,16 @@ export class ChatFavoritesRepository {
       id: favorite.id,
       characterId: favorite.characterId,
       modelId: resolvedModel?.id ?? null,
+      position: favorite.position,
       icon,
       content: {
         titleRow: {
           name,
           tagline,
+          activeBadge:
+            favorite.id === activeFavoriteId
+              ? ("app.chat.selector.active" as const)
+              : null,
         },
         description,
         modelRow,

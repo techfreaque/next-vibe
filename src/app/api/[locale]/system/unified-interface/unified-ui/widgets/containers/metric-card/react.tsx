@@ -24,6 +24,10 @@ import type {
   FieldUsageConfig,
   ObjectChildrenConstraint,
 } from "../../_shared/types";
+import {
+  useWidgetLocale,
+  useWidgetTranslation,
+} from "../../_shared/use-widget-context";
 import { extractMetricCardData } from "./shared";
 import type { MetricCardWidgetConfig } from "./types";
 
@@ -70,11 +74,13 @@ export function MetricCardWidget<
   >,
 >({
   field,
-  context,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   MetricCardWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
 >): JSX.Element {
+  const locale = useWidgetLocale();
+  const t = useWidgetTranslation();
   const {
     headerGap,
     headerPadding,
@@ -112,11 +118,10 @@ export function MetricCardWidget<
   }
 
   const { value: metricValue, label, icon, color, trend } = data;
-  const translatedLabel = context.t(label);
+  const translatedLabel = t(label);
   const unit = extractMetricUnit(field.value);
 
-  const displayValue =
-    field.value.toLocaleString(context.locale) || metricValue;
+  const displayValue = field.value.toLocaleString(locale) || metricValue;
 
   const trendDirection = trend?.direction;
   const trendValue = trend?.value;

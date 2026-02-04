@@ -8,6 +8,10 @@ import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
+import {
+  useInkWidgetLocale,
+  useInkWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import { extractTextData, formatIfDate, formatText } from "./shared";
@@ -25,13 +29,20 @@ export function TextWidgetInk<
   TUsage extends FieldUsageConfig,
 >(
   props:
-    | InkWidgetProps<TEndpoint, TextWidgetConfig<TKey, never, TUsage, "widget">>
     | InkWidgetProps<
         TEndpoint,
+        TUsage,
+        TextWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | InkWidgetProps<
+        TEndpoint,
+        TUsage,
         TextWidgetConfig<TKey, TextWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
-  const { field, context } = props;
+  const { field } = props;
+  const t = useInkWidgetTranslation();
+  const locale = useInkWidgetLocale();
   const {
     content,
     fieldType,
@@ -42,7 +53,7 @@ export function TextWidgetInk<
     format,
     href,
   } = field;
-  const label = labelKey ? context.t(labelKey) : undefined;
+  const label = labelKey ? t(labelKey) : undefined;
 
   // Map variant to color
   const getColor = (v: TextVariant | undefined): string | undefined => {
@@ -64,7 +75,7 @@ export function TextWidgetInk<
 
   // Handle static content from UI config
   if (content) {
-    const translatedContent = context.t(content);
+    const translatedContent = t(content);
     const displayText = formatText(translatedContent, maxLength);
 
     return (
@@ -84,7 +95,7 @@ export function TextWidgetInk<
 
   // Handle date formatting
   if (fieldType && field.value) {
-    const formattedValue = formatIfDate(field.value, fieldType, context.locale);
+    const formattedValue = formatIfDate(field.value, fieldType, locale);
     if (formattedValue) {
       return (
         <Box flexDirection="column">
@@ -96,7 +107,7 @@ export function TextWidgetInk<
   }
 
   // Extract data using shared logic
-  const data = extractTextData(field.value, context);
+  const data = extractTextData(field.value, t);
 
   // Handle null/empty case
   if (!data) {

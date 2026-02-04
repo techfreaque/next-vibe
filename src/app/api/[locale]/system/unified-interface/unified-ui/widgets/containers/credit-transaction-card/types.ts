@@ -23,6 +23,6 @@ export interface CreditTransactionCardWidgetConfig<
   >,
 > extends BaseObjectWidgetConfig<TKey, TUsage, TSchemaType, TChildren> {
   type: WidgetType.CREDIT_TRANSACTION_CARD;
-  leftFields?: (keyof TChildren)[];
-  rightFields?: (keyof TChildren)[];
+  leftFields?: NoInfer<(keyof TChildren)[]>;
+  rightFields?: NoInfer<(keyof TChildren)[]>;
 }

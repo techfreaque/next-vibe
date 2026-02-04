@@ -9,6 +9,7 @@ import { Upload } from "next-vibe-ui/ui/icons";
 import type React from "react";
 import { useState } from "react";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -17,11 +18,13 @@ import { CsvImportDialog } from "./csv-import-dialog";
 interface CsvImportButtonProps {
   onImportComplete?: () => void;
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 export function CsvImportButton({
   onImportComplete,
   locale,
+  user,
 }: CsvImportButtonProps): React.JSX.Element {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -46,6 +49,7 @@ export function CsvImportButton({
         onOpenChange={setIsOpen}
         onImportComplete={handleImportComplete}
         locale={locale}
+        user={user}
       />
     </>
   );

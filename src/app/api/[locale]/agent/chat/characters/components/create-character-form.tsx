@@ -59,12 +59,14 @@ export function CreateCharacterForm({
         return;
       }
 
-      // Create favorite from character
+      // Create favorite from character - server will populate characterModelSelection
       const favoriteData = {
         characterId: characterId,
         modelSelection: {
-          selectionType: ModelSelectionType.CHARACTER_BASED,
-        } as const,
+          currentSelection: {
+            selectionType: ModelSelectionType.CHARACTER_BASED,
+          },
+        },
       };
 
       const createdId = await addFavorite(favoriteData);

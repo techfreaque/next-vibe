@@ -111,6 +111,7 @@ export default async function HistoryPage({
       { paginationInfo: { page: 1, limit: 50 } },
       userResponse.data,
       logger,
+      locale,
     );
     history = historyResponse.success ? historyResponse.data : null;
   }

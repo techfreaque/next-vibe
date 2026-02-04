@@ -13,6 +13,7 @@ import type { z } from "zod";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import { useWidgetLocale } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { simpleT } from "@/i18n/core/shared";
 
 import type {
@@ -31,14 +32,16 @@ export default function CodeQualityFilesWidget<
   TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive",
 >({
-  context,
   field,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   CodeQualityFilesWidgetConfig<TSchema, TUsage, TSchemaType>
 >): ReactElement {
+  const locale = useWidgetLocale();
+
   const value = field.value;
-  const { t } = simpleT(context.locale);
+  const { t } = simpleT(locale);
 
   if (!Array.isArray(value) || value.length === 0) {
     return <></>;

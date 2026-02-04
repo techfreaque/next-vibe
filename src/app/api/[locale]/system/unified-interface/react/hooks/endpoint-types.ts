@@ -60,27 +60,6 @@ export type AutoPrefillDataType<T> =
 // Hook options interface with operation-specific configuration
 export interface UseEndpointOptions<T> {
   /**
-   * Storage mode configuration
-   * - api: Use API endpoints (default)
-   * - localStorage: Use local storage with callbacks
-   */
-  storage?:
-    | {
-        /** Storage mode - defaults to "api" */
-        mode: "api";
-        callbacks?: never;
-      }
-    | {
-        /** Local storage mode
-         *  - requires callbacks instead of using API endpoints
-         */
-        mode: "localStorage";
-        /** Type-safe callbacks for localStorage mode (required when mode is localStorage) */
-        callbacks: LocalStorageCallbacks<T>;
-      }
-    | undefined;
-
-  /**
    * Options for read (GET) operations
    * Supports all options from useEndpointRead hook
    */

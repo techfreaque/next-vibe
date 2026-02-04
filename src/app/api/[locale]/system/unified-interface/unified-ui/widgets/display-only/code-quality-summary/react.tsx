@@ -12,6 +12,7 @@ import type { ReactElement } from "react";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type {
   CodeQualitySummarySchema,
@@ -26,12 +27,14 @@ export default function CodeQualitySummaryWidget<
   TSchema extends CodeQualitySummarySchema,
   TUsage extends FieldUsageConfig,
 >({
-  context,
   field,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   CodeQualitySummaryWidgetConfig<TSchema, TUsage, "primitive">
 >): ReactElement {
+  const t = useWidgetTranslation();
+
   const value = field.value;
   if (!value) {
     return <></>;
@@ -47,18 +50,18 @@ export default function CodeQualitySummaryWidget<
 
   const filesDisplay =
     displayedFiles < totalFiles
-      ? `${displayedFiles} ${context.t("app.api.system.unifiedInterface.widgets.codeQualitySummary.of")} ${totalFiles}`
+      ? `${displayedFiles} ${t("app.api.system.unifiedInterface.widgets.codeQualitySummary.of")} ${totalFiles}`
       : totalFiles;
 
   const issuesDisplay =
     displayedIssues < totalIssues
-      ? `${displayedIssues} ${context.t("app.api.system.unifiedInterface.widgets.codeQualitySummary.of")} ${totalIssues}`
+      ? `${displayedIssues} ${t("app.api.system.unifiedInterface.widgets.codeQualitySummary.of")} ${totalIssues}`
       : totalIssues;
 
   return (
     <Div className="mt-4 space-y-2 rounded border p-4">
       <H3 className="text-sm font-semibold">
-        {context.t(
+        {t(
           "app.api.system.unifiedInterface.widgets.codeQualitySummary.summary",
         )}
       </H3>
@@ -66,7 +69,7 @@ export default function CodeQualitySummaryWidget<
         <Div className="space-y-1">
           <Div>
             <Span>
-              {context.t(
+              {t(
                 "app.api.system.unifiedInterface.widgets.codeQualitySummary.files",
               )}
               :{" "}
@@ -75,7 +78,7 @@ export default function CodeQualitySummaryWidget<
           </Div>
           <Div>
             <Span>
-              {context.t(
+              {t(
                 "app.api.system.unifiedInterface.widgets.codeQualitySummary.issues",
               )}
               :{" "}
@@ -85,7 +88,7 @@ export default function CodeQualitySummaryWidget<
           {totalErrors > 0 && (
             <Div>
               <Span>
-                {context.t(
+                {t(
                   "app.api.system.unifiedInterface.widgets.codeQualitySummary.errors",
                 )}
                 :{" "}

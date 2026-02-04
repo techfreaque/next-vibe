@@ -173,7 +173,7 @@ export interface ApiEndpoint<
     FieldUsageConfig
   >,
   out TFields extends UnifiedField<
-    string,
+    TScopedTranslationKey,
     z.ZodTypeAny,
     FieldUsageConfig,
     TChildren
@@ -183,6 +183,13 @@ export interface ApiEndpoint<
   readonly method: TMethod;
   readonly path: readonly string[];
   readonly allowedRoles: TUserRoleValue;
+
+  /**
+   * Roles allowed to use client-side route (localStorage/IndexedDB)
+   * If not specified, only allowedRoles can access (must use server route)
+   * Use [UserRole.PUBLIC] to allow unauthenticated access via client route
+   */
+  readonly allowedClientRoles?: readonly UserRoleValue[];
 
   // Translation keys use NoInfer to ensure they don't contribute to TScopedTranslationKey inference
   // This makes errors appear on the specific property with the invalid key
@@ -482,7 +489,7 @@ export type CreateEndpointReturnInMethod<
     ConstrainedChildUsage<FieldUsageConfig>
   >,
   TFields extends UnifiedField<
-    string,
+    TScopedTranslationKey,
     z.ZodTypeAny,
     FieldUsageConfig,
     TChildren
@@ -512,13 +519,19 @@ export function createEndpoint<
   TChildren extends
     | AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
     | never = never,
-  const TFields extends UnifiedField<
-    string,
+  const TFields extends
+    | UnifiedField<
+        TScopedTranslationKey,
+        z.ZodTypeAny,
+        FieldUsageConfig,
+        TChildren
+      >
+    | never = UnifiedField<
+    TScopedTranslationKey,
     z.ZodTypeAny,
     FieldUsageConfig,
-    // oxlint-disable-next-line typescript/no-explicit-any
     TChildren
-  > = UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, TChildren>,
+  >,
 >(
   config: ApiEndpoint<
     TMethod,
@@ -575,6 +588,7 @@ export function createEndpoint<
     tags: config.tags,
     fields: config.fields,
     allowedRoles: config.allowedRoles,
+    allowedClientRoles: config.allowedClientRoles,
     examples: config.examples,
     errorTypes: config.errorTypes,
     successTypes: config.successTypes,

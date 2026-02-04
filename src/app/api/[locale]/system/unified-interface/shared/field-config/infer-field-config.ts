@@ -5,6 +5,7 @@
  * It extracts the WidgetConfig from UnifiedField and converts it to FieldConfig.
  */
 
+import type { CreateApiEndpointAny } from "../types/endpoint-base";
 import { FieldDataType, WidgetType } from "../types/enums";
 import {
   type EndpointFieldStructure,
@@ -182,10 +183,13 @@ function extractFieldConfig<TKey extends string>(
  * This is the main function used by EndpointFormField
  */
 export function getFieldConfig<TKey extends string>(
-  fields: EndpointFieldStructure<TKey>,
+  fields: EndpointFieldStructure<TKey> | CreateApiEndpointAny["fields"],
   path: string,
 ): FieldConfig<TKey> | null {
-  const field = getFieldStructureByPath(fields, path);
+  const field = getFieldStructureByPath(
+    fields as EndpointFieldStructure<TKey>,
+    path,
+  );
   if (!field) {
     return null;
   }

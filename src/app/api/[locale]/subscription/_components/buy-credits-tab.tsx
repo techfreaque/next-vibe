@@ -50,6 +50,7 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { JwtPayloadType } from "../../user/auth/types";
 import { formatPrice } from "./types";
 
 interface BuyCreditsTabProps {
@@ -61,6 +62,7 @@ interface BuyCreditsTabProps {
   packPrice: number;
   packCredits: number;
   yearlySubscriptionPrice: number;
+  user: JwtPayloadType;
 }
 
 export function BuyCreditsTab({
@@ -72,6 +74,7 @@ export function BuyCreditsTab({
   packPrice,
   packCredits,
   yearlySubscriptionPrice,
+  user,
 }: BuyCreditsTabProps): JSX.Element {
   const { t } = useTranslation();
 
@@ -86,8 +89,8 @@ export function BuyCreditsTab({
 
   // Initialize hooks
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const subscriptionCheckoutEndpoint = useSubscriptionCheckout(logger);
-  const creditPurchaseEndpoint = useCreditPurchase(logger);
+  const subscriptionCheckoutEndpoint = useSubscriptionCheckout(logger, user);
+  const creditPurchaseEndpoint = useCreditPurchase(user, logger);
 
   const handleSubscribe = (): void => {
     setModalType("subscription");

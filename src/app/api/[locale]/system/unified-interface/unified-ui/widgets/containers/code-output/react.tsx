@@ -29,10 +29,12 @@ export function CodeOutputWidget<
   props:
     | ReactWidgetProps<
         TEndpoint,
+        TUsage,
         CodeOutputWidgetConfig<TKey, never, TUsage, "widget">
       >
     | ReactWidgetProps<
         TEndpoint,
+        TUsage,
         CodeOutputWidgetConfig<TKey, StringWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {

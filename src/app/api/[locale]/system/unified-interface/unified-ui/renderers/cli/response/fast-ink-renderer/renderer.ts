@@ -930,7 +930,16 @@ function createStaticReconciler(): ReturnType<typeof Reconciler> {
 
     createInstance(
       type: string,
-      props: Record<string, string | number | boolean | null | undefined>,
+      props: Record<
+        string,
+        | string
+        | number
+        | boolean
+        | null
+        | undefined
+        | ReactNode
+        | Record<string, string | number | boolean | null | undefined>
+      >,
     ): RenderNode {
       const instance: RenderNode = {
         type,

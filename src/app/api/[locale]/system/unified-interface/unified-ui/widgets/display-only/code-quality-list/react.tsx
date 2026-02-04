@@ -13,6 +13,10 @@ import { useMemo } from "react";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import {
+  useWidgetLocale,
+  useWidgetResponse,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { simpleT } from "@/i18n/core/shared";
 
 import type {
@@ -38,25 +42,28 @@ export default function CodeQualityListWidget<
   TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive",
 >({
-  context,
   field,
 }: ReactWidgetProps<
   TEndpoint,
+  TUsage,
   CodeQualityListWidgetConfig<TSchema, TUsage, TSchemaType>
 >): ReactElement {
+  const locale = useWidgetLocale();
+  const response = useWidgetResponse();
+
   const value = field.value;
-  const { t } = simpleT(context.locale);
+  const { t } = simpleT(locale);
 
   // Get editor URI scheme from response data if field key is provided
   const editorUriScheme = useMemo(() => {
     if (
       field.editorUriSchemaFieldKey &&
-      context.response?.success &&
-      context.response?.data &&
-      typeof context.response.data === "object" &&
-      !Array.isArray(context.response.data)
+      response?.success &&
+      response?.data &&
+      typeof response.data === "object" &&
+      !Array.isArray(response.data)
     ) {
-      const data = context.response.data;
+      const data = response.data;
       const scheme = data[field.editorUriSchemaFieldKey];
       if (typeof scheme === "string") {
         return scheme;
@@ -64,7 +71,7 @@ export default function CodeQualityListWidget<
     }
     // Default to vscode://file/ if not provided
     return "vscode://file/";
-  }, [field.editorUriSchemaFieldKey, context.response]);
+  }, [field.editorUriSchemaFieldKey, response]);
 
   // Group items by file
   const groupedItems = useMemo(() => {
@@ -83,7 +90,7 @@ export default function CodeQualityListWidget<
     return groups;
   }, [value]);
 
-  if (field.value.length === 0) {
+  if (!value || value.length === 0) {
     return (
       <Div className="text-green-600">
         {t("app.api.system.unifiedInterface.widgets.codeQualityList.noIssues")}
