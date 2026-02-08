@@ -11,9 +11,12 @@ import type { ReactElement } from "react";
 import type { z } from "zod";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type { ReactRequestResponseWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
-import { useWidgetLocale } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetForm,
+  useWidgetLocale,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { simpleT } from "@/i18n/core/shared";
 
 import type {
@@ -33,14 +36,27 @@ export default function CodeQualityFilesWidget<
   TSchemaType extends "primitive",
 >({
   field,
-}: ReactWidgetProps<
+  fieldName,
+}: ReactRequestResponseWidgetProps<
   TEndpoint,
   TUsage,
   CodeQualityFilesWidgetConfig<TSchema, TUsage, TSchemaType>
 >): ReactElement {
   const locale = useWidgetLocale();
+  const form = useWidgetForm();
+  const { usage } = field;
 
-  const value = field.value;
+  // Get value from form for request fields, otherwise from field.value
+  let value: typeof field.value | undefined;
+  if (usage.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value) {
+      value = field.value;
+    }
+  } else {
+    value = field.value;
+  }
+
   const { t } = simpleT(locale);
 
   if (!Array.isArray(value) || value.length === 0) {

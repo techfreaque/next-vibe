@@ -56,7 +56,7 @@ function isSeriesArray(
  * @returns Structured chart data or null if empty
  */
 export function extractChartData(
-  value: z.output<ChartWidgetSchema>,
+  value: z.output<ChartWidgetSchema> | undefined,
 ): ChartData | null {
   if (!value) {
     return null;

@@ -5,8 +5,9 @@
 
 import "server-only";
 
-import { and, eq, ne, or } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, ne, or, sql } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
+import type { z } from "zod";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
@@ -16,11 +17,21 @@ import {
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type {
+  FiltersModelSelection,
+  ManualModelSelection,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { TFunction } from "@/i18n/core/static-types";
+import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
-import { defaultModel, modelProviders } from "../../models/models";
+import type { iconSchema } from "../../../shared/types/common.schema";
+import {
+  defaultModel,
+  getCreditCostFromModel,
+  modelProviders,
+} from "../../models/models";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
+import { chatFavorites } from "../favorites/db";
 import type {
   CharacterDeleteResponseOutput,
   CharacterGetResponseOutput,
@@ -66,9 +77,30 @@ export class CharactersRepository {
       // For authenticated users, return default + user's own + public from others
       if (userId) {
         logger.debug("Getting all characters for user", { userId });
+
+        // Fetch custom characters with addedToFav status via LEFT JOIN
         const customCharactersList = await db
-          .select()
+          .select({
+            id: customCharacters.id,
+            name: customCharacters.name,
+            description: customCharacters.description,
+            icon: customCharacters.icon,
+            systemPrompt: customCharacters.systemPrompt,
+            category: customCharacters.category,
+            tagline: customCharacters.tagline,
+            ownershipType: customCharacters.ownershipType,
+            modelSelection: customCharacters.modelSelection,
+            voice: customCharacters.voice,
+            addedToFav: sql<boolean>`${isNotNull(chatFavorites.id)}`,
+          })
           .from(customCharacters)
+          .leftJoin(
+            chatFavorites,
+            and(
+              sql`${chatFavorites.characterId} = ${customCharacters.id}::text`,
+              eq(chatFavorites.userId, userId),
+            ),
+          )
           .where(
             or(
               // User's own characters (any ownershipType)
@@ -85,27 +117,54 @@ export class CharactersRepository {
           );
 
         // Map custom characters to card display fields
-        // Transform DB type to CharacterGetResponseOutput (remove DB-only fields)
         const customCharactersCards = customCharactersList.map((char) => {
-          const characterData: CharacterGetResponseOutput = {
-            id: char.id,
-            name: char.name,
-            description: char.description,
-            icon: char.icon,
-            systemPrompt: char.systemPrompt,
-            category: char.category,
-            tagline: char.tagline,
-            ownershipType: char.ownershipType,
-            modelSelection: char.modelSelection,
-            voice: char.voice || DEFAULT_TTS_VOICE,
-          };
-          return CharactersRepository.mapCharacterToListItem(characterData, t);
+          return CharactersRepository.mapCharacterToListItem(
+            char.id,
+            {
+              icon: char.icon,
+              name: char.name,
+              tagline: char.tagline,
+              description: char.description,
+              category: char.category,
+              modelSelection: char.modelSelection,
+            },
+            t,
+            char.addedToFav,
+          );
         });
 
-        // Map default characters to card display fields
-        const defaultCharactersCards = DEFAULT_CHARACTERS.map((char) =>
-          CharactersRepository.mapCharacterToListItem(char, t),
+        // Fetch favorites for all default characters in one query
+        const defaultCharacterIds = DEFAULT_CHARACTERS.map((c) => c.id);
+        const favoritedDefaultCharacters = await db
+          .select({ characterId: chatFavorites.characterId })
+          .from(chatFavorites)
+          .where(
+            and(
+              inArray(chatFavorites.characterId, defaultCharacterIds),
+              eq(chatFavorites.userId, userId),
+            ),
+          );
+
+        const favoritedDefaultCharacterIds = new Set(
+          favoritedDefaultCharacters.map((f) => f.characterId),
         );
+
+        // Map default characters to card display fields
+        const defaultCharactersCards = DEFAULT_CHARACTERS.map((char) => {
+          return CharactersRepository.mapCharacterToListItem(
+            char.id,
+            {
+              icon: char.icon,
+              name: char.name,
+              tagline: char.tagline,
+              description: char.description,
+              category: char.category,
+              modelSelection: char.modelSelection,
+            },
+            t,
+            favoritedDefaultCharacterIds.has(char.id),
+          );
+        });
 
         // Combine all characters
         const allCharacters = [
@@ -116,20 +175,35 @@ export class CharactersRepository {
         // Group characters by category into sections
         const sections = this.groupCharactersIntoSections(allCharacters);
 
+        // Flattened response - no container wrapper
         return success({
           sections,
         });
       }
 
       // For public/lead users, return only default characters as card display fields
+      // Public users don't have favorites, so addedToFav is always false
       logger.debug("Getting default characters for public user");
-      const defaultCharactersCards = DEFAULT_CHARACTERS.map((char) =>
-        CharactersRepository.mapCharacterToListItem(char, t),
-      );
+      const defaultCharactersCards = DEFAULT_CHARACTERS.map((char) => {
+        return CharactersRepository.mapCharacterToListItem(
+          char.id,
+          {
+            icon: char.icon,
+            name: char.name,
+            tagline: char.tagline,
+            description: char.description,
+            category: char.category,
+            modelSelection: char.modelSelection,
+          },
+          t,
+          false,
+        );
+      });
 
       // Group characters by category into sections
       const sections = this.groupCharactersIntoSections(defaultCharactersCards);
 
+      // Flattened response - no container wrapper
       return success({
         sections,
       });
@@ -162,22 +236,26 @@ export class CharactersRepository {
 
     // Convert to sections array with metadata from CATEGORY_CONFIG
     // Sort by category order before returning
+    // Flattened structure: sectionIcon, sectionTitle, sectionCount instead of nested sectionHeader
     return [...groupedByCategory.entries()]
       .map(([category, chars]) => {
         const config = CATEGORY_CONFIG[category];
         return {
-          sectionHeader: {
-            icon: config.icon,
-            title: config.label,
-            count: chars.length,
-          },
+          sectionIcon: config.icon,
+          sectionTitle: config.label,
+          sectionCount: chars.length,
           characters: chars,
           order: config.order,
         };
       })
       .filter((section) => section.characters.length > 0)
       .toSorted((a, b) => a.order - b.order)
-      .map(({ sectionHeader, characters }) => ({ sectionHeader, characters }));
+      .map(({ sectionIcon, sectionTitle, sectionCount, characters }) => ({
+        sectionIcon,
+        sectionTitle,
+        sectionCount,
+        characters,
+      }));
   }
 
   /**
@@ -199,36 +277,34 @@ export class CharactersRepository {
         (p) => p.id === characterId,
       );
       if (defaultCharacter) {
-        const characterData: CharacterGetResponseOutput = {
-          id: defaultCharacter.id,
-          name: defaultCharacter.name,
-          description: defaultCharacter.description,
+        // Flattened response - no container/character/badges/systemPromptSection nesting
+        return success({
           icon: defaultCharacter.icon,
-          systemPrompt: defaultCharacter.systemPrompt,
-          category: defaultCharacter.category,
+          name: defaultCharacter.name,
           tagline: defaultCharacter.tagline,
-          ownershipType: CharacterOwnershipType.SYSTEM,
-          modelSelection: defaultCharacter.modelSelection,
+          description: defaultCharacter.description,
+          category: defaultCharacter.category,
+          isPublic: false,
           voice: defaultCharacter.voice,
-        };
-        return success(characterData);
+          systemPrompt: defaultCharacter.systemPrompt,
+          modelSelection: defaultCharacter.modelSelection,
+        });
       }
 
       // Check for NO_CHARACTER
       if (characterId === NO_CHARACTER_ID) {
-        const characterData: CharacterGetResponseOutput = {
-          id: NO_CHARACTER_ID,
-          name: null,
-          description: null,
-          systemPrompt: null,
-          category: NO_CHARACTER.category,
+        // Flattened response
+        return success({
           icon: null,
+          name: null,
           tagline: null,
+          description: null,
+          category: NO_CHARACTER.category,
+          isPublic: false,
           voice: NO_CHARACTER.voice,
+          systemPrompt: null,
           modelSelection: NO_CHARACTER.modelSelection,
-          ownershipType: CharacterOwnershipType.SYSTEM,
-        };
-        return success(characterData);
+        });
       }
 
       // Check custom characters
@@ -265,17 +341,18 @@ export class CharactersRepository {
       }
 
       // Return only response fields (exclude database fields like userId, createdAt, updatedAt)
+      // Flattened response
       return success({
-        id: customCharacter.id,
-        name: customCharacter.name,
-        description: customCharacter.description,
         icon: customCharacter.icon,
-        systemPrompt: customCharacter.systemPrompt,
-        category: customCharacter.category,
+        name: customCharacter.name,
         tagline: customCharacter.tagline,
-        ownershipType: customCharacter.ownershipType,
-        modelSelection: customCharacter.modelSelection,
+        description: customCharacter.description,
+        category: customCharacter.category,
+        isPublic:
+          customCharacter.ownershipType === CharacterOwnershipType.PUBLIC,
         voice: customCharacter.voice || DEFAULT_TTS_VOICE,
+        systemPrompt: customCharacter.systemPrompt,
+        modelSelection: customCharacter.modelSelection,
       });
     } catch (error) {
       logger.error("Failed to get character by ID", parseError(error));
@@ -305,7 +382,10 @@ export class CharactersRepository {
         });
       }
 
-      logger.debug("Creating custom character", { userId, name: data.name });
+      logger.debug("Creating custom character", {
+        userId,
+        name: data.name,
+      });
 
       const [character] = await db
         .insert(customCharacters)
@@ -319,11 +399,16 @@ export class CharactersRepository {
           category: data.category,
           voice: data.voice,
           modelSelection: data.modelSelection,
-          ownershipType: data.ownershipType,
+          ownershipType: data.isPublic
+            ? CharacterOwnershipType.PUBLIC
+            : CharacterOwnershipType.USER,
         })
         .returning();
 
-      return success({ id: character.id });
+      return success({
+        success: "app.api.agent.chat.characters.post.success.title",
+        id: character.id,
+      });
     } catch (error) {
       logger.error("Failed to create character", parseError(error));
       return fail({
@@ -354,6 +439,42 @@ export class CharactersRepository {
         });
       }
 
+      // Check if this is a default character
+      const isDefaultCharacter = DEFAULT_CHARACTERS.some(
+        (c) => c.id === characterId,
+      );
+
+      if (isDefaultCharacter) {
+        // Create a new custom character instead of updating the default one
+        logger.debug("Creating custom character from default", {
+          userId,
+          defaultCharacterId: characterId,
+        });
+
+        await db
+          .insert(customCharacters)
+          .values({
+            userId,
+            name: data.name,
+            description: data.description,
+            tagline: data.tagline,
+            icon: data.icon,
+            systemPrompt: data.systemPrompt,
+            category: data.category,
+            voice: data.voice,
+            modelSelection: data.modelSelection,
+            ownershipType: data.isPublic
+              ? CharacterOwnershipType.PUBLIC
+              : CharacterOwnershipType.USER,
+          })
+          .returning();
+
+        // Flattened response
+        return success({
+          success: "app.api.agent.chat.characters.id.patch.success.title",
+        });
+      }
+
       logger.debug("Updating custom character", { userId, characterId });
 
       // Get existing character to compare icon
@@ -380,10 +501,23 @@ export class CharactersRepository {
       const iconToUpdate =
         data.icon && data.icon !== existingCharacter.icon ? data.icon : null;
 
+      // Map isPublic to ownershipType
+      const ownershipType =
+        data.isPublic !== undefined
+          ? data.isPublic
+            ? CharacterOwnershipType.PUBLIC
+            : CharacterOwnershipType.USER
+          : undefined;
+
+      // Prepare update values, excluding isPublic and including ownershipType
+      // oxlint-disable-next-line no-unused-vars
+      const { isPublic, ...dataWithoutIsPublic } = data;
       const updateValues = Object.fromEntries(
-        Object.entries({ ...data, icon: iconToUpdate }).filter(
-          ([, value]) => value !== undefined,
-        ),
+        Object.entries({
+          ...dataWithoutIsPublic,
+          icon: iconToUpdate,
+          ownershipType,
+        }).filter(([, value]) => value !== undefined),
       );
 
       const [updated] = await db
@@ -411,21 +545,9 @@ export class CharactersRepository {
       // Return the full updated character to match GET response structure
       // Transform ownershipType: PATCH response only accepts "user" | "public", not "system"
       // Custom characters should never be "system", but TypeScript doesn't know this
+      // Flattened response
       return success({
-        id: updated.id,
-        name: updated.name,
-        description: updated.description,
-        icon: updated.icon,
-        systemPrompt: updated.systemPrompt,
-        category: updated.category,
-        tagline: updated.tagline,
-        ownershipType:
-          updated.ownershipType ===
-          "app.api.agent.chat.characters.enums.ownershipType.system"
-            ? "app.api.agent.chat.characters.enums.ownershipType.user"
-            : updated.ownershipType,
-        voice: updated.voice || DEFAULT_TTS_VOICE,
-        modelSelection: updated.modelSelection,
+        success: "app.api.agent.chat.characters.id.patch.success.title",
       });
     } catch (error) {
       logger.error("Failed to update character", parseError(error));
@@ -491,8 +613,21 @@ export class CharactersRepository {
    * Uses CharactersRepositoryClient for all display field computation
    */
   private static mapCharacterToListItem(
-    char: CharacterGetResponseOutput,
+    id: string,
+    char: {
+      icon: z.infer<typeof iconSchema> | null;
+      name: TranslationKey | null;
+      tagline: TranslationKey | null;
+      description: TranslationKey | null;
+      category: typeof CharacterCategoryValue;
+      modelSelection:
+        | FiltersModelSelection
+        | ManualModelSelection
+        | null
+        | undefined;
+    },
     t: TFunction,
+    addedToFav: boolean,
   ): CharacterListItem {
     // Get best model from character's modelSelection
     const bestModel = CharactersRepositoryClient.getBestModelForCharacter(
@@ -507,7 +642,7 @@ export class CharactersRepository {
           modelInfo: bestModel.name,
           modelProvider: modelProviders[bestModel.provider].name,
           creditCost: CharactersRepositoryClient.formatCreditCost(
-            bestModel.creditCost,
+            getCreditCostFromModel(bestModel),
             t,
           ),
         }
@@ -522,24 +657,24 @@ export class CharactersRepository {
           ),
         };
 
+    // Flattened structure - no nested content object
     return {
-      id: char.id,
+      id,
       category: char.category,
       icon: char.icon ?? "sparkles",
       modelId,
-      content: {
-        name:
-          char.name ??
-          bestModel?.name ??
-          ("app.api.agent.chat.characters.fallbacks.unknownModel" as const),
-        description:
-          char.description ??
-          ("app.api.agent.chat.characters.fallbacks.noDescription" as const),
-        tagline:
-          char.tagline ??
-          ("app.api.agent.chat.characters.fallbacks.noTagline" as const),
-        ...modelRow,
-      },
+      addedToFav,
+      name:
+        char.name ??
+        bestModel?.name ??
+        ("app.api.agent.chat.characters.fallbacks.unknownModel" as const),
+      description:
+        char.description ??
+        ("app.api.agent.chat.characters.fallbacks.noDescription" as const),
+      tagline:
+        char.tagline ??
+        ("app.api.agent.chat.characters.fallbacks.noTagline" as const),
+      ...modelRow,
     };
   }
 }

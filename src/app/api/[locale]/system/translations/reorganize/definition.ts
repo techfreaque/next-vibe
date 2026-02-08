@@ -222,7 +222,7 @@ const { POST } = createEndpoint({
 
           changes: responseArrayField(
             {
-              type: WidgetType.GROUPED_LIST,
+              type: WidgetType.CONTAINER,
               groupBy: "type",
             },
             objectField(

@@ -75,7 +75,7 @@ export function ModelCharacterSelectorModal({
   const isDisabled = isLoading || isSubmitting;
 
   return (
-    <Div className="w-full max-h-[80dvh] overflow-y-auto relative z-10">
+    <Div className="w-full max-h-[calc(100dvh-180px)] overflow-y-auto relative z-10">
       <Div
         className={cn(
           "p-4 bg-card backdrop-blur",

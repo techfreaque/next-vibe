@@ -20,7 +20,7 @@ import type { IconKey } from "../icon-field/icons";
  */
 export interface BaseFormFieldWidgetConfig<
   out TKey extends string,
-  out TUsage extends FieldUsageConfig,
+  TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive",
   TSchema extends z.ZodTypeAny,
 > extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {

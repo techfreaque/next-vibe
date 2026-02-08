@@ -5,13 +5,13 @@ import { Link } from "next-vibe-ui/ui/link";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import ContactForm from "@/app/api/[locale]/contact/_components/contact-form";
 import ContactInfo from "@/app/api/[locale]/contact/_components/contact-info";
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import {
   ProductIds,
   productsRepository,
-  TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/products/repository-client";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";

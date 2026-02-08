@@ -1461,7 +1461,7 @@ const { POST } = createEndpoint({
 
       stepTimings: responseArrayOptionalField(
         {
-          type: WidgetType.DATA_TABLE,
+          type: WidgetType.CONTAINER,
           optional: true,
           icon: "list-checks",
         },

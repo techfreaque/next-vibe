@@ -493,7 +493,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
 
         // Call the user's onSuccess handler if provided
         if (queryOptions.onSuccess) {
-          return queryOptions.onSuccess(data);
+          return queryOptions.onSuccess(data, user, logger);
         }
       },
       // Use a custom onError handler

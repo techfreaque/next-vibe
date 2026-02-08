@@ -5,10 +5,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "next-vibe-ui/ui/avatar";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
+import type { StringWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import { getTextSizeClassName } from "../../../../shared/widgets/utils/widget-helpers";
-import type { ReactWidgetProps } from "../../_shared/react-types";
+import type {
+  ReactRequestResponseWidgetProps,
+  ReactStaticWidgetProps,
+} from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
-import { useWidgetTranslation } from "../../_shared/use-widget-context";
+import {
+  useWidgetForm,
+  useWidgetTranslation,
+} from "../../_shared/use-widget-context";
 import type { AvatarWidgetConfig } from "./types";
 
 /**
@@ -42,24 +49,29 @@ import type { AvatarWidgetConfig } from "./types";
  * @param context - Rendering context with translator
  * @param className - Optional CSS classes
  */
-interface AvatarData {
-  src?: string;
-  fallback?: string;
-  alt?: string;
-}
 
 export default function AvatarWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TUsage extends FieldUsageConfig,
->({
-  field,
-}: ReactWidgetProps<
-  TEndpoint,
-  TUsage,
-  AvatarWidgetConfig<TKey, TUsage, "widget", never>
->): JSX.Element {
+  TSchema extends StringWidgetSchema,
+>(
+  props:
+    | ReactStaticWidgetProps<
+        TEndpoint,
+        TUsage,
+        AvatarWidgetConfig<TKey, TUsage, "widget", never>
+      >
+    | ReactRequestResponseWidgetProps<
+        TEndpoint,
+        TUsage,
+        AvatarWidgetConfig<TKey, TUsage, "primitive", TSchema>
+      >,
+): JSX.Element {
   const t = useWidgetTranslation();
+  const form = useWidgetForm();
+  const { field } = props;
+  const fieldName = "fieldName" in props ? props.fieldName : undefined;
   const {
     src: configSrc,
     alt: altKey,
@@ -68,6 +80,18 @@ export default function AvatarWidget<
     fallbackSize,
     className,
   } = field;
+  const usage = "usage" in field ? field.usage : undefined;
+
+  // Get value from form for request fields, otherwise from field.value
+  let value: typeof field.value | undefined;
+  if (usage?.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value && "value" in field) {
+      value = field.value;
+    }
+  } else if ("value" in field) {
+    value = field.value;
+  }
 
   // Get classes from config (no hardcoding!)
   const fallbackSizeClass = getTextSizeClassName(fallbackSize);
@@ -84,13 +108,10 @@ export default function AvatarWidget<
             ? "h-16 w-16"
             : "h-10 w-10";
 
-  // Get avatar data from field value
-  const avatarData = field.value as AvatarData | undefined;
-
   // Use config values as fallback, then data values
-  const src = avatarData?.src || configSrc;
-  const fallback = avatarData?.fallback || configFallback || "?";
-  const alt = altKey ? t(altKey) : avatarData?.alt || "Avatar";
+  const src = value?.src || configSrc;
+  const fallback = value?.fallback || configFallback || "?";
+  const alt = altKey ? t(altKey) : value?.alt || "Avatar";
 
   return (
     <Avatar className={cn(avatarSizeClass, className)}>

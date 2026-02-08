@@ -202,7 +202,8 @@ export const translations = {
     createdAt: "Created At",
     updatedAt: "Updated At",
     referralCode: "Referral Code",
-    success: "Success",
+    success:
+      "🎉 Your referral code is ready! Copy the link below and start earning 20% commission on every subscription.",
     message: "Message",
   },
 

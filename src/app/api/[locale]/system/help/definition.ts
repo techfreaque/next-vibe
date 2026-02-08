@@ -63,7 +63,7 @@ const { POST } = createEndpoint({
       // Header section
       header: objectField(
         {
-          type: WidgetType.SECTION,
+          type: WidgetType.CONTAINER,
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -84,7 +84,7 @@ const { POST } = createEndpoint({
       // Usage section
       usage: objectField(
         {
-          type: WidgetType.SECTION,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.help.fields.usage.title",
           layoutType: LayoutType.STACKED,
         },
@@ -92,7 +92,7 @@ const { POST } = createEndpoint({
         {
           patterns: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             responseField({
               type: WidgetType.TEXT,
@@ -107,7 +107,7 @@ const { POST } = createEndpoint({
       // Options section
       options: objectField(
         {
-          type: WidgetType.SECTION,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.help.fields.options.title",
           layoutType: LayoutType.STACKED,
         },
@@ -115,7 +115,7 @@ const { POST } = createEndpoint({
         {
           items: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               {
@@ -144,7 +144,7 @@ const { POST } = createEndpoint({
       // Examples section
       examples: objectField(
         {
-          type: WidgetType.SECTION,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.help.fields.examples.title",
           layoutType: LayoutType.STACKED,
         },
@@ -152,7 +152,7 @@ const { POST } = createEndpoint({
         {
           items: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               {
@@ -182,7 +182,7 @@ const { POST } = createEndpoint({
       // Common Commands section (only for general help)
       commonCommands: objectField(
         {
-          type: WidgetType.SECTION,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.help.fields.commonCommands.title",
           layoutType: LayoutType.STACKED,
         },
@@ -190,7 +190,7 @@ const { POST } = createEndpoint({
         {
           items: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               {
@@ -220,7 +220,7 @@ const { POST } = createEndpoint({
       // Details section (only for specific command help)
       details: objectField(
         {
-          type: WidgetType.SECTION,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.help.fields.details.title",
           layoutType: LayoutType.GRID,
         },

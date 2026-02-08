@@ -170,37 +170,9 @@ export type ModelSelectionWithCharacter = z.infer<
 export type ModelSelectionSimple = z.infer<typeof modelSelectionSchemaSimple>;
 
 /**
- * Model Selection Field Widget Config - Full version with CHARACTER_BASED support
- * Used for favorites where character-based model selection is available
- */
-export interface ModelSelectionFieldWidgetConfig<
-  out TKey extends string,
-  TUsage extends FieldUsageConfig,
-> extends BaseFormFieldWidgetConfig<
-  TKey,
-  TUsage,
-  "primitive",
-  typeof modelSelectionSchemaWithCharacter
-> {
-  fieldType: FieldDataType.MODEL_SELECTION;
-
-  /**
-   * Whether to include CHARACTER_BASED mode (tab)
-   * When true, shows all three modes: CHARACTER_BASED, FILTERS, MANUAL
-   * When false, only shows FILTERS and MANUAL modes
-   */
-  includeCharacterBased: true;
-
-  /**
-   * Character ID for CHARACTER_BASED mode
-   * Required when includeCharacterBased is true
-   */
-  characterId?: string;
-}
-
-/**
- * Model Selection Field Widget Config - Filters-only version
- * Used for characters where only FILTERS and MANUAL modes are available
+ * Model Selection Field Widget Config - Simple version (filters + manual only)
+ * Case 1: Only FILTERS and MANUAL modes, no character-based selection
+ * Used when includeCharacterBased is false or undefined
  */
 export interface ModelSelectionFieldWidgetConfigSimple<
   out TKey extends string,
@@ -215,17 +187,89 @@ export interface ModelSelectionFieldWidgetConfigSimple<
 
   /**
    * Whether to include CHARACTER_BASED mode
-   * false = only FILTERS and MANUAL modes
+   * false or undefined = only FILTERS and MANUAL modes
    */
-  includeCharacterBased: false;
+  includeCharacterBased?: false;
 }
 
 /**
- * Union type for both widget config variants
+ * Model Selection Field Widget Config - With character selection
+ * Case 2: CHARACTER_BASED + FILTERS + MANUAL modes
+ * Used when character model selection is defined
+ */
+export interface ModelSelectionFieldWidgetConfigWithCharacter<
+  out TKey extends string,
+  TUsage extends FieldUsageConfig,
+> extends BaseFormFieldWidgetConfig<
+  TKey,
+  TUsage,
+  "primitive",
+  typeof modelSelectionSchemaWithCharacter
+> {
+  fieldType: FieldDataType.MODEL_SELECTION;
+
+  /**
+   * Whether to include CHARACTER_BASED mode (tab)
+   * true = shows all three modes: CHARACTER_BASED, FILTERS, MANUAL
+   */
+  includeCharacterBased: true;
+
+  /**
+   * Whether character model selection is available
+   * true = shows CHARACTER_BASED tab
+   * false/undefined = only shows FILTERS and MANUAL (Case 3)
+   */
+  hasCharacterModelSelection: true;
+
+  /**
+   * Character ID for CHARACTER_BASED mode
+   * Optional - used for fetching character data if needed
+   */
+  characterId?: string;
+}
+
+/**
+ * Model Selection Field Widget Config - Character-based but no selection yet
+ * Case 3: Character context exists but no characterModelSelection defined
+ * Only shows FILTERS and MANUAL modes (no CHARACTER_BASED tab)
+ */
+export interface ModelSelectionFieldWidgetConfigCharacterNoSelection<
+  out TKey extends string,
+  TUsage extends FieldUsageConfig,
+> extends BaseFormFieldWidgetConfig<
+  TKey,
+  TUsage,
+  "primitive",
+  typeof modelSelectionSchemaWithCharacter
+> {
+  fieldType: FieldDataType.MODEL_SELECTION;
+
+  /**
+   * Whether to include CHARACTER_BASED mode
+   * true but hasCharacterModelSelection is false
+   */
+  includeCharacterBased: true;
+
+  /**
+   * Whether character model selection is available
+   * false = only shows FILTERS and MANUAL (no CHARACTER_BASED tab)
+   */
+  hasCharacterModelSelection: false;
+
+  /**
+   * Character ID for CHARACTER_BASED mode
+   * Optional - used for fetching character data if needed
+   */
+  characterId?: string;
+}
+
+/**
+ * Union type for all widget config variants
  */
 export type ModelSelectionFieldWidgetConfigAny<
   TKey extends string = string,
   TUsage extends FieldUsageConfig = FieldUsageConfig,
 > =
-  | ModelSelectionFieldWidgetConfig<TKey, TUsage>
-  | ModelSelectionFieldWidgetConfigSimple<TKey, TUsage>;
+  | ModelSelectionFieldWidgetConfigSimple<TKey, TUsage>
+  | ModelSelectionFieldWidgetConfigWithCharacter<TKey, TUsage>
+  | ModelSelectionFieldWidgetConfigCharacterNoSelection<TKey, TUsage>;

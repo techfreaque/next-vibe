@@ -16,6 +16,7 @@ import {
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
+  objectFieldNew,
   objectOptionalField,
   requestField,
   responseField,
@@ -58,23 +59,21 @@ const { GET } = createEndpoint({
   tags: ["app.api.users.stats.tag" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.users.stats.container.title" as const,
-      description: "app.api.users.stats.container.description" as const,
-      layoutType: LayoutType.STACKED,
-      submitButton: {
-        text: "app.api.users.stats.actions.refresh" as const,
-        loadingText: "app.api.users.stats.actions.refreshing" as const,
-        position: "header",
-        icon: "refresh-cw",
-        variant: "ghost",
-        size: "sm",
-      },
-    },
-    { request: "data", response: true },
-    {
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    title: "app.api.users.stats.container.title" as const,
+    description: "app.api.users.stats.container.description" as const,
+    layoutType: LayoutType.STACKED,
+    submitButton: {
+      text: "app.api.users.stats.actions.refresh" as const,
+      loadingText: "app.api.users.stats.actions.refreshing" as const,
+      position: "header",
+      icon: "refresh-cw",
+      variant: "ghost",
+      size: "sm",
+    } as const,
+    usage: { request: "data", response: true },
+    children: {
       // === FORM ALERT (shows validation and API errors) ===
       formAlert: widgetField({
         type: WidgetType.FORM_ALERT,
@@ -760,7 +759,7 @@ const { GET } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

@@ -10,6 +10,7 @@ import type {
 import type { FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
@@ -132,11 +133,15 @@ export interface ApiQueryOptions<
   staleTime?: number;
   cacheTime?: number;
   refetchOnWindowFocus?: boolean;
-  onSuccess?: (data: {
-    responseData: TResponse;
-    requestData: TRequest;
-    urlPathParams: TUrlVariables;
-  }) => ErrorResponseType | void;
+  onSuccess?: (
+    data: {
+      responseData: TResponse;
+      requestData: TRequest;
+      urlPathParams: TUrlVariables;
+    },
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ) => ErrorResponseType | void | Promise<ErrorResponseType | void>;
   onError?: (data: {
     error: ErrorResponseType;
     requestData: TRequest;

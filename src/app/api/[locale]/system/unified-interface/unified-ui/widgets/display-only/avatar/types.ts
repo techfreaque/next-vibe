@@ -16,7 +16,7 @@ export interface AvatarWidgetConfig<
   TKey extends string,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "widget" | "primitive",
-  TSchema extends StringWidgetSchema,
+  TSchema extends TSchemaType extends "widget" ? never : StringWidgetSchema,
 > extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {
   type: WidgetType.AVATAR;
   src?: string;

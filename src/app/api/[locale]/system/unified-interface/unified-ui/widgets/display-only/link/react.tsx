@@ -14,9 +14,13 @@ import {
   getTextSizeClassName,
   isExternalUrl,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type {
+  ReactRequestResponseWidgetProps,
+  ReactStaticWidgetProps,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import {
+  useWidgetForm,
   useWidgetIsInteractive,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -55,22 +59,36 @@ export function LinkWidget<
   TUsage extends FieldUsageConfig,
 >(
   props:
-    | ReactWidgetProps<
+    | ReactStaticWidgetProps<
         TEndpoint,
         TUsage,
         LinkWidgetConfig<TKey, never, TUsage, "widget">
       >
-    | ReactWidgetProps<
+    | ReactRequestResponseWidgetProps<
         TEndpoint,
         TUsage,
         LinkWidgetConfig<TKey, LinkWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
   const { field } = props;
+  const fieldName = "fieldName" in props ? props.fieldName : undefined;
   const t = useWidgetTranslation();
   const isInteractive = useWidgetIsInteractive();
+  const form = useWidgetForm();
   const { size, gap, iconSize, href, text, external, textAlign, className } =
     field;
+  const usage = "usage" in field ? field.usage : undefined;
+
+  // Get value from form for request fields, otherwise from field.value
+  let value;
+  if (usage?.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value && "value" in field) {
+      value = field.value;
+    }
+  } else if ("value" in field) {
+    value = field.value;
+  }
 
   // Get classes from config
   const sizeClass = getTextSizeClassName(size);
@@ -83,9 +101,9 @@ export function LinkWidget<
         ? "flex justify-end w-full"
         : undefined;
 
-  // Priority 1: Dynamic value from field.value
-  if (field.value !== null && field.value !== undefined && field.value !== "") {
-    const data = extractLinkData(field.value);
+  // Priority 1: Dynamic value from value
+  if (value !== null && value !== undefined && value !== "") {
+    const data = extractLinkData(value);
 
     if (data) {
       const { url, text: dataText, openInNewTab } = data;

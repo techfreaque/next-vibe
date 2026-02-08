@@ -87,6 +87,7 @@ function isPlainObject(
 /**
  * Deep merge objects, with later sources taking priority
  * Handles nested objects recursively
+ * Special handling: chains functions for the same key instead of replacing
  */
 export function deepMerge<T>(...sources: (T | null | undefined)[]): T {
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Deep merge requires dynamic object building
@@ -101,7 +102,23 @@ export function deepMerge<T>(...sources: (T | null | undefined)[]): T {
       const sourceValue = source[key as keyof typeof source];
       const resultValue = result[key];
 
-      if (isPlainObject(sourceValue) && isPlainObject(resultValue)) {
+      // Special case: if both values are functions, chain them
+      if (
+        typeof sourceValue === "function" &&
+        typeof resultValue === "function"
+      ) {
+        // Create a chained function that calls both
+        result[key] = (async (...args: unknown[]) => {
+          // Call first function
+          const firstResult = await resultValue(...args);
+          // If first function returned an error/truthy value, return it
+          if (firstResult) {
+            return firstResult;
+          }
+          // Otherwise call second function
+          return await sourceValue(...args);
+        }) as DeepPartial<never>;
+      } else if (isPlainObject(sourceValue) && isPlainObject(resultValue)) {
         // Recursively merge nested objects
         result[key] = deepMerge(
           resultValue as DeepPartial<T>,

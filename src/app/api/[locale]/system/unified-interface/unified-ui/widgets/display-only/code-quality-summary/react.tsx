@@ -10,9 +10,12 @@ import { H3 } from "next-vibe-ui/ui/typography";
 import type { ReactElement } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type { ReactRequestResponseWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetForm,
+  useWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type {
   CodeQualitySummarySchema,
@@ -28,14 +31,27 @@ export default function CodeQualitySummaryWidget<
   TUsage extends FieldUsageConfig,
 >({
   field,
-}: ReactWidgetProps<
+  fieldName,
+}: ReactRequestResponseWidgetProps<
   TEndpoint,
   TUsage,
   CodeQualitySummaryWidgetConfig<TSchema, TUsage, "primitive">
 >): ReactElement {
   const t = useWidgetTranslation();
+  const form = useWidgetForm();
+  const { usage } = field;
 
-  const value = field.value;
+  // Get value from form for request fields, otherwise from field.value
+  let value: typeof field.value | undefined;
+  if (usage.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value) {
+      value = field.value;
+    }
+  } else {
+    value = field.value;
+  }
+
   if (!value) {
     return <></>;
   }

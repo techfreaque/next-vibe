@@ -7,7 +7,10 @@
 "use client";
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
-import { getModelById } from "@/app/api/[locale]/agent/models/models";
+import {
+  getCreditCostFromModel,
+  getModelById,
+} from "@/app/api/[locale]/agent/models/models";
 
 /**
  * Create onContentDone callback for credit updates
@@ -19,7 +22,7 @@ export function createCreditUpdateCallback(
   deductCredits: (creditCost: number, feature: string) => void,
 ): () => void {
   const modelConfig = getModelById(modelId);
-  const creditCost = modelConfig.creditCost;
+  const creditCost = getCreditCostFromModel(modelConfig);
 
   return () => {
     if (creditCost > 0) {

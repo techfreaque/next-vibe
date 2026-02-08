@@ -32,7 +32,6 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { useCallMode } from "../../../_components/chat-input/hooks/use-call-mode";
 import { useMessageEditor } from "./hooks/use-message-editor";
 
 interface MessageEditorProps {
@@ -57,14 +56,14 @@ export function MessageEditor({
   logger,
   user,
 }: MessageEditorProps): JSX.Element {
-  const { selectedModel, selectedCharacter, deductCredits } = useChatContext();
+  const {
+    selectedModel,
+    selectedCharacter,
+    deductCredits,
+    ttsAutoplay,
+    setTTSAutoplay,
+  } = useChatContext();
   const { t } = simpleT(locale);
-
-  // Call mode state
-  const { isCallMode, toggleCallMode } = useCallMode({
-    modelId: selectedModel,
-    characterId: selectedCharacter,
-  });
 
   // Message editor logic
   const editor = useMessageEditor({
@@ -106,13 +105,13 @@ export function MessageEditor({
           "p-4 backdrop-blur",
           "border border-border rounded-lg shadow-lg",
           "w-full",
-          isCallMode
+          ttsAutoplay
             ? "bg-green-100/70 dark:bg-green-950/70 border-green-300 dark:border-green-800"
             : "bg-card",
         )}
       >
         {/* Call mode indicator */}
-        <CallModeIndicator show={isCallMode} locale={locale} />
+        <CallModeIndicator show={ttsAutoplay} locale={locale} />
 
         {/* Recording modal */}
         <RecordingModal
@@ -183,11 +182,11 @@ export function MessageEditor({
                   <Button
                     type="button"
                     size="icon"
-                    variant={isCallMode ? "default" : "ghost"}
-                    onClick={toggleCallMode}
+                    variant={ttsAutoplay ? "default" : "ghost"}
+                    onClick={() => setTTSAutoplay(!ttsAutoplay)}
                     className={cn(
                       "h-8 w-8 sm:h-9 sm:w-9",
-                      isCallMode &&
+                      ttsAutoplay &&
                         "bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500",
                     )}
                   >
@@ -195,7 +194,7 @@ export function MessageEditor({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {isCallMode
+                  {ttsAutoplay
                     ? t("app.chat.voiceMode.callModeDescription")
                     : t("app.chat.voiceMode.callMode")}
                 </TooltipContent>

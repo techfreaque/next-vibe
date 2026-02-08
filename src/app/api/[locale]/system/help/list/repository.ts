@@ -42,11 +42,7 @@ class HelpListRepository {
 
     try {
       // Use unified endpoint listing service (filtered by user permissions from JWT)
-      const endpoints = definitionsRegistry.getEndpointsForUser(
-        platform,
-        user,
-        logger,
-      );
+      const endpoints = definitionsRegistry.getEndpointsForUser(platform, user);
 
       // Sort endpoints by category and toolName
       const sortedEndpoints = endpoints.toSorted((a, b) => {

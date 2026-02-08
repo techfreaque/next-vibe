@@ -7,16 +7,14 @@ import { z } from "zod";
 
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { backButton } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
-  objectField,
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -24,7 +22,11 @@ import { modelSelectionSchemaSimple } from "@/app/api/[locale]/system/unified-in
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../../shared/types/common.schema";
-import { TtsVoiceDB, TtsVoiceOptions } from "../../../text-to-speech/enum";
+import {
+  DEFAULT_TTS_VOICE,
+  TtsVoiceDB,
+  TtsVoiceOptions,
+} from "../../../text-to-speech/enum";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -33,12 +35,8 @@ import {
   SpeedLevel,
 } from "../../characters/enum";
 import { CategoryOptions } from "../enum";
-import {
-  CharacterCategory,
-  CharacterCategoryDB,
-  CharacterOwnershipType,
-  CharacterOwnershipTypeDB,
-} from "../enum";
+import { CharacterCategory, CharacterCategoryDB } from "../enum";
+import { CharacterCreateContainer } from "./widget";
 
 /**
  * Create Character Endpoint (POST)
@@ -55,42 +53,63 @@ const { POST } = createEndpoint({
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.characters" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-      noCard: true,
-      paddingTop: "6",
-      submitButton: {
-        text: "app.api.agent.chat.characters.post.submitButton.text" as const,
-        loadingText:
-          "app.api.agent.chat.characters.post.submitButton.loadingText" as const,
-        position: "bottom",
-      },
-    },
-    { request: "data", response: true },
-    {
-      // Back button navigation
-      backButton: backButton({ usage: { response: true } }),
-      // === REQUEST ===
+  fields: customWidgetObject({
+    render: CharacterCreateContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      // === RESPONSE ===
+      success: responseField({
+        type: WidgetType.ALERT,
+        schema: z.string(),
+      }),
+
       name: requestField({
-        schema: z.string().min(1).max(100),
+        schema: z
+          .string()
+          .min(2, {
+            message:
+              "app.api.agent.chat.characters.post.name.validation.minLength" as const,
+          })
+          .max(100, {
+            message:
+              "app.api.agent.chat.characters.post.name.validation.maxLength" as const,
+          }),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "app.api.agent.chat.characters.post.name.label" as const,
         description:
           "app.api.agent.chat.characters.post.name.description" as const,
+        placeholder:
+          "app.api.agent.chat.characters.post.name.placeholder" as const,
         columns: 6,
+        order: 0,
+        theme: {
+          descriptionStyle: "inline",
+        } as const,
       }),
-      description: requestField({
-        schema: z.string().min(1).max(500),
+      tagline: requestField({
+        schema: z
+          .string()
+          .min(2, {
+            message:
+              "app.api.agent.chat.characters.post.tagline.validation.minLength" as const,
+          })
+          .max(500, {
+            message:
+              "app.api.agent.chat.characters.post.tagline.validation.maxLength" as const,
+          }),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.agent.chat.characters.post.characterDescription.label" as const,
+        label: "app.api.agent.chat.characters.post.tagline.label" as const,
         description:
-          "app.api.agent.chat.characters.post.characterDescription.description" as const,
+          "app.api.agent.chat.characters.post.tagline.description" as const,
+        placeholder:
+          "app.api.agent.chat.characters.post.tagline.placeholder" as const,
         columns: 6,
+        order: 1,
+        theme: {
+          descriptionStyle: "inline",
+        } as const,
       }),
       icon: requestField({
         schema: iconSchema,
@@ -100,15 +119,35 @@ const { POST } = createEndpoint({
         description:
           "app.api.agent.chat.characters.post.icon.description" as const,
         columns: 6,
+        order: 2,
+        theme: {
+          descriptionStyle: "inline",
+        } as const,
       }),
-      systemPrompt: requestField({
-        schema: z.string().min(1).max(5000),
+      description: requestField({
+        schema: z
+          .string()
+          .min(10, {
+            message:
+              "app.api.agent.chat.characters.post.characterDescription.validation.minLength" as const,
+          })
+          .max(500, {
+            message:
+              "app.api.agent.chat.characters.post.characterDescription.validation.maxLength" as const,
+          }),
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXTAREA,
-        label: "app.api.agent.chat.characters.post.systemPrompt.label" as const,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.agent.chat.characters.post.characterDescription.label" as const,
         description:
-          "app.api.agent.chat.characters.post.systemPrompt.description" as const,
-        columns: 12,
+          "app.api.agent.chat.characters.post.characterDescription.description" as const,
+        placeholder:
+          "app.api.agent.chat.characters.post.characterDescription.placeholder" as const,
+        columns: 6,
+        order: 3,
+        theme: {
+          descriptionStyle: "inline",
+        },
       }),
       category: requestField({
         schema: z.enum(CharacterCategoryDB),
@@ -119,52 +158,26 @@ const { POST } = createEndpoint({
           "app.api.agent.chat.characters.post.category.description" as const,
         options: CategoryOptions,
         columns: 6,
+        order: 4,
+        theme: {
+          descriptionStyle: "inline",
+        },
       }),
-      tagline: requestField({
-        schema: z.string().min(1).max(500),
+      isPublic: requestField({
+        schema: z.boolean(),
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "app.api.agent.chat.characters.post.tagline.label" as const,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.agent.chat.characters.post.isPublic.label" as const,
         description:
-          "app.api.agent.chat.characters.post.tagline.description" as const,
+          "app.api.agent.chat.characters.post.isPublic.description" as const,
         columns: 6,
-      }),
-      ownershipType: requestField({
-        schema: z.enum(CharacterOwnershipTypeDB),
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.agent.chat.characters.post.ownershipType.label" as const,
-        description:
-          "app.api.agent.chat.characters.post.ownershipType.description" as const,
-        options: [
-          {
-            value: CharacterOwnershipType.USER,
-            label:
-              "app.api.agent.chat.characters.enums.ownershipType.user" as const,
-          },
-          {
-            value: CharacterOwnershipType.PUBLIC,
-            label:
-              "app.api.agent.chat.characters.enums.ownershipType.public" as const,
-          },
-        ],
-        columns: 6,
-      }),
-      // Model Selection - manual or filter-based
-      modelSelection: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.MODEL_SELECTION,
-        label:
-          "app.api.agent.chat.characters.post.modelSelection.title" as const,
-        description:
-          "app.api.agent.chat.characters.post.modelSelection.description" as const,
-        includeCharacterBased: false,
-        columns: 12,
-        schema: modelSelectionSchemaSimple,
+        order: 5,
+        theme: {
+          descriptionStyle: "inline",
+        },
       }),
       voice: requestField({
-        schema: z.enum(TtsVoiceDB).optional(),
+        schema: z.enum(TtsVoiceDB).default(DEFAULT_TTS_VOICE),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "app.api.agent.chat.characters.post.voice.label" as const,
@@ -172,6 +185,39 @@ const { POST } = createEndpoint({
           "app.api.agent.chat.characters.post.voice.description" as const,
         options: TtsVoiceOptions,
         columns: 6,
+        order: 6,
+        theme: {
+          descriptionStyle: "inline",
+        },
+      }),
+      systemPrompt: requestField({
+        schema: z
+          .string()
+          .min(10, {
+            message:
+              "app.api.agent.chat.characters.post.systemPrompt.validation.minLength" as const,
+          })
+          .max(5000, {
+            message:
+              "app.api.agent.chat.characters.post.systemPrompt.validation.maxLength" as const,
+          }),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "app.api.agent.chat.characters.post.systemPrompt.label" as const,
+        description:
+          "app.api.agent.chat.characters.post.systemPrompt.description" as const,
+        placeholder:
+          "app.api.agent.chat.characters.post.systemPrompt.placeholder" as const,
+        columns: 12,
+        order: 7,
+        theme: {
+          descriptionStyle: "inline",
+        },
+      }),
+      // Model Selection - manual or filter-based
+      modelSelection: requestField({
+        type: WidgetType.CUSTOM_WIDGET,
+        schema: modelSelectionSchemaSimple,
       }),
 
       // === RESPONSE ===
@@ -180,9 +226,10 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content:
           "app.api.agent.chat.characters.post.response.id.content" as const,
+        hidden: true,
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
@@ -255,7 +302,7 @@ const { POST } = createEndpoint({
         systemPrompt:
           "You are an expert code reviewer. Analyze code for bugs, performance issues, and best practices.",
         category: CharacterCategory.CODING,
-        ownershipType: CharacterOwnershipType.USER,
+        isPublic: true,
         modelSelection: {
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: ModelId.GPT_5,
@@ -270,7 +317,7 @@ const { POST } = createEndpoint({
         systemPrompt:
           "You are an expert code reviewer. Analyze code for bugs, performance issues, and best practices.",
         category: CharacterCategory.CODING,
-        ownershipType: CharacterOwnershipType.USER,
+        isPublic: true,
         modelSelection: {
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: ModelId.GPT_5,
@@ -286,7 +333,7 @@ const { POST } = createEndpoint({
         systemPrompt:
           "You are a creative writing assistant. Help users craft compelling stories, characters, and narratives.",
         category: CharacterCategory.CREATIVE,
-        ownershipType: CharacterOwnershipType.USER,
+        isPublic: true,
         modelSelection: {
           selectionType: ModelSelectionType.FILTERS,
           intelligenceRange: {
@@ -311,12 +358,15 @@ const { POST } = createEndpoint({
     },
     responses: {
       create: {
+        success: "app.api.agent.chat.characters.post.success.title",
         id: "550e8400-e29b-41d4-a716-446655440000",
       },
       createManual: {
+        success: "app.api.agent.chat.characters.post.success.title",
         id: "550e8400-e29b-41d4-a716-446655440001",
       },
       createFilters: {
+        success: "app.api.agent.chat.characters.post.success.title",
         id: "550e8400-e29b-41d4-a716-446655440002",
       },
     },

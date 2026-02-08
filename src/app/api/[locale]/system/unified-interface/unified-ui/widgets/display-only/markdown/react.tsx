@@ -6,12 +6,18 @@ import { Markdown } from "next-vibe-ui/ui/markdown";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type {
+  ReactRequestResponseWidgetProps,
+  ReactStaticWidgetProps,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { StringWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type { FieldUsageConfig } from "../../_shared/types";
-import { useWidgetLocale } from "../../_shared/use-widget-context";
+import {
+  useWidgetForm,
+  useWidgetLocale,
+} from "../../_shared/use-widget-context";
 import type { MarkdownWidgetConfig } from "./types";
 
 /**
@@ -52,22 +58,36 @@ export function MarkdownWidget<
   TUsage extends FieldUsageConfig,
 >(
   props:
-    | ReactWidgetProps<
+    | ReactStaticWidgetProps<
         TEndpoint,
         TUsage,
         MarkdownWidgetConfig<TKey, never, TUsage, "widget">
       >
-    | ReactWidgetProps<
+    | ReactRequestResponseWidgetProps<
         TEndpoint,
         TUsage,
         MarkdownWidgetConfig<TKey, StringWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
   const { field } = props;
+  const fieldName = "fieldName" in props ? props.fieldName : undefined;
   const locale = useWidgetLocale();
   const { t } = simpleT(locale);
+  const form = useWidgetForm();
+  const usage = "usage" in field ? field.usage : undefined;
 
-  if (!field.value) {
+  // Get value from form for request fields, otherwise from field.value
+  let value;
+  if (usage?.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value && "value" in field) {
+      value = field.value;
+    }
+  } else if ("value" in field) {
+    value = field.value;
+  }
+
+  if (!value) {
     return (
       <Div className={cn("text-muted-foreground italic", field.className)}>
         {t("app.api.system.unifiedInterface.react.widgets.markdown.noContent")}
@@ -86,7 +106,7 @@ export function MarkdownWidget<
         field.className,
       )}
     >
-      <Markdown content={field.value} />
+      <Markdown content={value} />
     </Div>
   );
 }

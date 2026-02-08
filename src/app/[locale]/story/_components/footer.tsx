@@ -16,7 +16,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/products/repository-client";
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

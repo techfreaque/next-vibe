@@ -256,18 +256,12 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
           TEndpoint["types"]["UrlVariablesOutput"]
         >,
   ): void => {
-    logger.debug("submitForm called", {
-      endpoint: endpoint.path.join("/"),
-    });
-
     const _submitForm = async (
       validatedData: TEndpoint["types"]["RequestOutput"],
     ): Promise<void> => {
-      logger.debug("_submitForm called with validated data", {
+      logger.debug("Submitting form", {
         endpoint: endpoint.path.join("/"),
-        validatedData,
-        validatedDataKeys: Object.keys(validatedData),
-        validatedDataValues: Object.values(validatedData),
+        keys: Object.keys(validatedData),
       });
       try {
         // Clear any previous errors

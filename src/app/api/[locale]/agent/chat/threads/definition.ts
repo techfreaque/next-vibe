@@ -175,7 +175,7 @@ const { GET } = createEndpoint({
         {
           threads: responseArrayField(
             {
-              type: WidgetType.DATA_CARDS,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               {
@@ -231,7 +231,7 @@ const { GET } = createEndpoint({
                 // Permission roles - nullable arrays (null = inherit, [] = deny, [roles...] = allow)
                 rolesView: responseArrayOptionalField(
                   {
-                    type: WidgetType.DATA_LIST,
+                    type: WidgetType.CONTAINER,
                   },
                   responseField({
                     type: WidgetType.BADGE,
@@ -240,7 +240,7 @@ const { GET } = createEndpoint({
                 ),
                 rolesEdit: responseArrayOptionalField(
                   {
-                    type: WidgetType.DATA_LIST,
+                    type: WidgetType.CONTAINER,
                   },
                   responseField({
                     type: WidgetType.BADGE,
@@ -249,7 +249,7 @@ const { GET } = createEndpoint({
                 ),
                 rolesPost: responseArrayOptionalField(
                   {
-                    type: WidgetType.DATA_LIST,
+                    type: WidgetType.CONTAINER,
                   },
                   responseField({
                     type: WidgetType.BADGE,
@@ -258,7 +258,7 @@ const { GET } = createEndpoint({
                 ),
                 rolesModerate: responseArrayOptionalField(
                   {
-                    type: WidgetType.DATA_LIST,
+                    type: WidgetType.CONTAINER,
                   },
                   responseField({
                     type: WidgetType.BADGE,
@@ -267,7 +267,7 @@ const { GET } = createEndpoint({
                 ),
                 rolesAdmin: responseArrayOptionalField(
                   {
-                    type: WidgetType.DATA_LIST,
+                    type: WidgetType.CONTAINER,
                   },
                   responseField({
                     type: WidgetType.BADGE,

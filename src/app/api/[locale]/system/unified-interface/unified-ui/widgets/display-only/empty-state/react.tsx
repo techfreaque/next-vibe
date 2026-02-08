@@ -13,7 +13,7 @@ import {
   getSpacingClassName,
   getTextSizeClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
-import type { ReactWidgetProps } from "../../_shared/react-types";
+import type { ReactStaticWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
   useWidgetLogger,
@@ -61,7 +61,7 @@ export default function EmptyStateWidget<
   TUsage extends FieldUsageConfig,
 >({
   field,
-}: ReactWidgetProps<
+}: ReactStaticWidgetProps<
   TEndpoint,
   TUsage,
   EmptyStateWidgetConfig<TKey, TUsage, "widget">

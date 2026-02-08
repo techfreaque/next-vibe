@@ -4,7 +4,9 @@
  * Used by both React and CLI implementations
  */
 
-import type { WidgetData } from "../../../../shared/widgets/widget-data";
+import type z from "zod";
+
+import type { MarkdownEditorWidgetSchema } from "./types";
 
 /**
  * Processed editable text data structure
@@ -21,7 +23,7 @@ interface ProcessedEditableText {
  * Extract and validate editable text data from WidgetData
  */
 export function extractEditableTextData(
-  value: WidgetData,
+  value: z.output<MarkdownEditorWidgetSchema>,
 ): ProcessedEditableText | null {
   // Handle string value directly
   if (typeof value === "string") {

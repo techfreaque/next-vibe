@@ -5,6 +5,9 @@
 
 import { format } from "date-fns";
 import { de, enUS, type Locale, pl } from "date-fns/locale";
+import type z from "zod";
+
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 
 import type { CountryLanguage, Currencies } from "./config";
 import { getCountryFromLocale } from "./language-utils";
@@ -181,10 +184,10 @@ export function formatTimeString(date: Date): string {
  * Format simple date string for locale
  */
 export function formatSimpleDate(
-  date: Date | string,
+  date: z.output<typeof dateSchema>,
   locale: CountryLanguage,
 ): string {
-  const dateObj = typeof date === "string" ? new Date(date) : date;
+  const dateObj = dateSchema.parse(date) as Date;
   const localeString = getLocaleString(locale);
 
   return dateObj.toLocaleDateString(localeString, {

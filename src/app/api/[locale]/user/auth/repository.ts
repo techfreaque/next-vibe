@@ -177,9 +177,6 @@ export class AuthRepository {
         logger,
       );
       if (isValid) {
-        logger.debug("Reusing existing leadId from cookie for public user", {
-          leadId: existingLeadId,
-        });
         return { leadId: existingLeadId, shouldUpdateCookie: false };
       }
       logger.warn(
@@ -346,11 +343,6 @@ export class AuthRepository {
       // If user has actual roles, return them (even if PUBLIC is in requiredRoles)
       // This ensures admin users get their ADMIN role, not PUBLIC
       if (roles.length > 0) {
-        logger.debug("Returning user's actual roles", {
-          userId,
-          roles: roles as string[],
-          requiredRoles: [...requiredRoles] as string[],
-        });
         return roles;
       }
 
@@ -819,7 +811,6 @@ export class AuthRepository {
       const token = await authHandler.getStoredAuthToken(context, logger);
 
       if (!token) {
-        logger.debug("No auth token found");
         if (isCliPlatform(context.platform)) {
           // Try CLI email auth if no token (works for both CLI and CLI_PACKAGE)
           const cliEmail = cliEnv.VIBE_CLI_USER_EMAIL;

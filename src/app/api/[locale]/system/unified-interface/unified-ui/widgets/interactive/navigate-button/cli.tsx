@@ -17,12 +17,19 @@ export function NavigateButtonWidgetInk<
   TKey extends string,
   TUsage extends FieldUsageConfig,
   TTargetEndpoint extends CreateApiEndpointAny | undefined,
+  TGetEndpoint extends CreateApiEndpointAny | undefined,
 >({
   field,
 }: InkWidgetProps<
   TEndpoint,
   TUsage,
-  NavigateButtonWidgetConfig<TKey, TUsage, "widget", TTargetEndpoint>
+  NavigateButtonWidgetConfig<
+    TKey,
+    TUsage,
+    "widget",
+    TTargetEndpoint,
+    TGetEndpoint
+  >
 >): JSX.Element {
   const t = useInkWidgetTranslation();
 

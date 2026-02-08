@@ -33,7 +33,6 @@ import { simpleT } from "@/i18n/core/shared";
 import { AGENT_MESSAGE_LENGTH } from "../../../constants";
 import { CallModeIndicator } from "./call-mode-indicator";
 import { FileUploadButton } from "./file-upload-button";
-import { useCallMode } from "./hooks/use-call-mode";
 import { useVoiceRecording } from "./hooks/use-voice-recording";
 import { RecordingModal } from "./recording-modal";
 import { SearchToggle } from "./search-toggle";
@@ -69,6 +68,8 @@ export function ChatInput({
     selectedCharacter,
     selectedModel,
     deductCredits,
+    ttsAutoplay,
+    setTTSAutoplay,
   } = chat;
 
   const { canPost, noPermissionReason } = useChatPermissions(chat, locale);
@@ -81,12 +82,6 @@ export function ChatInput({
 
   // Show stop button when streaming OR when TTS is playing
   const showStopButton = isLoading || voiceRuntime.isSpeaking;
-
-  // Call mode state
-  const { isCallMode, toggleCallMode } = useCallMode({
-    modelId: selectedModel,
-    characterId: selectedCharacter,
-  });
 
   // Voice recording state
   const voice = useVoiceRecording({
@@ -112,14 +107,14 @@ export function ChatInput({
         "@container",
         "p-2 @sm:p-3 @md:p-4 backdrop-blur",
         "border border-border rounded-t-lg",
-        isCallMode
+        ttsAutoplay
           ? "bg-green-100/70 dark:bg-green-950/70 border-green-300 dark:border-green-800"
           : "bg-blue-200/70 dark:bg-blue-950/70",
         className,
       )}
     >
       {/* Call mode indicator */}
-      <CallModeIndicator show={isCallMode} locale={locale} />
+      <CallModeIndicator show={ttsAutoplay} locale={locale} />
 
       {/* Recording modal */}
       <RecordingModal
@@ -246,11 +241,11 @@ export function ChatInput({
                 <Button
                   type="button"
                   size="icon"
-                  variant={isCallMode ? "default" : "ghost"}
-                  onClick={toggleCallMode}
+                  variant={ttsAutoplay ? "default" : "ghost"}
+                  onClick={() => setTTSAutoplay(!ttsAutoplay)}
                   className={cn(
                     "h-8 w-8 @sm:h-9 @sm:w-9",
-                    isCallMode &&
+                    ttsAutoplay &&
                       "bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500",
                   )}
                   data-tour={TOUR_DATA_ATTRS.CALL_MODE_BUTTON}
@@ -259,7 +254,7 @@ export function ChatInput({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                {isCallMode
+                {ttsAutoplay
                   ? t("app.chat.voiceMode.callModeDescription")
                   : t("app.chat.voiceMode.callMode")}
               </TooltipContent>

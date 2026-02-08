@@ -40,49 +40,290 @@ export const { GET } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.referral.stats.get.form.title",
-      description: "app.api.referral.stats.get.form.description",
+      noCard: true,
       layoutType: LayoutType.GRID,
-      columns: 12,
+      innerClassName: "sm:grid-cols-2 lg:grid-cols-4",
+      gap: "4",
     },
     { response: true },
     {
-      totalSignups: responseField({
-        type: WidgetType.TEXT,
-        content: "app.api.referral.stats.fields.totalSignups",
-        schema: z.coerce.number(),
-      }),
-      totalRevenueCredits: responseField({
-        type: WidgetType.TEXT,
-        content: "app.api.referral.stats.fields.totalRevenueCredits",
-        schema: z.coerce.number(),
-      }),
-      totalEarnedCredits: responseField({
-        type: WidgetType.TEXT,
-        content: "app.api.referral.stats.fields.totalEarnedCredits",
-        schema: z.coerce.number(),
-      }),
-      totalPaidOutCredits: responseField({
-        type: WidgetType.TEXT,
-        content: "app.api.referral.stats.fields.totalPaidOutCredits",
-        schema: z.coerce.number(),
-      }),
-      availableCredits: responseField({
-        type: WidgetType.TEXT,
-        content: "app.api.referral.stats.fields.availableCredits",
-        schema: z.coerce.number(),
-      }),
+      totalSignups: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          className:
+            "rounded-lg border bg-card text-card-foreground shadow-sm border-border/60 bg-gradient-to-br from-background to-muted/20",
+        },
+        { response: true },
+        {
+          header: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              noCard: true,
+              layoutType: LayoutType.INLINE,
+              className:
+                "gap-1.5 p-6 pb-2 flex flex-row items-center justify-between space-y-0",
+            },
+            { response: true },
+            {
+              title: responseField({
+                type: WidgetType.TEXT,
+                content: "app.user.referral.stats.totalSignups",
+                schema: z.string(),
+                className:
+                  "text-xs font-medium uppercase tracking-wide text-muted-foreground",
+              }),
+              icon: responseField({
+                type: WidgetType.ICON,
+                icon: "users",
+                schema: z.string().optional(),
+                className: "h-4 w-4 text-muted-foreground",
+              }),
+            },
+          ),
+          content: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              noCard: true,
+              layoutType: LayoutType.STACKED,
+              className: "p-6 pt-0",
+            },
+            { response: true },
+            {
+              value: responseField({
+                type: WidgetType.TEXT,
+                schema: z.coerce.number(),
+                className: "font-mono text-3xl font-bold tabular-nums",
+              }),
+              description: responseField({
+                type: WidgetType.TEXT,
+                content: "app.user.referral.stats.totalSignupsDesc",
+                schema: z.string(),
+                className: "text-xs text-muted-foreground mt-1",
+              }),
+            },
+          ),
+        },
+      ),
+      totalRevenueCredits: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          className:
+            "rounded-lg border bg-card text-card-foreground shadow-sm border-emerald-500/30 bg-gradient-to-br from-emerald-500/5 to-emerald-500/10",
+        },
+        { response: true },
+        {
+          header: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              noCard: true,
+              layoutType: LayoutType.INLINE,
+              className:
+                "gap-1.5 p-6 pb-2 flex flex-row items-center justify-between space-y-0",
+            },
+            { response: true },
+            {
+              title: responseField({
+                type: WidgetType.TEXT,
+                content: "app.user.referral.stats.totalRevenue",
+                schema: z.string(),
+                className:
+                  "text-xs font-medium uppercase tracking-wide text-muted-foreground",
+              }),
+              icon: responseField({
+                type: WidgetType.ICON,
+                icon: "trending-up",
+                schema: z.string().optional(),
+                className: "h-4 w-4 text-emerald-500",
+              }),
+            },
+          ),
+          content: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              noCard: true,
+              layoutType: LayoutType.STACKED,
+              className: "p-6 pt-0",
+            },
+            { response: true },
+            {
+              value: responseField({
+                type: WidgetType.TEXT,
+                schema: z.coerce.number(),
+                className:
+                  "font-mono text-3xl font-bold tabular-nums text-emerald-600 dark:text-emerald-400",
+              }),
+              description: responseField({
+                type: WidgetType.TEXT,
+                content: "app.user.referral.stats.totalRevenueDesc",
+                schema: z.string(),
+                className: "text-xs text-muted-foreground mt-1",
+              }),
+            },
+          ),
+        },
+      ),
+      totalEarnedCredits: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          className:
+            "rounded-lg border bg-card text-card-foreground shadow-sm border-blue-500/30 bg-gradient-to-br from-blue-500/5 to-blue-500/10",
+        },
+        { response: true },
+        {
+          header: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              noCard: true,
+              layoutType: LayoutType.INLINE,
+              className:
+                "gap-1.5 p-6 pb-2 flex flex-row items-center justify-between space-y-0",
+            },
+            { response: true },
+            {
+              title: responseField({
+                type: WidgetType.TEXT,
+                content: "app.user.referral.stats.totalEarned",
+                schema: z.string(),
+                className:
+                  "text-xs font-medium uppercase tracking-wide text-muted-foreground",
+              }),
+              icon: responseField({
+                type: WidgetType.ICON,
+                icon: "dollar-sign",
+                schema: z.string().optional(),
+                className: "h-4 w-4 text-blue-500",
+              }),
+            },
+          ),
+          content: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              noCard: true,
+              layoutType: LayoutType.STACKED,
+              className: "p-6 pt-0",
+            },
+            { response: true },
+            {
+              value: responseField({
+                type: WidgetType.TEXT,
+                schema: z.coerce.number(),
+                className:
+                  "font-mono text-3xl font-bold tabular-nums text-blue-600 dark:text-blue-400",
+              }),
+              description: responseField({
+                type: WidgetType.TEXT,
+                content: "app.user.referral.stats.totalEarnedDesc",
+                schema: z.string(),
+                className: "text-xs text-muted-foreground mt-1",
+              }),
+            },
+          ),
+        },
+      ),
+      availableCredits: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          className:
+            "rounded-lg border bg-card text-card-foreground shadow-sm border-violet-500/30 bg-gradient-to-br from-violet-500/5 to-violet-500/10",
+        },
+        { response: true },
+        {
+          header: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              noCard: true,
+              layoutType: LayoutType.INLINE,
+              className:
+                "gap-1.5 p-6 pb-2 flex flex-row items-center justify-between space-y-0",
+            },
+            { response: true },
+            {
+              title: responseField({
+                type: WidgetType.TEXT,
+                content: "app.user.referral.stats.availableBalance",
+                schema: z.string(),
+                className:
+                  "text-xs font-medium uppercase tracking-wide text-muted-foreground",
+              }),
+              icon: responseField({
+                type: WidgetType.ICON,
+                icon: "wallet",
+                schema: z.string().optional(),
+                className: "h-4 w-4 text-violet-500",
+              }),
+            },
+          ),
+          content: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              noCard: true,
+              layoutType: LayoutType.STACKED,
+              className: "p-6 pt-0",
+            },
+            { response: true },
+            {
+              value: responseField({
+                type: WidgetType.TEXT,
+                schema: z.coerce.number(),
+                className:
+                  "font-mono text-3xl font-bold tabular-nums text-violet-600 dark:text-violet-400",
+              }),
+              description: responseField({
+                type: WidgetType.TEXT,
+                content: "app.user.referral.stats.availableBalanceDesc",
+                schema: z.string(),
+                className: "text-xs text-muted-foreground mt-1",
+              }),
+            },
+          ),
+        },
+      ),
     },
   ),
 
   examples: {
     responses: {
       default: {
-        totalSignups: 10,
-        totalRevenueCredits: 8000,
-        totalEarnedCredits: 1600,
-        totalPaidOutCredits: 0,
-        availableCredits: 1600,
+        totalSignups: {
+          header: {
+            title: "app.user.referral.stats.totalSignups",
+            icon: undefined,
+          },
+          content: {
+            value: 10,
+            description: "app.user.referral.stats.totalSignupsDesc",
+          },
+        },
+        totalRevenueCredits: {
+          header: {
+            title: "app.user.referral.stats.totalRevenue",
+            icon: undefined,
+          },
+          content: {
+            value: 8000,
+            description: "app.user.referral.stats.totalRevenueDesc",
+          },
+        },
+        totalEarnedCredits: {
+          header: {
+            title: "app.user.referral.stats.totalEarned",
+            icon: undefined,
+          },
+          content: {
+            value: 1600,
+            description: "app.user.referral.stats.totalEarnedDesc",
+          },
+        },
+        availableCredits: {
+          header: {
+            title: "app.user.referral.stats.availableBalance",
+            icon: undefined,
+          },
+          content: {
+            value: 1600,
+            description: "app.user.referral.stats.availableBalanceDesc",
+          },
+        },
       },
     },
   },

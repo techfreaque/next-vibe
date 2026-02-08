@@ -99,7 +99,6 @@ export class MCPRegistry implements IMCPRegistry {
       Platform.MCP,
       user,
       this.locale,
-      logger,
     );
 
     // Convert to MCP tool metadata format

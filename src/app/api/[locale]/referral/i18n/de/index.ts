@@ -204,7 +204,8 @@ export const translations: typeof enTranslations = {
     createdAt: "Erstellt am",
     updatedAt: "Aktualisiert am",
     referralCode: "Empfehlungscode",
-    success: "Erfolg",
+    success:
+      "🎉 Ihr Empfehlungscode ist bereit! Kopieren Sie den Link unten und verdienen Sie 20% Provision auf jedes Abonnement.",
     message: "Nachricht",
   },
 

@@ -55,7 +55,7 @@ const { POST } = createEndpoint({
     {
       elements: requestDataArrayField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           title: "app.api.browser.fill-form.form.fields.elements.label",
           description:
             "app.api.browser.fill-form.form.fields.elements.description",
@@ -123,7 +123,7 @@ const { POST } = createEndpoint({
           }),
           elements: responseArrayOptionalField(
             {
-              type: WidgetType.DATA_TABLE,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               {

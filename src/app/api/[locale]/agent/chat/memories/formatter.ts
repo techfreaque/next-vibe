@@ -5,7 +5,8 @@
  */
 
 import { MEMORY_DELETE_ALIAS, MEMORY_UPDATE_ALIAS } from "./[id]/definition";
-import { type MemoriesList, MEMORY_ADD_ALIAS } from "./definition";
+import { MEMORY_ADD_ALIAS } from "./create/definition";
+import { type MemoriesList } from "./definition";
 
 /**
  * Format memory summary for system prompt (isomorphic - works on client and server)

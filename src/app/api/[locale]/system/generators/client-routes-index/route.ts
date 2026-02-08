@@ -2,16 +2,19 @@
  * Client Routes Index Generator Route Handler
  */
 
-import { endpointHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/single";
-
+import { endpointsHandler } from "../../unified-interface/shared/endpoints/route/multi";
+import { Methods } from "../../unified-interface/shared/types/enums";
 import definitions from "./definition";
 import { ClientRoutesIndexGeneratorRepository } from "./repository";
 
-export const { POST, tools } = endpointHandler({
-  endpoint: definitions.POST,
-  handler: ({ data, logger }) =>
-    ClientRoutesIndexGeneratorRepository.generateClientRoutesIndex(
-      data,
-      logger,
-    ),
+export const { POST, tools } = endpointsHandler({
+  endpoint: definitions,
+  [Methods.POST]: {
+    handler: async ({ data, logger }) => {
+      return await ClientRoutesIndexGeneratorRepository.generateClientRoutesIndex(
+        data,
+        logger,
+      );
+    },
+  },
 });

@@ -18,10 +18,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { Countries, CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { TOTAL_MODEL_COUNT } from "../../../agent/models/models";
 import {
   type ProductIds,
   productsRepository,
-  TOTAL_MODEL_COUNT,
 } from "../../../products/repository-client";
 import type { PaymentInterval } from "../types";
 import { stripe } from "./repository";

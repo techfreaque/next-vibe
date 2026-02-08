@@ -144,7 +144,7 @@ const { GET } = createEndpoint({
           }),
           userRoles: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               {
@@ -239,7 +239,7 @@ const { GET } = createEndpoint({
       }),
       userRoles: responseArrayField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
         },
         objectField(
           {
@@ -560,7 +560,7 @@ const { PUT } = createEndpoint({
       }),
       userRoles: responseArrayField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
         },
         objectField(
           {

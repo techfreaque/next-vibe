@@ -29,7 +29,12 @@ const { GET } = createEndpoint({
   category: "app.api.agent.chat.category" as const,
   icon: "download" as const,
   tags: ["app.api.agent.chat.tags.files" as const],
-  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.AI_TOOL_OFF,
+  ] as const,
   fields: objectField(
     {
       type: WidgetType.CONTAINER,

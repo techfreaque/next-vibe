@@ -935,7 +935,7 @@ const { GET } = createEndpoint({
       // Top performers with proper Zod schemas
       topPerformingCampaigns: responseArrayField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           title: "app.api.leads.stats.response.topPerformingCampaigns",
           description: "app.api.leads.stats.response.topPerformingCampaigns",
         },
@@ -983,7 +983,7 @@ const { GET } = createEndpoint({
 
       topPerformingSources: responseArrayField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           title: "app.api.leads.stats.response.topPerformingSources",
           description: "app.api.leads.stats.response.topPerformingSources",
         },
@@ -1022,7 +1022,7 @@ const { GET } = createEndpoint({
       // Recent activity with proper Zod schema
       recentActivity: responseArrayField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           title: "app.api.leads.stats.response.recentActivity",
           description: "app.api.leads.stats.response.recentActivity",
         },

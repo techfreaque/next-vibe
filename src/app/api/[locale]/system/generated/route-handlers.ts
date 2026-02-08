@@ -102,9 +102,10 @@ export async function getRouteHandler(
     case "agent_chat_memories_GET":
       return (await import("@/app/api/[locale]/agent/chat/memories/route"))
         .tools.GET as GenericHandlerBase;
-    case "agent_chat_memories_POST":
-      return (await import("@/app/api/[locale]/agent/chat/memories/route"))
-        .tools.POST as GenericHandlerBase;
+    case "agent_chat_memories_create_POST":
+      return (
+        await import("@/app/api/[locale]/agent/chat/memories/create/route")
+      ).tools.POST as GenericHandlerBase;
     case "agent_chat_memories_id_DELETE":
       return (await import("@/app/api/[locale]/agent/chat/memories/[id]/route"))
         .tools.DELETE as GenericHandlerBase;
@@ -201,6 +202,9 @@ export async function getRouteHandler(
       ).tools.POST as GenericHandlerBase;
     case "agent_fetch-url-content_GET":
       return (await import("@/app/api/[locale]/agent/fetch-url-content/route"))
+        .tools.GET as GenericHandlerBase;
+    case "agent_models_openrouter_GET":
+      return (await import("@/app/api/[locale]/agent/models/openrouter/route"))
         .tools.GET as GenericHandlerBase;
     case "agent_speech-to-text_POST":
       return (await import("@/app/api/[locale]/agent/speech-to-text/route"))
@@ -718,9 +722,6 @@ export async function getRouteHandler(
     case "ls":
       return (await import("@/app/api/[locale]/system/help/list/route")).tools
         .POST as GenericHandlerBase;
-    case "manifest_GET":
-      return (await import("@/app/api/[locale]/manifest/route")).tools
-        .GET as GenericHandlerBase;
     case "mcp":
       return (
         await import("@/app/api/[locale]/system/unified-interface/mcp/serve/route")
@@ -734,8 +735,9 @@ export async function getRouteHandler(
         await import("@/app/api/[locale]/system/unified-interface/mcp/serve/route")
       ).tools.POST as GenericHandlerBase;
     case "memories-add":
-      return (await import("@/app/api/[locale]/agent/chat/memories/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import("@/app/api/[locale]/agent/chat/memories/create/route")
+      ).tools.POST as GenericHandlerBase;
     case "memories-delete":
       return (await import("@/app/api/[locale]/agent/chat/memories/[id]/route"))
         .tools.DELETE as GenericHandlerBase;
@@ -863,9 +865,6 @@ export async function getRouteHandler(
     case "referral_earnings_list_GET":
       return (await import("@/app/api/[locale]/referral/earnings/list/route"))
         .tools.GET as GenericHandlerBase;
-    case "referral_link-to-lead_POST":
-      return (await import("@/app/api/[locale]/referral/link-to-lead/route"))
-        .tools.POST as GenericHandlerBase;
     case "referral_stats_GET":
       return (await import("@/app/api/[locale]/referral/stats/route")).tools
         .GET as GenericHandlerBase;
@@ -1299,6 +1298,9 @@ export async function getRouteHandler(
       return (
         await import("@/app/api/[locale]/system/unified-interface/cli/setup/update/route")
       ).tools.POST as GenericHandlerBase;
+    case "update-openrouter-models":
+      return (await import("@/app/api/[locale]/agent/models/openrouter/route"))
+        .tools.GET as GenericHandlerBase;
     case "update-subscription":
       return (await import("@/app/api/[locale]/subscription/route")).tools
         .PUT as GenericHandlerBase;

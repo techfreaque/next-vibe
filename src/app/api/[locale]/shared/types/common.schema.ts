@@ -17,7 +17,16 @@ export type DateInputType = z.input<typeof dateRangeSchema>;
 
 // Runtime: accepts any string (emoji, IconKey), Type: IconKey
 export const iconSchema = z.string() as z.ZodType<IconKey>;
+export const iconOptionalSchema = z.string().optional() as z.ZodType<
+  IconKey | undefined
+>;
+export const iconNullishSchema = z
+  .string()
+  .nullable() as z.ZodType<IconKey | null>;
+
 export type IconSchemaType = typeof iconSchema;
+export type IconSchemaOptionalType = typeof iconOptionalSchema;
+export type IconSchemaNullishType = typeof iconNullishSchema;
 
 export const idSchema = z.object({
   id: z.uuid(),

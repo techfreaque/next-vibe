@@ -158,11 +158,8 @@ export function EndpointRenderer<
     (endpoint.fields.schemaType === "object" ||
       endpoint.fields.schemaType === "object-optional" ||
       endpoint.fields.schemaType === "array" ||
-      endpoint.fields.schemaType === "array-optional") &&
-    (endpoint.fields.type === WidgetType.CONTAINER ||
-      endpoint.fields.type === WidgetType.DATA_LIST ||
-      endpoint.fields.type === WidgetType.DATA_CARDS ||
-      endpoint.fields.type === WidgetType.DATA_TABLE);
+      endpoint.fields.schemaType === "array-optional" ||
+      endpoint.fields.schemaType === "widget-object");
 
   // Create internal form if none provided (for display-only mode like tool calls)
   const internalForm = useForm<TFieldValues>({

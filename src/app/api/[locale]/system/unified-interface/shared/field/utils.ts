@@ -22,11 +22,7 @@ import type { RangeSliderFieldWidgetConfig } from "../../unified-ui/widgets/form
 import type { NavigateButtonWidgetConfig } from "../../unified-ui/widgets/interactive/navigate-button/types";
 import type { SubmitButtonWidgetConfig } from "../../unified-ui/widgets/interactive/submit-button/types";
 import type { EndpointLogger } from "../logger/endpoint";
-import type {
-  InferSchemaFromField,
-  NavigateButtonConfig,
-  UnifiedField,
-} from "../types/endpoint";
+import type { InferSchemaFromField, UnifiedField } from "../types/endpoint";
 import type { CreateApiEndpointAny } from "../types/endpoint-base";
 import { FieldUsage, type SpacingSize, WidgetType } from "../types/enums";
 import type {
@@ -1582,12 +1578,12 @@ export function navigateButtonField<
   TGetEndpoint extends CreateApiEndpointAny | undefined = undefined,
 >(
   config: Omit<
-    NavigateButtonConfig<
-      TTargetEndpoint,
-      TGetEndpoint,
+    NavigateButtonWidgetConfig<
       TranslationKey,
       TUsage,
-      "widget"
+      "widget",
+      TTargetEndpoint,
+      TGetEndpoint
     >,
     "schemaType" | "type"
   >,
@@ -1595,14 +1591,10 @@ export function navigateButtonField<
   TranslationKey,
   TUsage,
   "widget",
-  TTargetEndpoint
+  TTargetEndpoint,
+  TGetEndpoint
 > {
-  const widgetConfig: NavigateButtonWidgetConfig<
-    TranslationKey,
-    TUsage,
-    "widget",
-    TTargetEndpoint
-  > = {
+  return {
     schemaType: "widget" as const,
     usage: config.usage,
     type: WidgetType.NAVIGATE_BUTTON,
@@ -1616,17 +1608,13 @@ export function navigateButtonField<
     order: config.order,
     columns: config.columns,
     // Store navigation config in metadata for widget access
-    metadata: {
-      targetEndpoint: config.targetEndpoint,
-      extractParams: config.extractParams,
-      prefillFromGet: config.prefillFromGet,
-      getEndpoint: config.getEndpoint,
-      renderInModal: config.renderInModal,
-      popNavigationOnSuccess: config.popNavigationOnSuccess,
-    },
+    targetEndpoint: config.targetEndpoint,
+    extractParams: config.extractParams,
+    prefillFromGet: config.prefillFromGet,
+    getEndpoint: config.getEndpoint,
+    renderInModal: config.renderInModal,
+    popNavigationOnSuccess: config.popNavigationOnSuccess,
   };
-
-  return widgetConfig;
 }
 
 /**
@@ -1650,20 +1638,19 @@ export function editButton<
   TUsage extends FieldUsageConfig,
   TGetEndpoint extends CreateApiEndpointAny | undefined = undefined,
 >(
-  config: NavigateButtonConfig<
-    TTargetEndpoint,
-    TGetEndpoint,
+  config: NavigateButtonWidgetConfig<
     TranslationKey,
     TUsage,
-    "widget"
-  > & {
-    getEndpoint?: TGetEndpoint;
-  },
+    "widget",
+    TTargetEndpoint,
+    TGetEndpoint
+  >,
 ): NavigateButtonWidgetConfig<
   TranslationKey,
   TUsage,
   "widget",
-  TTargetEndpoint
+  TTargetEndpoint,
+  TGetEndpoint
 > {
   return navigateButtonField<TUsage, TTargetEndpoint, TGetEndpoint>({
     ...config,
@@ -1701,12 +1688,12 @@ export function deleteButton<
   TUsage extends FieldUsageConfig,
 >(
   config: Omit<
-    NavigateButtonConfig<
-      TTargetEndpoint,
-      undefined,
+    NavigateButtonWidgetConfig<
       TranslationKey,
       TUsage,
-      "widget"
+      "widget",
+      TTargetEndpoint,
+      undefined
     >,
     "schemaType" | "type" | "getEndpoint" | "prefillFromGet"
   >,
@@ -1714,7 +1701,8 @@ export function deleteButton<
   TranslationKey,
   TUsage,
   "widget",
-  TTargetEndpoint
+  TTargetEndpoint,
+  undefined
 > {
   return navigateButtonField<TUsage, TTargetEndpoint, undefined>({
     ...config,
@@ -1736,18 +1724,27 @@ export function deleteButton<
  * backButton: backButton({ label: "back_to_list" })
  * ```
  */
-export function backButton<TUsage extends FieldUsageConfig>(
-  config: Omit<
-    NavigateButtonConfig<never, never, TranslationKey, TUsage, "widget">,
-    | "schemaType"
-    | "type"
-    | "targetEndpoint"
-    | "extractParams"
-    | "prefillFromGet"
-    | "getEndpoint"
-    | "popNavigationOnSuccess"
+export function backButton<
+  TUsage extends FieldUsageConfig,
+  const TConfig extends Omit<
+    NavigateButtonWidgetConfig<
+      TranslationKey,
+      TUsage,
+      "widget",
+      undefined,
+      undefined
+    >,
+    "schemaType" | "type" | "targetEndpoint" | "getEndpoint" | "prefillFromGet"
   >,
-): NavigateButtonWidgetConfig<TranslationKey, TUsage, "widget", undefined> {
+>(
+  config: TConfig,
+): TConfig & {
+  schemaType: "widget";
+  type: WidgetType.NAVIGATE_BUTTON;
+  targetEndpoint: undefined;
+  getEndpoint: undefined;
+  prefillFromGet: false;
+} {
   return {
     schemaType: "widget" as const,
     usage: config.usage,
@@ -1761,14 +1758,12 @@ export function backButton<TUsage extends FieldUsageConfig>(
     hidden: config?.hidden,
     order: config?.order,
     columns: config?.columns,
-    metadata: {
-      targetEndpoint: undefined,
-      extractParams: undefined,
-      prefillFromGet: false,
-      getEndpoint: undefined,
-      renderInModal: false,
-      popNavigationOnSuccess: undefined,
-    },
+    targetEndpoint: undefined,
+    extractParams: undefined,
+    prefillFromGet: false,
+    getEndpoint: undefined,
+    renderInModal: false,
+    popNavigationOnSuccess: undefined,
   };
 }
 

@@ -44,11 +44,7 @@ class HelpRepository {
 
     try {
       // Discover commands (filtered by user permissions from JWT)
-      const commands = definitionsRegistry.getEndpointsForUser(
-        platform,
-        user,
-        logger,
-      );
+      const commands = definitionsRegistry.getEndpointsForUser(platform, user);
 
       if (data.command) {
         // Show help for specific command

@@ -216,7 +216,7 @@ const { PATCH } = createEndpoint({
           }),
           preview: responseArrayOptionalField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
               title: "app.api.leads.batch.patch.response.preview" as const,
               description:
                 "app.api.leads.batch.patch.response.preview" as const,
@@ -263,7 +263,7 @@ const { PATCH } = createEndpoint({
           ),
           errors: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
               title: "app.api.leads.batch.patch.response.errors" as const,
               description: "app.api.leads.batch.patch.response.errors" as const,
             },
@@ -485,7 +485,7 @@ const { DELETE } = createEndpoint({
           }),
           preview: responseArrayOptionalField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
               title: "app.api.leads.batch.delete.response.preview" as const,
               description:
                 "app.api.leads.batch.delete.response.preview" as const,
@@ -532,7 +532,7 @@ const { DELETE } = createEndpoint({
           ),
           errors: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
               title: "app.api.leads.batch.delete.response.errors" as const,
               description:
                 "app.api.leads.batch.delete.response.errors" as const,

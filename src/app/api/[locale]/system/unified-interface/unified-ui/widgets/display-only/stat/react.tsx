@@ -14,9 +14,13 @@ import {
   getSpacingClassName,
   getTextSizeClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
-import type { ReactWidgetProps } from "../../_shared/react-types";
+import type {
+  ReactRequestResponseWidgetProps,
+  ReactStaticWidgetProps,
+} from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
 } from "../../_shared/use-widget-context";
@@ -88,18 +92,25 @@ const variantClasses: Record<StatVariant, string> = {
 export function StatWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends NumberWidgetSchema,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "primitive",
->({
-  field,
-}: ReactWidgetProps<
-  TEndpoint,
-  TUsage,
-  StatWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
->): JSX.Element {
+>(
+  props:
+    | ReactStaticWidgetProps<
+        TEndpoint,
+        TUsage,
+        StatWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | ReactRequestResponseWidgetProps<
+        TEndpoint,
+        TUsage,
+        StatWidgetConfig<TKey, NumberWidgetSchema, TUsage, "primitive">
+      >,
+): JSX.Element {
   const locale = useWidgetLocale();
   const t = useWidgetTranslation();
+  const form = useWidgetForm();
+  const { field } = props;
+  const fieldName = "fieldName" in props ? props.fieldName : undefined;
   const {
     label: labelKey,
     format,
@@ -120,6 +131,18 @@ export function StatWidget<
     labelSpacing,
     className,
   } = field;
+  const usage = "usage" in field ? field.usage : undefined;
+
+  // Get value from form for request fields, otherwise from field.value
+  let value;
+  if (usage?.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value && "value" in field) {
+      value = field.value;
+    }
+  } else if ("value" in field) {
+    value = field.value;
+  }
 
   // Translate label from UI config - no assertion needed
   const label = labelKey ? t(labelKey) : "—";
@@ -140,7 +163,7 @@ export function StatWidget<
   const sizeDefault = sizeDefaults[size] || sizeDefaults.md;
 
   // Handle non-numeric values
-  if (typeof field.value !== "number") {
+  if (typeof value !== "number") {
     return (
       <Card className={cn("h-full", className)}>
         <CardContent
@@ -165,7 +188,7 @@ export function StatWidget<
   }
 
   // Format the value
-  const formattedValue = formatStatValue(field.value, format, locale);
+  const formattedValue = formatStatValue(value, format, locale);
 
   // Get variant class
   const variantClass =

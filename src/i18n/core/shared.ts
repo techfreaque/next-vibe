@@ -27,7 +27,6 @@ export function _simpleT<K extends TranslationKey>(
   }
   if (!key || typeof key !== "string") {
     // oxlint-disable-next-line no-console
-    console.warn("Invalid key provided to translation function:", key);
     return key; // Return the key as fallback
   }
 

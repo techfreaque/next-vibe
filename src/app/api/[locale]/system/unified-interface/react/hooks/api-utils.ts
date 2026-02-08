@@ -9,6 +9,8 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { authClientRepository } from "@/app/api/[locale]/user/auth/repository-client";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 
@@ -110,7 +112,63 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   endpointUrl: string,
   postBody: string | FormData | undefined,
   logger: EndpointLogger,
+  user: JwtPayloadType,
+  locale: CountryLanguage,
+  requestData: TEndpoint["types"]["RequestOutput"],
+  pathParams: TEndpoint["types"]["UrlVariablesOutput"],
 ): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
+  logger.debug("callApi", {
+    endpoint: endpoint.path.join("/"),
+    method: endpoint.method,
+  });
+  // Check if we should use client route based on user roles and endpoint allowedClientRoles
+  if (endpoint.allowedClientRoles) {
+    const { filterUserPermissionRoles, UserPermissionRole } =
+      await import("@/app/api/[locale]/user/user-roles/enum");
+    const clientPermissionRoles = filterUserPermissionRoles(
+      endpoint.allowedClientRoles,
+    );
+
+    // Check if user has permission for client route
+    let shouldUseClientRoute = false;
+
+    if (
+      user.isPublic &&
+      clientPermissionRoles.includes(UserPermissionRole.PUBLIC)
+    ) {
+      shouldUseClientRoute = true;
+    } else if (
+      user.roles?.some((role) => clientPermissionRoles.includes(role))
+    ) {
+      shouldUseClientRoute = true;
+    }
+
+    if (shouldUseClientRoute) {
+      // Load and use client handler
+      const { endpointToToolName } =
+        await import("@/app/api/[locale]/system/unified-interface/shared/utils/path");
+      const { getClientRouteHandler } =
+        await import("@/app/api/[locale]/system/generated/route-handlers-client");
+
+      const pathKey = endpointToToolName(endpoint);
+
+      const handlerObject = await getClientRouteHandler(pathKey);
+      if (handlerObject?.handler) {
+        return handlerObject.handler({
+          data: requestData,
+          urlPathParams: pathParams,
+          locale,
+          logger,
+        });
+      }
+
+      logger.warn(
+        "Client handler not found, falling back to server API",
+        pathKey,
+      );
+    }
+  }
+
   try {
     // Prepare headers - don't set Content-Type for FormData (browser will set it with boundary)
     const headers: HeadersInit =

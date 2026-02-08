@@ -14,7 +14,7 @@ import {
   getIconSizeClassName,
   getSpacingClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
-import type { ReactWidgetProps } from "../../_shared/react-types";
+import type { ReactDisplayWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
   useWidgetContext,
@@ -33,7 +33,7 @@ export function ButtonWidget<
   TSchemaType extends "widget",
 >({
   field,
-}: ReactWidgetProps<
+}: ReactDisplayWidgetProps<
   TEndpoint,
   TUsage,
   ButtonWidgetConfig<TKey, TUsage, TSchemaType>

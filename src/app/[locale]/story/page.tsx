@@ -7,7 +7,6 @@ import { ThreadsRepository } from "@/app/api/[locale]/agent/chat/threads/reposit
 import {
   ProductIds,
   productsRepository,
-  TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/products/repository-client";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
@@ -164,7 +163,6 @@ export default async function HomePage({
       {/* Features Section */}
       <Features
         locale={locale}
-        modelCount={TOTAL_MODEL_COUNT}
         subPrice={SUBSCRIPTION_PRICE}
         subCredits={SUBSCRIPTION_CREDITS}
         subCurrency={CURRENCY_SYMBOL}

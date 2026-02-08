@@ -5,7 +5,6 @@
  * Most of the implementation details are handled by the next-vibe package.
  */
 
-import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useCallback } from "react";
 
@@ -29,7 +28,7 @@ import logoutEndpoints from "./definition";
  * Features:
  * - Handles token removal
  * - Provides success notifications
- * - Redirects to login page
+ * - Redirects to login page with page refresh
  * - Refreshes user state
  *
  * @returns Logout function
@@ -39,7 +38,6 @@ export function useLogout(
   user: JwtPayloadType,
 ): () => void {
   const { toast } = useToast();
-  const router = useRouter();
   const { t, locale } = useTranslation();
 
   const logout = useApiMutation(logoutEndpoints.POST, logger, user, {
@@ -55,7 +53,9 @@ export function useLogout(
       // Invalidate credits queries to trigger refetch with new auth state
       await apiClient.refetchEndpoint(definitions.GET, logger);
 
-      router.push(`/${locale}/user/login`);
+      // Use window.location.href for full page refresh
+      // eslint-disable-next-line react-compiler/react-compiler
+      window.location.href = `/${locale}/user/login`;
     },
     onError: async () => {
       // Even if the API call fails, we still want to log the user out locally
@@ -70,7 +70,8 @@ export function useLogout(
       // Invalidate credits queries to trigger refetch with new auth state
       await apiClient.refetchEndpoint(definitions.GET, logger);
 
-      router.push(`/${locale}/user/login`);
+      // Use window.location.href for full page refresh
+      window.location.href = `/${locale}/user/login`;
     },
   });
 

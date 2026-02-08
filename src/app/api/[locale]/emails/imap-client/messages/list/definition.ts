@@ -171,7 +171,7 @@ const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
       messages: responseArrayField(
         {
-          type: WidgetType.DATA_TABLE,
+          type: WidgetType.CONTAINER,
         },
         objectField(
           {

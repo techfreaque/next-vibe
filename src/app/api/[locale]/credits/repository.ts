@@ -81,6 +81,7 @@ import {
   type CreditWallet,
   creditWallets,
 } from "./db";
+import type { CreditsGetResponseOutput } from "./definition";
 import {
   CreditPackType,
   type CreditPackTypeValue,
@@ -92,18 +93,6 @@ import type {
   CreditsHistoryGetRequestOutput,
   CreditsHistoryGetResponseOutput,
 } from "./history/definition";
-
-/**
- * Credit Balance - summary of user/lead credit state
- */
-export interface CreditBalance {
-  total: number;
-  expiring: number;
-  permanent: number;
-  earned: number;
-  free: number;
-  expiresAt: string | number | Date | null;
-}
 
 /**
  * Pool of wallets that share free credits
@@ -473,7 +462,7 @@ export class CreditRepository {
   private static async calculatePoolBalance(
     pool: CreditPool,
     logger: EndpointLogger,
-  ): Promise<CreditBalance> {
+  ): Promise<CreditsGetResponseOutput> {
     // Refetch all wallets to get current balances
     const walletIds = [
       pool.userWallet?.id,
@@ -590,10 +579,6 @@ export class CreditRepository {
         totalFreeInWallets,
         maxFreeCreditsPerPool - freeCreditsSpentThisPeriod,
       ),
-    );
-
-    logger.debug(
-      `Pool: free=${freeCreditsAvailable} paid=${totalPaid} wallets=${leadWallets.length}`,
     );
 
     return {
@@ -1009,7 +994,7 @@ export class CreditRepository {
   static async getBalance(
     identifier: CreditIdentifier,
     logger: EndpointLogger,
-  ): Promise<ResponseType<CreditBalance>> {
+  ): Promise<ResponseType<CreditsGetResponseOutput>> {
     try {
       let poolResult: ResponseType<CreditPool>;
 
@@ -1066,9 +1051,6 @@ export class CreditRepository {
       }
 
       const pool = poolResult.data;
-      logger.debug(
-        `Got pool ${pool.poolType}: ${pool.leadWallets.length} wallets`,
-      );
 
       // Check and reset monthly free credits for entire pool if needed
       await CreditRepository.ensureMonthlyFreeCreditsForPool(pool, logger);
@@ -1093,7 +1075,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<CreditBalance>> {
+  ): Promise<ResponseType<CreditsGetResponseOutput>> {
     try {
       let poolResult: ResponseType<CreditPool>;
       if (user.isPublic) {
@@ -1110,19 +1092,12 @@ export class CreditRepository {
       }
 
       const pool = poolResult.data;
-      logger.debug(
-        `Got pool ${pool.poolType}: ${pool.leadWallets.length} wallets`,
-      );
 
       // Check and reset monthly free credits for entire pool if needed
       await CreditRepository.ensureMonthlyFreeCreditsForPool(pool, logger);
 
       // Calculate balance across all wallets in pool
       const balance = await CreditRepository.calculatePoolBalance(pool, logger);
-
-      logger.debug(
-        `Balance: total=${balance.total} free=${balance.free} expiring=${balance.expiring} permanent=${balance.permanent}`,
-      );
 
       return success(balance);
     } catch (error) {
@@ -2167,8 +2142,6 @@ export class CreditRepository {
       data: {
         transactions: result.data.transactions,
         paginationInfo: {
-          page,
-          limit,
           totalCount: result.data.totalCount,
           pageCount: totalPages,
         },

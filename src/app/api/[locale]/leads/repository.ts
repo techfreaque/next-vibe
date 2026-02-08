@@ -627,8 +627,6 @@ export class LeadsRepository {
           ),
         },
         paginationInfo: {
-          page,
-          limit,
           totalCount: total,
           pageCount: totalPages,
         },

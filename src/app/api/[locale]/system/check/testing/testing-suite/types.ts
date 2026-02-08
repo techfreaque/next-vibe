@@ -9,7 +9,6 @@ import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type {
   AnyChildrenConstrain,
-  ConstrainedChildUsage,
   FieldUsageConfig,
 } from "../../../unified-interface/unified-ui/widgets/_shared/types";
 
@@ -24,10 +23,7 @@ export interface TestEndpointOptions<
     TScopedTranslationKey,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<
-      TScopedTranslationKey,
-      ConstrainedChildUsage<FieldUsageConfig>
-    >
+    AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
 > {
   /**
@@ -57,10 +53,7 @@ export interface TestRunner<
     TScopedTranslationKey,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<
-      TScopedTranslationKey,
-      ConstrainedChildUsage<FieldUsageConfig>
-    >
+    AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
 > {
   /**
@@ -72,20 +65,12 @@ export interface TestRunner<
       TMethod,
       TUserRoleValue,
       TScopedTranslationKey,
-      AnyChildrenConstrain<
-        TScopedTranslationKey,
-        ConstrainedChildUsage<FieldUsageConfig>
-      >,
       TFields
     >["types"]["RequestOutput"];
     urlPathParams: CreateApiEndpoint<
       TMethod,
       TUserRoleValue,
       TScopedTranslationKey,
-      AnyChildrenConstrain<
-        TScopedTranslationKey,
-        ConstrainedChildUsage<FieldUsageConfig>
-      >,
       TFields
     >["types"]["UrlVariablesOutput"];
     user: JwtPayloadType;
@@ -95,10 +80,6 @@ export interface TestRunner<
         TMethod,
         TUserRoleValue,
         TScopedTranslationKey,
-        AnyChildrenConstrain<
-          TScopedTranslationKey,
-          ConstrainedChildUsage<FieldUsageConfig>
-        >,
         TFields
       >["types"]["ResponseOutput"]
     >
@@ -111,10 +92,6 @@ export interface TestRunner<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    AnyChildrenConstrain<
-      TScopedTranslationKey,
-      ConstrainedChildUsage<FieldUsageConfig>
-    >,
     TFields
   >;
 }

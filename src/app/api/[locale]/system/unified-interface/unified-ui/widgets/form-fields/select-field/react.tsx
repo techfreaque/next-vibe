@@ -28,7 +28,7 @@ import {
 import type { JSX } from "react";
 
 import type { EnumWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type { ReactFormFieldProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import { simpleT } from "@/i18n/core/shared";
 import {
   FormControl,
@@ -60,7 +60,7 @@ export function SelectFieldWidget<
   field,
 
   fieldName,
-}: ReactWidgetProps<
+}: ReactFormFieldProps<
   TEndpoint,
   TUsage,
   SelectFieldWidgetConfig<TKey, TSchema, TUsage>

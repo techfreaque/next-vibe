@@ -12,24 +12,31 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { parseError } from "../../../shared/utils";
 import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { modelProviders } from "../../models/models";
+import type {
+  FiltersModelSelection,
+  ManualModelSelection,
+} from "../../../system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
+import { getCreditCostFromModel, modelProviders } from "../../models/models";
 import type { TtsVoiceValue } from "../../text-to-speech/enum";
-import {
-  DEFAULT_CHARACTERS,
-  toCleanModelSelection,
-} from "../characters/config";
+import { DEFAULT_CHARACTERS } from "../characters/config";
+import { ModelSelectionType } from "../characters/enum";
 import { CharactersRepositoryClient } from "../characters/repository-client";
 import { STORAGE_KEYS } from "../constants";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import type {
+  FavoriteGetModelSelection,
   FavoriteGetResponseOutput,
   FavoriteUpdateRequestOutput,
+  FavoriteUpdateResponseOutput,
 } from "./[id]/definition";
-import type { FavoriteCreateRequestOutput } from "./create/definition";
-import type { FavoriteModelSelection } from "./create/definition";
+import type {
+  FavoriteCreateRequestOutput,
+  FavoriteCreateResponseOutput,
+} from "./create/definition";
 import type { FavoriteCard, FavoritesListResponseOutput } from "./definition";
 import type { FavoritesReorderRequestOutput } from "./reorder/definition";
 
@@ -40,13 +47,10 @@ import type { FavoritesReorderRequestOutput } from "./reorder/definition";
 interface StoredLocalFavorite {
   id: string;
   characterId: string;
-  customName: string | null;
   customIcon: IconKey | null;
   voice: typeof TtsVoiceValue | null;
-  modelSelection: FavoriteModelSelection["currentSelection"];
-  color: string | null;
+  modelSelection: FavoriteGetModelSelection["currentSelection"] | null;
   position: number;
-  useCount: number;
 }
 
 /**
@@ -61,17 +65,26 @@ export class ChatFavoritesRepositoryClient {
     logger: EndpointLogger,
   ): Promise<ResponseType<FavoritesListResponseOutput>> {
     try {
-      logger.debug("Fetching client-side favorites from localStorage");
-
       const settings = ChatSettingsRepositoryClient.loadLocalSettings();
       const activeFavoriteId = settings.activeFavoriteId;
 
       // Load stored minimal configs
       const storedConfigs = this.loadAllLocalFavorites();
 
-      // Enrich with DEFAULT_CHARACTERS data
+      // For PUBLIC users (localStorage), get character data from DEFAULT_CHARACTERS
       const cards = storedConfigs.map((config): FavoriteCard => {
-        return this.computeFavoriteDisplayFields(config, activeFavoriteId);
+        const character = DEFAULT_CHARACTERS.find(
+          (c) => c.id === config.characterId,
+        );
+        return this.computeFavoriteDisplayFields(
+          config,
+          character?.modelSelection,
+          character?.icon ?? null,
+          character?.name ?? null,
+          character?.tagline ?? null,
+          character?.description ?? null,
+          activeFavoriteId,
+        );
       });
 
       // Sort by position (ascending)
@@ -93,7 +106,7 @@ export class ChatFavoritesRepositoryClient {
   static async createFavorite(
     data: FavoriteCreateRequestOutput,
     logger: EndpointLogger,
-  ): Promise<ResponseType<{ id: string }>> {
+  ): Promise<ResponseType<FavoriteCreateResponseOutput>> {
     try {
       const id = `local-${Date.now()}`;
       const currentConfigs = this.loadAllLocalFavorites();
@@ -101,19 +114,19 @@ export class ChatFavoritesRepositoryClient {
       const newConfig: StoredLocalFavorite = {
         id,
         characterId: data.characterId ?? "default",
-        customName: data.customName ?? null,
         voice: data.voice ?? null,
         modelSelection: data.modelSelection.currentSelection,
-        color: null,
-        customIcon: data.customIcon ?? null,
+        customIcon: null,
         position: currentConfigs.length,
-        useCount: 0,
       };
 
       this.saveAllLocalFavorites([...currentConfigs, newConfig]);
       logger.debug("Created favorite", { id });
 
-      return success({ id });
+      return success({
+        success: "app.api.agent.chat.favorites.post.success.title",
+        id,
+      });
     } catch (error) {
       logger.error("Failed to create favorite", parseError(error));
       return fail({
@@ -157,7 +170,7 @@ export class ChatFavoritesRepositoryClient {
     id: string,
     data: FavoriteUpdateRequestOutput,
     logger: EndpointLogger,
-  ): Promise<ResponseType<{ success: string }>> {
+  ): Promise<ResponseType<FavoriteUpdateResponseOutput>> {
     try {
       const existing = this.loadLocalFavorite(id);
       if (!existing) {
@@ -171,7 +184,7 @@ export class ChatFavoritesRepositoryClient {
       const character = DEFAULT_CHARACTERS.find((c) => c.id === characterId);
 
       // Extract icon from character.info.icon in request data
-      const iconFromRequest = data.character.info.icon;
+      const iconFromRequest = data.icon;
 
       // Only store customIcon if different from character default
       const customIconToStore =
@@ -182,7 +195,6 @@ export class ChatFavoritesRepositoryClient {
       const updated: StoredLocalFavorite = {
         ...existing,
         characterId,
-        customName: existing.customName,
         customIcon: customIconToStore,
         voice: data.voice ?? null,
         modelSelection: data.modelSelection.currentSelection,
@@ -263,85 +275,74 @@ export class ChatFavoritesRepositoryClient {
    */
   static computeFavoriteDisplayFields(
     stored: StoredLocalFavorite,
+    characterModelSelection:
+      | FiltersModelSelection
+      | ManualModelSelection
+      | undefined
+      | null,
+    characterIcon: IconKey | null,
+    characterName: TranslationKey | null,
+    characterTagline: TranslationKey | null,
+    characterDescription: TranslationKey | null,
     activeFavoriteId: string | null,
   ): FavoriteCard {
-    const character = DEFAULT_CHARACTERS.find(
-      (c) => c.id === stored.characterId,
-    );
+    // When stored.modelSelection is null, it means CHARACTER_BASED (use character defaults)
+    // Construct the model selection dynamically
+    const modelSelectionForLookup = stored.modelSelection
+      ? {
+          currentSelection: stored.modelSelection,
+          characterModelSelection: characterModelSelection ?? undefined,
+        }
+      : characterModelSelection
+        ? {
+            currentSelection: {
+              selectionType: ModelSelectionType.CHARACTER_BASED,
+            },
+            characterModelSelection,
+          }
+        : null;
 
-    if (!character) {
-      return {
-        id: stored.id,
-        characterId: stored.characterId,
-        modelId: null,
-        position: stored.position,
-        icon: stored.customIcon ?? ("user" as const),
-        content: {
-          titleRow: {
-            name: stored.customName ?? "Unknown Character",
-            tagline: null,
-            activeBadge:
-              stored.id === activeFavoriteId
-                ? ("app.chat.selector.active" as const)
-                : null,
-          },
-          description: null,
-          modelRow: {
-            modelIcon: "sparkles" as const,
-            modelInfo: "Unknown",
-            modelProvider: "Unknown",
-            creditCost: "0 credits",
-          },
-        },
-      };
-    }
+    const bestModel = modelSelectionForLookup
+      ? CharactersRepositoryClient.getBestModelForFavorite(
+          modelSelectionForLookup,
+        )
+      : null;
+    const hasCharacter = stored.characterId !== "default";
 
-    const fullModelSelection: FavoriteGetResponseOutput["modelSelection"] = {
-      currentSelection: stored.modelSelection,
-      characterModelSelection: toCleanModelSelection(character.modelSelection),
-    };
-
-    const bestModel =
-      CharactersRepositoryClient.getBestModelForFavorite(fullModelSelection);
-
+    // Flattened structure - no nested content/titleRow/modelRow
     return {
       id: stored.id,
       characterId: stored.characterId,
       modelId: bestModel?.id ?? null,
       position: stored.position,
-      icon: stored.customIcon ?? character.icon ?? bestModel?.icon ?? "bot",
-      content: {
-        titleRow: {
-          name:
-            stored.customName ?? character.name ?? bestModel?.name ?? "Unknown",
-          tagline: character.tagline ?? null,
-          activeBadge:
-            stored.id === activeFavoriteId
-              ? ("app.chat.selector.active" as const)
-              : null,
-        },
-        description: character.description ?? null,
-        modelRow: bestModel
-          ? {
-              modelIcon: bestModel.icon,
-              modelInfo: bestModel.name,
-              modelProvider:
-                modelProviders[bestModel.provider]?.name ?? "Unknown",
-
-              creditCost: `${bestModel.creditCost} credits`,
-            }
-          : {
-              modelIcon: "sparkles" as const,
-              modelInfo: "No model found",
-              modelProvider: "Unknown",
-              creditCost: "0 credits",
-            },
-      },
+      icon: stored.customIcon ?? characterIcon ?? bestModel?.icon ?? "bot",
+      name: characterName ?? bestModel?.name ?? "Unknown",
+      tagline: characterTagline ?? null,
+      activeBadge:
+        stored.id === activeFavoriteId
+          ? ("app.chat.selector.active" as const)
+          : null,
+      description: characterDescription ?? null,
+      ...(bestModel
+        ? {
+            modelIcon: hasCharacter ? bestModel.icon : ("sparkles" as const),
+            modelInfo: bestModel.name,
+            modelProvider:
+              modelProviders[bestModel.provider]?.name ?? "Unknown",
+            creditCost: `${getCreditCostFromModel(bestModel)} credits`,
+          }
+        : {
+            modelIcon: "sparkles" as const,
+            modelInfo: "No model found",
+            modelProvider: "Unknown",
+            creditCost: "0 credits",
+          }),
     };
   }
 
   /**
    * Enrich minimal stored favorite with DEFAULT_CHARACTERS data
+   * Returns flattened structure matching FavoriteGetResponseOutput
    */
   static enrichLocalFavorite(
     stored: StoredLocalFavorite,
@@ -351,61 +352,43 @@ export class ChatFavoritesRepositoryClient {
     );
 
     if (!character) {
+      // If no character found, use stored selection or create CHARACTER_BASED default
+      const currentSelection = stored.modelSelection ?? {
+        selectionType: ModelSelectionType.CHARACTER_BASED,
+      };
+
+      // Flattened structure
       return {
-        id: stored.id,
         characterId: stored.characterId,
-        character: {
-          info: {
-            icon: "user" as const,
-            info: {
-              titleRow: {
-                name: "Unknown Character",
-                tagline: "",
-              },
-              description: "",
-            },
-          },
-        },
-        customName: stored.customName,
-        customIcon: stored.customIcon,
+        icon: "user" as const,
+        name: "Unknown Character",
+        tagline: "",
+        description: "",
         voice: stored.voice,
         modelSelection: {
-          currentSelection: stored.modelSelection,
+          currentSelection,
           characterModelSelection: undefined,
         },
-        color: stored.color,
-        position: stored.position,
-        useCount: stored.useCount,
       };
     }
 
+    // If modelSelection is null, it means CHARACTER_BASED (use character defaults)
+    const currentSelection = stored.modelSelection ?? {
+      selectionType: ModelSelectionType.CHARACTER_BASED,
+    };
+
+    // Flattened structure
     return {
-      id: stored.id,
       characterId: stored.characterId,
-      character: {
-        info: {
-          icon: stored.customIcon ?? character.icon,
-          info: {
-            titleRow: {
-              name: character.name ?? "Unknown",
-              tagline: character.tagline ?? null,
-            },
-            description: character.description ?? null,
-          },
-        },
-      },
-      customName: stored.customName,
-      customIcon: stored.customIcon,
-      voice: stored.voice,
+      icon: stored.customIcon ?? character.icon,
+      name: character.name ?? "Unknown",
+      tagline: character.tagline ?? null,
+      description: character.description ?? null,
+      voice: stored.voice ?? character.voice,
       modelSelection: {
-        currentSelection: stored.modelSelection,
-        characterModelSelection: toCleanModelSelection(
-          character.modelSelection,
-        ),
+        currentSelection,
+        characterModelSelection: character.modelSelection,
       },
-      color: stored.color,
-      position: stored.position,
-      useCount: stored.useCount,
     };
   }
 

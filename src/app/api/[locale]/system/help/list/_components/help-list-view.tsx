@@ -37,6 +37,7 @@ export function HelpListView({ locale, user }: HelpListViewProps): JSX.Element {
   const { form, submitForm, isSubmitting, submitError } = useApiForm(
     helpListEndpoints.POST,
     logger,
+    user,
     {
       defaultValues: {
         format: "tree",

@@ -13,7 +13,7 @@ import {
   getSpacingClassName,
   getTextSizeClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
-import type { ReactWidgetProps } from "../../_shared/react-types";
+import type { ReactStaticWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import { useWidgetTranslation } from "../../_shared/use-widget-context";
 import type { LoadingWidgetConfig } from "./types";
@@ -59,7 +59,7 @@ export function LoadingWidget<
   TUsage extends FieldUsageConfig,
 >({
   field,
-}: ReactWidgetProps<
+}: ReactStaticWidgetProps<
   TEndpoint,
   TUsage,
   LoadingWidgetConfig<TKey, TUsage, "widget">

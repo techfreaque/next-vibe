@@ -8,7 +8,10 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type { ModelOption } from "@/app/api/[locale]/agent/models/models";
-import { modelProviders } from "@/app/api/[locale]/agent/models/models";
+import {
+  getCreditCostFromModel,
+  modelProviders,
+} from "@/app/api/[locale]/agent/models/models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -77,11 +80,14 @@ export function ModelCard({
           variant={selected ? "outline" : "secondary"}
           className="text-[10px] h-5"
         >
-          {model.creditCost === 0
-            ? t("app.chat.selector.free")
-            : model.creditCost === 1
-              ? t("app.chat.selector.creditsSingle")
-              : t("app.chat.selector.creditsExact", { cost: model.creditCost })}
+          {(() => {
+            const cost = getCreditCostFromModel(model);
+            return cost === 0
+              ? t("app.chat.selector.free")
+              : cost === 1
+                ? t("app.chat.selector.creditsSingle")
+                : t("app.chat.selector.creditsExact", { cost });
+          })()}
         </Badge>
         {selected && <Check className="h-4 w-4 text-primary" />}
       </Div>

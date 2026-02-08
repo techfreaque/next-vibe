@@ -280,10 +280,10 @@ export function CharacterBrowserCore({
 
   // Get all characters as flat array
   const allCharacters = useMemo(() => {
-    if (!charactersEndpoint.read?.data?.sections) {
+    if (!charactersEndpoint.read?.data?.container?.sections) {
       return [];
     }
-    return charactersEndpoint.read.data.sections.flatMap(
+    return charactersEndpoint.read.data.container?.sections.flatMap(
       (section: { characters: CharacterListItemType[] }) => section.characters,
     );
   }, [charactersEndpoint.read?.data]);

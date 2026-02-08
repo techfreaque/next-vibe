@@ -322,8 +322,6 @@ export class UserRolesRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
     try {
-      logger.debug("Checking if user has role", { userId, role });
-
       const existingRoleResult = await UserRolesRepository.findByUserIdAndRole(
         userId,
         role,

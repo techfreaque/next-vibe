@@ -3,7 +3,10 @@
  */
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { EndpointLogger } from "../../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { SpacingSize, WidgetType } from "../../../../shared/types/enums";
 import type { WidgetData } from "../../../../shared/widgets/widget-data";
@@ -17,7 +20,7 @@ import type {
  */
 export interface NavigateButtonWidgetConfig<
   TKey extends string,
-  TUsage extends FieldUsageConfig,
+  out TUsage extends FieldUsageConfig,
   TSchemaType extends "widget",
   out TTargetEndpoint extends CreateApiEndpointAny | undefined,
 > extends BasePrimitiveDisplayOnlyWidgetConfig<TUsage, TSchemaType> {
@@ -35,18 +38,32 @@ export interface NavigateButtonWidgetConfig<
   metadata?: {
     targetEndpoint: TTargetEndpoint;
     extractParams?: TTargetEndpoint extends CreateApiEndpointAny
-      ? (source: {
-          // The parent item of an array (if any)
-          itemData: WidgetData | undefined;
-          requestData: WidgetData;
-          urlPathParams: WidgetData;
-          responseData: WidgetData;
-        }) => {
-          urlPathParams?: Partial<
-            TTargetEndpoint["types"]["UrlVariablesOutput"]
-          >;
-          data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
-        }
+      ? (
+          source: {
+            // The parent item of an array (if any)
+            itemData: WidgetData | undefined;
+            requestData: WidgetData;
+            urlPathParams: WidgetData;
+            responseData: WidgetData;
+          },
+          context: {
+            logger: EndpointLogger;
+            user: JwtPayloadType;
+            locale: CountryLanguage;
+          },
+        ) =>
+          | {
+              urlPathParams?: Partial<
+                TTargetEndpoint["types"]["UrlVariablesOutput"]
+              >;
+              data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
+            }
+          | Promise<{
+              urlPathParams?: Partial<
+                TTargetEndpoint["types"]["UrlVariablesOutput"]
+              >;
+              data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
+            }>
       : undefined;
 
     prefillFromGet?: boolean;

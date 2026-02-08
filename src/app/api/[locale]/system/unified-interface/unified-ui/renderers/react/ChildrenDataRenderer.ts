@@ -26,8 +26,39 @@ import type {
   AnyChildrenConstrain,
   BaseWidgetConfig,
   FieldUsageConfig,
+  ObjectChildrenConstraint,
   SchemaTypes,
 } from "../../widgets/_shared/types";
+
+/**
+ * Type guard to check if a variant has object-like children that can be indexed
+ */
+function hasIndexableChildren(
+  variant: UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >,
+): variant is UnifiedField<
+  string,
+  z.ZodTypeAny,
+  FieldUsageConfig,
+  AnyChildrenConstrain<string, FieldUsageConfig>
+> & {
+  schemaType: "object" | "object-optional" | "widget-object";
+  children: ObjectChildrenConstraint<string, FieldUsageConfig>;
+} {
+  return (
+    "children" in variant &&
+    variant.children !== undefined &&
+    typeof variant.children === "object" &&
+    "schemaType" in variant &&
+    (variant.schemaType === "object" ||
+      variant.schemaType === "object-optional" ||
+      variant.schemaType === "widget-object")
+  );
+}
 
 /**
  * A single child ready to render with its data
@@ -79,6 +110,8 @@ export interface ChildrenFilterConfig {
   responseOnly?: boolean;
   /** Only include request fields (for form mode) */
   requestOnly?: boolean;
+  /** Whether the context has actual response data (from context.response.success) */
+  hasResponseData?: boolean;
   /** Custom predicate to filter children */
   predicate?: (
     name: string,
@@ -167,8 +200,10 @@ export class ChildrenDataRenderer {
       // Check hidden
       if (
         config.hideHidden !== false &&
-        "hidden" in field &&
-        field.hidden === true
+        (("hidden" in field && field.hidden === true) ||
+          ("hidden" in field &&
+            typeof field.hidden === "function" &&
+            field.hidden(value)))
       ) {
         continue;
       }
@@ -187,30 +222,23 @@ export class ChildrenDataRenderer {
       // Extract data
       const data = value?.[name] ?? null;
 
+      // Determine if this is a widget-only object or widget field (before we use it)
+      const isWidgetOnly = this.isWidgetOnlyObject(field);
+      const isWidgetField =
+        "schemaType" in field && field.schemaType === "widget";
+
       // Check data existence for response-only fields
-      if (config.responseOnly && (data === null || data === undefined)) {
-        continue;
+      // Widget-only fields should always render (they have static content)
+      // Regular response fields need their own field-specific data
+      if (config.responseOnly && !isWidgetField && !isWidgetOnly) {
+        // Regular response field: check if field data exists
+        if (data === null || data === undefined) {
+          continue;
+        }
       }
 
       // Custom predicate
       if (config.predicate && !config.predicate(name, field, data)) {
-        continue;
-      }
-
-      // Determine if this is a widget-only object
-      const isWidgetOnly = this.isWidgetOnlyObject(field);
-
-      // Check if should skip based on widget-only + response-only logic
-      const isWidgetField =
-        "schemaType" in field && field.schemaType === "widget";
-      const isRequestFieldCheck = isRequestField(field);
-      if (
-        !isWidgetField &&
-        !isWidgetOnly &&
-        isResponseField(field) &&
-        !isRequestFieldCheck &&
-        (data === null || data === undefined)
-      ) {
         continue;
       }
 
@@ -450,14 +478,11 @@ export class ChildrenDataRenderer {
     }
 
     for (const variant of variants) {
-      if (!("children" in variant) || !variant.children) {
+      if (!hasIndexableChildren(variant)) {
         continue;
       }
 
-      const variantChildren = variant.children as Record<
-        string,
-        BaseWidgetConfig<FieldUsageConfig, SchemaTypes> | undefined
-      >;
+      const variantChildren = variant.children;
       const discriminatorField = variantChildren[discriminator];
 
       if (!discriminatorField) {
@@ -508,42 +533,19 @@ export class ChildrenDataRenderer {
         >
       | undefined,
     discriminator: string | undefined,
-  ): Record<
-    string,
-    UnifiedField<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      AnyChildrenConstrain<string, FieldUsageConfig>
-    >
-  > {
+  ): Record<string, AnyChildrenConstrain<string, FieldUsageConfig>> {
     const result: Record<
       string,
-      UnifiedField<
-        string,
-        z.ZodTypeAny,
-        FieldUsageConfig,
-        AnyChildrenConstrain<string, FieldUsageConfig>
-      >
+      AnyChildrenConstrain<string, FieldUsageConfig>
     > = {};
 
     // Get discriminator field from reference variant
     if (
       referenceVariant &&
       discriminator &&
-      "children" in referenceVariant &&
-      referenceVariant.children
+      hasIndexableChildren(referenceVariant)
     ) {
-      const refChildren = referenceVariant.children as Record<
-        string,
-        | UnifiedField<
-            string,
-            z.ZodTypeAny,
-            FieldUsageConfig,
-            AnyChildrenConstrain<string, FieldUsageConfig>
-          >
-        | undefined
-      >;
+      const refChildren = referenceVariant.children;
       if (discriminator in refChildren && refChildren[discriminator]) {
         result[discriminator] = refChildren[discriminator]!;
       }
@@ -552,19 +554,9 @@ export class ChildrenDataRenderer {
       if (
         selectedVariant &&
         selectedVariant !== referenceVariant &&
-        "children" in selectedVariant &&
-        selectedVariant.children
+        hasIndexableChildren(selectedVariant)
       ) {
-        const selectedChildren = selectedVariant.children as Record<
-          string,
-          | UnifiedField<
-              string,
-              z.ZodTypeAny,
-              FieldUsageConfig,
-              AnyChildrenConstrain<string, FieldUsageConfig>
-            >
-          | undefined
-        >;
+        const selectedChildren = selectedVariant.children;
         for (const key in selectedChildren) {
           if (
             Object.prototype.hasOwnProperty.call(selectedChildren, key) &&

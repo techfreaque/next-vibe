@@ -7,7 +7,11 @@ import chalk from "chalk";
 import { Box, Text } from "ink";
 import type { JSX } from "react";
 
-import type { IconSchemaType } from "@/app/api/[locale]/shared/types/common.schema";
+import type {
+  IconSchemaNullishType,
+  IconSchemaOptionalType,
+  IconSchemaType,
+} from "@/app/api/[locale]/shared/types/common.schema";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
@@ -22,7 +26,10 @@ import type { IconWidgetConfig } from "./types";
  */
 export function IconWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TSchema extends IconSchemaType,
+  TSchema extends
+    | IconSchemaType
+    | IconSchemaOptionalType
+    | IconSchemaNullishType,
   TUsage extends FieldUsageConfig,
 >({
   field,

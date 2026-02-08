@@ -16,12 +16,11 @@ export const { GET, tools } = endpointsHandler({
   endpoint: toolsDefinition,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ user, logger, locale }) => {
+    handler: ({ user, locale }) => {
       const tools = definitionsRegistry.getSerializedToolsForUser(
         Platform.AI,
         user,
         locale,
-        logger,
       );
       return success({ tools });
     },

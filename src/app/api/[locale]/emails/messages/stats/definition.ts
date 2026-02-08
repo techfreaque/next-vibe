@@ -363,7 +363,7 @@ const { GET } = createEndpoint({
         {
           byStatus: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               { type: WidgetType.CONTAINER },
@@ -386,7 +386,7 @@ const { GET } = createEndpoint({
           ),
           byType: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               { type: WidgetType.CONTAINER },
@@ -409,7 +409,7 @@ const { GET } = createEndpoint({
           ),
           byProvider: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               { type: WidgetType.CONTAINER },
@@ -432,7 +432,7 @@ const { GET } = createEndpoint({
           ),
           byTemplate: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               { type: WidgetType.CONTAINER },
@@ -455,7 +455,7 @@ const { GET } = createEndpoint({
           ),
           byEngagement: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               { type: WidgetType.CONTAINER },
@@ -478,7 +478,7 @@ const { GET } = createEndpoint({
           ),
           byRetryCount: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               { type: WidgetType.CONTAINER },
@@ -501,7 +501,7 @@ const { GET } = createEndpoint({
           ),
           byUserAssociation: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               { type: WidgetType.CONTAINER },
@@ -556,7 +556,7 @@ const { GET } = createEndpoint({
       // Recent activity
       recentActivity: responseArrayField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
         },
         objectField(
           { type: WidgetType.CONTAINER },
@@ -593,7 +593,7 @@ const { GET } = createEndpoint({
       // Top performers
       topPerformingTemplates: responseArrayField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
         },
         objectField(
           { type: WidgetType.CONTAINER },
@@ -653,7 +653,7 @@ const { GET } = createEndpoint({
 
       topPerformingProviders: responseArrayField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
         },
         objectField(
           { type: WidgetType.CONTAINER },

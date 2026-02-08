@@ -166,13 +166,17 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
           onSuccess: options.onSuccess
             ? (
                 context,
-              ): void | ErrorResponseType | Promise<void | ErrorResponseType> =>
-                options.onSuccess?.({
+              ):
+                | void
+                | ErrorResponseType
+                | Promise<void | ErrorResponseType> => {
+                return options.onSuccess?.({
                   requestData: context.requestData,
                   pathParams: context.urlPathParams,
                   responseData: context.responseData,
                   logger: context.logger,
-                })
+                });
+              }
             : undefined,
           onError: options.onError
             ? (context): void | Promise<void> =>

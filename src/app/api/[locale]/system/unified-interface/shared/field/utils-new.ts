@@ -25,6 +25,8 @@ import type {
   FieldUsageConfig,
   ObjectChildrenConstraint,
 } from "../../unified-ui/widgets/_shared/types";
+import type { CustomWidgetObjectConfig } from "../../unified-ui/widgets/containers/custom/types";
+import { WidgetType } from "../types/enums";
 import type {
   ArrayWidgetConfig,
   FormFieldWidgetConfig,
@@ -50,11 +52,12 @@ interface ScopedTranslationType<TKey extends string> {
  */
 export function requestField<
   TSchema extends z.ZodTypeAny,
-  TConfig extends Omit<
-    FormFieldWidgetConfig<
+  const TConfig extends Omit<
+    RequestResponseWidgetConfig<
       TranslationKey,
       TSchema,
-      { request: "data"; response?: never }
+      { request: "data"; response?: never },
+      "primitive"
     >,
     "usage" | "schemaType"
   >,
@@ -78,7 +81,7 @@ export function requestField<
  */
 export function responseField<
   TSchema extends z.ZodTypeAny,
-  TConfig extends Omit<
+  const TConfig extends Omit<
     RequestResponseWidgetConfig<
       TranslationKey,
       TSchema,
@@ -338,34 +341,50 @@ export function scopedResponseArrayOptionalField<
  * - Value type is inferred from children, not WidgetData (any)
  * - Full type safety from config -> children -> value
  *
- * @example
- * ```typescript
- * // PaginationWidgetConfig requires specific fields
- * objectFieldNew({
- *   type: WidgetType.PAGINATION,
- *   usage: { response: true },
- *   children: {
- *     page: responseField({ ... }, z.number()),
- *     limit: responseField({ ... }, z.number()),
- *     totalCount: responseField({ ... }, z.number()),
- *   }
- * })
- * ```
  */
 export function objectFieldNew<
   TKey extends string,
   TUsage extends FieldUsageConfig,
-  TChildren extends ObjectChildrenConstraint<
-    TKey,
-    ConstrainedChildUsage<TUsage>
-  >,
   const TConfig extends Omit<
-    ObjectWidgetConfig<TKey, TUsage, "object", TChildren>,
+    ObjectWidgetConfig<
+      TKey,
+      TUsage,
+      "object",
+      ObjectChildrenConstraint<TKey, FieldUsageConfig>
+    >,
     "schemaType"
   >,
 >(config: TConfig): TConfig & { schemaType: "object" } {
   return {
     ...config,
+    schemaType: "object" as const,
+  };
+}
+
+/**
+ * Custom widget field creator - wraps children with custom render component
+ */
+export function customWidgetObject<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+  const TConfig extends Omit<
+    CustomWidgetObjectConfig<
+      TKey,
+      TUsage,
+      "object",
+      ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
+    >,
+    "schemaType" | "type"
+  >,
+>(
+  config: TConfig,
+): TConfig & {
+  type: WidgetType.CUSTOM_WIDGET;
+  schemaType: "object";
+} {
+  return {
+    ...config,
+    type: WidgetType.CUSTOM_WIDGET,
     schemaType: "object" as const,
   };
 }

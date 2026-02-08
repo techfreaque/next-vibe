@@ -102,7 +102,7 @@ export function IconPicker({
           </Div>
         </button>
       </DialogTrigger>
-      <DialogContent className="max-w-[600px] max-h-[80vh] p-0 flex flex-col m-4">
+      <DialogContent className="max-w-[600px] max-h-[80vh] p-0 flex flex-col m-4 z-[500]">
         {/* Scrollable content wrapper */}
         <Div className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col">
           {/* Header with search */}

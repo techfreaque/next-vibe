@@ -3,7 +3,11 @@
  * Icon picker/selector field
  */
 
-import type { IconSchemaType } from "@/app/api/[locale]/shared/types/common.schema";
+import type {
+  IconSchemaNullishType,
+  IconSchemaOptionalType,
+  IconSchemaType,
+} from "@/app/api/[locale]/shared/types/common.schema";
 import type { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import type { FieldUsageConfig } from "../../_shared/types";
@@ -11,7 +15,10 @@ import type { BaseFormFieldWidgetConfig } from "../_shared/types";
 
 export interface IconFieldWidgetConfig<
   out TKey extends string,
-  TSchema extends IconSchemaType,
+  TSchema extends
+    | IconSchemaType
+    | IconSchemaOptionalType
+    | IconSchemaNullishType,
   TUsage extends FieldUsageConfig,
 > extends BaseFormFieldWidgetConfig<TKey, TUsage, "primitive", TSchema> {
   fieldType: FieldDataType.ICON;

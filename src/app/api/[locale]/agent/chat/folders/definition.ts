@@ -129,7 +129,7 @@ const { GET } = createEndpoint({
       ),
       folders: responseArrayField(
         {
-          type: WidgetType.DATA_CARDS,
+          type: WidgetType.CONTAINER,
         },
         objectField(
           {
@@ -198,7 +198,7 @@ const { GET } = createEndpoint({
             }),
             rolesView: responseArrayOptionalField(
               {
-                type: WidgetType.DATA_LIST,
+                type: WidgetType.CONTAINER,
               },
               responseField({
                 type: WidgetType.BADGE,
@@ -208,7 +208,7 @@ const { GET } = createEndpoint({
             ),
             rolesManage: responseArrayOptionalField(
               {
-                type: WidgetType.DATA_LIST,
+                type: WidgetType.CONTAINER,
               },
               responseField({
                 type: WidgetType.BADGE,
@@ -218,7 +218,7 @@ const { GET } = createEndpoint({
             ),
             rolesCreateThread: responseArrayOptionalField(
               {
-                type: WidgetType.DATA_LIST,
+                type: WidgetType.CONTAINER,
               },
               responseField({
                 type: WidgetType.BADGE,
@@ -228,7 +228,7 @@ const { GET } = createEndpoint({
             ),
             rolesPost: responseArrayOptionalField(
               {
-                type: WidgetType.DATA_LIST,
+                type: WidgetType.CONTAINER,
               },
               responseField({
                 type: WidgetType.BADGE,
@@ -238,7 +238,7 @@ const { GET } = createEndpoint({
             ),
             rolesModerate: responseArrayOptionalField(
               {
-                type: WidgetType.DATA_LIST,
+                type: WidgetType.CONTAINER,
               },
               responseField({
                 type: WidgetType.BADGE,
@@ -248,7 +248,7 @@ const { GET } = createEndpoint({
             ),
             rolesAdmin: responseArrayOptionalField(
               {
-                type: WidgetType.DATA_LIST,
+                type: WidgetType.CONTAINER,
               },
               responseField({
                 type: WidgetType.BADGE,
@@ -576,7 +576,7 @@ const { POST } = createEndpoint({
               }),
               rolesView: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.BADGE,
@@ -586,7 +586,7 @@ const { POST } = createEndpoint({
               ),
               rolesManage: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.BADGE,
@@ -596,7 +596,7 @@ const { POST } = createEndpoint({
               ),
               rolesCreateThread: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.BADGE,
@@ -606,7 +606,7 @@ const { POST } = createEndpoint({
               ),
               rolesPost: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.BADGE,
@@ -616,7 +616,7 @@ const { POST } = createEndpoint({
               ),
               rolesModerate: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.BADGE,
@@ -626,7 +626,7 @@ const { POST } = createEndpoint({
               ),
               rolesAdmin: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.BADGE,

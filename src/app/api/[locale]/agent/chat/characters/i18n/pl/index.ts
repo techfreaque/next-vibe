@@ -3,6 +3,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   id: idTranslations,
+  separator: {
+    or: "lub",
+  },
   fallbacks: {
     unknownModel: "Nieznany Model",
     unknownProvider: "nieznany",
@@ -643,16 +646,51 @@ export const translations: typeof enTranslations = {
       label: "Utwórz postać",
     },
     browser: {
-      advancedModelAccess: "Zaawansowany dostęp do modeli",
-      configureFiltersText: "Skonfiguruj filtry lub wybierz ręcznie z",
+      advancedModelAccess: "Wybierz swoje doświadczenie AI",
+      configureFiltersText:
+        "Wybierz modele bezpośrednio lub zacznij od gotowych postaci",
       aiModels: "modele AI",
-      configureAiModelsTitle: "Konfiguruj modele AI bezpośrednio",
-      advancedChooseText: "Zaawansowane: Wybierz z",
+      configureAiModelsTitle: "Bezpośredni wybór modelu",
+      advancedChooseText:
+        "Wybierz spośród {{count}} modeli z precyzyjną kontrolą inteligencji, szybkości i kosztów",
       modelsWithCustomFilters: "modeli z niestandardowymi filtrami",
       configureButton: "Konfiguruj",
-      characterPresets: "Szablony postaci",
+      selectButton: {
+        label: "Przeglądaj Modele",
+      },
+      characterPresets: "Gotowe postacie",
       pickCharacterText:
-        "Wybierz postać z zoptymalizowanymi ustawieniami. Dostosuj w dowolnym momencie po dodaniu.",
+        "Zacznij od ekspercko dostrojonych postaci z już wybranym idealnym modelem. Dostosuj w dowolnym momencie.",
+    },
+    marketing: {
+      title: "Postacie AI i Niestandardowe Modele",
+      description:
+        "Twórz spersonalizowane asystenty AI z unikalnymi osobowościami, głosami i konfiguracjami modeli. Wybieraj spośród setek modeli lub pozwól naszemu inteligentnemu systemowi wybrać najlepszy dla Twoich potrzeb.",
+      feature1: {
+        title: "Niestandardowe Postacie",
+        description:
+          "Projektuj osobowości AI z niestandardowymi promptami systemowymi, ikonami i głosami",
+      },
+      feature2: {
+        title: "Inteligentny Wybór Modelu",
+        description:
+          "Filtruj według inteligencji, szybkości, ceny i typu treści, aby znaleźć idealny model",
+      },
+      feature3: {
+        title: "System Ulubionych",
+        description:
+          "Zapisuj ulubione konfiguracje dla szybkiego dostępu i organizuj według priorytetu",
+      },
+      feature4: {
+        title: "Dostęp do",
+        titleSuffix: "+ Modeli",
+        description:
+          "Wybieraj spośród najnowszych modeli od Anthropic, OpenAI, Google i innych",
+      },
+      cta: {
+        signup: "Zarejestruj się, aby zacząć",
+        login: "Zaloguj się",
+      },
     },
     response: {
       characters: {
@@ -685,6 +723,9 @@ export const translations: typeof enTranslations = {
           ignoredWeaknesses: { content: "Ignorowane słabe strony" },
           manualModelId: { content: "Ręczny model" },
           separator: { content: "•" },
+          actions: {
+            directModelButton: { label: "Model bezpośredni" },
+          },
         },
       },
     },
@@ -735,6 +776,11 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Utwórz postacię",
     description: "Utwórz nową niestandardową postacię",
+    form: {
+      title: "Utwórz swoją niestandardową postać",
+      description:
+        "Zaprojektuj unikalną postać AI z niestandardowym zachowaniem, osobowością i możliwościami. Wybierz konkretny model lub pozwól systemowi wybrać na podstawie Twoich wymagań.",
+    },
     submitButton: {
       text: "Utwórz niestandardową postacię",
       loadingText: "Tworzenie postacię...",
@@ -746,10 +792,20 @@ export const translations: typeof enTranslations = {
     name: {
       label: "Nazwa",
       description: "Nazwa postaciy",
+      placeholder: "Wprowadź nazwę postaci",
+      validation: {
+        minLength: "Nazwa musi mieć co najmniej 2 znaki",
+        maxLength: "Nazwa musi mieć mniej niż 100 znaków",
+      },
     },
     characterDescription: {
       label: "Opis",
       description: "Krótki opis postaciy",
+      placeholder: "Opisz cel i możliwości postaci",
+      validation: {
+        minLength: "Opis musi mieć co najmniej 10 znaków",
+        maxLength: "Opis musi mieć mniej niż 500 znaków",
+      },
     },
     icon: {
       label: "Ikona",
@@ -758,6 +814,11 @@ export const translations: typeof enTranslations = {
     systemPrompt: {
       label: "Prompt systemowy",
       description: "Prompt systemowy definiujący zachowanie postaciy",
+      placeholder: "Jesteś pomocnym asystentem, który specjalizuje się w...",
+      validation: {
+        minLength: "Prompt systemowy musi mieć co najmniej 10 znaków",
+        maxLength: "Prompt systemowy musi mieć mniej niż 5000 znaków",
+      },
     },
     category: {
       label: "Kategoria",
@@ -766,11 +827,16 @@ export const translations: typeof enTranslations = {
     tagline: {
       label: "Slogan",
       description: "Krótki slogan opisujący postać",
+      placeholder: "Wprowadź slogan",
+      validation: {
+        minLength: "Slogan musi mieć co najmniej 2 znaki",
+        maxLength: "Slogan musi mieć mniej niż 500 znaków",
+      },
     },
-    ownershipType: {
-      label: "Typ własności",
+    isPublic: {
+      label: "Udostępnij publicznie",
       description:
-        "Kto jest właścicielem tej postaci (system, użytkownik lub publiczny)",
+        "Włącz, aby udostępnić swoją postać społeczności. Po wyłączeniu postać pozostaje prywatna i widoczna tylko dla Ciebie.",
     },
     modelSelection: {
       title: "Wybór modelu",

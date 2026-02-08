@@ -173,7 +173,7 @@ const { GET } = createEndpoint({
         },
         objectField(
           {
-            type: WidgetType.DATA_CARDS,
+            type: WidgetType.CONTAINER,
             linkable: true,
             layoutType: LayoutType.GRID,
             columns: 12,

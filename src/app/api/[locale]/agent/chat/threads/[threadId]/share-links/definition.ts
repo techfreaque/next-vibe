@@ -57,7 +57,7 @@ const { GET } = createEndpoint({
       }),
       shareLinks: responseArrayOptionalField(
         {
-          type: WidgetType.DATA_CARDS,
+          type: WidgetType.CONTAINER,
           emptyTitle:
             "app.api.agent.chat.threads.threadId.shareLinks.shareLinks.emptyTitle" as const,
           emptyDescription:

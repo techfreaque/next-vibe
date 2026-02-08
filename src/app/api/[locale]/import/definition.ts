@@ -66,7 +66,7 @@ const { POST: ImportCsvPost } = createEndpoint({
       // === FILE UPLOAD SECTION ===
       fileUploadSection: objectField(
         {
-          type: WidgetType.SECTION,
+          type: WidgetType.CONTAINER,
           title: "app.api.import.csv.post.fileSection.title",
           description: "app.api.import.csv.post.fileSection.description",
           layoutType: LayoutType.STACKED,
@@ -301,7 +301,7 @@ const { POST: ImportCsvPost } = createEndpoint({
           // === ERROR DETAILS ===
           errors: responseArrayField(
             {
-              type: WidgetType.DATA_TABLE,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               {
@@ -335,7 +335,7 @@ const { POST: ImportCsvPost } = createEndpoint({
           // === NEXT STEPS ===
           nextSteps: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
               title: "app.api.import.csv.post.response.nextSteps.title",
             },
             responseField({
@@ -512,7 +512,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
       // === RESPONSE DATA ===
       jobs: responseArrayField(
         {
-          type: WidgetType.DATA_TABLE,
+          type: WidgetType.CONTAINER,
           title: "app.api.import.jobs.get.response.jobs.title",
         },
         objectField(

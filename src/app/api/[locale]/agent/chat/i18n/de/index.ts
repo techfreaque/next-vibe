@@ -101,7 +101,8 @@ export const translations: typeof enTranslations = {
     showAllModels: "Alle Modelle anzeigen",
     showLess: "Weniger anzeigen",
     showMore: "{{remaining}} weitere anzeigen",
-    showLegacyModels: "{{count}} Legacy-Modelle anzeigen",
+    showLegacyModels_one: "{{count}} Legacy-Modell anzeigen",
+    showLegacyModels_other: "{{count}} Legacy-Modelle anzeigen",
     noMatchingModels: "Keine passenden Modelle",
     noModelsWarning: "Keine Modelle entsprechen Ihren Filtern",
     useOnce: "Einmal verwenden",
@@ -341,6 +342,8 @@ export const translations: typeof enTranslations = {
         "Venice Uncensored - Unzensiertes KI-Modell für uneingeschränkte Konversationen",
       claudeOpus45:
         "Claude Opus 4.5 - Leistungsstärkstes Claude-Modell mit außergewöhnlichen Reasoning- und kreativen Fähigkeiten",
+      claudeOpus46:
+        "Claude Opus 4.6 - Neuestes und leistungsstärkstes Claude-Modell mit außergewöhnlichen Reasoning- und kreativen Fähigkeiten",
       claudeHaiku45:
         "Claude Haiku 4.5 - Schnelles und effizientes Claude-Modell optimiert für Geschwindigkeit und Kosteneffizienz",
     },

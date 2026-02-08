@@ -13,6 +13,9 @@ import {
   objectField,
   requestField,
   responseField,
+  submitButton,
+  widgetField,
+  widgetObjectField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -22,11 +25,10 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { success } from "../shared/types/response.schema";
 import { UserRole } from "../user/user-roles/enum";
+import type { CodesListGetResponseOutput } from "./codes/list/definition";
 
-/**
- * POST endpoint for creating a referral code
- */
 export const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["referral"],
@@ -42,75 +44,119 @@ export const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ] as const,
 
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const { apiClient } =
+          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+        const codesListDefinition = await import("./codes/list/definition");
+
+        // Get the new code from request
+        const newCode: CodesListGetResponseOutput["codes"][number] = {
+          code: data.requestData.fieldsGrid.code,
+          label: data.requestData.fieldsGrid.label ?? null,
+          currentUses: 0,
+          totalSignups: 0,
+          totalRevenueCents: 0,
+          totalEarningsCents: 0,
+          isActive: true,
+        };
+
+        // Optimistically add the new code to the beginning of the list
+        apiClient.updateEndpointData(
+          codesListDefinition.default.GET,
+          data.logger,
+          (oldData) => {
+            if (!oldData?.success) {
+              return oldData;
+            }
+
+            return success<CodesListGetResponseOutput>({
+              codes: [newCode, ...oldData.data.codes],
+            });
+          },
+          undefined,
+        );
+      },
+    },
+  },
+
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.referral.post.form.title",
-      description: "app.api.referral.post.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
+      noCard: true,
+      layoutType: LayoutType.STACKED,
+      className: "flex flex-col gap-4",
     },
     { request: "data", response: true },
     {
-      // Request fields
-      code: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "app.api.referral.form.fields.code.label",
-        description: "app.api.referral.form.fields.code.description",
-        placeholder: "app.api.referral.form.fields.code.placeholder",
-        schema: z.string().min(3).max(50),
+      // Fields grid
+      fieldsGrid: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          noCard: true,
+          layoutType: LayoutType.GRID,
+          innerClassName: "grid-cols-1 md:grid-cols-2",
+          gap: "4",
+        },
+        { request: "data" },
+        {
+          code: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.referral.form.fields.code.label",
+            description: "app.api.referral.form.fields.code.description",
+            placeholder: "app.api.referral.form.fields.code.placeholder",
+            schema: z.string().min(3).max(50),
+            theme: {
+              style: "none",
+              showAllRequired: false,
+            },
+          }),
+          label: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "app.api.referral.form.fields.label.label",
+            description: "app.api.referral.form.fields.label.description",
+            placeholder: "app.api.referral.form.fields.label.placeholder",
+            schema: z.string().optional(),
+            theme: {
+              style: "none",
+              showAllRequired: false,
+            },
+          }),
+        },
+      ),
+
+      // Form alert for validation and API errors
+      formAlert: widgetField({
+        type: WidgetType.FORM_ALERT,
+        usage: { request: "data" },
       }),
-      label: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "app.api.referral.form.fields.label.label",
-        description: "app.api.referral.form.fields.label.description",
-        placeholder: "app.api.referral.form.fields.label.placeholder",
-        schema: z.string().optional(),
+      // Success message
+      successMessage: responseField({
+        type: WidgetType.ALERT,
+        schema: z.string(),
+        usage: { response: true },
       }),
 
-      // Response fields
-      id: responseField({
-        type: WidgetType.TEXT,
-        content: "app.api.contact.response.success",
-        schema: z.string().uuid(),
-      }),
-      responseCode: responseField({
-        type: WidgetType.TEXT,
-        content: "app.api.contact.response.success",
-        schema: z.string(),
-      }),
-      responseLabel: responseField({
-        type: WidgetType.TEXT,
-        content: "app.api.contact.response.success",
-        schema: z.string().nullable(),
-      }),
-      ownerUserId: responseField({
-        type: WidgetType.TEXT,
-        content: "app.api.contact.response.success",
-        schema: z.string().uuid(),
-      }),
-      currentUses: responseField({
-        type: WidgetType.TEXT,
-        content: "app.api.contact.response.success",
-        schema: z.coerce.number(),
-      }),
-      isActive: responseField({
-        type: WidgetType.TEXT,
-        content: "app.api.contact.response.success",
-        schema: z.boolean(),
-      }),
-      createdAt: responseField({
-        type: WidgetType.TEXT,
-        content: "app.api.contact.response.success",
-        schema: z.string(),
-      }),
-      updatedAt: responseField({
-        type: WidgetType.TEXT,
-        content: "app.api.contact.response.success",
-        schema: z.string(),
-      }),
+      // Submit button row
+      submitRow: widgetObjectField(
+        {
+          type: WidgetType.CONTAINER,
+          noCard: true,
+          layoutType: LayoutType.INLINE,
+          className: "flex justify-end",
+        },
+        { request: "data" },
+        {
+          submit: submitButton({
+            label: "app.user.referral.createCode.create",
+            loadingText: "app.user.referral.createCode.creating",
+            usage: { request: "data" },
+          }),
+        },
+      ),
     },
   ),
 
@@ -161,33 +207,20 @@ export const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        code: "FRIEND2024",
-        label: "Friend Referral",
+        fieldsGrid: {
+          code: "FRIEND2024",
+          label: "Friend Referral",
+        },
       },
       unlimited: {
-        code: "UNLIMITED",
+        fieldsGrid: {
+          code: "UNLIMITED",
+        },
       },
     },
     responses: {
       default: {
-        id: "123e4567-e89b-12d3-a456-426614174000",
-        responseCode: "FRIEND2024",
-        responseLabel: "Friend Referral",
-        ownerUserId: "123e4567-e89b-12d3-a456-426614174001",
-        currentUses: 0,
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      unlimited: {
-        id: "123e4567-e89b-12d3-a456-426614174002",
-        responseCode: "UNLIMITED",
-        responseLabel: null,
-        ownerUserId: "123e4567-e89b-12d3-a456-426614174001",
-        currentUses: 0,
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        successMessage: "app.api.referral.response.success",
       },
     },
   },

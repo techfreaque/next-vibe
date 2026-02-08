@@ -14,11 +14,12 @@ import {
   getIconSizeClassName,
   getSpacingClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
-import type { ReactWidgetProps } from "../../_shared/react-types";
+import type { ReactStaticWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
   useWidgetEndpoint,
   useWidgetForm,
+  useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetResponse,
@@ -40,32 +41,45 @@ import type { NavigateButtonWidgetConfig } from "./types";
  */
 export function NavigateButtonWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
   TUsage extends FieldUsageConfig,
+  TKey extends string,
   TSchemaType extends "widget",
   TTargetEndpoint extends CreateApiEndpointAny | undefined,
+  TGetEndpoint extends CreateApiEndpointAny | undefined,
 >({
   field,
-}: ReactWidgetProps<
+}: ReactStaticWidgetProps<
   TEndpoint,
   TUsage,
-  NavigateButtonWidgetConfig<TKey, TUsage, TSchemaType, TTargetEndpoint>
+  NavigateButtonWidgetConfig<
+    TKey,
+    TUsage,
+    TSchemaType,
+    TTargetEndpoint,
+    TGetEndpoint
+  >
 >): JSX.Element {
   const t = useWidgetTranslation();
   const navigation = useWidgetNavigation();
   const logger = useWidgetLogger();
   const user = useWidgetUser();
+  const locale = useWidgetLocale();
   const response = useWidgetResponse();
-  const endpoint = useWidgetEndpoint();
+  const endpoint = useWidgetEndpoint<TEndpoint>();
   const form = useWidgetForm();
   const {
     label,
     icon,
     variant = "default",
-    metadata,
     iconSize,
     iconSpacing,
     className,
+    targetEndpoint,
+    extractParams,
+    prefillFromGet,
+    getEndpoint,
+    renderInModal,
+    popNavigationOnSuccess,
   } = field;
 
   // Get classes from config (no hardcoding!)
@@ -75,16 +89,8 @@ export function NavigateButtonWidget<
   const buttonIcon = icon ? (icon as IconKey) : undefined;
   const buttonText = label ? t(label) : undefined;
 
-  // Don't render if no metadata
-  if (!metadata) {
-    return <></>;
-  }
-
   // Back navigation
-  if (
-    metadata.targetEndpoint === null ||
-    metadata.targetEndpoint === undefined
-  ) {
+  if (targetEndpoint === null || targetEndpoint === undefined) {
     // Don't render back button if there's nothing to navigate back to
     if (!navigation || !navigation.canGoBack) {
       return <></>;
@@ -118,9 +124,9 @@ export function NavigateButtonWidget<
 
   // Forward navigation - check if extractParams exists and targetEndpoint is not null/undefined
   if (
-    !metadata.extractParams ||
-    metadata.targetEndpoint === null ||
-    metadata.targetEndpoint === undefined
+    !extractParams ||
+    targetEndpoint === null ||
+    targetEndpoint === undefined
   ) {
     logger.error(
       "NavigateButtonWidget: Forward navigation without extractParams or targetEndpoint",
@@ -129,7 +135,6 @@ export function NavigateButtonWidget<
   }
 
   // Check if user has permission to access the target endpoint
-  const targetEndpoint = metadata.targetEndpoint;
   if (!targetEndpoint) {
     return <></>;
   }
@@ -156,11 +161,7 @@ export function NavigateButtonWidget<
   const handleClick = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
 
-    if (
-      !navigation ||
-      !metadata.extractParams ||
-      metadata.targetEndpoint === null
-    ) {
+    if (!navigation || !extractParams || targetEndpoint === null) {
       logger.warn(
         "NavigateButtonWidget: No navigation context, extractParams, or targetEndpoint",
       );
@@ -176,7 +177,7 @@ export function NavigateButtonWidget<
     const responseData =
       response?.success && response.data ? response.data : {};
     const urlPathParams = navigation?.current?.params?.urlPathParams ?? {};
-    const itemData = field.value; // For array items
+    const itemData = field.parentValue; // For array items
 
     const source = {
       itemData,
@@ -185,40 +186,78 @@ export function NavigateButtonWidget<
       responseData,
     };
 
-    logger.debug("NavigateButtonWidget: calling extractParams with source", {
-      source,
-    });
+    // Build context for extractParams
+    const context = {
+      logger,
+      user,
+      locale,
+    };
 
-    const params = metadata.extractParams(source);
-    logger.debug("NavigateButtonWidget: extracted params", {
-      params,
-    });
+    // Handle both sync and async extractParams
+    const paramsOrPromise = extractParams(source, context);
 
-    // If prefillFromGet is true but no getEndpoint provided, use current endpoint if it's a GET
-    let effectiveGetEndpoint = metadata.getEndpoint;
-    if (metadata.prefillFromGet && !effectiveGetEndpoint && endpoint) {
-      // Check if current endpoint is a GET endpoint
-      if (endpoint.method === "GET") {
-        effectiveGetEndpoint = endpoint;
-        logger.debug(
-          "NavigateButtonWidget: Using current GET endpoint for prefill",
-        );
+    if (paramsOrPromise instanceof Promise) {
+      // Async extractParams - wrap in async IIFE
+      void (async (): Promise<void> => {
+        try {
+          const params = await paramsOrPromise;
+
+          // If prefillFromGet is true but no getEndpoint provided, use current endpoint if it's a GET
+          let effectiveGetEndpoint: CreateApiEndpointAny | undefined =
+            getEndpoint;
+          if (prefillFromGet && !effectiveGetEndpoint && endpoint) {
+            // Check if current endpoint is a GET endpoint
+            if (endpoint.method === "GET") {
+              effectiveGetEndpoint = endpoint;
+            }
+          }
+
+          // Capture click position for modal positioning
+          const clickX = e.clientX ?? 0;
+          const clickY = e.clientY ?? 0;
+
+          navigation.push(
+            targetEndpoint,
+            params,
+            prefillFromGet,
+            effectiveGetEndpoint,
+            renderInModal,
+            popNavigationOnSuccess,
+            { x: clickX, y: clickY },
+          );
+        } catch (error) {
+          logger.error("NavigateButtonWidget: Failed to extract params", {
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      })();
+    } else {
+      // Sync extractParams
+      const params = paramsOrPromise;
+
+      // If prefillFromGet is true but no getEndpoint provided, use current endpoint if it's a GET
+      let effectiveGetEndpoint: CreateApiEndpointAny | undefined = getEndpoint;
+      if (prefillFromGet && !effectiveGetEndpoint && endpoint) {
+        // Check if current endpoint is a GET endpoint
+        if (endpoint.method === "GET") {
+          effectiveGetEndpoint = endpoint;
+        }
       }
+
+      // Capture click position for modal positioning
+      const clickX = e.clientX ?? 0;
+      const clickY = e.clientY ?? 0;
+
+      navigation.push(
+        targetEndpoint,
+        params,
+        prefillFromGet,
+        effectiveGetEndpoint,
+        renderInModal,
+        popNavigationOnSuccess,
+        { x: clickX, y: clickY },
+      );
     }
-
-    // Capture click position for modal positioning
-    const clickX = e.clientX ?? 0;
-    const clickY = e.clientY ?? 0;
-
-    navigation.push(
-      targetEndpoint,
-      params,
-      metadata.prefillFromGet,
-      effectiveGetEndpoint,
-      metadata.renderInModal,
-      metadata.popNavigationOnSuccess,
-      { x: clickX, y: clickY },
-    );
   };
 
   return (

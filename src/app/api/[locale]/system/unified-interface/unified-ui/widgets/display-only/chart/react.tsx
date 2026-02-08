@@ -6,6 +6,7 @@ import { Area, Axis, Bar, Chart, Line, Pie } from "next-vibe-ui/ui/chart";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
+import type z from "zod";
 
 import { simpleT } from "@/i18n/core/shared";
 
@@ -14,9 +15,13 @@ import {
   getSpacingClassName,
   getTextSizeClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
-import type { ReactWidgetProps } from "../../_shared/react-types";
+import type {
+  ReactRequestResponseWidgetProps,
+  ReactStaticWidgetProps,
+} from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
 } from "../../_shared/use-widget-context";
@@ -60,23 +65,26 @@ export function ChartWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TUsage extends FieldUsageConfig,
+  TSchemaType extends "primitive" | "widget",
 >(
-  props:
-    | ReactWidgetProps<
-        TEndpoint,
-        TUsage,
-        ChartWidgetConfig<TKey, never, TUsage, "widget">
-      >
-    | ReactWidgetProps<
+  props: TSchemaType extends "primitive"
+    ? ReactRequestResponseWidgetProps<
         TEndpoint,
         TUsage,
         ChartWidgetConfig<TKey, ChartWidgetSchema, TUsage, "primitive">
+      >
+    : ReactStaticWidgetProps<
+        TEndpoint,
+        TUsage,
+        ChartWidgetConfig<TKey, never, TUsage, "widget">
       >,
 ): JSX.Element {
   const { field } = props;
+  const fieldName = "fieldName" in props ? props.fieldName : undefined;
   const locale = useWidgetLocale();
   const t = useWidgetTranslation();
   const { t: globalT } = simpleT(locale);
+  const form = useWidgetForm();
   const {
     chartType = "line",
     label: labelKey,
@@ -96,6 +104,18 @@ export function ChartWidget<
     legendMarginTop,
     className,
   } = field;
+  const usage = "usage" in field ? field.usage : undefined;
+
+  // Get value from form for request fields, otherwise from field.value
+  let value: z.output<ChartWidgetSchema> | undefined;
+  if (usage?.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value && "value" in field) {
+      value = field.value;
+    }
+  } else if ("value" in field) {
+    value = field.value;
+  }
 
   // Get classes from config (no hardcoding!)
   const titleTextSizeClass = getTextSizeClassName(titleTextSize);
@@ -112,7 +132,7 @@ export function ChartWidget<
   const description = descriptionKey ? t(descriptionKey) : undefined;
 
   // Extract chart data using shared logic
-  const chartData = extractChartData(field.value);
+  const chartData = extractChartData(value);
 
   // No data - show empty state
   if (!chartData || chartData.data.length === 0) {

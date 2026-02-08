@@ -29,7 +29,6 @@ export type CreateApiEndpointAny = CreateApiEndpoint<
   Methods,
   readonly UserRoleValue[],
   string,
-  AnyChildrenConstrain<string, FieldUsageConfig>,
   UnifiedField<
     string,
     z.ZodTypeAny,

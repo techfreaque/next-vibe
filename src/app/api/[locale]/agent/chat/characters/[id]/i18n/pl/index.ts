@@ -21,6 +21,9 @@ export const translations: typeof enTranslations = {
       label: "ID postaciy",
       description: "Unikalny identyfikator postaciy",
     },
+    systemPrompt: {
+      label: "Prompt systemowy",
+    },
     response: {
       character: {
         title: "Postać",
@@ -123,10 +126,20 @@ export const translations: typeof enTranslations = {
     name: {
       label: "Nazwa",
       description: "Nazwa postaciy",
+      placeholder: "Wprowadź nazwę postaci",
+      validation: {
+        minLength: "Nazwa musi mieć co najmniej 2 znaki",
+        maxLength: "Nazwa musi mieć mniej niż 100 znaków",
+      },
     },
     description: {
       label: "Opis",
       description: "Krótki opis postaciy",
+      placeholder: "Opisz cel i możliwości postaci",
+      validation: {
+        minLength: "Opis musi mieć co najmniej 10 znaków",
+        maxLength: "Opis musi mieć mniej niż 500 znaków",
+      },
     },
     icon: {
       label: "Ikona",
@@ -135,6 +148,11 @@ export const translations: typeof enTranslations = {
     systemPrompt: {
       label: "Prompt systemowy",
       description: "Prompt systemowy definiujący zachowanie postaciy",
+      placeholder: "Wprowadź prompt systemowy",
+      validation: {
+        minLength: "Prompt systemowy musi mieć co najmniej 10 znaków",
+        maxLength: "Prompt systemowy musi mieć mniej niż 5000 znaków",
+      },
     },
     category: {
       label: "Kategoria",
@@ -143,16 +161,21 @@ export const translations: typeof enTranslations = {
     tagline: {
       label: "Slogan",
       description: "Krótki slogan opisujący postać",
+      placeholder: "Wprowadź slogan",
+      validation: {
+        minLength: "Slogan musi mieć co najmniej 2 znaki",
+        maxLength: "Slogan musi mieć mniej niż 500 znaków",
+      },
     },
     source: {
       label: "Źródło",
       description:
         "Źródło tej postaciy (wbudowane, niestandardowe lub społecznościowe)",
     },
-    ownershipType: {
-      label: "Typ własności",
+    isPublic: {
+      label: "Udostępnij publicznie",
       description:
-        "Kto jest właścicielem tej postaciy (system, użytkownik lub publiczny)",
+        "Włącz, aby udostępnić swoją postać społeczności. Po wyłączeniu postać pozostaje prywatna i widoczna tylko dla Ciebie.",
     },
     voice: {
       label: "Głos",

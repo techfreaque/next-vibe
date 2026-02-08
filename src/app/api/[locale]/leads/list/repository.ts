@@ -55,8 +55,6 @@ export class LeadsListRepositoryImpl implements LeadsListRepository {
             leads: responseData.leads,
           },
           paginationInfo: {
-            page: paginationData.page,
-            limit: paginationData.limit,
             totalCount: paginationData.totalCount,
             pageCount: paginationData.pageCount,
           },

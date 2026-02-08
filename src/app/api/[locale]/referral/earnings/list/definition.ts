@@ -72,7 +72,7 @@ export const { GET } = createEndpoint({
 
       // Response fields
       earnings: responseArrayField(
-        { type: WidgetType.DATA_TABLE },
+        { type: WidgetType.CONTAINER },
         objectField(
           {
             type: WidgetType.CONTAINER,

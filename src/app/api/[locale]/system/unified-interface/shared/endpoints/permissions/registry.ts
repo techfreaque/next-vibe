@@ -81,16 +81,6 @@ interface IPermissionsRegistry {
     platform: Platform,
     logger: EndpointLogger,
   ): CreateApiEndpointAny[];
-
-  /**
-   * Get endpoint count by category for user (used by definitions registry)
-   */
-  getEndpointCountByCategory(
-    endpoints: CreateApiEndpointAny[],
-    user: JwtPayloadType,
-    platform: Platform,
-    logger: EndpointLogger,
-  ): Record<string, number>;
 }
 
 /**
@@ -481,77 +471,12 @@ class PermissionsRegistry implements IPermissionsRegistry {
     endpoints: CreateApiEndpointAny[],
     user: JwtPayloadType,
     platform: Platform,
-    logger: EndpointLogger,
   ): CreateApiEndpointAny[] {
-    logger.debug("[Permissions Registry] Filtering endpoints by permissions", {
-      totalEndpoints: endpoints.length,
-      platform,
-      isPublic: user.isPublic,
-    });
-
     const filtered = endpoints.filter((endpoint) =>
       this.hasEndpointPermission(endpoint, user, platform),
     );
 
-    logger.debug("[Permissions Registry] Filtered endpoints", {
-      totalEndpoints: endpoints.length,
-      filteredEndpoints: filtered.length,
-    });
-
     return filtered;
-  }
-
-  /**
-   * Get available endpoints count by category for user
-   */
-  getEndpointCountByCategory(
-    endpoints: CreateApiEndpointAny[],
-    user: JwtPayloadType,
-    platform: Platform = Platform.AI,
-    logger: EndpointLogger,
-  ): Record<string, number> {
-    const filtered = this.filterEndpointsByPermissions(
-      endpoints,
-      user,
-      platform,
-      logger,
-    );
-    const counts: Record<string, number> = {};
-
-    for (const endpoint of filtered) {
-      const category = endpoint.category;
-      if (category) {
-        counts[category] = (counts[category] || 0) + 1;
-      }
-    }
-
-    return counts;
-  }
-
-  /**
-   * Get available endpoints count by role (PRIVATE - used internally)
-   */
-  private getEndpointCountByRole(
-    endpoints: CreateApiEndpointAny[],
-  ): Record<string, number> {
-    const counts: Record<string, number> = {};
-
-    for (const endpoint of endpoints) {
-      // Safety check: skip if allowedRoles is undefined or not an array
-      if (!endpoint?.allowedRoles || !Array.isArray(endpoint.allowedRoles)) {
-        continue;
-      }
-
-      for (const role of endpoint.allowedRoles) {
-        // Only count actual user roles, not opt-out roles
-        const roleValue = role as UserRoleValue[number];
-        if (!this.isOptOutRole(roleValue)) {
-          counts[roleValue] = (counts[roleValue] || 0) + 1;
-        }
-      }
-    }
-
-    return counts;
   }
 
   /**

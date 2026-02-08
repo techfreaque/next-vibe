@@ -2,11 +2,9 @@ import type { Metadata } from "next";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
+import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import { type CreditsHistoryGetResponseOutput } from "@/app/api/[locale]/credits/history/definition";
-import {
-  type CreditBalance,
-  CreditRepository,
-} from "@/app/api/[locale]/credits/repository";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import {
   ProductIds,
   productsRepository,
@@ -73,7 +71,7 @@ export default async function HistoryPage({
 
   // Fetch data
   let history: CreditsHistoryGetResponseOutput | null = null;
-  let credits: CreditBalance;
+  let credits: CreditsGetResponseOutput;
   let subscription: SubscriptionGetResponseOutput | null = null;
 
   if (userResponse.success && userResponse.data && userResponse.data.leadId) {

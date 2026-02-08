@@ -61,16 +61,16 @@ export function CompanionCard({
 
       {/* Name */}
       <Span className="text-lg font-bold text-center mb-2">
-        {t(character.content.name)}
+        {t(character.name)}
       </Span>
 
       {/* Tagline */}
       <Span className="text-sm font-medium text-primary text-center mb-2">
-        {t(character.content.tagline)}
+        {t(character.tagline)}
       </Span>
       {/* Description */}
       <P className="text-xs text-muted-foreground text-center leading-relaxed">
-        {t(character.content.description)}
+        {t(character.description)}
       </P>
     </Div>
   );

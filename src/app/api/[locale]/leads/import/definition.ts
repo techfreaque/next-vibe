@@ -219,7 +219,7 @@ const { POST } = createEndpoint({
       }),
       errors: responseArrayField(
         {
-          type: WidgetType.DATA_TABLE,
+          type: WidgetType.CONTAINER,
           title: "app.api.leads.import.post.response.errors" as const,
         },
         objectField(

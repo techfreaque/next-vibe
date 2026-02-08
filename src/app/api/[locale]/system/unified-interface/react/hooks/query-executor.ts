@@ -57,11 +57,15 @@ function isJsonObject(value: JsonValue): value is JsonObject {
  */
 export interface QueryExecutorOptions<TRequest, TResponse, TUrlVariables> {
   /** Callback when query succeeds */
-  onSuccess?: (context: {
-    requestData: TRequest;
-    urlPathParams: TUrlVariables;
-    responseData: TResponse;
-  }) => void | ErrorResponseType | Promise<void | ErrorResponseType>;
+  onSuccess?: (
+    context: {
+      requestData: TRequest;
+      urlPathParams: TUrlVariables;
+      responseData: TResponse;
+    },
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ) => void | ErrorResponseType | Promise<void | ErrorResponseType>;
 
   /** Callback when query fails */
   onError?: (context: {
@@ -338,13 +342,17 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
 
     // Call onSuccess callback if provided
     if (options.onSuccess) {
-      const onSuccessResult = await options.onSuccess({
-        requestData,
-        urlPathParams: pathParams,
-        responseData: (response.success
-          ? response.data
-          : undefined) as TEndpoint["types"]["ResponseOutput"],
-      });
+      const onSuccessResult = await options.onSuccess(
+        {
+          requestData,
+          urlPathParams: pathParams,
+          responseData: (response.success
+            ? response.data
+            : undefined) as TEndpoint["types"]["ResponseOutput"],
+        },
+        user,
+        logger,
+      );
 
       // If onSuccess returns an error, treat it as an error
       if (onSuccessResult) {

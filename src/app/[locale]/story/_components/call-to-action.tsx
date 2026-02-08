@@ -9,7 +9,7 @@ import { H2, P } from "next-vibe-ui/ui/typography";
 import type { FC } from "react";
 import { useInView } from "react-intersection-observer";
 
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/products/repository-client";
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

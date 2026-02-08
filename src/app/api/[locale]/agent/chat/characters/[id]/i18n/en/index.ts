@@ -19,6 +19,9 @@ export const translations = {
       label: "Character ID",
       description: "The unique identifier of the character",
     },
+    systemPrompt: {
+      label: "System Prompt",
+    },
     response: {
       character: {
         title: "Character",
@@ -119,41 +122,69 @@ export const translations = {
       description: "The unique identifier of the character to update",
     },
     name: {
-      label: "Name",
-      description: "The name of the character",
+      label: "Character Name",
+      description:
+        "Give your character a memorable name. This is how you and others will identify them.",
+      placeholder: "Enter character name",
+      validation: {
+        minLength: "Name must be at least 2 characters",
+        maxLength: "Name must be less than 100 characters",
+      },
     },
-    description: {
-      label: "Description",
-      description: "A brief description of the character",
+    tagline: {
+      label: "Character Tagline",
+      description:
+        "A catchy one-liner that captures the essence of your character. Keep it short and descriptive.",
+      placeholder: "Enter a short tagline",
+      validation: {
+        minLength: "Tagline must be at least 2 characters",
+        maxLength: "Tagline must be less than 500 characters",
+      },
     },
     icon: {
-      label: "Icon",
-      description: "An emoji icon for the character",
+      label: "Character Icon",
+      description:
+        "Pick an emoji that represents your character. This icon appears whenever the character is displayed.",
     },
-    systemPrompt: {
-      label: "System Prompt",
-      description: "The system prompt that defines the character's behavior",
+    description: {
+      label: "Character Description",
+      description:
+        "Describe what makes this character unique. What's their role? What can they help with? Be specific and detailed.",
+      placeholder: "Describe your character's purpose and capabilities",
+      validation: {
+        minLength: "Description must be at least 10 characters",
+        maxLength: "Description must be less than 500 characters",
+      },
     },
     category: {
       label: "Category",
-      description: "The category this character belongs to",
+      description:
+        "Choose the category that best fits your character. This helps with organization and discovery.",
     },
-    tagline: {
-      label: "Tagline",
-      description: "A short tagline describing the character",
+    isPublic: {
+      label: "Make Public",
+      description:
+        "Enable this to share your character with the community. When disabled, the character remains private and only visible to you.",
+    },
+    voice: {
+      label: "Voice",
+      description:
+        "Select a text-to-speech voice for audio responses. Each character can have their own unique voice.",
+    },
+    systemPrompt: {
+      label: "System Prompt",
+      description:
+        "Define your character's behavior, personality, and expertise. This is the core instruction that shapes how the AI responds. Be detailed about tone, knowledge areas, and conversation style.",
+      placeholder: "You are a helpful assistant who specializes in...",
+      validation: {
+        minLength: "System prompt must be at least 10 characters",
+        maxLength: "System prompt must be less than 5000 characters",
+      },
     },
     source: {
       label: "Source",
       description:
         "The source of this character (built-in, custom, or community)",
-    },
-    ownershipType: {
-      label: "Ownership Type",
-      description: "Who owns this character (system, user, or public)",
-    },
-    voice: {
-      label: "Voice",
-      description: "Text-to-speech voice for this character",
     },
     modelSelection: {
       label: "Model Selection",

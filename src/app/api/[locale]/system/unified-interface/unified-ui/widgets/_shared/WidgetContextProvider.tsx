@@ -41,19 +41,25 @@ export function WidgetContextProvider<TEndpoint extends CreateApiEndpointAny>({
       ReactWidgetContext<CreateApiEndpointAny>
     >
   > | null>(null);
+
+  // Initialize store with current context
   if (!storeRef.current) {
     storeRef.current = createWidgetContextStore<
       CreateApiEndpointAny,
       ReactWidgetContext<CreateApiEndpointAny>
     >(context as ReactWidgetContext<CreateApiEndpointAny>);
+  } else {
+    // Update the store's internal state directly without triggering subscriptions during render
+    // This is safe because we're just updating the store's state object, not calling setState
+    const currentState = storeRef.current.getState();
+    if (currentState.context !== context) {
+      // Use Object.assign to update the internal state without triggering listeners
+      Object.assign(currentState, {
+        context: context as ReactWidgetContext<CreateApiEndpointAny>,
+      });
+    }
   }
   const store = storeRef.current;
-
-  // Update store synchronously when context changes (before render)
-  // This ensures context is always up-to-date before children render
-  store.setState({
-    context: context as ReactWidgetContext<CreateApiEndpointAny>,
-  });
 
   return (
     <WidgetContextStoreContext.Provider value={store}>

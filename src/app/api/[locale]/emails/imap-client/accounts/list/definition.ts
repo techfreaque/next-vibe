@@ -152,7 +152,7 @@ const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
       accounts: responseArrayField(
         {
-          type: WidgetType.GROUPED_LIST,
+          type: WidgetType.CONTAINER,
           sortBy: "name",
           columns: 12,
         },

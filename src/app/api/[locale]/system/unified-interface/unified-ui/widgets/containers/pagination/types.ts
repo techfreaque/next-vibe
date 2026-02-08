@@ -2,13 +2,63 @@
  * Pagination Widget Type Definitions
  */
 
-import type { SpacingSize, WidgetType } from "../../../../shared/types/enums";
-import type {
-  AnyChildrenConstrain,
-  BaseObjectWidgetConfig,
-  ConstrainedChildUsage,
-  FieldUsageConfig,
-} from "../../_shared/types";
+import z from "zod";
+
+import type { TranslationKey } from "@/i18n/core/static-types";
+
+import type { SpacingSize } from "../../../../shared/types/enums";
+import { FieldDataType, WidgetType } from "../../../../shared/types/enums";
+import type { BaseObjectWidgetConfig } from "../../_shared/types";
+import type { TextWidgetConfig } from "../../display-only/text/types";
+import type { NumberFieldWidgetConfig } from "../../form-fields/number-field/types";
+
+export function paginationField(config?: {
+  order?: number;
+}): PaginationWidgetConfig {
+  return {
+    type: WidgetType.PAGINATION,
+    schemaType: "object" as const,
+    order: config?.order,
+    usage: { request: "data", response: true },
+    children: {
+      page: {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        schema: pageSchema,
+        usage: { request: "data" },
+        schemaType: "primitive" as const,
+      },
+      limit: {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        schema: limitSchema,
+        usage: { request: "data" },
+        schemaType: "primitive" as const,
+      },
+      totalCount: {
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.credits.history.get.paginationInfo.total" as const,
+        schema: totalCountSchema,
+        usage: { response: true },
+        schemaType: "primitive" as const,
+      },
+      pageCount: {
+        type: WidgetType.TEXT,
+        content:
+          "app.api.agent.chat.credits.history.get.paginationInfo.totalPages" as const,
+        schema: pageCountSchema,
+        usage: { response: true },
+        schemaType: "primitive" as const,
+      },
+    },
+  };
+}
+
+const pageSchema = z.coerce.number().optional().default(1);
+const limitSchema = z.coerce.number().optional().default(50);
+const totalCountSchema = z.coerce.number();
+const pageCountSchema = z.coerce.number();
 
 /**
  * Pagination Widget Config
@@ -25,18 +75,35 @@ import type {
  * - pageCount: Total number of pages
  * - offset: Current offset
  */
-export interface PaginationWidgetConfig<
-  TKey extends string,
-  TUsage extends FieldUsageConfig,
-  TSchemaType extends "object" | "object-optional" | "widget-object",
-  TChildren extends {
-    page: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
-    limit: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
-    totalCount: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
-    pageCount?: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
-    offset?: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
-  },
-> extends BaseObjectWidgetConfig<TKey, TUsage, TSchemaType, TChildren> {
+export interface PaginationWidgetConfig extends BaseObjectWidgetConfig<
+  TranslationKey,
+  { request: "data"; response: true },
+  "object",
+  {
+    page: NumberFieldWidgetConfig<
+      TranslationKey,
+      typeof pageSchema,
+      { request: "data"; response?: never }
+    >;
+    limit: NumberFieldWidgetConfig<
+      TranslationKey,
+      typeof limitSchema,
+      { request: "data"; response?: never }
+    >;
+    totalCount: TextWidgetConfig<
+      TranslationKey,
+      typeof totalCountSchema,
+      { request?: undefined; response: true },
+      "primitive"
+    >;
+    pageCount: TextWidgetConfig<
+      TranslationKey,
+      typeof pageCountSchema,
+      { request?: undefined; response: true },
+      "primitive"
+    >;
+  }
+> {
   type: WidgetType.PAGINATION;
   /** Top border */
   showBorder?: boolean;

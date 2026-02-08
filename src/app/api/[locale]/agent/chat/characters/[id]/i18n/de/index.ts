@@ -21,6 +21,9 @@ export const translations: typeof enTranslations = {
       label: "Charakter-ID",
       description: "Die eindeutige Kennung der Charakter",
     },
+    systemPrompt: {
+      label: "System-Prompt",
+    },
     response: {
       character: {
         title: "Charakter",
@@ -125,10 +128,20 @@ export const translations: typeof enTranslations = {
     name: {
       label: "Name",
       description: "Der Name der Charakter",
+      placeholder: "Charakternamen eingeben",
+      validation: {
+        minLength: "Name muss mindestens 2 Zeichen lang sein",
+        maxLength: "Name muss weniger als 100 Zeichen lang sein",
+      },
     },
     description: {
       label: "Beschreibung",
       description: "Eine kurze Beschreibung der Charakter",
+      placeholder: "Zweck und Fähigkeiten des Charakters beschreiben",
+      validation: {
+        minLength: "Beschreibung muss mindestens 10 Zeichen lang sein",
+        maxLength: "Beschreibung muss weniger als 500 Zeichen lang sein",
+      },
     },
     icon: {
       label: "Symbol",
@@ -138,6 +151,11 @@ export const translations: typeof enTranslations = {
       label: "System-Prompt",
       description:
         "Der System-Prompt, der das Verhalten der Charakter definiert",
+      placeholder: "System-Prompt eingeben",
+      validation: {
+        minLength: "System-Prompt muss mindestens 10 Zeichen lang sein",
+        maxLength: "System-Prompt muss weniger als 5000 Zeichen lang sein",
+      },
     },
     category: {
       label: "Kategorie",
@@ -146,16 +164,21 @@ export const translations: typeof enTranslations = {
     tagline: {
       label: "Slogan",
       description: "Ein kurzer Slogan, der den Charakter beschreibt",
+      placeholder: "Slogan eingeben",
+      validation: {
+        minLength: "Slogan muss mindestens 2 Zeichen lang sein",
+        maxLength: "Slogan muss weniger als 500 Zeichen lang sein",
+      },
     },
     source: {
       label: "Quelle",
       description:
         "Die Quelle dieses Charakters (integriert, benutzerdefiniert oder Community)",
     },
-    ownershipType: {
-      label: "Eigentümertyp",
+    isPublic: {
+      label: "Öffentlich machen",
       description:
-        "Wer besitzt diesen Charakter (System, Benutzer oder öffentlich)",
+        "Aktivieren Sie dies, um Ihren Charakter mit der Community zu teilen. Wenn deaktiviert, bleibt der Charakter privat und nur für Sie sichtbar.",
     },
     voice: {
       label: "Stimme",

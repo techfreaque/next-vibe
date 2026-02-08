@@ -7,7 +7,7 @@ import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
-import type { CreditBalance } from "@/app/api/[locale]/credits/repository";
+import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import { CreditBalanceCard } from "@/app/api/[locale]/subscription/_components/credit-balance-card";
 import { OverviewTab } from "@/app/api/[locale]/subscription/_components/overview-tab";
 import { PaymentStatusAlert } from "@/app/api/[locale]/subscription/_components/payment-status-alert";
@@ -22,7 +22,7 @@ import { simpleT } from "@/i18n/core/shared";
 interface OverviewPageClientProps {
   locale: CountryLanguage;
   isAuthenticated: boolean;
-  initialCredits: CreditBalance | null;
+  initialCredits: CreditsGetResponseOutput | null;
   initialSubscription: SubscriptionGetResponseOutput | null;
   subscriptionPrice: number;
   subscriptionCredits: number;

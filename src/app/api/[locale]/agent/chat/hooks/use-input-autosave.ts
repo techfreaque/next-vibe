@@ -46,15 +46,9 @@ export async function loadDraft(
   try {
     const savedDraft = await storage.getItem(storageKey);
     if (savedDraft) {
-      logger.debug("Chat Input Autosave", "Loaded draft", {
-        storageKey,
-        draftLength: savedDraft.length,
-      });
       return savedDraft;
     }
-    logger.debug("Chat Input Autosave", "No draft found", {
-      storageKey,
-    });
+
     return "";
   } catch (error) {
     logger.error("Chat Input Autosave", "Failed to load draft", {
@@ -76,16 +70,9 @@ export async function saveDraft(
   try {
     if (input.trim()) {
       await storage.setItem(storageKey, input);
-      logger.debug("Chat Input Autosave", "Saved draft", {
-        storageKey,
-        inputLength: input.length,
-      });
     } else {
       // Remove empty drafts to keep storage clean
       await storage.removeItem(storageKey);
-      logger.debug("Chat Input Autosave", "Removed empty draft", {
-        storageKey,
-      });
     }
   } catch (error) {
     logger.error("Chat Input Autosave", "Failed to save draft", {
@@ -105,7 +92,6 @@ export async function clearDraft(
   try {
     await storage.removeItem(storageKey);
     await clearDraftAttachments(storageKey, logger);
-    logger.debug("Chat Input Autosave", "Cleared draft", { storageKey });
   } catch (error) {
     logger.error("Chat Input Autosave", "Failed to clear draft", {
       error: error instanceof Error ? error : String(error),

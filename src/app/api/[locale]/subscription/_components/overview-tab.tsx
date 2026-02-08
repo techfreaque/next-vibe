@@ -21,13 +21,12 @@ import { H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import {
+  getCreditCostFromModel,
   modelOptions,
   modelProviders,
-} from "@/app/api/[locale]/agent/models/models";
-import {
-  FEATURE_COSTS,
   TOTAL_MODEL_COUNT,
-} from "@/app/api/[locale]/products/repository-client";
+} from "@/app/api/[locale]/agent/models/models";
+import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -202,10 +201,11 @@ export function OverviewTab({
                         </H4>
                         <Div className="grid grid-cols-2 gap-2 text-sm">
                           {providerModels.map((model) => {
+                            const creditCost = getCreditCostFromModel(model);
                             const creditText =
-                              model.creditCost === 1
-                                ? `${model.creditCost} credit`
-                                : `${model.creditCost} credits`;
+                              creditCost === 1
+                                ? `${creditCost} credit`
+                                : `${creditCost} credits`;
                             return (
                               <Div
                                 key={model.id}

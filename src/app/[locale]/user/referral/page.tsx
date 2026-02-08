@@ -9,6 +9,7 @@ import type { JSX } from "react";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -41,8 +42,8 @@ export default async function ReferralPage({
 
   // Check if user is authenticated (but don't redirect)
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const minimalUser = await AuthRepository.getAuthMinimalUser<[]>(
-    [],
+  const minimalUser = await AuthRepository.getAuthMinimalUser(
+    [UserRole.CUSTOMER, UserRole.PUBLIC, UserRole.ADMIN],
     { platform: Platform.NEXT_PAGE, locale },
     logger,
   );
@@ -52,7 +53,6 @@ export default async function ReferralPage({
       locale={locale}
       isAuthenticated={isAuthenticated}
       user={minimalUser}
-      logger={logger}
     />
   );
 }

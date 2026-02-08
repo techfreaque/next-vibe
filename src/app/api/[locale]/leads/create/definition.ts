@@ -96,7 +96,7 @@ const { POST } = createEndpoint({
       // === CONTACT INFORMATION ===
       contactInfo: objectField(
         {
-          type: WidgetType.SECTION,
+          type: WidgetType.CONTAINER,
           title: "app.api.leads.create.post.contactInfo.title",
           description: "app.api.leads.create.post.contactInfo.description",
           layoutType: LayoutType.GRID_2_COLUMNS,
@@ -151,7 +151,7 @@ const { POST } = createEndpoint({
       // === LOCATION & PREFERENCES ===
       locationPreferences: objectField(
         {
-          type: WidgetType.SECTION,
+          type: WidgetType.CONTAINER,
           title: "app.api.leads.create.post.locationPreferences.title",
           description:
             "app.api.leads.create.post.locationPreferences.description",
@@ -186,7 +186,7 @@ const { POST } = createEndpoint({
       // === LEAD DETAILS ===
       leadDetails: objectField(
         {
-          type: WidgetType.SECTION,
+          type: WidgetType.CONTAINER,
           title: "app.api.leads.create.post.leadDetails.title",
           description: "app.api.leads.create.post.leadDetails.description",
           layoutType: LayoutType.STACKED,

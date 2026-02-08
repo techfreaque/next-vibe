@@ -3,7 +3,6 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import { Methods } from "../../types/enums";
 import type { Platform } from "../../types/platform";
@@ -37,7 +36,6 @@ export interface IDefinitionsRegistry {
   getEndpointsForUser(
     platform: Platform,
     user: JwtPayloadType,
-    logger: EndpointLogger,
   ): CreateApiEndpointAny[];
 
   /**
@@ -52,7 +50,6 @@ export interface IDefinitionsRegistry {
     platform: Platform,
     user: JwtPayloadType,
     locale: CountryLanguage,
-    logger: EndpointLogger,
   ): SerializableToolMetadata[];
 }
 
@@ -122,13 +119,7 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
   getEndpointsForUser(
     platform: Platform,
     user: JwtPayloadType,
-    logger: EndpointLogger,
   ): CreateApiEndpointAny[] {
-    logger.debug("[Definitions Registry] Discovering endpoints for user", {
-      platform,
-      userId: user.isPublic ? "public" : user.id,
-    });
-
     const discovered = this.getEndpoints(platform);
 
     // Filter by user permissions
@@ -136,13 +127,7 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
       discovered,
       user,
       platform,
-      logger,
     );
-
-    logger.debug("[Definitions Registry] Filtered endpoints", {
-      total: discovered.length,
-      filtered: filtered.length,
-    });
 
     return filtered;
   }
@@ -228,36 +213,13 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
     platform: Platform,
     user: JwtPayloadType,
     locale: CountryLanguage,
-    logger: EndpointLogger,
   ): SerializableToolMetadata[] {
-    logger.debug("[Definitions Registry] Getting serialized tools for user", {
-      platform,
-      isPublic: user.isPublic,
-      userId: user.isPublic ? undefined : user.id,
-    });
-
-    const filteredEndpoints = this.getEndpointsForUser(platform, user, logger);
-
-    logger.info("[Definitions Registry] Filtered endpoints by permissions", {
-      filteredEndpoints: filteredEndpoints.length,
-      isPublic: user.isPublic,
-      userId: user.isPublic ? undefined : user.id,
-    });
+    const filteredEndpoints = this.getEndpointsForUser(platform, user);
 
     const serializableTools = this.serializeEndpoints(
       filteredEndpoints,
       locale,
     );
-
-    logger.info("[Definitions Registry] Serialized tools", {
-      count: serializableTools.length,
-      samples: serializableTools.slice(0, 3).map((t) => ({
-        name: t.name,
-        method: t.method,
-        toolName: t.toolName,
-        aliases: t.aliases,
-      })),
-    });
 
     return serializableTools;
   }

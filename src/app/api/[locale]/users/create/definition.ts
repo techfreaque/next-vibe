@@ -309,7 +309,7 @@ const { POST } = createEndpoint({
       }),
       responseUserRoles: responseArrayField(
         {
-          type: WidgetType.DATA_TABLE,
+          type: WidgetType.CONTAINER,
           usage: { response: true },
         },
         objectField(

@@ -9,12 +9,6 @@ import type z from "zod";
 import type { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
-import {
-  isBoolean,
-  isNullish,
-  isObject,
-  isString,
-} from "../../_shared/type-guards";
 import type { BaseWidgetContext } from "../../_shared/types";
 import type { TextFormat, TextWidgetSchema } from "./types";
 
@@ -39,16 +33,10 @@ export function extractTextData(
   value: z.output<TextWidgetSchema>,
   t: BaseWidgetContext<CreateApiEndpointAny>["t"],
 ): ProcessedText | null {
-  // Handle null/undefined
-  if (isNullish(value)) {
-    return null;
-  }
-
   // Handle string value with translation
-  const stringValue = isString(value, t);
-  if (stringValue) {
+  if (typeof value === "string") {
     return {
-      text: stringValue,
+      text: t(value),
       format: "plain",
     };
   }
@@ -70,23 +58,30 @@ export function extractTextData(
   }
 
   // Handle boolean value
-  if (isBoolean(value)) {
+  if (typeof value === "boolean") {
     return {
       text: value ? "true" : "false",
       format: "plain",
     };
   }
+  // Handle null/undefined
+  if (!value) {
+    return null;
+  }
+
+  // Handle array by converting to JSON
+  if (Array.isArray(value)) {
+    return {
+      text: JSON.stringify(value),
+      format: "code",
+    };
+  }
 
   // Handle object value with text properties
-  if (isObject(value)) {
-    const textValue = value["text"];
-    const truncateValue = value["truncate"];
-    const formatValue = value["format"];
-
-    const text = typeof textValue === "string" ? textValue : "";
-    const truncate =
-      typeof truncateValue === "number" ? truncateValue : undefined;
-    const format = typeof formatValue === "string" ? formatValue : "plain";
+  if (typeof value === "object") {
+    const text = value.text;
+    const truncate = value.truncate;
+    const format = value.format;
 
     if (!text) {
       return null;
@@ -108,14 +103,6 @@ export function extractTextData(
     };
   }
 
-  // Handle array by converting to JSON
-  if (Array.isArray(value)) {
-    return {
-      text: JSON.stringify(value),
-      format: "code",
-    };
-  }
-
   return null;
 }
 
@@ -133,7 +120,7 @@ function formatDateValue(
   locale: string,
   includeTime = true,
 ): string | null {
-  if (isNullish(value)) {
+  if (!value) {
     return null;
   }
 
@@ -183,7 +170,7 @@ export function formatIfDate(
   fieldType: FieldDataType | undefined,
   locale: string,
 ): string | null {
-  if (!fieldType || isNullish(value)) {
+  if (!fieldType || !value) {
     return null;
   }
 

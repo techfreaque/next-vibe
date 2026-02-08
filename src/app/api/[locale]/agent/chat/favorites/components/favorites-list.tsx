@@ -184,15 +184,14 @@ function FavoriteRow({
               )}
             >
               {favorite.characterId !== NO_CHARACTER_ID
-                ? t(favorite.content.titleRow.name)
-                : favorite.content.titleRow.name}
+                ? t(favorite.name)
+                : favorite.name}
             </Span>
-            {favorite.characterId !== NO_CHARACTER_ID &&
-              favorite.content.titleRow.tagline && (
-                <Span className="text-xs text-muted-foreground truncate">
-                  {t(favorite.content.titleRow.tagline)}
-                </Span>
-              )}
+            {favorite.characterId !== NO_CHARACTER_ID && favorite.tagline && (
+              <Span className="text-xs text-muted-foreground truncate">
+                {t(favorite.tagline)}
+              </Span>
+            )}
           </Div>
           {isActive && (
             <Badge variant="default" className="text-[9px] h-4 px-1.5 shrink-0">
@@ -201,35 +200,28 @@ function FavoriteRow({
           )}
         </Div>
         {/* Description - shown for character-based favorites */}
-        {favorite.content.description && (
+        {favorite.description && (
           <Span className="text-xs text-muted-foreground block mt-1 truncate">
-            {t(favorite.content.description)}
+            {t(favorite.description)}
           </Span>
         )}
         <Div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
-          {favorite.content.modelRow.modelInfo && (
+          {favorite.modelInfo && (
             <>
-              <Icon
-                icon={favorite.content.modelRow.modelIcon}
-                className="h-4 w-4"
-              />
-              <Span className="truncate">
-                {favorite.content.modelRow.modelInfo}
-              </Span>
+              <Icon icon={favorite.modelIcon} className="h-4 w-4" />
+              <Span className="truncate">{favorite.modelInfo}</Span>
               <Span className="text-muted-foreground/40">•</Span>
             </>
           )}
-          {favorite.content.modelRow.modelProvider && (
+          {favorite.modelProvider && (
             <>
               <Span className="shrink-0">
-                {modelProviders[favorite.content.modelRow.modelProvider]?.name}
+                {modelProviders[favorite.modelProvider]?.name}
               </Span>
               <Span className="text-muted-foreground/40">•</Span>
             </>
           )}
-          <Span className="shrink-0">
-            {favorite.content.modelRow.creditCost}
-          </Span>
+          <Span className="shrink-0">{favorite.creditCost}</Span>
         </Div>
       </Div>
     </Div>

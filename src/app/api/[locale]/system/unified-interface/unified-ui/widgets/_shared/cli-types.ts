@@ -69,16 +69,18 @@ export interface InkWidgetRendererProps<
 /**
  * Ink-specific widget props. Uses BaseWidgetProps with InkWidgetContext.
  * Receives fields WITH values from the renderer
+ * Distributive conditional to allow any UnifiedField member while preserving types
  */
 export type InkWidgetProps<
   TEndpoint extends CreateApiEndpointAny,
+  TUsage extends FieldUsageConfig,
   TWidgetConfig extends UnifiedField<
     string,
     z.ZodTypeAny,
-    FieldUsageConfig,
-    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
+    TUsage,
+    AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
   >,
-> = BaseWidgetProps<TEndpoint, TWidgetConfig>;
+> = BaseWidgetProps<TEndpoint, TUsage, TWidgetConfig>;
 
 /**
  * Type guard to check if a form is InkFormState

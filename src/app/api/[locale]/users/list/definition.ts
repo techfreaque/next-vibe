@@ -178,7 +178,7 @@ const { GET } = createEndpoint({
         {
           users: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
               columns: 12,
             },
             objectField(

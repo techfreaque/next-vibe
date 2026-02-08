@@ -7,17 +7,25 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
-import type { JSX } from "react";
+import { type JSX, useMemo } from "react";
 
-import type { IconSchemaType } from "@/app/api/[locale]/shared/types/common.schema";
+import type {
+  IconSchemaNullishType,
+  IconSchemaOptionalType,
+  IconSchemaType,
+} from "@/app/api/[locale]/shared/types/common.schema";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import {
   getBorderRadiusClassName,
   getContainerSizeClassName,
   getIconSizeClassName,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type {
+  ReactRequestResponseWidgetProps,
+  ReactStaticWidgetProps,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import { useWidgetForm } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import {
   Icon,
   type IconKey,
@@ -32,16 +40,27 @@ import type { IconWidgetConfig } from "./types";
  */
 export function IconWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TSchema extends IconSchemaType,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "primitive",
->({
-  field,
-}: ReactWidgetProps<
-  TEndpoint,
-  TUsage,
-  IconWidgetConfig<TSchema, TUsage, TSchemaType>
->): JSX.Element {
+>(
+  props:
+    | ReactStaticWidgetProps<
+        TEndpoint,
+        TUsage,
+        IconWidgetConfig<never, TUsage, "widget">
+      >
+    | ReactRequestResponseWidgetProps<
+        TEndpoint,
+        TUsage,
+        IconWidgetConfig<
+          IconSchemaType | IconSchemaOptionalType | IconSchemaNullishType,
+          TUsage,
+          "primitive"
+        >
+      >,
+): JSX.Element {
+  const { field } = props;
+  const fieldName = "fieldName" in props ? props.fieldName : undefined;
+  const form = useWidgetForm();
   const {
     containerSize,
     iconSize,
@@ -51,63 +70,87 @@ export function IconWidget<
     className: fieldClassName,
     icon: staticIcon,
     getClassName,
+    parentValue,
   } = field;
+  const usage = "usage" in field ? field.usage : undefined;
 
-  const icon: IconKey | undefined = field.value || staticIcon;
+  // Get value from form for request fields, otherwise from field.value
+  const value =
+    "value" in field
+      ? usage?.request && fieldName && form
+        ? form.watch(fieldName) || field.value
+        : field.value
+      : undefined;
 
-  // Apply dynamic className callback if present
-  const dynamicClassName = getClassName
-    ? getClassName(field.value, field.parentValue)
-    : "";
-  const mergedClassName = cn(fieldClassName, dynamicClassName);
+  return useMemo(() => {
+    const icon: IconKey | undefined = value || staticIcon;
 
-  // Get classes from config
-  const iconSizeClass = getIconSizeClassName(iconSize);
-  const containerSizeClass = containerSize
-    ? getContainerSizeClassName(containerSize)
-    : "";
-  const borderRadiusClass = getBorderRadiusClassName(borderRadius);
+    // Apply dynamic className callback if present
+    const dynamicClassName = getClassName
+      ? getClassName(value, parentValue)
+      : "";
+    const mergedClassName = cn(fieldClassName, dynamicClassName);
 
-  // JIT-safe justify-content classes mapping
-  const justifyClassMap: Record<string, string> = {
-    start: "justify-start",
-    center: "justify-center",
-    end: "justify-end",
-  };
-  const justifyClass = justifyClassMap[justifyContent] ?? "justify-center";
+    // Get classes from config
+    const iconSizeClass = getIconSizeClassName(iconSize);
+    const containerSizeClass = containerSize
+      ? getContainerSizeClassName(containerSize)
+      : "";
+    const borderRadiusClass = getBorderRadiusClassName(borderRadius);
 
-  if (!icon) {
-    return <></>;
-  }
-  if (typeof icon !== "string") {
-    // oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Error indicator character
-    return <Div className={mergedClassName}>!</Div>;
-  }
+    // JIT-safe justify-content classes mapping
+    const justifyClassMap: Record<string, string> = {
+      start: "justify-start",
+      center: "justify-center",
+      end: "justify-end",
+    };
+    const justifyClass = justifyClassMap[justifyContent] ?? "justify-center";
 
-  // If no containerSize, render icon without wrapper
-  if (!containerSize) {
+    if (!icon) {
+      return <></>;
+    }
+    if (typeof icon !== "string") {
+      // oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Error indicator character
+      return <Div className={mergedClassName}>!</Div>;
+    }
+
+    // If no containerSize, render icon without wrapper
+    if (!containerSize) {
+      return (
+        <Icon
+          icon={icon}
+          className={cn("flex", iconSizeClass || "h-5 w-5", mergedClassName)}
+        />
+      );
+    }
+
     return (
-      <Icon
-        icon={icon}
-        className={cn("flex", iconSizeClass || "h-5 w-5", mergedClassName)}
-      />
+      <Div
+        className={cn(
+          containerSizeClass,
+          borderRadiusClass,
+          "bg-muted flex items-center shrink-0",
+          justifyClass,
+          !noHover &&
+            "bg-primary/10 group-hover:bg-primary/20 transition-colors",
+          mergedClassName,
+        )}
+      >
+        <Icon icon={icon} className={iconSizeClass || "h-5 w-5"} />
+      </Div>
     );
-  }
-
-  return (
-    <Div
-      className={cn(
-        containerSizeClass,
-        borderRadiusClass,
-        "bg-muted flex items-center shrink-0",
-        justifyClass,
-        !noHover && "bg-primary/10 group-hover:bg-primary/20 transition-colors",
-        mergedClassName,
-      )}
-    >
-      <Icon icon={icon} className={iconSizeClass || "h-5 w-5"} />
-    </Div>
-  );
+  }, [
+    value,
+    parentValue,
+    borderRadius,
+    containerSize,
+    fieldClassName,
+    iconSize,
+    justifyContent,
+    noHover,
+    staticIcon,
+    getClassName,
+  ]);
 }
 
 export default IconWidget;

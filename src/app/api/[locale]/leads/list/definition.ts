@@ -12,7 +12,6 @@ import {
   objectField,
   objectOptionalField,
   requestField,
-  requestResponseField,
   responseArrayField,
   responseField,
   widgetField,
@@ -32,6 +31,7 @@ import {
   LanguagesOptions,
 } from "@/i18n/core/config";
 
+import { paginationField } from "../../system/unified-interface/unified-ui/widgets/containers/pagination/types";
 import { UserRole } from "../../user/user-roles/enum";
 import createLeadDefinitions from "../create/definition";
 import {
@@ -278,7 +278,7 @@ const { GET } = createEndpoint({
         {
           leads: responseArrayField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
               columns: 12,
               metadata: {
                 onRowClick: {
@@ -461,35 +461,9 @@ const { GET } = createEndpoint({
       ),
 
       // === PAGINATION INFO (Editable controls + display in one row) ===
-      paginationInfo: objectField(
-        {
-          type: WidgetType.PAGINATION,
-          order: 5,
-        },
-        { request: "data", response: true },
-        {
-          page: requestResponseField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.NUMBER,
-            schema: z.coerce.number().optional().default(1),
-          }),
-          limit: requestResponseField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.NUMBER,
-            schema: z.coerce.number().optional().default(20),
-          }),
-          totalCount: responseField({
-            type: WidgetType.TEXT,
-            content: "app.api.leads.list.get.response.total" as const,
-            schema: z.coerce.number(),
-          }),
-          pageCount: responseField({
-            type: WidgetType.TEXT,
-            content: "app.api.leads.list.get.response.totalPages" as const,
-            schema: z.coerce.number(),
-          }),
-        },
-      ),
+      paginationInfo: paginationField({
+        order: 5,
+      }),
     },
   ),
 
@@ -610,8 +584,6 @@ const { GET } = createEndpoint({
         },
         paginationInfo: {
           totalCount: 100,
-          page: 1,
-          limit: 20,
           pageCount: 5,
         },
       },
@@ -621,8 +593,6 @@ const { GET } = createEndpoint({
         },
         paginationInfo: {
           totalCount: 0,
-          page: 1,
-          limit: 10,
           pageCount: 0,
         },
       },
@@ -660,8 +630,6 @@ const { GET } = createEndpoint({
         },
         paginationInfo: {
           totalCount: 25,
-          page: 1,
-          limit: 50,
           pageCount: 1,
         },
       },

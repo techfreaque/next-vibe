@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
+  customWidgetObject,
   navigateButtonField,
   widgetField,
-  widgetObjectField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   objectField,
@@ -27,10 +27,17 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { iconSchema } from "../../../shared/types/common.schema";
-import { ModelId } from "../../models/models";
-import characterSingleDefinitions from "./[id]/definition";
+import {
+  ModelSortDirection,
+  ModelSortField,
+} from "../../../system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
+import { ModelId, TOTAL_MODEL_COUNT } from "../../models/models";
+import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
+import createFavoriteDefinitions from "../favorites/create/definition";
+import { NO_CHARACTER_ID } from "./config";
 import createCharacterDefinitions from "./create/definition";
-import { CharacterCategoryDB } from "./enum";
+import { CharacterCategoryDB, ModelSelectionType } from "./enum";
+import { CharactersListContainer } from "./widget";
 
 /**
  * Get Characters List Endpoint (GET)
@@ -47,101 +54,198 @@ const { GET } = createEndpoint({
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.characters" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-      noCard: true,
-      gap: "2",
+  options: {
+    queryOptions: {
+      onSuccess: async (data, user, logger) => {
+        // Only compute addedToFav from localStorage for PUBLIC users
+        // Authenticated users get it from the database query
+        if (!user.isPublic) {
+          return;
+        }
+
+        if (!data.responseData.sections) {
+          return;
+        }
+
+        const { ChatFavoritesRepositoryClient } =
+          await import("../favorites/repository-client");
+
+        // Load all favorites from localStorage
+        const favoritesResult =
+          await ChatFavoritesRepositoryClient.getFavorites(logger);
+
+        if (!favoritesResult.success) {
+          return;
+        }
+
+        const favoritedCharacterIds = new Set(
+          favoritesResult.data.favoritesList.map((fav) => fav.characterId),
+        );
+
+        // Mutate the response data directly (before it's added to cache)
+        for (const section of data.responseData.sections) {
+          for (const character of section.characters) {
+            character.addedToFav = favoritedCharacterIds.has(character.id);
+          }
+        }
+      },
     },
-    { response: true },
-    {
-      // Top action buttons container
-      topActions: widgetObjectField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.INLINE,
-          gap: "2",
-          className: "p-6",
-          noCard: true,
+  },
+
+  fields: customWidgetObject({
+    render: CharactersListContainer,
+    usage: { response: true },
+    children: {
+      // Flattened top action buttons (no container wrapper)
+      backButton: backButton({
+        usage: { response: true },
+      }),
+      createButton: navigateButtonField({
+        targetEndpoint: createCharacterDefinitions.POST,
+        extractParams: () => ({}),
+        prefillFromGet: false,
+        label: "app.api.agent.chat.characters.get.createButton.label" as const,
+        icon: "plus",
+        className: "ml-auto",
+        usage: { response: true },
+      }),
+
+      // Flattened fields (no container wrapper)
+      title: widgetField({
+        type: WidgetType.TEXT,
+        size: "base",
+        content:
+          "app.api.agent.chat.characters.get.browser.advancedModelAccess" as const,
+        emphasis: "bold",
+        inline: true,
+        usage: { response: true },
+      }),
+
+      description: widgetField({
+        type: WidgetType.TEXT,
+        size: "xs",
+        variant: "muted",
+        content:
+          "app.api.agent.chat.characters.get.browser.configureFiltersText" as const,
+        className: "text-muted-foreground pb-4",
+        usage: { response: true },
+      }),
+      // Flattened model fields (no container wrapper)
+      icon: widgetField({
+        type: WidgetType.ICON,
+        icon: "sparkles",
+        containerSize: "lg",
+        iconSize: "base",
+        borderRadius: "xl",
+        className: "text-primary bg-primary/15",
+        usage: { response: true },
+      }),
+      name: widgetField({
+        type: WidgetType.TEXT,
+        size: "base",
+        content:
+          "app.api.agent.chat.characters.get.browser.configureAiModelsTitle" as const,
+        emphasis: "bold",
+        className: "text-primary",
+        inline: true,
+        usage: { response: true },
+      }),
+      modelDescription: widgetField({
+        type: WidgetType.TEXT,
+        size: "xs",
+        variant: "muted",
+        content:
+          "app.api.agent.chat.characters.get.browser.advancedChooseText" as const,
+        contentParams: { count: TOTAL_MODEL_COUNT },
+        usage: { response: true },
+      }),
+      selectButton: navigateButtonField({
+        targetEndpoint: createFavoriteDefinitions.POST,
+        extractParams: async () => {
+          return {
+            data: {
+              characterId: NO_CHARACTER_ID,
+              icon: "sparkles" as const,
+              name: "",
+              tagline: "",
+              description: "",
+              voice: DEFAULT_TTS_VOICE,
+              modelSelection: {
+                currentSelection: {
+                  selectionType: ModelSelectionType.FILTERS,
+                  sortBy: ModelSortField.CONTENT,
+                  sortDirection: ModelSortDirection.DESC,
+                },
+              },
+            },
+          };
         },
-        { response: true },
-        {
-          backButton: backButton({ usage: { response: true } }),
-          createButton: navigateButtonField({
-            targetEndpoint: createCharacterDefinitions.POST,
-            extractParams: () => ({}),
-            prefillFromGet: false,
-            label:
-              "app.api.agent.chat.characters.get.createButton.label" as const,
-            icon: "plus",
-            className: "ml-auto",
-            usage: { response: true },
-          }),
-        },
-      ),
+        label:
+          "app.api.agent.chat.characters.get.browser.selectButton.label" as const,
+        icon: "flame",
+        variant: "default",
+        size: "sm",
+        usage: { response: true },
+      }),
+
+      separator: widgetField({
+        type: WidgetType.SEPARATOR,
+        label: "app.api.agent.chat.characters.separator.or" as const,
+        usage: { response: true },
+      }),
+
+      charactersTitle: widgetField({
+        type: WidgetType.TEXT,
+        size: "base",
+        content:
+          "app.api.agent.chat.characters.get.browser.characterPresets" as const,
+        emphasis: "bold",
+        inline: true,
+        usage: { response: true },
+      }),
+
+      charactersDesc: widgetField({
+        type: WidgetType.TEXT,
+        size: "xs",
+        variant: "muted",
+        content:
+          "app.api.agent.chat.characters.get.browser.pickCharacterText" as const,
+        className: "text-muted-foreground pb-4",
+        usage: { response: true },
+      }),
 
       // Sections array
       sections: responseArrayField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.STACKED,
-          className: "border-t border-border p-6 overflow-y-auto max-h-[70dvh]",
-          noCard: true,
-          gap: "6",
-        },
+        { type: WidgetType.CONTAINER },
         objectField(
           {
             type: WidgetType.CONTAINER,
-            layoutType: LayoutType.STACKED,
+            layoutType: LayoutType.INLINE,
             gap: "4",
+            alignItems: "start",
             noCard: true,
           },
           { response: true },
           {
-            sectionHeader: objectField(
-              {
-                type: WidgetType.CONTAINER,
-                layoutType: LayoutType.INLINE,
-                gap: "2",
-                noCard: true,
-              },
-              { response: true },
-              {
-                icon: responseField({
-                  type: WidgetType.ICON,
-                  iconSize: "sm",
-                  noHover: true,
-                  schema: iconSchema,
-                }),
-                title: responseField({
-                  type: WidgetType.TEXT,
-                  size: "lg",
-                  emphasis: "bold",
-                  schema: z.string() as z.ZodType<TranslationKey>,
-                }),
-                count: responseField({
-                  type: WidgetType.BADGE,
-
-                  schema: z.number(),
-                }),
-              },
-            ),
+            // Flattened section header fields (no nested sectionHeader object)
+            sectionIcon: responseField({
+              type: WidgetType.ICON,
+              iconSize: "sm",
+              noHover: true,
+              schema: iconSchema,
+            }),
+            sectionTitle: responseField({
+              type: WidgetType.TEXT,
+              size: "lg",
+              emphasis: "bold",
+              schema: z.string() as z.ZodType<TranslationKey>,
+            }),
+            sectionCount: responseField({
+              type: WidgetType.BADGE,
+              schema: z.number(),
+            }),
             characters: responseArrayField(
-              {
-                type: WidgetType.DATA_CARDS,
-                layoutType: LayoutType.STACKED,
-                columns: 1,
-                spacing: "normal",
-                metadata: {
-                  onCardClick: {
-                    targetEndpoint: characterSingleDefinitions.GET,
-                    extractParams: (character: { id: string }) => ({
-                      urlPathParams: { id: character.id },
-                    }),
-                  },
-                },
-              },
+              { type: WidgetType.CONTAINER },
               objectField(
                 {
                   type: WidgetType.CONTAINER,
@@ -149,7 +253,6 @@ const { GET } = createEndpoint({
                   gap: "4",
                   alignItems: "start",
                   noCard: true,
-                  className: "group relative",
                 },
                 { response: true },
                 {
@@ -168,6 +271,11 @@ const { GET } = createEndpoint({
                     hidden: true,
                     schema: z.enum(ModelId),
                   }),
+                  addedToFav: responseField({
+                    type: WidgetType.TEXT,
+                    hidden: true,
+                    schema: z.boolean(),
+                  }),
                   icon: responseField({
                     type: WidgetType.ICON,
                     containerSize: "lg",
@@ -175,118 +283,91 @@ const { GET } = createEndpoint({
                     borderRadius: "lg",
                     schema: iconSchema,
                   }),
-                  content: objectField(
-                    {
-                      type: WidgetType.CONTAINER,
-                      layoutType: LayoutType.STACKED,
-                      gap: "1",
-                      noCard: true,
-                    },
-                    { response: true },
-                    {
-                      name: responseField({
-                        type: WidgetType.TEXT,
-                        size: "base",
-                        emphasis: "bold",
-                        inline: true,
-                        schema: z.string() as z.ZodType<TranslationKey>,
-                      }),
-                      tagline: responseField({
-                        type: WidgetType.TEXT,
-                        size: "xs",
-                        variant: "muted",
-                        inline: true,
-                        schema: z.string() as z.ZodType<TranslationKey>,
-                      }),
-                      description: responseField({
-                        type: WidgetType.TEXT,
-                        size: "xs",
-                        variant: "muted",
-                        schema: z.string() as z.ZodType<TranslationKey>,
-                      }),
 
-                      modelIcon: responseField({
-                        type: WidgetType.ICON,
-                        iconSize: "xs",
-                        inline: true,
-                        noHover: true,
-                        schema: iconSchema,
-                      }),
-                      modelInfo: responseField({
-                        type: WidgetType.TEXT,
-                        size: "xs",
-                        inline: true,
-                        variant: "muted",
-                        schema: z.string(),
-                      }),
-                      separator1: widgetField({
-                        type: WidgetType.TEXT,
-                        size: "xs",
-                        variant: "muted",
-                        inline: true,
-                        content:
-                          "app.api.agent.chat.characters.get.response.characters.character.separator.content" as const,
-                        usage: { response: true },
-                      }),
-                      modelProvider: responseField({
-                        type: WidgetType.TEXT,
-                        size: "xs",
-                        variant: "muted",
-                        inline: true,
-                        schema: z.string(),
-                      }),
-                      separator2: widgetField({
-                        type: WidgetType.TEXT,
-                        size: "xs",
-                        variant: "muted",
-                        inline: true,
-                        content:
-                          "app.api.agent.chat.characters.get.response.characters.character.separator.content" as const,
-                        usage: { response: true },
-                      }),
-                      creditCost: responseField({
-                        type: WidgetType.TEXT,
-                        size: "xs",
-                        variant: "muted",
-                        inline: true,
-                        schema: z.string(),
-                      }),
-                    },
-                  ),
-                  actions: widgetObjectField(
-                    {
-                      type: WidgetType.CONTAINER,
-                      layoutType: LayoutType.ACTIONS,
-                      noCard: true,
-                    },
-                    { response: true },
-                    {
-                      editButton: navigateButtonField({
-                        targetEndpoint: characterSingleDefinitions.PATCH,
-                        extractParams: (source) => ({
-                          urlPathParams: { id: String(source.itemData.id) },
-                        }),
-                        prefillFromGet: true,
-                        getEndpoint: characterSingleDefinitions.GET,
-                        icon: "pencil",
-                        variant: "ghost",
-                        size: "sm",
-                        usage: { response: true },
-                      }),
-                      deleteButton: navigateButtonField({
-                        targetEndpoint: characterSingleDefinitions.DELETE,
-                        extractParams: (source) => ({
-                          urlPathParams: { id: String(source.itemData.id) },
-                        }),
-                        prefillFromGet: false,
-                        icon: "trash",
-                        variant: "ghost",
-                        size: "sm",
-                        renderInModal: true,
-                        usage: { response: true },
-                      }),
-                    },
-                  ),
+                  // Flattened content fields (no nested content object)
+                  name: responseField({
+                    type: WidgetType.TEXT,
+                    size: "base",
+                    emphasis: "bold",
+                    inline: true,
+                    schema: z.string() as z.ZodType<TranslationKey>,
+                  }),
+                  tagline: responseField({
+                    type: WidgetType.TEXT,
+                    size: "xs",
+                    variant: "muted",
+                    inline: true,
+                    schema: z.string() as z.ZodType<TranslationKey>,
+                  }),
+                  description: responseField({
+                    type: WidgetType.TEXT,
+                    size: "xs",
+                    variant: "muted",
+                    schema: z.string() as z.ZodType<TranslationKey>,
+                  }),
+                  modelIcon: responseField({
+                    type: WidgetType.ICON,
+                    iconSize: "xs",
+                    inline: true,
+                    noHover: true,
+                    schema: iconSchema,
+                  }),
+                  modelInfo: responseField({
+                    type: WidgetType.TEXT,
+                    size: "xs",
+                    inline: true,
+                    variant: "muted",
+                    schema: z.string(),
+                  }),
+                  separator1: widgetField({
+                    type: WidgetType.TEXT,
+                    size: "xs",
+                    variant: "muted",
+                    inline: true,
+                    className: "hidden @sm:inline",
+                    content:
+                      "app.api.agent.chat.characters.get.response.characters.character.separator.content" as const,
+                    usage: { response: true },
+                  }),
+                  modelProvider: responseField({
+                    type: WidgetType.TEXT,
+                    size: "xs",
+                    variant: "muted",
+                    className: "hidden @sm:inline",
+                    inline: true,
+                    schema: z.string(),
+                  }),
+                  separator2: widgetField({
+                    type: WidgetType.TEXT,
+                    size: "xs",
+                    variant: "muted",
+                    inline: true,
+                    content:
+                      "app.api.agent.chat.characters.get.response.characters.character.separator.content" as const,
+                    usage: { response: true },
+                  }),
+                  creditCost: responseField({
+                    type: WidgetType.TEXT,
+                    size: "xs",
+                    variant: "muted",
+                    inline: true,
+                    schema: z.string(),
+                  }),
+
+                  favoriteButton: widgetField({
+                    type: WidgetType.BUTTON,
+                    icon: "star",
+                    variant: "ghost",
+                    size: "sm",
+                    usage: { response: true },
+                  }),
+                  editButton: widgetField({
+                    type: WidgetType.BUTTON,
+                    icon: "pencil",
+                    variant: "ghost",
+                    size: "sm",
+                    usage: { response: true },
+                  }),
                 },
               ),
             ),
@@ -294,7 +375,7 @@ const { GET } = createEndpoint({
         ),
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
@@ -359,11 +440,10 @@ const { GET } = createEndpoint({
       listAll: {
         sections: [
           {
-            sectionHeader: {
-              title: "app.api.agent.chat.characters.enums.category.assistant",
-              icon: "robot-face",
-              count: 1,
-            },
+            sectionIcon: "robot-face",
+            sectionTitle:
+              "app.api.agent.chat.characters.enums.category.assistant",
+            sectionCount: 1,
             characters: [
               {
                 id: "default",
@@ -371,41 +451,36 @@ const { GET } = createEndpoint({
                 modelId: ModelId.CLAUDE_SONNET_4_5,
                 category:
                   "app.api.agent.chat.characters.enums.category.assistant",
-                content: {
-                  name: "app.api.agent.chat.characters.default.name",
-                  tagline: "app.api.agent.chat.characters.default.tagline",
-                  description:
-                    "app.api.agent.chat.characters.default.description",
-                  modelIcon: "sparkles",
-                  modelInfo: "Claude Sonnet 4.5",
-                  modelProvider: "Anthropic",
-                  creditCost: "1.5 credits",
-                },
+                addedToFav: false,
+                name: "app.api.agent.chat.characters.default.name",
+                tagline: "app.api.agent.chat.characters.default.tagline",
+                description:
+                  "app.api.agent.chat.characters.default.description",
+                modelIcon: "sparkles",
+                modelInfo: "Claude Sonnet 4.5",
+                modelProvider: "Anthropic",
+                creditCost: "1.5 credits",
               },
             ],
           },
           {
-            sectionHeader: {
-              title: "app.api.agent.chat.characters.enums.category.coding",
-              icon: "code",
-              count: 1,
-            },
+            sectionIcon: "code",
+            sectionTitle: "app.api.agent.chat.characters.enums.category.coding",
+            sectionCount: 1,
             characters: [
               {
                 id: "550e8400-e29b-41d4-a716-446655440000",
                 icon: "direct-hit",
                 modelId: ModelId.GPT_5,
                 category: "app.api.agent.chat.characters.enums.category.coding",
-                content: {
-                  name: "app.api.agent.chat.characters.custom.name",
-                  tagline: "app.api.agent.chat.characters.custom.tagline",
-                  description:
-                    "app.api.agent.chat.characters.custom.description",
-                  modelIcon: "sparkles",
-                  modelInfo: "GPT-5",
-                  modelProvider: "OpenAI",
-                  creditCost: "3 credits",
-                },
+                addedToFav: true,
+                name: "app.api.agent.chat.characters.custom.name",
+                tagline: "app.api.agent.chat.characters.custom.tagline",
+                description: "app.api.agent.chat.characters.custom.description",
+                modelIcon: "sparkles",
+                modelInfo: "GPT-5",
+                modelProvider: "OpenAI",
+                creditCost: "3 credits",
               },
             ],
           },

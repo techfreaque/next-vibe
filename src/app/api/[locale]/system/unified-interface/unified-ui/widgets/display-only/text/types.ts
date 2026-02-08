@@ -15,6 +15,7 @@ import type {
   StringWidgetSchema,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
+import type { TParams } from "@/i18n/core/static-types";
 
 import type {
   BasePrimitiveWidgetConfig,
@@ -99,6 +100,7 @@ export interface TextWidgetConfig<
 
   /** Static content translation key - use for fixed text */
   content?: NoInfer<TKey>;
+  contentParams?: TParams;
 
   /** Number of columns in grid layout */
   columns?: number;
@@ -143,7 +145,10 @@ export interface TextWidgetConfig<
    * Dynamic className callback - receives field value and parent value
    * Returns additional className to merge with static className
    */
-  getClassName?: (value: z.output<TSchema>, parentValue?: WidgetData) => string;
+  getClassName?: <TSchema extends TextWidgetSchema>(
+    value: TSchema extends TextWidgetSchema ? z.output<TSchema> : undefined,
+    parentValue?: WidgetData,
+  ) => string;
 
   /** Schema constraint for the field value */
   schema: TSchema;

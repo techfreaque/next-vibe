@@ -133,7 +133,7 @@ export const TOUR_SPACING = {
   BUTTON_MARGIN_RIGHT: 8,
   BUTTON_FONT_SIZE: 14,
   BUTTON_FONT_WEIGHT: 600,
-  Z_INDEX: 10000,
+  Z_INDEX: 300,
 } as const;
 
 export const TOUR_TEXT_ALIGN = {

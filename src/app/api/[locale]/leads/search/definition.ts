@@ -124,7 +124,7 @@ const { GET } = createEndpoint({
         {
           leads: responseArrayField(
             {
-              type: WidgetType.DATA_TABLE,
+              type: WidgetType.CONTAINER,
               title: "app.api.leads.search.get.response.leads.title" as const,
             },
             responseField({

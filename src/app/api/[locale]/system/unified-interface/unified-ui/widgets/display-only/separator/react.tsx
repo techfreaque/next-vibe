@@ -3,10 +3,11 @@
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { Separator } from "next-vibe-ui/ui/separator";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type { ReactStaticWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
@@ -19,14 +20,13 @@ import type { SeparatorWidgetConfig } from "./types";
 export function SeparatorWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TUsage extends FieldUsageConfig,
   TSchemaType extends "widget",
 >({
   field,
-}: ReactWidgetProps<
+}: ReactStaticWidgetProps<
   TEndpoint,
-  TUsage,
-  SeparatorWidgetConfig<TKey, TUsage, TSchemaType>
+  FieldUsageConfig,
+  SeparatorWidgetConfig<TKey, FieldUsageConfig, TSchemaType>
 >): JSX.Element {
   const t = useWidgetTranslation();
   const { spacingTop = "normal", spacingBottom = "normal", label } = field;
@@ -50,21 +50,17 @@ export function SeparatorWidget<
     return (
       <Div
         className={cn(
-          "relative flex items-center",
+          "flex items-center gap-3",
           topSpacing,
           bottomSpacing,
           field.className,
         )}
       >
-        <Div className="flex-grow">
-          <Separator />
-        </Div>
-        <Div className="px-4 text-xs text-muted-foreground">
+        <Separator className="flex-1" />
+        <Span className="text-xs text-muted-foreground/70 uppercase tracking-wider font-medium">
           {translatedLabel}
-        </Div>
-        <Div className="flex-grow">
-          <Separator />
-        </Div>
+        </Span>
+        <Separator className="flex-1" />
       </Div>
     );
   }

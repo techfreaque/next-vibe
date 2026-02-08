@@ -206,7 +206,7 @@ const { POST } = createEndpoint({
       }),
       tools: requestDataArrayOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           title: "app.api.agent.chat.aiStream.post.tools.label",
           description: "app.api.agent.chat.aiStream.post.tools.description",
         },
@@ -242,7 +242,7 @@ const { POST } = createEndpoint({
       ),
       toolConfirmations: requestDataArrayOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           title: "app.api.agent.aiStream.post.toolConfirmation.label",
           description:
             "app.api.agent.aiStream.post.toolConfirmation.description",
@@ -301,7 +301,7 @@ const { POST } = createEndpoint({
       // === FILE ATTACHMENTS ===
       attachments: requestDataArrayOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           title: "app.api.agent.chat.aiStream.post.attachments.label" as const,
           description:
             "app.api.agent.chat.aiStream.post.attachments.description" as const,

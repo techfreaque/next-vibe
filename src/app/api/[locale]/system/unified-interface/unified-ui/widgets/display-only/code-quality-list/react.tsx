@@ -11,9 +11,10 @@ import type { ReactElement } from "react";
 import { useMemo } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type { ReactRequestResponseWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import {
+  useWidgetForm,
   useWidgetLocale,
   useWidgetResponse,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -43,15 +44,28 @@ export default function CodeQualityListWidget<
   TSchemaType extends "primitive",
 >({
   field,
-}: ReactWidgetProps<
+  fieldName,
+}: ReactRequestResponseWidgetProps<
   TEndpoint,
   TUsage,
   CodeQualityListWidgetConfig<TSchema, TUsage, TSchemaType>
 >): ReactElement {
   const locale = useWidgetLocale();
   const response = useWidgetResponse();
+  const form = useWidgetForm();
+  const { usage } = field;
 
-  const value = field.value;
+  // Get value from form for request fields, otherwise from field.value
+  let value: typeof field.value | undefined;
+  if (usage.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value) {
+      value = field.value;
+    }
+  } else {
+    value = field.value;
+  }
+
   const { t } = simpleT(locale);
 
   // Get editor URI scheme from response data if field key is provided

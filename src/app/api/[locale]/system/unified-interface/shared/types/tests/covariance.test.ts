@@ -119,7 +119,7 @@ const test1_4: Test1_4_Result = "✓ PASS";
 
 // Test 1.5: ArrayField extends UnifiedField
 const test1_5_field = requestDataArrayField(
-  { type: WidgetType.DATA_LIST },
+  { type: WidgetType.CONTAINER },
   objectField(
     { type: WidgetType.CONTAINER },
     { request: "data" },
@@ -223,7 +223,6 @@ type Test3_1_Endpoint = ApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   string,
-  AnyChildrenConstrain<string, FieldUsageConfig>,
   typeof test3_1_field
 >;
 
@@ -233,7 +232,6 @@ type Test3_1_Result =
     Methods,
     readonly UserRoleValue[],
     string,
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     UnifiedField<
       string,
       z.ZodTypeAny,
@@ -250,7 +248,6 @@ type Test3_2_Endpoint = ApiEndpoint<
   Methods.PUT,
   readonly UserRoleValue[],
   string,
-  AnyChildrenConstrain<string, FieldUsageConfig>,
   typeof test2_1_field
 >;
 type Test3_2_Result =
@@ -258,7 +255,6 @@ type Test3_2_Result =
     Methods,
     readonly UserRoleValue[],
     string,
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     UnifiedField<
       string,
       z.ZodTypeAny,
@@ -276,9 +272,16 @@ const test3_2: Test3_2_Result = "✓ PASS";
 
 // Test 4.1: CreateApiEndpoint with optional object field
 const test4_1_field = objectOptionalField(
-  { type: WidgetType.TABS },
+  { type: WidgetType.CONTAINER },
   { request: "data" },
-  {},
+  {
+    value: requestField({
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "test4_1_field.value",
+      schema: z.string(),
+    }),
+  },
 );
 
 type Test4_1_CreateEndpoint = CreateApiEndpoint<
@@ -300,11 +303,11 @@ const test4_1: Test4_1_Result = "✓ PASS";
 
 // Test 4.2: CreateApiEndpoint with nested ObjectField
 const test4_2_field = objectField(
-  { type: WidgetType.ACCORDION },
+  { type: WidgetType.CONTAINER },
   { request: "data" },
   {
     nested: objectField(
-      { type: WidgetType.DATA_LIST },
+      { type: WidgetType.CONTAINER },
       { request: "data" },
       {},
     ),
@@ -334,7 +337,7 @@ const test4_2: Test4_2_Result = "✓ PASS";
 
 // Test 5.1: Simple request-only field
 const test5_1_request_field = objectField(
-  { type: WidgetType.SECTION },
+  { type: WidgetType.CONTAINER },
   { request: "data" },
   {
     name: requestField({
@@ -348,9 +351,9 @@ const test5_1_request_field = objectField(
 
 // Test 5.1b: Response-only array field
 const test5_1_response_field = responseArrayField(
-  { type: WidgetType.DATA_TABLE },
+  { type: WidgetType.CONTAINER },
   objectField(
-    { type: WidgetType.DATA_LIST },
+    { type: WidgetType.CONTAINER },
     { response: true },
     {
       id: responseField({
@@ -364,7 +367,7 @@ const test5_1_response_field = responseArrayField(
 // Test 5.1c: Optional login history
 const test5_1_optional_field = arrayOptionalField(
   { response: true },
-  { type: WidgetType.DATA_CARDS },
+  { type: WidgetType.CONTAINER },
   objectField(
     { type: WidgetType.CREDIT_TRANSACTION_CARD },
     { response: true },
@@ -379,7 +382,7 @@ const test5_1_optional_field = arrayOptionalField(
 
 // Test 5.1d: Request data with optional settings
 const test5_1_request_optional = objectOptionalField(
-  { type: WidgetType.LINK_CARD },
+  { type: WidgetType.CONTAINER },
   { request: "data" },
   {
     url: requestField({
@@ -393,11 +396,11 @@ const test5_1_request_optional = objectOptionalField(
 
 // Test 5.1e: Mixed request/response structure with nested fields
 const test5_1_field = objectField(
-  { type: WidgetType.SECTION },
+  { type: WidgetType.CONTAINER },
   { request: "data", response: true },
   {
     login: objectField(
-      { type: WidgetType.TABS },
+      { type: WidgetType.CONTAINER },
       { request: "data" },
       {
         username: requestField({
@@ -409,7 +412,7 @@ const test5_1_field = objectField(
       },
     ),
     preferences: objectOptionalField(
-      { type: WidgetType.ACCORDION },
+      { type: WidgetType.CONTAINER },
       { request: "data" },
       {
         theme: requestField({
@@ -421,9 +424,9 @@ const test5_1_field = objectField(
       },
     ),
     results: responseArrayField(
-      { type: WidgetType.DATA_CARDS },
+      { type: WidgetType.CONTAINER },
       objectField(
-        { type: WidgetType.METRIC_CARD },
+        { type: WidgetType.CONTAINER },
         { response: true },
         {
           value: responseField({
@@ -466,7 +469,7 @@ type Test5_1c_Result =
     string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<string, FieldUsageConfig>
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -479,7 +482,7 @@ type Test5_1d_Result =
     string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<string, FieldUsageConfig>
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -492,7 +495,7 @@ type Test5_1e_Result =
     string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<string, FieldUsageConfig>
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -545,13 +548,16 @@ const test5_2c: Test5_2c_Result = "✓ PASS";
 type Test5_2d_MatchingTKeys = CreateApiEndpoint<
   Methods,
   readonly UserRoleValue[],
-  TranslationKey, // Specific translation key
+  TranslationKey,
   UnifiedField<
     TranslationKey,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<TranslationKey, FieldUsageConfig>
-  > // Matching TKey in fields
+    AnyChildrenConstrain<
+      TranslationKey,
+      ConstrainedChildUsage<FieldUsageConfig>
+    >
+  >
 >;
 type Test5_2d_Result = Test5_2d_MatchingTKeys extends CreateApiEndpointAny
   ? "✓ PASS"
@@ -677,7 +683,10 @@ type Test7_2_AcceptsAnyEndpoint = (
       TranslationKey,
       z.ZodTypeAny,
       FieldUsageConfig,
-      AnyChildrenConstrain<TranslationKey, FieldUsageConfig>
+      AnyChildrenConstrain<
+        TranslationKey,
+        ConstrainedChildUsage<FieldUsageConfig>
+      >
     >
   >,
 ) => void;
@@ -741,7 +750,7 @@ const test9_2: Test9_2_HasChildren = "✓ PASS";
 
 // Test 10.1: Array with nested object children with id and name fields
 const test10_1_field = requestDataArrayField(
-  { type: WidgetType.DATA_LIST },
+  { type: WidgetType.CONTAINER },
   objectField(
     { type: WidgetType.CONTAINER },
     { request: "data" },
@@ -848,7 +857,7 @@ const test10_3: Test10_3_Result = "✓ PASS";
 
 // Test 10.4: Nested arrays (array of arrays)
 const test10_4_innerArray = requestDataArrayField(
-  { type: WidgetType.DATA_LIST },
+  { type: WidgetType.CONTAINER },
   requestField({
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXT,
@@ -858,7 +867,7 @@ const test10_4_innerArray = requestDataArrayField(
 );
 
 const test10_4_field = requestDataArrayField(
-  { type: WidgetType.DATA_LIST },
+  { type: WidgetType.CONTAINER },
   test10_4_innerArray,
 );
 
@@ -1141,7 +1150,7 @@ const test15_1_field = objectField(
       },
     ),
     results: responseArrayField(
-      { type: WidgetType.DATA_LIST },
+      { type: WidgetType.CONTAINER },
       objectField(
         { type: WidgetType.CONTAINER },
         { response: true },
@@ -1360,7 +1369,7 @@ const test19_1: Test19_1_Result = "✓ PASS";
 
 // Test 19.2: Deeply nested arrays (3 levels)
 const test19_2_level3 = responseArrayField(
-  { type: WidgetType.DATA_LIST },
+  { type: WidgetType.CONTAINER },
   responseField({
     type: WidgetType.TEXT,
     content: "String",
@@ -1369,12 +1378,12 @@ const test19_2_level3 = responseArrayField(
 );
 
 const test19_2_level2 = responseArrayField(
-  { type: WidgetType.DATA_LIST },
+  { type: WidgetType.CONTAINER },
   test19_2_level3,
 );
 
 const test19_2_field = responseArrayField(
-  { type: WidgetType.DATA_LIST },
+  { type: WidgetType.CONTAINER },
   test19_2_level2,
 );
 

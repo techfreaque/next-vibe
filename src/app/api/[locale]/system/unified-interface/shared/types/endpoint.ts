@@ -8,11 +8,9 @@ import type { z } from "zod";
 
 import type {
   ArrayChildConstraint,
-  BasePrimitiveDisplayOnlyWidgetConfig,
   FieldUsageConfig,
   ObjectChildrenConstraint,
 } from "../../unified-ui/widgets/_shared/types";
-import type { IconKey } from "../../unified-ui/widgets/form-fields/icon-field/icons";
 import type { ObjectWidgetConfig } from "../widgets/configs";
 
 // Re-export UnifiedField from configs.ts where it's now defined
@@ -208,64 +206,81 @@ type _InferSchemaFromFieldImpl<F, Usage extends FieldUsage> =
 // NAVIGATION TYPE SYSTEM
 // ============================================================================
 
-/**
- * Type-safe navigation button configuration
- * Enforces type safety at the definition level
- *
- * @template TTargetEndpoint - The target endpoint to navigate to
- * @template TGetEndpoint - Optional GET endpoint for prefilling data
- * @template TKey - Translation key type
- */
-export interface NavigateButtonConfig<
-  TTargetEndpoint extends CreateApiEndpointAny,
-  TGetEndpoint extends CreateApiEndpointAny | undefined,
-  TKey extends string,
-  TUsage extends FieldUsageConfig,
-  TSchemaType extends "widget",
-> extends BasePrimitiveDisplayOnlyWidgetConfig<TUsage, TSchemaType> {
-  /** Target endpoint to navigate to */
-  targetEndpoint: TTargetEndpoint;
-  /**
-   * Extract parameters from source data
-   * Source: Row data from parent (WidgetData values - allows strings, numbers, booleans, etc.)
-   * Return: Partial urlPathParams (for navigation) and partial data (for prefilling)
-   */
-  extractParams: TTargetEndpoint extends CreateApiEndpointAny
-    ? (source: {
-        // The parent item of an array (if any)
-        // oxlint-disable-next-line typescript/no-explicit-any
-        itemData: any | undefined;
-        // oxlint-disable-next-line typescript/no-explicit-any
-        requestData: any;
-        // oxlint-disable-next-line typescript/no-explicit-any
-        urlPathParams: any;
-        // oxlint-disable-next-line typescript/no-explicit-any
-        responseData: any;
-      }) => {
-        urlPathParams?: Partial<TTargetEndpoint["types"]["UrlVariablesOutput"]>;
-        data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
-        response?: Partial<TTargetEndpoint["types"]["ResponseOutput"]>;
-      }
-    : never;
-  /** Prefetch GET data before showing PATCH/PUT form */
-  prefillFromGet?: boolean;
-  /** Optional GET endpoint for prefilling */
-  getEndpoint?: TGetEndpoint;
-  /** Button label translation key */
-  label?: NoInfer<TKey>;
-  /** Button icon */
-  icon?: IconKey;
-  /** Button variant */
-  variant?: "default" | "secondary" | "destructive" | "ghost" | "outline";
-  /** Button size */
-  size?: "default" | "sm" | "lg" | "icon";
-  /** Optional CSS class name */
-  className?: string;
-  /** Render target endpoint in a popover modal instead of pushing to navigation stack */
-  renderInModal?: boolean;
-  /** How many times to pop navigation stack after successful deletion (only used with renderInModal) */
-  popNavigationOnSuccess?: number;
-}
+// /**
+//  * Type-safe navigation button configuration
+//  * Enforces type safety at the definition level
+//  *
+//  * @template TTargetEndpoint - The target endpoint to navigate to
+//  * @template TGetEndpoint - Optional GET endpoint for prefilling data
+//  * @template TKey - Translation key type
+//  */
+// export interface NavigateButtonConfig<
+//   TTargetEndpoint extends CreateApiEndpointAny,
+//   TGetEndpoint extends CreateApiEndpointAny | undefined,
+//   TKey extends string,
+//   TUsage extends FieldUsageConfig,
+//   TSchemaType extends "widget",
+// > extends BasePrimitiveDisplayOnlyWidgetConfig<TUsage, TSchemaType> {
+//   /** Target endpoint to navigate to */
+//   targetEndpoint: TTargetEndpoint;
+//   /**
+//    * Extract parameters from source data
+//    * Source: Row data from parent (WidgetData values - allows strings, numbers, booleans, etc.)
+//    * Return: Partial urlPathParams (for navigation) and partial data (for prefilling)
+//    */
+//   extractParams: TTargetEndpoint extends CreateApiEndpointAny
+//     ? (
+//         source: {
+//           // The parent item of an array (if any)
+//           // oxlint-disable-next-line typescript/no-explicit-any
+//           itemData: any | undefined;
+//           // oxlint-disable-next-line typescript/no-explicit-any
+//           requestData: any;
+//           // oxlint-disable-next-line typescript/no-explicit-any
+//           urlPathParams: any;
+//           // oxlint-disable-next-line typescript/no-explicit-any
+//           responseData: any;
+//         },
+//         context: {
+//           logger: EndpointLogger;
+//           user: JwtPayloadType;
+//           locale: CountryLanguage;
+//         },
+//       ) =>
+//         | {
+//             urlPathParams?: Partial<
+//               TTargetEndpoint["types"]["UrlVariablesOutput"]
+//             >;
+//             data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
+//             response?: Partial<TTargetEndpoint["types"]["ResponseOutput"]>;
+//           }
+//         | Promise<{
+//             urlPathParams?: Partial<
+//               TTargetEndpoint["types"]["UrlVariablesOutput"]
+//             >;
+//             data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
+//             response?: Partial<TTargetEndpoint["types"]["ResponseOutput"]>;
+//           }>
+//     : never;
+//   /** Prefetch GET data before showing PATCH/PUT form */
+//   prefillFromGet?: boolean;
+//   /** Optional GET endpoint for prefilling */
+//   getEndpoint?: TGetEndpoint;
+//   /** Button label translation key */
+//   label?: NoInfer<TKey>;
+//   /** Button icon */
+//   icon?: IconKey;
+//   /** Button variant */
+//   variant?: "default" | "secondary" | "destructive" | "ghost" | "outline";
+//   /** Button size */
+//   size?: "default" | "sm" | "lg" | "icon";
+//   /** Optional CSS class name */
+//   className?: string;
+//   /** Render target endpoint in a popover modal instead of pushing to navigation stack */
+//   renderInModal?: boolean;
+//   /** How many times to pop navigation stack after successful deletion (only used with renderInModal) */
+//   popNavigationOnSuccess?: number;
+// }
 
 /**
  * Navigation stack entry

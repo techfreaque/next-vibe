@@ -12,10 +12,11 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ModelId } from "../agent/models/models";
 import type { CreditPackCheckoutSession } from "../payment/providers/types";
-import creditsDefinitions from "./definition";
+import creditsDefinitions, {
+  type CreditsGetResponseOutput,
+} from "./definition";
 import type { CreditTypeIdentifierValue } from "./enum";
 import type {
-  CreditBalance,
   CreditIdentifier,
   CreditPool,
   CreditRepositoryType,
@@ -31,7 +32,7 @@ export class CreditRepository {
     _user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<CreditBalance>> {
+  ): Promise<ResponseType<CreditsGetResponseOutput>> {
     const response = await nativeEndpoint(
       creditsDefinitions.GET,
       {},
@@ -54,7 +55,7 @@ export class CreditRepository {
     _identifier: CreditIdentifier,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
-  ): Promise<ResponseType<CreditBalance>> {
+  ): Promise<ResponseType<CreditsGetResponseOutput>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("getBalance is not implemented on native");
   }

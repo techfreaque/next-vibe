@@ -69,13 +69,6 @@ export default async function ThreadsPathPage({
   );
   const initialCredits = creditsResponse.success ? creditsResponse.data : null;
 
-  logger.debug("Server-side credits fetch", {
-    success: creditsResponse.success,
-    hasData: !!initialCredits,
-    isPublic: user.isPublic,
-    leadId: user.leadId,
-  });
-
   // Parse URL server-side to get navigation state
   // This prevents hydration mismatch - URL is the single source of truth
   let { initialRootFolderId, initialSubFolderId, initialThreadId } =

@@ -218,7 +218,7 @@ const { GET } = createEndpoint({
           ),
           users: responseArrayField(
             {
-              type: WidgetType.DATA_TABLE,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               {
@@ -282,7 +282,7 @@ const { GET } = createEndpoint({
                 }),
                 userRoles: responseArrayField(
                   {
-                    type: WidgetType.GROUPED_LIST,
+                    type: WidgetType.CONTAINER,
                     groupBy: "role",
                   },
                   objectField(

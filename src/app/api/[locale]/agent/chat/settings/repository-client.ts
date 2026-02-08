@@ -58,7 +58,6 @@ export class ChatSettingsRepositoryClient {
   ): Promise<ResponseType<never>> {
     try {
       this.updateLocalSettings(data);
-      logger.debug("Updated settings in localStorage");
       return success();
     } catch (error) {
       logger.error(
@@ -264,16 +263,10 @@ export class ChatSettingsRepositoryClient {
         // Update all favorites: remove active badge from others, add to selected one
         const updatedList = oldData.data.favoritesList.map((fav) => ({
           ...fav,
-          content: {
-            ...fav.content,
-            titleRow: {
-              ...fav.content.titleRow,
-              activeBadge:
-                fav.id === favoriteId
-                  ? ("app.chat.selector.active" as const)
-                  : null,
-            },
-          },
+          activeBadge:
+            fav.id === favoriteId
+              ? ("app.chat.selector.active" as const)
+              : null,
         }));
 
         return {

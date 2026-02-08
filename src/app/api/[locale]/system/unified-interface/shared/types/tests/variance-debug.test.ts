@@ -58,7 +58,6 @@ type TestEndpoint2 = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   string,
-  AnyChildrenConstrain<string, FieldUsageConfig>,
   UnifiedField<
     string,
     z.ZodTypeAny,

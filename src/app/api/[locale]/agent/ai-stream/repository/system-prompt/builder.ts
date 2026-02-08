@@ -100,15 +100,10 @@ export async function buildSystemPrompt(params: {
       );
 
       if (result.success) {
-        const character = result.data;
-        logger.debug("Using character system prompt", {
-          characterId: character.id,
-          characterName: character.name,
-          hasSystemPrompt: !!character.systemPrompt,
-        });
+        const systemPrompt = result.data.systemPrompt;
 
-        if (character.systemPrompt && character.systemPrompt.trim()) {
-          characterPrompt = character.systemPrompt.trim();
+        if (systemPrompt && systemPrompt.trim()) {
+          characterPrompt = systemPrompt.trim();
         } else {
           logger.debug(
             "Character has empty system prompt, using default behavior",

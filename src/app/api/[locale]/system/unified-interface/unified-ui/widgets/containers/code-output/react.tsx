@@ -13,7 +13,7 @@ import {
   getSpacingClassName,
   getTextSizeClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
-import type { ReactWidgetProps } from "../../_shared/react-types";
+import type { ReactDisplayWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import { isLineHighlighted, splitCodeIntoLines } from "./shared";
 import type { CodeOutputWidgetConfig } from "./types";
@@ -27,12 +27,12 @@ export function CodeOutputWidget<
   TUsage extends FieldUsageConfig,
 >(
   props:
-    | ReactWidgetProps<
+    | ReactDisplayWidgetProps<
         TEndpoint,
         TUsage,
         CodeOutputWidgetConfig<TKey, never, TUsage, "widget">
       >
-    | ReactWidgetProps<
+    | ReactDisplayWidgetProps<
         TEndpoint,
         TUsage,
         CodeOutputWidgetConfig<TKey, StringWidgetSchema, TUsage, "primitive">

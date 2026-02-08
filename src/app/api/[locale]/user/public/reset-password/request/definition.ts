@@ -33,7 +33,7 @@ const { POST } = createEndpoint({
   icon: "lock",
   category: "app.api.user.category" as const,
   tags: ["app.api.user.public.resetPassword.request.tag" as const],
-  allowedRoles: [UserRole.PUBLIC] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
   fields: objectField(
     {
       type: WidgetType.CONTAINER,

@@ -1,6 +1,7 @@
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import { STANDARD_MARKUP_PERCENTAGE } from "../../products/repository-client";
 import {
   ContentLevel,
   type ContentLevelValue,
@@ -38,6 +39,7 @@ export enum ModelId {
   GPT_5_MINI = "gpt-5-mini",
   GPT_5_NANO = "gpt-5-nano",
   GEMINI_3_PRO = "gemini-3-pro",
+  GEMINI_3_FLASH = "gemini-3-flash",
   GEMINI_2_5_PRO = "gemini-2.5-pro",
   GEMINI_2_5_FLASH = "gemini-2.5-flash",
   GEMINI_2_5_FLASH_LITE = "gemini-2.5-flash-lite",
@@ -58,13 +60,16 @@ export enum ModelId {
   CLAUDE_HAIKU_4_5 = "claude-haiku-4.5",
   CLAUDE_SONNET_4_5 = "claude-sonnet-4.5",
   CLAUDE_OPUS_4_5 = "claude-opus-4.5",
+  CLAUDE_OPUS_4_6 = "claude-opus-4.6",
+  GLM_4_7 = "glm-4.7",
+  GLM_4_7_FLASH = "glm-4.7-flash",
   GLM_4_6 = "glm-4.6",
   GLM_4_5_AIR = "glm-4.5-air",
   GLM_4_5V = "glm-4.5v",
   VENICE_UNCENSORED = "venice-uncensored-free",
-  DOLPHIN_3_0_MISTRAL_24B = "dolphin-3.0-mistral-24b",
-  DOLPHIN_LLAMA_3_70B = "dolphin-llama-3.70b",
-  DOLPHIN_3_0_R1_MISTRAL_24B = "dolphin-3.0-r1-mistral-24b",
+  // DOLPHIN_3_0_MISTRAL_24B = "dolphin-3.0-mistral-24b",
+  // DOLPHIN_LLAMA_3_70B = "dolphin-llama-3.70b",
+  // DOLPHIN_3_0_R1_MISTRAL_24B = "dolphin-3.0-r1-mistral-24b",
   FREEDOMGPT_LIBERTY = "freedomgpt-liberty",
   GAB_AI_ARYA = "gab-ai-arya",
 }
@@ -83,7 +88,7 @@ export enum ApiProvider {
  * Configuration interface for AI model options.
  * Contains all necessary information for model selection and API integration.
  */
-export interface ModelOption {
+export interface ModelOptionBase {
   /** Unique identifier for the model */
   id: ModelId;
   /** Human-readable display name */
@@ -102,8 +107,7 @@ export interface ModelOption {
   icon: IconKey;
   /** OpenRouter API model identifier */
   openRouterModel: string;
-  /** Credit cost per message (0 = free) */
-  creditCost: number;
+
   /** Utility categories this model belongs to (strengths) */
   utilities: (typeof ModelUtilityValue)[];
   /** Whether this model supports tool/function calling (for search, etc.) */
@@ -121,6 +125,22 @@ export interface ModelOption {
   /** What the model is NOT good at (optional) */
   weaknesses?: (typeof ModelUtilityValue)[];
 }
+export interface ModelOptionTokenBased extends ModelOptionBase {
+  /** Credit cost calculation function */
+  creditCost: typeof calculateCreditCost;
+  /** Input token cost in USD per million tokens */
+  inputTokenCost: number;
+  /** Output token cost in USD per million tokens */
+  outputTokenCost: number;
+}
+export interface ModelOptionCreditBased extends ModelOptionBase {
+  /** Credit cost per message (0 = free). */
+  creditCost: number;
+  inputTokenCost?: never;
+  outputTokenCost?: never;
+}
+
+export type ModelOption = ModelOptionTokenBased | ModelOptionCreditBased;
 
 export interface ModelProvider {
   name: string;
@@ -217,6 +237,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "uncensored-ai",
     openRouterModel: "uncensored-lm",
     creditCost: 7,
+
     utilities: [
       ModelUtility.UNCENSORED,
       ModelUtility.CREATIVE,
@@ -225,7 +246,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.THOROUGH,
+    speed: SpeedLevel.BALANCED,
     content: ContentLevel.UNCENSORED,
     features: { ...defaultFeatures, toolCalling: true },
     weaknesses: [ModelUtility.CODING],
@@ -241,6 +262,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "freedom-gpt-logo",
     openRouterModel: "freedomgpt-liberty",
     creditCost: 3,
+
     utilities: [
       ModelUtility.UNCENSORED,
       ModelUtility.CREATIVE,
@@ -248,9 +270,9 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.ROLEPLAY,
     ],
     supportsTools: false,
-    intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
-    content: ContentLevel.OPEN,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.UNCENSORED,
     features: { ...defaultFeatures },
     weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
   },
@@ -265,6 +287,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "gab-ai-logo",
     openRouterModel: "arya",
     creditCost: 7,
+
     utilities: [
       ModelUtility.UNCENSORED,
       ModelUtility.CREATIVE,
@@ -278,9 +301,9 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.BALANCED,
-    content: ContentLevel.OPEN,
+    content: ContentLevel.UNCENSORED,
     features: { ...defaultFeatures },
-    weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
+    weaknesses: [ModelUtility.CODING],
   },
   [ModelId.VENICE_UNCENSORED]: {
     id: ModelId.VENICE_UNCENSORED,
@@ -294,6 +317,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     openRouterModel:
       "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
     creditCost: 1,
+
     utilities: [
       ModelUtility.UNCENSORED,
       ModelUtility.CREATIVE,
@@ -302,121 +326,77 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
     speed: SpeedLevel.FAST,
-    content: ContentLevel.OPEN,
+    content: ContentLevel.UNCENSORED,
     features: { ...defaultFeatures },
     weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
   },
-  [ModelId.DOLPHIN_LLAMA_3_70B]: {
-    id: ModelId.DOLPHIN_LLAMA_3_70B,
-    name: "Dolphin Llama 3 70B",
-    provider: "cognitiveComputations",
-    apiProvider: ApiProvider.OPENROUTER,
-    description: "app.chat.models.descriptions.dolphinLlama3_70B",
-    parameterCount: 70,
-    contextWindow: 8192,
-    icon: "ocean",
-    openRouterModel: "cognitivecomputations/dolphin-llama-3-70b",
-    creditCost: 1,
-    utilities: [ModelUtility.FAST, ModelUtility.CHAT],
-    supportsTools: false,
-    intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
-    content: ContentLevel.OPEN,
-    features: { ...defaultFeatures },
-    weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
-  },
-  [ModelId.DOLPHIN_3_0_R1_MISTRAL_24B]: {
-    id: ModelId.DOLPHIN_3_0_R1_MISTRAL_24B,
-    name: "Dolphin 3.0 R1 Mistral 24B",
-    provider: "cognitiveComputations",
-    apiProvider: ApiProvider.OPENROUTER,
-    description: "app.chat.models.descriptions.dolphin3_0_r1_mistral_24b",
-    parameterCount: 24,
-    contextWindow: 32768,
-    icon: "ocean",
-    openRouterModel: "cognitivecomputations/dolphin3.0-r1-mistral-24b",
-    creditCost: 1,
-    utilities: [ModelUtility.FAST, ModelUtility.REASONING],
-    supportsTools: false,
-    intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
-    content: ContentLevel.OPEN,
-    features: { ...defaultFeatures },
-    weaknesses: [ModelUtility.CODING],
-  },
-  [ModelId.DOLPHIN_3_0_MISTRAL_24B]: {
-    id: ModelId.DOLPHIN_3_0_MISTRAL_24B,
-    name: "Dolphin 3.0 Mistral 24B",
-    provider: "cognitiveComputations",
-    apiProvider: ApiProvider.OPENROUTER,
-    description: "app.chat.models.descriptions.mistralNemo",
-    parameterCount: 24,
-    contextWindow: 32768,
-    icon: "ocean",
-    openRouterModel: "cognitivecomputations/dolphin3.0-mistral-24b:free",
-    creditCost: 1,
-    utilities: [ModelUtility.FAST, ModelUtility.CHAT],
-    supportsTools: false,
-    intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
-    content: ContentLevel.OPEN,
-    features: { ...defaultFeatures },
-    weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
-  },
-  [ModelId.GLM_4_5_AIR]: {
-    id: ModelId.GLM_4_5_AIR,
-    name: "GLM 4.5 AIR",
-    provider: "zAi",
-    apiProvider: ApiProvider.OPENROUTER,
-    description: "app.chat.models.descriptions.glm45Air",
-    parameterCount: undefined,
-    contextWindow: 203000,
-    icon: "si-zendesk",
-    openRouterModel: "z-ai/glm-4.5-air",
-    creditCost: 1,
-    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
-    supportsTools: true,
-    intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
-    content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, toolCalling: true },
-  },
-  [ModelId.GLM_4_6]: {
-    id: ModelId.GLM_4_6,
-    name: "GLM 4.6",
-    provider: "zAi",
-    apiProvider: ApiProvider.OPENROUTER,
-    description: "app.chat.models.descriptions.glm46",
-    parameterCount: undefined,
-    contextWindow: 203000,
-    icon: "si-zendesk",
-    openRouterModel: "z-ai/glm-4.6",
-    creditCost: 5,
-    utilities: [ModelUtility.SMART, ModelUtility.CHAT, ModelUtility.ANALYSIS],
-    supportsTools: true,
-    intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
-    content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, toolCalling: true },
-  },
-  [ModelId.GLM_4_5V]: {
-    id: ModelId.GLM_4_5V,
-    name: "GLM 4.5v",
-    provider: "zAi",
-    apiProvider: ApiProvider.OPENROUTER,
-    description: "app.chat.models.descriptions.glm45v",
-    parameterCount: 106,
-    contextWindow: 203000,
-    icon: "si-zendesk",
-    openRouterModel: "z-ai/glm-4.5v",
-    creditCost: 1,
-    utilities: [ModelUtility.VISION, ModelUtility.CHAT],
-    supportsTools: true,
-    intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
-    content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
-  },
+  // [ModelId.DOLPHIN_LLAMA_3_70B]: {
+  //   id: ModelId.DOLPHIN_LLAMA_3_70B,
+  //   name: "Dolphin Llama 3 70B",
+  //   provider: "cognitiveComputations",
+  //   apiProvider: ApiProvider.OPENROUTER,
+  //   description: "app.chat.models.descriptions.dolphinLlama3_70B",
+  //   parameterCount: 70,
+  //   contextWindow: 8192,
+  //   icon: "ocean",
+  //   openRouterModel: "cognitivecomputations/dolphin-llama-3-70b",
+  //   creditCost: 1,
+  //   inputTokenCost: 0,
+  //   outputTokenCost: 0,
+
+  //   utilities: [ModelUtility.FAST, ModelUtility.CHAT],
+  //   supportsTools: false,
+  //   intelligence: IntelligenceLevel.QUICK,
+  //   speed: SpeedLevel.FAST,
+  //   content: ContentLevel.UNCENSORED,
+  //   features: { ...defaultFeatures },
+  //   weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
+  // },
+  // [ModelId.DOLPHIN_3_0_R1_MISTRAL_24B]: {
+  //   id: ModelId.DOLPHIN_3_0_R1_MISTRAL_24B,
+  //   name: "Dolphin 3.0 R1 Mistral 24B",
+  //   provider: "cognitiveComputations",
+  //   apiProvider: ApiProvider.OPENROUTER,
+  //   description: "app.chat.models.descriptions.dolphin3_0_r1_mistral_24b",
+  //   parameterCount: 24,
+  //   contextWindow: 32768,
+  //   icon: "ocean",
+  //   openRouterModel: "cognitivecomputations/dolphin3.0-r1-mistral-24b",
+  //   creditCost: 1,
+  //   inputTokenCost: 0,
+  //   outputTokenCost: 0,
+
+  //   utilities: [ModelUtility.FAST, ModelUtility.REASONING],
+  //   supportsTools: false,
+  //   intelligence: IntelligenceLevel.SMART,
+  //   speed: SpeedLevel.FAST,
+  //   content: ContentLevel.UNCENSORED,
+  //   features: { ...defaultFeatures },
+  //   weaknesses: [ModelUtility.CODING],
+  // },
+  // [ModelId.DOLPHIN_3_0_MISTRAL_24B]: {
+  //   id: ModelId.DOLPHIN_3_0_MISTRAL_24B,
+  //   name: "Dolphin 3.0 Mistral 24B",
+  //   provider: "cognitiveComputations",
+  //   apiProvider: ApiProvider.OPENROUTER,
+  //   description: "app.chat.models.descriptions.mistralNemo",
+  //   parameterCount: 24,
+  //   contextWindow: 32768,
+  //   icon: "ocean",
+  //   openRouterModel: "cognitivecomputations/dolphin3.0-mistral-24b:free",
+  //   creditCost: 1,
+  //   inputTokenCost: 0,
+  //   outputTokenCost: 0,
+
+  //   utilities: [ModelUtility.FAST, ModelUtility.CHAT],
+  //   supportsTools: false,
+  //   intelligence: IntelligenceLevel.QUICK,
+  //   speed: SpeedLevel.FAST,
+  //   content: ContentLevel.UNCENSORED,
+  //   features: { ...defaultFeatures },
+  //   weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
+  // },
+
   [ModelId.CLAUDE_HAIKU_4_5]: {
     id: ModelId.CLAUDE_HAIKU_4_5,
     name: "Claude Haiku 4.5",
@@ -427,7 +407,10 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 200000,
     icon: "si-anthropic",
     openRouterModel: "anthropic/claude-haiku-4.5",
-    creditCost: 5,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 1,
+    outputTokenCost: 5,
+
     utilities: [
       ModelUtility.CHAT,
       ModelUtility.FAST,
@@ -435,7 +418,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.VISION,
     ],
     supportsTools: true,
-    intelligence: IntelligenceLevel.SMART,
+    intelligence: IntelligenceLevel.QUICK,
     speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
@@ -454,10 +437,47 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     apiProvider: ApiProvider.OPENROUTER,
     description: "app.api.agent.chat.models.descriptions.claudeOpus45",
     parameterCount: undefined,
-    contextWindow: 1000000,
+    contextWindow: 200000,
     icon: "si-anthropic",
     openRouterModel: "anthropic/claude-opus-4.5",
-    creditCost: 30,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 5,
+    outputTokenCost: 25,
+
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.CREATIVE,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    speed: SpeedLevel.THOROUGH,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
+    weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
+  },
+  [ModelId.CLAUDE_OPUS_4_6]: {
+    id: ModelId.CLAUDE_OPUS_4_6,
+    name: "Claude Opus 4.6",
+    provider: "anthropic",
+    apiProvider: ApiProvider.OPENROUTER,
+    description: "app.api.agent.chat.models.descriptions.claudeOpus46",
+    parameterCount: undefined,
+    contextWindow: 200000,
+    icon: "si-anthropic",
+    openRouterModel: "anthropic/claude-opus-4.6",
+    creditCost: calculateCreditCost,
+    inputTokenCost: 5,
+    outputTokenCost: 25,
+
     utilities: [
       ModelUtility.SMART,
       ModelUtility.CODING,
@@ -487,7 +507,10 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 1000000,
     icon: "si-anthropic",
     openRouterModel: "anthropic/claude-sonnet-4.5",
-    creditCost: 15,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 3,
+    outputTokenCost: 15,
+
     utilities: [
       ModelUtility.SMART,
       ModelUtility.CODING,
@@ -496,7 +519,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.REASONING,
     ],
     supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
+    intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
@@ -506,6 +529,59 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       toolCalling: true,
     },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
+  },
+
+  [ModelId.GROK_4]: {
+    id: ModelId.GROK_4,
+    name: "Grok 4",
+    provider: "xAI",
+    apiProvider: ApiProvider.OPENROUTER,
+    description: "app.chat.models.descriptions.grok4",
+    parameterCount: undefined,
+    contextWindow: 256000,
+    icon: "si-x",
+    openRouterModel: "x-ai/grok-4",
+    creditCost: calculateCreditCost,
+    inputTokenCost: 3,
+    outputTokenCost: 15,
+
+    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.ANALYSIS],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
+  },
+  [ModelId.GROK_4_FAST]: {
+    id: ModelId.GROK_4_FAST,
+    name: "Grok 4 Fast",
+    provider: "xAI",
+    apiProvider: ApiProvider.OPENROUTER,
+    description: "app.chat.models.descriptions.grok4Fast",
+    parameterCount: undefined,
+    contextWindow: 2000000,
+    icon: "si-x",
+    openRouterModel: "x-ai/grok-4-fast",
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.2,
+    outputTokenCost: 0.5,
+
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
   },
   [ModelId.GTP_5_PRO]: {
     id: ModelId.GTP_5_PRO,
@@ -517,10 +593,13 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 400000,
     icon: "si-openai",
     openRouterModel: "openai/gpt-5-pro",
-    creditCost: 20,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 15,
+    outputTokenCost: 120,
+
     utilities: [ModelUtility.LEGACY, ModelUtility.SMART],
     supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
+    intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.THOROUGH,
     content: ContentLevel.MAINSTREAM,
     features: {
@@ -541,7 +620,10 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 400000,
     icon: "si-openai",
     openRouterModel: "openai/gpt-5.2-pro",
-    creditCost: 30,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 21,
+    outputTokenCost: 168,
+
     utilities: [
       ModelUtility.SMART,
       ModelUtility.CODING,
@@ -571,7 +653,10 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 400000,
     icon: "si-openai",
     openRouterModel: "openai/gpt-5-codex",
-    creditCost: 10,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 1.25,
+    outputTokenCost: 10,
+
     utilities: [ModelUtility.LEGACY, ModelUtility.CODING],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
@@ -595,7 +680,10 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 400000,
     icon: "si-openai",
     openRouterModel: "openai/gpt-5.1-codex",
-    creditCost: 10,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 1.25,
+    outputTokenCost: 10,
+
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
@@ -619,10 +707,13 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 400000,
     icon: "si-openai",
     openRouterModel: "openai/gpt-5.1",
-    creditCost: 10,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 1.25,
+    outputTokenCost: 10,
+
     utilities: [ModelUtility.LEGACY, ModelUtility.SMART],
     supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
+    intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
@@ -644,9 +735,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "si-openai",
     openRouterModel: "openai/gpt-5.2",
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
-    creditCost: 10,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 1.75,
+    outputTokenCost: 14,
+
     supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
+    intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
@@ -664,7 +758,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.gpt52_chat",
     parameterCount: undefined,
-    contextWindow: 400000,
+    contextWindow: 128000,
     icon: "si-openai",
     openRouterModel: "openai/gpt-5.2-chat",
     utilities: [
@@ -674,9 +768,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.FAST,
       ModelUtility.CHAT,
     ],
-    creditCost: 10,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 1.75,
+    outputTokenCost: 14,
+
     supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
+    intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
@@ -697,10 +794,13 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 400000,
     icon: "si-openai",
     openRouterModel: "openai/gpt-5",
-    creditCost: 10,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 1.25,
+    outputTokenCost: 10,
+
     utilities: [ModelUtility.LEGACY, ModelUtility.SMART, ModelUtility.CHAT],
     supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
+    intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
     features: {
@@ -721,10 +821,13 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 400000,
     icon: "si-openai",
     openRouterModel: "openai/gpt-5-mini",
-    creditCost: 3,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.25,
+    outputTokenCost: 2,
+
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
-    intelligence: IntelligenceLevel.SMART,
+    intelligence: IntelligenceLevel.QUICK,
     speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
@@ -745,7 +848,10 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 400000,
     icon: "si-openai",
     openRouterModel: "openai/gpt-5-nano",
-    creditCost: 2,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.05,
+    outputTokenCost: 0.4,
+
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
@@ -770,14 +876,17 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.gptOss120b",
     parameterCount: 117,
-    contextWindow: 33000,
+    contextWindow: 131072,
     icon: "si-openai",
     openRouterModel: "openai/gpt-oss-120b",
-    creditCost: 1,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.04,
+    outputTokenCost: 0.19,
+
     utilities: [ModelUtility.CHAT, ModelUtility.CODING],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
+    speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
@@ -788,10 +897,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.kimiK2.5",
     parameterCount: 1000,
-    contextWindow: 256000,
-    creditCost: 4,
+    contextWindow: 262144,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.45,
+    outputTokenCost: 2.5,
+
     utilities: [
-      ModelUtility.LEGACY,
       ModelUtility.SMART,
       ModelUtility.FAST,
       ModelUtility.CODING,
@@ -803,7 +914,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.FAST,
-    content: ContentLevel.MAINSTREAM,
+    content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.KIMI_K2]: {
@@ -813,9 +924,13 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.kimiK2",
     parameterCount: 1000,
-    contextWindow: 256000,
-    creditCost: 4,
+    contextWindow: 262144,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.39,
+    outputTokenCost: 1.9,
+
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.SMART,
       ModelUtility.FAST,
       ModelUtility.CODING,
@@ -825,9 +940,9 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "moon",
     openRouterModel: "moonshotai/kimi-k2-0905",
     supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
+    intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.FAST,
-    content: ContentLevel.MAINSTREAM,
+    content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.KIMI_K2_THINKING]: {
@@ -837,8 +952,11 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.kimiK2Thinking",
     parameterCount: 1000,
-    contextWindow: 256000,
-    creditCost: 8,
+    contextWindow: 262144,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.4,
+    outputTokenCost: 1.75,
+
     utilities: [
       ModelUtility.LEGACY,
       ModelUtility.SMART,
@@ -850,10 +968,121 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "moon",
     openRouterModel: "moonshotai/kimi-k2-thinking",
     supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
+    intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.THOROUGH,
-    content: ContentLevel.MAINSTREAM,
+    content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ModelId.GLM_4_7]: {
+    id: ModelId.GLM_4_7,
+    name: "GLM 4.7",
+    provider: "zAi",
+    apiProvider: ApiProvider.OPENROUTER,
+    description: "app.chat.models.descriptions.glm47",
+    parameterCount: undefined,
+    contextWindow: 202752,
+    icon: "si-zendesk",
+    openRouterModel: "z-ai/glm-4.7",
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.4,
+    outputTokenCost: 1.5,
+
+    utilities: [ModelUtility.SMART, ModelUtility.CHAT, ModelUtility.ANALYSIS],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+  [ModelId.GLM_4_7_FLASH]: {
+    id: ModelId.GLM_4_7_FLASH,
+    name: "GLM 4.7 Flash",
+    provider: "zAi",
+    apiProvider: ApiProvider.OPENROUTER,
+    description: "app.chat.models.descriptions.glm47Flash",
+    parameterCount: undefined,
+    contextWindow: 200000,
+    icon: "si-zendesk",
+    openRouterModel: "z-ai/glm-4.7-flash",
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.07,
+    outputTokenCost: 0.4,
+
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+  [ModelId.GLM_4_5_AIR]: {
+    id: ModelId.GLM_4_5_AIR,
+    name: "GLM 4.5 AIR",
+    provider: "zAi",
+    apiProvider: ApiProvider.OPENROUTER,
+    description: "app.chat.models.descriptions.glm45Air",
+    parameterCount: undefined,
+    contextWindow: 131072,
+    icon: "si-zendesk",
+    openRouterModel: "z-ai/glm-4.5-air",
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.05,
+    outputTokenCost: 0.22,
+
+    utilities: [ModelUtility.LEGACY, ModelUtility.CHAT, ModelUtility.FAST],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+  [ModelId.GLM_4_6]: {
+    id: ModelId.GLM_4_6,
+    name: "GLM 4.6",
+    provider: "zAi",
+    apiProvider: ApiProvider.OPENROUTER,
+    description: "app.chat.models.descriptions.glm46",
+    parameterCount: undefined,
+    contextWindow: 202752,
+    icon: "si-zendesk",
+    openRouterModel: "z-ai/glm-4.6",
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.35,
+    outputTokenCost: 1.5,
+
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.SMART,
+      ModelUtility.CHAT,
+      ModelUtility.ANALYSIS,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+  [ModelId.GLM_4_5V]: {
+    id: ModelId.GLM_4_5V,
+    name: "GLM 4.5v",
+    provider: "zAi",
+    apiProvider: ApiProvider.OPENROUTER,
+    description: "app.chat.models.descriptions.glm45v",
+    parameterCount: 106,
+    contextWindow: 65536,
+    icon: "si-zendesk",
+    openRouterModel: "z-ai/glm-4.5v",
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.6,
+    outputTokenCost: 1.8,
+
+    utilities: [ModelUtility.LEGACY, ModelUtility.VISION, ModelUtility.CHAT],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
   },
   [ModelId.GEMINI_2_5_FLASH_LITE]: {
     id: ModelId.GEMINI_2_5_FLASH_LITE,
@@ -862,11 +1091,14 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.geminiFlash25Lite",
     parameterCount: undefined,
-    contextWindow: 1050000,
+    contextWindow: 1048576,
     icon: "si-googlegemini",
     openRouterModel: "google/gemini-2.5-flash-lite",
-    creditCost: 1,
-    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.1,
+    outputTokenCost: 0.4,
+
+    utilities: [ModelUtility.LEGACY, ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
     speed: SpeedLevel.FAST,
@@ -885,13 +1117,16 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.geminiFlash25Flash",
     parameterCount: undefined,
-    contextWindow: 1050000,
+    contextWindow: 1048576,
     icon: "si-googlegemini",
     openRouterModel: "google/gemini-2.5-flash",
-    creditCost: 2,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.3,
+    outputTokenCost: 2.5,
+
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
-    intelligence: IntelligenceLevel.SMART,
+    intelligence: IntelligenceLevel.QUICK,
     speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
@@ -908,14 +1143,17 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.geminiFlash25Pro",
     parameterCount: undefined,
-    contextWindow: 1050000,
+    contextWindow: 1048576,
     icon: "si-googlegemini",
-    openRouterModel: "google/gemini-2.5-flash-pro",
-    creditCost: 10,
+    openRouterModel: "google/gemini-2.5-pro",
+    creditCost: calculateCreditCost,
+    inputTokenCost: 1.25,
+    outputTokenCost: 10,
+
     utilities: [ModelUtility.LEGACY, ModelUtility.SMART],
     supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.BALANCED,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -934,7 +1172,10 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 1048576,
     icon: "si-googlegemini",
     openRouterModel: "google/gemini-3-pro-preview",
-    creditCost: 15,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 2,
+    outputTokenCost: 12,
+
     utilities: [
       ModelUtility.SMART,
       ModelUtility.CODING,
@@ -943,6 +1184,32 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
+  },
+  [ModelId.GEMINI_3_FLASH]: {
+    id: ModelId.GEMINI_3_FLASH,
+    name: "Gemini 3 Flash",
+    provider: "google",
+    apiProvider: ApiProvider.OPENROUTER,
+    description: "app.api.agent.chat.models.descriptions.gemini3Flash",
+    parameterCount: undefined,
+    contextWindow: 1048576,
+    icon: "si-googlegemini",
+    openRouterModel: "google/gemini-3-flash-preview",
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.5,
+    outputTokenCost: 3,
+
+    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.FAST],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -962,6 +1229,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
   //   icon: "si-mistralai",
   //   openRouterModel: "mistralai/mistral-nemo:free",
   //   creditCost: 0,
+
   //   utilities: [ModelUtility.CHAT, ModelUtility.FAST],
   //   supportsTools: true,
   //   intelligence: IntelligenceLevel.QUICK,
@@ -980,12 +1248,15 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 163840,
     icon: "whale",
     openRouterModel: "deepseek/deepseek-v3.2",
-    creditCost: 10,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.25,
+    outputTokenCost: 0.38,
+
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.ANALYSIS],
     supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.BALANCED,
-    content: ContentLevel.MAINSTREAM,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.DEEPSEEK_V31]: {
@@ -995,15 +1266,18 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.deepseekV31",
     parameterCount: 671,
-    contextWindow: 164000,
+    contextWindow: 32768,
     icon: "whale",
     openRouterModel: "deepseek/deepseek-chat-v3.1",
-    creditCost: 10,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.15,
+    outputTokenCost: 0.75,
+
     utilities: [ModelUtility.LEGACY, ModelUtility.SMART, ModelUtility.CODING],
     supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.BALANCED,
-    content: ContentLevel.MAINSTREAM,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.DEEPSEEK_R1]: {
@@ -1013,10 +1287,13 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.deepseekR1",
     parameterCount: 671,
-    contextWindow: 164000,
+    contextWindow: 163840,
     icon: "whale",
     openRouterModel: "deepseek/deepseek-r1-0528",
-    creditCost: 10,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.4,
+    outputTokenCost: 1.75,
+
     utilities: [
       ModelUtility.SMART,
       ModelUtility.CODING,
@@ -1024,9 +1301,9 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.REASONING,
     ],
     supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
+    intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.THOROUGH,
-    content: ContentLevel.MAINSTREAM,
+    content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.QWEN3_235B_FREE]: {
@@ -1036,15 +1313,18 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.qwen3235bFree",
     parameterCount: 235,
-    contextWindow: 131000,
+    contextWindow: 40960,
     icon: "si-alibabadotcom",
-    openRouterModel: "qwen/qwen3-235b-a22b:free",
-    creditCost: 0,
+    openRouterModel: "qwen/qwen3-235b-a22b",
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.2,
+    outputTokenCost: 0.6,
+
     utilities: [ModelUtility.SMART, ModelUtility.CODING],
     supportsTools: true,
-    intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
-    content: ContentLevel.MAINSTREAM,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.DEEPSEEK_R1_DISTILL]: {
@@ -1054,19 +1334,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.deepseekR1Distill",
     parameterCount: 70,
-    contextWindow: 64000,
+    contextWindow: 32768,
     icon: "whale",
     openRouterModel: "deepseek/deepseek-r1-distill-qwen-32b",
-    creditCost: 2,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.29,
+    outputTokenCost: 0.29,
+
     utilities: [
       ModelUtility.CODING,
       ModelUtility.ANALYSIS,
       ModelUtility.REASONING,
     ],
     supportsTools: true,
-    intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.BALANCED,
-    content: ContentLevel.MAINSTREAM,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.QWEN_2_5_7B]: {
@@ -1079,60 +1362,17 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 32768,
     icon: "si-alibabadotcom",
     openRouterModel: "qwen/qwen-2.5-7b-instruct",
-    creditCost: 2,
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.04,
+    outputTokenCost: 0.1,
+
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
     speed: SpeedLevel.FAST,
-    content: ContentLevel.MAINSTREAM,
+    content: ContentLevel.OPEN,
     features: { ...defaultFeatures, toolCalling: true },
     weaknesses: [ModelUtility.ANALYSIS, ModelUtility.CODING],
-  },
-  [ModelId.GROK_4]: {
-    id: ModelId.GROK_4,
-    name: "Grok 4",
-    provider: "xAI",
-    apiProvider: ApiProvider.OPENROUTER,
-    description: "app.chat.models.descriptions.grok4",
-    parameterCount: undefined,
-    contextWindow: 256000,
-    icon: "si-x",
-    openRouterModel: "x-ai/grok-4",
-    creditCost: 10,
-    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.ANALYSIS],
-    supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
-    speed: SpeedLevel.BALANCED,
-    content: ContentLevel.OPEN,
-    features: {
-      ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
-      toolCalling: true,
-    },
-  },
-  [ModelId.GROK_4_FAST]: {
-    id: ModelId.GROK_4_FAST,
-    name: "Grok 4 Fast",
-    provider: "xAI",
-    apiProvider: ApiProvider.OPENROUTER,
-    description: "app.chat.models.descriptions.grok4Fast",
-    parameterCount: undefined,
-    contextWindow: 2000000,
-    icon: "si-x",
-    openRouterModel: "x-ai/grok-4-fast",
-    creditCost: 2,
-    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
-    supportsTools: true,
-    intelligence: IntelligenceLevel.SMART,
-    speed: SpeedLevel.FAST,
-    content: ContentLevel.OPEN,
-    features: {
-      ...defaultFeatures,
-      imageInput: true,
-      pdfInput: true,
-      toolCalling: true,
-    },
   },
 };
 /* eslint-enable i18next/no-literal-string */
@@ -1167,16 +1407,73 @@ export const ModelIdOptions = Object.values(modelOptions).map((model) => ({
 }));
 
 /**
+ * Get credit cost from a ModelOption object
+ * Handles both function and number types
+ * @param model - The model option object
+ * @returns Credit cost as a number
+ */
+export function getCreditCostFromModel(model: ModelOption): number {
+  return typeof model.creditCost === "number"
+    ? model.creditCost
+    : model.inputTokenCost !== undefined && model.outputTokenCost !== undefined
+      ? model.creditCost(model)
+      : 0;
+}
+
+/**
  * Get credit cost for a specific model
  * @param modelId - The model identifier
  * @returns Credit cost (defaults to 1 if model not found)
  */
-export function getModelCost(modelId: ModelId | string): number {
+export function getModelCost(modelId: ModelId): number {
   try {
-    const model = getModelById(modelId as ModelId);
-    return model.creditCost;
+    const model = getModelById(modelId);
+    return getCreditCostFromModel(model);
   } catch {
     // Fallback to 1 credit if model not found
     return 1;
   }
 }
+
+/**
+ * Calculate credit cost based on token pricing
+ * Uses 2000 input tokens and 800 output tokens as the base calculation
+ * 1 credit = $0.01 (1 cent)
+ * @param modelOption - The model option with pricing information
+ * @returns Calculated credit cost (0 for models with 0 token costs)
+ */
+export function calculateCreditCost(modelOption: ModelOption): number {
+  const INPUT_TOKENS = 7000;
+  const OUTPUT_TOKENS = 500;
+  const DOLLARS_PER_CREDIT = 0.01; // 1 credit = $0.01 (1 cent)
+  // const
+
+  // If no token costs defined, return 0
+  if (!modelOption.inputTokenCost && !modelOption.outputTokenCost) {
+    return 0;
+  }
+
+  // Calculate cost in USD per message
+  const inputCostPerMessage =
+    (modelOption.inputTokenCost / 1_000_000) * INPUT_TOKENS;
+  const outputCostPerMessage =
+    (modelOption.outputTokenCost / 1_000_000) * OUTPUT_TOKENS;
+  const totalCostPerMessage = inputCostPerMessage + outputCostPerMessage;
+
+  // Convert to credits (1 credit = $0.01)
+  const credits =
+    (totalCostPerMessage / DOLLARS_PER_CREDIT) *
+    (1 + STANDARD_MARKUP_PERCENTAGE);
+
+  // Round to one decimal place
+  const rounded = Math.round(credits * 10) / 10;
+
+  // Return as integer if the decimal place is 0 (e.g., 1.0 → 1, 2.0 → 2)
+  return rounded % 1 === 0 ? Math.round(rounded) : rounded;
+}
+
+/**
+ * Total number of AI models available
+ * Dynamically calculated from modelOptions object
+ */
+export const TOTAL_MODEL_COUNT = Object.keys(modelOptions).length;

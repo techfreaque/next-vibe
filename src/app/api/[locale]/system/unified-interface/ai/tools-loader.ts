@@ -240,7 +240,6 @@ export async function loadTools(params: {
     const allEndpoints = definitionsRegistry.getEndpointsForUser(
       Platform.AI,
       params.user,
-      params.logger,
     );
 
     // Filter by requested toolNames (full path with underscores or alias)

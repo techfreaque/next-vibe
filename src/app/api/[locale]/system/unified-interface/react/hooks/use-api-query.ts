@@ -61,11 +61,15 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
       enabled?: boolean;
       staleTime?: number;
       gcTime?: number;
-      onSuccess?: (data: {
-        responseData: TEndpoint["types"]["ResponseOutput"];
-        requestData: TEndpoint["types"]["RequestOutput"];
-        urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
-      }) => void | ErrorResponseType | Promise<void | ErrorResponseType>;
+      onSuccess?: (
+        data: {
+          responseData: TEndpoint["types"]["ResponseOutput"];
+          requestData: TEndpoint["types"]["RequestOutput"];
+          urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
+        },
+        user: JwtPayloadType,
+        logger: EndpointLogger,
+      ) => void | ErrorResponseType | Promise<void | ErrorResponseType>;
       onError?: ({
         error,
         requestData,
@@ -128,11 +132,6 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
           )
         : requestData;
 
-      logger.info("useApiQuery: Executing query", {
-        endpointPath: endpoint.path.join("/"),
-        queryKeyString: JSON.stringify(queryKey),
-      });
-
       const response = await executeQuery<TEndpoint>({
         endpoint,
         logger,
@@ -141,21 +140,38 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
         locale,
         user,
         options: {
-          onSuccess: onSuccess
-            ? (
-                context,
-              ):
-                | void
-                | ErrorResponseType
-                | Promise<void | ErrorResponseType> => {
-                const result = onSuccess({
+          onSuccess: async (context) => {
+            // Call endpoint-defined onSuccess first (from endpoint.options.queryOptions.onSuccess)
+            if (endpoint.options?.queryOptions?.onSuccess) {
+              const endpointResult =
+                await endpoint.options.queryOptions.onSuccess(
+                  {
+                    responseData: context.responseData,
+                    requestData: context.requestData,
+                    urlPathParams: context.urlPathParams,
+                  },
+                  user,
+                  logger,
+                );
+              if (endpointResult) {
+                return endpointResult;
+              }
+            }
+
+            // Then call hook-provided onSuccess (from useApiQuery options)
+            if (onSuccess) {
+              const result = await onSuccess(
+                {
                   responseData: context.responseData,
                   requestData: context.requestData,
                   urlPathParams: context.urlPathParams,
-                });
-                return result;
-              }
-            : undefined,
+                },
+                user,
+                logger,
+              );
+              return result;
+            }
+          },
           onError,
         },
       });

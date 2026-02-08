@@ -7,18 +7,17 @@
 
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe-ui/ui/popover";
 import { P } from "next-vibe-ui/ui/typography";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils/utils";
 import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
+import { deepMerge } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-utils";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { useNavigationStack } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
+import {
+  NavigationStackProvider,
+  useNavigationStack,
+} from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { NavigationStackEntry } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
@@ -56,16 +55,16 @@ export interface EndpointsPageProps<
   className?: string;
   /** User object for permission checks */
   user: JwtPayloadType;
-  /** Internal: Disable navigation stack rendering (used for stacked instances) */
+  /** Internal: Disable finalNavigation stack rendering (used for stacked instances) */
   _disableNavigationStack?: boolean;
   /** Force which endpoint method to render when multiple are present (e.g., both GET and PATCH) */
   forceMethod?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-  /** Optional navigation overrides (e.g., to override pop behavior in modals) */
+  /** Optional finalNavigation overrides (e.g., to override pop behavior in modals) */
   navigationOverride?: Partial<ReturnType<typeof useNavigationStack>>;
 }
 
 /**
- * EndpointsPage Component
+ * Internal EndpointsPage Component (wrapped by provider)
  *
  * A complete page wrapper that handles:
  * - Endpoint hook logic (useEndpoint)
@@ -73,31 +72,8 @@ export interface EndpointsPageProps<
  * - Title with optional counts
  * - Submit button in header (if configured)
  * - EndpointRenderer for form and response display
- *
- * @example
- * ```tsx
- * <EndpointsPage
- *   endpoint={leadsListEndpoints}
- *   locale={locale}
- *   icon={List}
- *   titleKey="app.api.leads.list.get.title"
- *   endpointOptions={{
- *     queryOptions: { enabled: true },
- *     filterOptions: { initialFilters: { ... } }
- *   }}
- *   submitButton={{
- *     text: "app.admin.common.actions.filter",
- *     position: "header",
- *     icon: RefreshCw,
- *     variant: "ghost",
- *     size: "sm",
- *   }}
- *   showCounts
- *   getCount={(data) => data?.response?.leads?.length}
- * />
- * ```
  */
-export function EndpointsPage<
+function EndpointsPageInternal<
   T extends {
     GET?: CreateApiEndpointAny;
     POST?: CreateApiEndpointAny;
@@ -118,18 +94,17 @@ export function EndpointsPage<
   forceMethod,
   navigationOverride,
 }: EndpointsPageProps<T>): React.JSX.Element {
-  // Check navigation stack to render stacked endpoints (only for base layer)
-  const baseNavigation = useNavigationStack();
-  // Merge with any provided overrides (e.g., for modal context)
-  // Wrap in useMemo to ensure stable reference for other hooks
-  const navigation = useMemo(
+  // Check finalNavigation stack to render stacked endpoints (only for base layer)
+  const navigation = useNavigationStack();
+
+  // Apply navigationOverride if provided
+  const finalNavigation = useMemo(
     () =>
       navigationOverride
-        ? { ...baseNavigation, ...navigationOverride }
-        : baseNavigation,
-    [baseNavigation, navigationOverride],
+        ? { ...navigation, ...navigationOverride }
+        : navigation,
+    [navigation, navigationOverride],
   );
-
   // Determine which endpoint to use for base layer
   // If forceMethod is provided, use that; otherwise use default priority
   const forcedEndpoint = forceMethod ? endpoint[forceMethod] : undefined;
@@ -163,75 +138,222 @@ export function EndpointsPage<
     [finalDebug, locale],
   );
 
-  // Build mutation options with onSuccess callback for navigation
+  // Build mutation options with onSuccess callback for finalNavigation
   const mutationOptionsWithNav = useMemo(() => {
-    const existingMutationOptions = endpointOptions?.create?.mutationOptions;
+    // Collect all onSuccess callbacks to chain them
+    const endpointOnSuccess =
+      endpoint.POST?.options?.mutationOptions?.onSuccess;
+    const callerOnSuccess = endpointOptions?.create?.mutationOptions?.onSuccess;
+
+    // Deep merge mutation options (endpoint options as base, caller options override)
+    const baseMutationOptions = endpoint.POST?.options?.mutationOptions ?? {};
+    const callerMutationOptions =
+      endpointOptions?.create?.mutationOptions ?? {};
+    const mergedMutationOptions = deepMerge(
+      baseMutationOptions,
+      callerMutationOptions,
+    );
 
     // For POST endpoints, navigate to GET endpoint after successful creation if GET exists
-    if (isMutationEndpoint && endpoint.GET && endpoint.POST) {
-      const targetGetEndpoint = endpoint.GET;
-
+    if (isMutationEndpoint && endpoint.POST) {
       return {
-        ...existingMutationOptions,
-        onSuccess: ({
+        ...mergedMutationOptions,
+        onSuccess: async ({
           responseData,
           requestData,
           pathParams,
           logger,
-        }): void | ErrorResponseType | Promise<void | ErrorResponseType> => {
-          // Call existing onSuccess first
-          const existingResult = existingMutationOptions?.onSuccess?.({
+        }): Promise<void | ErrorResponseType> => {
+          const endpointResult = await endpointOnSuccess?.({
             responseData,
             requestData,
             pathParams,
             logger,
           });
 
-          // Navigate to GET endpoint with ID from response
-          if (
-            responseData &&
-            typeof responseData === "object" &&
-            "id" in responseData
-          ) {
-            const id = String(responseData.id);
-            navigation.replace(targetGetEndpoint, {
-              urlPathParams: { id } as never,
-            });
+          // If endpoint's onSuccess returned an error, return it
+          if (endpointResult) {
+            return endpointResult;
           }
 
-          return existingResult;
+          // Call caller's onSuccess second (from endpointOptions)
+          const callerResult = await callerOnSuccess?.({
+            responseData,
+            requestData,
+            pathParams,
+            logger,
+          });
+
+          // If caller's onSuccess returned an error, return it
+          if (callerResult) {
+            return callerResult;
+          }
+
+          // Handle popNavigationOnSuccess from finalNavigation entry
+          const currentEntry =
+            finalNavigation.stack[finalNavigation.stack.length - 1];
+          const popCount = currentEntry?.popNavigationOnSuccess;
+          if (popCount && popCount > 0) {
+            for (let i = 0; i < popCount; i++) {
+              finalNavigation.pop();
+            }
+            return;
+          }
         },
       };
     }
 
-    return existingMutationOptions;
+    return mergedMutationOptions;
   }, [
     isMutationEndpoint,
-    endpoint.GET,
     endpoint.POST,
     endpointOptions?.create?.mutationOptions,
-    navigation,
+    finalNavigation,
   ]);
 
-  // Merge navigation-aware mutation options into endpoint options
-  const finalEndpointOptions = useMemo(() => {
+  // Create wrapped PATCH mutation options with finalNavigation handling
+  const patchMutationOptionsWithNav = useMemo(() => {
+    const patchEndpoint = endpoint.PATCH;
+    const existingPatchOptions = endpointOptions?.update?.mutationOptions;
+
+    if (!patchEndpoint || !existingPatchOptions) {
+      return existingPatchOptions;
+    }
+
+    return {
+      ...existingPatchOptions,
+      onSuccess: async ({
+        responseData,
+        requestData,
+        pathParams,
+        logger,
+      }): Promise<void | ErrorResponseType> => {
+        // Call existing onSuccess first
+        if (existingPatchOptions?.onSuccess) {
+          const result = await existingPatchOptions.onSuccess({
+            responseData,
+            requestData,
+            pathParams,
+            logger,
+          });
+          if (result) {
+            return result;
+          }
+        }
+
+        // Handle popNavigationOnSuccess from finalNavigation entry
+        const currentEntry =
+          finalNavigation.stack[finalNavigation.stack.length - 1];
+        const popCount = currentEntry?.popNavigationOnSuccess;
+        if (popCount && popCount > 0) {
+          for (let i = 0; i < popCount; i++) {
+            finalNavigation.pop();
+          }
+        }
+      },
+    };
+  }, [
+    endpoint.PATCH,
+    endpointOptions?.update?.mutationOptions,
+    finalNavigation,
+  ]);
+
+  // Create wrapped DELETE mutation options with finalNavigation handling
+  const deleteMutationOptionsWithNav = useMemo(() => {
+    const deleteEndpoint = endpoint.DELETE;
+    const existingDeleteOptions = endpointOptions?.delete?.mutationOptions;
+
+    if (!deleteEndpoint || !existingDeleteOptions) {
+      return existingDeleteOptions;
+    }
+
+    return {
+      ...existingDeleteOptions,
+      onSuccess: async ({
+        responseData,
+        requestData,
+        pathParams,
+        logger,
+      }): Promise<void | ErrorResponseType> => {
+        // Call existing onSuccess first
+        if (existingDeleteOptions?.onSuccess) {
+          const result = await existingDeleteOptions.onSuccess({
+            responseData,
+            requestData,
+            pathParams,
+            logger,
+          });
+          if (result) {
+            return result;
+          }
+        }
+
+        // Handle popNavigationOnSuccess from finalNavigation entry
+        const currentEntry =
+          finalNavigation.stack[finalNavigation.stack.length - 1];
+        const popCount = currentEntry?.popNavigationOnSuccess;
+        if (popCount && popCount > 0) {
+          for (let i = 0; i < popCount; i++) {
+            finalNavigation.pop();
+          }
+        }
+      },
+    };
+  }, [
+    endpoint.DELETE,
+    endpointOptions?.delete?.mutationOptions,
+    finalNavigation,
+  ]);
+
+  // Merge finalNavigation-aware mutation options and endpoint's built-in options
+  const finalEndpointOptions = useMemo((): UseEndpointOptions<T> => {
     const baseOptions = {
       ...endpointOptions,
       user,
     };
 
-    if (!mutationOptionsWithNav) {
+    if (
+      !mutationOptionsWithNav &&
+      !patchMutationOptionsWithNav &&
+      !deleteMutationOptionsWithNav
+    ) {
       return baseOptions;
     }
 
-    return {
-      ...baseOptions,
-      create: {
+    const result: UseEndpointOptions<T> = { ...baseOptions };
+
+    if (mutationOptionsWithNav) {
+      result.create = {
         ...endpointOptions?.create,
+        ...baseOptions.create,
         mutationOptions: mutationOptionsWithNav,
-      },
-    };
-  }, [endpointOptions, mutationOptionsWithNav, user]);
+      };
+    }
+
+    if (patchMutationOptionsWithNav) {
+      result.update = {
+        ...endpointOptions?.update,
+        ...baseOptions.update,
+        mutationOptions: patchMutationOptionsWithNav,
+      };
+    }
+
+    if (deleteMutationOptionsWithNav) {
+      result.delete = {
+        ...endpointOptions?.delete,
+        ...baseOptions.delete,
+        mutationOptions: deleteMutationOptionsWithNav,
+      };
+    }
+
+    return result;
+  }, [
+    endpointOptions,
+    mutationOptionsWithNav,
+    patchMutationOptionsWithNav,
+    deleteMutationOptionsWithNav,
+    user,
+  ]);
 
   // Use the endpoint hook for base endpoint
   const endpointState = useEndpoint(
@@ -334,7 +456,7 @@ export function EndpointsPage<
   );
 
   // Check if top entry is a modal
-  const topEntry = navigation.stack[navigation.stack.length - 1];
+  const topEntry = finalNavigation.stack[finalNavigation.stack.length - 1];
   const topIsModal = topEntry?.renderInModal ?? false;
 
   // Base layer is visible only when:
@@ -343,8 +465,8 @@ export function EndpointsPage<
   // - Stack has ONLY a modal (base is the background for that modal)
   const isBaseVisible =
     _disableNavigationStack ||
-    navigation.stack.length === 0 ||
-    (navigation.stack.length === 1 && topIsModal);
+    finalNavigation.stack.length === 0 ||
+    (finalNavigation.stack.length === 1 && topIsModal);
 
   return (
     <>
@@ -429,9 +551,9 @@ export function EndpointsPage<
       </Div>
 
       {/* Stacked endpoint layers - each mounted to preserve state */}
-      {/* Only render navigation stack for base layer (not for stacked instances) */}
+      {/* Only render finalNavigation stack for base layer (not for stacked instances) */}
       {!_disableNavigationStack &&
-        navigation.stack.map((entry, index) => (
+        finalNavigation.stack.map((entry, index) => (
           <StackEntryLayer
             key={`nav-${entry.timestamp}-${index}`}
             entry={entry}
@@ -443,10 +565,30 @@ export function EndpointsPage<
             locale={locale}
             modalOpenState={modalOpenState}
             setModalOpenState={setModalOpenState}
-            navigation={navigation}
+            finalNavigation={finalNavigation}
           />
         ))}
     </>
+  );
+}
+
+/**
+ * EndpointsPageInternal wrapped with NavigationStackProvider
+ * This is the main export that should be used
+ */
+export function EndpointsPage<
+  T extends {
+    GET?: CreateApiEndpointAny;
+    POST?: CreateApiEndpointAny;
+    PUT?: CreateApiEndpointAny;
+    PATCH?: CreateApiEndpointAny;
+    DELETE?: CreateApiEndpointAny;
+  },
+>(props: EndpointsPageProps<T>): React.JSX.Element {
+  return (
+    <NavigationStackProvider>
+      <EndpointsPageInternal {...props} />
+    </NavigationStackProvider>
   );
 }
 
@@ -463,7 +605,7 @@ function StackEntryRenderer({
   children,
   modalOpenState,
   setModalOpenState,
-  navigation,
+  finalNavigation,
 }: {
   entry: NavigationStackEntry;
   isModal: boolean;
@@ -476,66 +618,9 @@ function StackEntryRenderer({
       | Record<number, boolean>
       | ((prev: Record<number, boolean>) => Record<number, boolean>),
   ) => void;
-  navigation: ReturnType<typeof useNavigationStack>;
+  finalNavigation: ReturnType<typeof useNavigationStack>;
 }): React.JSX.Element {
   const modalIsOpen = modalOpenState[entry.timestamp] ?? true;
-  const triggerRef = useRef<HTMLDivElement>(null);
-
-  // Calculate adjusted position for modal based on click coordinates
-  const adjustedPosition = useMemo(() => {
-    if (!entry.modalPosition) {
-      return undefined;
-    }
-
-    const POPOVER_WIDTH = 500;
-    const POPOVER_HEIGHT = 500;
-    const BUTTON_WIDTH = 40;
-    const BUTTON_HEIGHT = 32;
-    const OFFSET_BELOW = 12;
-    const PADDING = 16;
-
-    const buttonMiddleX = entry.modalPosition.x + BUTTON_WIDTH / 2;
-    const buttonBottomY = entry.modalPosition.y + BUTTON_HEIGHT + OFFSET_BELOW;
-
-    // Calculate available space on left and right
-    const spaceOnLeft = buttonMiddleX;
-    const spaceOnRight = window.innerWidth - buttonMiddleX;
-
-    let finalX: number;
-
-    // Position modal so one edge aligns with button middle
-    if (spaceOnLeft > spaceOnRight) {
-      // More space on left: position modal to the left with RIGHT edge at button middle
-      finalX = Math.max(PADDING, buttonMiddleX - POPOVER_WIDTH);
-    } else {
-      // More space on right: position modal to the right with LEFT edge at button middle
-      finalX = Math.min(
-        window.innerWidth - POPOVER_WIDTH - PADDING,
-        buttonMiddleX,
-      );
-    }
-
-    // Position below button, adjust if it goes off bottom
-    let finalY = buttonBottomY;
-    if (finalY + POPOVER_HEIGHT + PADDING > window.innerHeight) {
-      finalY = Math.max(PADDING, window.innerHeight - POPOVER_HEIGHT - PADDING);
-    }
-
-    const positionStyle: React.CSSProperties = {
-      position: "fixed",
-      left: `${finalX}px`,
-      top: `${finalY}px`,
-      margin: 0,
-    };
-
-    return {
-      x: finalX,
-      y: finalY,
-      left: `${finalX}px`,
-      top: `${finalY}px`,
-      style: positionStyle,
-    };
-  }, [entry.modalPosition]);
 
   if (!isModal) {
     return (
@@ -550,74 +635,47 @@ function StackEntryRenderer({
 
   return (
     <>
-      {/* Backdrop - dims page and handles outside clicks */}
+      {/* Modal as centered dialog */}
       {modalIsOpen && (
-        <Div
-          onClick={(e) => {
-            e.preventDefault();
-            setModalOpenState({
-              ...modalOpenState,
-              [entry.timestamp]: false,
-            });
-            navigation.pop();
-          }}
-          className="fixed inset-0 z-40 bg-black/30"
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Modal popover */}
-      <Popover
-        key={`nav-${entry.timestamp}`}
-        open={modalIsOpen}
-        onOpenChange={(open) => {
-          setModalOpenState({
-            ...modalOpenState,
-            [entry.timestamp]: open,
-          });
-          if (!open) {
-            navigation.pop();
-          }
-        }}
-      >
-        <PopoverTrigger asChild>
-          <Div ref={triggerRef} className="hidden" />
-        </PopoverTrigger>
-        <PopoverContent
-          className="p-0 w-[90vw] sm:w-[500px] max-w-[600px] relative z-50"
-          side="bottom"
-          align="start"
-          sideOffset={8}
-          alignOffset={0}
-        >
+        <>
+          {/* Backdrop - dims page and handles outside clicks */}
           <Div
-            style={
-              adjustedPosition?.style
-                ? {
-                    display: "flex",
-                    flexDirection: "column",
-                    maxHeight: "min(500px,calc(100dvh-100px))",
-                    overflowY: "auto",
-                    ...adjustedPosition.style,
-                  }
-                : {
-                    display: "flex",
-                    flexDirection: "column",
-                    maxHeight: "min(500px,calc(100dvh-100px))",
-                    overflowY: "auto",
-                  }
-            }
+            onClick={(e) => {
+              e.preventDefault();
+              setModalOpenState({
+                ...modalOpenState,
+                [entry.timestamp]: false,
+              });
+              finalNavigation.pop();
+            }}
+            className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center"
+            aria-hidden="true"
           >
-            {children}
+            {/* Modal content - click stopPropagation to prevent backdrop click */}
+            {/* @ts-expect-error - style props */}
+            <Div
+              onClick={(e) => e.stopPropagation()}
+              className="p-4 relative z-[101] bg-background border shadow-lg rounded-lg"
+              style={{
+                display: "flex",
+                flexDirection: "column" as const,
+                width: "400px",
+                maxWidth: "90vw",
+                maxHeight: "min(600px,calc(100dvh-100px))",
+                overflowY: "auto" as const,
+              }}
+            >
+              {children}
+            </Div>
           </Div>
-        </PopoverContent>
-      </Popover>
+        </>
+      )}
     </>
   );
 }
 
 /**
- * Component to render a single navigation stack entry
+ * Component to render a single finalNavigation stack entry
  * Handles hook calls at proper component level (not inside map)
  */
 function StackEntryLayer({
@@ -630,7 +688,7 @@ function StackEntryLayer({
   locale,
   modalOpenState,
   setModalOpenState,
-  navigation,
+  finalNavigation,
 }: {
   entry: NavigationStackEntry;
   index: number;
@@ -645,12 +703,13 @@ function StackEntryLayer({
       | Record<number, boolean>
       | ((prev: Record<number, boolean>) => Record<number, boolean>),
   ) => void;
-  navigation: ReturnType<typeof useNavigationStack>;
+  finalNavigation: ReturnType<typeof useNavigationStack>;
 }): React.JSX.Element | null {
-  const isTopEntry = index === navigation.stack.length - 1;
-  const topEntry = navigation.stack[navigation.stack.length - 1];
+  const isTopEntry = index === finalNavigation.stack.length - 1;
+  const topEntry = finalNavigation.stack[finalNavigation.stack.length - 1];
   const isBackgroundOfModal =
-    index === navigation.stack.length - 2 && (topEntry?.renderInModal ?? false);
+    index === finalNavigation.stack.length - 2 &&
+    (topEntry?.renderInModal ?? false);
 
   // Show if: top entry OR background layer of a modal
   const isVisible = isTopEntry || isBackgroundOfModal;
@@ -670,11 +729,11 @@ function StackEntryLayer({
             [entry.timestamp]: false,
           }),
         );
-        navigation.pop();
+        finalNavigation.pop();
       },
       canGoBack: true,
     };
-  }, [isModal, entry.timestamp, navigation, setModalOpenState]);
+  }, [isModal, entry.timestamp, finalNavigation, setModalOpenState]);
 
   // Don't render if not visible
   if (!isVisible) {
@@ -691,9 +750,9 @@ function StackEntryLayer({
         className={className}
         modalOpenState={modalOpenState}
         setModalOpenState={setModalOpenState}
-        navigation={navigation}
+        finalNavigation={finalNavigation}
       >
-        <EndpointsPage
+        <EndpointsPageInternal
           endpoint={{ GET: entry.endpoint }}
           locale={locale}
           endpointOptions={{
@@ -720,9 +779,9 @@ function StackEntryLayer({
         className={className}
         modalOpenState={modalOpenState}
         setModalOpenState={setModalOpenState}
-        navigation={navigation}
+        finalNavigation={finalNavigation}
       >
-        <EndpointsPage
+        <EndpointsPageInternal
           user={user}
           endpoint={{ POST: entry.endpoint }}
           locale={locale}
@@ -730,6 +789,13 @@ function StackEntryLayer({
             create: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.data,
+              mutationOptions: (() => {
+                console.log(
+                  "EndpointsPage: entry.endpoint.options?.mutationOptions =",
+                  entry.endpoint.options?.mutationOptions,
+                );
+                return entry.endpoint.options?.mutationOptions;
+              })(),
             },
           }}
           submitButton={submitButton}
@@ -755,9 +821,9 @@ function StackEntryLayer({
         className={className}
         modalOpenState={modalOpenState}
         setModalOpenState={setModalOpenState}
-        navigation={navigation}
+        finalNavigation={finalNavigation}
       >
-        <EndpointsPage
+        <EndpointsPageInternal
           user={user}
           endpoint={endpointConfig}
           locale={locale}
@@ -773,6 +839,7 @@ function StackEntryLayer({
             update: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.data,
+              mutationOptions: entry.endpoint.options?.mutationOptions,
             },
           }}
           submitButton={submitButton}
@@ -793,9 +860,9 @@ function StackEntryLayer({
         className={className}
         modalOpenState={modalOpenState}
         setModalOpenState={setModalOpenState}
-        navigation={navigation}
+        finalNavigation={finalNavigation}
       >
-        <EndpointsPage
+        <EndpointsPageInternal
           user={user}
           endpoint={{ DELETE: entry.endpoint }}
           locale={locale}
@@ -803,6 +870,7 @@ function StackEntryLayer({
             delete: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.urlPathParams,
+              mutationOptions: entry.endpoint.options?.mutationOptions,
             },
           }}
           debug={debug}
@@ -827,9 +895,9 @@ function StackEntryLayer({
         className={className}
         modalOpenState={modalOpenState}
         setModalOpenState={setModalOpenState}
-        navigation={navigation}
+        finalNavigation={finalNavigation}
       >
-        <EndpointsPage
+        <EndpointsPageInternal
           user={user}
           endpoint={endpointConfig}
           locale={locale}

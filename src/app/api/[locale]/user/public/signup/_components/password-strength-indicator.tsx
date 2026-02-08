@@ -1,100 +1,154 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
-import { P } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { useWidgetLocale } from "../../../../system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { calculatePasswordStrength } from "./calculate-password-strenght";
 
 interface PasswordStrengthIndicatorProps {
   password: string;
-  locale: CountryLanguage;
 }
 
+/**
+ * Displays a visual indicator of password strength.
+ */
 export function PasswordStrengthIndicator({
   password,
-  locale,
-}: PasswordStrengthIndicatorProps): JSX.Element | null {
-  const { t } = simpleT(locale);
+}: PasswordStrengthIndicatorProps): React.JSX.Element | null {
+  const locale = useWidgetLocale();
+  const { t: globalT } = simpleT(locale);
 
   if (!password) {
     return null;
   }
 
-  // Calculate password strength
-  let strength = 0;
-  let color = "bg-red-500";
-  let labelText = t("app.user.components.auth.common.passwordStrength.weak");
+  // Use shared logic for strength calculation
+  const { level, widthPercentage, missing } =
+    calculatePasswordStrength(password);
 
-  // Length check
-  if (password.length >= 8) {
-    strength += 1;
-  }
-  if (password.length >= 10) {
-    strength += 1;
-  }
+  // Get colors based on level
+  const colorClass =
+    level === "weak"
+      ? "bg-red-500"
+      : level === "fair"
+        ? "bg-orange-500"
+        : level === "good"
+          ? "bg-yellow-500"
+          : "bg-green-500";
 
-  // Complexity checks
-  if (/[A-Z]/.test(password)) {
-    strength += 1;
-  }
-  if (/[0-9]/.test(password)) {
-    strength += 1;
-  }
-  if (/[^A-Za-z0-9]/.test(password)) {
-    strength += 1;
-  }
+  const textColorClass =
+    level === "weak"
+      ? "text-red-500"
+      : level === "fair"
+        ? "text-orange-500"
+        : level === "good"
+          ? "text-yellow-500"
+          : "text-green-500";
 
-  // Determine color and label based on strength
-  if (strength <= 2) {
-    color = "bg-red-500";
-    labelText = t("app.user.components.auth.common.passwordStrength.weak");
-  } else if (strength <= 3) {
-    color = "bg-orange-500";
-    labelText = t("app.user.components.auth.common.passwordStrength.fair");
-  } else if (strength <= 4) {
-    color = "bg-yellow-500";
-    labelText = t("app.user.components.auth.common.passwordStrength.good");
-  } else {
-    color = "bg-green-500";
-    labelText = t("app.user.components.auth.common.passwordStrength.strong");
-  }
-
-  // Calculate width percentage (between 20% and 100%)
-  const widthPercentage = Math.max(20, Math.min(100, (strength / 5) * 100));
+  const labelText = globalT(
+    `app.user.components.auth.common.passwordStrength.${level}`,
+  );
 
   return (
-    <Div className="mt-2 flex flex-col gap-1">
-      <Div className="flex justify-between text-xs">
-        <Span>
-          {t("app.user.components.auth.common.passwordStrength.label")}
+    <Div className="flex flex-col gap-2">
+      <Div className="flex justify-between items-center text-sm">
+        <Span className="font-medium">
+          {globalT("app.user.components.auth.common.passwordStrength.label")}
         </Span>
-        <Span
-          className={
-            strength <= 2
-              ? "text-red-500"
-              : strength <= 3
-                ? "text-orange-500"
-                : strength <= 4
-                  ? "text-yellow-500"
-                  : "text-green-500"
-          }
-        >
-          {labelText}
-        </Span>
+        <Span className={cn("font-semibold", textColorClass)}>{labelText}</Span>
       </Div>
-      <Div className="h-1.5 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-        <Div style={{ width: `${widthPercentage}%` }}>
-          <Div className={`h-full ${color} transition-all duration-300`} />
+      <Div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+        <Div
+          style={{
+            width: `${widthPercentage}%`,
+            height: "100%",
+            transitionProperty: "all",
+            transitionDuration: "300ms",
+            backgroundColor: colorClass,
+          }}
+        />
+      </Div>
+      {level !== "strong" && (
+        <Div className="flex flex-col gap-1 text-sm mt-1 text-muted-foreground">
+          {missing.minLength && (
+            <Div className="flex items-center gap-2">
+              <Span className="text-red-500">
+                {globalT(
+                  "app.user.components.auth.passwordStrength.requirement.minLength.icon",
+                )}
+              </Span>
+              <Span>
+                {globalT(
+                  "app.user.components.auth.passwordStrength.requirement.minLength.text",
+                )}
+              </Span>
+            </Div>
+          )}
+          {missing.uppercase && (
+            <Div className="flex items-center gap-2">
+              <Span className="text-red-500">
+                {globalT(
+                  "app.user.components.auth.passwordStrength.requirement.uppercase.icon",
+                )}
+              </Span>
+              <Span>
+                {globalT(
+                  "app.user.components.auth.passwordStrength.requirement.uppercase.text",
+                )}
+              </Span>
+            </Div>
+          )}
+          {missing.lowercase && (
+            <Div className="flex items-center gap-2">
+              <Span className="text-red-500">
+                {globalT(
+                  "app.user.components.auth.passwordStrength.requirement.lowercase.icon",
+                )}
+              </Span>
+              <Span>
+                {globalT(
+                  "app.user.components.auth.passwordStrength.requirement.lowercase.text",
+                )}
+              </Span>
+            </Div>
+          )}
+          {missing.number && (
+            <Div className="flex items-center gap-2">
+              <Span className="text-red-500">
+                {globalT(
+                  "app.user.components.auth.passwordStrength.requirement.number.icon",
+                )}
+              </Span>
+              <Span>
+                {globalT(
+                  "app.user.components.auth.passwordStrength.requirement.number.text",
+                )}
+              </Span>
+            </Div>
+          )}
+          {missing.special && (
+            <Div className="flex items-center gap-2">
+              <Span className="text-yellow-500">
+                {globalT(
+                  "app.user.components.auth.passwordStrength.requirement.special.icon",
+                )}
+              </Span>
+              <Span>
+                {globalT(
+                  "app.user.components.auth.passwordStrength.requirement.special.text",
+                )}
+              </Span>
+            </Div>
+          )}
         </Div>
-      </Div>
-      {strength <= 2 && (
-        <P className="text-xs text-red-500 mt-1">
-          {t("app.user.components.auth.common.passwordStrength.suggestion")}
-        </P>
       )}
     </Div>
   );
 }
+
+PasswordStrengthIndicator.displayName = "PasswordStrengthIndicator";
+
+export default PasswordStrengthIndicator;

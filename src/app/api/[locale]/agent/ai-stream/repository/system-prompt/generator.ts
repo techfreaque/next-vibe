@@ -7,11 +7,11 @@
 /* eslint-disable i18next/no-literal-string */
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/products/repository-client";
 import { languageConfig } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
+import { TOTAL_MODEL_COUNT } from "../../../models/models";
 import { NO_LOOP_PARAM } from "../core/constants";
 
 /**

@@ -10,9 +10,15 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type {
+  ReactRequestResponseWidgetProps,
+  ReactStaticWidgetProps,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetForm,
+  useWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import { findEnumLabel } from "./shared";
 import type { BadgeWidgetConfig, BadgeWidgetSchema } from "./types";
@@ -67,21 +73,25 @@ export function BadgeWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TUsage extends FieldUsageConfig,
+  TSchemaType extends "primitive" | "widget",
+  TSchema extends TSchemaType extends "primitive" ? BadgeWidgetSchema : never,
 >(
   props:
-    | ReactWidgetProps<
+    | ReactRequestResponseWidgetProps<
         TEndpoint,
         TUsage,
-        BadgeWidgetConfig<TKey, never, TUsage, "widget">
+        BadgeWidgetConfig<TKey, TSchema, TUsage, "primitive">
       >
-    | ReactWidgetProps<
+    | ReactStaticWidgetProps<
         TEndpoint,
         TUsage,
-        BadgeWidgetConfig<TKey, BadgeWidgetSchema, TUsage, "primitive">
+        BadgeWidgetConfig<TKey, TSchema, TUsage, "widget">
       >,
 ): JSX.Element {
   const { field } = props;
+  const fieldName = "fieldName" in props ? props.fieldName : undefined;
   const t = useWidgetTranslation();
+  const form = useWidgetForm();
   const {
     text: staticText,
     enumOptions,
@@ -89,13 +99,25 @@ export function BadgeWidget<
     size,
     className,
   } = field;
+  const usage = "usage" in field ? field.usage : undefined;
 
   const sizeClass = getBadgeSizeClass(size);
+
+  // Get value from form for request fields, otherwise from value
+  let value: typeof field.value | undefined;
+  if (usage?.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value && "value" in field) {
+      value = field.value;
+    }
+  } else if ("value" in field) {
+    value = field.value;
+  }
 
   // value is properly typed from schema - no assertions needed
   // Handle enum options - find matching label for value
   if (enumOptions) {
-    const enumLabel = findEnumLabel(field.value, enumOptions, t);
+    const enumLabel = findEnumLabel(value, enumOptions, t);
     if (enumLabel) {
       return (
         <Badge variant={badgeVariant} className={cn(sizeClass, className)}>
@@ -106,7 +128,7 @@ export function BadgeWidget<
   }
 
   // Handle null/empty case
-  if (!field.value) {
+  if (!value) {
     // Handle static text from UI config
     if (staticText) {
       const translatedText = t(staticText);
@@ -117,19 +139,12 @@ export function BadgeWidget<
         </Badge>
       );
     }
-    return (
-      <Badge
-        variant="outline"
-        className={cn(sizeClass, "text-muted-foreground", className)}
-      >
-        —
-      </Badge>
-    );
+    return <></>;
   }
 
   // Handle string value as translation key
-  if (typeof field.value === "string") {
-    const translatedText = t(field.value);
+  if (typeof value === "string") {
+    const translatedText = t(value);
 
     return (
       <Badge variant={badgeVariant} className={cn(sizeClass, className)}>
@@ -140,7 +155,7 @@ export function BadgeWidget<
 
   return (
     <Badge variant={badgeVariant} className={cn(sizeClass, className)}>
-      {field.value}
+      {value}
     </Badge>
   );
 }

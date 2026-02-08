@@ -166,7 +166,7 @@ const { POST } = createEndpoint({
         {
           requests: responseArrayField(
             {
-              type: WidgetType.DATA_TABLE,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               {

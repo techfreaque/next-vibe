@@ -24,7 +24,7 @@ import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { BooleanWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type { ReactFormFieldProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import {
   FormControl,
   FormField,
@@ -48,7 +48,7 @@ export function BooleanFieldWidget<
 >({
   field,
   fieldName,
-}: ReactWidgetProps<
+}: ReactFormFieldProps<
   TEndpoint,
   TUsage,
   BooleanFieldWidgetConfig<TKey, TSchema, TUsage>

@@ -101,7 +101,7 @@ const { POST } = createEndpoint({
 
       stoppedGuards: responseArrayField(
         {
-          type: WidgetType.DATA_TABLE,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.guard.stop.fields.stoppedGuards.title",
         },
         objectField(

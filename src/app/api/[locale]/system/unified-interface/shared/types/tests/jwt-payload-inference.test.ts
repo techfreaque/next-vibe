@@ -75,9 +75,77 @@ type Test6Check = Expect<Equal<Test6, JwtPayloadType>>;
 
 /**
  * TEST 7: Single CLI_OFF role should infer JwtPrivatePayloadType
+ * Note: This is debatable - platform markers alone might be considered invalid
+ * But for type safety, we treat them as requiring authentication
  */
 type Test7 = InferJwtPayloadTypeFromRoles<readonly [typeof UserRole.CLI_OFF]>;
 type Test7Check = Expect<Equal<Test7, JwtPrivatePayloadType>>;
+
+/**
+ * TEST 8: PUBLIC + platform markers should infer JWTPublicPayloadType
+ * Platform markers should be ignored when determining JWT payload type
+ */
+type Test8 = InferJwtPayloadTypeFromRoles<
+  readonly [
+    typeof UserRole.PUBLIC,
+    typeof UserRole.CLI_OFF,
+    typeof UserRole.WEB_OFF,
+  ]
+>;
+type Test8Check = Expect<Equal<Test8, JWTPublicPayloadType>>;
+
+/**
+ * TEST 9: PUBLIC + all platform markers should still infer JWTPublicPayloadType
+ */
+type Test9 = InferJwtPayloadTypeFromRoles<
+  readonly [
+    typeof UserRole.PUBLIC,
+    typeof UserRole.CLI_OFF,
+    typeof UserRole.CLI_AUTH_BYPASS,
+    typeof UserRole.AI_TOOL_OFF,
+    typeof UserRole.WEB_OFF,
+    typeof UserRole.MCP_ON,
+    typeof UserRole.PRODUCTION_OFF,
+  ]
+>;
+type Test9Check = Expect<Equal<Test9, JWTPublicPayloadType>>;
+
+/**
+ * TEST 10: ADMIN + platform markers should infer JwtPrivatePayloadType
+ */
+type Test10 = InferJwtPayloadTypeFromRoles<
+  readonly [
+    typeof UserRole.ADMIN,
+    typeof UserRole.CLI_OFF,
+    typeof UserRole.MCP_ON,
+  ]
+>;
+type Test10Check = Expect<Equal<Test10, JwtPrivatePayloadType>>;
+
+/**
+ * TEST 11: PUBLIC + ADMIN + platform markers should infer JwtPayloadType (union)
+ */
+type Test11 = InferJwtPayloadTypeFromRoles<
+  readonly [
+    typeof UserRole.PUBLIC,
+    typeof UserRole.ADMIN,
+    typeof UserRole.CLI_OFF,
+    typeof UserRole.WEB_OFF,
+  ]
+>;
+type Test11Check = Expect<Equal<Test11, JwtPayloadType>>;
+
+/**
+ * TEST 12: Multiple private roles + platform markers should infer JwtPrivatePayloadType
+ */
+type Test12 = InferJwtPayloadTypeFromRoles<
+  readonly [
+    typeof UserRole.ADMIN,
+    typeof UserRole.CUSTOMER,
+    typeof UserRole.CLI_OFF,
+  ]
+>;
+type Test12Check = Expect<Equal<Test12, JwtPrivatePayloadType>>;
 
 // Export a dummy value to make this a valid module
 export const JWT_PAYLOAD_TYPE_TESTS_PASS = true;

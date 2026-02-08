@@ -22,7 +22,7 @@ import {
 import type { JSX } from "react";
 
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type { ReactFormFieldProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import { simpleT } from "@/i18n/core/shared";
 import {
   FormControl,
@@ -70,11 +70,18 @@ export function TextFieldWidget<
 >({
   field,
   fieldName,
-}: ReactWidgetProps<
-  TEndpoint,
-  TUsage,
-  TextFieldWidgetConfig<TKey, TSchema, TUsage>
->): JSX.Element {
+}: {
+  fieldName: ReactFormFieldProps<
+    TEndpoint,
+    TUsage,
+    TextFieldWidgetConfig<TKey, TSchema, TUsage>
+  >["fieldName"];
+  field: ReactFormFieldProps<
+    TEndpoint,
+    TUsage,
+    TextFieldWidgetConfig<TKey, TSchema, TUsage>
+  >["field"];
+}): JSX.Element {
   const t = useWidgetTranslation();
   const locale = useWidgetLocale();
   const form = useWidgetForm();

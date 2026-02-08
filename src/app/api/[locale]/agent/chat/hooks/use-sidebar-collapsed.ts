@@ -11,32 +11,19 @@ const STORAGE_KEY = "sidebar-collapsed";
 const MOBILE_BREAKPOINT = 930; // px
 
 /**
- * Get initial collapsed state based on screen size
- * Returns true (collapsed) for mobile, false (open) for desktop
- */
-const getInitialCollapsedState = (): boolean => {
-  if (typeof window === "undefined") {
-    // SSR: default to false (open)
-    return false;
-  }
-  // Client: check if mobile
-  return window.innerWidth < MOBILE_BREAKPOINT;
-};
-
-/**
  * Hook for managing sidebar collapsed state
- * - Initial state: false (not collapsed) for SSR
- * - Initial loaded state: collapsed for mobile, open for desktop
+ * - Initial state: false (not collapsed) for SSR and client (to avoid hydration mismatch)
+ * - After mount: updates based on screen size and localStorage
  * - Only saves when user explicitly changes it (not on initial load)
  */
 export function useSidebarCollapsed(): [boolean, (collapsed: boolean) => void] {
-  // Initialize state based on screen size (client-side only)
-  const [collapsed, setCollapsed] = useState<boolean>(getInitialCollapsedState);
+  // Initialize state to false on both server and client to avoid hydration mismatch
+  const [collapsed, setCollapsed] = useState<boolean>(false);
 
   // Track if user has explicitly changed the state
   const hasUserChanged = useRef(false);
 
-  // Load state from storage on mount
+  // Load state from storage and apply screen size check on mount
   useEffect(() => {
     const loadState = async (): Promise<void> => {
       try {
@@ -46,10 +33,15 @@ export function useSidebarCollapsed(): [boolean, (collapsed: boolean) => void] {
           // User has a saved preference - use it
           const savedCollapsed = JSON.parse(stored) as boolean;
           setCollapsed(savedCollapsed);
+        } else {
+          // No stored preference - check screen size
+          const initialCollapsed = window.innerWidth < MOBILE_BREAKPOINT;
+          setCollapsed(initialCollapsed);
         }
-        // If no stored preference, keep the initial state (already set based on screen size)
       } catch {
-        // If storage fails, keep the initial state
+        // If storage fails, check screen size
+        const initialCollapsed = window.innerWidth < MOBILE_BREAKPOINT;
+        setCollapsed(initialCollapsed);
       }
     };
 

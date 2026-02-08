@@ -170,7 +170,7 @@ const { GET: cronStatusGetEndpoint } = createEndpoint({
 
       tasks: responseArrayField(
         {
-          type: WidgetType.DATA_TABLE,
+          type: WidgetType.CONTAINER,
         },
         responseField({
           type: WidgetType.TEXT,

@@ -37,8 +37,8 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
  */
 export const config = {
   matcher: [
-    // Match all paths except static files and API routes
+    // Match all paths except static files and specific API routes
     "/",
-    "/((?!_next/static|_next/image|image|images|favicon.ico|robots.txt|sitemap.xml).*)",
+    "/((?!_next/static|_next/image|image|images|favicon.ico|robots.txt|sitemap.xml|api/[^/]+/manifest).*)",
   ],
 };

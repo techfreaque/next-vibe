@@ -45,7 +45,7 @@ type Equal<X, Y> =
  */
 const optionalArrayField = requestDataArrayField(
   {
-    type: WidgetType.DATA_LIST,
+    type: WidgetType.CONTAINER,
     title: "app.admin.common.actions.back",
     description: "app.admin.common.actions.back",
     optional: true,
@@ -77,7 +77,7 @@ const optionalArrayField = requestDataArrayField(
 // Test 1: responseArrayOptionalField should create array-optional type
 const testResponseArrayOptional = responseArrayOptionalField(
   {
-    type: WidgetType.DATA_TABLE,
+    type: WidgetType.CONTAINER,
     title: "app.test.optional.array.title" as TranslationKey,
   },
   objectField(

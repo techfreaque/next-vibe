@@ -102,7 +102,7 @@ const { GET } = createEndpoint({
           }),
           languages: responseArrayField(
             {
-              type: WidgetType.GROUPED_LIST,
+              type: WidgetType.CONTAINER,
               groupBy: "type",
             },
             responseField({

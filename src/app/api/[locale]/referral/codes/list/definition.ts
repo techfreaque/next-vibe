@@ -6,18 +6,17 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  responseArrayField,
+  customWidgetObject,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user/user-roles/enum";
+import { ReferralCodesListContainer } from "./widget";
 
 /**
  * GET endpoint for listing user's referral codes
@@ -41,114 +40,39 @@ export const { GET } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.referral.codes.list.get.form.title",
-      description: "app.api.referral.codes.list.get.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { response: true },
-    {
-      codes: responseArrayField(
-        {
-          type: WidgetType.DATA_TABLE,
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            id: responseField({
-              type: WidgetType.TEXT,
-              content: "app.api.referral.codes.list.get.response.codes.id",
-              schema: z.string(),
-            }),
-            code: responseField({
-              type: WidgetType.TEXT,
-              content: "app.api.referral.codes.list.get.response.codes.code",
-              schema: z.string(),
-            }),
-            label: responseField({
-              type: WidgetType.TEXT,
-              content: "app.api.referral.codes.list.get.response.codes.label",
-              schema: z.string().nullable(),
-            }),
-            currentUses: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.referral.codes.list.get.response.codes.currentUses",
-              schema: z.coerce.number(),
-            }),
-            isActive: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.referral.codes.list.get.response.codes.isActive",
-              schema: z.boolean(),
-            }),
-            createdAt: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.referral.codes.list.get.response.codes.createdAt",
-              schema: z.string(),
-            }),
-            totalSignups: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.referral.codes.list.get.response.codes.totalSignups",
-              schema: z.coerce.number(),
-            }),
-            totalRevenueCents: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.referral.codes.list.get.response.codes.totalRevenueCents",
-              schema: z.coerce.number(),
-            }),
-            totalEarningsCents: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.referral.codes.list.get.response.codes.totalEarningsCents",
-              schema: z.coerce.number(),
-            }),
-          },
+  fields: customWidgetObject({
+    render: ReferralCodesListContainer,
+    usage: { response: true } as const,
+    children: {
+      codes: responseField({
+        type: WidgetType.TEXT,
+        schema: z.array(
+          z.object({
+            code: z.string(),
+            label: z.string().nullable(),
+            currentUses: z.coerce.number(),
+            totalSignups: z.coerce.number(),
+            totalRevenueCents: z.coerce.number(),
+            totalEarningsCents: z.coerce.number(),
+            isActive: z.boolean(),
+          }),
         ),
-      ),
+      }),
     },
-  ),
+  }),
 
   examples: {
     responses: {
       default: {
         codes: [
           {
-            id: "550e8400-e29b-41d4-a716-446655440000",
             code: "FRIEND2024",
             label: "Friends & Family",
             currentUses: 5,
-            isActive: true,
-            createdAt: "2024-01-01T00:00:00Z",
             totalSignups: 3,
             totalRevenueCents: 50000,
             totalEarningsCents: 5000,
-          },
-        ],
-      },
-      success: {
-        codes: [
-          {
-            id: "550e8400-e29b-41d4-a716-446655440000",
-            code: "FRIEND2024",
-            label: "Friends & Family",
-            currentUses: 5,
             isActive: true,
-            createdAt: "2024-01-01T00:00:00Z",
-            totalSignups: 3,
-            totalRevenueCents: 50000,
-            totalEarningsCents: 5000,
           },
         ],
       },

@@ -22,23 +22,9 @@ import type {
   DispatchField,
   FieldUsageConfig,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
-// Container widgets
-import { AccordionWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/accordion/cli";
 import { CodeOutputWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/code-output/cli";
 import { ContainerWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/container/cli";
-import { CreditTransactionCardWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/credit-transaction-card/cli";
-import { CreditTransactionListWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/credit-transaction-list/cli";
-import { DataCardsWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/data-cards/cli";
-import { DataGridWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/data-grid/cli";
-import { DataListWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/data-list/cli";
-import { DataTableWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/data-table/cli";
-import { GroupedListWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/grouped-list/cli";
-import { LinkCardWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/link-card/cli";
-import { MetricCardWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/metric-card/cli";
 import { PaginationWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/pagination/cli";
-import { SectionWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/section/cli";
-import { TabsWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/tabs/cli";
-// Display-only widgets
 import { AlertWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/cli";
 import AvatarWidgetInk from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/avatar/cli";
 import { BadgeWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/badge/cli";
@@ -54,13 +40,11 @@ import { LinkWidgetInk } from "@/app/api/[locale]/system/unified-interface/unifi
 import { LoadingWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/loading/cli";
 import { MarkdownWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/markdown/cli";
 import { MetadataWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/metadata/cli";
-import { PasswordStrengthWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/password-strength/cli";
 import { SeparatorWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/separator/cli";
 import { StatWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/stat/cli";
 import { StatusIndicatorWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/status-indicator/cli";
 import { TextWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/cli";
 import { TitleWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/title/cli";
-// Form field widgets - all 31 field types
 import { BooleanFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/cli";
 import { ColorFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/color-field/cli";
 import { CountrySelectFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/country-select-field/cli";
@@ -93,9 +77,7 @@ import { TimeRangeFieldWidgetInk } from "@/app/api/[locale]/system/unified-inter
 import { TimezoneFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/timezone-field/cli";
 import { UrlFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/url-field/cli";
 import { UuidFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/uuid-field/cli";
-// Interactive widgets
 import { ButtonWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/button/cli";
-import DragHandleWidgetInk from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/drag-handle/cli";
 import { FormAlertWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/cli";
 import { NavigateButtonWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/cli";
 import { SubmitButtonWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/cli";
@@ -129,7 +111,7 @@ function asField<T>(
   >,
 ): T {
   // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- dispatch boundary: conditional types don't resolve against generic union members
-  return field as unknown as T;
+  return field as T;
 }
 
 /**
@@ -147,7 +129,7 @@ function asWidgetProps<TEndpoint extends CreateApiEndpointAny, T>(
   >,
 ): T {
   // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- union-props boundary: { field: A | B } not assignable to { field: A } | { field: B }
-  return { fieldName, field } as unknown as T;
+  return { fieldName, field } as T;
 }
 
 /**
@@ -176,15 +158,6 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
           )}
         />
       );
-    case WidgetType.SECTION:
-      return (
-        <SectionWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof SectionWidgetInk>[0]["field"]>(
-            field,
-          )}
-        />
-      );
     case WidgetType.SEPARATOR:
       return (
         <SeparatorWidgetInk
@@ -201,53 +174,6 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
             TEndpoint,
             Parameters<typeof CodeOutputWidgetInk>[0]
           >(fieldName, field)}
-        />
-      );
-
-    // === DATA DISPLAY WIDGETS ===
-    case WidgetType.DATA_TABLE:
-      return (
-        <DataTableWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof DataTableWidgetInk>[0]["field"]>(
-            field,
-          )}
-        />
-      );
-    case WidgetType.DATA_CARDS:
-      return (
-        <DataCardsWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof DataCardsWidgetInk>[0]["field"]>(
-            field,
-          )}
-        />
-      );
-    case WidgetType.DATA_GRID:
-      return (
-        <DataGridWidgetInk
-          {...asWidgetProps<TEndpoint, Parameters<typeof DataGridWidgetInk>[0]>(
-            fieldName,
-            field,
-          )}
-        />
-      );
-    case WidgetType.DATA_LIST:
-      return (
-        <DataListWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof DataListWidgetInk>[0]["field"]>(
-            field,
-          )}
-        />
-      );
-    case WidgetType.GROUPED_LIST:
-      return (
-        <GroupedListWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof GroupedListWidgetInk>[0]["field"]>(
-            field,
-          )}
         />
       );
     case WidgetType.CODE_QUALITY_LIST:
@@ -274,24 +200,6 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
           fieldName={fieldName}
           field={asField<
             Parameters<typeof CodeQualityFilesWidgetInk>[0]["field"]
-          >(field)}
-        />
-      );
-    case WidgetType.CREDIT_TRANSACTION_CARD:
-      return (
-        <CreditTransactionCardWidgetInk
-          {...asWidgetProps<
-            TEndpoint,
-            Parameters<typeof CreditTransactionCardWidgetInk>[0]
-          >(fieldName, field)}
-        />
-      );
-    case WidgetType.CREDIT_TRANSACTION_LIST:
-      return (
-        <CreditTransactionListWidgetInk
-          fieldName={fieldName}
-          field={asField<
-            Parameters<typeof CreditTransactionListWidgetInk>[0]["field"]
           >(field)}
         />
       );
@@ -385,29 +293,11 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
           )}
         />
       );
-    case WidgetType.LINK_CARD:
-      return (
-        <LinkCardWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof LinkCardWidgetInk>[0]["field"]>(
-            field,
-          )}
-        />
-      );
     case WidgetType.STAT:
       return (
         <StatWidgetInk
           fieldName={fieldName}
           field={asField<Parameters<typeof StatWidgetInk>[0]["field"]>(field)}
-        />
-      );
-    case WidgetType.METRIC_CARD:
-      return (
-        <MetricCardWidgetInk
-          {...asWidgetProps<
-            TEndpoint,
-            Parameters<typeof MetricCardWidgetInk>[0]
-          >(fieldName, field)}
         />
       );
     case WidgetType.CHART:
@@ -437,17 +327,6 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
           )}
         />
       );
-    case WidgetType.PASSWORD_STRENGTH:
-      return (
-        <PasswordStrengthWidgetInk
-          fieldName={fieldName}
-          field={asField<
-            Parameters<typeof PasswordStrengthWidgetInk>[0]["field"]
-          >(field)}
-        />
-      );
-
-    // === INTERACTIVE WIDGETS ===
     case WidgetType.BUTTON:
       return (
         <ButtonWidgetInk
@@ -494,24 +373,6 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
         />
       );
 
-    case WidgetType.ACCORDION:
-      return (
-        <AccordionWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof AccordionWidgetInk>[0]["field"]>(
-            field,
-          )}
-        />
-      );
-
-    case WidgetType.TABS:
-      return (
-        <TabsWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof TabsWidgetInk>[0]["field"]>(field)}
-        />
-      );
-
     case WidgetType.LOADING:
       return (
         <LoadingWidgetInk
@@ -537,16 +398,6 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
         <AvatarWidgetInk
           fieldName={fieldName}
           field={asField<Parameters<typeof AvatarWidgetInk>[0]["field"]>(field)}
-        />
-      );
-
-    case WidgetType.DRAG_HANDLE:
-      return (
-        <DragHandleWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof DragHandleWidgetInk>[0]["field"]>(
-            field,
-          )}
         />
       );
 

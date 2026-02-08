@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import type z from "zod";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 
 import { withValue } from "../../widgets/_shared/field-helpers";
 import type {
@@ -12,6 +11,8 @@ import type {
   ArrayChildConstraint,
   ConstrainedChildUsage,
   FieldUsageConfig,
+  InferChildOutput,
+  InferChildrenOutput,
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
 } from "../../widgets/_shared/types";
@@ -56,7 +57,7 @@ interface ObjectChildrenRendererProps<
   TChildren extends ObjectChildrenConstraint<TKey, TUsage>,
 > {
   childrenSchema: TChildren;
-  value: Record<string, WidgetData> | null | undefined;
+  value: InferChildrenOutput<TChildren> | null | undefined;
   fieldName: string | undefined;
 }
 
@@ -69,11 +70,11 @@ interface ArrayChildRendererProps<
   TChild extends AnyChildrenConstrain<TKey, TUsage>,
 > {
   childSchema: TChild;
-  value: Array<WidgetData> | null | undefined;
+  value: InferChildOutput<TChild>[] | null | undefined;
   fieldName: string | undefined;
   /** Optional render callback to customize how each item is rendered */
   renderItem?: (props: {
-    itemData: WidgetData;
+    itemData: InferChildOutput<TChild>;
     index: number;
     itemFieldName: string;
     childSchema: TChild;
@@ -89,7 +90,12 @@ interface UnionObjectRendererProps<
   TVariants extends UnionObjectWidgetConfigConstrain<TKey, TUsage>,
 > {
   variantSchemas: TVariants;
-  value: Record<string, WidgetData> | null | undefined;
+  value:
+    | InferChildrenOutput<
+        ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
+      >
+    | null
+    | undefined;
   fieldName: string | undefined;
   discriminator: string | undefined;
   watchedDiscriminatorValue: string | undefined;
@@ -155,7 +161,7 @@ export function ObjectChildrenRenderer<
       <InkWidgetRenderer<TEndpoint>
         key={child.name}
         fieldName={childFieldName}
-        field={withValue(child.field, child.data, value ?? undefined)}
+        field={withValue(child.field, child.data, value ?? null)}
       />
     );
 
@@ -352,25 +358,36 @@ export function UnionObjectRenderer<
 
 UnionObjectRenderer.displayName = "UnionObjectRenderer";
 
+/**
+ * Helper type to infer value type from children schema
+ */
 export interface MultiWidgetRendererProps<
   TKey extends string,
   TUsage extends FieldUsageConfig,
-> {
-  childrenSchema:
+  TChildrenSchema extends
     | ObjectChildrenConstraint<TKey, TUsage>
     | ArrayChildConstraint<TKey, TUsage>
     | UnionObjectWidgetConfigConstrain<TKey, TUsage>
+    | undefined = undefined,
+> {
+  childrenSchema: TChildrenSchema;
+  value:
+    | InferChildrenOutput<ObjectChildrenConstraint<TKey, TUsage>>
+    | InferChildrenOutput<
+        ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
+      >
+    | InferChildOutput<AnyChildrenConstrain<TKey, TUsage>>[]
+    | null
     | undefined;
-  value: WidgetData;
   fieldName: string | undefined;
   discriminator?: string;
   watchedDiscriminatorValue?: string;
   /** Optional render callback for array items to customize rendering */
   renderItem?: (props: {
-    itemData: WidgetData;
+    itemData: InferChildOutput<AnyChildrenConstrain<TKey, TUsage>>;
     index: number;
     itemFieldName: string;
-    childSchema: ArrayChildConstraint<TKey, TUsage>;
+    childSchema: AnyChildrenConstrain<TKey, TUsage>;
   }) => ReactElement | null;
 }
 
@@ -417,6 +434,12 @@ function isArrayChild<TKey extends string, TUsage extends FieldUsageConfig>(
 export function MultiWidgetRenderer<
   TKey extends string,
   TUsage extends FieldUsageConfig,
+  TChildrenSchema extends
+    | ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
+    | ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>
+    | UnionObjectWidgetConfigConstrain<TKey, ConstrainedChildUsage<TUsage>>
+    | undefined = undefined,
+  TEndpoint extends CreateApiEndpointAny = CreateApiEndpointAny,
 >({
   childrenSchema,
   value,
@@ -424,7 +447,7 @@ export function MultiWidgetRenderer<
   discriminator,
   watchedDiscriminatorValue,
   renderItem,
-}: MultiWidgetRendererProps<TKey, TUsage>): ReactElement {
+}: MultiWidgetRendererProps<TKey, TUsage, TChildrenSchema>): ReactElement {
   if (!childrenSchema) {
     return <></>;
   }
@@ -433,10 +456,21 @@ export function MultiWidgetRenderer<
   const isUnion = isUnionVariants<TKey, TUsage>(childrenSchema);
 
   if (isUnion) {
+    const objectValue:
+      | InferChildrenOutput<
+          ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
+        >
+      | null
+      | undefined = (!Array.isArray(value) ? value : null) as
+      | InferChildrenOutput<
+          ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
+        >
+      | null
+      | undefined;
     return (
-      <UnionObjectRenderer
+      <UnionObjectRenderer<TKey, TUsage, typeof childrenSchema>
         variantSchemas={childrenSchema}
-        value={value as Record<string, WidgetData> | null | undefined}
+        value={objectValue}
         fieldName={fieldName}
         discriminator={discriminator}
         watchedDiscriminatorValue={watchedDiscriminatorValue}
@@ -446,10 +480,16 @@ export function MultiWidgetRenderer<
 
   // Check for array child constraint
   if (isArrayChild<TKey, TUsage>(childrenSchema)) {
+    const arrayValue:
+      | InferChildOutput<typeof childrenSchema>[]
+      | null
+      | undefined = Array.isArray(value)
+      ? (value as InferChildOutput<typeof childrenSchema>[])
+      : null;
     return (
-      <ArrayChildRenderer
+      <ArrayChildRenderer<TKey, TUsage, typeof childrenSchema, TEndpoint>
         childSchema={childrenSchema}
-        value={value as Array<WidgetData> | null | undefined}
+        value={arrayValue}
         fieldName={fieldName}
         renderItem={renderItem}
       />
@@ -458,10 +498,17 @@ export function MultiWidgetRenderer<
 
   // ObjectChildrenConstraint is a Record<string, ...>
   const objectChildren: ObjectChildrenConstraint<TKey, TUsage> = childrenSchema;
+  const objectValue:
+    | InferChildrenOutput<typeof objectChildren>
+    | null
+    | undefined = (!Array.isArray(value) ? value : null) as
+    | InferChildrenOutput<typeof objectChildren>
+    | null
+    | undefined;
   return (
-    <ObjectChildrenRenderer
+    <ObjectChildrenRenderer<TKey, TUsage, typeof objectChildren, TEndpoint>
       childrenSchema={objectChildren}
-      value={value as Record<string, WidgetData> | null | undefined}
+      value={objectValue}
       fieldName={fieldName}
     />
   );

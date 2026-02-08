@@ -113,7 +113,7 @@ export function FlatMessage({
   const characterDisplayName =
     (message.role === "user" || message.role === "assistant") &&
     message.character
-      ? characters[message.character]?.content.name || message.character
+      ? characters[message.character]?.name || message.character
       : t("app.chat.flatView.anonymous");
 
   // Determine display name for user messages

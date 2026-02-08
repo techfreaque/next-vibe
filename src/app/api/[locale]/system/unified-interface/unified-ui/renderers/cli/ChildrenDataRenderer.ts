@@ -25,9 +25,44 @@ import {
 import type {
   AnyChildrenConstrain,
   BaseWidgetConfig,
+  ConstrainedChildUsage,
   FieldUsageConfig,
+  ObjectChildrenConstraint,
   SchemaTypes,
 } from "../../widgets/_shared/types";
+
+/**
+ * Type guard to check if a variant has object-like children that can be indexed
+ */
+function hasIndexableChildren(
+  variant: UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
+  >,
+): variant is UnifiedField<
+  string,
+  z.ZodTypeAny,
+  FieldUsageConfig,
+  AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
+> & {
+  schemaType: "object" | "object-optional" | "widget-object";
+  children: ObjectChildrenConstraint<
+    string,
+    ConstrainedChildUsage<FieldUsageConfig>
+  >;
+} {
+  return (
+    "children" in variant &&
+    variant.children !== undefined &&
+    typeof variant.children === "object" &&
+    "schemaType" in variant &&
+    (variant.schemaType === "object" ||
+      variant.schemaType === "object-optional" ||
+      variant.schemaType === "widget-object")
+  );
+}
 
 /**
  * A single child ready to render with its data
@@ -72,7 +107,7 @@ export interface ProcessedChildren {
 /**
  * Configuration for filtering children
  */
-export interface ChildrenFilterConfig {
+export interface ChildrenFilterConfig<TData = WidgetData> {
   /** Hide fields with hidden: true */
   hideHidden?: boolean;
   /** Only include response fields (for display-only mode) */
@@ -90,7 +125,7 @@ export interface ChildrenFilterConfig {
           AnyChildrenConstrain<string, FieldUsageConfig>
         >
       | AnyChildrenConstrain<string, FieldUsageConfig>,
-    data: WidgetData,
+    data: TData,
   ) => boolean;
 }
 
@@ -135,7 +170,8 @@ export class ChildrenDataRenderer {
    * Extract and filter children, resolving parent value for special fields
    * Accepts both UnifiedField (from endpoints) and AnyChildrenConstrain (from container children)
    */
-  static extractChildren(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  static extractChildren<TValue extends Record<string, any>>(
     childrenSchema:
       | Record<
           string,
@@ -149,8 +185,8 @@ export class ChildrenDataRenderer {
           | undefined
         >
       | undefined,
-    value: Record<string, WidgetData> | undefined | null,
-    config: ChildrenFilterConfig = {},
+    value: TValue | undefined | null,
+    config: ChildrenFilterConfig<TValue[string]> = {},
   ): ProcessedChild[] {
     if (!childrenSchema) {
       return [];
@@ -230,7 +266,9 @@ export class ChildrenDataRenderer {
           FieldUsageConfig,
           AnyChildrenConstrain<string, FieldUsageConfig>
         >,
-        data: resolvedData,
+        // Safe cast: TValue is InferChildrenOutput which is structurally WidgetData-compatible
+        // Runtime values are always valid WidgetData (primitives, objects, arrays)
+        data: resolvedData as WidgetData,
         columns:
           "columns" in field && typeof field.columns === "number"
             ? field.columns
@@ -450,14 +488,11 @@ export class ChildrenDataRenderer {
     }
 
     for (const variant of variants) {
-      if (!("children" in variant) || !variant.children) {
+      if (!hasIndexableChildren(variant)) {
         continue;
       }
 
-      const variantChildren = variant.children as Record<
-        string,
-        BaseWidgetConfig<FieldUsageConfig, SchemaTypes> | undefined
-      >;
+      const variantChildren = variant.children;
       const discriminatorField = variantChildren[discriminator];
 
       if (!discriminatorField) {
@@ -508,42 +543,19 @@ export class ChildrenDataRenderer {
         >
       | undefined,
     discriminator: string | undefined,
-  ): Record<
-    string,
-    UnifiedField<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      AnyChildrenConstrain<string, FieldUsageConfig>
-    >
-  > {
+  ): Record<string, AnyChildrenConstrain<string, FieldUsageConfig>> {
     const result: Record<
       string,
-      UnifiedField<
-        string,
-        z.ZodTypeAny,
-        FieldUsageConfig,
-        AnyChildrenConstrain<string, FieldUsageConfig>
-      >
+      AnyChildrenConstrain<string, FieldUsageConfig>
     > = {};
 
     // Get discriminator field from reference variant
     if (
       referenceVariant &&
       discriminator &&
-      "children" in referenceVariant &&
-      referenceVariant.children
+      hasIndexableChildren(referenceVariant)
     ) {
-      const refChildren = referenceVariant.children as Record<
-        string,
-        | UnifiedField<
-            string,
-            z.ZodTypeAny,
-            FieldUsageConfig,
-            AnyChildrenConstrain<string, FieldUsageConfig>
-          >
-        | undefined
-      >;
+      const refChildren = referenceVariant.children;
       if (discriminator in refChildren && refChildren[discriminator]) {
         result[discriminator] = refChildren[discriminator]!;
       }
@@ -552,19 +564,9 @@ export class ChildrenDataRenderer {
       if (
         selectedVariant &&
         selectedVariant !== referenceVariant &&
-        "children" in selectedVariant &&
-        selectedVariant.children
+        hasIndexableChildren(selectedVariant)
       ) {
-        const selectedChildren = selectedVariant.children as Record<
-          string,
-          | UnifiedField<
-              string,
-              z.ZodTypeAny,
-              FieldUsageConfig,
-              AnyChildrenConstrain<string, FieldUsageConfig>
-            >
-          | undefined
-        >;
+        const selectedChildren = selectedVariant.children;
         for (const key in selectedChildren) {
           if (
             Object.prototype.hasOwnProperty.call(selectedChildren, key) &&

@@ -103,11 +103,8 @@ export class FavoritesCreateRepository {
         .values({
           userId,
           characterId: data.characterId,
-          customName: data.customName ?? null,
-          customIcon:
-            data.customIcon === character?.icon
-              ? null
-              : (data.customIcon ?? null),
+          customName: null,
+          customIcon: null,
           voice: voiceToStore,
           modelSelection: modelSelectionToStore,
           position: nextPosition,
@@ -123,7 +120,10 @@ export class FavoritesCreateRepository {
         });
       }
 
-      return success({ id: favorite.id });
+      return success({
+        success: "app.api.agent.chat.favorites.post.success.title",
+        id: favorite.id,
+      });
     } catch (error) {
       logger.error("Failed to create favorite", parseError(error));
       return fail({

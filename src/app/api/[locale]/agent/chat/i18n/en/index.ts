@@ -99,7 +99,8 @@ export const translations = {
     showAllModels: "Show all models",
     showLess: "Show less",
     showMore: "Show {{remaining}} more",
-    showLegacyModels: "Show {{count}} Legacy Models",
+    showLegacyModels_one: "Show {{count}} Legacy Model",
+    showLegacyModels_other: "Show {{count}} Legacy Models",
     noMatchingModels: "No matching models",
     noModelsWarning: "No models match your filters",
     useOnce: "Use Once",
@@ -337,6 +338,8 @@ export const translations = {
         "Venice Uncensored - Uncensored AI model for unrestricted conversations",
       claudeOpus45:
         "Claude Opus 4.5 - Most powerful Claude model with exceptional reasoning and creative capabilities",
+      claudeOpus46:
+        "Claude Opus 4.6 - Latest and most powerful Claude model with exceptional reasoning and creative capabilities",
       claudeHaiku45:
         "Claude Haiku 4.5 - Fast and efficient Claude model optimized for speed and cost-effectiveness",
     },

@@ -13,9 +13,12 @@ import {
   getIconSizeClassName,
   getSpacingClassName,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type { ReactRequestResponseWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
-import { useWidgetIsInteractive } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetForm,
+  useWidgetIsInteractive,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
@@ -35,7 +38,8 @@ export function MarkdownEditorWidget<
   TUsage extends FieldUsageConfig,
 >({
   field,
-}: ReactWidgetProps<
+  fieldName,
+}: ReactRequestResponseWidgetProps<
   TEndpoint,
   TUsage,
   MarkdownEditorWidgetConfig<TKey, TSchema, TUsage, "primitive">
@@ -53,6 +57,10 @@ export function MarkdownEditorWidget<
   const gapClass = getSpacingClassName("gap", gap);
   const actionIconSizeClass = getIconSizeClassName(actionIconSize);
   const editIconSizeClass = getIconSizeClassName(editIconSize);
+
+  const form = useWidgetForm();
+  const rawValue =
+    form?.watch(fieldName) || "value" in field ? field.value : "";
 
   const inputHeightClass =
     inputHeight === "xs"
@@ -79,7 +87,7 @@ export function MarkdownEditorWidget<
         ? "h-6 w-6"
         : "h-7 w-7";
 
-  const extractedData = extractEditableTextData(field.value);
+  const extractedData = extractEditableTextData(rawValue);
 
   const value = extractedData?.value;
 

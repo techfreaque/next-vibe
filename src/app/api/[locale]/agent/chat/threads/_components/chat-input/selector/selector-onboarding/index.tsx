@@ -5,48 +5,46 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 
+import { CharacterBrowserCore } from "@/app/api/[locale]/agent/chat/characters/components/character-browser";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/characters/enum";
-import type { FavoriteCreateRequestOutput } from "@/app/api/[locale]/agent/chat/favorites/create/definition";
 import type { FavoriteCard } from "@/app/api/[locale]/agent/chat/favorites/definition";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { useFavoriteCreate } from "../../../../../favorites/create/hooks";
 import { PickStep } from "./pick-step";
-import { SpecialistStep } from "./specialist-step";
 import { StoryStep } from "./story-step";
 
 type OnboardingStep = "story" | "pick" | "specialists";
 
 interface SelectorOnboardingProps {
-  initialStep: OnboardingStep;
-  onStepChange: (step: OnboardingStep) => void;
   initialSelectedId: string | null;
   onSelectedIdChange: (id: string | null) => void;
   favorites: FavoriteCard[];
-  addFavorite: (data: FavoriteCreateRequestOutput) => Promise<string | null>;
-  onOnboardingComplete: () => void;
-  onCustomize: (characterId: string) => void;
   locale: CountryLanguage;
   logger: EndpointLogger;
 }
 
 export function SelectorOnboarding({
-  initialStep = "story",
-  onStepChange,
   initialSelectedId = null,
   onSelectedIdChange,
   favorites,
-  addFavorite,
-  onOnboardingComplete,
-  onCustomize,
   locale,
   logger,
 }: SelectorOnboardingProps): JSX.Element {
+  // Local state
+  const [onboardingStep, setOnboardingStep] = useState<
+    "story" | "pick" | "specialists"
+  >("story");
   // Get chat context and characters
   const { characters, setActiveFavorite, ttsVoice, user } = useChatContext();
+  const { addFavorite } = useFavoriteCreate({
+    user,
+    logger,
+  });
 
-  const [step, setStep] = useState<OnboardingStep>(initialStep);
+  const [step, setStep] = useState<OnboardingStep>(onboardingStep);
   const [selectedId, setSelectedId] = useState<string | null>(
     initialSelectedId,
   );
@@ -56,9 +54,9 @@ export function SelectorOnboarding({
   const changeStep = useCallback(
     (newStep: OnboardingStep) => {
       setStep(newStep);
-      onStepChange?.(newStep);
+      setOnboardingStep?.(newStep);
     },
-    [onStepChange],
+    [setOnboardingStep],
   );
 
   // Notify parent when selected ID changes
@@ -93,6 +91,11 @@ export function SelectorOnboarding({
     try {
       const createdId = await addFavorite({
         characterId: selectedId,
+        icon: character.icon,
+        name: character.name,
+        tagline: character.tagline,
+        description: character.description,
+        voice: null,
         modelSelection: {
           currentSelection: {
             selectionType: ModelSelectionType.CHARACTER_BASED,
@@ -118,9 +121,20 @@ export function SelectorOnboarding({
 
   const handleAddSpecialist = useCallback(
     async (characterId: string) => {
+      const character = characters[characterId];
+      if (!character) {
+        logger.error("Character not found", { characterId });
+        return;
+      }
+
       // Only save, don't activate - this is for adding specialists to list
       await addFavorite({
         characterId,
+        icon: character.icon,
+        name: character.name,
+        tagline: character.tagline,
+        description: character.description,
+        voice: null,
         modelSelection: {
           currentSelection: {
             selectionType: ModelSelectionType.CHARACTER_BASED,
@@ -128,60 +142,8 @@ export function SelectorOnboarding({
         },
       });
     },
-    [addFavorite],
+    [addFavorite, characters, logger],
   );
-
-  const handleStartChatting = useCallback(async () => {
-    if (!selectedId) {
-      return;
-    }
-
-    const existingFavorite = favorites.find(
-      (f) => f.characterId === selectedId,
-    );
-
-    if (!existingFavorite) {
-      const character = characters[selectedId];
-      if (!character) {
-        logger.error("Character not found", { characterId: selectedId });
-        return;
-      }
-
-      const createdId = await addFavorite({
-        characterId: selectedId,
-        modelSelection: {
-          currentSelection: {
-            selectionType: ModelSelectionType.CHARACTER_BASED,
-          },
-        },
-      });
-
-      if (createdId) {
-        setActiveFavorite(createdId, selectedId, character.modelId, ttsVoice);
-      }
-    } else {
-      const character = characters[selectedId];
-      if (character) {
-        setActiveFavorite(
-          existingFavorite.id,
-          selectedId,
-          character.modelId,
-          ttsVoice,
-        );
-      }
-    }
-
-    onOnboardingComplete();
-  }, [
-    selectedId,
-    favorites,
-    characters,
-    addFavorite,
-    logger,
-    onOnboardingComplete,
-    setActiveFavorite,
-    ttsVoice,
-  ]);
 
   return (
     <Div
@@ -207,16 +169,16 @@ export function SelectorOnboarding({
       )}
 
       {step === "specialists" && selectedId && (
-        <SpecialistStep
-          selectedCharacterId={selectedId}
-          onAddSpecialist={handleAddSpecialist}
-          onCustomize={onCustomize}
-          onStartChatting={handleStartChatting}
+        <CharacterBrowserCore
+          onAdd={handleAddSpecialist}
           favorites={favorites}
-          characters={characters}
           locale={locale}
+          hideCompanions={true}
           logger={logger}
           user={user}
+          selectedCharacterId={selectedId}
+          characters={characters}
+          showSpecialistWrapper={true}
         />
       )}
     </Div>

@@ -16,8 +16,12 @@ import {
   getSpacingClassName,
   getTextSizeClassName,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type {
+  ReactRequestResponseWidgetProps,
+  ReactStaticWidgetProps,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import {
+  useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetResponse,
@@ -75,22 +79,24 @@ export function TitleWidget<
   TUsage extends FieldUsageConfig,
 >(
   props:
-    | ReactWidgetProps<
-        TEndpoint,
-        TUsage,
-        TitleWidgetConfig<TKey, TitleWidgetSchema, TUsage, "primitive">
-      >
-    | ReactWidgetProps<
+    | ReactStaticWidgetProps<
         TEndpoint,
         TUsage,
         TitleWidgetConfig<TKey, never, TUsage, "widget">
+      >
+    | ReactRequestResponseWidgetProps<
+        TEndpoint,
+        TUsage,
+        TitleWidgetConfig<TKey, TitleWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
   const { field } = props;
+  const fieldName = "fieldName" in props ? props.fieldName : undefined;
   const locale = useWidgetLocale();
   const t = useWidgetTranslation();
   const response = useWidgetResponse();
   const logger = useWidgetLogger();
+  const form = useWidgetForm();
   const {
     content,
     level: configLevel,
@@ -102,6 +108,18 @@ export function TitleWidget<
     getCount,
     className,
   } = field;
+  const usage = "usage" in field ? field.usage : undefined;
+
+  // Get value from form for request fields, otherwise from field.value
+  let value;
+  if (usage?.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value && "value" in field) {
+      value = field.value;
+    }
+  } else if ("value" in field) {
+    value = field.value;
+  }
 
   // Get classes from config (no hardcoding!)
   const sizeClass = getTextSizeClassName(size);
@@ -151,7 +169,7 @@ export function TitleWidget<
   }
 
   // Handle date formatting if fieldType is DATE or DATETIME
-  const dateFormatted = formatIfDate(field.value, fieldType, locale);
+  const dateFormatted = formatIfDate(value, fieldType, locale);
   if (dateFormatted) {
     const level = configLevel ?? 2;
     const alignmentClass = getAlignmentClass(textAlign);
@@ -167,7 +185,7 @@ export function TitleWidget<
 
   // value is properly typed from schema - no assertions needed
   // Extract data using shared logic with translation context
-  const data = extractTitleData(field.value, { t });
+  const data = extractTitleData(value, { t });
 
   if (!data) {
     return (

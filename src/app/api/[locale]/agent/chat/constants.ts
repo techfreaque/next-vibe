@@ -11,7 +11,8 @@ import {
   MEMORY_DELETE_ALIAS,
   MEMORY_UPDATE_ALIAS,
 } from "./memories/[id]/definition";
-import { MEMORY_ADD_ALIAS, MEMORY_LIST_ALIAS } from "./memories/definition";
+import { MEMORY_ADD_ALIAS } from "./memories/create/definition";
+import { MEMORY_LIST_ALIAS } from "./memories/definition";
 
 /**
  * Storage keys for localStorage persistence

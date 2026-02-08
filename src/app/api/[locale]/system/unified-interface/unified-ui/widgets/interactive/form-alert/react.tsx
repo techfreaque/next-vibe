@@ -9,7 +9,7 @@ import type { JSX } from "react";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
-import type { ReactWidgetProps } from "../../_shared/react-types";
+import type { ReactStaticWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import { useWidgetResponse } from "../../_shared/use-widget-context";
 import type { FormAlertWidgetConfig } from "./types";
@@ -22,7 +22,7 @@ export function FormAlertWidget<
   TEndpoint extends CreateApiEndpointAny,
 >({
   field,
-}: ReactWidgetProps<
+}: ReactStaticWidgetProps<
   TEndpoint,
   TUsage,
   FormAlertWidgetConfig<TUsage, "widget">

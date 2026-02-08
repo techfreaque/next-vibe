@@ -14,7 +14,7 @@ import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { getModelCost } from "../agent/models/models";
+import { getModelCost, type ModelId } from "../agent/models/models";
 import { CreditRepository } from "./repository";
 
 /**
@@ -71,7 +71,7 @@ class CreditValidator implements CreditValidatorInterface {
    */
   async validateUserCredits(
     userId: string,
-    modelId: string,
+    modelId: ModelId,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditValidationResult>> {
     try {
@@ -126,7 +126,7 @@ class CreditValidator implements CreditValidatorInterface {
    */
   async validateLeadCredits(
     leadId: string,
-    modelId: string,
+    modelId: ModelId,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditValidationResult>> {
     try {
@@ -179,7 +179,7 @@ class CreditValidator implements CreditValidatorInterface {
    */
   async validateLeadByIp(
     ipAddress: string,
-    modelId: string,
+    modelId: ModelId,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<

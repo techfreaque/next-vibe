@@ -2,6 +2,9 @@ import { translations as idTranslations } from "../../[id]/i18n/en";
 
 export const translations = {
   id: idTranslations,
+  separator: {
+    or: "or",
+  },
   fallbacks: {
     unknownModel: "Unknown Model",
     unknownProvider: "unknown",
@@ -637,16 +640,51 @@ export const translations = {
       label: "Create Character",
     },
     browser: {
-      advancedModelAccess: "Advanced Model Access",
-      configureFiltersText: "Configure filters or manually select from",
+      advancedModelAccess: "Choose Your AI Experience",
+      configureFiltersText:
+        "Select models directly or start with pre-configured characters",
       aiModels: "AI models",
-      configureAiModelsTitle: "Configure AI Models Directly",
-      advancedChooseText: "Advanced: Choose from",
+      configureAiModelsTitle: "Direct Model Selection",
+      advancedChooseText:
+        "Choose from {{count}} models with fine-tuned control over intelligence, speed, and cost",
       modelsWithCustomFilters: "models with custom filters",
       configureButton: "Configure",
-      characterPresets: "Character Presets",
+      selectButton: {
+        label: "Explore Models",
+      },
+      characterPresets: "Ready-to-Use Characters",
       pickCharacterText:
-        "Pick a character with optimized settings. Customize anytime after adding.",
+        "Start with expert-tuned characters that have the perfect model already selected. Fine-tune settings anytime.",
+    },
+    marketing: {
+      title: "AI Characters & Custom Models",
+      description:
+        "Create personalized AI assistants with unique personalities, voices, and model configurations. Choose from hundreds of models or let our intelligent system select the best one for your needs.",
+      feature1: {
+        title: "Custom Characters",
+        description:
+          "Design AI personalities with custom system prompts, icons, and voices",
+      },
+      feature2: {
+        title: "Smart Model Selection",
+        description:
+          "Filter by intelligence, speed, price, and content type to find the perfect model",
+      },
+      feature3: {
+        title: "Favorites System",
+        description:
+          "Save your favorite configurations for quick access and organize by priority",
+      },
+      feature4: {
+        title: "Access",
+        titleSuffix: "+ Models",
+        description:
+          "Choose from the latest models from Anthropic, OpenAI, Google, and more",
+      },
+      cta: {
+        signup: "Sign Up to Get Started",
+        login: "Log In",
+      },
     },
     response: {
       characters: {
@@ -679,6 +717,11 @@ export const translations = {
           ignoredWeaknesses: { content: "Ignored Weaknesses" },
           manualModelId: { content: "Manual Model" },
           separator: { content: "•" },
+          actions: {
+            directModelButton: {
+              label: "Direct Model",
+            },
+          },
         },
       },
     },
@@ -728,6 +771,11 @@ export const translations = {
   post: {
     title: "Create Character",
     description: "Create a new custom character",
+    form: {
+      title: "Create Your Custom Character",
+      description:
+        "Design a unique AI character with custom behavior, personality, and capabilities. Choose a specific model or let the system select based on your requirements.",
+    },
     submitButton: {
       text: "Create Custom Character",
       loadingText: "Creating Character...",
@@ -737,32 +785,64 @@ export const translations = {
       description: "Define a new custom character",
     },
     name: {
-      label: "Name",
-      description: "The name of the character",
+      label: "Character Name",
+      description:
+        "Give your character a memorable name. This is how you and others will identify them.",
+      placeholder: "Enter character name",
+      validation: {
+        minLength: "Name must be at least 2 characters",
+        maxLength: "Name must be less than 100 characters",
+      },
     },
-    characterDescription: {
-      label: "Description",
-      description: "A brief description of the character",
+    tagline: {
+      label: "Character Tagline",
+      description:
+        "A catchy one-liner that captures the essence of your character. Keep it short and descriptive.",
+      placeholder: "Enter a short tagline",
+      validation: {
+        minLength: "Tagline must be at least 2 characters",
+        maxLength: "Tagline must be less than 500 characters",
+      },
     },
     icon: {
-      label: "Icon",
-      description: "An emoji icon for the character",
+      label: "Character Icon",
+      description:
+        "Pick an emoji that represents your character. This icon appears whenever the character is displayed.",
     },
-    systemPrompt: {
-      label: "System Prompt",
-      description: "The system prompt that defines the character's behavior",
+    characterDescription: {
+      label: "Character Description",
+      description:
+        "Describe what makes this character unique. What's their role? What can they help with? Be specific and detailed.",
+      placeholder: "Describe your character's purpose and capabilities",
+      validation: {
+        minLength: "Description must be at least 10 characters",
+        maxLength: "Description must be less than 500 characters",
+      },
     },
     category: {
       label: "Category",
-      description: "The category this character belongs to",
+      description:
+        "Choose the category that best fits your character. This helps with organization and discovery.",
     },
-    tagline: {
-      label: "Tagline",
-      description: "A short tagline describing the character",
+    isPublic: {
+      label: "Make Public",
+      description:
+        "Enable this to share your character with the community. When disabled, the character remains private and only visible to you.",
     },
-    ownershipType: {
-      label: "Ownership Type",
-      description: "Who owns this character (system, user, or public)",
+    voice: {
+      label: "Voice",
+      description:
+        "Select a text-to-speech voice for audio responses. Each character can have their own unique voice.",
+    },
+    systemPrompt: {
+      label: "System Prompt",
+      description:
+        "Define your character's behavior, personality, and expertise. This is the core instruction that shapes how the AI responds. Be detailed about tone, knowledge areas, and conversation style.",
+      placeholder: "You are a helpful assistant who specializes in...",
+      validation: {
+        minLength: "System prompt must be at least 10 characters",
+        maxLength: "System prompt must be less than 5000 characters",
+      },
     },
     modelSelection: {
       title: "Model Selection",
@@ -856,10 +936,6 @@ export const translations = {
     manualModelId: {
       label: "Manual Model",
       description: "Specific model to always use with this character",
-    },
-    voice: {
-      label: "Voice",
-      description: "Text-to-speech voice for this character",
     },
     suggestedPrompts: {
       label: "Suggested Prompts",

@@ -5,20 +5,16 @@
 
 import { z } from "zod";
 
-import { CreditTransactionType } from "@/app/api/[locale]/credits/enum";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   objectFieldNew,
   responseArrayField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
-import {
-  requestResponseField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -26,6 +22,9 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ModelId } from "../../agent/models/models";
 import { dateSchema } from "../../shared/types/common.schema";
+import { paginationField } from "../../system/unified-interface/unified-ui/widgets/containers/pagination/types";
+import { CreditTransactionType } from "../enum";
+import { CreditHistoryContainer } from "./widget";
 
 /**
  * Get Credit History Endpoint (GET)
@@ -41,33 +40,17 @@ const { GET } = createEndpoint({
   icon: "wallet",
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  fields: objectFieldNew({
-    type: WidgetType.CONTAINER,
-    title: "app.api.agent.chat.credits.history.get.container.title",
-    description: "app.api.agent.chat.credits.history.get.container.description",
-    layoutType: LayoutType.STACKED,
-    getCount: (data: { paginationInfo?: { total?: number } }) =>
-      data.paginationInfo?.total,
-    submitButton: {
-      text: "app.api.leads.list.get.actions.refresh",
-      loadingText: "app.api.leads.list.get.actions.refreshing",
-      position: "header",
-      icon: "refresh-cw",
-      variant: "ghost",
-      size: "sm",
-    },
-    showSubmitButton: false,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: CreditHistoryContainer,
+    usage: { response: true, request: "data" } as const,
     children: {
-      // === RESPONSE FIELDS ===
+      // === TRANSACTION LIST ===
       transactions: responseArrayField(
         {
-          type: WidgetType.CREDIT_TRANSACTION_LIST,
+          type: WidgetType.CONTAINER,
         },
         objectFieldNew({
-          type: WidgetType.CREDIT_TRANSACTION_CARD,
-          leftFields: ["type", "createdAt"],
-          rightFields: ["amount", "balanceAfter"],
+          type: WidgetType.CONTAINER,
           usage: { response: true },
           children: {
             id: responseField({
@@ -90,7 +73,6 @@ const { GET } = createEndpoint({
               content: "app.api.agent.chat.credits.history.get.type" as const,
               schema: z.string().optional(),
             }),
-
             messageId: responseField({
               type: WidgetType.TEXT,
               content:
@@ -108,34 +90,8 @@ const { GET } = createEndpoint({
         }),
       ),
 
-      paginationInfo: objectFieldNew({
-        type: WidgetType.PAGINATION,
+      paginationInfo: paginationField({
         order: 2,
-        usage: { request: "data", response: true },
-        children: {
-          page: requestResponseField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.NUMBER,
-            schema: z.coerce.number().optional().default(1),
-          }),
-          limit: requestResponseField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.NUMBER,
-            schema: z.coerce.number().optional().default(50),
-          }),
-          totalCount: responseField({
-            type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.credits.history.get.paginationInfo.total" as const,
-            schema: z.coerce.number(),
-          }),
-          pageCount: responseField({
-            type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.credits.history.get.paginationInfo.totalPages" as const,
-            schema: z.coerce.number(),
-          }),
-        },
       }),
     },
   }),
@@ -227,8 +183,6 @@ const { GET } = createEndpoint({
           },
         ],
         paginationInfo: {
-          page: 1,
-          limit: 50,
           totalCount: 2,
           pageCount: 1,
         },

@@ -21,9 +21,13 @@ import {
 } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
-import type { IconSchemaType } from "@/app/api/[locale]/shared/types/common.schema";
+import type {
+  IconSchemaNullishType,
+  IconSchemaOptionalType,
+  IconSchemaType,
+} from "@/app/api/[locale]/shared/types/common.schema";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type { ReactFormFieldProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { simpleT } from "@/i18n/core/shared";
 import {
@@ -48,12 +52,15 @@ import type { IconFieldWidgetConfig } from "./types";
 export function IconFieldWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
-  TSchema extends IconSchemaType,
+  TSchema extends
+    | IconSchemaType
+    | IconSchemaOptionalType
+    | IconSchemaNullishType,
   TUsage extends FieldUsageConfig,
 >({
   field,
   fieldName,
-}: ReactWidgetProps<
+}: ReactFormFieldProps<
   TEndpoint,
   TUsage,
   IconFieldWidgetConfig<TKey, TSchema, TUsage>

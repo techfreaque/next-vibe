@@ -15,7 +15,7 @@ import type { IconKey } from "../../form-fields/icon-field/icons";
  */
 export interface StatWidgetConfig<
   TKey extends string,
-  TSchema extends NumberWidgetSchema,
+  TSchema extends TSchemaType extends "widget" ? never : NumberWidgetSchema,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive" | "widget",
 > extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {

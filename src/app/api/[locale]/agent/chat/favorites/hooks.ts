@@ -6,17 +6,14 @@
 
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 
 import type { CharacterListItem } from "@/app/api/[locale]/agent/chat/characters/definition";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { UseEndpointOptions } from "../../../system/unified-interface/react/hooks/endpoint-types";
-import type { FavoriteCreateRequestOutput } from "./create/definition";
-import favoritesCreateDefinition from "./create/definition";
 import favoritesDefinition, { type FavoriteCard } from "./definition";
 
 interface UseChatFavoritesOptions {
@@ -27,10 +24,9 @@ interface UseChatFavoritesOptions {
 export interface UseChatFavoritesReturn {
   favorites: FavoriteCard[];
   activeFavoriteId: string | null;
-  isLoading: boolean;
+  isInitialLoading: boolean;
   isAuthenticated: boolean;
   endpoint: ReturnType<typeof useEndpoint<typeof favoritesDefinition>>;
-  addFavorite: (data: FavoriteCreateRequestOutput) => Promise<string | null>;
 }
 
 /**
@@ -73,47 +69,16 @@ export function useChatFavorites({
     user,
   );
 
-  const createEndpoint = useEndpoint(
-    favoritesCreateDefinition,
-    undefined,
-    logger,
-    user,
-  );
-
   // Extract favorites from flat array
   const favorites = useMemo(() => {
     return endpoint.read?.data?.favoritesList ?? [];
   }, [endpoint.read?.data]);
 
-  // Add favorite with cache invalidation
-  const addFavorite = useCallback(
-    async (data: FavoriteCreateRequestOutput): Promise<string | null> => {
-      createEndpoint.create.form.reset(data);
-
-      const result = await new Promise<string | null>((resolve, reject) => {
-        createEndpoint.create.submitForm({
-          onSuccess: ({ responseData }) => {
-            resolve(responseData.id);
-          },
-          onError: ({ error }): void => reject(error),
-        });
-      });
-
-      if (result) {
-        await apiClient.refetchEndpoint(favoritesDefinition.GET, logger);
-      }
-
-      return result;
-    },
-    [createEndpoint, logger],
-  );
-
   return {
     favorites,
     activeFavoriteId,
-    isLoading: endpoint.read?.isLoading ?? false,
+    isInitialLoading: !endpoint.read?.data,
     isAuthenticated,
     endpoint,
-    addFavorite,
   };
 }

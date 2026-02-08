@@ -130,7 +130,7 @@ const { GET } = createEndpoint({
               }),
               rolesView: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.TEXT,
@@ -139,7 +139,7 @@ const { GET } = createEndpoint({
               ),
               rolesManage: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.TEXT,
@@ -148,7 +148,7 @@ const { GET } = createEndpoint({
               ),
               rolesCreateThread: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.TEXT,
@@ -157,7 +157,7 @@ const { GET } = createEndpoint({
               ),
               rolesPost: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.TEXT,
@@ -166,7 +166,7 @@ const { GET } = createEndpoint({
               ),
               rolesModerate: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.TEXT,
@@ -175,7 +175,7 @@ const { GET } = createEndpoint({
               ),
               rolesAdmin: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.TEXT,
@@ -532,7 +532,7 @@ const { PATCH } = createEndpoint({
               }),
               rolesView: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.TEXT,
@@ -541,7 +541,7 @@ const { PATCH } = createEndpoint({
               ),
               rolesManage: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.TEXT,
@@ -550,7 +550,7 @@ const { PATCH } = createEndpoint({
               ),
               rolesCreateThread: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.TEXT,
@@ -559,7 +559,7 @@ const { PATCH } = createEndpoint({
               ),
               rolesPost: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.TEXT,
@@ -568,7 +568,7 @@ const { PATCH } = createEndpoint({
               ),
               rolesModerate: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.TEXT,
@@ -577,7 +577,7 @@ const { PATCH } = createEndpoint({
               ),
               rolesAdmin: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                 },
                 responseField({
                   type: WidgetType.TEXT,

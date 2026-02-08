@@ -10,7 +10,10 @@
 
 import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 import type { ModelOption } from "@/app/api/[locale]/agent/models/models";
-import { modelOptions } from "@/app/api/[locale]/agent/models/models";
+import {
+  getCreditCostFromModel,
+  modelOptions,
+} from "@/app/api/[locale]/agent/models/models";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
@@ -47,10 +50,10 @@ export class CharactersRepositoryClient {
    * Convert model credit cost to price level
    */
   private static getModelPriceLevel(creditCost: number): string {
-    if (creditCost <= 4) {
+    if (creditCost <= 3) {
       return PriceLevel.CHEAP;
     }
-    if (creditCost <= 7) {
+    if (creditCost <= 9) {
       return PriceLevel.STANDARD;
     }
     return PriceLevel.PREMIUM;
@@ -100,7 +103,7 @@ export class CharactersRepositoryClient {
         return idx === -1 ? 0 : idx;
       }
       case ModelSortField.PRICE:
-        return model.creditCost;
+        return getCreditCostFromModel(model);
       case ModelSortField.CONTENT: {
         const idx = ContentLevelDB.indexOf(model.content);
         return idx === -1 ? 0 : idx;
@@ -117,7 +120,7 @@ export class CharactersRepositoryClient {
     filters: FiltersModelSelection,
   ): ModelOption[] {
     const filtered = Object.values(modelOptions).filter((model) => {
-      const modelPrice = this.getModelPriceLevel(model.creditCost);
+      const modelPrice = this.getModelPriceLevel(getCreditCostFromModel(model));
 
       return (
         this.meetsRangeConstraint(

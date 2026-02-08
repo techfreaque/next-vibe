@@ -449,7 +449,6 @@ export function useChat(
   const effectiveSettings = useMemo(() => {
     return settingsOps.settings ?? ChatSettingsRepositoryClient.getDefaults();
   }, [settingsOps.settings]);
-
   useStreamSync({
     streamingMessages,
     streamThreads,

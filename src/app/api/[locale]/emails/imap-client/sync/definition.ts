@@ -130,7 +130,7 @@ const { POST } = createEndpoint({
 
       errors: responseArrayField(
         {
-          type: WidgetType.GROUPED_LIST,
+          type: WidgetType.CONTAINER,
           groupBy: "code",
           sortBy: "message",
         },

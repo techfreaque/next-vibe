@@ -42,10 +42,10 @@ export const aliasToPathMap = {
   agent_chat_folders_POST: "agent_chat_folders_POST",
   "agent_chat_folders_root-permissions_GET":
     "agent_chat_folders_root-permissions_GET",
+  agent_chat_memories_create_POST: "agent_chat_memories_create_POST",
   agent_chat_memories_GET: "agent_chat_memories_GET",
   agent_chat_memories_id_DELETE: "agent_chat_memories_id_DELETE",
   agent_chat_memories_id_PATCH: "agent_chat_memories_id_PATCH",
-  agent_chat_memories_POST: "agent_chat_memories_POST",
   agent_chat_settings_GET: "agent_chat_settings_GET",
   agent_chat_settings_POST: "agent_chat_settings_POST",
   agent_chat_threads_GET: "agent_chat_threads_GET",
@@ -85,6 +85,7 @@ export const aliasToPathMap = {
   "agent_chat_threads_threadId_share-links_POST":
     "agent_chat_threads_threadId_share-links_POST",
   "agent_fetch-url-content_GET": "agent_fetch-url-content_GET",
+  agent_models_openrouter_GET: "agent_models_openrouter_GET",
   "agent_speech-to-text_hotkey_POST": "agent_speech-to-text_hotkey_POST",
   "agent_speech-to-text_POST": "agent_speech-to-text_POST",
   "agent_text-to-speech_POST": "agent_text-to-speech_POST",
@@ -253,11 +254,10 @@ export const aliasToPathMap = {
   lint: "system_check_oxlint_POST",
   list: "system_help_list_POST",
   ls: "system_help_list_POST",
-  manifest_GET: "manifest_GET",
   mcp: "system_unified-interface_mcp_serve_POST",
   "mcp:serve": "system_unified-interface_mcp_serve_POST",
   "mcp:start": "system_unified-interface_mcp_serve_POST",
-  "memories-add": "agent_chat_memories_POST",
+  "memories-add": "agent_chat_memories_create_POST",
   "memories-delete": "agent_chat_memories_id_DELETE",
   "memories-list": "agent_chat_memories_GET",
   "memories-update": "agent_chat_memories_id_PATCH",
@@ -297,7 +297,6 @@ export const aliasToPathMap = {
   "record-engagement": "leads_tracking_engagement_POST",
   referral_codes_list_GET: "referral_codes_list_GET",
   referral_earnings_list_GET: "referral_earnings_list_GET",
-  "referral_link-to-lead_POST": "referral_link-to-lead_POST",
   referral_POST: "referral_POST",
   referral_stats_GET: "referral_stats_GET",
   release: "system_release-tool_POST",
@@ -432,6 +431,7 @@ export const aliasToPathMap = {
   uninstall: "system_setup_uninstall_POST",
   unsubscribe: "newsletter_unsubscribe_POST",
   update: "system_setup_update_POST",
+  "update-openrouter-models": "agent_models_openrouter_GET",
   "update-subscription": "subscription_PUT",
   user_auth_check_GET: "user_auth_check_GET",
   user_private_logout_POST: "user_private_logout_POST",
@@ -568,9 +568,10 @@ export async function getEndpoint(
     case "agent_chat_memories_GET":
       return (await import("@/app/api/[locale]/agent/chat/memories/definition"))
         .default.GET;
-    case "agent_chat_memories_POST":
-      return (await import("@/app/api/[locale]/agent/chat/memories/definition"))
-        .default.POST;
+    case "agent_chat_memories_create_POST":
+      return (
+        await import("@/app/api/[locale]/agent/chat/memories/create/definition")
+      ).default.POST;
     case "agent_chat_memories_id_DELETE":
       return (
         await import("@/app/api/[locale]/agent/chat/memories/[id]/definition")
@@ -670,6 +671,10 @@ export async function getEndpoint(
     case "agent_fetch-url-content_GET":
       return (
         await import("@/app/api/[locale]/agent/fetch-url-content/definition")
+      ).default.GET;
+    case "agent_models_openrouter_GET":
+      return (
+        await import("@/app/api/[locale]/agent/models/openrouter/definition")
       ).default.GET;
     case "agent_speech-to-text_POST":
       return (
@@ -1214,9 +1219,6 @@ export async function getEndpoint(
     case "ls":
       return (await import("@/app/api/[locale]/system/help/list/definition"))
         .default.POST;
-    case "manifest_GET":
-      return (await import("@/app/api/[locale]/manifest/definition")).default
-        .GET;
     case "mcp":
       return (
         await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition")
@@ -1230,8 +1232,9 @@ export async function getEndpoint(
         await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition")
       ).default.POST;
     case "memories-add":
-      return (await import("@/app/api/[locale]/agent/chat/memories/definition"))
-        .default.POST;
+      return (
+        await import("@/app/api/[locale]/agent/chat/memories/create/definition")
+      ).default.POST;
     case "memories-delete":
       return (
         await import("@/app/api/[locale]/agent/chat/memories/[id]/definition")
@@ -1369,10 +1372,6 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/referral/earnings/list/definition")
       ).default.GET;
-    case "referral_link-to-lead_POST":
-      return (
-        await import("@/app/api/[locale]/referral/link-to-lead/definition")
-      ).default.POST;
     case "referral_stats_GET":
       return (await import("@/app/api/[locale]/referral/stats/definition"))
         .default.GET;
@@ -1819,6 +1818,10 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/system/unified-interface/cli/setup/update/definition")
       ).default.POST;
+    case "update-openrouter-models":
+      return (
+        await import("@/app/api/[locale]/agent/models/openrouter/definition")
+      ).default.GET;
     case "update-subscription":
       return (await import("@/app/api/[locale]/subscription/definition"))
         .default.PUT;

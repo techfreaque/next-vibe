@@ -11,6 +11,7 @@ import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type {
   AnyChildrenConstrain,
+  ConstrainedChildUsage,
   FieldUsageConfig,
 } from "../../../unified-ui/widgets/_shared/types";
 import type {
@@ -76,7 +77,6 @@ type Test2_1_LiteralEndpoint = ApiEndpoint<
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   string,
-  AnyChildrenConstrain<string, FieldUsageConfig>,
   typeof test2_1_field
 >;
 
@@ -86,7 +86,6 @@ type Test2_2_Result =
     Methods,
     readonly UserRoleValue[],
     string,
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     UnifiedField<
       string,
       z.ZodTypeAny,
@@ -104,7 +103,6 @@ type Test2_3_WithVariance =
     Methods,
     readonly UserRoleValue[],
     string,
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     UnifiedField<
       string,
       z.ZodTypeAny,
@@ -223,13 +221,11 @@ type Test3_7_ApiEndpointBase =
     Methods.POST,
     readonly ["app.api.user.userRoles.enums.userRole.admin"],
     string,
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     TestObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
     string,
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     UnifiedField<
       string,
       z.ZodTypeAny,
@@ -266,13 +262,11 @@ type Test3_10_SimpleObject =
     Methods.POST,
     readonly ["app.api.user.userRoles.enums.userRole.admin"],
     string,
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     SimpleObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
     string,
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     UnifiedField<
       string,
       z.ZodTypeAny,
@@ -384,13 +378,11 @@ type Test3_14_ActualApiEndpoint =
     Methods,
     readonly UserRoleValue[],
     string,
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     SimpleObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
     string,
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     UnifiedField<
       string,
       z.ZodTypeAny,
@@ -519,13 +511,11 @@ type Test3_20_OnlyExampleKeySpecific =
     Methods, // generic
     readonly UserRoleValue[], // generic
     string, // generic
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     SimpleObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
     string,
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     UnifiedField<
       string,
       z.ZodTypeAny,
@@ -543,13 +533,11 @@ type Test3_21_OnlyMethodSpecific =
     Methods.POST, // SPECIFIC
     readonly UserRoleValue[], // generic
     string, // generic
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     SimpleObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
     string,
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     UnifiedField<
       string,
       z.ZodTypeAny,
@@ -567,13 +555,11 @@ type Test3_22_OnlyRolesSpecific =
     Methods, // generic
     readonly ["app.api.user.userRoles.enums.userRole.admin"], // SPECIFIC tuple
     string, // generic
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     SimpleObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
     string,
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     UnifiedField<
       string,
       z.ZodTypeAny,
@@ -849,14 +835,12 @@ type Test3_31_SpecificApi = ApiEndpoint<
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   "app.api.someScope.title",
-  AnyChildrenConstrain<string, FieldUsageConfig>,
   SimpleObjectField
 >;
 type Test3_31_GenericApi = ApiEndpoint<
   Methods,
   readonly UserRoleValue[],
   string,
-  AnyChildrenConstrain<string, FieldUsageConfig>,
   UnifiedField<
     string,
     z.ZodTypeAny,
@@ -882,7 +866,7 @@ type Test4_1_GenericExample = CreateApiEndpoint<
     string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<string, FieldUsageConfig>
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >
 >;
 type Test4_1_Result = Test4_1_GenericExample extends CreateApiEndpointAny
@@ -899,7 +883,7 @@ type Test4_2_GenericMethod = CreateApiEndpoint<
     string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<string, FieldUsageConfig>
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >
 >;
 type Test4_2_Result = Test4_2_GenericMethod extends CreateApiEndpointAny
@@ -916,7 +900,7 @@ type Test4_3_GenericRoles = CreateApiEndpoint<
     string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<string, FieldUsageConfig>
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >
 >;
 type Test4_3_Result = Test4_3_GenericRoles extends CreateApiEndpointAny
@@ -933,7 +917,7 @@ type Test4_4_OnlyRoleIssue = CreateApiEndpoint<
     string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<string, FieldUsageConfig>
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >
 >;
 type Test4_4_Result = Test4_4_OnlyRoleIssue extends CreateApiEndpointAny
@@ -988,7 +972,6 @@ type Test6_1_WithOutVariance = ApiEndpoint<
   Methods.POST,
   readonly ["app.api.user.userRoles.enums.userRole.admin"],
   string,
-  AnyChildrenConstrain<string, FieldUsageConfig>,
   UnifiedField<
     string,
     z.ZodTypeAny,
@@ -1001,7 +984,6 @@ type Test6_1_Result =
     Methods,
     readonly UserRoleValue[],
     string,
-    AnyChildrenConstrain<string, FieldUsageConfig>,
     UnifiedField<
       string,
       z.ZodTypeAny,
@@ -1026,7 +1008,7 @@ type Test7_1_CreateWithOut = CreateApiEndpoint<
     string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<string, FieldUsageConfig>
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >
 >;
 type Test7_1_Result = Test7_1_CreateWithOut extends CreateApiEndpointAny

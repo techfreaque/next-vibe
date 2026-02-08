@@ -36,13 +36,14 @@ import {
 import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
 import {
+  getCreditCostFromModel,
   type ModelId,
   type ModelOption,
   modelOptions,
   modelProviders,
 } from "@/app/api/[locale]/agent/models/models";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type { ReactFormFieldProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import {
   useWidgetForm,
@@ -53,8 +54,7 @@ import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/wid
 import type {
   FiltersModelSelection,
   ManualModelSelection,
-  ModelSelectionFieldWidgetConfig,
-  ModelSelectionFieldWidgetConfigSimple,
+  ModelSelectionFieldWidgetConfigAny,
   ModelSelectionSimple,
   ModelSelectionWithCharacter,
 } from "./types";
@@ -83,6 +83,8 @@ function ModelCard({
   dimmed = false,
   t,
 }: ModelCardProps): JSX.Element {
+  const cost = getCreditCostFromModel(model);
+
   return (
     <Div
       onClick={onClick}
@@ -128,11 +130,11 @@ function ModelCard({
           variant={selected ? "outline" : "secondary"}
           className="text-[10px] h-5"
         >
-          {model.creditCost === 0
+          {cost === 0
             ? t("app.chat.selector.free")
-            : model.creditCost === 1
+            : cost === 1
               ? t("app.chat.selector.creditsSingle")
-              : t("app.chat.selector.creditsExact", { cost: model.creditCost })}
+              : t("app.chat.selector.creditsExact", { cost })}
         </Badge>
         {selected && <Check className="h-4 w-4 text-primary" />}
       </Div>
@@ -178,18 +180,18 @@ function getRangeFromIndices<T extends string>(
 }
 
 interface ModelSelectionInnerProps {
-  value: ModelSelectionValue | undefined;
+  value: ModelSelectionValue | ModelSelectionWithCharacter | undefined;
   onUpdateValue: (value: ModelSelectionValue) => void;
   includeCharacterBased: boolean;
+  hasCharacterModelSelection: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 function ModelSelectionInner({
   value,
   onUpdateValue,
-  fullCharacter,
-  isLoadingCharacter,
   includeCharacterBased,
+  hasCharacterModelSelection,
   t,
 }: ModelSelectionInnerProps): JSX.Element {
   // UI state only (not form state)
@@ -202,7 +204,9 @@ function ModelSelectionInner({
   // Extract current selection from form value
   const currentSelection = useMemo(() => {
     if (!value) {
-      return includeCharacterBased
+      // Default to CHARACTER_BASED only if we have character model selection
+      // Otherwise default to FILTERS
+      return includeCharacterBased && hasCharacterModelSelection
         ? { selectionType: ModelSelectionType.CHARACTER_BASED }
         : { selectionType: ModelSelectionType.FILTERS };
     }
@@ -210,15 +214,15 @@ function ModelSelectionInner({
       return value.currentSelection;
     }
     return value;
-  }, [value, includeCharacterBased]);
+  }, [value, includeCharacterBased, hasCharacterModelSelection]);
 
   // Get character model selection
   const characterModelSelection = useMemo(() => {
     if (value && "characterModelSelection" in value) {
       return value.characterModelSelection;
     }
-    return fullCharacter?.modelSelection;
-  }, [value, fullCharacter]);
+    return undefined;
+  }, [value]);
 
   // Determine current mode
   const mode = currentSelection.selectionType;
@@ -579,18 +583,18 @@ function ModelSelectionInner({
             label: t(SPEED_DISPLAY[idx]?.label ?? ""),
           };
         }
-        case ModelSortField.PRICE:
+        case ModelSortField.PRICE: {
+          const cost = getCreditCostFromModel(model);
           return {
-            value: model.creditCost,
+            value: cost,
             label:
-              model.creditCost === 0
+              cost === 0
                 ? t("app.chat.selector.free")
-                : model.creditCost === 1
+                : cost === 1
                   ? t("app.chat.selector.creditsSingle")
-                  : t("app.chat.selector.creditsExact", {
-                      cost: model.creditCost,
-                    }),
+                  : t("app.chat.selector.creditsExact", { cost }),
           };
+        }
         case ModelSortField.CONTENT: {
           const idx = CONTENT_DISPLAY.findIndex(
             (d) => d.value === model.content,
@@ -642,24 +646,16 @@ function ModelSelectionInner({
     return sortedAndGroupedModels;
   }, [sortedAndGroupedModels, showAllModels]);
 
-  if (isLoadingCharacter && includeCharacterBased) {
-    return (
-      <Div className="flex items-center justify-center p-8">
-        <Div className="flex flex-col items-center gap-3">
-          <Div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <Span className="text-sm text-muted-foreground">
-            {t("app.chat.selector.loading")}
-          </Span>
-        </Div>
-      </Div>
-    );
-  }
+  // Determine if we should show the CHARACTER_BASED tab
+  // Only show it if includeCharacterBased is true AND hasCharacterModelSelection is true
+  const showCharacterBasedTab =
+    includeCharacterBased && hasCharacterModelSelection;
 
   return (
     <Div className="flex flex-col gap-4 border rounded-lg p-4">
       {/* Model selection mode tabs */}
       <Div className="flex items-center gap-1.5 p-1 bg-muted/50 rounded-lg">
-        {includeCharacterBased && (
+        {showCharacterBasedTab && (
           <Button
             type="button"
             variant={
@@ -730,13 +726,14 @@ function ModelSelectionInner({
             variant="secondary"
             className="text-[10px] h-5 shrink-0 bg-background/60"
           >
-            {bestModel.creditCost === 0
-              ? t("app.chat.selector.free")
-              : bestModel.creditCost === 1
-                ? t("app.chat.selector.creditsSingle")
-                : t("app.chat.selector.creditsExact", {
-                    cost: bestModel.creditCost,
-                  })}
+            {(() => {
+              const cost = getCreditCostFromModel(bestModel);
+              return cost === 0
+                ? t("app.chat.selector.free")
+                : cost === 1
+                  ? t("app.chat.selector.creditsSingle")
+                  : t("app.chat.selector.creditsExact", { cost });
+            })()}
           </Badge>
         </Div>
       ) : (
@@ -984,9 +981,14 @@ function ModelSelectionInner({
                       >
                         <ChevronRight className="h-4 w-4" />
                         <Span className="text-sm font-medium">
-                          {t("app.chat.selector.showLegacyModels", {
-                            count: legacyModels.length,
-                          })}
+                          {t(
+                            legacyModels.length === 1
+                              ? "app.chat.selector.showLegacyModels_one"
+                              : "app.chat.selector.showLegacyModels_other",
+                            {
+                              count: legacyModels.length,
+                            },
+                          )}
                         </Span>
                       </Div>
                     )}
@@ -1008,15 +1010,16 @@ export function ModelSelectionFieldWidget<
 >({
   field,
   fieldName,
-}: ReactWidgetProps<
+}: ReactFormFieldProps<
   TEndpoint,
-  | ModelSelectionFieldWidgetConfig<TKey, TUsage>
-  | ModelSelectionFieldWidgetConfigSimple<TKey, TUsage>
+  TUsage,
+  ModelSelectionFieldWidgetConfigAny<TKey, TUsage>
 >): JSX.Element {
   const t = useWidgetTranslation();
   const form = useWidgetForm();
 
-  const includeCharacterBased = field.includeCharacterBased;
+  // Determine if we should include character-based mode from config
+  const includeCharacterBased = field.includeCharacterBased ?? false;
 
   if (!form || !fieldName) {
     return (
@@ -1029,11 +1032,26 @@ export function ModelSelectionFieldWidget<
   }
 
   // Read from form state (single source of truth)
-  const value = form.watch(fieldName) as ModelSelectionValue | undefined;
+  const value =
+    form.watch(fieldName) ||
+    (field.value as
+      | ModelSelectionValue
+      | ModelSelectionWithCharacter
+      | undefined);
+
+  // Determine if character model selection is available based on the actual data
+  // Show CHARACTER_BASED tab only when:
+  // 1. includeCharacterBased is true (config allows it)
+  // 2. value has characterModelSelection property AND it's defined
+  const hasCharacterModelSelection =
+    includeCharacterBased &&
+    value !== undefined &&
+    "characterModelSelection" in value &&
+    value.characterModelSelection !== undefined;
 
   // Update form state directly
   const handleUpdate = (newValue: ModelSelectionValue): void => {
-    form.setValue(fieldName, newValue, {
+    form.setValue(fieldName as never, newValue as never, {
       shouldValidate: true,
       shouldDirty: true,
     });
@@ -1044,6 +1062,7 @@ export function ModelSelectionFieldWidget<
       value={value}
       onUpdateValue={handleUpdate}
       includeCharacterBased={includeCharacterBased}
+      hasCharacterModelSelection={hasCharacterModelSelection}
       t={t}
     />
   );

@@ -16,7 +16,7 @@ import { Separator } from "next-vibe-ui/ui/separator";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/products/repository-client";
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";

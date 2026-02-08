@@ -31,7 +31,7 @@ import {
 } from "@/packages/next-vibe-ui/web/ui/form/form";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
-import type { ReactWidgetProps } from "../../_shared/react-types";
+import type { ReactFormFieldProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
   useWidgetForm,
@@ -53,7 +53,7 @@ export function UuidFieldWidget<
   field,
 
   fieldName,
-}: ReactWidgetProps<
+}: ReactFormFieldProps<
   TEndpoint,
   TUsage,
   UuidFieldWidgetConfig<TKey, TSchema, TUsage>

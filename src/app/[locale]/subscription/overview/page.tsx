@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-import {
-  type CreditBalance,
-  CreditRepository,
-} from "@/app/api/[locale]/credits/repository";
+import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import {
   ProductIds,
   productsRepository,
@@ -74,7 +72,7 @@ export default async function OverviewPage({
     !!userResponse.data.id;
 
   // Fetch data
-  let credits: CreditBalance;
+  let credits: CreditsGetResponseOutput;
   let subscription: SubscriptionGetResponseOutput | null = null;
 
   if (userResponse.success && userResponse.data && userResponse.data.leadId) {

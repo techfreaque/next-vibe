@@ -322,8 +322,10 @@ export async function dev(
       const referralResult = await ReferralRepository.createReferralCode(
         adminUserId,
         {
-          code: "FRIEND2024",
-          label: "Test Referral Code",
+          fieldsGrid: {
+            code: "FRIEND2024",
+            label: "Test Referral Code",
+          },
         },
         logger,
       );

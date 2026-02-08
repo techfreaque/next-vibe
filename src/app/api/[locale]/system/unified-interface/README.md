@@ -130,7 +130,7 @@ Define how data should be displayed:
 
 // Card grid
 {
-  type: WidgetType.DATA_CARDS;
+  type: WidgetType.CONTAINER;
 }
 
 // Search results

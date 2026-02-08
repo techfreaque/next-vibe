@@ -19,6 +19,7 @@ import { hasChildren } from "./type-guards";
 import type {
   AnyChildrenConstrain,
   BaseWidgetConfig,
+  BaseWidgetFieldProps,
   ConstrainedChildUsage,
   DispatchField,
   FieldUsageConfig,
@@ -107,10 +108,11 @@ export function getTranslatorFromEndpoint<
  *      arrayFieldPath("", 0)      → "[0]"
  */
 export function arrayFieldPath(
-  parentPath: string | undefined,
+  parentPath: string,
   index: number,
+  childPath: string,
 ): string {
-  return parentPath ? `${parentPath}[${index}]` : `[${index}]`;
+  return `${parentPath}.${index}.${childPath}`;
 }
 
 /**
@@ -150,14 +152,24 @@ export function getFieldLabel(
  * This is the single boundary where type widening is acceptable for the rendering system.
  */
 export function withValue<
-  TField extends
-    | UnifiedField<
-        string,
-        ZodTypeAny,
-        FieldUsageConfig,
-        AnyChildrenConstrain<string, FieldUsageConfig>
-      >
-    | AnyChildrenConstrain<string, FieldUsageConfig>,
+  TUsage extends FieldUsageConfig,
+  TField extends UnifiedField<
+    string,
+    ZodTypeAny,
+    TUsage,
+    AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
+  >,
+  TValue,
+  TParentValue,
+>(
+  field: TField,
+  value: TValue,
+  parentValue: TParentValue,
+): BaseWidgetFieldProps<TUsage, TField>;
+
+export function withValue<
+  TUsage extends FieldUsageConfig,
+  TField extends AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>,
   TValue,
   TParentValue,
 >(
@@ -167,16 +179,52 @@ export function withValue<
 ): DispatchField<
   string,
   ZodTypeAny,
-  FieldUsageConfig,
-  AnyChildrenConstrain<string, FieldUsageConfig>
-> {
+  TUsage,
+  AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
+>;
+
+export function withValue<
+  TUsage extends FieldUsageConfig,
+  TField extends
+    | UnifiedField<
+        string,
+        ZodTypeAny,
+        TUsage,
+        AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
+      >
+    | AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>,
+  TValue,
+  TParentValue,
+>(
+  field: TField,
+  value: TValue,
+  parentValue: TParentValue,
+):
+  | BaseWidgetFieldProps<
+      TUsage,
+      UnifiedField<
+        string,
+        ZodTypeAny,
+        TUsage,
+        AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
+      >
+    >
+  | DispatchField<
+      string,
+      ZodTypeAny,
+      TUsage,
+      AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
+    > {
   // Safe cast: spread preserves discriminated union properties (type, schemaType, etc.)
   // which allows TypeScript to narrow in switch statements
-  return { ...field, value, parentValue } as DispatchField<
-    string,
-    ZodTypeAny,
-    FieldUsageConfig,
-    AnyChildrenConstrain<string, FieldUsageConfig>
+  return { ...field, value, parentValue } as BaseWidgetFieldProps<
+    TUsage,
+    UnifiedField<
+      string,
+      ZodTypeAny,
+      TUsage,
+      AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
+    >
   >;
 }
 

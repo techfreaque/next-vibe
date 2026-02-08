@@ -24,6 +24,7 @@ import type {
   UnionObjectWidgetConfigConstrain,
 } from "../../_shared/types";
 import type { SpacingSize } from "../../display-only/title/types";
+import type { CustomWidgetObjectConfig } from "../custom/types";
 
 /**
  * Base container properties shared between regular and union variants
@@ -51,6 +52,8 @@ interface BaseContainerProps<TKey extends string> {
   spacing?: "compact" | "normal" | "relaxed";
   /** Render without Card wrapper for inline layouts */
   noCard?: boolean;
+  /** Additional className for the inner children container div (merged with layoutClass) */
+  innerClassName?: string;
   /** Title text alignment */
   titleAlign?: "left" | "center" | "right";
   /** Title text size */
@@ -258,6 +261,13 @@ export type ContainerWidgetConfig<
       TChildren
     >
   | ContainerObjectWidgetConfig<
+      TKey,
+      TUsage,
+      // @ts-expect-error -- TSchemaType is the full union; object variant resolves only when "object"|"object-optional"|"widget-object" is passed
+      TSchemaType,
+      TChildren
+    >
+  | CustomWidgetObjectConfig<
       TKey,
       TUsage,
       // @ts-expect-error -- TSchemaType is the full union; object variant resolves only when "object"|"object-optional"|"widget-object" is passed

@@ -39,7 +39,6 @@ import {
   PaymentProvider,
   type PaymentProviderValue,
 } from "@/app/api/[locale]/payment/enum";
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/products/repository-client";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import {
   BillingInterval,
@@ -50,6 +49,7 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { TOTAL_MODEL_COUNT } from "../../agent/models/models";
 import type { JwtPayloadType } from "../../user/auth/types";
 import { formatPrice } from "./types";
 

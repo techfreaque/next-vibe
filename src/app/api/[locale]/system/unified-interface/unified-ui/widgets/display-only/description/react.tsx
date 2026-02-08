@@ -9,9 +9,12 @@ import {
   getSpacingClassName,
   getTextSizeClassName,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type { ReactRequestResponseWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetForm,
+  useWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { StringWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type { DescriptionWidgetConfig } from "./types";
@@ -43,13 +46,26 @@ export function DescriptionWidget<
   TUsage extends FieldUsageConfig,
 >({
   field,
-}: ReactWidgetProps<
+  fieldName,
+}: ReactRequestResponseWidgetProps<
   TEndpoint,
   TUsage,
   DescriptionWidgetConfig<TSchema, TUsage, "primitive">
 >): JSX.Element {
   const t = useWidgetTranslation();
-  const { textSize, spacing, lineClamp, className } = field;
+  const form = useWidgetForm();
+  const { textSize, spacing, lineClamp, className, usage } = field;
+
+  // Get value from form for request fields, otherwise from field.value
+  let value;
+  if (usage.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value) {
+      value = field.value;
+    }
+  } else {
+    value = field.value;
+  }
 
   // Get classes from config (no hardcoding!)
   const textSizeClass = getTextSizeClassName(textSize);
@@ -73,7 +89,7 @@ export function DescriptionWidget<
                   ? ""
                   : "line-clamp-2";
 
-  if (!field.value) {
+  if (!value) {
     return <Div className={className}>—</Div>;
   }
 
@@ -87,7 +103,7 @@ export function DescriptionWidget<
         className,
       )}
     >
-      {t(field.value)}
+      {t(value)}
     </Div>
   );
 }

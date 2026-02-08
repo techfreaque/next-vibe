@@ -281,7 +281,7 @@ const { POST } = createEndpoint({
 
       operations: responseArrayField(
         {
-          type: WidgetType.DATA_TABLE,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.db.reset.fields.operations.title",
         },
         objectField(

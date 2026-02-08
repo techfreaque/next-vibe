@@ -33,15 +33,11 @@ export async function sendTestRequest<
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
-  TChildren extends AnyChildrenConstrain<
-    TScopedTranslationKey,
-    FieldUsageConfig
-  >,
   TFields extends UnifiedField<
     TScopedTranslationKey,
     z.ZodTypeAny,
     FieldUsageConfig,
-    TChildren
+    AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
 >({
   endpoint,
@@ -53,21 +49,18 @@ export async function sendTestRequest<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    TChildren,
     TFields
   >;
   data?: CreateApiEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    TChildren,
     TFields
   >["types"]["RequestOutput"];
   urlPathParams?: CreateApiEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    TChildren,
     TFields
   >["types"]["UrlVariablesOutput"];
   user: JwtPayloadType;
@@ -77,7 +70,6 @@ export async function sendTestRequest<
       TMethod,
       TUserRoleValue,
       TScopedTranslationKey,
-      TChildren,
       TFields
     >["types"]["ResponseOutput"]
   >

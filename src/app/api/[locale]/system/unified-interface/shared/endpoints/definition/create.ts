@@ -35,7 +35,6 @@ import type {
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type {
   AnyChildrenConstrain,
-  ConstrainedChildUsage,
   FieldUsageConfig,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -168,15 +167,11 @@ export interface ApiEndpoint<
   out TMethod extends Methods,
   out TUserRoleValue extends readonly UserRoleValue[],
   out TScopedTranslationKey extends string,
-  out TChildren extends AnyChildrenConstrain<
-    TScopedTranslationKey,
-    FieldUsageConfig
-  >,
   out TFields extends UnifiedField<
     TScopedTranslationKey,
     z.ZodTypeAny,
     FieldUsageConfig,
-    TChildren
+    AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
 > {
   // Core endpoint metadata - all required for type safety
@@ -402,20 +397,11 @@ export interface CreateApiEndpoint<
   out TMethod extends Methods,
   out TUserRoleValue extends readonly UserRoleValue[],
   out TScopedTranslationKey extends string,
-  out TChildren extends AnyChildrenConstrain<
-    TScopedTranslationKey,
-    ConstrainedChildUsage<FieldUsageConfig>
-  > = never,
   out TFields extends UnifiedField<
     TScopedTranslationKey,
     z.ZodTypeAny,
     FieldUsageConfig,
-    TChildren
-  > = UnifiedField<
-    TScopedTranslationKey,
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    TChildren
+    AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
   RequestInput = InferRequestInput<TFields>,
   RequestOutput = InferRequestOutput<TFields>,
@@ -423,13 +409,7 @@ export interface CreateApiEndpoint<
   ResponseOutput = InferResponseOutput<TFields>,
   UrlVariablesInput = InferUrlVariablesInput<TFields>,
   UrlVariablesOutput = InferUrlVariablesOutput<TFields>,
-> extends ApiEndpoint<
-  TMethod,
-  TUserRoleValue,
-  TScopedTranslationKey,
-  TChildren,
-  TFields
-> {
+> extends ApiEndpoint<TMethod, TUserRoleValue, TScopedTranslationKey, TFields> {
   readonly scopedTranslation: {
     readonly ScopedTranslationKey: TScopedTranslationKey;
     readonly scopedT: (locale: CountryLanguage) => {
@@ -484,22 +464,17 @@ export type CreateEndpointReturnInMethod<
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
-  TChildren extends AnyChildrenConstrain<
-    TScopedTranslationKey,
-    ConstrainedChildUsage<FieldUsageConfig>
-  >,
   TFields extends UnifiedField<
     TScopedTranslationKey,
     z.ZodTypeAny,
     FieldUsageConfig,
-    TChildren
+    AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
 > = {
   readonly [KMethod in TMethod]: CreateApiEndpoint<
     KMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    TChildren,
     TFields
   >;
 };
@@ -516,35 +491,23 @@ export function createEndpoint<
   const TMethod extends Methods,
   const TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string = TranslationKey,
-  TChildren extends
-    | AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
-    | never = never,
-  const TFields extends
-    | UnifiedField<
-        TScopedTranslationKey,
-        z.ZodTypeAny,
-        FieldUsageConfig,
-        TChildren
-      >
-    | never = UnifiedField<
+  const TFields extends UnifiedField<
     TScopedTranslationKey,
     z.ZodTypeAny,
     FieldUsageConfig,
-    TChildren
+    AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
+  > = UnifiedField<
+    TScopedTranslationKey,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
 >(
-  config: ApiEndpoint<
-    TMethod,
-    TUserRoleValue,
-    TScopedTranslationKey,
-    TChildren,
-    TFields
-  >,
+  config: ApiEndpoint<TMethod, TUserRoleValue, TScopedTranslationKey, TFields>,
 ): CreateEndpointReturnInMethod<
   TMethod,
   TUserRoleValue,
   TScopedTranslationKey,
-  TChildren,
   TFields
 > {
   // Generate schemas from unified fields
@@ -577,7 +540,6 @@ export function createEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    TChildren,
     TFields
   > = {
     method: config.method,
@@ -636,7 +598,6 @@ export function createEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    TChildren,
     TFields
   >;
 }

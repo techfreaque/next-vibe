@@ -3,10 +3,8 @@ import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import {
-  type CreditBalance,
-  CreditRepository,
-} from "@/app/api/[locale]/credits/repository";
+import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import {
   ProductIds,
   productsRepository,
@@ -87,7 +85,7 @@ export default async function BuyCreditsPage({
   const isAuthenticated = user !== undefined && !user.isPublic;
 
   // Fetch data
-  let credits: CreditBalance;
+  let credits: CreditsGetResponseOutput;
   let subscription: SubscriptionGetResponseOutput | null = null;
 
   if (userResponse.success && userResponse.data && userResponse.data.leadId) {

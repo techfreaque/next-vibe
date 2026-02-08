@@ -142,7 +142,6 @@ type GenericEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   string,
-  AnyChildrenConstrain<string, FieldUsageConfig>,
   UnifiedField<
     string,
     z.ZodTypeAny,
@@ -160,7 +159,6 @@ type SpecificEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly [SpecificRole],
   string,
-  AnyChildrenConstrain<string, FieldUsageConfig>,
   UnifiedField<
     string,
     z.ZodTypeAny,

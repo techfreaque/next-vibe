@@ -113,7 +113,7 @@ const { POST } = createEndpoint({
 
       destroyedGuards: responseArrayField(
         {
-          type: WidgetType.DATA_TABLE,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.guard.destroy.fields.destroyedGuards.title",
         },
         objectField(

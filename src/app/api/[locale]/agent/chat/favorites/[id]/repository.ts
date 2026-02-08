@@ -18,6 +18,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import { DEFAULT_TTS_VOICE } from "../../../text-to-speech/enum";
 import { CharactersRepository } from "../../characters/repository";
 import { chatFavorites } from "../db";
 import type {
@@ -95,7 +96,7 @@ export class SingleFavoriteRepository {
       }
 
       const character = characterResult.data;
-      const voice = favorite.voice ?? character?.voice ?? null;
+      const voice = favorite.voice || character?.voice || DEFAULT_TTS_VOICE;
 
       // Validate character has modelSelection
       if (!character?.modelSelection) {
@@ -132,34 +133,21 @@ export class SingleFavoriteRepository {
       // Merge customIcon with character icon (customIcon takes precedence)
       const displayIcon = favorite.customIcon ?? character?.icon ?? "bot";
 
+      // Flattened response
       return success<FavoriteGetResponseOutput>({
-        id: favorite.id,
         characterId: favorite.characterId,
-        character: {
-          info: {
-            icon: displayIcon,
-            info: {
-              titleRow: {
-                name:
-                  character?.name ??
-                  ("app.api.agent.chat.characters.characters.default.name" as const),
-                tagline:
-                  character?.tagline ??
-                  ("app.api.agent.chat.characters.characters.default.tagline" as const),
-              },
-              description:
-                character?.description ??
-                ("app.api.agent.chat.characters.characters.default.description" as const),
-            },
-          },
-        },
-        customName: favorite.customName,
-        customIcon: favorite.customIcon ?? character?.icon ?? null,
+        icon: displayIcon,
+        name:
+          character?.name ??
+          ("app.api.agent.chat.characters.characters.default.name" as const),
+        tagline:
+          character?.tagline ??
+          ("app.api.agent.chat.characters.characters.default.tagline" as const),
+        description:
+          character?.description ??
+          ("app.api.agent.chat.characters.characters.default.description" as const),
         voice,
         modelSelection,
-        color: favorite.color,
-        position: favorite.position,
-        useCount: favorite.useCount,
       });
     } catch (error) {
       logger.error("Failed to fetch favorite", parseError(error));
@@ -241,9 +229,7 @@ export class SingleFavoriteRepository {
 
       // Only store customIcon if different from character default
       const customIconToStore =
-        character && data.character?.info?.icon === character.icon
-          ? null
-          : data.character?.info?.icon;
+        character && data.icon === character.icon ? null : data.icon;
 
       // Store only currentSelection (not characterModelSelection)
       // If CHARACTER_BASED, store null to indicate "use character defaults"
@@ -303,6 +289,7 @@ export class SingleFavoriteRepository {
         });
       }
 
+      // Flattened response
       return success({
         success:
           "app.api.agent.chat.favorites.id.patch.response.success.content",

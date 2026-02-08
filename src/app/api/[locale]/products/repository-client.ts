@@ -5,7 +5,6 @@
 
 import type { JSX } from "react";
 
-import { modelOptions } from "@/app/api/[locale]/agent/models/models";
 import type { SubscriptionPlanValue } from "@/app/api/[locale]/subscription/enum";
 import { SubscriptionPlan } from "@/app/api/[locale]/subscription/enum";
 import type {
@@ -15,12 +14,6 @@ import type {
 } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import type { TranslationKey } from "@/i18n/core/static-types";
-
-/**
- * Total number of AI models available
- * Dynamically calculated from modelOptions object
- */
-export const TOTAL_MODEL_COUNT = Object.keys(modelOptions).length;
 
 /**
  * ============================================================================
@@ -38,7 +31,7 @@ const CREDIT_VALUE_USD = 0.01;
 /**
  * Standard markup percentage applied to all external API costs
  */
-const STANDARD_MARKUP_PERCENTAGE = 0.3; // 30% markup
+export const STANDARD_MARKUP_PERCENTAGE = 0.3; // 30% markup
 
 /**
  * TTS Pricing (Amazon Polly)

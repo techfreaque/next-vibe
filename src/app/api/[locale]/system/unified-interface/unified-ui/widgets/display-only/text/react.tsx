@@ -14,8 +14,12 @@ import {
   getTextFormatClassName,
   getTextSizeClassName,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type {
+  ReactRequestResponseWidgetProps,
+  ReactStaticWidgetProps,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import {
+  useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -102,22 +106,25 @@ export function TextWidget<
   TUsage extends FieldUsageConfig,
 >(
   props:
-    | ReactWidgetProps<
+    | ReactStaticWidgetProps<
         TEndpoint,
         TUsage,
         TextWidgetConfig<TKey, never, TUsage, "widget">
       >
-    | ReactWidgetProps<
+    | ReactRequestResponseWidgetProps<
         TEndpoint,
         TUsage,
         TextWidgetConfig<TKey, TextWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
   const { field } = props;
+  const fieldName = "fieldName" in props ? props.fieldName : undefined;
   const locale = useWidgetLocale();
   const t = useWidgetTranslation();
+  const form = useWidgetForm();
   const {
     content,
+    contentParams,
     fieldType,
     label: labelKey,
     variant,
@@ -131,9 +138,20 @@ export function TextWidget<
     gap,
     padding,
     className: fieldClassName,
-    getClassName,
   } = field;
+  const usage = "usage" in field ? field.usage : undefined;
   const label = labelKey ? t(labelKey) : undefined;
+
+  // Get value from form for request fields, otherwise from value
+  let value;
+  if (usage?.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value && "value" in field) {
+      value = field.value;
+    }
+  } else if ("value" in field) {
+    value = field.value;
+  }
 
   // Text alignment classes
   const alignmentClass =
@@ -155,8 +173,8 @@ export function TextWidget<
   const emphasisClass = emphasis ? getTextEmphasisClassName(emphasis) : "";
 
   // Apply dynamic className callback if present
-  const dynamicClassName = getClassName
-    ? getClassName(field.value, field.parentValue)
+  const dynamicClassName = field.getClassName
+    ? field.getClassName(value, field.parentValue)
     : "";
 
   // Merge all className sources: field className, dynamic className, and external className
@@ -169,7 +187,7 @@ export function TextWidget<
   );
 
   // Handle date formatting if fieldType is DATE or DATETIME
-  const dateFormatted = formatIfDate(field.value, fieldType, locale);
+  const dateFormatted = formatIfDate(value, fieldType, locale);
   if (dateFormatted) {
     const displayText = formatText(dateFormatted, maxLength);
     return (
@@ -182,7 +200,7 @@ export function TextWidget<
 
   // Handle format="link" with href from field.ui config
   if (format === "link" && href && content) {
-    const linkText = t(content);
+    const linkText = t(content, contentParams);
     const displayText = formatText(linkText, maxLength);
     // Prepend locale to href if it doesn't start with http
     const localizedHref = href.startsWith("http")
@@ -203,13 +221,13 @@ export function TextWidget<
 
   // Extract data using shared logic with translation context
   // value is properly typed from schema - no assertions needed
-  const data = extractTextData(field.value, t);
+  const data = extractTextData(value, t);
 
   // No data - show empty placeholder
   if (!data) {
     // Handle static content from UI config
     if (content) {
-      const translatedContent = t(content);
+      const translatedContent = t(content, contentParams);
       const displayText = formatText(translatedContent, maxLength);
 
       const textElement = multiline ? (
@@ -251,7 +269,7 @@ export function TextWidget<
       );
     }
 
-    return <Div className={cn("flex", alignmentClass)}>{emptyElement}</Div>;
+    return <></>;
   }
 
   const { text, truncate, format: dataFormat } = data;

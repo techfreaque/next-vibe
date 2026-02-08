@@ -18,6 +18,22 @@ import type {
 } from "../../widgets/_shared/types";
 import { useWidgetLocale } from "../../widgets/_shared/use-widget-context";
 import ContainerWidget from "../../widgets/containers/container/react";
+import AlertWidget from "../../widgets/display-only/alert/react";
+import BadgeWidget from "../../widgets/display-only/badge/react";
+import IconWidget from "../../widgets/display-only/icon/react";
+import SeparatorWidget from "../../widgets/display-only/separator/react";
+import TextWidget from "../../widgets/display-only/text/react";
+import TitleWidget from "../../widgets/display-only/title/react";
+import BooleanFieldWidget from "../../widgets/form-fields/boolean-field/react";
+import IconFieldWidget from "../../widgets/form-fields/icon-field/react";
+import ModelSelectionFieldWidget from "../../widgets/form-fields/model-selection-field/react";
+import SelectFieldWidget from "../../widgets/form-fields/select-field/react";
+import TextFieldWidget from "../../widgets/form-fields/text-field/react";
+import TextareaFieldWidget from "../../widgets/form-fields/textarea-field/react";
+import UuidFieldWidget from "../../widgets/form-fields/uuid-field/react";
+import ButtonWidget from "../../widgets/interactive/button/react";
+import FormAlertWidget from "../../widgets/interactive/form-alert/react";
+import NavigateButtonWidget from "../../widgets/interactive/navigate-button/react";
 import SubmitButtonWidget from "../../widgets/interactive/submit-button/react";
 import { WidgetErrorBoundary } from "./ErrorBoundary";
 
@@ -30,6 +46,7 @@ export function WidgetRenderer<TEndpoint extends CreateApiEndpointAny>({
   field,
 }: ReactWidgetProps<
   TEndpoint,
+  FieldUsageConfig,
   DispatchField<
     string,
     z.ZodTypeAny,
@@ -56,6 +73,7 @@ export function WidgetRenderer<TEndpoint extends CreateApiEndpointAny>({
 function renderWidget<TEndpoint extends CreateApiEndpointAny>(
   props: ReactWidgetProps<
     TEndpoint,
+    FieldUsageConfig,
     DispatchField<
       string,
       z.ZodTypeAny,
@@ -68,12 +86,7 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
   // Use props directly (not props) to preserve narrowing
   switch (props.field.type) {
     case WidgetType.TEXT:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/react"),
-        props,
-        "widget-text",
-      );
+      return <TextWidget {...props} />;
     case WidgetType.DESCRIPTION:
       return createWidget(
         () =>
@@ -96,26 +109,9 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
         "widget-key-value",
       );
     case WidgetType.BADGE:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/badge/react"),
-        props,
-        "widget-badge",
-      );
+      return <BadgeWidget {...props} />;
     case WidgetType.ICON:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/icon/react"),
-        props,
-        "widget-icon",
-      );
-    case WidgetType.DRAG_HANDLE:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/drag-handle/react"),
-        props,
-        "widget-drag-handle",
-      );
+      return <IconWidget {...props} />;
     case WidgetType.MARKDOWN:
       return createWidget(
         () =>
@@ -131,12 +127,7 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
         "widget-markdown-editor",
       );
     case WidgetType.TITLE:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/title/react"),
-        props,
-        "widget-title",
-      );
+      return <TitleWidget {...props} />;
     case WidgetType.LINK:
       return createWidget(
         () =>
@@ -158,62 +149,12 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
         props,
         "widget-code-quality-list",
       );
-    case WidgetType.CREDIT_TRANSACTION_CARD:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/credit-transaction-card/react"),
-        props,
-        "widget-credit-transaction-card",
-      );
-    case WidgetType.CREDIT_TRANSACTION_LIST:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/credit-transaction-list/react"),
-        props,
-        "widget-credit-transaction-list",
-      );
     case WidgetType.PAGINATION:
       return createWidget(
         () =>
           import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/pagination/react"),
         props,
         "widget-pagination",
-      );
-
-    case WidgetType.DATA_TABLE:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/data-table/react"),
-        props,
-        "widget-data-table",
-      );
-    case WidgetType.DATA_CARDS:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/data-cards/react"),
-        props,
-        "widget-data-cards",
-      );
-    case WidgetType.DATA_LIST:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/data-list/react"),
-        props,
-        "widget-data-list",
-      );
-    case WidgetType.GROUPED_LIST:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/grouped-list/react"),
-        props,
-        "widget-grouped-list",
-      );
-    case WidgetType.METRIC_CARD:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/metric-card/react"),
-        props,
-        "widget-metric-card",
       );
     case WidgetType.STAT:
       return createWidget(
@@ -229,80 +170,44 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
         props,
         "widget-chart",
       );
+    case WidgetType.CUSTOM_WIDGET: {
+      // Get render function from field
+      const customField = props.field as typeof props.field & {
+        render?: React.ComponentType<
+          ReactWidgetProps<TEndpoint, FieldUsageConfig, typeof props.field>
+        >;
+      };
+      const CustomRender = customField.render;
+
+      if (!CustomRender) {
+        return <></>;
+      }
+
+      // Pass the entire props (fieldName + field) to custom render
+      return <CustomRender {...props} />;
+    }
     case WidgetType.CONTAINER:
       return (
         <ContainerWidget
           {...(props as ReactWidgetProps<
             TEndpoint,
+            FieldUsageConfig,
             Parameters<typeof ContainerWidget>[0]["field"]
           >)}
         />
       );
-    case WidgetType.SECTION:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/section/react"),
-        props,
-        "widget-section",
-      );
     case WidgetType.SEPARATOR:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/separator/react"),
-        props,
-        "widget-separator",
-      );
-    case WidgetType.LINK_CARD:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/link-card/react"),
-        props,
-        "widget-link-card",
-      );
+      return <SeparatorWidget {...props} />;
     case WidgetType.BUTTON:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/button/react"),
-        props,
-        "widget-button",
-      );
+      return <ButtonWidget {...props} />;
     case WidgetType.NAVIGATE_BUTTON:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react"),
-        props,
-        "widget-navigate-button",
-      );
+      return <NavigateButtonWidget {...props} />;
     case WidgetType.SUBMIT_BUTTON:
-      return (
-        <SubmitButtonWidget
-          {...(props as ReactWidgetProps<
-            TEndpoint,
-            Parameters<typeof SubmitButtonWidget>[0]["field"]
-          >)}
-        />
-      );
+      return <SubmitButtonWidget {...props} />;
     case WidgetType.ALERT:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react"),
-        props,
-        "widget-alert",
-      );
+      return <AlertWidget {...props} />;
     case WidgetType.FORM_ALERT:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react"),
-        props,
-        "widget-form-alert",
-      );
-    case WidgetType.PASSWORD_STRENGTH:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/password-strength/react"),
-        props,
-        "widget-password-strength",
-      );
+      return <FormAlertWidget {...props} />;
     case WidgetType.STATUS_INDICATOR:
       return createWidget(
         () =>
@@ -338,20 +243,6 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
         props,
         "widget-avatar",
       );
-    case WidgetType.TABS:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/tabs/react"),
-        props,
-        "widget-tabs",
-      );
-    case WidgetType.ACCORDION:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/accordion/react"),
-        props,
-        "widget-accordion",
-      );
     case WidgetType.LOADING:
       return createWidget(
         () =>
@@ -367,12 +258,7 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
 
       switch (fieldType) {
         case FieldDataType.BOOLEAN:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react"),
-            props,
-            "field-boolean",
-          );
+          return <BooleanFieldWidget {...props} />;
         case FieldDataType.COLOR:
           return createWidget(
             () =>
@@ -437,12 +323,7 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
             "field-filter-pills",
           );
         case FieldDataType.ICON:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/react"),
-            props,
-            "field-icon",
-          );
+          return <IconFieldWidget {...props} />;
         case FieldDataType.INT:
           return createWidget(
             () =>
@@ -500,19 +381,9 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
             "field-range-slider",
           );
         case FieldDataType.MODEL_SELECTION:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/react"),
-            props,
-            "field-model-selection",
-          );
+          return <ModelSelectionFieldWidget {...props} />;
         case FieldDataType.SELECT:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react"),
-            props,
-            "field-select",
-          );
+          return <SelectFieldWidget {...props} />;
         case FieldDataType.SLIDER:
           return createWidget(
             () =>
@@ -528,12 +399,7 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
             "field-tags",
           );
         case FieldDataType.TEXTAREA:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react"),
-            props,
-            "field-textarea",
-          );
+          return <TextareaFieldWidget {...props} />;
         case FieldDataType.TEXT_ARRAY:
           return createWidget(
             () =>
@@ -542,12 +408,7 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
             "field-text-array",
           );
         case FieldDataType.TEXT:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react"),
-            props,
-            "field-text",
-          );
+          return <TextFieldWidget {...props} />;
         case FieldDataType.TIME:
           return createWidget(
             () =>
@@ -577,12 +438,7 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
             "field-url",
           );
         case FieldDataType.UUID:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/uuid-field/react"),
-            props,
-            "field-uuid",
-          );
+          return <UuidFieldWidget {...props} />;
 
         default: {
           // oxlint-disable-next-line no-unused-vars
@@ -610,6 +466,7 @@ const lazyComponentCache = new Map<
   React.ComponentType<
     ReactWidgetProps<
       CreateApiEndpointAny,
+      FieldUsageConfig,
       DispatchField<
         string,
         z.ZodTypeAny,
@@ -629,6 +486,7 @@ function getLazyWidget(
     default: React.ComponentType<
       ReactWidgetProps<
         CreateApiEndpointAny,
+        FieldUsageConfig,
         DispatchField<
           string,
           z.ZodTypeAny,
@@ -642,6 +500,7 @@ function getLazyWidget(
 ): React.ComponentType<
   ReactWidgetProps<
     CreateApiEndpointAny,
+    FieldUsageConfig,
     DispatchField<
       string,
       z.ZodTypeAny,
@@ -667,6 +526,7 @@ function createWidget<TEndpoint extends CreateApiEndpointAny>(
   importFn: () => Promise<{ default: React.ComponentType<any> }>,
   props: ReactWidgetProps<
     TEndpoint,
+    FieldUsageConfig,
     DispatchField<
       string,
       z.ZodTypeAny,

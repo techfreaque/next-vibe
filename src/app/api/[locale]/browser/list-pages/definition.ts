@@ -69,7 +69,7 @@ const { POST } = createEndpoint({
         {
           pages: responseArrayField(
             {
-              type: WidgetType.DATA_TABLE,
+              type: WidgetType.CONTAINER,
             },
             objectField(
               {

@@ -65,7 +65,7 @@ const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
       rolesView: responseArrayOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
         },
         responseField({
           type: WidgetType.BADGE,
@@ -75,7 +75,7 @@ const { GET } = createEndpoint({
       ),
       rolesManage: responseArrayOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
         },
         responseField({
           type: WidgetType.BADGE,
@@ -85,7 +85,7 @@ const { GET } = createEndpoint({
       ),
       rolesCreateThread: responseArrayOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
         },
         responseField({
           type: WidgetType.BADGE,
@@ -95,7 +95,7 @@ const { GET } = createEndpoint({
       ),
       rolesPost: responseArrayOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
         },
         responseField({
           type: WidgetType.BADGE,
@@ -105,7 +105,7 @@ const { GET } = createEndpoint({
       ),
       rolesModerate: responseArrayOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
         },
         responseField({
           type: WidgetType.BADGE,
@@ -115,7 +115,7 @@ const { GET } = createEndpoint({
       ),
       rolesAdmin: responseArrayOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
         },
         responseField({
           type: WidgetType.BADGE,
@@ -328,7 +328,7 @@ const { PATCH } = createEndpoint({
         {
           rolesView: responseArrayOptionalField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             responseField({
               type: WidgetType.BADGE,
@@ -338,7 +338,7 @@ const { PATCH } = createEndpoint({
           ),
           rolesManage: responseArrayOptionalField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             responseField({
               type: WidgetType.BADGE,
@@ -348,7 +348,7 @@ const { PATCH } = createEndpoint({
           ),
           rolesCreateThread: responseArrayOptionalField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             responseField({
               type: WidgetType.BADGE,
@@ -358,7 +358,7 @@ const { PATCH } = createEndpoint({
           ),
           rolesPost: responseArrayOptionalField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             responseField({
               type: WidgetType.BADGE,
@@ -368,7 +368,7 @@ const { PATCH } = createEndpoint({
           ),
           rolesModerate: responseArrayOptionalField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             responseField({
               type: WidgetType.BADGE,
@@ -378,7 +378,7 @@ const { PATCH } = createEndpoint({
           ),
           rolesAdmin: responseArrayOptionalField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
             },
             responseField({
               type: WidgetType.BADGE,

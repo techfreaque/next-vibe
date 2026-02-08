@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
+  customWidgetObject,
   navigateButtonField,
   widgetField,
-  widgetObjectField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   objectField,
@@ -27,35 +27,22 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { iconSchema } from "../../../shared/types/common.schema";
-import type { CreateApiEndpointAny } from "../../../system/unified-interface/shared/types/endpoint-base";
-import type { ReactWidgetContext } from "../../../system/unified-interface/unified-ui/widgets/_shared/react-types";
 import { ModelId } from "../../models/models";
 import charactersDefinitions from "../characters/definition";
-import favoriteDefinition from "./[id]/definition";
+import { FavoritesListContainer } from "./widget";
 
 /**
  * Type for parent value in favorite card callbacks
  * Used to access activeBadge for conditional styling
  */
 interface FavoriteCardParent {
-  content: {
-    titleRow: {
-      activeBadge: string | null;
-    };
-  };
-}
-
-/**
- * Type for titleRow parent value
- * activeBadge is a sibling field in titleRow
- */
-interface TitleRowParent {
   activeBadge: string | null;
 }
 
 /**
  * Favorite Card type - manually defined to avoid circular reference
  * This represents a single favorite card in the favorites list
+ * Flattened structure - no nested content/titleRow/modelRow objects
  */
 export interface FavoriteCard {
   id: string;
@@ -63,20 +50,14 @@ export interface FavoriteCard {
   modelId: ModelId | null;
   position: number;
   icon: z.infer<typeof iconSchema>;
-  content: {
-    titleRow: {
-      name: TranslationKey;
-      tagline: TranslationKey | null;
-      activeBadge: TranslationKey | null;
-    };
-    description: TranslationKey | null;
-    modelRow: {
-      modelIcon: z.infer<typeof iconSchema>;
-      modelInfo: string;
-      modelProvider: string;
-      creditCost: string;
-    };
-  };
+  name: TranslationKey;
+  tagline: TranslationKey | null;
+  activeBadge: TranslationKey | null;
+  description: TranslationKey | null;
+  modelIcon: z.infer<typeof iconSchema>;
+  modelInfo: string;
+  modelProvider: string;
+  creditCost: string;
 }
 
 /**
@@ -95,148 +76,31 @@ const { GET } = createEndpoint({
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.favorites" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-      noCard: true,
-      gap: "6",
-      className: "p-6",
-    },
-    { response: true },
-    {
-      // Top action buttons container (widget object field - pure UI, no response data)
-      topActions: widgetObjectField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.INLINE,
-          gap: "2",
-          noCard: true,
-        },
-        { response: true },
-        {
-          backButton: backButton({ usage: { response: true } }),
-          title: widgetField({
-            type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.favorites.get.container.title" as const,
-            usage: { response: true },
-          }),
-          createButton: navigateButtonField({
-            targetEndpoint: charactersDefinitions.GET,
-            extractParams: () => ({}),
-            prefillFromGet: false,
-            label:
-              "app.api.agent.chat.favorites.get.createButton.label" as const,
-            icon: "plus",
-            variant: "outline",
-            className: "ml-auto",
-            usage: { response: true },
-          }),
-        },
-      ),
+  fields: customWidgetObject({
+    render: FavoritesListContainer,
+    usage: { response: true } as const,
+    children: {
+      // Flattened top action buttons (no container wrapper)
+      backButton: backButton({ usage: { response: true } }),
+      title: widgetField({
+        type: WidgetType.TEXT,
+        content: "app.api.agent.chat.favorites.get.container.title" as const,
+        usage: { response: true },
+      }),
+      createButton: navigateButtonField({
+        targetEndpoint: charactersDefinitions.GET,
+        extractParams: () => ({}),
+        prefillFromGet: false,
+        label: "app.api.agent.chat.favorites.get.createButton.label" as const,
+        icon: "plus",
+        variant: "outline",
+        className: "ml-auto",
+        usage: { response: true },
+      }),
 
       // Favorites list
       favoritesList: responseArrayField(
-        {
-          type: WidgetType.DATA_CARDS,
-          className: "overflow-y-auto max-h-[70dvh]",
-          columns: 1,
-          getClassName: (item: FavoriteCardParent) => {
-            const activeClass = item.content?.titleRow?.activeBadge
-              ? "bg-primary/5 border-primary/20"
-              : "";
-            return `group relative ${activeClass}`;
-          },
-          metadata: {
-            enableDragDrop: true,
-            onReorder: async (
-              items: FavoriteCard[],
-              context: ReactWidgetContext<CreateApiEndpointAny>,
-            ) => {
-              // Import apiClient and reorder definition
-              const { apiClient } =
-                await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
-
-              const { logger, locale, user } = context;
-
-              // Update positions in all items
-              const updatedItems = items.map((item, index) => ({
-                ...item,
-                position: index,
-              }));
-
-              // Optimistic update: Update favorites list with new positions
-              apiClient.updateEndpointData(
-                GET,
-                logger,
-                (oldData) => {
-                  if (!oldData?.success) {
-                    return oldData;
-                  }
-
-                  return {
-                    success: true,
-                    data: {
-                      favoritesList: updatedItems,
-                    },
-                  };
-                },
-                undefined,
-              );
-
-              // Persist position changes via batch reorder endpoint
-              try {
-                const reorderDefinition = await import("./reorder/definition");
-
-                await apiClient.mutate(
-                  reorderDefinition.default.POST,
-                  logger,
-                  user,
-                  {
-                    positions: updatedItems.map((item, index) => ({
-                      id: item.id,
-                      position: index,
-                    })),
-                  },
-                  undefined,
-                  locale,
-                );
-
-                logger.info("Favorites positions updated successfully");
-              } catch (error) {
-                logger.error("Failed to update favorite positions", {
-                  errorMessage:
-                    error instanceof Error ? error.message : String(error),
-                });
-                // Refetch to revert optimistic update
-                await apiClient.refetchEndpoint(GET, logger);
-              }
-            },
-            onCardClick: {
-              isClickable: (item: FavoriteCard) =>
-                !item.content.titleRow.activeBadge,
-              onClick: async (
-                item: FavoriteCard,
-                context: ReactWidgetContext<CreateApiEndpointAny>,
-              ) => {
-                const { ChatSettingsRepositoryClient } =
-                  await import("../settings/repository-client");
-
-                const { logger, locale, user } = context;
-
-                await ChatSettingsRepositoryClient.selectFavorite({
-                  favoriteId: item.id,
-                  modelId: item.modelId,
-                  characterId: item.characterId,
-                  logger,
-                  locale,
-                  user,
-                });
-              },
-            },
-          },
-        },
+        { type: WidgetType.CONTAINER },
         objectField(
           {
             type: WidgetType.CONTAINER,
@@ -278,186 +142,92 @@ const { GET } = createEndpoint({
                 value: undefined,
                 parent?: FavoriteCardParent,
               ) => {
-                return parent?.content?.titleRow?.activeBadge
+                return parent?.activeBadge
                   ? "bg-primary/15 text-primary"
                   : "bg-primary/10 group-hover:bg-primary/20";
               },
             }),
-            content: objectField(
-              {
-                type: WidgetType.CONTAINER,
-                layoutType: LayoutType.STACKED,
-                gap: "0",
-                noCard: true,
+            // Flattened fields (no nested content/titleRow/modelRow objects)
+            name: responseField({
+              type: WidgetType.TEXT,
+              size: "base",
+              emphasis: "bold",
+              schema: z.string() as z.ZodType<TranslationKey>,
+              getClassName: (
+                // oxlint-disable-next-line no-unused-vars
+                value: undefined,
+                parentValue?: FavoriteCardParent,
+              ) => {
+                const parent = parentValue;
+                const hasActive = parent?.activeBadge;
+                return hasActive ? "text-primary" : "";
               },
-              { response: true },
-              {
-                titleRow: objectField(
-                  {
-                    type: WidgetType.CONTAINER,
-                    layoutType: LayoutType.INLINE,
-                    gap: "2",
-                    noCard: true,
-                  },
-                  { response: true },
-                  {
-                    name: responseField({
-                      type: WidgetType.TEXT,
-                      size: "base",
-                      emphasis: "bold",
-                      schema: z.string() as z.ZodType<TranslationKey>,
-                      getClassName: (
-                        // oxlint-disable-next-line no-unused-vars
-                        value: undefined,
-                        parentValue?: TitleRowParent,
-                      ) => {
-                        const parent = parentValue;
-                        const hasActive = parent?.activeBadge;
-                        return hasActive ? "text-primary" : "";
-                      },
-                    }),
-                    tagline: responseField({
-                      type: WidgetType.TEXT,
-                      size: "sm",
-                      variant: "muted",
-                      schema: z
-                        .string()
-                        .nullable() as z.ZodType<TranslationKey | null>,
-                    }),
-                    activeBadge: responseField({
-                      type: WidgetType.BADGE,
-                      variant: "default",
-                      size: "xs",
-                      schema: z
-                        .string()
-                        .nullable() as z.ZodType<TranslationKey | null>,
-                    }),
-                  },
-                ),
-                description: responseField({
-                  type: WidgetType.TEXT,
-                  size: "xs",
-                  variant: "muted",
-                  schema: z
-                    .string()
-                    .nullable() as z.ZodType<TranslationKey | null>,
-                }),
-                modelRow: objectField(
-                  {
-                    type: WidgetType.CONTAINER,
-                    layoutType: LayoutType.INLINE,
-                    gap: "1",
-                    noCard: true,
-                  },
-                  { response: true },
-                  {
-                    modelIcon: responseField({
-                      type: WidgetType.ICON,
-                      iconSize: "xs",
-                      noHover: true,
-                      schema: iconSchema,
-                    }),
-                    modelInfo: responseField({
-                      type: WidgetType.TEXT,
-                      size: "xs",
-                      variant: "muted",
-                      schema: z.string(),
-                    }),
-                    separator1: widgetField({
-                      type: WidgetType.TEXT,
-                      size: "xs",
-                      variant: "muted",
-                      content:
-                        "app.api.agent.chat.favorites.get.response.favorite.separator.content" as const,
-                      usage: { response: true },
-                    }),
-                    modelProvider: responseField({
-                      type: WidgetType.TEXT,
-                      size: "xs",
-                      variant: "muted",
-                      schema: z.string(),
-                    }),
-                    separator2: widgetField({
-                      type: WidgetType.TEXT,
-                      size: "xs",
-                      variant: "muted",
-                      content:
-                        "app.api.agent.chat.favorites.get.response.favorite.separator.content" as const,
-                      usage: { response: true },
-                    }),
-                    creditCost: responseField({
-                      type: WidgetType.TEXT,
-                      size: "xs",
-                      variant: "muted",
-                      schema: z.string(),
-                    }),
-                  },
-                ),
-              },
-            ),
-            actions: widgetObjectField(
-              {
-                type: WidgetType.CONTAINER,
-                layoutType: LayoutType.ACTIONS,
-                noCard: true,
-              },
-              { response: true },
-              {
-                dragHandle: widgetField({
-                  type: WidgetType.DRAG_HANDLE,
-                  icon: "grip",
-                  usage: { response: true },
-                }),
-                selectButton: widgetField({
-                  type: WidgetType.BUTTON,
-                  icon: "zap",
-                  variant: "ghost",
-                  size: "sm",
-                  className: "text-primary",
-                  usage: { response: true },
-                  hidden: (value: FavoriteCard) =>
-                    Boolean(value.content.titleRow.activeBadge),
-                  onClick: async (
-                    item: FavoriteCard,
-                    context: ReactWidgetContext<CreateApiEndpointAny>,
-                  ) => {
-                    const { ChatSettingsRepositoryClient } =
-                      await import("../settings/repository-client");
-
-                    const { logger, locale, user } = context;
-
-                    await ChatSettingsRepositoryClient.selectFavorite({
-                      favoriteId: item.id,
-                      modelId: item.modelId,
-                      characterId: item.characterId,
-                      logger,
-                      locale,
-                      user,
-                    });
-                  },
-                }),
-                editButton: navigateButtonField({
-                  icon: "pencil",
-                  variant: "ghost",
-                  size: "sm",
-                  targetEndpoint: favoriteDefinition.PATCH,
-                  extractParams: (source) => ({
-                    urlPathParams: {
-                      id: String((source.itemData as { id: string }).id),
-                    },
-                  }),
-                  prefillFromGet: true,
-                  getEndpoint: favoriteDefinition.GET,
-                  popNavigationOnSuccess: 1, // Pop once to go back to favorites list after save
-                  usage: { response: true },
-                }),
-              },
-            ),
+            }),
+            tagline: responseField({
+              type: WidgetType.TEXT,
+              size: "sm",
+              variant: "muted",
+              schema: z.string().nullable() as z.ZodType<TranslationKey | null>,
+            }),
+            activeBadge: responseField({
+              type: WidgetType.BADGE,
+              variant: "default",
+              size: "xs",
+              schema: z.string().nullable() as z.ZodType<TranslationKey | null>,
+            }),
+            description: responseField({
+              type: WidgetType.TEXT,
+              size: "xs",
+              variant: "muted",
+              schema: z.string().nullable() as z.ZodType<TranslationKey | null>,
+            }),
+            modelIcon: responseField({
+              type: WidgetType.ICON,
+              iconSize: "xs",
+              noHover: true,
+              schema: iconSchema,
+            }),
+            modelInfo: responseField({
+              type: WidgetType.TEXT,
+              size: "xs",
+              variant: "muted",
+              schema: z.string(),
+            }),
+            separator1: widgetField({
+              type: WidgetType.TEXT,
+              size: "xs",
+              variant: "muted",
+              content:
+                "app.api.agent.chat.favorites.get.response.favorite.separator.content" as const,
+              usage: { response: true },
+            }),
+            modelProvider: responseField({
+              type: WidgetType.TEXT,
+              size: "xs",
+              variant: "muted",
+              className: "hidden sm:inline",
+              schema: z.string(),
+            }),
+            separator2: widgetField({
+              type: WidgetType.TEXT,
+              size: "xs",
+              variant: "muted",
+              className: "hidden sm:inline",
+              content:
+                "app.api.agent.chat.favorites.get.response.favorite.separator.content" as const,
+              usage: { response: true },
+            }),
+            creditCost: responseField({
+              type: WidgetType.TEXT,
+              size: "xs",
+              variant: "muted",
+              schema: z.string(),
+            }),
           },
         ),
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
@@ -526,20 +296,14 @@ const { GET } = createEndpoint({
             modelId: ModelId.CLAUDE_SONNET_4_5,
             position: 0,
             icon: "sparkles",
-            content: {
-              titleRow: {
-                name: "Thea",
-                tagline: "Greek goddess of light",
-                activeBadge: "app.chat.selector.active",
-              },
-              description: "Devoted companion with ancient wisdom",
-              modelRow: {
-                modelIcon: "sparkles",
-                modelInfo: "Claude Sonnet 4.5",
-                modelProvider: "Anthropic",
-                creditCost: "1.5 credits",
-              },
-            },
+            name: "Thea",
+            tagline: "Greek goddess of light",
+            activeBadge: "app.chat.selector.active",
+            description: "Devoted companion with ancient wisdom",
+            modelIcon: "sparkles",
+            modelInfo: "Claude Sonnet 4.5",
+            modelProvider: "Anthropic",
+            creditCost: "1.5 credits",
           },
         ],
       },

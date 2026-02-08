@@ -5,7 +5,11 @@
 
 import type { z } from "zod";
 
-import type { IconSchemaType } from "@/app/api/[locale]/shared/types/common.schema";
+import type {
+  IconSchemaNullishType,
+  IconSchemaOptionalType,
+  IconSchemaType,
+} from "@/app/api/[locale]/shared/types/common.schema";
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -20,7 +24,10 @@ import type {
  * Displays an icon with customizable size, container, and style
  */
 export interface IconWidgetConfig<
-  TSchema extends IconSchemaType,
+  TSchema extends
+    | IconSchemaType
+    | IconSchemaOptionalType
+    | IconSchemaNullishType,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive" | "widget",
 > extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {
@@ -48,7 +55,20 @@ export interface IconWidgetConfig<
    * Dynamic className callback - receives field value and parent value
    * Returns additional className to merge with static className
    */
-  getClassName?: (value: z.output<TSchema>, parentValue?: WidgetData) => string;
+  getClassName?: <
+    TSchema extends
+      | IconSchemaType
+      | IconSchemaOptionalType
+      | IconSchemaNullishType,
+  >(
+    value: TSchema extends
+      | IconSchemaType
+      | IconSchemaOptionalType
+      | IconSchemaNullishType
+      ? z.output<TSchema>
+      : undefined,
+    parentValue?: WidgetData,
+  ) => string;
 
   /** Schema constraint for the field value */
   schema: TSchema;

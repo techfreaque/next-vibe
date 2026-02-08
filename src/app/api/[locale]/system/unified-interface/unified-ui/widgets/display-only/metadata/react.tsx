@@ -5,9 +5,15 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type {
+  ReactRequestResponseWidgetProps,
+  ReactStaticWidgetProps,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetForm,
+  useWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { MetadataWidgetConfig, MetadataWidgetSchema } from "./types";
 
@@ -35,32 +41,47 @@ export function MetadataWidget<
   TUsage extends FieldUsageConfig,
 >(
   props:
-    | ReactWidgetProps<
+    | ReactStaticWidgetProps<
         TEndpoint,
         TUsage,
         MetadataWidgetConfig<TKey, never, TUsage, "widget">
       >
-    | ReactWidgetProps<
+    | ReactRequestResponseWidgetProps<
         TEndpoint,
         TUsage,
         MetadataWidgetConfig<TKey, MetadataWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
   const t = useWidgetTranslation();
+  const form = useWidgetForm();
   const { field } = props;
+  const fieldName = "fieldName" in props ? props.fieldName : undefined;
+  const usage = "usage" in field ? field.usage : undefined;
+
+  // Get value from form for request fields, otherwise from field.value
+  let value;
+  if (usage?.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value && "value" in field) {
+      value = field.value;
+    }
+  } else if ("value" in field) {
+    value = field.value;
+  }
+
   // Handle string values
-  if (typeof field.value === "string") {
+  if (typeof value === "string") {
     return (
       <Span
         className={cn("text-[11px] text-muted-foreground/70", field.className)}
       >
-        {t(field.value)}
+        {t(value)}
       </Span>
     );
   }
 
   // Handle null/undefined
-  if (!field.value) {
+  if (!value) {
     return (
       <Span
         className={cn("text-[11px] text-muted-foreground/70", field.className)}
@@ -71,7 +92,7 @@ export function MetadataWidget<
   }
 
   // Handle object with key-value pairs
-  const entries = Object.entries(field.value);
+  const entries = Object.entries(value);
 
   return (
     <Span

@@ -105,7 +105,7 @@ const { POST } = createEndpoint({
 
       commands: responseArrayField(
         {
-          type: WidgetType.GROUPED_LIST,
+          type: WidgetType.CONTAINER,
           groupBy: "category",
           sortBy: "alias",
           hierarchical: true,

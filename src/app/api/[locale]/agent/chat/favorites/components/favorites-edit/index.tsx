@@ -30,6 +30,7 @@ import {
 import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
 import type { FavoriteGetResponseOutput } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 import {
+  getCreditCostFromModel,
   getModelById,
   type ModelId,
   type ModelOption,
@@ -393,8 +394,8 @@ export function QuickSettingsPanel({
       : bestModel;
 
   // Get display icon with fallback logic
-  const displayIcon = favorite.customIcon
-    ? favorite.customIcon
+  const displayIcon = favorite.icon
+    ? favorite.icon
     : character
       ? character.icon
       : resolvedModel
@@ -402,13 +403,11 @@ export function QuickSettingsPanel({
         : "bot";
 
   // Get display name with fallback logic
-  const displayName = favorite.customName
-    ? favorite.customName
-    : character
-      ? t(character.content.name)
-      : resolvedModel
-        ? resolvedModel.name
-        : t("app.chat.selector.modelOnly");
+  const displayName = character
+    ? t(character.name)
+    : resolvedModel
+      ? resolvedModel.name
+      : t("app.chat.selector.modelOnly");
 
   // Show loading spinner while fetching character data
   if (isLoadingCharacter && !isModelOnly && favorite.characterId) {
@@ -560,13 +559,14 @@ export function QuickSettingsPanel({
                 variant="secondary"
                 className="text-[10px] h-5 shrink-0 bg-background/60"
               >
-                {bestModel.creditCost === 0
-                  ? t("app.chat.selector.free")
-                  : bestModel.creditCost === 1
-                    ? t("app.chat.selector.creditsSingle")
-                    : t("app.chat.selector.creditsExact", {
-                        cost: bestModel.creditCost,
-                      })}
+                {(() => {
+                  const cost = getCreditCostFromModel(bestModel);
+                  return cost === 0
+                    ? t("app.chat.selector.free")
+                    : cost === 1
+                      ? t("app.chat.selector.creditsSingle")
+                      : t("app.chat.selector.creditsExact", { cost });
+                })()}
               </Badge>
             </Div>
           ) : (

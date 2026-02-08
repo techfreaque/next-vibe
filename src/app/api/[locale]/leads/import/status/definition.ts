@@ -108,7 +108,7 @@ const { GET } = createEndpoint({
         {
           items: responseArrayField(
             {
-              type: WidgetType.GROUPED_LIST,
+              type: WidgetType.CONTAINER,
               groupBy: "status",
               title: "app.api.leads.import.status.get.response.items.title",
               description:

@@ -2,7 +2,7 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
-import type { JSX } from "react";
+import { type JSX } from "react";
 
 import {
   Icon,
@@ -15,7 +15,7 @@ import {
   getIconSizeClassName,
   getSpacingClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
-import type { ReactWidgetProps } from "../../_shared/react-types";
+import type { ReactStaticWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
   useWidgetForm,
@@ -36,7 +36,7 @@ export function SubmitButtonWidget<
   TSchemaType extends "widget",
 >({
   field,
-}: ReactWidgetProps<
+}: ReactStaticWidgetProps<
   TEndpoint,
   TUsage,
   SubmitButtonWidgetConfig<TKey, TUsage, TSchemaType>
@@ -81,7 +81,7 @@ export function SubmitButtonWidget<
       type="button"
       onClick={(): void => {
         if (form && onSubmit) {
-          void form.handleSubmit(onSubmit)();
+          form.handleSubmit(onSubmit)();
         }
       }}
       disabled={isSubmitting}

@@ -5,8 +5,6 @@
 
 import { z } from "zod";
 
-import characterDefinitions from "@/app/api/[locale]/agent/chat/characters/[id]/definition";
-import charactersDefinitions from "@/app/api/[locale]/agent/chat/characters/definition";
 import {
   TtsVoiceDB,
   TtsVoiceOptions,
@@ -15,18 +13,16 @@ import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
+  customWidgetObject,
   deleteButton,
   navigateButtonField,
-  submitButton,
-  widgetField,
-  widgetObjectField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
-import {
   objectField,
   requestField,
   requestUrlPathParamsField,
-  requestUrlPathParamsResponseField,
   responseField,
+  submitButton,
+  widgetField,
+  widgetObjectField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -38,7 +34,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { modelSelectionSchemaWithCharacter } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type {
   FiltersModelSelection,
@@ -51,6 +46,7 @@ import {
   PriceLevel,
   SpeedLevel,
 } from "../../characters/enum";
+import { FavoriteEditContainer, FavoriteViewContainer } from "./widgets";
 
 /**
  * Delete Favorite Endpoint (DELETE)
@@ -74,6 +70,29 @@ const { DELETE } = createEndpoint({
         const { apiClient } =
           await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
         const favoritesDefinition = await import("../definition");
+        const charactersDefinition =
+          await import("../../characters/definition");
+
+        // Find the characterId from the deleted favorite
+        let deletedCharacterId: string | null = null;
+
+        // Get the favorite from the list before removing it
+        apiClient.updateEndpointData(
+          favoritesDefinition.default.GET,
+          data.logger,
+          (oldData) => {
+            if (oldData?.success) {
+              const deletedFavorite = oldData.data.favoritesList.find(
+                (fav) => fav.id === data.pathParams.id,
+              );
+              if (deletedFavorite) {
+                deletedCharacterId = deletedFavorite.characterId;
+              }
+            }
+            return oldData;
+          },
+          undefined,
+        );
 
         // Optimistically remove the deleted favorite from the list
         apiClient.updateEndpointData(
@@ -95,6 +114,34 @@ const { DELETE } = createEndpoint({
           },
           undefined,
         );
+
+        // Optimistically update characters list addedToFav if we found the characterId
+        if (deletedCharacterId) {
+          apiClient.updateEndpointData(
+            charactersDefinition.default.GET,
+            data.logger,
+            (oldData) => {
+              if (!oldData?.success) {
+                return oldData;
+              }
+
+              return {
+                success: true,
+                data: {
+                  sections: oldData.data.sections.map((section) => ({
+                    ...section,
+                    characters: section.characters.map((char) =>
+                      char.id === deletedCharacterId
+                        ? { ...char, addedToFav: false }
+                        : char,
+                    ),
+                  })),
+                },
+              };
+            },
+            undefined,
+          );
+        }
       },
     },
   },
@@ -253,20 +300,19 @@ const { PATCH } = createEndpoint({
         const favoritesDefinition = await import("../definition");
         const { ChatFavoritesRepositoryClient } =
           await import("../repository-client");
-        const { ChatSettingsRepositoryClient } =
-          await import("../../settings/repository-client");
-
-        // Get active favorite ID for badge computation
-        const settings = ChatSettingsRepositoryClient.loadLocalSettings();
-        const activeFavoriteId = settings.activeFavoriteId;
 
         // Load the updated favorite config from localStorage for cache updates
         const updatedConfig = ChatFavoritesRepositoryClient.loadLocalFavorite(
           data.pathParams.id,
         );
-        const enrichedFavorite = updatedConfig
-          ? ChatFavoritesRepositoryClient.enrichLocalFavorite(updatedConfig)
-          : null;
+
+        if (!updatedConfig) {
+          // Config not found - skip cache update, server will handle it
+          data.logger.error("Favorite config not found in localStorage", {
+            id: data.pathParams.id,
+          });
+          return;
+        }
 
         // Optimistically update the favorite in the list with proper recomputation
         apiClient.updateEndpointData(
@@ -285,18 +331,33 @@ const { PATCH } = createEndpoint({
                     return fav;
                   }
 
-                  // Load the updated favorite config from localStorage
-                  const updatedConfig =
-                    ChatFavoritesRepositoryClient.loadLocalFavorite(fav.id);
-                  if (!updatedConfig) {
-                    return fav;
-                  }
+                  // For PATCH, character display fields (name/tagline/description) are widget-only
+                  // and not in the request. Keep them from the existing favorite card.
+                  // Only update icon (from request) and modelSelection (from updatedConfig).
+                  const characterIcon = data.requestData.icon ?? null;
 
-                  // Recompute display fields with proper model selection and icon
-                  return ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
-                    updatedConfig,
-                    activeFavoriteId,
-                  );
+                  // Extract character info from existing favorite
+                  const characterName = data.requestData.name ?? null;
+                  const characterTagline = data.requestData.tagline ?? null;
+                  const characterDescription =
+                    data.requestData.description ?? null;
+                  const characterModelSelection =
+                    data.requestData.modelSelection.characterModelSelection;
+
+                  // Recompute display fields with updated config
+                  const updatedFavorite =
+                    ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
+                      updatedConfig,
+                      characterModelSelection,
+                      characterIcon,
+                      characterName,
+                      characterTagline,
+                      characterDescription,
+                      null,
+                    );
+
+                  updatedFavorite.activeBadge = fav.activeBadge;
+                  return updatedFavorite;
                 }),
               },
             };
@@ -306,83 +367,40 @@ const { PATCH } = createEndpoint({
 
         // Also optimistically update the single favorite GET endpoint cache
         // This ensures that navigating back to edit shows the updated data
-        if (enrichedFavorite) {
-          const favoriteByIdDefinition = await import("./definition");
-          apiClient.updateEndpointData(
-            favoriteByIdDefinition.default.GET,
-            data.logger,
-            () => {
-              return {
-                success: true,
-                data: enrichedFavorite,
-              };
-            },
-            { id: data.pathParams.id },
-          );
-        }
+        const favoriteByIdDefinition = await import("./definition");
+        apiClient.updateEndpointData(
+          favoriteByIdDefinition.default.GET,
+          data.logger,
+          (prevData) => {
+            if (!prevData?.success) {
+              return prevData;
+            }
+            return {
+              success: true,
+              data: {
+                ...prevData.data,
+                characterIcon: data.requestData.icon ?? prevData.data.icon,
+                characterName: data.requestData.name ?? prevData.data.name,
+                characterTagline:
+                  data.requestData.tagline ?? prevData.data.tagline,
+                characterDescription:
+                  data.requestData.description ?? prevData.data.description,
+                voice: data.requestData.voice ?? null,
+                modelSelection: data.requestData.modelSelection,
+              },
+            };
+          },
+          { id: data.pathParams.id },
+        );
       },
     },
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-      noCard: true,
-    },
-    { request: "data&urlPathParams", response: true },
-    {
-      // Navigation and action buttons
-      topActions: widgetObjectField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.INLINE,
-          gap: "2",
-          noCard: true,
-        },
-        { request: "data", response: true },
-        {
-          backButton: backButton({
-            label:
-              "app.api.agent.chat.favorites.id.patch.backButton.label" as const,
-            icon: "arrow-left",
-            variant: "outline",
-            usage: { request: "data", response: true },
-          }),
-          deleteButton: deleteButton({
-            label:
-              "app.api.agent.chat.favorites.id.patch.deleteButton.label" as const,
-            targetEndpoint: DELETE,
-            extractParams: (source) => ({
-              urlPathParams: {
-                id: (source.urlPathParams as { id: string }).id,
-              },
-            }),
-            icon: "trash",
-            variant: "destructive",
-            className: "ml-auto",
-            popNavigationOnSuccess: 2, // Pop twice: edit -> details -> list
-            usage: { request: "data", response: true },
-          }),
-          submitButton: widgetField({
-            type: WidgetType.SUBMIT_BUTTON,
-            text: "app.api.agent.chat.favorites.id.patch.submitButton.label" as const,
-            loadingText:
-              "app.api.agent.chat.favorites.id.patch.submitButton.loadingText" as const,
-            icon: "save",
-            variant: "primary",
-            usage: { request: "data", response: true },
-          }),
-        },
-      ),
-
-      // === RESPONSE ===
-      success: responseField({
-        type: WidgetType.ALERT,
-        schema: z.string() as z.ZodType<TranslationKey>,
-      }),
-
-      // === REQUEST (URL Path Params) ===
+  fields: customWidgetObject({
+    render: FavoriteEditContainer,
+    usage: { request: "data&urlPathParams", response: true } as const,
+    children: {
+      // === URL PARAMETERS ===
       id: requestUrlPathParamsField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -391,7 +409,30 @@ const { PATCH } = createEndpoint({
         schema: z.string().uuid(),
       }),
 
-      // === REQUEST (Data) ===
+      // Delete button configuration
+      deleteButton: deleteButton({
+        label:
+          "app.api.agent.chat.favorites.id.patch.deleteButton.label" as const,
+        targetEndpoint: DELETE,
+        extractParams: (source) => ({
+          urlPathParams: {
+            id: (source.urlPathParams as { id: string }).id,
+          },
+        }),
+        icon: "trash",
+        variant: "destructive",
+        className: "ml-auto",
+        popNavigationOnSuccess: 2,
+        usage: { request: "data", response: true } as const,
+      }),
+
+      // === RESPONSE ===
+      success: responseField({
+        type: WidgetType.ALERT,
+        schema: z.string(),
+      }),
+
+      // === REQUEST ===
       characterId: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -401,125 +442,36 @@ const { PATCH } = createEndpoint({
         hidden: true,
         schema: z.string().optional(),
       }),
-      character: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.STACKED,
-          gap: "2",
-          className: "group",
-        },
-        { request: "data" },
-        {
-          info: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              layoutType: LayoutType.INLINE,
-              gap: "4",
-              alignItems: "start",
-              noCard: true,
-            },
-            { request: "data" },
-            {
-              icon: requestField({
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.ICON,
-                schema: iconSchema,
-                theme: {
-                  style: "none",
-                },
-              }),
-              info: widgetObjectField(
-                {
-                  type: WidgetType.CONTAINER,
-                  layoutType: LayoutType.STACKED,
-                  gap: "2",
-                  theme: {},
-                  noCard: true,
-                },
-                { request: "data" },
-                {
-                  titleRow: widgetObjectField(
-                    {
-                      type: WidgetType.CONTAINER,
-                      layoutType: LayoutType.INLINE,
-                      gap: "2",
-                      noCard: true,
-                    },
-                    { request: "data" },
-                    {
-                      name: widgetField({
-                        type: WidgetType.TEXT,
-                        size: "base",
-                        emphasis: "bold",
-                        usage: { request: "data" },
-                      }),
-                      tagline: widgetField({
-                        type: WidgetType.TEXT,
-                        size: "sm",
-                        variant: "muted",
-                        usage: { request: "data" },
-                      }),
-                    },
-                  ),
-                  description: widgetField({
-                    type: WidgetType.TEXT,
-                    size: "xs",
-                    variant: "muted",
-                    usage: { request: "data" },
-                  }),
-                },
-              ),
-            },
-          ),
-          separator: widgetField({
-            type: WidgetType.SEPARATOR,
-            spacingTop: SpacingSize.RELAXED,
-            spacingBottom: SpacingSize.RELAXED,
-            usage: { request: "data" },
-          }),
 
-          actions: widgetObjectField(
-            {
-              type: WidgetType.CONTAINER,
-              layoutType: LayoutType.INLINE,
-              gap: "2",
-              noCard: true,
-            },
-            { request: "data" },
-            {
-              changeCharacter: navigateButtonField({
-                label:
-                  "app.api.agent.chat.favorites.id.patch.changeCharacter.label" as const,
-                icon: "refresh-cw",
-                variant: "ghost",
-                size: "sm",
-                targetEndpoint: charactersDefinitions.GET,
-                extractParams: () => ({}),
-                usage: { request: "data" },
-              }),
-              modifyCharacter: navigateButtonField({
-                label:
-                  "app.api.agent.chat.favorites.id.patch.modifyCharacter.label" as const,
-                icon: "pencil",
-                variant: "ghost",
-                size: "sm",
-                targetEndpoint: characterDefinitions.PATCH,
-                extractParams: (source) => ({
-                  urlPathParams: {
-                    id: String(
-                      (source.responseData as { characterId: string })
-                        .characterId,
-                    ),
-                  },
-                }),
-                prefillFromGet: true,
-                getEndpoint: characterDefinitions.GET,
-                usage: { request: "data" },
-              }),
-            },
-          ),
-        },
-      ),
+      icon: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.ICON,
+        schema: iconSchema,
+        theme: {
+          style: "none",
+        } as const,
+      }),
+
+      name: requestField({
+        type: WidgetType.TEXT,
+        schema: z.string(),
+        size: "base",
+        emphasis: "bold",
+      }),
+
+      tagline: requestField({
+        type: WidgetType.TEXT,
+        schema: z.string(),
+        size: "sm",
+        variant: "muted",
+      }),
+
+      description: requestField({
+        type: WidgetType.TEXT,
+        schema: z.string(),
+        size: "xs",
+        variant: "muted",
+      }),
 
       voice: requestField({
         type: WidgetType.FORM_FIELD,
@@ -533,18 +485,11 @@ const { PATCH } = createEndpoint({
       }),
 
       modelSelection: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.MODEL_SELECTION,
-        label:
-          "app.api.agent.chat.favorites.post.modelSelection.title" as const,
-        description:
-          "app.api.agent.chat.favorites.post.modelSelection.description" as const,
-        includeCharacterBased: true,
-        columns: 12,
+        type: WidgetType.CUSTOM_WIDGET,
         schema: modelSelectionSchemaWithCharacter,
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
@@ -613,12 +558,11 @@ const { PATCH } = createEndpoint({
     requests: {
       update: {
         characterId: "thea",
-        character: {
-          info: {
-            icon: "sun",
-          },
-        },
-
+        icon: "sun" as const,
+        name: "Thea",
+        tagline: "AI Assistant",
+        description: "A helpful AI assistant",
+        voice: "app.api.agent.textToSpeech.voices.FEMALE" as const,
         modelSelection: {
           currentSelection: {
             selectionType: ModelSelectionType.FILTERS,
@@ -663,7 +607,7 @@ const { PATCH } = createEndpoint({
     },
     responses: {
       update: {
-        success: true,
+        success: "app.api.agent.chat.favorites.id.patch.success.title",
       },
     },
     urlPathParams: {
@@ -687,244 +631,108 @@ const { GET } = createEndpoint({
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.favorites" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.agent.chat.favorites.id.get.container.title" as const,
-      layoutType: LayoutType.STACKED,
-      noCard: true,
-    },
-    { request: "urlPathParams", response: true },
-    {
-      // === REQUEST (URL Path Params) + RESPONSE ===
-      id: requestUrlPathParamsResponseField({
+  fields: customWidgetObject({
+    render: FavoriteViewContainer,
+    usage: { request: "urlPathParams", response: true } as const,
+    children: {
+      // === URL PARAMETERS ===
+      id: requestUrlPathParamsField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label:
           "app.api.agent.chat.favorites.get.response.favorite.id.content" as const,
         schema: z.string().uuid(),
+        hidden: true,
       }),
+
+      // Edit button configuration
+      editButton: navigateButtonField({
+        targetEndpoint: PATCH,
+        extractParams: (source) => ({
+          urlPathParams: {
+            id: (source.urlPathParams as { id: string }).id,
+          },
+        }),
+        prefillFromGet: true,
+        label: "app.api.agent.chat.favorites.id.get.editButton.label" as const,
+        icon: "pencil",
+        variant: "default",
+        className: "ml-auto",
+        usage: { response: true } as const,
+      }),
+
+      // Delete button configuration
+      deleteButton: deleteButton({
+        targetEndpoint: DELETE,
+        extractParams: (source) => ({
+          urlPathParams: {
+            id: (source.urlPathParams as { id: string }).id,
+          },
+        }),
+        label:
+          "app.api.agent.chat.favorites.id.get.deleteButton.label" as const,
+        icon: "trash",
+        variant: "destructive",
+        popNavigationOnSuccess: 1,
+        usage: { response: true } as const,
+      }),
+
+      // Separator
+      separator: widgetField({
+        type: WidgetType.SEPARATOR,
+        spacingTop: SpacingSize.RELAXED,
+        spacingBottom: SpacingSize.RELAXED,
+        usage: { response: true } as const,
+      }),
+
+      // === FLAT RESPONSE FIELDS ===
       characterId: responseField({
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.favorites.id.get.response.characterId.content" as const,
+        schema: z.string(),
+        hidden: true,
+      }),
+
+      icon: responseField({
+        type: WidgetType.ICON,
+        containerSize: "lg",
+        iconSize: "lg",
+        borderRadius: "lg",
+        schema: iconSchema,
+      }),
+
+      name: responseField({
+        type: WidgetType.TEXT,
+        size: "base",
+        emphasis: "bold",
         schema: z.string(),
       }),
-      character: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.STACKED,
-          gap: "2",
-          className: "group",
-        },
-        { response: true },
-        {
-          info: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              layoutType: LayoutType.INLINE,
-              gap: "4",
-              alignItems: "start",
-              noCard: true,
-            },
-            { response: true },
-            {
-              icon: responseField({
-                type: WidgetType.ICON,
-                containerSize: "lg",
-                iconSize: "lg",
-                borderRadius: "lg",
-                schema: iconSchema,
-              }),
-              info: objectField(
-                {
-                  type: WidgetType.CONTAINER,
-                  layoutType: LayoutType.STACKED,
-                  gap: "2",
-                  noCard: true,
-                },
-                { response: true },
-                {
-                  titleRow: objectField(
-                    {
-                      type: WidgetType.CONTAINER,
-                      layoutType: LayoutType.INLINE,
-                      gap: "2",
-                      noCard: true,
-                    },
-                    { response: true },
-                    {
-                      name: responseField({
-                        type: WidgetType.TEXT,
-                        size: "base",
-                        emphasis: "bold",
-                        schema: z.string() as z.ZodType<TranslationKey>,
-                      }),
-                      tagline: responseField({
-                        type: WidgetType.TEXT,
-                        size: "sm",
-                        variant: "muted",
-                        schema: z.string() as z.ZodType<TranslationKey>,
-                      }),
-                    },
-                  ),
-                  description: responseField({
-                    type: WidgetType.TEXT,
-                    size: "xs",
-                    variant: "muted",
-                    schema: z.string() as z.ZodType<TranslationKey>,
-                  }),
-                },
-              ),
-            },
-          ),
-          separator: widgetField({
-            type: WidgetType.SEPARATOR,
-            spacingTop: SpacingSize.RELAXED,
-            spacingBottom: SpacingSize.RELAXED,
-            usage: { response: true },
-          }),
 
-          actions: widgetObjectField(
-            {
-              type: WidgetType.CONTAINER,
-              layoutType: LayoutType.INLINE,
-              gap: "2",
-              noCard: true,
-            },
-            { response: true },
-            {
-              changeCharacter: navigateButtonField({
-                icon: "pencil",
-                variant: "ghost",
-                size: "sm",
-                targetEndpoint: charactersDefinitions.GET,
-                extractParams: () => ({}),
-                usage: { response: true },
-              }),
-              modifyCharacter: navigateButtonField({
-                icon: "trash",
-                variant: "ghost",
-                size: "sm",
-                targetEndpoint: characterDefinitions.PATCH,
-                extractParams: (source) => ({
-                  urlPathParams: {
-                    id: String(
-                      (source.responseData as { characterId: string })
-                        .characterId,
-                    ),
-                  },
-                }),
-                prefillFromGet: true,
-                getEndpoint: characterDefinitions.GET,
-                usage: { response: true },
-              }),
-            },
-          ),
-        },
-      ),
+      tagline: responseField({
+        type: WidgetType.TEXT,
+        size: "sm",
+        variant: "muted",
+        schema: z.string(),
+      }),
 
-      customName: responseField({
+      description: responseField({
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.favorites.id.get.response.customName.content" as const,
-        hidden: true,
-        schema: z.string().nullable(),
+        size: "xs",
+        variant: "muted",
+        schema: z.string(),
       }),
-      customIcon: responseField({
-        type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.favorites.id.get.response.customIcon.content" as const,
-        schema: iconSchema.nullable().optional(),
-      }),
+
       voice: responseField({
-        type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.favorites.id.get.response.voice.content" as const,
+        type: WidgetType.BADGE,
+        variant: "default",
         schema: z.enum(TtsVoiceDB).nullable(),
       }),
+
       modelSelection: responseField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.MODEL_SELECTION,
-        label:
-          "app.api.agent.chat.favorites.id.get.response.modelSelection.title" as const,
-        includeCharacterBased: true,
-        columns: 12,
+        type: WidgetType.CUSTOM_WIDGET,
         schema: modelSelectionSchemaWithCharacter,
       }),
-
-      color: responseField({
-        type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.favorites.id.get.response.color.content" as const,
-        schema: z.string().nullable(),
-      }),
-      position: responseField({
-        type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.favorites.id.get.response.position.content" as const,
-        hidden: true,
-        schema: z.number().int(),
-      }),
-      useCount: responseField({
-        type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.favorites.id.get.response.useCount.content" as const,
-        schema: z.number(),
-      }),
-      // Navigation and action buttons
-      buttons: widgetObjectField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.INLINE,
-          gap: "2",
-          noCard: true,
-        },
-        { response: true },
-        {
-          // Back button (left side)
-          backButton: backButton({
-            icon: "arrow-left",
-            variant: "outline",
-            usage: { response: true },
-          }),
-
-          // Edit button - uses self-referencing GET endpoint for prefill
-          editButton: navigateButtonField({
-            targetEndpoint: PATCH,
-            extractParams: (source) => ({
-              urlPathParams: {
-                id: (source.responseData as { id: string }).id,
-              },
-            }),
-            prefillFromGet: true,
-            label:
-              "app.api.agent.chat.favorites.id.get.editButton.label" as const,
-            icon: "pencil",
-            variant: "default",
-            className: "ml-auto",
-            usage: { response: true },
-          }),
-
-          // Delete button
-          deleteButton: deleteButton({
-            targetEndpoint: DELETE,
-            extractParams: (source) => ({
-              urlPathParams: {
-                id: (source.responseData as { id: string }).id,
-              },
-            }),
-            label:
-              "app.api.agent.chat.favorites.id.get.deleteButton.label" as const,
-            icon: "trash",
-            variant: "destructive",
-            popNavigationOnSuccess: 1, // Pop once: details -> list
-            usage: { response: true },
-          }),
-        },
-      ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
@@ -991,24 +799,13 @@ const { GET } = createEndpoint({
   examples: {
     responses: {
       default: {
-        id: "550e8400-e29b-41d4-a716-446655440000",
         characterId: "thea",
-        character: {
-          info: {
-            icon: "sun",
-            info: {
-              titleRow: {
-                name: "app.api.agent.chat.characters.characters.thea.name" as const,
-                tagline:
-                  "app.api.agent.chat.characters.characters.thea.tagline" as const,
-              },
-              description:
-                "app.api.agent.chat.characters.characters.thea.description" as const,
-            },
-          },
-        },
-        customName: "Thea (Smart)",
-        customIcon: null,
+        icon: "sun" as const,
+        name: "app.api.agent.chat.characters.characters.thea.name" as const,
+        tagline:
+          "app.api.agent.chat.characters.characters.thea.tagline" as const,
+        description:
+          "app.api.agent.chat.characters.characters.thea.description" as const,
         voice: null,
         modelSelection: {
           currentSelection: {
@@ -1030,29 +827,7 @@ const { GET } = createEndpoint({
               max: SpeedLevel.THOROUGH,
             },
           },
-          characterModelSelection: {
-            selectionType: ModelSelectionType.FILTERS,
-            intelligenceRange: {
-              min: IntelligenceLevel.SMART,
-              max: IntelligenceLevel.BRILLIANT,
-            },
-            priceRange: {
-              min: PriceLevel.CHEAP,
-              max: PriceLevel.STANDARD,
-            },
-            contentRange: {
-              min: ContentLevel.MAINSTREAM,
-              max: ContentLevel.UNCENSORED,
-            },
-            speedRange: {
-              min: SpeedLevel.FAST,
-              max: SpeedLevel.THOROUGH,
-            },
-          },
         },
-        color: null,
-        position: 0,
-        useCount: 50,
       },
     },
     urlPathParams: {

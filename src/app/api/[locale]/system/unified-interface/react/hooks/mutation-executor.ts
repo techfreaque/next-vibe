@@ -12,6 +12,7 @@ import { z } from "zod";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Methods as MethodsEnum } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { EndpointErrorTypes } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -62,20 +63,20 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
   pathParams,
   locale,
   options = {},
+  user,
 }: {
   endpoint: TEndpoint;
   logger: EndpointLogger;
   requestData: TEndpoint["types"]["RequestOutput"];
   pathParams: TEndpoint["types"]["UrlVariablesOutput"];
   locale: CountryLanguage;
+  user: JwtPayloadType;
   options?: MutationExecutorOptions<
     TEndpoint["types"]["RequestOutput"],
     TEndpoint["types"]["ResponseOutput"],
     TEndpoint["types"]["UrlVariablesOutput"]
   >;
 }): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
-  let requestData = initialRequestData;
-
   // Validate request data against schema
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Schema type cast requires 'unknown' for runtime type compatibility
   const requestSchema = endpoint.requestSchema as unknown as z.ZodTypeAny;
@@ -86,6 +87,8 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
   const isEmptyObjectSchema =
     requestSchema instanceof z.ZodObject &&
     Object.keys(requestSchema.shape).length === 0;
+
+  let requestData = initialRequestData;
 
   // Handle schema conversions
   if (
@@ -170,7 +173,16 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
 
   try {
     // Make API call
-    const response = await callApi(endpoint, endpointUrl, body, logger);
+    const response = await callApi(
+      endpoint,
+      endpointUrl,
+      body,
+      logger,
+      user,
+      locale,
+      requestData,
+      pathParams,
+    );
 
     // Handle success callback
     if (response.success && options.onSuccess) {

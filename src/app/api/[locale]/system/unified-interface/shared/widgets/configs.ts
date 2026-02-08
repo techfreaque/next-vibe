@@ -15,24 +15,16 @@ import type {
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
 } from "../../unified-ui/widgets/_shared/types";
-import type { AccordionWidgetConfig } from "../../unified-ui/widgets/containers/accordion/types";
 import type { CodeOutputWidgetConfig } from "../../unified-ui/widgets/containers/code-output/types";
 import type {
   ContainerUnionWidgetConfig,
   ContainerWidgetConfig,
 } from "../../unified-ui/widgets/containers/container/types";
-import type { CreditTransactionCardWidgetConfig } from "../../unified-ui/widgets/containers/credit-transaction-card/types";
-import type { CreditTransactionListWidgetConfig } from "../../unified-ui/widgets/containers/credit-transaction-list/types";
-import type { DataCardsWidgetConfig } from "../../unified-ui/widgets/containers/data-cards/types";
-import type { DataGridWidgetConfig } from "../../unified-ui/widgets/containers/data-grid/types";
-import type { DataListWidgetConfig } from "../../unified-ui/widgets/containers/data-list/types";
-import type { DataTableWidgetConfig } from "../../unified-ui/widgets/containers/data-table/types";
-import type { GroupedListWidgetConfig } from "../../unified-ui/widgets/containers/grouped-list/types";
-import type { LinkCardWidgetConfig } from "../../unified-ui/widgets/containers/link-card/types";
-import type { MetricCardWidgetConfig } from "../../unified-ui/widgets/containers/metric-card/types";
+import type {
+  CustomWidgetObjectConfig,
+  CustomWidgetPrimitiveConfig,
+} from "../../unified-ui/widgets/containers/custom/types";
 import type { PaginationWidgetConfig } from "../../unified-ui/widgets/containers/pagination/types";
-import type { SectionWidgetConfig } from "../../unified-ui/widgets/containers/section/types";
-import type { TabsWidgetConfig } from "../../unified-ui/widgets/containers/tabs/types";
 import type { AlertWidgetConfig } from "../../unified-ui/widgets/display-only/alert/types";
 import type { AvatarWidgetConfig } from "../../unified-ui/widgets/display-only/avatar/types";
 import type { BadgeWidgetConfig } from "../../unified-ui/widgets/display-only/badge/types";
@@ -48,7 +40,6 @@ import type { LinkWidgetConfig } from "../../unified-ui/widgets/display-only/lin
 import type { LoadingWidgetConfig } from "../../unified-ui/widgets/display-only/loading/types";
 import type { MarkdownWidgetConfig } from "../../unified-ui/widgets/display-only/markdown/types";
 import type { MetadataWidgetConfig } from "../../unified-ui/widgets/display-only/metadata/types";
-import type { PasswordStrengthWidgetConfig } from "../../unified-ui/widgets/display-only/password-strength/types";
 import type { SeparatorWidgetConfig } from "../../unified-ui/widgets/display-only/separator/types";
 import type { StatWidgetConfig } from "../../unified-ui/widgets/display-only/stat/types";
 import type { StatusIndicatorWidgetConfig } from "../../unified-ui/widgets/display-only/status-indicator/types";
@@ -87,7 +78,6 @@ import type { TimezoneFieldWidgetConfig } from "../../unified-ui/widgets/form-fi
 import type { UrlFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/url-field/types";
 import type { UuidFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/uuid-field/types";
 import type { ButtonWidgetConfig } from "../../unified-ui/widgets/interactive/button/types";
-import type { DragHandleWidgetConfig } from "../../unified-ui/widgets/interactive/drag-handle/types";
 import type { FormAlertWidgetConfig } from "../../unified-ui/widgets/interactive/form-alert/types";
 import type { NavigateButtonWidgetConfig } from "../../unified-ui/widgets/interactive/navigate-button/types";
 import type { SubmitButtonWidgetConfig } from "../../unified-ui/widgets/interactive/submit-button/types";
@@ -309,23 +299,8 @@ export type ObjectWidgetConfig<
   >,
 > =
   | ContainerWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
-  | AccordionWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
-  | SectionWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
-  | TabsWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
-  | DataCardsWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
-  | DataListWidgetConfig<TKey, TUsage, TSchemaType, TChildren, undefined>
-  | LinkCardWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
-  | MetricCardWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
-  | CreditTransactionCardWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
-  | DataTableWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
-  | PaginationWidgetConfig<
-      TKey,
-      TUsage,
-      TSchemaType,
-      // @ts-expect-error - TChildren is only valid for object widgets
-      TChildren
-    >
-  | DataGridWidgetConfig<TKey, TUsage, TSchemaType, TChildren>;
+  | CustomWidgetObjectConfig<TKey, TUsage, TSchemaType, TChildren>
+  | PaginationWidgetConfig;
 
 /**
  * Widget configs that work with array data
@@ -338,19 +313,8 @@ export type ArrayWidgetConfig<
   TKey extends string,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "array" | "array-optional",
-  // oxlint-disable-next-line typescript/no-explicit-any
   TChild extends ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>,
-> =
-  | ContainerWidgetConfig<TKey, TUsage, TSchemaType, TChild>
-  | AccordionWidgetConfig<TKey, TUsage, TSchemaType, TChild>
-  // oxlint-disable-next-line typescript/no-explicit-any -- union membership: TTargetEndpoint checked at widget constraint level
-  | DataListWidgetConfig<TKey, TUsage, TSchemaType, TChild, undefined>
-  // oxlint-disable-next-line typescript/no-explicit-any -- union membership: TItemData checked at widget constraint level
-  | DataCardsWidgetConfig<TKey, TUsage, TSchemaType, TChild>
-  | DataTableWidgetConfig<TKey, TUsage, TSchemaType, TChild>
-  | DataGridWidgetConfig<TKey, TUsage, TSchemaType, TChild>
-  | GroupedListWidgetConfig<TKey, TUsage, TSchemaType, TChild>
-  | CreditTransactionListWidgetConfig<TKey, TUsage, TSchemaType, TChild>;
+> = ContainerWidgetConfig<TKey, TUsage, TSchemaType, TChild>;
 
 export type DisplayOnlyWidgetConfig<
   TKey extends string,
@@ -359,16 +323,16 @@ export type DisplayOnlyWidgetConfig<
 > =
   | SeparatorWidgetConfig<TKey, TUsage, TSchemaType>
   | ButtonWidgetConfig<TKey, TUsage, TSchemaType>
-  | DragHandleWidgetConfig<TUsage, TSchemaType>
   | SubmitButtonWidgetConfig<TKey, TUsage, TSchemaType>
   | NavigateButtonWidgetConfig<
       TKey,
       TUsage,
       TSchemaType,
+      CreateApiEndpointAny | undefined,
       CreateApiEndpointAny | undefined
     >
+  | CustomWidgetPrimitiveConfig<TUsage, TSchemaType, never>
   | FormAlertWidgetConfig<TUsage, TSchemaType>
-  | PasswordStrengthWidgetConfig<TUsage, TSchemaType, CreateApiEndpointAny>
   | TextWidgetConfig<TKey, never, TUsage, TSchemaType>
   | TitleWidgetConfig<TKey, never, TUsage, TSchemaType>
   | LoadingWidgetConfig<TKey, TUsage, TSchemaType>
@@ -397,6 +361,7 @@ export type RequestResponseDisplayWidgetConfig<
       TUsage,
       TSchemaType
     >
+  | CustomWidgetPrimitiveConfig<TUsage, TSchemaType, TSchema>
   | ChartWidgetConfig<
       TKey,
       // @ts-expect-error - TSchema constraint mismatch with ChartWidgetSchema
@@ -429,6 +394,13 @@ export type RequestResponseDisplayWidgetConfig<
       TSchema,
       TUsage,
       TSchemaType
+    >
+  | AvatarWidgetConfig<
+      TKey,
+      TUsage,
+      TSchemaType,
+      // @ts-expect-error - TSchema constraint mismatch with AvatarWidgetSchema
+      TSchema
     >
   | BadgeWidgetConfig<
       TKey,
@@ -525,7 +497,7 @@ export type UnifiedField<
   TKey extends string,
   TSchema extends z.ZodTypeAny,
   TUsage extends FieldUsageConfig,
-  TChildren extends AnyChildrenConstrain<TKey, TUsage>,
+  TChildren extends AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>,
 > =
   | FormFieldWidgetConfig<TKey, TSchema, TUsage>
   | ObjectWidgetConfig<

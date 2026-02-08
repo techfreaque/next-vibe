@@ -13,8 +13,7 @@ import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interfa
 import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type {
-  ModelSelectionFieldWidgetConfig,
-  ModelSelectionFieldWidgetConfigSimple,
+  ModelSelectionFieldWidgetConfigAny,
   ModelSelectionSimple,
   ModelSelectionWithCharacter,
 } from "./types";
@@ -30,8 +29,7 @@ export function ModelSelectionFieldWidgetInk<
 }: InkWidgetProps<
   TEndpoint,
   TUsage,
-  | ModelSelectionFieldWidgetConfig<TKey, TUsage>
-  | ModelSelectionFieldWidgetConfigSimple<TKey, TUsage>
+  ModelSelectionFieldWidgetConfigAny<TKey, TUsage>
 >): JSX.Element {
   const t = useInkWidgetTranslation();
 

@@ -20,12 +20,12 @@ import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import {
   ProductIds,
   productsRepository,
-  TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/products/repository-client";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { TOTAL_MODEL_COUNT } from "../../agent/models/models";
 import type { JwtPayloadType } from "../../user/auth/types";
 
 /**

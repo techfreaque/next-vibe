@@ -23,6 +23,7 @@ import type React from "react";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -34,7 +35,6 @@ interface FeatureItem {
 
 interface FeaturesProps {
   locale: CountryLanguage;
-  modelCount: number;
   subPrice: number;
   subCredits: number;
   subCurrency: string;
@@ -51,7 +51,6 @@ interface FeaturesProps {
  */
 export default function Features({
   locale,
-  modelCount,
   subPrice,
   subCredits,
   subCurrency,
@@ -72,7 +71,7 @@ export default function Features({
       description: t(
         "app.story._components.home.features.contentCreation.description",
         {
-          modelCount,
+          modelCount: TOTAL_MODEL_COUNT,
         },
       ),
     },
@@ -102,7 +101,7 @@ export default function Features({
     {
       icon: <TrendingUp className="h-10 w-10 text-cyan-500" />,
       title: t("app.story._components.home.features.growth.title", {
-        modelCount,
+        modelCount: TOTAL_MODEL_COUNT,
       }),
       description: t("app.story._components.home.features.growth.description"),
     },

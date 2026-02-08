@@ -132,7 +132,7 @@ const { GET } = createEndpoint({
       // Response fields
       tasks: responseArrayField(
         {
-          type: WidgetType.DATA_TABLE,
+          type: WidgetType.CONTAINER,
         },
         objectField(
           {

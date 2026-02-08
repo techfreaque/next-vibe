@@ -114,7 +114,7 @@ const { POST } = createEndpoint({
       }),
       results: responseArrayField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           title:
             "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.response.results",
         },

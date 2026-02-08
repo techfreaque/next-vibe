@@ -142,7 +142,7 @@ const { POST } = createEndpoint({
 
       errors: responseArrayField(
         {
-          type: WidgetType.GROUPED_LIST,
+          type: WidgetType.CONTAINER,
           columns: 12,
         },
         objectField(

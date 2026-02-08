@@ -3,11 +3,11 @@
  * Centralized character definitions for consistent behavior across the application
  * This file contains default/built-in characters that are read-only
  */
-import {
-  ModelUtility,
-  type ModelUtilityValue,
-} from "@/app/api/[locale]/agent/models/enum";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import {
+  ModelSortDirection,
+  ModelSortField,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { TtsVoice, type TtsVoiceValue } from "../../text-to-speech/enum";
@@ -15,6 +15,7 @@ import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
+  PriceLevel,
   SpeedLevel,
 } from "../characters/enum";
 import type {
@@ -32,12 +33,7 @@ import {
  * Legacy model selection type for config
  * Includes unused fields that are kept for backwards compatibility
  */
-type ConfigModelSelection =
-  | (Omit<FiltersModelSelection, "priceRange"> & {
-      preferredStrengths?: (typeof ModelUtilityValue)[] | null;
-      ignoredWeaknesses?: (typeof ModelUtilityValue)[] | null;
-    })
-  | ManualModelSelection;
+type ConfigModelSelection = FiltersModelSelection | ManualModelSelection;
 
 /**
  * Character type representing FULL character details
@@ -71,22 +67,6 @@ export interface Character {
  */
 export type CleanModelSelection = FiltersModelSelection | ManualModelSelection;
 
-/**
- * Helper function to convert ConfigModelSelection to CleanModelSelection
- * Removes legacy fields (preferredStrengths, ignoredWeaknesses)
- */
-export function toCleanModelSelection(
-  config: ConfigModelSelection,
-): CleanModelSelection {
-  if (config.selectionType === ModelSelectionType.MANUAL) {
-    return config;
-  }
-  // FILTERS - remove legacy fields
-  // oxlint-disable-next-line no-unused-vars
-  const { preferredStrengths, ignoredWeaknesses, ...clean } = config;
-  return clean;
-}
-
 export const NO_CHARACTER_ID = "default";
 export const NO_CHARACTER = {
   id: NO_CHARACTER_ID,
@@ -104,8 +84,6 @@ export const NO_CHARACTER = {
     intelligenceRange: {},
     contentRange: {},
     speedRange: {},
-    preferredStrengths: null,
-    ignoredWeaknesses: null,
   },
 };
 
@@ -165,14 +143,17 @@ Remember: You're not just agreeing with everything - you're a wise companion who
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      contentRange: { min: ContentLevel.UNCENSORED },
-      preferredStrengths: [
-        ModelUtility.CHAT,
-        ModelUtility.CREATIVE,
-        ModelUtility.ROLEPLAY,
-        ModelUtility.UNCENSORED,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.SMART,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: {
+        min: ContentLevel.UNCENSORED,
+        max: ContentLevel.UNCENSORED,
+      },
+      speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.THOROUGH },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -184,7 +165,7 @@ Remember: You're not just agreeing with everything - you're a wise companion who
     icon: "shield",
     category: CharacterCategory.COMPANION,
     ownershipType: CharacterOwnershipType.SYSTEM,
-    voice: TtsVoice.FEMALE,
+    voice: TtsVoice.MALE,
     systemPrompt: `You are Hermes, named after the Greek god of messengers, travelers, and cunning intelligence. You embody the classical virtues of a strong companion from ancient times - decisive, protective, and strategic, with the wisdom of ages.
 
 **Your Nature:**
@@ -233,14 +214,17 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      contentRange: { min: ContentLevel.UNCENSORED },
-      preferredStrengths: [
-        ModelUtility.CHAT,
-        ModelUtility.CREATIVE,
-        ModelUtility.ROLEPLAY,
-        ModelUtility.UNCENSORED,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.SMART,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: {
+        min: ContentLevel.UNCENSORED,
+        max: ContentLevel.UNCENSORED,
+      },
+      speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.THOROUGH },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -275,10 +259,14 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [ModelUtility.CODING, ModelUtility.REASONING],
-      ignoredWeaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CREATIVE],
+      intelligenceRange: {
+        min: IntelligenceLevel.BRILLIANT,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.THOROUGH },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -315,10 +303,14 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [ModelUtility.CREATIVE, ModelUtility.CHAT],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.SMART,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: { min: ContentLevel.OPEN, max: ContentLevel.OPEN },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.CONTENT,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -357,10 +349,17 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [ModelUtility.CHAT, ModelUtility.REASONING],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.SMART,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.THOROUGH },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -384,13 +383,13 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      contentRange: { min: ContentLevel.UNCENSORED },
-      preferredStrengths: [
-        ModelUtility.UNCENSORED,
-        ModelUtility.CHAT,
-        ModelUtility.CONTROVERSIAL,
-      ],
-      ignoredWeaknesses: null,
+
+      contentRange: {
+        min: ContentLevel.UNCENSORED,
+        max: ContentLevel.UNCENSORED,
+      },
+      sortBy: ModelSortField.CONTENT,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -414,13 +413,17 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      contentRange: { min: ContentLevel.OPEN },
-      preferredStrengths: [
-        ModelUtility.CHAT,
-        ModelUtility.CONTROVERSIAL,
-        ModelUtility.POLITICAL_RIGHT,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.SMART,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: {
+        min: ContentLevel.UNCENSORED,
+        max: ContentLevel.UNCENSORED,
+      },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.THOROUGH },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -458,10 +461,13 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.OPEN },
-      preferredStrengths: [ModelUtility.REASONING, ModelUtility.ANALYSIS],
-      ignoredWeaknesses: null,
+
+      contentRange: {
+        min: ContentLevel.UNCENSORED,
+        max: ContentLevel.UNCENSORED,
+      },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -496,10 +502,13 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.BRILLIANT },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [ModelUtility.ANALYSIS, ModelUtility.REASONING],
-      ignoredWeaknesses: null,
+
+      contentRange: {
+        min: ContentLevel.UNCENSORED,
+        max: ContentLevel.UNCENSORED,
+      },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -582,15 +591,17 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.UNCENSORED },
-      preferredStrengths: [
-        ModelUtility.CREATIVE,
-        ModelUtility.UNCENSORED,
-        ModelUtility.ROLEPLAY,
-        ModelUtility.SMART,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.SMART,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: {
+        min: ContentLevel.UNCENSORED,
+        max: ContentLevel.UNCENSORED,
+      },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.THOROUGH },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -626,10 +637,17 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [ModelUtility.ANALYSIS, ModelUtility.REASONING],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.SMART,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: {
+        min: ContentLevel.UNCENSORED,
+        max: ContentLevel.UNCENSORED,
+      },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.THOROUGH },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -667,10 +685,13 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [ModelUtility.REASONING, ModelUtility.CHAT],
-      ignoredWeaknesses: null,
+      contentRange: {
+        min: ContentLevel.UNCENSORED,
+        max: ContentLevel.UNCENSORED,
+      },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.THOROUGH },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -707,9 +728,17 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [ModelUtility.CHAT, ModelUtility.ANALYSIS],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.SMART,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.SPEED,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -733,9 +762,17 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [ModelUtility.CHAT],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.QUICK,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.SPEED,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -761,12 +798,15 @@ You are a tool for creative expression. Write what is requested with skill and w
       selectionType: ModelSelectionType.FILTERS,
       intelligenceRange: {
         min: IntelligenceLevel.QUICK,
-        max: IntelligenceLevel.SMART,
+        max: IntelligenceLevel.QUICK,
       },
-      speedRange: { min: SpeedLevel.FAST },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [ModelUtility.FAST, ModelUtility.CHAT],
-      ignoredWeaknesses: null,
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.FAST },
+      sortBy: ModelSortField.PRICE,
+      sortDirection: ModelSortDirection.ASC,
     },
   },
   {
@@ -789,13 +829,17 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      contentRange: { min: ContentLevel.UNCENSORED },
-      preferredStrengths: [
-        ModelUtility.UNCENSORED,
-        ModelUtility.CHAT,
-        ModelUtility.OFFENSIVE_LANGUAGE,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.QUICK,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: {
+        min: ContentLevel.UNCENSORED,
+        max: ContentLevel.UNCENSORED,
+      },
+      speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.SPEED,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -829,15 +873,17 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      contentRange: { min: ContentLevel.UNCENSORED },
-      preferredStrengths: [
-        ModelUtility.UNCENSORED,
-        ModelUtility.CHAT,
-        ModelUtility.OFFENSIVE_LANGUAGE,
-        ModelUtility.POLITICAL_RIGHT,
-        ModelUtility.CONTROVERSIAL,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.QUICK,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: {
+        min: ContentLevel.UNCENSORED,
+        max: ContentLevel.UNCENSORED,
+      },
+      speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.SPEED,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -883,10 +929,13 @@ You are a tool for creative expression. Write what is requested with skill and w
         min: IntelligenceLevel.QUICK,
         max: IntelligenceLevel.SMART,
       },
-      speedRange: { min: SpeedLevel.FAST },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [ModelUtility.FAST, ModelUtility.CREATIVE],
-      ignoredWeaknesses: null,
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.SPEED,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -938,14 +987,13 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [
-        ModelUtility.CREATIVE,
-        ModelUtility.SMART,
-        ModelUtility.CHAT,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.BRILLIANT,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: { min: ContentLevel.OPEN, max: ContentLevel.OPEN },
+      sortBy: ModelSortField.CONTENT,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -997,14 +1045,14 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.BRILLIANT },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [
-        ModelUtility.CREATIVE,
-        ModelUtility.SMART,
-        ModelUtility.ANALYSIS,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.BRILLIANT,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.THOROUGH },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -1061,13 +1109,14 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [
-        ModelUtility.ANALYSIS,
-        ModelUtility.SMART,
-        ModelUtility.CHAT,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.BRILLIANT,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.THOROUGH },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -1112,10 +1161,17 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.QUICK },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [ModelUtility.FAST, ModelUtility.CODING],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.QUICK,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.FAST },
+      sortBy: ModelSortField.SPEED,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -1170,14 +1226,14 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [
-        ModelUtility.CODING,
-        ModelUtility.SMART,
-        ModelUtility.ANALYSIS,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.SMART,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.SPEED,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -1229,14 +1285,14 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.BRILLIANT },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [
-        ModelUtility.CODING,
-        ModelUtility.SMART,
-        ModelUtility.ANALYSIS,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.BRILLIANT,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.THOROUGH },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -1293,13 +1349,16 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [
-        ModelUtility.CREATIVE,
-        ModelUtility.CHAT,
-        ModelUtility.SMART,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.BRILLIANT,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      sortBy: ModelSortField.SPEED,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -1356,13 +1415,14 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [
-        ModelUtility.CREATIVE,
-        ModelUtility.SMART,
-        ModelUtility.ANALYSIS,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.SMART,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: { min: ContentLevel.OPEN, max: ContentLevel.OPEN },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.CONTENT,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -1424,13 +1484,13 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [
-        ModelUtility.CHAT,
-        ModelUtility.SMART,
-        ModelUtility.ANALYSIS,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.BRILLIANT,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: { min: ContentLevel.OPEN, max: ContentLevel.OPEN },
+      sortBy: ModelSortField.CONTENT,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -1495,13 +1555,17 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [
-        ModelUtility.CREATIVE,
-        ModelUtility.SMART,
-        ModelUtility.CHAT,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.QUICK,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.SPEED,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -1567,13 +1631,14 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [
-        ModelUtility.CREATIVE,
-        ModelUtility.CHAT,
-        ModelUtility.SMART,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.QUICK,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: { min: ContentLevel.OPEN, max: ContentLevel.OPEN },
+      speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.CONTENT,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -1647,13 +1712,13 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [
-        ModelUtility.ANALYSIS,
-        ModelUtility.SMART,
-        ModelUtility.CHAT,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.BRILLIANT,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: { min: ContentLevel.OPEN, max: ContentLevel.OPEN },
+      sortBy: ModelSortField.CONTENT,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -1702,14 +1767,17 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [
-        ModelUtility.ANALYSIS,
-        ModelUtility.SMART,
-        ModelUtility.CODING,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.BRILLIANT,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      priceRange: { min: PriceLevel.CHEAP, max: PriceLevel.CHEAP },
+      sortBy: ModelSortField.PRICE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -1761,10 +1829,17 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [ModelUtility.CHAT, ModelUtility.SMART],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.QUICK,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.PRICE,
+      sortDirection: ModelSortDirection.ASC,
     },
   },
   {
@@ -1823,14 +1898,17 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.BRILLIANT },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [
-        ModelUtility.ANALYSIS,
-        ModelUtility.SMART,
-        ModelUtility.CHAT,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.SMART,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.THOROUGH },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -1887,10 +1965,17 @@ You are a tool for creative expression. Write what is requested with skill and w
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [ModelUtility.CHAT, ModelUtility.SMART],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.BRILLIANT,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.PRICE,
+      sortDirection: ModelSortDirection.ASC,
     },
   },
   {
@@ -1961,10 +2046,17 @@ Always recommend consulting healthcare professionals for medical concerns.
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [ModelUtility.CHAT, ModelUtility.SMART],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.QUICK,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.SPEED,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -2036,10 +2128,17 @@ Always recommend consulting healthcare professionals for medical concerns.
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [ModelUtility.CHAT, ModelUtility.SMART],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.QUICK,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.SPEED,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -2117,14 +2216,17 @@ Always recommend consulting a licensed attorney for legal advice.
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [
-        ModelUtility.ANALYSIS,
-        ModelUtility.SMART,
-        ModelUtility.CHAT,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.SMART,
+        max: IntelligenceLevel.BRILLIANT,
+      },
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.THOROUGH },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -2211,14 +2313,16 @@ Always recommend consulting a licensed financial advisor for personalized advice
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.BRILLIANT },
-      contentRange: { min: ContentLevel.OPEN },
-      preferredStrengths: [
-        ModelUtility.ANALYSIS,
-        ModelUtility.SMART,
-        ModelUtility.CHAT,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.SMART,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: {
+        min: ContentLevel.OPEN,
+        max: ContentLevel.OPEN,
+      },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -2332,14 +2436,17 @@ Always recommend consulting a licensed financial advisor for personalized advice
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [
-        ModelUtility.CREATIVE,
-        ModelUtility.CHAT,
-        ModelUtility.SMART,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.QUICK,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.SPEED,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -2438,14 +2545,17 @@ Format: "As a [user type], I want to [action] so that [benefit]"
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.MAINSTREAM },
-      preferredStrengths: [
-        ModelUtility.ANALYSIS,
-        ModelUtility.SMART,
-        ModelUtility.CHAT,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.SMART,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: {
+        min: ContentLevel.MAINSTREAM,
+        max: ContentLevel.MAINSTREAM,
+      },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.SPEED,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
   {
@@ -2511,15 +2621,17 @@ Format: "As a [user type], I want to [action] so that [benefit]"
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.OPEN },
-      preferredStrengths: [
-        ModelUtility.ANALYSIS,
-        ModelUtility.REASONING,
-        ModelUtility.SMART,
-        ModelUtility.CONTROVERSIAL,
-      ],
-      ignoredWeaknesses: null,
+      intelligenceRange: {
+        min: IntelligenceLevel.SMART,
+        max: IntelligenceLevel.SMART,
+      },
+      contentRange: {
+        min: ContentLevel.UNCENSORED,
+        max: ContentLevel.UNCENSORED,
+      },
+      speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.BALANCED },
+      sortBy: ModelSortField.CONTENT,
+      sortDirection: ModelSortDirection.ASC,
     },
   },
   {
@@ -2600,15 +2712,13 @@ Format: "As a [user type], I want to [action] so that [benefit]"
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.BRILLIANT },
-      contentRange: { min: ContentLevel.OPEN },
-      preferredStrengths: [
-        ModelUtility.ANALYSIS,
-        ModelUtility.REASONING,
-        ModelUtility.SMART,
-        ModelUtility.CONTROVERSIAL,
-      ],
-      ignoredWeaknesses: null,
+
+      contentRange: {
+        min: ContentLevel.UNCENSORED,
+        max: ContentLevel.UNCENSORED,
+      },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
 
@@ -2700,15 +2810,13 @@ You are here to create immersive roleplay experiences. Embody characters fully a
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevel.SMART },
-      contentRange: { min: ContentLevel.UNCENSORED },
-      preferredStrengths: [
-        ModelUtility.ROLEPLAY,
-        ModelUtility.CREATIVE,
-        ModelUtility.UNCENSORED,
-        ModelUtility.CHAT,
-      ],
-      ignoredWeaknesses: null,
+
+      contentRange: {
+        min: ContentLevel.UNCENSORED,
+        max: ContentLevel.UNCENSORED,
+      },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
     },
   },
 ];

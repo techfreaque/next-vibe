@@ -10,7 +10,7 @@ import {
 } from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 import { useTourState } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-state-context";
@@ -52,36 +52,10 @@ export function Selector({
   const characters = chat.characters;
 
   // Tour state
-  const tourIsActive = useTourState((state) => state.isActive);
-  const tourOpen = useTourState((state) => state.modelSelectorOpen);
-  const setTourOpen = useTourState((state) => state.setModelSelectorOpen);
-
-  // Local state
-  const [popoverOpen, setPopoverOpen] = useState(false);
-  const [onboardingStep, setOnboardingStep] = useState<
-    "story" | "pick" | "specialists"
-  >("story");
-  const [isOnboardingActive, setIsOnboardingActive] = useState(false);
+  const popoverOpen = useTourState((state) => state.modelSelectorOpen);
+  const setPopoverOpen = useTourState((state) => state.setModelSelectorOpen);
 
   // Use tour state if active
-  const open = tourIsActive ? tourOpen : popoverOpen;
-
-  // Handle open state changes
-  const handleOpenChange = useCallback(
-    (newOpen: boolean): void => {
-      if (tourIsActive) {
-        setTourOpen(newOpen);
-      } else {
-        setPopoverOpen(newOpen);
-      }
-    },
-    [tourIsActive, setTourOpen],
-  );
-
-  // Close modal
-  const handleClose = useCallback((): void => {
-    handleOpenChange(false);
-  }, [handleOpenChange]);
 
   // Get current character and model for display
   const currentCharacter = useMemo(
@@ -93,7 +67,7 @@ export function Selector({
   const isModelOnly = characterId === NO_CHARACTER_ID;
 
   return (
-    <Popover open={open} onOpenChange={handleOpenChange}>
+    <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
       <PopoverTrigger asChild>
         <Button
           type="button"
@@ -124,9 +98,7 @@ export function Selector({
                 modelSupportsTools ? "hidden @md:inline" : "hidden @xs:inline",
               )}
             >
-              {currentCharacter?.content?.name
-                ? t(currentCharacter.content.name)
-                : ""}
+              {currentCharacter?.name ? t(currentCharacter.name) : ""}
             </Span>
           )}
 
@@ -164,28 +136,14 @@ export function Selector({
       </PopoverTrigger>
 
       <PopoverContent
-        className={cn(
-          "p-0 w-screen sm:w-[480px] sm:max-w-[520px]",
-          // Ensure popover appears above tour overlay (z-index 10000) when tour is active
-          tourIsActive && "z-[10001]",
-        )}
+        className="p-0 w-[480px] max-w-screen"
         align="start"
         side="top"
         sideOffset={8}
       >
         {/* Only render content when popover is open - this is where all data fetching happens */}
-        {open && (
-          <SelectorContent
-            characterId={characterId}
-            locale={locale}
-            user={user}
-            logger={logger}
-            onClose={handleClose}
-            onboardingStep={onboardingStep}
-            onOnboardingStepChange={setOnboardingStep}
-            isOnboardingActive={isOnboardingActive}
-            onOnboardingActiveChange={setIsOnboardingActive}
-          />
+        {popoverOpen && (
+          <SelectorContent locale={locale} user={user} logger={logger} />
         )}
       </PopoverContent>
     </Popover>

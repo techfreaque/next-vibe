@@ -652,7 +652,7 @@ const { POST } = createEndpoint({
           // Packages array
           packages: requestDataArrayOptionalField(
             {
-              type: WidgetType.DATA_LIST,
+              type: WidgetType.CONTAINER,
               title: "app.api.system.releaseTool.fields.packages.title",
               description:
                 "app.api.system.releaseTool.fields.packages.description",
@@ -1603,7 +1603,7 @@ const { POST } = createEndpoint({
       // Errors displayed prominently if present
       errors: responseArrayOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.releaseTool.response.errors",
           optional: true,
         },
@@ -1616,7 +1616,7 @@ const { POST } = createEndpoint({
       // Warnings displayed if present
       warnings: responseArrayOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.releaseTool.response.warnings",
           optional: true,
         },
@@ -1629,7 +1629,7 @@ const { POST } = createEndpoint({
       // Packages table with status highlighting
       packagesProcessed: responseArrayOptionalField(
         {
-          type: WidgetType.DATA_TABLE,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.releaseTool.response.packages",
         },
         objectField(
@@ -1742,7 +1742,7 @@ const { POST } = createEndpoint({
       // Published packages
       publishedPackages: responseArrayOptionalField(
         {
-          type: WidgetType.DATA_TABLE,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.releaseTool.response.published",
         },
         objectField(
@@ -1780,7 +1780,7 @@ const { POST } = createEndpoint({
       // Timings
       timings: objectOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.releaseTool.response.timings",
         },
         { response: true },
@@ -1840,7 +1840,7 @@ const { POST } = createEndpoint({
 
       notificationsSent: responseArrayOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.releaseTool.response.notificationsSent",
           optional: true,
         },
@@ -1925,7 +1925,7 @@ const { POST } = createEndpoint({
               }),
               updateIgnoreDependencies: responseArrayOptionalField(
                 {
-                  type: WidgetType.DATA_LIST,
+                  type: WidgetType.CONTAINER,
                   title: "app.api.system.releaseTool.fields.name.title",
                   optional: true,
                 },

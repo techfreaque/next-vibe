@@ -18,7 +18,6 @@ import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -261,22 +260,14 @@ export function HelpInteractiveView({
   // Sidebar is collapsed by default when viewing a specific endpoint, open otherwise
   const [isSidebarCollapsed, setIsSidebarCollapsed] =
     useState(!!initialEndpointId);
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
 
   // Fetch endpoints for sidebar using registry
   const endpoints = useMemo(
     () =>
       user
-        ? definitionsRegistry.getEndpointsForUser(
-            Platform.NEXT_PAGE,
-            user,
-            logger,
-          )
+        ? definitionsRegistry.getEndpointsForUser(Platform.NEXT_PAGE, user)
         : [],
-    [user, logger],
+    [user],
   );
 
   // Create endpoint lookup map

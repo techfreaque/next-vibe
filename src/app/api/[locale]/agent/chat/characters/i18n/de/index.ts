@@ -3,6 +3,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   id: idTranslations,
+  separator: {
+    or: "oder",
+  },
   fallbacks: {
     unknownModel: "Unbekanntes Modell",
     unknownProvider: "unbekannt",
@@ -641,16 +644,51 @@ export const translations: typeof enTranslations = {
       label: "Charakter erstellen",
     },
     browser: {
-      advancedModelAccess: "Erweiterter Modellzugriff",
-      configureFiltersText: "Filter konfigurieren oder manuell auswählen aus",
+      advancedModelAccess: "Wähle deine KI-Erfahrung",
+      configureFiltersText:
+        "Modelle direkt auswählen oder mit vorkonfigurierten Charakteren starten",
       aiModels: "KI-Modelle",
-      configureAiModelsTitle: "KI-Modelle direkt konfigurieren",
-      advancedChooseText: "Erweitert: Wählen Sie aus",
+      configureAiModelsTitle: "Direkte Modellauswahl",
+      advancedChooseText:
+        "Wähle aus {{count}} Modellen mit präziser Steuerung von Intelligenz, Geschwindigkeit und Kosten",
       modelsWithCustomFilters: "Modelle mit benutzerdefinierten Filtern",
       configureButton: "Konfigurieren",
-      characterPresets: "Charakter-Vorlagen",
+      selectButton: {
+        label: "Modelle Erkunden",
+      },
+      characterPresets: "Fertige Charaktere",
       pickCharacterText:
-        "Wählen Sie einen Charakter mit optimierten Einstellungen. Jederzeit nach dem Hinzufügen anpassen.",
+        "Starte mit professionell abgestimmten Charakteren, die bereits das perfekte Modell nutzen. Jederzeit anpassbar.",
+    },
+    marketing: {
+      title: "KI-Charaktere & Benutzerdefinierte Modelle",
+      description:
+        "Erstelle personalisierte KI-Assistenten mit einzigartigen Persönlichkeiten, Stimmen und Modellkonfigurationen. Wähle aus Hunderten von Modellen oder lass unser intelligentes System das beste für dich auswählen.",
+      feature1: {
+        title: "Benutzerdefinierte Charaktere",
+        description:
+          "Gestalte KI-Persönlichkeiten mit benutzerdefinierten System-Prompts, Icons und Stimmen",
+      },
+      feature2: {
+        title: "Intelligente Modellauswahl",
+        description:
+          "Filtere nach Intelligenz, Geschwindigkeit, Preis und Inhaltstyp, um das perfekte Modell zu finden",
+      },
+      feature3: {
+        title: "Favoriten-System",
+        description:
+          "Speichere deine Lieblingskonfigurationen für schnellen Zugriff und organisiere nach Priorität",
+      },
+      feature4: {
+        title: "Zugriff auf",
+        titleSuffix: "+ Modelle",
+        description:
+          "Wähle aus den neuesten Modellen von Anthropic, OpenAI, Google und mehr",
+      },
+      cta: {
+        signup: "Jetzt Registrieren",
+        login: "Anmelden",
+      },
     },
     response: {
       characters: {
@@ -683,6 +721,11 @@ export const translations: typeof enTranslations = {
           ignoredWeaknesses: { content: "Ignorierte Schwächen" },
           manualModelId: { content: "Manuelles Modell" },
           separator: { content: "•" },
+          actions: {
+            directModelButton: {
+              label: "Direktes Modell",
+            },
+          },
         },
       },
     },
@@ -734,6 +777,11 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Charakter erstellen",
     description: "Einen neuen benutzerdefinierten Charakter erstellen",
+    form: {
+      title: "Erstellen Sie Ihren benutzerdefinierten Charakter",
+      description:
+        "Entwerfen Sie einen einzigartigen KI-Charakter mit individuellem Verhalten, Persönlichkeit und Fähigkeiten. Wählen Sie ein bestimmtes Modell oder lassen Sie das System basierend auf Ihren Anforderungen auswählen.",
+    },
     submitButton: {
       text: "Benutzerdefinierten Charakter erstellen",
       loadingText: "Charakter wird erstellt...",
@@ -745,10 +793,20 @@ export const translations: typeof enTranslations = {
     name: {
       label: "Name",
       description: "Der Name des Charakters",
+      placeholder: "Charakternamen eingeben",
+      validation: {
+        minLength: "Name muss mindestens 2 Zeichen lang sein",
+        maxLength: "Name muss weniger als 100 Zeichen lang sein",
+      },
     },
     characterDescription: {
       label: "Beschreibung",
       description: "Eine kurze Beschreibung des Charakters",
+      placeholder: "Zweck und Fähigkeiten des Charakters beschreiben",
+      validation: {
+        minLength: "Beschreibung muss mindestens 10 Zeichen lang sein",
+        maxLength: "Beschreibung muss weniger als 500 Zeichen lang sein",
+      },
     },
     icon: {
       label: "Symbol",
@@ -758,6 +816,12 @@ export const translations: typeof enTranslations = {
       label: "System-Prompt",
       description:
         "Der System-Prompt, der das Verhalten des Charakters definiert",
+      placeholder:
+        "Sie sind ein hilfreicher Assistent, der sich spezialisiert auf...",
+      validation: {
+        minLength: "System-Prompt muss mindestens 10 Zeichen lang sein",
+        maxLength: "System-Prompt muss weniger als 5000 Zeichen lang sein",
+      },
     },
     category: {
       label: "Kategorie",
@@ -766,11 +830,16 @@ export const translations: typeof enTranslations = {
     tagline: {
       label: "Slogan",
       description: "Ein kurzer Slogan, der den Charakter beschreibt",
+      placeholder: "Slogan eingeben",
+      validation: {
+        minLength: "Slogan muss mindestens 2 Zeichen lang sein",
+        maxLength: "Slogan muss weniger als 500 Zeichen lang sein",
+      },
     },
-    ownershipType: {
-      label: "Eigentümertyp",
+    isPublic: {
+      label: "Öffentlich machen",
       description:
-        "Wer besitzt diesen Charakter (System, Benutzer oder öffentlich)",
+        "Aktivieren Sie dies, um Ihren Charakter mit der Community zu teilen. Wenn deaktiviert, bleibt der Charakter privat und nur für Sie sichtbar.",
     },
     modelSelection: {
       title: "Modellauswahl",

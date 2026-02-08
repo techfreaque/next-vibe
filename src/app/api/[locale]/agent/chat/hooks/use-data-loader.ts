@@ -280,30 +280,13 @@ export function useDataLoader(
     dataLoadedRef.current = true;
 
     const loadData = async (): Promise<void> => {
-      // Determine if user is authenticated from passed user prop
-      const isAuthenticated = user !== undefined && !user.isPublic;
-
-      logger.debug("Chat: Checking authentication before loading data", {
-        isAuthenticated,
-        isPublic: user?.isPublic ?? true,
-        currentRootFolderId,
-      });
-
       // ALWAYS load incognito data from localStorage (for incognito mode only)
       if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
         await loadIncognitoData(logger, addThread, addMessage, addFolder);
         // Skip server calls for incognito mode - everything is local-only
         setDataLoaded(true);
-        logger.info("Chat: Incognito mode - skipping server data load");
         return;
       }
-
-      // Load server data in parallel for non-incognito folders
-      logger.info("Chat: Loading server data", {
-        isAuthenticated,
-        loadingScope: isAuthenticated ? "all" : "public only",
-        rootFolderId: currentRootFolderId,
-      });
 
       // TypeScript now knows currentRootFolderId is PRIVATE | SHARED | PUBLIC
       await Promise.all([

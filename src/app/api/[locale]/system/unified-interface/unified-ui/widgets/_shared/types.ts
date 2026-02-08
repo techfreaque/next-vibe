@@ -85,21 +85,10 @@ export type BaseWidgetFieldProps<
     TUsage,
     AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
   >,
-> = TWidgetConfig &
-  BaseWidgetConfig<TUsage, SchemaTypes> & {
-    value: TWidgetConfig extends { schema: z.ZodTypeAny }
-      ? z.output<TWidgetConfig["schema"]>
-      : TWidgetConfig extends { children: infer TChildren }
-        ? InferChildrenOutput<TChildren>
-        : TWidgetConfig extends { child: infer TChild }
-          ? InferChildOutput<TChild>[]
-          : TWidgetConfig extends {
-                variants: infer TVariants;
-              }
-            ? InferUnionType<TVariants>
-            : undefined;
-    parentValue?: WidgetData;
-  };
+> = TWidgetConfig & {
+  value: InferFieldOutput<TWidgetConfig, FieldUsage.ResponseData>;
+  parentValue?: WidgetData;
+};
 
 /**
  * Dispatch-level field type for renderer entry points.
@@ -222,7 +211,7 @@ export type FieldUsageConfig =
  */
 
 export interface BaseWidgetConfig<
-  out TUsage extends FieldUsageConfig,
+  TUsage extends FieldUsageConfig,
   TSchemaType extends SchemaTypes,
 > {
   type: WidgetType;
@@ -239,7 +228,7 @@ export interface BaseWidgetConfig<
 }
 
 export interface BasePrimitiveWidgetConfig<
-  out TUsage extends FieldUsageConfig,
+  TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive" | "widget",
   TSchema extends z.ZodTypeAny,
 > extends BaseWidgetConfig<TUsage, TSchemaType> {
@@ -330,40 +319,44 @@ export type BaseArrayWidgetConfig<
  * Children can be more specific than parent but must be compatible
  */
 export type ConstrainedChildUsage<TUsage extends FieldUsageConfig> =
-  TUsage extends {
-    request: "data&urlPathParams";
-    response: true;
-  }
-    ?
-        | { request: "data"; response?: never }
-        | { request: "urlPathParams"; response?: never }
-        | { request: "data&urlPathParams"; response?: never }
-        | { request?: never; response: true }
-        | { request: "data"; response: true }
-        | { request: "urlPathParams"; response: true }
-        | { request: "data&urlPathParams"; response: true }
-    : TUsage extends { request: "data"; response: true }
+  FieldUsageConfig &
+    (TUsage extends {
+      request: "data&urlPathParams";
+      response: true;
+    }
       ?
           | { request: "data"; response?: never }
+          | { request: "urlPathParams"; response?: never }
+          | { request: "data&urlPathParams"; response?: never }
           | { request?: never; response: true }
           | { request: "data"; response: true }
-      : TUsage extends { request: "urlPathParams"; response: true }
+          | { request: "urlPathParams"; response: true }
+          | { request: "data&urlPathParams"; response: true }
+      : TUsage extends { request: "data"; response: true }
         ?
-            | { request: "urlPathParams"; response?: never }
+            | { request: "data"; response?: never }
             | { request?: never; response: true }
-            | { request: "urlPathParams"; response: true }
-        : TUsage extends { request: "data"; response?: never }
-          ? { request: "data"; response?: never }
-          : TUsage extends { request: "urlPathParams"; response?: never }
-            ? { request: "urlPathParams"; response?: never }
-            : TUsage extends { request: "data&urlPathParams"; response?: never }
-              ?
-                  | { request: "data"; response?: never }
-                  | { request: "urlPathParams"; response?: never }
-                  | { request: "data&urlPathParams"; response?: never }
-              : TUsage extends { request?: never; response: true }
-                ? { request?: never; response: true }
-                : TUsage;
+            | { request: "data"; response: true }
+        : TUsage extends { request: "urlPathParams"; response: true }
+          ?
+              | { request: "urlPathParams"; response?: never }
+              | { request?: never; response: true }
+              | { request: "urlPathParams"; response: true }
+          : TUsage extends { request: "data"; response?: never }
+            ? { request: "data"; response?: never }
+            : TUsage extends { request: "urlPathParams"; response?: never }
+              ? { request: "urlPathParams"; response?: never }
+              : TUsage extends {
+                    request: "data&urlPathParams";
+                    response?: never;
+                  }
+                ?
+                    | { request: "data"; response?: never }
+                    | { request: "urlPathParams"; response?: never }
+                    | { request: "data&urlPathParams"; response?: never }
+                : TUsage extends { request?: never; response: true }
+                  ? { request?: never; response: true }
+                  : TUsage);
 
 export type AnyChildrenConstrain<
   TKey extends string,
@@ -442,6 +435,7 @@ export type UnionObjectWidgetConfigConstrain<
 
 /**
  * Infer output type from a UnifiedField based on usage
+ * This is the ONLY inference function - all value types flow through InferSchemaFromField
  */
 type InferFieldOutput<
   TField extends UnifiedField<
@@ -452,50 +446,3 @@ type InferFieldOutput<
   >,
   TUsage extends FieldUsage = FieldUsage.ResponseData,
 > = z.output<InferSchemaFromField<TField, TUsage>>;
-
-/**
- * Infer output type from children field
- * Returns WidgetData-compatible object type
- */
-export type InferChildrenOutput<TChildren> =
-  // For Record of fields -> object output (structural: any value with BaseWidgetConfig shape)
-  TChildren extends Record<
-    string,
-    BaseWidgetConfig<FieldUsageConfig, SchemaTypes>
-  >
-    ? {
-        [K in keyof TChildren]: InferChildOutput<TChildren[K]>;
-      }
-    : never;
-
-/**
- * Infer output type from single child field (structural matching)
- * Returns WidgetData-compatible types
- */
-export type InferChildOutput<TChild> =
-  // Primitive field with schema
-  TChild extends { schema: infer TSchema extends z.ZodTypeAny }
-    ? z.output<TSchema>
-    : // Object field with children
-      TChild extends { children: infer TChildren }
-      ? InferChildrenOutput<TChildren>
-      : // Array field with child
-        TChild extends { child: infer TGrandChild }
-        ? Array<InferChildOutput<TGrandChild>>
-        : never;
-
-/**
- * Infer output type from union/variant field
- */
-type InferUnionType<TVariants> =
-  TVariants extends Record<
-    string,
-    UnifiedField<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
-    >
-  >
-    ? InferFieldOutput<TVariants[keyof TVariants]>
-    : never;

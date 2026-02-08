@@ -133,7 +133,6 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       const discoveredEndpoints = definitionsRegistry.getEndpointsForUser(
         platform,
         user,
-        logger,
       );
 
       this.buildRouteTree(discoveredEndpoints);

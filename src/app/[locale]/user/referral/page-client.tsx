@@ -26,10 +26,10 @@ import { Link } from "next-vibe-ui/ui/link";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { ReferralCodeForm } from "@/app/api/[locale]/referral/_components/referral-code-form";
-import { ReferralCodesList } from "@/app/api/[locale]/referral/_components/referral-codes-list";
-import { ReferralStats } from "@/app/api/[locale]/referral/_components/referral-stats";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import referralCodesListDefinition from "@/app/api/[locale]/referral/codes/list/definition";
+import referralDefinition from "@/app/api/[locale]/referral/definition";
+import referralStatsDefinition from "@/app/api/[locale]/referral/stats/definition";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -38,12 +38,10 @@ export function ReferralPageClient({
   locale,
   isAuthenticated,
   user,
-  logger,
 }: {
   locale: CountryLanguage;
   isAuthenticated: boolean;
   user: JwtPayloadType;
-  logger: EndpointLogger;
 }): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -84,7 +82,11 @@ export function ReferralPageClient({
             <H2 className="text-xl font-semibold mb-4">
               {t("app.user.referral.overview.title")}
             </H2>
-            <ReferralStats locale={locale} user={user} logger={logger} />
+            <EndpointsPage
+              endpoint={referralStatsDefinition}
+              user={user}
+              locale={locale}
+            />
           </Div>
         )}
 
@@ -203,7 +205,11 @@ export function ReferralPageClient({
                 </Div>
               </CardHeader>
               <CardContent>
-                <ReferralCodeForm locale={locale} user={user} logger={logger} />
+                <EndpointsPage
+                  endpoint={referralDefinition}
+                  user={user}
+                  locale={locale}
+                />
               </CardContent>
             </Card>
 
@@ -219,10 +225,10 @@ export function ReferralPageClient({
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ReferralCodesList
-                  locale={locale}
+                <EndpointsPage
+                  endpoint={referralCodesListDefinition}
                   user={user}
-                  logger={logger}
+                  locale={locale}
                 />
               </CardContent>
             </Card>

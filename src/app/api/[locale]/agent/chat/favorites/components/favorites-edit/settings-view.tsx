@@ -20,8 +20,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { QuickSettingsPanel } from ".";
 
 interface SettingsViewProps {
-  editingFavoriteId: string | null;
-  editingCharacterId: string | null;
+  editingFavoriteId: string;
+  editingCharacterId: string;
   locale: CountryLanguage;
   characterId: string;
   isOnboardingActive: boolean;
@@ -85,30 +85,16 @@ export function EditFavorite({
       }
 
       return {
-        id: `temp-${Date.now()}`,
         characterId: editingCharacterId,
-        character: {
-          info: {
-            icon: character.icon,
-            info: {
-              titleRow: {
-                name: character.content.name,
-                tagline: character.content.tagline,
-              },
-              description: character.content.description,
-            },
-          },
-        },
+        icon: character.icon,
+        name: character.name,
+        tagline: character.tagline,
+        description: character.description,
         modelSelection: {
           currentSelection: {
             selectionType: ModelSelectionType.CHARACTER_BASED,
           },
         },
-        position: 0,
-        color: null,
-        useCount: 0,
-        customName: null,
-        customIcon: null,
         voice: null,
       } satisfies FavoriteGetResponseOutput;
     }
@@ -138,12 +124,42 @@ export function EditFavorite({
         const modelId = resolveModelId(updatedFavorite.modelSelection);
 
         if (modelId) {
-          setActiveFavorite(
-            editingFavorite.id,
-            updatedFavorite.characterId,
-            modelId,
-            ttsVoice,
-          );
+          // If it's a new character, we need to create it first to get real ID
+          if (isNewCharacter) {
+            const character = characters[editingFavorite.characterId];
+            if (!character) {
+              logger.error("Character not found", {
+                characterId: editingFavorite.characterId,
+              });
+              return;
+            }
+            const createdId = await addFavorite({
+              characterId: editingFavorite.characterId,
+              icon: character.icon,
+              name: character.name,
+              tagline: character.tagline,
+              description: character.description,
+              voice: editingFavorite.voice ?? undefined,
+              modelSelection,
+            });
+
+            if (createdId) {
+              setActiveFavorite(
+                createdId,
+                updatedFavorite.characterId,
+                modelId,
+                ttsVoice,
+              );
+            }
+          } else {
+            // Existing favorite, just set it as active
+            setActiveFavorite(
+              editingFavoriteId,
+              updatedFavorite.characterId,
+              modelId,
+              ttsVoice,
+            );
+          }
         }
       } else if (saveMode === "update") {
         if (isNewCharacter) {
@@ -156,17 +172,19 @@ export function EditFavorite({
           }
           await addFavorite({
             characterId: editingFavorite.characterId,
-            customName: editingFavorite.customName ?? undefined,
+            icon: null,
+            name: null,
+            tagline: null,
+            description: null,
             voice: editingFavorite.voice ?? undefined,
             modelSelection,
           });
         } else {
           await updateFavorite({
-            character: {
-              info: {
-                icon: editingFavorite.character.info.icon,
-              },
-            },
+            icon: editingFavorite.icon,
+            name: editingFavorite.name,
+            tagline: editingFavorite.tagline ?? "",
+            description: editingFavorite.description ?? "",
             modelSelection,
           });
 
@@ -178,7 +196,7 @@ export function EditFavorite({
 
             if (modelId) {
               setActiveFavorite(
-                editingFavorite.id,
+                editingFavoriteId,
                 updatedFavorite.characterId,
                 modelId,
                 ttsVoice,
@@ -197,7 +215,10 @@ export function EditFavorite({
 
         const createdId = await addFavorite({
           characterId: editingFavorite.characterId,
-          customName: editingFavorite.customName ?? undefined,
+          icon: null,
+          name: null,
+          tagline: null,
+          description: null,
           voice: editingFavorite.voice ?? undefined,
           modelSelection,
         });
@@ -227,6 +248,7 @@ export function EditFavorite({
     [
       editingFavorite,
       editingCharacterId,
+      editingFavoriteId,
       characterId,
       isOnboardingActive,
       characters,
@@ -254,7 +276,7 @@ export function EditFavorite({
       return;
     }
 
-    const deletedId = editingFavorite.id;
+    const deletedId = editingFavoriteId;
 
     const willRemain = favorites.filter((f) => f.id !== deletedId);
     const willBeEmpty = willRemain.length === 0;
@@ -272,6 +294,7 @@ export function EditFavorite({
   }, [
     editingFavorite,
     editingCharacterId,
+    editingFavoriteId,
     favorites,
     onEditingClear,
     onOnboardingActiveChange,
@@ -288,11 +311,10 @@ export function EditFavorite({
 
       const updates: FavoriteUpdateRequestOutput = {
         characterId: newCharacterId,
-        character: {
-          info: {
-            icon: editingFavorite.character.info.icon,
-          },
-        },
+        icon: editingFavorite.icon,
+        name: editingFavorite.name,
+        tagline: editingFavorite.tagline ?? "",
+        description: editingFavorite.description ?? "",
         voice: keepSettings ? editingFavorite.voice : undefined,
         modelSelection: editingFavorite.modelSelection,
       };
@@ -308,12 +330,19 @@ export function EditFavorite({
           const modelId = resolveModelId(modelSel);
 
           if (modelId) {
-            setActiveFavorite(editingFavorite.id, charId, modelId, ttsVoice);
+            setActiveFavorite(editingFavoriteId, charId, modelId, ttsVoice);
           }
         }
       }
     },
-    [editingFavorite, updateFavorite, characterId, setActiveFavorite, ttsVoice],
+    [
+      editingFavorite,
+      updateFavorite,
+      characterId,
+      setActiveFavorite,
+      ttsVoice,
+      editingFavoriteId,
+    ],
   );
 
   if (!editingFavorite) {

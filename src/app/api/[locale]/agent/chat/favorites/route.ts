@@ -13,7 +13,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ user, logger, locale }) =>
-      ChatFavoritesRepository.getFavorites(user, logger, locale),
+    handler: ({ user, logger }) =>
+      ChatFavoritesRepository.getFavorites(user, logger),
   },
 });

@@ -9,8 +9,11 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import type { ReactRequestResponseWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import {
+  useWidgetForm,
+  useWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import type {
@@ -64,21 +67,34 @@ export function StatusIndicatorWidget<
   TSchemaType extends "primitive",
 >({
   field,
-}: ReactWidgetProps<
+  fieldName,
+}: ReactRequestResponseWidgetProps<
   TEndpoint,
   TUsage,
   StatusIndicatorWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
 >): JSX.Element {
   const t = useWidgetTranslation();
-  const { status, label, className } = field;
+  const form = useWidgetForm();
+  const { status, label, className, usage } = field;
+
+  // Get value from form for request fields, otherwise from field.value
+  let value;
+  if (usage.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value) {
+      value = field.value;
+    }
+  } else {
+    value = field.value;
+  }
 
   const badgeVariant = mapStatusToBadgeVariant(status);
 
   // Use label if provided, otherwise use the value itself
   const displayText = label
     ? t(label)
-    : typeof field.value === "string"
-      ? field.value
+    : typeof value === "string"
+      ? value
       : status;
 
   return (

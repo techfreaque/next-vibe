@@ -7,8 +7,8 @@ import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
+import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import type { CreditsHistoryGetResponseOutput } from "@/app/api/[locale]/credits/history/definition";
-import type { CreditBalance } from "@/app/api/[locale]/credits/repository";
 import { CreditBalanceCard } from "@/app/api/[locale]/subscription/_components/credit-balance-card";
 import { HistoryTab } from "@/app/api/[locale]/subscription/_components/history-tab";
 import { PaymentStatusAlert } from "@/app/api/[locale]/subscription/_components/payment-status-alert";
@@ -23,7 +23,7 @@ import { simpleT } from "@/i18n/core/shared";
 interface HistoryPageClientProps {
   locale: CountryLanguage;
   isAuthenticated: boolean;
-  initialCredits: CreditBalance;
+  initialCredits: CreditsGetResponseOutput;
   initialHistory: CreditsHistoryGetResponseOutput | null;
   initialSubscription: SubscriptionGetResponseOutput | null;
   freeCredits: number;

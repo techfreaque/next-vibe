@@ -41,7 +41,6 @@ import {
   type PayoutStatusValue,
   ReferralEarningStatus,
 } from "./enum";
-import type { LinkToLeadPostResponseOutput } from "./link-to-lead/definition";
 import type { StatsGetResponseOutput } from "./stats/definition";
 
 // Internal types
@@ -77,7 +76,7 @@ export class ReferralRepository {
       const [existingCode] = await db
         .select()
         .from(referralCodes)
-        .where(eq(referralCodes.code, data.code))
+        .where(eq(referralCodes.code, data.fieldsGrid.code))
         .limit(1);
 
       if (existingCode) {
@@ -87,26 +86,22 @@ export class ReferralRepository {
         });
       }
 
-      const [newCode] = await db
+      await db
         .insert(referralCodes)
         .values({
-          code: data.code,
+          code: data.fieldsGrid.code,
           ownerUserId: userId,
-          label: data.label ?? null,
+          label: data.fieldsGrid.label ?? null,
           isActive: true,
           currentUses: 0,
         })
         .returning();
 
       return success({
-        id: newCode.id,
-        responseCode: newCode.code,
-        responseLabel: newCode.label,
-        ownerUserId: newCode.ownerUserId,
-        currentUses: newCode.currentUses,
-        isActive: newCode.isActive,
-        createdAt: newCode.createdAt.toISOString(),
-        updatedAt: newCode.updatedAt.toISOString(),
+        successMessage: "app.api.referral.response.success",
+        formAlert: undefined,
+        fieldsGrid: undefined,
+        submitRow: undefined,
       });
     } catch (error) {
       logger.error("Failed to create referral code", parseError(error));
@@ -171,15 +166,31 @@ export class ReferralRepository {
             );
 
           return {
-            id: code.id,
-            code: code.code,
-            label: code.label,
-            currentUses: code.currentUses,
-            isActive: code.isActive,
-            createdAt: code.createdAt.toISOString(),
-            totalSignups: signupCount?.count ?? 0,
-            totalRevenueCents: stats?.totalRevenue ?? 0,
-            totalEarningsCents: stats?.totalEarnings ?? 0,
+            topRow: {
+              codeInfo: {
+                code: code.code,
+                label: code.label,
+              },
+            },
+            statsGrid: {
+              uses: {
+                label: "app.user.referral.myCodes.uses",
+                currentUses: code.currentUses,
+              },
+              signups: {
+                label: "app.user.referral.myCodes.signups",
+                totalSignups: signupCount?.count ?? 0,
+              },
+              revenue: {
+                label: "app.user.referral.myCodes.revenue",
+                totalRevenueCents: stats?.totalRevenue ?? 0,
+              },
+              earnings: {
+                label: "app.user.referral.myCodes.earnings",
+                totalEarningsCents: stats?.totalEarnings ?? 0,
+              },
+            },
+            inactiveWarning: code.isActive,
           };
         }),
       );
@@ -249,7 +260,7 @@ export class ReferralRepository {
     leadId: string,
     referralCode: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LinkToLeadPostResponseOutput>> {
+  ): Promise<ResponseType<void>> {
     try {
       logger.debug("Linking referral to lead", { leadId, referralCode });
 
@@ -279,9 +290,7 @@ export class ReferralRepository {
           leadId,
           referralCode,
         });
-        return success({
-          referralCode,
-        });
+        return success();
       }
 
       // Create new lead referral record (allows multiple different codes per lead)
@@ -292,9 +301,7 @@ export class ReferralRepository {
 
       logger.debug("Referral linked to lead successfully", { leadId, codeId });
 
-      return success({
-        referralCode,
-      });
+      return success();
     } catch (error) {
       logger.error("Failed to link referral to lead", parseError(error));
       return fail({
@@ -492,11 +499,46 @@ export class ReferralRepository {
       const availableCredits = totalEarnedCredits - totalPaidOutCredits;
 
       return success({
-        totalSignups,
-        totalRevenueCredits,
-        totalEarnedCredits,
-        totalPaidOutCredits,
-        availableCredits,
+        totalSignups: {
+          header: {
+            title: "app.user.referral.stats.totalSignups",
+            icon: undefined,
+          },
+          content: {
+            value: totalSignups,
+            description: "app.user.referral.stats.totalSignupsDesc",
+          },
+        },
+        totalRevenueCredits: {
+          header: {
+            title: "app.user.referral.stats.totalRevenue",
+            icon: undefined,
+          },
+          content: {
+            value: totalRevenueCredits,
+            description: "app.user.referral.stats.totalRevenueDesc",
+          },
+        },
+        totalEarnedCredits: {
+          header: {
+            title: "app.user.referral.stats.totalEarned",
+            icon: undefined,
+          },
+          content: {
+            value: totalEarnedCredits,
+            description: "app.user.referral.stats.totalEarnedDesc",
+          },
+        },
+        availableCredits: {
+          header: {
+            title: "app.user.referral.stats.availableBalance",
+            icon: undefined,
+          },
+          content: {
+            value: availableCredits,
+            description: "app.user.referral.stats.availableBalanceDesc",
+          },
+        },
       });
     } catch (error) {
       logger.error("Failed to get referral stats", parseError(error));

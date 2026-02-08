@@ -63,7 +63,6 @@ export function testEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>,
     TFields
   >,
   options: TestEndpointOptions<
@@ -89,7 +88,6 @@ export function testEndpoint<
           TMethod,
           TUserRoleValue,
           TScopedTranslationKey,
-          AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>,
           TFields
         >({
           endpoint,

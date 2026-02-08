@@ -4,9 +4,15 @@ import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
-import type { ReactWidgetProps } from "../../_shared/react-types";
+import type {
+  ReactRequestResponseWidgetProps,
+  ReactStaticWidgetProps,
+} from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
-import { useWidgetTranslation } from "../../_shared/use-widget-context";
+import {
+  useWidgetForm,
+  useWidgetTranslation,
+} from "../../_shared/use-widget-context";
 import type { AlertWidgetConfig, AlertWidgetSchema } from "./types";
 
 /**
@@ -19,24 +25,42 @@ export function AlertWidget<
   TUsage extends FieldUsageConfig,
 >(
   props:
-    | ReactWidgetProps<
+    | ReactStaticWidgetProps<
         TEndpoint,
         TUsage,
         AlertWidgetConfig<TKey, never, TUsage, "widget">
       >
-    | ReactWidgetProps<
+    | ReactRequestResponseWidgetProps<
         TEndpoint,
         TUsage,
         AlertWidgetConfig<TKey, AlertWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element | null {
   const t = useWidgetTranslation();
+  const form = useWidgetForm();
   const { field } = props;
-  const { variant = "default", className, content: hardcodedContent } = field;
+  const fieldName = "fieldName" in props ? props.fieldName : undefined;
+  const {
+    variant = "default",
+    className,
+    content: hardcodedContent,
+  } = props.field;
+  const usage = "usage" in field ? field.usage : undefined;
+
+  // Get value from form for request fields, otherwise from field.value
+  let value;
+  if (usage?.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value && "value" in field) {
+      value = field.value;
+    }
+  } else if ("value" in field) {
+    value = field.value;
+  }
 
   let content: string | undefined;
-  if (field.value) {
-    content = t(field.value);
+  if (value) {
+    content = t(value);
   } else if (hardcodedContent) {
     content = t(hardcodedContent);
   }

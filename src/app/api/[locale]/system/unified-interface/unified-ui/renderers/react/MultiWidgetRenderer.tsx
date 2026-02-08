@@ -4,6 +4,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import { useMemo } from "react";
 import type { Path } from "react-hook-form";
+import { useWatch } from "react-hook-form";
 import type z from "zod";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
@@ -15,9 +16,12 @@ import type {
   ArrayChildConstraint,
   ConstrainedChildUsage,
   FieldUsageConfig,
+  InferChildOutput,
+  InferChildrenOutput,
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
 } from "../../widgets/_shared/types";
+import { useWidgetForm } from "../../widgets/_shared/use-widget-context";
 import {
   ChildrenDataRenderer,
   type ProcessedChildren,
@@ -152,13 +156,37 @@ export function ObjectChildrenRenderer<
   value,
   fieldName,
 }: ObjectChildrenRendererProps<TKey, TUsage, TChildren>): JSX.Element {
+  const form = useWidgetForm();
+
+  // Check if any child has a hidden function (request fields need form data)
+  const hasRequestFields =
+    childrenSchema &&
+    Object.values(childrenSchema).some(
+      (field) => field && "usage" in field && field.usage?.request,
+    );
+
+  // Watch entire form root to get all form data
+  const formDataRoot = useWatch({
+    control: form?.control,
+    disabled: !form || !hasRequestFields,
+  }) as Record<string, WidgetData> | undefined;
+
+  // Merge form data with response data
+  const mergedValue = useMemo(() => {
+    if (!formDataRoot) {
+      return value;
+    }
+    // Deep merge: form data takes precedence over response data
+    return { ...value, ...formDataRoot };
+  }, [formDataRoot, value]);
+
   const processed = useMemo(() => {
     if (!childrenSchema) {
       return undefined;
     }
     const extracted = ChildrenDataRenderer.extractChildren(
       childrenSchema,
-      value,
+      mergedValue,
     );
     const sorted = ChildrenDataRenderer.sortChildren(extracted);
     const groupResult = ChildrenDataRenderer.groupInlineFields(sorted);
@@ -167,7 +195,7 @@ export function ObjectChildrenRenderer<
       inlineGroups: groupResult.groups,
       inlineGroupMembers: groupResult.members,
     };
-  }, [childrenSchema, value]);
+  }, [childrenSchema, mergedValue]);
 
   if (!processed || processed.children.length === 0) {
     return <></>;
@@ -422,22 +450,23 @@ UnionObjectRenderer.displayName = "UnionObjectRenderer";
 export interface MultiWidgetRendererProps<
   TKey extends string,
   TUsage extends FieldUsageConfig,
-> {
-  childrenSchema:
+  TChildren extends
     | ObjectChildrenConstraint<TKey, TUsage>
     | ArrayChildConstraint<TKey, TUsage>
     | UnionObjectWidgetConfigConstrain<TKey, TUsage>
-    | undefined;
-  value: WidgetData;
+    | undefined,
+> {
+  childrenSchema: TChildren;
+  value: InferChildrenOutput<TChildren> | null | undefined;
   fieldName: string | undefined;
   discriminator?: string;
   watchedDiscriminatorValue?: string;
   /** Optional render callback for array items to customize rendering */
   renderItem?: (props: {
-    itemData: WidgetData;
+    itemData: InferChildOutput<AnyChildrenConstrain<TKey, TUsage>>;
     index: number;
     itemFieldName: string;
-    childSchema: ArrayChildConstraint<TKey, TUsage>;
+    childSchema: AnyChildrenConstrain<TKey, TUsage>;
   }) => JSX.Element;
 }
 

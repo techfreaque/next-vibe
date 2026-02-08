@@ -7,9 +7,10 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { ReactWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
+import type { ReactRequestResponseWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import {
+  useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -40,21 +41,30 @@ export function KeyValueWidget<
   TUsage extends FieldUsageConfig,
 >({
   field,
-}: ReactWidgetProps<
+  fieldName,
+}: ReactRequestResponseWidgetProps<
   TEndpoint,
   TUsage,
   KeyValueWidgetConfig<TKey, TSchema, TUsage, "primitive">
 >): JSX.Element {
   const locale = useWidgetLocale();
   const t = useWidgetTranslation();
-  const { label: labelKey, className } = field;
+  const form = useWidgetForm();
+  const { label: labelKey, className, usage } = field;
   const label = labelKey ? t(labelKey) : undefined;
 
-  if (
-    !field.value ||
-    typeof field.value !== "object" ||
-    Array.isArray(field.value)
-  ) {
+  // Get value from form for request fields, otherwise from field.value
+  let value;
+  if (usage.request && fieldName && form) {
+    value = form.watch(fieldName);
+    if (!value) {
+      value = field.value;
+    }
+  } else {
+    value = field.value;
+  }
+
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
     return (
       <Div className={cn("flex flex-col gap-2", className)}>
         {label && (
@@ -67,7 +77,7 @@ export function KeyValueWidget<
     );
   }
 
-  const record = field.value;
+  const record = value;
   const entries = Object.entries(record);
 
   if (entries.length === 0) {

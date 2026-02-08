@@ -148,7 +148,7 @@ export function ThreadedMessage({
   // Resolve character name from ID for assistant messages
   const characterName =
     message.role === "assistant" && message.character
-      ? (characters[message.character]?.content.name ?? null)
+      ? (characters[message.character]?.name ?? null)
       : null;
 
   // Minimal fixed indent - just THREAD_INDENT for any nested level (no increase with depth)

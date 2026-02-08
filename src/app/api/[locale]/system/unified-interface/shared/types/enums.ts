@@ -47,11 +47,6 @@ export enum WidgetType {
   FORM_FIELD = "form_field",
 
   // Data display widgets
-  DATA_TABLE = "data_table",
-  DATA_GRID = "data_grid",
-  DATA_CARDS = "data_cards",
-  DATA_LIST = "data_list",
-  GROUPED_LIST = "grouped_list",
   CODE_QUALITY_LIST = "code_quality_list",
   CODE_QUALITY_SUMMARY = "code_quality_summary",
   CODE_QUALITY_FILES = "code_quality_files",
@@ -59,9 +54,7 @@ export enum WidgetType {
 
   // Layout widgets
   CONTAINER = "container",
-  SECTION = "section",
-  TABS = "tabs",
-  ACCORDION = "accordion",
+  CUSTOM_WIDGET = "custom-widget",
   SEPARATOR = "separator",
 
   // Content widgets
@@ -75,7 +68,6 @@ export enum WidgetType {
   MARKDOWN = "markdown",
   MARKDOWN_EDITOR = "markdown_editor",
   LINK = "link",
-  LINK_CARD = "link_card",
 
   // Specialized content widgets
   CODE_OUTPUT = "code_output",
@@ -90,7 +82,6 @@ export enum WidgetType {
 
   // Stats widgets
   STAT = "stat", // Simple stat display: number + label from field definition
-  METRIC_CARD = "metric_card",
   CHART = "chart",
 
   // Status widgets
@@ -102,9 +93,6 @@ export enum WidgetType {
 
   // Interactive action widgets
   SUBMIT_BUTTON = "submit_button",
-
-  // Form feedback widgets
-  PASSWORD_STRENGTH = "password_strength",
 }
 
 /**

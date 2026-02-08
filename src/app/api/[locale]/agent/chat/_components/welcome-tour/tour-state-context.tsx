@@ -3,9 +3,7 @@ import { create } from "zustand";
 interface TourState {
   isActive: boolean;
   modelSelectorOpen: boolean;
-  characterSelectorOpen: boolean;
-  modelSelectorShowAll: boolean;
-  characterSelectorShowAll: boolean;
+  modelSelectorOnboarding: boolean;
   // Pause tour while selector is open (hides tooltip)
   isPaused: boolean;
   // Current tour step index (for coordination)
@@ -16,9 +14,7 @@ interface TourState {
   advanceTour: (() => void) | null;
   setTourActive: (active: boolean) => void;
   setModelSelectorOpen: (open: boolean) => void;
-  setCharacterSelectorOpen: (open: boolean) => void;
-  setModelSelectorShowAll: (showAll: boolean) => void;
-  setCharacterSelectorShowAll: (showAll: boolean) => void;
+  setModelSelectorOnboarding: (onboarding: boolean) => void;
   setIsPaused: (paused: boolean) => void;
   setCurrentStepIndex: (index: number) => void;
   setBottomSheetExpanded: (expanded: boolean) => void;
@@ -28,9 +24,7 @@ interface TourState {
 export const useTourState = create<TourState>((set) => ({
   isActive: false,
   modelSelectorOpen: false,
-  characterSelectorOpen: false,
-  modelSelectorShowAll: false,
-  characterSelectorShowAll: false,
+  modelSelectorOnboarding: false,
   isPaused: false,
   currentStepIndex: 0,
   bottomSheetExpanded: false,
@@ -41,14 +35,8 @@ export const useTourState = create<TourState>((set) => ({
   setModelSelectorOpen: (open): void => {
     set({ modelSelectorOpen: open });
   },
-  setCharacterSelectorOpen: (open): void => {
-    set({ characterSelectorOpen: open });
-  },
-  setModelSelectorShowAll: (showAll): void => {
-    set({ modelSelectorShowAll: showAll });
-  },
-  setCharacterSelectorShowAll: (showAll): void => {
-    set({ characterSelectorShowAll: showAll });
+  setModelSelectorOnboarding: (onboarding): void => {
+    set({ modelSelectorOnboarding: onboarding });
   },
   setIsPaused: (paused): void => {
     set({ isPaused: paused });
