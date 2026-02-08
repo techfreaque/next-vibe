@@ -1,11 +1,12 @@
 /**
- * Custom Widget for Character Create
+ * Custom Widget for Favorite Create
  */
 
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
 
+import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/config";
 import { ModelSelector } from "@/app/api/[locale]/agent/models/components/model-selector";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
@@ -13,57 +14,53 @@ import {
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
+import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/react";
 import { IconFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/react";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
-import type defintion from "./definition";
-import type { CharacterCreateResponseOutput } from "./definition";
+import type definition from "./definition";
+import type { FavoriteCreateResponseOutput } from "./definition";
 
 /**
- * Props for custom widget - field with fully typed children
+ * Props for custom widget
  */
 interface CustomWidgetProps {
   field: {
-    value: CharacterCreateResponseOutput | null | undefined;
-  } & (typeof defintion.POST)["fields"];
+    value: FavoriteCreateResponseOutput | null | undefined;
+  } & (typeof definition.POST)["fields"];
   fieldName: string;
 }
 
 /**
- * Custom container widget for character creation
- * Handles layout, actions, and flattened field rendering
+ * Custom container widget for favorite creation
  */
-export function CharacterCreateContainer({
+export function FavoriteCreateContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
+  const characterId = field.value?.id;
+  const showCharacterInfo = characterId !== NO_CHARACTER_ID;
   const form = useWidgetForm();
   const t = useWidgetTranslation();
 
   return (
     <Div className="flex flex-col gap-0">
-      {/* Top Actions: Back Button + Submit Button */}
+      {/* Top Actions: Back + Submit */}
       <Div className="flex flex-row gap-2 px-4 pt-4 pb-4">
-        {/* Back Button */}
         <NavigateButtonWidget
           field={{
             icon: "arrow-left",
             variant: "outline",
           }}
         />
-
-        {/* Submit Button */}
         <SubmitButtonWidget
           field={{
-            text: "app.api.agent.chat.characters.post.submitButton.text",
+            text: "app.api.agent.chat.favorites.post.submitButton.label",
             loadingText:
-              "app.api.agent.chat.characters.post.submitButton.loadingText",
+              "app.api.agent.chat.favorites.post.submitButton.loadingText",
             icon: "plus",
             variant: "primary",
             className: "ml-auto",
@@ -73,36 +70,50 @@ export function CharacterCreateContainer({
 
       {/* Scrollable Form Container */}
       <Div className="group overflow-y-auto max-h-[calc(100dvh-180px)] px-4 pb-4">
-        {/* Form Alert */}
         <FormAlertWidget field={{}} />
 
-        {/* Success message (response only) */}
         <AlertWidget
           fieldName="success"
           field={withValue(children.success, field.value?.success, null)}
         />
 
-        {/* Render form fields in explicit order */}
         <Div className="flex flex-col gap-4">
-          <TextFieldWidget fieldName="name" field={children.name} />
-          <TextFieldWidget fieldName="tagline" field={children.tagline} />
-          <IconFieldWidget fieldName="icon" field={children.icon} />
-          <TextFieldWidget
-            fieldName="description"
-            field={children.description}
-          />
-          <SelectFieldWidget fieldName="category" field={children.category} />
-          <BooleanFieldWidget fieldName="isPublic" field={children.isPublic} />
+          {/* Character Info (hidden for default character) */}
+          {showCharacterInfo && (
+            <Div className="flex items-start gap-4">
+              <IconFieldWidget
+                fieldName="characterIcon"
+                field={children.icon}
+              />
+              <Div className="flex flex-col gap-2">
+                <Div className="flex gap-2 items-center">
+                  <TextWidget fieldName="characterName" field={children.name} />
+                  <TextWidget
+                    fieldName="characterTagline"
+                    field={children.tagline}
+                  />
+                </Div>
+                <TextWidget
+                  fieldName="characterDescription"
+                  field={children.description}
+                />
+              </Div>
+            </Div>
+          )}
+
           <SelectFieldWidget fieldName="voice" field={children.voice} />
-          <TextareaFieldWidget
-            fieldName="systemPrompt"
-            field={children.systemPrompt}
-          />
           {form && (
             <ModelSelector
-              modelSelection={form.watch("modelSelection")}
+              modelSelection={form.watch("modelSelection")?.currentSelection}
               onChange={(selection) =>
-                form.setValue("modelSelection", selection)
+                form.setValue("modelSelection", {
+                  currentSelection: selection,
+                  characterModelSelection:
+                    form.watch("modelSelection")?.characterModelSelection,
+                })
+              }
+              characterModelSelection={
+                form.watch("modelSelection")?.characterModelSelection
               }
               t={t}
             />

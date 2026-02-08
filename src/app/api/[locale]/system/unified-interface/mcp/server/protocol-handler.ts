@@ -126,7 +126,12 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
               "Server not initialized. Call initialize first.",
             );
           }
-          if (!request.params) {
+          if (
+            !request.params ||
+            typeof request.params !== "object" ||
+            !("name" in request.params) ||
+            typeof request.params.name !== "string"
+          ) {
             return this.fail(
               request.id ?? null,
               MCPErrorCode.INVALID_PARAMS,
@@ -134,7 +139,17 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
               "Tool call params are required",
             );
           }
-          result = await this.handleToolCall(request.params);
+          // Runtime check ensures params has name property
+          const toolCallParams: MCPToolCallParams = {
+            name: request.params.name,
+            arguments:
+              "arguments" in request.params &&
+              typeof request.params.arguments === "object" &&
+              !Array.isArray(request.params.arguments)
+                ? (request.params.arguments as Record<string, WidgetData>)
+                : undefined,
+          };
+          result = await this.handleToolCall(toolCallParams);
           break;
 
         default:
@@ -228,7 +243,6 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     const endpoints = definitionsRegistry.getEndpointsForUser(
       Platform.MCP,
       this.user,
-      this.logger,
     );
 
     // Convert to MCP tool format with proper JSON Schema and translated descriptions

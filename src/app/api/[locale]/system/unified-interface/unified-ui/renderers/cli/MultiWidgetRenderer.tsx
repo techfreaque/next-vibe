@@ -3,6 +3,7 @@ import type { ReactElement } from "react";
 import { useMemo } from "react";
 import type z from "zod";
 
+import type { InferResponseOutput } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
 import { withValue } from "../../widgets/_shared/field-helpers";
@@ -11,8 +12,6 @@ import type {
   ArrayChildConstraint,
   ConstrainedChildUsage,
   FieldUsageConfig,
-  InferChildOutput,
-  InferChildrenOutput,
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
 } from "../../widgets/_shared/types";
@@ -57,7 +56,12 @@ interface ObjectChildrenRendererProps<
   TChildren extends ObjectChildrenConstraint<TKey, TUsage>,
 > {
   childrenSchema: TChildren;
-  value: InferChildrenOutput<TChildren> | null | undefined;
+  value:
+    | {
+        [K in keyof TChildren]: InferResponseOutput<TChildren[K]>;
+      }
+    | null
+    | undefined;
   fieldName: string | undefined;
 }
 
@@ -70,11 +74,11 @@ interface ArrayChildRendererProps<
   TChild extends AnyChildrenConstrain<TKey, TUsage>,
 > {
   childSchema: TChild;
-  value: InferChildOutput<TChild>[] | null | undefined;
+  value: Array<InferResponseOutput<TChild>> | null | undefined;
   fieldName: string | undefined;
   /** Optional render callback to customize how each item is rendered */
   renderItem?: (props: {
-    itemData: InferChildOutput<TChild>;
+    itemData: InferResponseOutput<TChild>;
     index: number;
     itemFieldName: string;
     childSchema: TChild;
@@ -91,9 +95,14 @@ interface UnionObjectRendererProps<
 > {
   variantSchemas: TVariants;
   value:
-    | InferChildrenOutput<
-        ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
-      >
+    | {
+        [K in keyof ObjectChildrenConstraint<
+          TKey,
+          ConstrainedChildUsage<TUsage>
+        >]: InferResponseOutput<
+          ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>[K]
+        >;
+      }
     | null
     | undefined;
   fieldName: string | undefined;
@@ -372,11 +381,21 @@ export interface MultiWidgetRendererProps<
 > {
   childrenSchema: TChildrenSchema;
   value:
-    | InferChildrenOutput<ObjectChildrenConstraint<TKey, TUsage>>
-    | InferChildrenOutput<
-        ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
-      >
-    | InferChildOutput<AnyChildrenConstrain<TKey, TUsage>>[]
+    | {
+        [K in keyof ObjectChildrenConstraint<
+          TKey,
+          TUsage
+        >]: InferResponseOutput<ObjectChildrenConstraint<TKey, TUsage>[K]>;
+      }
+    | {
+        [K in keyof ObjectChildrenConstraint<
+          TKey,
+          ConstrainedChildUsage<TUsage>
+        >]: InferResponseOutput<
+          ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>[K]
+        >;
+      }
+    | Array<InferResponseOutput<AnyChildrenConstrain<TKey, TUsage>>>
     | null
     | undefined;
   fieldName: string | undefined;
@@ -384,7 +403,7 @@ export interface MultiWidgetRendererProps<
   watchedDiscriminatorValue?: string;
   /** Optional render callback for array items to customize rendering */
   renderItem?: (props: {
-    itemData: InferChildOutput<AnyChildrenConstrain<TKey, TUsage>>;
+    itemData: InferResponseOutput<AnyChildrenConstrain<TKey, TUsage>>;
     index: number;
     itemFieldName: string;
     childSchema: AnyChildrenConstrain<TKey, TUsage>;

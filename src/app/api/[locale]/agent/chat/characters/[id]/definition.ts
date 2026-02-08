@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/components/types";
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { success } from "@/app/api/[locale]/shared/types/response.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -26,7 +27,6 @@ import {
   SpacingSize,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { modelSelectionSchemaSimple } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../../shared/types/common.schema";
@@ -480,14 +480,7 @@ const { PATCH } = createEndpoint({
       }),
       modelSelection: requestField({
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.MODEL_SELECTION,
-        label:
-          "app.api.agent.chat.characters.post.modelSelection.title" as const,
-        description:
-          "app.api.agent.chat.characters.post.modelSelection.description" as const,
-        includeCharacterBased: false,
-        columns: 12,
-        order: 8,
+        fieldType: FieldDataType.OBJECT,
         schema: modelSelectionSchemaSimple,
       }),
     },
@@ -663,7 +656,8 @@ const { GET } = createEndpoint({
         schema: z.string().min(1).max(5000).nullable(),
       }),
       modelSelection: responseField({
-        type: WidgetType.CUSTOM_WIDGET,
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.OBJECT,
         schema: modelSelectionSchemaSimple,
       }),
     },

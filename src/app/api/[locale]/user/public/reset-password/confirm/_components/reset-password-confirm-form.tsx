@@ -1,33 +1,18 @@
 "use client";
 
 import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { Loader2 } from "next-vibe-ui/ui/icons";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { Link } from "next-vibe-ui/ui/link";
-import { Environment } from "next-vibe/shared/utils/env-util";
 import { Button } from "next-vibe-ui/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "next-vibe-ui/ui/card";
+import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
-import { Form } from "next-vibe-ui/ui/form/form";
-import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
-import { FormItem } from "next-vibe-ui/ui/form/form";
-import { useMemo, type JSX } from "react";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { JSX } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useResetPasswordConfirm } from "@/app/api/[locale]/user/public/reset-password/confirm/hooks";
-import type { ResetPasswordValidateGetResponseOutput } from "@/app/api/[locale]/user/public/reset-password/validate/definition";
-import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { PasswordStrengthIndicator } from "../../../signup/_components/password-strength-indicator";
 import resetConfirmDefinitions from "@/app/api/[locale]/user/public/reset-password/confirm/definition";
+import type { ResetPasswordValidateGetResponseOutput } from "@/app/api/[locale]/user/public/reset-password/validate/definition";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "../../../../auth/types";
 
 interface ResetPasswordConfirmFormProps {
@@ -45,23 +30,12 @@ export default function ResetPasswordConfirmForm({
 }: ResetPasswordConfirmFormProps): JSX.Element {
   const { t } = simpleT(locale);
 
-  // Initialize logger for client-side operations
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  // Extract token validation status
+  const tokenValid = tokenValidationResponse.success
+    ? tokenValidationResponse.data?.response?.valid
+    : false;
 
-  const {
-    form,
-    submitForm,
-    isSubmitting,
-    passwordValue,
-    tokenValid,
-    alert,
-    isSuccess,
-  } = useResetPasswordConfirm(token, tokenValidationResponse, logger, user);
-
-  // If the token is invalid
+  // If the token is invalid, show error state
   if (tokenValid === false) {
     return (
       <MotionDiv
@@ -70,8 +44,18 @@ export default function ResetPasswordConfirmForm({
         transition={{ duration: 0.5 }}
       >
         <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
-          <CardContent className="pt-6">
-            {alert && <FormAlert alert={alert} className="mb-6" />}
+          <CardContent className="pt-6 space-y-4">
+            <Div className="text-destructive text-center">
+              {tokenValidationResponse.success
+                ? t(
+                    tokenValidationResponse.data?.response?.message ||
+                      "app.common.errors.unknown",
+                  )
+                : t(
+                    tokenValidationResponse.message,
+                    tokenValidationResponse.messageParams,
+                  )}
+            </Div>
             <Div className="text-center">
               <Button asChild>
                 <Link href={`/${locale}/user/reset-password`}>
@@ -87,116 +71,26 @@ export default function ResetPasswordConfirmForm({
     );
   }
 
-  // If password reset was successful
-  if (isSuccess) {
-    return (
-      <MotionDiv
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
-          <CardContent className="pt-6">
-            {alert && <FormAlert alert={alert} className="mb-6" />}
-            <Div className="text-center">
-              <Button
-                asChild
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                <Link href={`/${locale}/user/login`}>
-                  {t("app.user.other.login.auth.login.signInButton")}
-                </Link>
-              </Button>
-            </Div>
-          </CardContent>
-        </Card>
-      </MotionDiv>
-    );
-  }
-
-  // Valid token, show the form
+  // Valid token - show the reset password form using EndpointsPage
   return (
     <MotionDiv
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
-        <CardHeader className="flex flex-col gap-1 pb-2">
-          <CardTitle className="text-2xl font-bold text-center">
-            {t(
-              "app.user.other.resetPassword.auth.resetPassword.createNewPasswordTitle",
-            )}
-          </CardTitle>
-          <CardDescription className="text-center">
-            {t(
-              "app.user.other.resetPassword.auth.resetPassword.createNewPasswordSubtitle",
-            )}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {/* Show form alert if any */}
-          {alert && <FormAlert alert={alert} className="mb-6" />}
-
-          <Form
-            form={form}
-            onSubmit={submitForm}
-            className="flex flex-col gap-6"
-          >
-            <EndpointFormField
-              name="verification.email"
-              control={form.control}
-              endpoint={resetConfirmDefinitions.POST}
-              theme={{
-                style: "none",
-                showAllRequired: false,
-              }}
-              locale={locale}
-            />
-
-            <FormItem>
-              <EndpointFormField
-                name="newPassword.password"
-                control={form.control}
-                endpoint={resetConfirmDefinitions.POST}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-                locale={locale}
-              />
-              <PasswordStrengthIndicator
-                password={passwordValue}
-                locale={locale}
-              />
-            </FormItem>
-
-            <EndpointFormField
-              name="newPassword.confirmPassword"
-              control={form.control}
-              endpoint={resetConfirmDefinitions.POST}
-              theme={{
-                style: "none",
-                showAllRequired: false,
-              }}
-              locale={locale}
-            />
-
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t("app.user.common.loading")}
-                </>
-              ) : (
-                t(
-                  "app.user.other.resetPassword.auth.resetPassword.resetPasswordButton",
-                )
-              )}
-            </Button>
-          </Form>
-        </CardContent>
-      </Card>
+      <EndpointsPage
+        endpoint={resetConfirmDefinitions}
+        locale={locale}
+        user={user}
+        endpointOptions={{
+          create: {
+            initialState: {
+              token,
+              email: "",
+            },
+          },
+        }}
+      />
     </MotionDiv>
   );
 }

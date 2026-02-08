@@ -7,8 +7,11 @@ import "server-only";
 
 import { and, eq, inArray, isNotNull, ne, or, sql } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
-import type { z } from "zod";
 
+import type {
+  FiltersModelSelection,
+  ManualModelSelection,
+} from "@/app/api/[locale]/agent/models/components/types";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -17,14 +20,10 @@ import {
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type {
-  FiltersModelSelection,
-  ManualModelSelection,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
-import type { iconSchema } from "../../../shared/types/common.schema";
+import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import {
   defaultModel,
   getCreditCostFromModel,
@@ -615,16 +614,12 @@ export class CharactersRepository {
   private static mapCharacterToListItem(
     id: string,
     char: {
-      icon: z.infer<typeof iconSchema> | null;
+      icon: IconKey | null;
       name: TranslationKey | null;
       tagline: TranslationKey | null;
       description: TranslationKey | null;
       category: typeof CharacterCategoryValue;
-      modelSelection:
-        | FiltersModelSelection
-        | ManualModelSelection
-        | null
-        | undefined;
+      modelSelection: FiltersModelSelection | ManualModelSelection;
     },
     t: TFunction,
     addedToFav: boolean,

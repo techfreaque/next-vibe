@@ -27,16 +27,17 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { iconSchema } from "../../../shared/types/common.schema";
-import {
-  ModelSortDirection,
-  ModelSortField,
-} from "../../../system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
 import { ModelId, TOTAL_MODEL_COUNT } from "../../models/models";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import createFavoriteDefinitions from "../favorites/create/definition";
 import { NO_CHARACTER_ID } from "./config";
 import createCharacterDefinitions from "./create/definition";
-import { CharacterCategoryDB, ModelSelectionType } from "./enum";
+import {
+  CharacterCategoryDB,
+  ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
+} from "./enum";
 import { CharactersListContainer } from "./widget";
 
 /**
@@ -79,7 +80,7 @@ const { GET } = createEndpoint({
         }
 
         const favoritedCharacterIds = new Set(
-          favoritesResult.data.favoritesList.map((fav) => fav.characterId),
+          favoritesResult.data.favorites.map((fav) => fav.characterId),
         );
 
         // Mutate the response data directly (before it's added to cache)
@@ -171,11 +172,9 @@ const { GET } = createEndpoint({
               description: "",
               voice: DEFAULT_TTS_VOICE,
               modelSelection: {
-                currentSelection: {
-                  selectionType: ModelSelectionType.FILTERS,
-                  sortBy: ModelSortField.CONTENT,
-                  sortDirection: ModelSortDirection.DESC,
-                },
+                selectionType: ModelSelectionType.FILTERS,
+                sortBy: ModelSortField.CONTENT,
+                sortDirection: ModelSortDirection.DESC,
               },
             },
           };

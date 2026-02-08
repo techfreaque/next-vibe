@@ -95,7 +95,7 @@ const { POST } = createEndpoint({
       }),
       status: responseArrayOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           title: "app.api.browser.response.status",
         },
         responseField({

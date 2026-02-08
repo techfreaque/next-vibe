@@ -69,7 +69,7 @@ const { POST } = createEndpoint({
       }),
       args: requestDataArrayOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           title: "app.api.browser.evaluate-script.form.fields.args.label",
           description:
             "app.api.browser.evaluate-script.form.fields.args.description",

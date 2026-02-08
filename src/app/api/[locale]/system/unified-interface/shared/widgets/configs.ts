@@ -24,7 +24,6 @@ import type {
   CustomWidgetObjectConfig,
   CustomWidgetPrimitiveConfig,
 } from "../../unified-ui/widgets/containers/custom/types";
-import type { PaginationWidgetConfig } from "../../unified-ui/widgets/containers/pagination/types";
 import type { AlertWidgetConfig } from "../../unified-ui/widgets/display-only/alert/types";
 import type { AvatarWidgetConfig } from "../../unified-ui/widgets/display-only/avatar/types";
 import type { BadgeWidgetConfig } from "../../unified-ui/widgets/display-only/badge/types";
@@ -60,7 +59,6 @@ import type { IntFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/
 import type { JsonFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/json-field/types";
 import type { LanguageSelectFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/language-select-field/types";
 import type { MarkdownEditorWidgetConfig } from "../../unified-ui/widgets/form-fields/markdown-editor/types";
-import type { ModelSelectionFieldWidgetConfigAny } from "../../unified-ui/widgets/form-fields/model-selection-field/types";
 import type { MultiSelectFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/multiselect-field/types";
 import type { NumberFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/number-field/types";
 import type { PasswordFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/password-field/types";
@@ -269,8 +267,7 @@ export type FormFieldWidgetConfig<
       // @ts-expect-error - TSchema constraint mismatch
       TSchema,
       TUsage
-    >
-  | ModelSelectionFieldWidgetConfigAny<TKey, TUsage>;
+    >;
 
 /**
  * Widget configs that support object-union (discriminated unions)
@@ -299,8 +296,7 @@ export type ObjectWidgetConfig<
   >,
 > =
   | ContainerWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
-  | CustomWidgetObjectConfig<TKey, TUsage, TSchemaType, TChildren>
-  | PaginationWidgetConfig;
+  | CustomWidgetObjectConfig<TKey, TUsage, TSchemaType, TChildren>;
 
 /**
  * Widget configs that work with array data
@@ -499,7 +495,7 @@ export type UnifiedField<
   TUsage extends FieldUsageConfig,
   TChildren extends AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>,
 > =
-  | FormFieldWidgetConfig<TKey, TSchema, TUsage>
+  | RequestResponseWidgetConfig<TKey, TSchema, TUsage, "primitive">
   | ObjectWidgetConfig<
       TKey,
       TUsage,
@@ -514,5 +510,4 @@ export type UnifiedField<
       // @ts-expect-error - TChildren is only valid for object widgets
       TChildren
     >
-  | DisplayOnlyWidgetConfig<TKey, TUsage, "widget">
-  | RequestResponseDisplayWidgetConfig<TKey, TSchema, TUsage, "primitive">;
+  | DisplayOnlyWidgetConfig<TKey, TUsage, "widget">;

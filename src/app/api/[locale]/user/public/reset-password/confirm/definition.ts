@@ -9,18 +9,17 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
-  objectField,
+  customWidgetObject,
   requestField,
-  responseArrayField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 
 import { UserRole } from "../../../user-roles/enum";
+import { ResetPasswordConfirmContainer } from "./widget";
 
 /**
  * POST /reset-password/confirm - Confirm password reset
@@ -34,144 +33,79 @@ const { POST } = createEndpoint({
   category: "app.api.user.category" as const,
   tags: ["app.api.user.public.resetPassword.confirm.tag" as const],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.user.public.resetPassword.confirm.title" as const,
-      description:
-        "app.api.user.public.resetPassword.confirm.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
+  fields: customWidgetObject({
+    render: ResetPasswordConfirmContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      token: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.user.public.resetPassword.confirm.fields.token.label" as const,
+        description:
+          "app.api.user.public.resetPassword.confirm.fields.token.description" as const,
+        placeholder:
+          "app.api.user.public.resetPassword.confirm.fields.token.placeholder" as const,
+        helpText:
+          "app.api.user.public.resetPassword.confirm.fields.token.help" as const,
+        schema: z.string().min(1, {
+          message:
+            "app.api.user.public.resetPassword.confirm.fields.token.validation.required",
+        }),
+      }),
+      email: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label:
+          "app.api.user.public.resetPassword.confirm.fields.email.label" as const,
+        description:
+          "app.api.user.public.resetPassword.confirm.fields.email.description" as const,
+        placeholder:
+          "app.api.user.public.resetPassword.confirm.fields.email.placeholder" as const,
+        schema: z
+          .email({
+            message:
+              "app.api.user.public.resetPassword.confirm.fields.email.validation.invalid",
+          })
+          .transform((val) => val.toLowerCase().trim()),
+      }),
+      password: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.PASSWORD,
+        label:
+          "app.api.user.public.resetPassword.confirm.fields.password.label" as const,
+        description:
+          "app.api.user.public.resetPassword.confirm.fields.password.description" as const,
+        placeholder:
+          "app.api.user.public.resetPassword.confirm.fields.password.placeholder" as const,
+        helpText:
+          "app.api.user.public.resetPassword.confirm.fields.password.help" as const,
+        schema: z.string().min(8, {
+          message:
+            "app.api.user.public.resetPassword.confirm.fields.password.validation.minLength",
+        }),
+      }),
+      confirmPassword: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.PASSWORD,
+        label:
+          "app.api.user.public.resetPassword.confirm.fields.confirmPassword.label" as const,
+        description:
+          "app.api.user.public.resetPassword.confirm.fields.confirmPassword.description" as const,
+        placeholder:
+          "app.api.user.public.resetPassword.confirm.fields.confirmPassword.placeholder" as const,
+        schema: z.string().min(8, {
+          message:
+            "app.api.user.public.resetPassword.confirm.fields.confirmPassword.validation.minLength",
+        }),
+      }),
+
+      message: responseField({
+        type: WidgetType.ALERT,
+        schema: z.string().describe("Human-readable status message"),
+      }),
     },
-    { request: "data", response: true },
-    {
-      // === VERIFICATION DETAILS ===
-      verification: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.public.resetPassword.confirm.groups.verification.title" as const,
-          description:
-            "app.api.user.public.resetPassword.confirm.groups.verification.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { request: "data" },
-        {
-          token: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label:
-              "app.api.user.public.resetPassword.confirm.fields.token.label" as const,
-            description:
-              "app.api.user.public.resetPassword.confirm.fields.token.description" as const,
-            placeholder:
-              "app.api.user.public.resetPassword.confirm.fields.token.placeholder" as const,
-            helpText:
-              "app.api.user.public.resetPassword.confirm.fields.token.help" as const,
-            schema: z.string().min(1, {
-              message:
-                "app.api.user.public.resetPassword.confirm.fields.token.validation.required",
-            }),
-          }),
-
-          email: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.EMAIL,
-            label:
-              "app.api.user.public.resetPassword.confirm.fields.email.label" as const,
-            description:
-              "app.api.user.public.resetPassword.confirm.fields.email.description" as const,
-            placeholder:
-              "app.api.user.public.resetPassword.confirm.fields.email.placeholder" as const,
-            schema: z
-              .string()
-              .email({
-                message:
-                  "app.api.user.public.resetPassword.confirm.fields.email.validation.invalid",
-              })
-              .transform((val) => val.toLowerCase().trim()),
-          }),
-        },
-      ),
-
-      // === NEW PASSWORD SETUP ===
-      newPassword: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.public.resetPassword.confirm.groups.newPassword.title" as const,
-          description:
-            "app.api.user.public.resetPassword.confirm.groups.newPassword.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { request: "data" },
-        {
-          password: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.PASSWORD,
-            label:
-              "app.api.user.public.resetPassword.confirm.fields.password.label" as const,
-            description:
-              "app.api.user.public.resetPassword.confirm.fields.password.description" as const,
-            placeholder:
-              "app.api.user.public.resetPassword.confirm.fields.password.placeholder" as const,
-            helpText:
-              "app.api.user.public.resetPassword.confirm.fields.password.help" as const,
-            schema: z.string().min(8, {
-              message:
-                "app.api.user.public.resetPassword.confirm.fields.password.validation.minLength",
-            }),
-          }),
-
-          confirmPassword: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.PASSWORD,
-            label:
-              "app.api.user.public.resetPassword.confirm.fields.confirmPassword.label" as const,
-            description:
-              "app.api.user.public.resetPassword.confirm.fields.confirmPassword.description" as const,
-            placeholder:
-              "app.api.user.public.resetPassword.confirm.fields.confirmPassword.placeholder" as const,
-            schema: z.string().min(8, {
-              message:
-                "app.api.user.public.resetPassword.confirm.fields.confirmPassword.validation.minLength",
-            }),
-          }),
-        },
-      ),
-
-      // === RESPONSE FIELDS ===
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.public.resetPassword.confirm.response.title" as const,
-          description:
-            "app.api.user.public.resetPassword.confirm.response.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          success: responseField({
-            type: WidgetType.BADGE,
-            text: "app.api.user.public.resetPassword.confirm.success.title" as const,
-            schema: z
-              .boolean()
-              .describe("Whether the password reset was successful"),
-          }),
-          message: responseField({
-            type: WidgetType.TEXT,
-            content:
-              "app.api.user.public.resetPassword.confirm.response.message.label" as const,
-            schema: z.string().describe("Human-readable status message"),
-          }),
-        },
-      ),
-    },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
@@ -242,57 +176,36 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        verification: {
-          email: "user@example.com",
-          token: "abc123",
-        },
-        newPassword: {
-          password: "newPassword123",
-          confirmPassword: "newPassword123",
-        },
+        email: "user@example.com",
+        token: "abc123",
+        password: "newPassword123",
+        confirmPassword: "newPassword123",
       },
       mismatchedPasswords: {
-        verification: {
-          email: "user@example.com",
-          token: "abc123",
-        },
-        newPassword: {
-          password: "newPassword123",
-          confirmPassword: "differentPassword123",
-        },
+        email: "user@example.com",
+        token: "abc123",
+        password: "newPassword123",
+        confirmPassword: "differentPassword123",
       },
       expiredToken: {
-        verification: {
-          email: "user@example.com",
-          token: "expired-token",
-        },
-        newPassword: {
-          password: "newPassword123",
-          confirmPassword: "newPassword123",
-        },
+        email: "user@example.com",
+        token: "expired-token",
+        password: "newPassword123",
+        confirmPassword: "newPassword123",
       },
     },
     responses: {
       default: {
-        response: {
-          success: true,
-          message:
-            "Password reset successfully! You can now log in with your new password.",
-        },
+        message:
+          "Password reset successfully! You can now log in with your new password.",
       },
       mismatchedPasswords: {
-        response: {
-          success: false,
-          message:
-            "Passwords do not match. Please ensure both password fields are identical.",
-        },
+        message:
+          "Passwords do not match. Please ensure both password fields are identical.",
       },
       expiredToken: {
-        response: {
-          success: false,
-          message:
-            "Reset token has expired. Please request a new password reset.",
-        },
+        message:
+          "Reset token has expired. Please request a new password reset.",
       },
     },
   },

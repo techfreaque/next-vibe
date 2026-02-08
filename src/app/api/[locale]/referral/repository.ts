@@ -130,72 +130,55 @@ export class ReferralRepository {
         .orderBy(desc(referralCodes.createdAt));
 
       // Get stats for each code
-      const codesWithStats = await Promise.all(
-        codes.map(async (code) => {
-          // Count signups: leads linked to this code that have signedUp status
-          const [signupCount] = await db
-            .select({ count: sql<number>`count(*)::int` })
-            .from(leadReferrals)
-            .innerJoin(leads, eq(leadReferrals.leadId, leads.id))
-            .where(
-              and(
-                eq(leadReferrals.referralCodeId, code.id),
-                eq(leads.status, LeadStatus.SIGNED_UP),
-              ),
-            );
+      const codesWithStats: CodesListGetResponseOutput["codes"] =
+        await Promise.all(
+          codes.map(async (code) => {
+            // Count signups: leads linked to this code that have signedUp status
+            const [signupCount] = await db
+              .select({ count: sql<number>`count(*)::int` })
+              .from(leadReferrals)
+              .innerJoin(leads, eq(leadReferrals.leadId, leads.id))
+              .where(
+                and(
+                  eq(leadReferrals.referralCodeId, code.id),
+                  eq(leads.status, LeadStatus.SIGNED_UP),
+                ),
+              );
 
-          // Get earnings and revenue for this code from users referred by this code
-          // Revenue = total amount paid by referred users (amountCents / POOL_PERCENTAGE)
-          // Earnings = commission earned by code owner
-          const [stats] = await db
-            .select({
-              totalEarnings: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}), 0)::int`,
-              // Revenue is earnings divided by pool percentage (0.2) = earnings * 5
-              totalRevenue: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}), 0)::int * 5`,
-            })
-            .from(referralEarnings)
-            .innerJoin(
-              userReferrals,
-              eq(referralEarnings.sourceUserId, userReferrals.referredUserId),
-            )
-            .where(
-              and(
-                eq(userReferrals.referralCodeId, code.id),
-                eq(referralEarnings.earnerUserId, userId), // Only count earnings for this code owner
-              ),
-            );
+            // Get earnings and revenue for this code from users referred by this code
+            // Revenue = total amount paid by referred users (amountCents / POOL_PERCENTAGE)
+            // Earnings = commission earned by code owner
+            const [stats] = await db
+              .select({
+                totalEarnings: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}), 0)::int`,
+                // Revenue is earnings divided by pool percentage (0.2) = earnings * 5
+                totalRevenue: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}), 0)::int * 5`,
+              })
+              .from(referralEarnings)
+              .innerJoin(
+                userReferrals,
+                eq(referralEarnings.sourceUserId, userReferrals.referredUserId),
+              )
+              .where(
+                and(
+                  eq(userReferrals.referralCodeId, code.id),
+                  eq(referralEarnings.earnerUserId, userId), // Only count earnings for this code owner
+                ),
+              );
 
-          return {
-            topRow: {
-              codeInfo: {
-                code: code.code,
-                label: code.label,
-              },
-            },
-            statsGrid: {
-              uses: {
-                label: "app.user.referral.myCodes.uses",
-                currentUses: code.currentUses,
-              },
-              signups: {
-                label: "app.user.referral.myCodes.signups",
-                totalSignups: signupCount?.count ?? 0,
-              },
-              revenue: {
-                label: "app.user.referral.myCodes.revenue",
-                totalRevenueCents: stats?.totalRevenue ?? 0,
-              },
-              earnings: {
-                label: "app.user.referral.myCodes.earnings",
-                totalEarningsCents: stats?.totalEarnings ?? 0,
-              },
-            },
-            inactiveWarning: code.isActive,
-          };
-        }),
-      );
+            return {
+              code: code.code,
+              label: code.label,
+              currentUses: code.currentUses,
+              totalSignups: signupCount?.count ?? 0,
+              totalRevenueCents: stats?.totalRevenue ?? 0,
+              totalEarningsCents: stats?.totalEarnings ?? 0,
+              isActive: code.isActive,
+            } satisfies CodesListGetResponseOutput["codes"][number];
+          }),
+        );
 
-      return success({ codes: codesWithStats });
+      return success<CodesListGetResponseOutput>({ codes: codesWithStats });
     } catch (error) {
       logger.error("Failed to get referral codes", parseError(error));
       return fail({
@@ -459,13 +442,25 @@ export class ReferralRepository {
     try {
       logger.debug("Getting referral stats", { userId });
 
-      // Count total signups (users who signed up via this user's referral codes)
+      // Count total signups from user referrals
       const [signupsResult] = await db
-        .select({ count: sql<number>`count(*)::int` })
+        .select({
+          count: sql<number>`count(*)::int`,
+        })
         .from(userReferrals)
         .where(eq(userReferrals.referrerUserId, userId));
 
       const totalSignups = signupsResult?.count || 0;
+
+      // Calculate total revenue generated (sum of all earnings * 5, since earnings are 20% of revenue)
+      const [revenueResult] = await db
+        .select({
+          total: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}) * 5, 0)::int`,
+        })
+        .from(referralEarnings)
+        .where(eq(referralEarnings.earnerUserId, userId));
+
+      const totalRevenueCredits = revenueResult?.total || 0;
 
       // Calculate total earned credits (sum of all earnings)
       const [earningsResult] = await db
@@ -476,9 +471,6 @@ export class ReferralRepository {
         .where(eq(referralEarnings.earnerUserId, userId));
 
       const totalEarnedCredits = earningsResult?.total || 0;
-
-      // Total revenue = earned credits * 5 (since pool is 20% of transaction)
-      const totalRevenueCredits = totalEarnedCredits * 5;
 
       // Calculate total paid out (from completed payout requests)
       const [payoutResult] = await db
@@ -499,46 +491,22 @@ export class ReferralRepository {
       const availableCredits = totalEarnedCredits - totalPaidOutCredits;
 
       return success({
-        totalSignups: {
-          header: {
-            title: "app.user.referral.stats.totalSignups",
-            icon: undefined,
-          },
-          content: {
-            value: totalSignups,
-            description: "app.user.referral.stats.totalSignupsDesc",
-          },
-        },
-        totalRevenueCredits: {
-          header: {
-            title: "app.user.referral.stats.totalRevenue",
-            icon: undefined,
-          },
-          content: {
-            value: totalRevenueCredits,
-            description: "app.user.referral.stats.totalRevenueDesc",
-          },
-        },
-        totalEarnedCredits: {
-          header: {
-            title: "app.user.referral.stats.totalEarned",
-            icon: undefined,
-          },
-          content: {
-            value: totalEarnedCredits,
-            description: "app.user.referral.stats.totalEarnedDesc",
-          },
-        },
-        availableCredits: {
-          header: {
-            title: "app.user.referral.stats.availableBalance",
-            icon: undefined,
-          },
-          content: {
-            value: availableCredits,
-            description: "app.user.referral.stats.availableBalanceDesc",
-          },
-        },
+        totalSignupsTitle: "app.user.referral.stats.totalSignups",
+        totalSignupsValue: totalSignups,
+        totalSignupsDescription: "app.user.referral.stats.totalSignupsDesc",
+
+        totalRevenueTitle: "app.user.referral.stats.totalRevenue",
+        totalRevenueValue: totalRevenueCredits,
+        totalRevenueDescription: "app.user.referral.stats.totalRevenueDesc",
+
+        totalEarnedTitle: "app.user.referral.stats.totalEarned",
+        totalEarnedValue: totalEarnedCredits,
+        totalEarnedDescription: "app.user.referral.stats.totalEarnedDesc",
+
+        availableCreditsTitle: "app.user.referral.stats.availableBalance",
+        availableCreditsValue: availableCredits,
+        availableCreditsDescription:
+          "app.user.referral.stats.availableBalanceDesc",
       });
     } catch (error) {
       logger.error("Failed to get referral stats", parseError(error));

@@ -157,7 +157,7 @@ const { GET } = createEndpoint({
                   }),
                   providers: responseArrayField(
                     {
-                      type: WidgetType.DATA_LIST,
+                      type: WidgetType.CONTAINER,
                     },
                     objectField(
                       {

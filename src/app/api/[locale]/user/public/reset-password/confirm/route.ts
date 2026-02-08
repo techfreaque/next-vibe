@@ -23,29 +23,13 @@ export const { POST, tools } = endpointsHandler({
       },
     ],
     handler: async ({ data, logger, locale }) => {
-      const result = await PasswordRepository.confirmPasswordReset(
-        data.verification.token,
-        data.verification.email,
-        data.newPassword.password,
+      return await PasswordRepository.confirmPasswordReset(
+        data.token,
+        data.email,
+        data.password,
         locale,
         logger,
       );
-      // Transform the string response to match the definition's expected structure
-      if (result.success) {
-        return {
-          success: true,
-          data: {
-            response: {
-              success: true,
-              message: result.data,
-              nextSteps: [
-                "app.api.user.public.resetPassword.confirm.nextSteps.login",
-              ],
-            },
-          },
-        };
-      }
-      return result;
     },
   },
 });

@@ -17,6 +17,7 @@ import {
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
+  ReactWidgetPropsNoValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import {
   useWidgetForm,
@@ -106,12 +107,17 @@ export function TextWidget<
   TUsage extends FieldUsageConfig,
 >(
   props:
+    | ReactRequestResponseWidgetProps<
+        TEndpoint,
+        TUsage,
+        TextWidgetConfig<TKey, TextWidgetSchema, TUsage, "primitive">
+      >
     | ReactStaticWidgetProps<
         TEndpoint,
         TUsage,
         TextWidgetConfig<TKey, never, TUsage, "widget">
       >
-    | ReactRequestResponseWidgetProps<
+    | ReactWidgetPropsNoValue<
         TEndpoint,
         TUsage,
         TextWidgetConfig<TKey, TextWidgetSchema, TUsage, "primitive">

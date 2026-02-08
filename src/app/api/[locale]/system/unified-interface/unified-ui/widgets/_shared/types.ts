@@ -8,10 +8,10 @@ import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
 import type { UseNavigationStackReturn } from "../../../react/hooks/use-navigation-stack";
+import type { InferResponseOutput } from "../../../shared/endpoints/definition/create";
 import type { EndpointLogger } from "../../../shared/logger/endpoint";
-import type { InferSchemaFromField } from "../../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
-import type { FieldUsage, WidgetType } from "../../../shared/types/enums";
+import type { WidgetType } from "../../../shared/types/enums";
 import type { Platform } from "../../../shared/types/platform";
 import type {
   DisplayOnlyWidgetConfig,
@@ -86,7 +86,7 @@ export type BaseWidgetFieldProps<
     AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
   >,
 > = TWidgetConfig & {
-  value: InferFieldOutput<TWidgetConfig, FieldUsage.ResponseData>;
+  value: InferResponseOutput<TWidgetConfig>;
   parentValue?: WidgetData;
 };
 
@@ -432,17 +432,3 @@ export type UnionObjectWidgetConfigConstrain<
   ObjectUnionVariant<TKey, TUsage>,
   ...ObjectUnionVariant<TKey, TUsage>[],
 ];
-
-/**
- * Infer output type from a UnifiedField based on usage
- * This is the ONLY inference function - all value types flow through InferSchemaFromField
- */
-type InferFieldOutput<
-  TField extends UnifiedField<
-    string,
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
-  >,
-  TUsage extends FieldUsage = FieldUsage.ResponseData,
-> = z.output<InferSchemaFromField<TField, TUsage>>;

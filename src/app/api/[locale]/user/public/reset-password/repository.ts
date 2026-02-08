@@ -30,6 +30,7 @@ import type { NewPasswordReset, PasswordReset } from "./db";
 import { insertPasswordResetSchema, passwordResets } from "./db";
 import type { ResetPasswordRequestPostResponseOutput } from "./request/definition";
 import type { ResetPasswordValidateGetResponseOutput } from "./validate/definition";
+import type { ResetPasswordConfirmPostResponseOutput } from "./confirm/definition";
 
 /**
  * Password reset token payload
@@ -406,13 +407,13 @@ export class PasswordRepository {
     token: string,
     newPassword: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<null>> {
+  ): Promise<ResponseType<ResetPasswordConfirmPostResponseOutput>> {
     try {
       logger.debug("Resetting password with token");
 
       const verifyResponse = await this.verifyTokenInternal(token, logger);
       if (!verifyResponse.success) {
-        return verifyResponse as ResponseType<null>;
+        return verifyResponse;
       }
 
       const userId = verifyResponse.data;
@@ -433,7 +434,9 @@ export class PasswordRepository {
 
       await this.deleteByToken(token, logger);
 
-      return success(null);
+      return success({
+        message: "app.api.user.public.resetPassword.confirm.success.title",
+      });
     } catch (error) {
       logger.error("Error resetting password with token", parseError(error));
       return fail({
@@ -476,7 +479,7 @@ export class PasswordRepository {
     password: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<string>> {
+  ): Promise<ResponseType<ResetPasswordConfirmPostResponseOutput>> {
     try {
       logger.debug("Processing password reset confirmation", { email });
 
@@ -516,14 +519,14 @@ export class PasswordRepository {
 
       const updateResponse = await this.resetPassword(token, password, logger);
       if (!updateResponse.success) {
-        return updateResponse as ResponseType<string>;
+        return updateResponse;
       }
 
       logger.debug("Password reset successful", {
         userId: resetPayload.userId,
         email,
       });
-      return success("app.api.user.auth.resetPassword.success");
+      return success({ message: "app.api.user.auth.resetPassword.success" });
     } catch (error) {
       logger.error("Error confirming password reset", parseError(error));
       return fail({

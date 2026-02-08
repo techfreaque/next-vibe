@@ -203,11 +203,11 @@ export const renderResetPasswordConfirmMail: EmailFunctionType<
   UndefinedType
 > = async ({ requestData, locale, t, logger }) => {
   logger.debug("Rendering password reset confirmation email", {
-    email: requestData.verification.email,
+    email: requestData.email,
   });
 
   const userResponse = await UserRepository.getUserByEmail(
-    requestData.verification.email,
+    requestData.email,
     UserDetailLevel.STANDARD,
     locale,
     logger,
@@ -229,7 +229,7 @@ export const renderResetPasswordConfirmMail: EmailFunctionType<
   };
 
   return success({
-    toEmail: requestData.verification.email,
+    toEmail: requestData.email,
     toName: user.publicName,
     subject: t("app.api.user.public.resetPassword.confirm.email.subject", {
       appName,
@@ -238,7 +238,7 @@ export const renderResetPasswordConfirmMail: EmailFunctionType<
       props: templateProps,
       t,
       locale,
-      recipientEmail: requestData.verification.email,
+      recipientEmail: requestData.email,
       tracking: createTrackingContext(locale, undefined, user.id),
     }),
   });

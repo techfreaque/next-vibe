@@ -6,6 +6,7 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 import {
   useInkWidgetResponseOnly,
   useInkWidgetTranslation,
@@ -14,14 +15,37 @@ import {
 import { InkWidgetRenderer } from "../../../renderers/cli/CliWidgetRenderer";
 import type { FieldUsageConfig, InkWidgetProps } from "../../_shared/cli-types";
 import { withValue } from "../../_shared/field-helpers";
-import { hasChildren, isResponseField } from "../../_shared/type-guards";
+import {
+  hasChildren,
+  isObject,
+  isResponseField,
+} from "../../_shared/type-guards";
 import type {
   ArrayChildConstraint,
   ConstrainedChildUsage,
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
 } from "../../_shared/types";
-import type { ContainerWidgetConfig } from "./types";
+import type {
+  ContainerArrayWidgetConfig,
+  ContainerObjectWidgetConfig,
+  ContainerUnionWidgetConfig,
+} from "./types";
+
+/**
+ * Helper to safely get a value from field.value after hasChildren guard
+ * The type guard narrows to Record but TypeScript can't track this through
+ * the union, so we use isObject runtime check
+ */
+function getChildValue(
+  value: WidgetData,
+  key: string,
+): WidgetData | null | undefined {
+  if (!isObject(value)) {
+    return null;
+  }
+  return value[key];
+}
 
 export function ContainerWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
@@ -42,7 +66,33 @@ export function ContainerWidgetInk<
   fieldName,
 }: InkWidgetProps<
   TEndpoint,
-  ContainerWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
+  TUsage,
+  | ContainerObjectWidgetConfig<
+      TKey,
+      TUsage,
+      Extract<TSchemaType, "object" | "object-optional" | "widget-object">,
+      Extract<
+        TChildren,
+        ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
+      >
+    >
+  | ContainerArrayWidgetConfig<
+      TKey,
+      TUsage,
+      Extract<TSchemaType, "array" | "array-optional">,
+      Extract<
+        TChildren,
+        ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>
+      >
+    >
+  | ContainerUnionWidgetConfig<
+      TKey,
+      TUsage,
+      Extract<
+        TChildren,
+        UnionObjectWidgetConfigConstrain<TKey, ConstrainedChildUsage<TUsage>>
+      >
+    >
 >): JSX.Element {
   const t = useInkWidgetTranslation();
   const responseOnly = useInkWidgetResponseOnly();
@@ -59,14 +109,10 @@ export function ContainerWidgetInk<
   }
 
   const children = Object.entries(field.children);
-  const valueRecord = field.value;
 
   // Filter and render children - avoid type predicate in destructure
   const childElements: JSX.Element[] = [];
-  for (const entry of children) {
-    const childName = entry[0];
-    const childField = entry[1];
-
+  for (const [childName, childField] of children) {
     // Skip hidden fields
     const hidden = "hidden" in childField && childField.hidden === true;
     if (hidden) {
@@ -78,7 +124,7 @@ export function ContainerWidgetInk<
       if (!isResponseField(childField)) {
         continue;
       }
-      const childData = valueRecord[childName];
+      const childData = getChildValue(field.value, childName);
       const hasData = childData !== null && childData !== undefined;
       if (!hasData) {
         continue;
@@ -86,19 +132,19 @@ export function ContainerWidgetInk<
     } else {
       // In interactive mode, show all fields but filter response fields without data
       if (isResponseField(childField)) {
-        const childData = valueRecord[childName];
+        const childData = getChildValue(field.value, childName);
         if (childData === null || childData === undefined) {
           continue;
         }
       }
     }
 
-    const childData = valueRecord[childName] ?? null;
+    const childData = getChildValue(field.value, childName) ?? null;
     const childFieldName = fieldName ? `${fieldName}.${childName}` : childName;
     childElements.push(
       <Box key={childName}>
         <InkWidgetRenderer
-          field={withValue(childField, childData, valueRecord)}
+          field={withValue(childField, childData ?? null, field.value)}
           fieldName={childFieldName}
         />
       </Box>,

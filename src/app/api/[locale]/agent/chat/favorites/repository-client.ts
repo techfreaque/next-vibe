@@ -19,7 +19,7 @@ import type { IconKey } from "../../../system/unified-interface/unified-ui/widge
 import type {
   FiltersModelSelection,
   ManualModelSelection,
-} from "../../../system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
+} from "../../models/components/types";
 import { getCreditCostFromModel, modelProviders } from "../../models/models";
 import type { TtsVoiceValue } from "../../text-to-speech/enum";
 import { DEFAULT_CHARACTERS } from "../characters/config";
@@ -49,7 +49,7 @@ interface StoredLocalFavorite {
   characterId: string;
   customIcon: IconKey | null;
   voice: typeof TtsVoiceValue | null;
-  modelSelection: FavoriteGetModelSelection["currentSelection"] | null;
+  modelSelection: FavoriteGetModelSelection | null;
   position: number;
 }
 
@@ -88,9 +88,9 @@ export class ChatFavoritesRepositoryClient {
       });
 
       // Sort by position (ascending)
-      const sortedCards = cards.toSorted((a, b) => a.position - b.position);
+      const favorites = cards.toSorted((a, b) => a.position - b.position);
 
-      return success({ favoritesList: sortedCards });
+      return success({ favorites });
     } catch (error) {
       logger.error("Failed to load favorites", parseError(error));
       return fail({
@@ -115,7 +115,7 @@ export class ChatFavoritesRepositoryClient {
         id,
         characterId: data.characterId ?? "default",
         voice: data.voice ?? null,
-        modelSelection: data.modelSelection.currentSelection,
+        modelSelection: data.modelSelection,
         customIcon: null,
         position: currentConfigs.length,
       };
@@ -197,7 +197,7 @@ export class ChatFavoritesRepositoryClient {
         characterId,
         customIcon: customIconToStore,
         voice: data.voice ?? null,
-        modelSelection: data.modelSelection.currentSelection,
+        modelSelection: data.modelSelection,
       };
 
       this.updateLocalFavorite(id, updated);
@@ -286,27 +286,10 @@ export class ChatFavoritesRepositoryClient {
     characterDescription: TranslationKey | null,
     activeFavoriteId: string | null,
   ): FavoriteCard {
-    // When stored.modelSelection is null, it means CHARACTER_BASED (use character defaults)
-    // Construct the model selection dynamically
-    const modelSelectionForLookup = stored.modelSelection
-      ? {
-          currentSelection: stored.modelSelection,
-          characterModelSelection: characterModelSelection ?? undefined,
-        }
-      : characterModelSelection
-        ? {
-            currentSelection: {
-              selectionType: ModelSelectionType.CHARACTER_BASED,
-            },
-            characterModelSelection,
-          }
-        : null;
-
-    const bestModel = modelSelectionForLookup
-      ? CharactersRepositoryClient.getBestModelForFavorite(
-          modelSelectionForLookup,
-        )
-      : null;
+    const bestModel = CharactersRepositoryClient.getBestModelForFavorite(
+      stored.modelSelection,
+      characterModelSelection ?? undefined,
+    );
     const hasCharacter = stored.characterId !== "default";
 
     // Flattened structure - no nested content/titleRow/modelRow
@@ -352,12 +335,7 @@ export class ChatFavoritesRepositoryClient {
     );
 
     if (!character) {
-      // If no character found, use stored selection or create CHARACTER_BASED default
-      const currentSelection = stored.modelSelection ?? {
-        selectionType: ModelSelectionType.CHARACTER_BASED,
-      };
-
-      // Flattened structure
+      // Flattened structure - no character found
       return {
         characterId: stored.characterId,
         icon: "user" as const,
@@ -365,17 +343,12 @@ export class ChatFavoritesRepositoryClient {
         tagline: "",
         description: "",
         voice: stored.voice,
-        modelSelection: {
-          currentSelection,
-          characterModelSelection: undefined,
+        modelSelection: stored.modelSelection, // null or actual selection
+        characterModelSelection: {
+          selectionType: ModelSelectionType.FILTERS,
         },
       };
     }
-
-    // If modelSelection is null, it means CHARACTER_BASED (use character defaults)
-    const currentSelection = stored.modelSelection ?? {
-      selectionType: ModelSelectionType.CHARACTER_BASED,
-    };
 
     // Flattened structure
     return {
@@ -385,9 +358,9 @@ export class ChatFavoritesRepositoryClient {
       tagline: character.tagline ?? null,
       description: character.description ?? null,
       voice: stored.voice ?? character.voice,
-      modelSelection: {
-        currentSelection,
-        characterModelSelection: character.modelSelection,
+      modelSelection: stored.modelSelection, // null = use character defaults
+      characterModelSelection: character.modelSelection ?? {
+        selectionType: ModelSelectionType.FILTERS,
       },
     };
   }

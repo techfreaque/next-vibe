@@ -27,6 +27,7 @@ export const iconNullishSchema = z
 export type IconSchemaType = typeof iconSchema;
 export type IconSchemaOptionalType = typeof iconOptionalSchema;
 export type IconSchemaNullishType = typeof iconNullishSchema;
+export type IconSchemaGenericType = z.ZodType<IconKey>;
 
 export const idSchema = z.object({
   id: z.uuid(),

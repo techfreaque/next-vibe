@@ -48,12 +48,8 @@ export const chatFavorites = pgTable("chat_favorites", {
   // Custom TTS voice (overrides character voice, null means use character default)
   voice: text("voice").$type<typeof TtsVoiceValue>(),
 
-  // Model selection (stores only currentSelection part: MANUAL, FILTERS, or CHARACTER_BASED)
-  // We reconstruct full FavoriteGetModelSelection with characterModelSelection on read
-  modelSelection:
-    jsonb("model_selection").$type<
-      FavoriteGetModelSelection["currentSelection"]
-    >(),
+  // Model selection (stores only MANUAL or FILTERS, null means use character defaults)
+  modelSelection: jsonb("model_selection").$type<FavoriteGetModelSelection>(),
   position: integer("position").notNull(),
   color: text("color"),
 

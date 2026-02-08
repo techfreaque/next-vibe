@@ -90,7 +90,7 @@ const { GET } = createEndpoint({
       // Updated models section
       models: responseArrayField(
         {
-          type: WidgetType.DATA_CARDS,
+          type: WidgetType.CONTAINER,
           title:
             "app.api.agent.models.openrouter.get.response.models.title" as const,
           cardTitle: "name",
@@ -147,7 +147,7 @@ const { GET } = createEndpoint({
       // Missing OpenRouter models section
       missingOpenRouterModels: responseArrayField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           title:
             "app.api.agent.models.openrouter.get.response.missingOpenRouterModels.title" as const,
           columns: 12,
@@ -188,7 +188,7 @@ const { GET } = createEndpoint({
       // Non-OpenRouter models section
       nonOpenRouterModels: responseArrayField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           title:
             "app.api.agent.models.openrouter.get.response.nonOpenRouterModels.title" as const,
           columns: 12,

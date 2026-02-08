@@ -68,7 +68,7 @@ export function useFavorite(
           return {
             success: true,
             data: {
-              favoritesList: oldData.data.favoritesList.map((fav) =>
+              favorites: oldData.data.favorites.map((fav) =>
                 fav.id === favoriteId ? { ...fav, ...updates } : fav,
               ),
             },
@@ -96,7 +96,7 @@ export function useFavorite(
         return {
           success: true,
           data: {
-            favoritesList: oldData.data.favoritesList.filter(
+            favorites: oldData.data.favorites.filter(
               (fav) => fav.id !== favoriteId,
             ),
           },

@@ -256,12 +256,12 @@ export class ChatSettingsRepositoryClient {
       favoritesDefinition.default.GET,
       logger,
       (oldData) => {
-        if (!oldData?.success || !oldData.data?.favoritesList) {
+        if (!oldData?.success || !oldData.data?.favorites) {
           return oldData;
         }
 
         // Update all favorites: remove active badge from others, add to selected one
-        const updatedList = oldData.data.favoritesList.map((fav) => ({
+        const updatedList = oldData.data.favorites.map((fav) => ({
           ...fav,
           activeBadge:
             fav.id === favoriteId
@@ -272,7 +272,7 @@ export class ChatSettingsRepositoryClient {
         return {
           success: true,
           data: {
-            favoritesList: updatedList,
+            favorites: updatedList,
           },
         };
       },

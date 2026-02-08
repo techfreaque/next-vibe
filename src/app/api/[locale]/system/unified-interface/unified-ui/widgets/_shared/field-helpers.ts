@@ -21,7 +21,6 @@ import type {
   BaseWidgetConfig,
   BaseWidgetFieldProps,
   ConstrainedChildUsage,
-  DispatchField,
   FieldUsageConfig,
   SchemaTypes,
 } from "./types";
@@ -152,78 +151,34 @@ export function getFieldLabel(
  * This is the single boundary where type widening is acceptable for the rendering system.
  */
 export function withValue<
-  TUsage extends FieldUsageConfig,
-  TField extends UnifiedField<
-    string,
-    ZodTypeAny,
-    TUsage,
-    AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
-  >,
+  TField extends { usage: FieldUsageConfig },
   TValue,
   TParentValue,
 >(
   field: TField,
   value: TValue,
   parentValue: TParentValue,
-): BaseWidgetFieldProps<TUsage, TField>;
-
-export function withValue<
-  TUsage extends FieldUsageConfig,
-  TField extends AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>,
-  TValue,
-  TParentValue,
->(
-  field: TField,
-  value: TValue,
-  parentValue: TParentValue,
-): DispatchField<
+): TField extends UnifiedField<
   string,
   ZodTypeAny,
-  TUsage,
-  AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
->;
-
-export function withValue<
-  TUsage extends FieldUsageConfig,
-  TField extends
-    | UnifiedField<
-        string,
-        ZodTypeAny,
-        TUsage,
-        AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
-      >
-    | AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>,
-  TValue,
-  TParentValue,
->(
-  field: TField,
-  value: TValue,
-  parentValue: TParentValue,
-):
-  | BaseWidgetFieldProps<
-      TUsage,
-      UnifiedField<
-        string,
-        ZodTypeAny,
-        TUsage,
-        AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
-      >
-    >
-  | DispatchField<
-      string,
-      ZodTypeAny,
-      TUsage,
-      AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
-    > {
+  infer TUsage,
+  infer TChildren
+>
+  ? BaseWidgetFieldProps<TUsage, TField>
+  : TField extends AnyChildrenConstrain<string, infer TUsage>
+    ? TField extends { usage: infer U extends FieldUsageConfig }
+      ? BaseWidgetFieldProps<U, TField>
+      : BaseWidgetFieldProps<TUsage, TField>
+    : never {
   // Safe cast: spread preserves discriminated union properties (type, schemaType, etc.)
   // which allows TypeScript to narrow in switch statements
   return { ...field, value, parentValue } as BaseWidgetFieldProps<
-    TUsage,
+    FieldUsageConfig,
     UnifiedField<
       string,
       ZodTypeAny,
-      TUsage,
-      AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
+      FieldUsageConfig,
+      AnyChildrenConstrain<string, FieldUsageConfig>
     >
   >;
 }

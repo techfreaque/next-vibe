@@ -49,15 +49,23 @@ export const translations = {
       balanced: "Balanced",
       thorough: "Thorough",
     },
+  },
+  modelSelection: {
+    sort: {
+      intelligence: "Sort by Intelligence Level",
+      price: "Sort by Price",
+      speed: "Sort by Response Speed",
+      content: "Sort by Content Policy",
+    },
+    sortDirection: {
+      asc: "Low to High",
+      desc: "High to Low",
+    },
     sortField: {
       intelligence: "Intelligence",
       speed: "Speed",
       price: "Price",
       content: "Content",
-    },
-    sortDirection: {
-      asc: "Low to High",
-      desc: "High to Low",
     },
   },
   get: {

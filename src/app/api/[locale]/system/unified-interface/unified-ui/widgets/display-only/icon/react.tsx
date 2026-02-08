@@ -23,6 +23,7 @@ import {
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
+  ReactWidgetPropsNoValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import { useWidgetForm } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -42,13 +43,8 @@ export function IconWidget<
   TEndpoint extends CreateApiEndpointAny,
   TUsage extends FieldUsageConfig,
 >(
-  props:
-    | ReactStaticWidgetProps<
-        TEndpoint,
-        TUsage,
-        IconWidgetConfig<never, TUsage, "widget">
-      >
-    | ReactRequestResponseWidgetProps<
+  props: TUsage extends { response: true }
+    ? ReactRequestResponseWidgetProps<
         TEndpoint,
         TUsage,
         IconWidgetConfig<
@@ -56,7 +52,22 @@ export function IconWidget<
           TUsage,
           "primitive"
         >
-      >,
+      >
+    : TUsage extends { request?: never; response?: never }
+      ? ReactStaticWidgetProps<
+          TEndpoint,
+          TUsage,
+          IconWidgetConfig<never, TUsage, "widget">
+        >
+      : ReactWidgetPropsNoValue<
+          TEndpoint,
+          TUsage,
+          IconWidgetConfig<
+            IconSchemaType | IconSchemaOptionalType | IconSchemaNullishType,
+            TUsage,
+            "primitive"
+          >
+        >,
 ): JSX.Element {
   const { field } = props;
   const fieldName = "fieldName" in props ? props.fieldName : undefined;

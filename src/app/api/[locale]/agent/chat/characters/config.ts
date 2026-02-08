@@ -3,11 +3,8 @@
  * Centralized character definitions for consistent behavior across the application
  * This file contains default/built-in characters that are read-only
  */
+
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import {
-  ModelSortDirection,
-  ModelSortField,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { TtsVoice, type TtsVoiceValue } from "../../text-to-speech/enum";
@@ -15,6 +12,8 @@ import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
   PriceLevel,
   SpeedLevel,
 } from "../characters/enum";

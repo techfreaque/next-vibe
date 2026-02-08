@@ -25,7 +25,10 @@ import type {
   FieldUsageConfig,
   ObjectChildrenConstraint,
 } from "../../unified-ui/widgets/_shared/types";
-import type { CustomWidgetObjectConfig } from "../../unified-ui/widgets/containers/custom/types";
+import type {
+  CustomWidgetObjectConfig,
+  CustomWidgetPrimitiveConfig,
+} from "../../unified-ui/widgets/containers/custom/types";
 import { WidgetType } from "../types/enums";
 import type {
   ArrayWidgetConfig,
@@ -386,6 +389,56 @@ export function customWidgetObject<
     ...config,
     type: WidgetType.CUSTOM_WIDGET,
     schemaType: "object" as const,
+  };
+}
+
+export function customResponseField<
+  TSchema extends z.ZodTypeAny,
+  const TConfig extends Omit<
+    CustomWidgetPrimitiveConfig<
+      { request?: never; response: true },
+      "primitive",
+      TSchema
+    >,
+    "schemaType" | "type" | "usage"
+  >,
+>(
+  config: TConfig,
+): TConfig & {
+  type: WidgetType.CUSTOM_WIDGET;
+  schemaType: "primitive";
+  usage: { request?: never; response: true };
+} {
+  return {
+    ...config,
+    type: WidgetType.CUSTOM_WIDGET,
+    usage: { response: true },
+    schemaType: "primitive" as const,
+  };
+}
+
+export function customRequestField<
+  TSchema extends z.ZodTypeAny,
+  const TConfig extends Omit<
+    CustomWidgetPrimitiveConfig<
+      { request: "data"; response?: never },
+      "primitive",
+      TSchema
+    >,
+    "schemaType" | "type" | "usage"
+  >,
+>(
+  config: TConfig,
+): TConfig & {
+  type: WidgetType.CUSTOM_WIDGET;
+  schemaType: "primitive";
+  usage: { request: "data"; response?: never };
+} {
+  return {
+    ...config,
+    type: WidgetType.CUSTOM_WIDGET,
+    usage: { request: "data" },
+    schemaType: "primitive" as const,
   };
 }
 

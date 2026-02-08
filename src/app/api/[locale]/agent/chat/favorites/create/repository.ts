@@ -81,14 +81,8 @@ export class FavoritesCreateRepository {
       const voiceToStore =
         character && data.voice === character.voice ? null : data.voice;
 
-      // Extract only currentSelection from modelSelection (don't store character defaults)
-      // If CHARACTER_BASED, store null to indicate "use character defaults"
-      const currentSelection = data.modelSelection.currentSelection;
-      const modelSelectionToStore =
-        currentSelection.selectionType !==
-        "app.api.agent.chat.favorites.enums.selectionType.characterBased"
-          ? currentSelection
-          : null;
+      // modelSelection is already the right format - store it directly
+      const modelSelectionToStore = data.modelSelection;
 
       // Get current max position using database aggregation
       const [maxPositionResult] = await db

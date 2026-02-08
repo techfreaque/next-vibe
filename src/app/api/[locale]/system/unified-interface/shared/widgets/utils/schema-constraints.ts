@@ -50,7 +50,12 @@ export type StringWidgetSchema =
   | z.ZodDefault<z.ZodOptional<z.ZodString>>
   | z.ZodDefault<z.ZodNullable<z.ZodString>>
   | z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>
-  | z.ZodDefault<z.ZodNullable<z.ZodOptional<z.ZodString>>>;
+  | z.ZodDefault<z.ZodNullable<z.ZodOptional<z.ZodString>>>
+  // Generic string types (e.g., z.string() as z.ZodType<TranslationKey>)
+  | z.ZodType<string>
+  | z.ZodType<string | null>
+  | z.ZodType<string | undefined>
+  | z.ZodType<string | null | undefined>;
 
 /**
  * Boolean widgets: Checkbox, StatusIndicator
@@ -94,4 +99,8 @@ export type EnumWidgetSchema =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   | z.ZodNullable<z.ZodEnum<any>>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  | z.ZodDefault<z.ZodEnum<any>>;
+  | z.ZodDefault<z.ZodEnum<any>>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  | z.ZodOptional<z.ZodNullable<z.ZodEnum<any>>>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  | z.ZodNullable<z.ZodOptional<z.ZodEnum<any>>>;

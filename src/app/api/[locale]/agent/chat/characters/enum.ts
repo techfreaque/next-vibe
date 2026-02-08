@@ -153,6 +153,44 @@ export const SpeedLevelDB = [
   SpeedLevel.THOROUGH,
 ] as const;
 
+/**
+ * Model Sort Field Enum
+ */
+export const {
+  enum: ModelSortField,
+  options: ModelSortFieldOptions,
+  Value: ModelSortFieldValue,
+} = createEnumOptions({
+  INTELLIGENCE: "app.api.agent.chat.favorites.modelSelection.sort.intelligence",
+  PRICE: "app.api.agent.chat.favorites.modelSelection.sort.price",
+  SPEED: "app.api.agent.chat.favorites.modelSelection.sort.speed",
+  CONTENT: "app.api.agent.chat.favorites.modelSelection.sort.content",
+});
+
+export const ModelSortFieldDB = [
+  ModelSortField.INTELLIGENCE,
+  ModelSortField.PRICE,
+  ModelSortField.SPEED,
+  ModelSortField.CONTENT,
+] as const;
+
+/**
+ * Model Sort Direction Enum
+ */
+export const {
+  enum: ModelSortDirection,
+  options: ModelSortDirectionOptions,
+  Value: ModelSortDirectionValue,
+} = createEnumOptions({
+  ASC: "app.api.agent.chat.favorites.modelSelection.sortDirection.asc",
+  DESC: "app.api.agent.chat.favorites.modelSelection.sortDirection.desc",
+});
+
+export const ModelSortDirectionDB = [
+  ModelSortDirection.ASC,
+  ModelSortDirection.DESC,
+] as const;
+
 interface TierDisplayConfig<T extends string> {
   value: T;
   label: TranslationKey;

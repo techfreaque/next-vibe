@@ -9,25 +9,23 @@
  */
 
 import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import type {
+  FiltersModelSelection,
+  ManualModelSelection,
+} from "@/app/api/[locale]/agent/models/components/types";
 import type { ModelOption } from "@/app/api/[locale]/agent/models/models";
 import {
   getCreditCostFromModel,
   modelOptions,
 } from "@/app/api/[locale]/agent/models/models";
-import type {
-  FiltersModelSelection,
-  ManualModelSelection,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
-import {
-  ModelSortDirection,
-  ModelSortField,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import {
   ContentLevelDB,
   IntelligenceLevelDB,
   ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
   PriceLevel,
   PriceLevelDB,
   SpeedLevelDB,
@@ -170,32 +168,26 @@ export class CharactersRepositoryClient {
   }
 
   static getFilteredModelsForFavorite(
-    favoriteModelSelection: FavoriteGetModelSelection,
+    favoriteModelSelection: FavoriteGetModelSelection | null,
+    characterModelSelection?: FiltersModelSelection | ManualModelSelection,
   ): ModelOption[] {
-    if (
-      !favoriteModelSelection.currentSelection ||
-      favoriteModelSelection.currentSelection.selectionType ===
-        ModelSelectionType.CHARACTER_BASED
-    ) {
-      // characterModelSelection should always be present when CHARACTER_BASED, but handle fallback
-      if (!favoriteModelSelection.characterModelSelection) {
-        return [];
-      }
-      return this.getFilteredModelsInternal(
-        favoriteModelSelection.characterModelSelection,
-      );
+    // Use favorite's custom selection if present, otherwise fall back to character's selection
+    const selectionToUse = favoriteModelSelection ?? characterModelSelection;
+
+    if (!selectionToUse) {
+      return [];
     }
 
-    return this.getFilteredModelsInternal(
-      favoriteModelSelection.currentSelection,
-    );
+    return this.getFilteredModelsInternal(selectionToUse);
   }
 
   static getBestModelForFavorite(
-    favoriteModelSelection: FavoriteGetModelSelection,
+    favoriteModelSelection: FavoriteGetModelSelection | null,
+    characterModelSelection?: FiltersModelSelection | ManualModelSelection,
   ): ModelOption | null {
     const candidates = this.getFilteredModelsForFavorite(
       favoriteModelSelection,
+      characterModelSelection,
     );
     return candidates.length > 0 ? candidates[0] : null;
   }

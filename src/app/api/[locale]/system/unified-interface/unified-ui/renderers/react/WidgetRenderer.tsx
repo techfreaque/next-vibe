@@ -26,7 +26,6 @@ import TextWidget from "../../widgets/display-only/text/react";
 import TitleWidget from "../../widgets/display-only/title/react";
 import BooleanFieldWidget from "../../widgets/form-fields/boolean-field/react";
 import IconFieldWidget from "../../widgets/form-fields/icon-field/react";
-import ModelSelectionFieldWidget from "../../widgets/form-fields/model-selection-field/react";
 import SelectFieldWidget from "../../widgets/form-fields/select-field/react";
 import TextFieldWidget from "../../widgets/form-fields/text-field/react";
 import TextareaFieldWidget from "../../widgets/form-fields/textarea-field/react";
@@ -380,8 +379,7 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
             props,
             "field-range-slider",
           );
-        case FieldDataType.MODEL_SELECTION:
-          return <ModelSelectionFieldWidget {...props} />;
+
         case FieldDataType.SELECT:
           return <SelectFieldWidget {...props} />;
         case FieldDataType.SLIDER:

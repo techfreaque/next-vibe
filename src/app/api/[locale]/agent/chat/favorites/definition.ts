@@ -32,35 +32,6 @@ import charactersDefinitions from "../characters/definition";
 import { FavoritesListContainer } from "./widget";
 
 /**
- * Type for parent value in favorite card callbacks
- * Used to access activeBadge for conditional styling
- */
-interface FavoriteCardParent {
-  activeBadge: string | null;
-}
-
-/**
- * Favorite Card type - manually defined to avoid circular reference
- * This represents a single favorite card in the favorites list
- * Flattened structure - no nested content/titleRow/modelRow objects
- */
-export interface FavoriteCard {
-  id: string;
-  characterId: string | null;
-  modelId: ModelId | null;
-  position: number;
-  icon: z.infer<typeof iconSchema>;
-  name: TranslationKey;
-  tagline: TranslationKey | null;
-  activeBadge: TranslationKey | null;
-  description: TranslationKey | null;
-  modelIcon: z.infer<typeof iconSchema>;
-  modelInfo: string;
-  modelProvider: string;
-  creditCost: string;
-}
-
-/**
  * Get Favorites List Endpoint (GET)
  * Retrieves all favorites for the current user
  */
@@ -99,7 +70,7 @@ const { GET } = createEndpoint({
       }),
 
       // Favorites list
-      favoritesList: responseArrayField(
+      favorites: responseArrayField(
         { type: WidgetType.CONTAINER },
         objectField(
           {
@@ -137,15 +108,6 @@ const { GET } = createEndpoint({
               iconSize: "lg",
               borderRadius: "lg",
               schema: iconSchema,
-              getClassName: (
-                // oxlint-disable-next-line no-unused-vars
-                value: undefined,
-                parent?: FavoriteCardParent,
-              ) => {
-                return parent?.activeBadge
-                  ? "bg-primary/15 text-primary"
-                  : "bg-primary/10 group-hover:bg-primary/20";
-              },
             }),
             // Flattened fields (no nested content/titleRow/modelRow objects)
             name: responseField({
@@ -153,15 +115,6 @@ const { GET } = createEndpoint({
               size: "base",
               emphasis: "bold",
               schema: z.string() as z.ZodType<TranslationKey>,
-              getClassName: (
-                // oxlint-disable-next-line no-unused-vars
-                value: undefined,
-                parentValue?: FavoriteCardParent,
-              ) => {
-                const parent = parentValue;
-                const hasActive = parent?.activeBadge;
-                return hasActive ? "text-primary" : "";
-              },
             }),
             tagline: responseField({
               type: WidgetType.TEXT,
@@ -289,7 +242,7 @@ const { GET } = createEndpoint({
   examples: {
     responses: {
       listAll: {
-        favoritesList: [
+        favorites: [
           {
             id: "550e8400-e29b-41d4-a716-446655440000",
             characterId: "default",
@@ -316,6 +269,9 @@ export type FavoritesListRequestInput = typeof GET.types.RequestInput;
 export type FavoritesListRequestOutput = typeof GET.types.RequestOutput;
 export type FavoritesListResponseInput = typeof GET.types.ResponseInput;
 export type FavoritesListResponseOutput = typeof GET.types.ResponseOutput;
+
+// Favorite card type (single item from favorites list)
+export type FavoriteCard = FavoritesListResponseOutput["favorites"][number];
 
 const definitions = { GET } as const;
 export default definitions;

@@ -1,0 +1,123 @@
+/**
+ * Custom Widget for Referral Stats
+ */
+
+"use client";
+
+import { Card, CardContent } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import { DollarSign, TrendingUp, Users, Wallet } from "next-vibe-ui/ui/icons";
+
+import type definition from "./definition";
+import type { StatsGetResponseOutput } from "./definition";
+
+/**
+ * Props for custom widget
+ */
+interface CustomWidgetProps {
+  field: {
+    value: StatsGetResponseOutput | null | undefined;
+  } & (typeof definition.GET)["fields"];
+  fieldName: string;
+}
+
+/**
+ * Stat card component with modern design
+ */
+function StatCard({
+  title,
+  IconComponent,
+  iconColor,
+  iconBg,
+  value,
+  valueColor,
+  description,
+}: {
+  title: string;
+  IconComponent: React.ComponentType<{ className?: string }>;
+  iconColor: string;
+  iconBg: string;
+  value: number;
+  valueColor: string;
+  description: string;
+}): React.JSX.Element {
+  const valueClassName = `text-2xl font-bold tabular-nums tracking-tight ${valueColor}`;
+  const iconContainerClassName = `flex h-12 w-12 shrink-0 items-center justify-center rounded-lg ${iconBg}`;
+  const iconClassName = `h-6 w-6 ${iconColor}`;
+
+  return (
+    <Card className="overflow-hidden">
+      <CardContent className="p-6">
+        <Div className="flex items-start justify-between gap-4">
+          <Div className="flex-1 space-y-1">
+            <Div className="text-sm font-medium text-muted-foreground">
+              {title}
+            </Div>
+            <Div className={valueClassName}>{value.toLocaleString()}</Div>
+            <Div className="text-xs text-muted-foreground">{description}</Div>
+          </Div>
+          <Div className={iconContainerClassName}>
+            <IconComponent className={iconClassName} />
+          </Div>
+        </Div>
+      </CardContent>
+    </Card>
+  );
+}
+
+/**
+ * Custom container widget for referral stats
+ */
+export function ReferralStatsContainer({
+  field,
+}: CustomWidgetProps): React.JSX.Element {
+  const stats = field.value;
+
+  if (!stats) {
+    return <Div />;
+  }
+
+  return (
+    <Div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <StatCard
+        title={stats.totalSignupsTitle}
+        IconComponent={Users}
+        iconColor={"text-slate-700 dark:text-slate-300"}
+        iconBg={"bg-slate-100 dark:bg-slate-800"}
+        value={stats.totalSignupsValue}
+        valueColor={"text-foreground"}
+        description={stats.totalSignupsDescription}
+      />
+
+      <StatCard
+        title={stats.totalRevenueTitle}
+        IconComponent={TrendingUp}
+        iconColor={"text-emerald-700 dark:text-emerald-300"}
+        iconBg={"bg-emerald-100 dark:bg-emerald-900/30"}
+        value={stats.totalRevenueValue}
+        valueColor={"text-emerald-600 dark:text-emerald-400"}
+        description={stats.totalRevenueDescription}
+      />
+
+      <StatCard
+        title={stats.totalEarnedTitle}
+        IconComponent={DollarSign}
+        iconColor={"text-blue-700 dark:text-blue-300"}
+        iconBg={"bg-blue-100 dark:bg-blue-900/30"}
+        value={stats.totalEarnedValue}
+        valueColor={"text-blue-600 dark:text-blue-400"}
+        description={stats.totalEarnedDescription}
+      />
+
+      <StatCard
+        title={stats.availableCreditsTitle}
+        IconComponent={Wallet}
+        iconColor={"text-violet-700 dark:text-violet-300"}
+        iconBg={"bg-violet-100 dark:bg-violet-900/30"}
+        value={stats.availableCreditsValue}
+        valueColor={"text-violet-600 dark:text-violet-400"}
+        description={stats.availableCreditsDescription}
+      />
+    </Div>
+  );
+}

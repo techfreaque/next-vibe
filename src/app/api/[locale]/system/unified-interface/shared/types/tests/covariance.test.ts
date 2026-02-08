@@ -369,7 +369,7 @@ const test5_1_optional_field = arrayOptionalField(
   { response: true },
   { type: WidgetType.CONTAINER },
   objectField(
-    { type: WidgetType.CREDIT_TRANSACTION_CARD },
+    { type: WidgetType.CONTAINER },
     { response: true },
     {
       amount: responseField({

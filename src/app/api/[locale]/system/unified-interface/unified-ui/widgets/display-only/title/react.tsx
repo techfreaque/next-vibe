@@ -19,6 +19,7 @@ import {
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
+  ReactWidgetPropsNoValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import {
   useWidgetForm,
@@ -78,17 +79,23 @@ export function TitleWidget<
   TKey extends string,
   TUsage extends FieldUsageConfig,
 >(
-  props:
-    | ReactStaticWidgetProps<
-        TEndpoint,
-        TUsage,
-        TitleWidgetConfig<TKey, never, TUsage, "widget">
-      >
-    | ReactRequestResponseWidgetProps<
+  props: TUsage extends { response: true }
+    ? ReactRequestResponseWidgetProps<
         TEndpoint,
         TUsage,
         TitleWidgetConfig<TKey, TitleWidgetSchema, TUsage, "primitive">
-      >,
+      >
+    : TUsage extends { request?: never; response?: never }
+      ? ReactStaticWidgetProps<
+          TEndpoint,
+          TUsage,
+          TitleWidgetConfig<TKey, never, TUsage, "widget">
+        >
+      : ReactWidgetPropsNoValue<
+          TEndpoint,
+          TUsage,
+          TitleWidgetConfig<TKey, TitleWidgetSchema, TUsage, "primitive">
+        >,
 ): JSX.Element {
   const { field } = props;
   const fieldName = "fieldName" in props ? props.fieldName : undefined;

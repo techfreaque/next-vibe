@@ -175,7 +175,7 @@ const { GET } = createEndpoint({
       // === RESPONSE ===
       results: responseArrayField(
         {
-          type: WidgetType.DATA_CARDS,
+          type: WidgetType.CONTAINER,
         },
         objectField(
           {

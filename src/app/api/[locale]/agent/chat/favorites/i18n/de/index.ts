@@ -50,15 +50,23 @@ export const translations: typeof enTranslations = {
       balanced: "Ausgewogen",
       thorough: "Gründlich",
     },
+  },
+  modelSelection: {
+    sort: {
+      intelligence: "Nach Intelligenzstufe sortieren",
+      price: "Nach Preis sortieren",
+      speed: "Nach Antwortgeschwindigkeit sortieren",
+      content: "Nach Inhaltsrichtlinien sortieren",
+    },
+    sortDirection: {
+      asc: "Niedrig zu Hoch",
+      desc: "Hoch zu Niedrig",
+    },
     sortField: {
       intelligence: "Intelligenz",
       speed: "Geschwindigkeit",
       price: "Preis",
       content: "Inhalt",
-    },
-    sortDirection: {
-      asc: "Niedrig bis Hoch",
-      desc: "Hoch bis Niedrig",
     },
   },
   get: {

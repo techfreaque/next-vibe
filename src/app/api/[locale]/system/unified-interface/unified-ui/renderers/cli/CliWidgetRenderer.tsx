@@ -60,7 +60,6 @@ import { IntFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/u
 import { JsonFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/json-field/cli";
 import { LanguageSelectFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/language-select-field/cli";
 import { MarkdownEditorWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/markdown-editor/cli";
-import { ModelSelectionFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/cli";
 import { MultiSelectFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/multiselect-field/cli";
 import { NumberFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/cli";
 import { PasswordFieldWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/cli";
@@ -681,16 +680,6 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
               >(field)}
             />
           );
-        case FieldDataType.MODEL_SELECTION:
-          return (
-            <ModelSelectionFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof ModelSelectionFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-
         default:
           const _exhaustiveCheck: never = field;
           return _exhaustiveCheck;

@@ -133,7 +133,6 @@ export enum FieldDataType {
   TEXT_ARRAY = "text_array",
   FILTER_PILLS = "filter_pills",
   RANGE_SLIDER = "range_slider",
-  MODEL_SELECTION = "model_selection",
 
   // Complex data types
   ARRAY = "array",

@@ -9,12 +9,11 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
-  objectField,
+  customWidgetObject,
   requestField,
   responseField,
   widgetField,
@@ -22,6 +21,7 @@ import {
 
 import { UserRole } from "../../user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
+import { SignupFormContainer } from "./widget";
 
 /**
  * POST /signup - User registration
@@ -35,14 +35,10 @@ const { POST } = createEndpoint({
   category: "app.api.user.category" as const,
   tags: ["app.api.user.public.signup.tag" as const],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-      gap: "4",
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: SignupFormContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
       title: widgetField({
         type: WidgetType.TITLE,
         content: "app.api.user.public.signup.form.title",
@@ -164,15 +160,6 @@ const { POST } = createEndpoint({
           }),
       }),
 
-      // === PASSWORD STRENGTH INDICATOR ===
-      passwordStrength: widgetField({
-        type: WidgetType.PASSWORD_STRENGTH,
-        watchField: "password",
-        columns: 12,
-        order: 10,
-        usage: { request: "data" },
-      }),
-
       confirmPassword: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
@@ -286,7 +273,7 @@ const { POST } = createEndpoint({
         usage: { request: "data" },
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {

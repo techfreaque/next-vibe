@@ -113,22 +113,12 @@ export class SingleFavoriteRepository {
       }
 
       // Build modelSelection response
-      // DB stores only currentSelection, we need to add characterModelSelection
+      // If favorite has custom selection, return it; otherwise return null (use character defaults)
       const modelSelection: FavoriteGetResponseOutput["modelSelection"] =
-        favorite.modelSelection
-          ? // Has custom MANUAL or FILTERS selection - wrap with character defaults
-            {
-              currentSelection: favorite.modelSelection,
-              characterModelSelection: character.modelSelection,
-            }
-          : {
-              // Default to CHARACTER_BASED (use character's model selection)
-              currentSelection: {
-                selectionType:
-                  "app.api.agent.chat.favorites.enums.selectionType.characterBased" as const,
-              },
-              characterModelSelection: character.modelSelection,
-            };
+        favorite.modelSelection ?? null;
+
+      const characterModelSelection: FavoriteGetResponseOutput["characterModelSelection"] =
+        character.modelSelection;
 
       // Merge customIcon with character icon (customIcon takes precedence)
       const displayIcon = favorite.customIcon ?? character?.icon ?? "bot";
@@ -148,6 +138,7 @@ export class SingleFavoriteRepository {
           ("app.api.agent.chat.characters.characters.default.description" as const),
         voice,
         modelSelection,
+        characterModelSelection,
       });
     } catch (error) {
       logger.error("Failed to fetch favorite", parseError(error));
@@ -231,19 +222,8 @@ export class SingleFavoriteRepository {
       const customIconToStore =
         character && data.icon === character.icon ? null : data.icon;
 
-      // Store only currentSelection (not characterModelSelection)
-      // If CHARACTER_BASED, store null to indicate "use character defaults"
-      let modelSelectionToStore = null;
-      if ("currentSelection" in data.modelSelection) {
-        const currentSelection = data.modelSelection.currentSelection;
-        // Only store if not CHARACTER_BASED
-        if (
-          currentSelection.selectionType !==
-          "app.api.agent.chat.favorites.enums.selectionType.characterBased"
-        ) {
-          modelSelectionToStore = currentSelection;
-        }
-      }
+      // Store modelSelection directly (null = use character defaults)
+      const modelSelectionToStore = data.modelSelection;
 
       const [updated] = await db
         .update(chatFavorites)

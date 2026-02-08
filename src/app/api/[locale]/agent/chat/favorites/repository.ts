@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { CharactersRepository } from "../characters/repository";
 import { ChatSettingsRepository } from "../settings/repository";
@@ -32,15 +32,10 @@ export class ChatFavoritesRepository {
    * Get all favorites for the authenticated user
    */
   static async getFavorites(
-    user: JwtPayloadType,
+    user: JwtPrivatePayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<FavoritesListResponseOutput>> {
     const userId = user.id;
-
-    if (!userId) {
-      logger.debug("No user ID, returning empty favorites");
-      return success({ favoritesList: [] });
-    }
 
     try {
       logger.debug("Fetching favorites", { userId });
@@ -106,7 +101,7 @@ export class ChatFavoritesRepository {
         }),
       );
 
-      return success({ favoritesList: favoritesCards });
+      return success({ favorites: favoritesCards });
     } catch (error) {
       logger.error("Failed to fetch favorites", parseError(error));
       return fail({

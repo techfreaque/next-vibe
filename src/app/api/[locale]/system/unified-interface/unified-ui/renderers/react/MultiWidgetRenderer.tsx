@@ -7,6 +7,7 @@ import type { Path } from "react-hook-form";
 import { useWatch } from "react-hook-form";
 import type z from "zod";
 
+import type { InferResponseOutput } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 
@@ -16,8 +17,6 @@ import type {
   ArrayChildConstraint,
   ConstrainedChildUsage,
   FieldUsageConfig,
-  InferChildOutput,
-  InferChildrenOutput,
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
 } from "../../widgets/_shared/types";
@@ -103,7 +102,12 @@ interface ObjectChildrenRendererProps<
   TChildren extends ObjectChildrenConstraint<TKey, TUsage>,
 > {
   childrenSchema: TChildren;
-  value: Record<string, WidgetData> | null | undefined;
+  value:
+    | {
+        [K in keyof TChildren]: InferResponseOutput<TChildren[K]>;
+      }
+    | null
+    | undefined;
   fieldName: string | undefined;
 }
 
@@ -457,13 +461,19 @@ export interface MultiWidgetRendererProps<
     | undefined,
 > {
   childrenSchema: TChildren;
-  value: InferChildrenOutput<TChildren> | null | undefined;
+  value:
+    | {
+        [K in keyof TChildren]: InferResponseOutput<TChildren[K]>;
+      }
+    | Array<InferResponseOutput<ArrayChildConstraint<TKey, TUsage>>>
+    | null
+    | undefined;
   fieldName: string | undefined;
   discriminator?: string;
   watchedDiscriminatorValue?: string;
   /** Optional render callback for array items to customize rendering */
   renderItem?: (props: {
-    itemData: InferChildOutput<AnyChildrenConstrain<TKey, TUsage>>;
+    itemData: InferResponseOutput<AnyChildrenConstrain<TKey, TUsage>>;
     index: number;
     itemFieldName: string;
     childSchema: AnyChildrenConstrain<TKey, TUsage>;

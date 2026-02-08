@@ -90,7 +90,7 @@ export interface ReactFormFieldProps<
   fieldName: BaseWidgetProps<TEndpoint, TUsage, TWidgetConfig>["fieldName"];
   field: Omit<
     BaseWidgetProps<TEndpoint, TUsage, TWidgetConfig>["field"],
-    "value" | "type" | "schemaType" | "usage"
+    "value" | "type" | "schemaType" | "usage" | "fieldType"
   >;
   inlineButtonInfo?: BaseWidgetProps<
     TEndpoint,
@@ -100,7 +100,7 @@ export interface ReactFormFieldProps<
 }
 
 /**
- 
+
  */
 export interface ReactRequestResponseWidgetProps<
   TEndpoint extends CreateApiEndpointAny,

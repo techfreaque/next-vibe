@@ -8,11 +8,13 @@
 import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import type { JSX } from "react";
+import type z from "zod";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
+  ReactWidgetPropsNoValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import {
@@ -73,20 +75,24 @@ export function BadgeWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends string,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "primitive" | "widget",
-  TSchema extends TSchemaType extends "primitive" ? BadgeWidgetSchema : never,
 >(
-  props:
-    | ReactRequestResponseWidgetProps<
+  props: TUsage extends { response: true }
+    ? ReactRequestResponseWidgetProps<
         TEndpoint,
         TUsage,
-        BadgeWidgetConfig<TKey, TSchema, TUsage, "primitive">
+        BadgeWidgetConfig<TKey, BadgeWidgetSchema, TUsage, "primitive">
       >
-    | ReactStaticWidgetProps<
-        TEndpoint,
-        TUsage,
-        BadgeWidgetConfig<TKey, TSchema, TUsage, "widget">
-      >,
+    : TUsage extends { request?: never; response?: never }
+      ? ReactStaticWidgetProps<
+          TEndpoint,
+          TUsage,
+          BadgeWidgetConfig<TKey, never, TUsage, "widget">
+        >
+      : ReactWidgetPropsNoValue<
+          TEndpoint,
+          TUsage,
+          BadgeWidgetConfig<TKey, BadgeWidgetSchema, TUsage, "primitive">
+        >,
 ): JSX.Element {
   const { field } = props;
   const fieldName = "fieldName" in props ? props.fieldName : undefined;
@@ -104,7 +110,7 @@ export function BadgeWidget<
   const sizeClass = getBadgeSizeClass(size);
 
   // Get value from form for request fields, otherwise from value
-  let value: typeof field.value | undefined;
+  let value: z.output<BadgeWidgetSchema> | undefined = undefined;
   if (usage?.request && fieldName && form) {
     value = form.watch(fieldName);
     if (!value && "value" in field) {

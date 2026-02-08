@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/components/types";
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -18,7 +19,6 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { modelSelectionSchemaSimple } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../../shared/types/common.schema";
@@ -216,7 +216,8 @@ const { POST } = createEndpoint({
       }),
       // Model Selection - manual or filter-based
       modelSelection: requestField({
-        type: WidgetType.CUSTOM_WIDGET,
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.OBJECT,
         schema: modelSelectionSchemaSimple,
       }),
 

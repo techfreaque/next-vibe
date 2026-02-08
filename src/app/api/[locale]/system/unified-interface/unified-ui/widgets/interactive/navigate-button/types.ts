@@ -20,9 +20,10 @@ import type {
  */
 export interface NavigateButtonWidgetConfig<
   TKey extends string,
-  out TUsage extends FieldUsageConfig,
+  TUsage extends FieldUsageConfig,
   TSchemaType extends "widget",
-  out TTargetEndpoint extends CreateApiEndpointAny | undefined,
+  TTargetEndpoint extends CreateApiEndpointAny | undefined,
+  TGetEndpoint extends CreateApiEndpointAny | undefined,
 > extends BasePrimitiveDisplayOnlyWidgetConfig<TUsage, TSchemaType> {
   type: WidgetType.NAVIGATE_BUTTON;
   label?: NoInfer<TKey>;
@@ -35,42 +36,40 @@ export interface NavigateButtonWidgetConfig<
     | "ghost"
     | "outline";
   size?: "default" | "sm" | "lg" | "icon";
-  metadata?: {
-    targetEndpoint: TTargetEndpoint;
-    extractParams?: TTargetEndpoint extends CreateApiEndpointAny
-      ? (
-          source: {
-            // The parent item of an array (if any)
-            itemData: WidgetData | undefined;
-            requestData: WidgetData;
-            urlPathParams: WidgetData;
-            responseData: WidgetData;
-          },
-          context: {
-            logger: EndpointLogger;
-            user: JwtPayloadType;
-            locale: CountryLanguage;
-          },
-        ) =>
-          | {
-              urlPathParams?: Partial<
-                TTargetEndpoint["types"]["UrlVariablesOutput"]
-              >;
-              data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
-            }
-          | Promise<{
-              urlPathParams?: Partial<
-                TTargetEndpoint["types"]["UrlVariablesOutput"]
-              >;
-              data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
-            }>
-      : undefined;
+  targetEndpoint?: TTargetEndpoint;
+  extractParams?: TTargetEndpoint extends CreateApiEndpointAny
+    ? (
+        source: {
+          // The parent item of an array (if any)
+          itemData: WidgetData | undefined;
+          requestData: WidgetData;
+          urlPathParams: WidgetData;
+          responseData: WidgetData;
+        },
+        context: {
+          logger: EndpointLogger;
+          user: JwtPayloadType;
+          locale: CountryLanguage;
+        },
+      ) =>
+        | {
+            urlPathParams?: Partial<
+              TTargetEndpoint["types"]["UrlVariablesOutput"]
+            >;
+            data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
+          }
+        | Promise<{
+            urlPathParams?: Partial<
+              TTargetEndpoint["types"]["UrlVariablesOutput"]
+            >;
+            data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
+          }>
+    : undefined;
 
-    prefillFromGet?: boolean;
-    getEndpoint?: CreateApiEndpointAny;
-    renderInModal?: boolean;
-    popNavigationOnSuccess?: number;
-  };
+  prefillFromGet?: boolean;
+  getEndpoint?: TGetEndpoint;
+  renderInModal?: boolean;
+  popNavigationOnSuccess?: number;
   iconSize?: "xs" | "sm" | "base" | "lg";
   iconSpacing?: SpacingSize;
 }

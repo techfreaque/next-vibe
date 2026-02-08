@@ -7,6 +7,7 @@ import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-bas
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
+  ReactWidgetPropsNoValue,
 } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
@@ -24,17 +25,23 @@ export function AlertWidget<
   TKey extends string,
   TUsage extends FieldUsageConfig,
 >(
-  props:
-    | ReactStaticWidgetProps<
-        TEndpoint,
-        TUsage,
-        AlertWidgetConfig<TKey, never, TUsage, "widget">
-      >
-    | ReactRequestResponseWidgetProps<
+  props: TUsage extends { response: true }
+    ? ReactRequestResponseWidgetProps<
         TEndpoint,
         TUsage,
         AlertWidgetConfig<TKey, AlertWidgetSchema, TUsage, "primitive">
-      >,
+      >
+    : TUsage extends { request?: never; response?: never }
+      ? ReactStaticWidgetProps<
+          TEndpoint,
+          TUsage,
+          AlertWidgetConfig<TKey, never, TUsage, "widget">
+        >
+      : ReactWidgetPropsNoValue<
+          TEndpoint,
+          TUsage,
+          AlertWidgetConfig<TKey, AlertWidgetSchema, TUsage, "primitive">
+        >,
 ): JSX.Element | null {
   const t = useWidgetTranslation();
   const form = useWidgetForm();

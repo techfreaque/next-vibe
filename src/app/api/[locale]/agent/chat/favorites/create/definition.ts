@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/components/types";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -17,7 +18,6 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { modelSelectionSchemaWithCharacter } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../../shared/types/common.schema";
@@ -62,7 +62,7 @@ const { POST } = createEndpoint({
         const characterTagline = data.requestData.tagline;
         const characterDescription = data.requestData.description;
         const characterModelSelection =
-          data.requestData.modelSelection.characterModelSelection;
+          data.requestData.characterModelSelection;
 
         // Create new favorite config for optimistic update
         const newFavoriteConfig = {
@@ -70,7 +70,7 @@ const { POST } = createEndpoint({
           characterId: data.requestData.characterId ?? "default",
           customIcon: null,
           voice: data.requestData.voice ?? null,
-          modelSelection: data.requestData.modelSelection.currentSelection,
+          modelSelection: data.requestData.modelSelection,
           position: 0, // Will be set correctly by the list
         };
 
@@ -97,7 +97,7 @@ const { POST } = createEndpoint({
             return {
               success: true,
               data: {
-                favoritesList: [...oldData.data.favoritesList, newFavorite],
+                favorites: [...oldData.data.favorites, newFavorite],
               },
             };
           },
@@ -190,8 +190,9 @@ const { POST } = createEndpoint({
       }),
 
       modelSelection: requestField({
-        type: WidgetType.CUSTOM_WIDGET,
-        schema: modelSelectionSchemaWithCharacter,
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.OBJECT,
+        schema: modelSelectionSchemaSimple.nullable(),
       }),
 
       // === RESPONSE ===
@@ -271,12 +272,10 @@ const { POST } = createEndpoint({
         description: "A helpful AI assistant",
         voice: "app.api.agent.textToSpeech.voices.FEMALE" as const,
         modelSelection: {
-          currentSelection: {
-            selectionType: ModelSelectionType.FILTERS,
-            intelligenceRange: {
-              min: IntelligenceLevel.SMART,
-              max: IntelligenceLevel.BRILLIANT,
-            },
+          selectionType: ModelSelectionType.FILTERS,
+          intelligenceRange: {
+            min: IntelligenceLevel.SMART,
+            max: IntelligenceLevel.BRILLIANT,
           },
         },
       },
@@ -302,31 +301,14 @@ export type FavoriteModelSelection =
   FavoriteCreateRequestOutput["modelSelection"];
 
 export type FavoriteFiltersModelSelection = Extract<
-  FavoriteModelSelection["currentSelection"],
+  FavoriteModelSelection,
   { selectionType: typeof ModelSelectionType.FILTERS }
 >;
 
 export type FavoriteManualModelSelection = Extract<
-  FavoriteModelSelection["currentSelection"],
+  FavoriteModelSelection,
   { selectionType: typeof ModelSelectionType.MANUAL }
 >;
-
-export type FavoriteCharacterBasedModelSelection = Extract<
-  FavoriteModelSelection["currentSelection"],
-  {
-    selectionType: typeof ModelSelectionType.CHARACTER_BASED;
-  }
->;
-
-export function isCharacterBasedModelSelection(
-  sel: FavoriteModelSelection,
-): sel is {
-  currentSelection: FavoriteCharacterBasedModelSelection;
-} & FavoriteModelSelection {
-  return (
-    sel.currentSelection.selectionType === ModelSelectionType.CHARACTER_BASED
-  );
-}
 
 const definitions = { POST } as const;
 export default definitions;
@@ -335,7 +317,3 @@ export default definitions;
 const _test1: FiltersModelSelection = {} as FavoriteFiltersModelSelection;
 // oxlint-disable-next-line no-unused-vars
 const _test2: ManualModelSelection = {} as FavoriteManualModelSelection;
-// oxlint-disable-next-line no-unused-vars
-const _test3: {
-  selectionType: typeof ModelSelectionType.CHARACTER_BASED;
-} = {} as FavoriteCharacterBasedModelSelection;

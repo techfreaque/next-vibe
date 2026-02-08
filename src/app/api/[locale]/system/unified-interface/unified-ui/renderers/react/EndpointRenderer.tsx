@@ -33,7 +33,6 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 import { useNavigationStack } from "../../../react/hooks/use-navigation-stack";
 import type { EndpointLogger } from "../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
-import { WidgetType } from "../../../shared/types/enums";
 import { Platform } from "../../../shared/types/platform";
 import type { WidgetData } from "../../../shared/widgets/widget-data";
 import {

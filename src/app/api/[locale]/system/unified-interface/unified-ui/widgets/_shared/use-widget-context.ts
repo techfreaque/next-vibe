@@ -34,10 +34,9 @@ export const WidgetContextStoreContext = createContext<WidgetContextStoreType<
  * Hook to get the widget context store
  * Returns the store as CreateApiEndpointAny since React Context cannot be properly generic
  */
-function useWidgetContextStore(): WidgetContextStoreType<
-  CreateApiEndpointAny,
-  ReactWidgetContext<CreateApiEndpointAny>
-> {
+function useWidgetContextStore<
+  TEndpoint extends CreateApiEndpointAny,
+>(): WidgetContextStoreType<TEndpoint, ReactWidgetContext<TEndpoint>> {
   const store = useContext(WidgetContextStoreContext);
   if (!store) {
     // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Provider check
@@ -45,7 +44,11 @@ function useWidgetContextStore(): WidgetContextStoreType<
       "useWidgetContextStore must be used within a WidgetContextStoreProvider",
     );
   }
-  return store;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- React Context cannot be properly generic
+  return store as any as WidgetContextStoreType<
+    TEndpoint,
+    ReactWidgetContext<TEndpoint>
+  >;
 }
 
 /**
@@ -187,15 +190,13 @@ export function useWidgetNavigation(): UseNavigationStackReturn {
 /**
  * Hook to get endpoint from context
  */
-export function useWidgetEndpoint(): CreateApiEndpointAny {
-  const store = useWidgetContextStore();
+export function useWidgetEndpoint<
+  TEndpoint extends CreateApiEndpointAny,
+>(): TEndpoint {
+  const store = useWidgetContextStore<TEndpoint>();
   return store(
-    (
-      state: WidgetContextStore<
-        CreateApiEndpointAny,
-        ReactWidgetContext<CreateApiEndpointAny>
-      >,
-    ) => state.context.endpoint,
+    (state: WidgetContextStore<TEndpoint, ReactWidgetContext<TEndpoint>>) =>
+      state.context.endpoint,
   );
 }
 
@@ -251,7 +252,9 @@ export function useWidgetIsInteractive(): boolean {
  * Hook to get form from context (React Hook Form only)
  * Use this in React widgets. CLI widgets should use useInkWidgetForm from use-ink-widget-context.
  */
-export function useWidgetForm(): ReactWidgetContext<CreateApiEndpointAny>["form"] {
+export function useWidgetForm<
+  TEndpoint extends CreateApiEndpointAny,
+>(): ReactWidgetContext<TEndpoint>["form"] {
   const store = useWidgetContextStore();
   return store(
     (

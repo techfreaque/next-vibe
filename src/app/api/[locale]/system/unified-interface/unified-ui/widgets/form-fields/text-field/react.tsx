@@ -33,6 +33,7 @@ import {
 } from "@/packages/next-vibe-ui/web/ui/form/form";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
+import { FieldDataType } from "../../../../shared/types/enums";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
   useWidgetForm,
@@ -191,7 +192,7 @@ export function TextFieldWidget<
                   value={formField.value ? t(formField.value) : ""}
                   onChange={(e) => formField.onChange(e.target.value)}
                   onBlur={formField.onBlur}
-                  type={field.fieldType}
+                  type={FieldDataType.TEXT}
                   placeholder={
                     field.placeholder ? t(field.placeholder) : undefined
                   }

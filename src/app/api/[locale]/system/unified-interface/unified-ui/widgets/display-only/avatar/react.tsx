@@ -83,14 +83,14 @@ export default function AvatarWidget<
   const usage = "usage" in field ? field.usage : undefined;
 
   // Get value from form for request fields, otherwise from field.value
-  let value: typeof field.value | undefined;
+  let value: string | undefined;
   if (usage?.request && fieldName && form) {
     value = form.watch(fieldName);
     if (!value && "value" in field) {
-      value = field.value;
+      value = field.value ?? undefined;
     }
   } else if ("value" in field) {
-    value = field.value;
+    value = field.value ?? undefined;
   }
 
   // Get classes from config (no hardcoding!)
@@ -109,9 +109,9 @@ export default function AvatarWidget<
             : "h-10 w-10";
 
   // Use config values as fallback, then data values
-  const src = value?.src || configSrc;
-  const fallback = value?.fallback || configFallback || "?";
-  const alt = altKey ? t(altKey) : value?.alt || "Avatar";
+  const src = value || configSrc;
+  const fallback = configFallback || "?";
+  const alt = altKey ? t(altKey) : value || "Avatar";
 
   return (
     <Avatar className={cn(avatarSizeClass, className)}>

@@ -23,11 +23,7 @@ import {
   getTextSizeClassName,
 } from "../../../../shared/widgets/utils/widget-helpers";
 import type { ReactWidgetProps } from "../../_shared/react-types";
-import type {
-  AnyChildrenConstrain,
-  ConstrainedChildUsage,
-  FieldUsageConfig,
-} from "../../_shared/types";
+import type { FieldUsageConfig } from "../../_shared/types";
 import {
   useWidgetForm,
   useWidgetLocale,
@@ -40,23 +36,11 @@ import type { PaginationWidgetConfig } from "./types";
  */
 export function PaginationWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "object" | "object-optional" | "widget-object",
-  TChildren extends {
-    page: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
-    limit: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
-    totalCount: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
-    pageCount?: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
-    offset?: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
-  },
 >({
   field,
-}: ReactWidgetProps<
-  TEndpoint,
-  TUsage,
-  PaginationWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
->): JSX.Element {
+  fieldName,
+}: ReactWidgetProps<TEndpoint, TUsage, PaginationWidgetConfig>): JSX.Element {
   const locale = useWidgetLocale();
   const form = useWidgetForm();
   const { t } = simpleT(locale);
@@ -92,11 +76,13 @@ export function PaginationWidget<
   }
 
   const pagination = field.value;
-  const page = typeof pagination.page === "number" ? pagination.page : 1;
-  const limit = typeof pagination.limit === "number" ? pagination.limit : 50;
-  const total = typeof pagination.total === "number" ? pagination.total : 0;
+
+  const page = form?.watch(`${fieldName}.page`) || 1;
+  const limit = form?.watch(`${fieldName}.limit`) || 50;
+  const total =
+    typeof pagination.totalCount === "number" ? pagination.totalCount : 0;
   const totalPages =
-    typeof pagination.totalPages === "number" ? pagination.totalPages : 1;
+    typeof pagination.pageCount === "number" ? pagination.pageCount : 1;
 
   const canGoPrevious = page > 1;
   const canGoNext = page < totalPages;
@@ -104,7 +90,7 @@ export function PaginationWidget<
   const handlePageChange = (newPage: number): void => {
     // Pagination is auto-refreshed via onChange action in field definition
     if (form) {
-      form.setValue("paginationInfo.page", newPage);
+      form.setValue(`${fieldName}.page` as string, newPage);
     }
   };
 
@@ -112,8 +98,8 @@ export function PaginationWidget<
     const limitValue = Number.parseInt(newLimit, 10);
     // Pagination is auto-refreshed via onChange action in field definition
     if (form) {
-      form.setValue("paginationInfo.limit", limitValue);
-      form.setValue("paginationInfo.page", 1); // Reset to page 1
+      form.setValue(`${fieldName}.limit` as string, limitValue);
+      form.setValue(`${fieldName}.page` as string, 1); // Reset to page 1
     }
   };
 

@@ -15,7 +15,7 @@ import {
   type FormAlertState,
 } from "next-vibe-ui/ui/form/form-alert";
 import { H1, P } from "next-vibe-ui/ui/typography";
-import React, { type JSX } from "react";
+import { type JSX } from "react";
 import type { Path } from "react-hook-form";
 import { useWatch } from "react-hook-form";
 
@@ -55,7 +55,6 @@ import {
   useWidgetSubmitButton,
   useWidgetTranslation,
 } from "../../_shared/use-widget-context";
-import { ContainerActionsWidget } from "./actions";
 import type { ContainerWidgetConfig } from "./types";
 
 /**
@@ -129,6 +128,7 @@ export function ContainerWidget<
     title: titleKey,
     description: descriptionKey,
     noCard = false,
+    innerClassName,
     submitButton: submitButtonConfig,
     // Auto-features: default to true, can be disabled
     showFormAlert = true,
@@ -181,21 +181,29 @@ export function ContainerWidget<
 
   const { childrenForRenderer, discriminator, fieldValue } = extractFieldData();
 
-  // Calculate count from field data if getCount function is provided
-  // This is accessed on the container config itself, not passed to children
-  const countFromField = field.getCount
-    ? field.getCount(fieldValue)
-    : undefined;
+  // Calculate count - extract separately to handle complex conditional types
+  const countFromField = ((): number | undefined => {
+    if (hasChild(field)) {
+      if (!field.getCount) {
+        return undefined;
+      }
+      return field.getCount(field.value as never);
+    }
+    if (hasChildren(field)) {
+      if (!field.getCount) {
+        return undefined;
+      }
+      return field.getCount(field.value as never);
+    }
+    return undefined;
+  })();
 
   // Call useWatch unconditionally (React hooks rule) - disabled when not needed
-  const watchPath =
-    discriminator && fieldName
-      ? `${fieldName}.${discriminator}`
-      : (discriminator ?? "");
+  const watchPath = discriminator ?? "";
   const watchedDiscriminator = useWatch({
     control: form?.control,
     name: watchPath as Path<TEndpoint["types"]["RequestOutput"]>,
-    disabled: !discriminator || !form || !fieldName,
+    disabled: !discriminator || !form,
   }) as string | undefined;
 
   // Check if this is the ROOT container (first in the chain)
@@ -247,14 +255,6 @@ export function ContainerWidget<
       backButtonFieldName = "backButton";
       hasBackButton = true;
     }
-  }
-
-  // Button state is tracked by context provider
-  // This prevents nested containers from rendering duplicate buttons
-
-  // Handle ACTIONS layout type with separate component (after all hooks are called)
-  if (layoutTypeRaw === LayoutType.ACTIONS && hasChildren(field)) {
-    return <ContainerActionsWidget field={field} fieldName={fieldName} />;
   }
 
   const layoutTypeStr = layoutTypeRaw;
@@ -413,10 +413,16 @@ export function ContainerWidget<
         )}
         {/* Auto FormAlert at top */}
         {shouldShowAutoFormAlert && <FormAlert alert={formAlertState} />}
-        <Div className={layoutClass}>
+        <Div className={cn(layoutClass, innerClassName)}>
           <MultiWidgetRenderer
             childrenSchema={childrenForRenderer}
-            value={fieldValue}
+            value={
+              fieldValue as
+                | { [key: string]: WidgetData }
+                | WidgetData[]
+                | null
+                | undefined
+            }
             fieldName={fieldName}
             discriminator={discriminator}
             watchedDiscriminatorValue={watchedDiscriminator}
@@ -431,7 +437,7 @@ export function ContainerWidget<
                 key={backButtonFieldName}
                 childrenSchema={undefined}
                 value={null}
-                fieldName={backButtonFieldName}
+                fieldName={undefined}
               />
             )}
             {/* Submit button (right side) */}
@@ -569,10 +575,16 @@ export function ContainerWidget<
             : "pt-6"
         }
       >
-        <Div className={layoutClass}>
+        <Div className={cn(layoutClass, innerClassName)}>
           <MultiWidgetRenderer
             childrenSchema={childrenForRenderer}
-            value={fieldValue}
+            value={
+              fieldValue as
+                | { [key: string]: WidgetData }
+                | WidgetData[]
+                | null
+                | undefined
+            }
             fieldName={fieldName}
             discriminator={discriminator}
             watchedDiscriminatorValue={watchedDiscriminator}
@@ -593,7 +605,7 @@ export function ContainerWidget<
                 key={backButtonFieldName}
                 childrenSchema={undefined}
                 value={null}
-                fieldName={backButtonFieldName}
+                fieldName={fieldName}
               />
             )}
             {/* Submit button (right side) */}

@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/components/types";
 import {
   TtsVoiceDB,
   TtsVoiceOptions,
@@ -32,7 +33,6 @@ import {
   SpacingSize,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { modelSelectionSchemaWithCharacter } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type {
@@ -82,7 +82,7 @@ const { DELETE } = createEndpoint({
           data.logger,
           (oldData) => {
             if (oldData?.success) {
-              const deletedFavorite = oldData.data.favoritesList.find(
+              const deletedFavorite = oldData.data.favorites.find(
                 (fav) => fav.id === data.pathParams.id,
               );
               if (deletedFavorite) {
@@ -106,7 +106,7 @@ const { DELETE } = createEndpoint({
             return {
               success: true,
               data: {
-                favoritesList: oldData.data.favoritesList.filter(
+                favorites: oldData.data.favorites.filter(
                   (fav) => fav.id !== data.pathParams.id,
                 ),
               },
@@ -326,7 +326,7 @@ const { PATCH } = createEndpoint({
             return {
               success: true,
               data: {
-                favoritesList: oldData.data.favoritesList.map((fav) => {
+                favorites: oldData.data.favorites.map((fav) => {
                   if (fav.id !== data.pathParams.id) {
                     return fav;
                   }
@@ -341,8 +341,16 @@ const { PATCH } = createEndpoint({
                   const characterTagline = data.requestData.tagline ?? null;
                   const characterDescription =
                     data.requestData.description ?? null;
-                  const characterModelSelection =
-                    data.requestData.modelSelection.characterModelSelection;
+
+                  // Get characterModelSelection from GET endpoint cache
+                  const getEndpointData = apiClient.getEndpointData(
+                    definitions.GET,
+                    data.logger,
+                    { id: data.pathParams.id },
+                  );
+                  const characterModelSelection = getEndpointData?.success
+                    ? getEndpointData.data.characterModelSelection
+                    : undefined;
 
                   // Recompute display fields with updated config
                   const updatedFavorite =
@@ -485,8 +493,9 @@ const { PATCH } = createEndpoint({
       }),
 
       modelSelection: requestField({
-        type: WidgetType.CUSTOM_WIDGET,
-        schema: modelSelectionSchemaWithCharacter,
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.OBJECT,
+        schema: modelSelectionSchemaSimple.nullable(),
       }),
     },
   }),
@@ -564,43 +573,22 @@ const { PATCH } = createEndpoint({
         description: "A helpful AI assistant",
         voice: "app.api.agent.textToSpeech.voices.FEMALE" as const,
         modelSelection: {
-          currentSelection: {
-            selectionType: ModelSelectionType.FILTERS,
-            intelligenceRange: {
-              min: IntelligenceLevel.BRILLIANT,
-              max: IntelligenceLevel.BRILLIANT,
-            },
-            priceRange: {
-              min: PriceLevel.CHEAP,
-              max: PriceLevel.PREMIUM,
-            },
-            contentRange: {
-              min: ContentLevel.MAINSTREAM,
-              max: ContentLevel.UNCENSORED,
-            },
-            speedRange: {
-              min: SpeedLevel.FAST,
-              max: SpeedLevel.THOROUGH,
-            },
+          selectionType: ModelSelectionType.FILTERS,
+          intelligenceRange: {
+            min: IntelligenceLevel.BRILLIANT,
+            max: IntelligenceLevel.BRILLIANT,
           },
-          characterModelSelection: {
-            selectionType: ModelSelectionType.FILTERS,
-            intelligenceRange: {
-              min: IntelligenceLevel.SMART,
-              max: IntelligenceLevel.BRILLIANT,
-            },
-            priceRange: {
-              min: PriceLevel.CHEAP,
-              max: PriceLevel.STANDARD,
-            },
-            contentRange: {
-              min: ContentLevel.MAINSTREAM,
-              max: ContentLevel.UNCENSORED,
-            },
-            speedRange: {
-              min: SpeedLevel.FAST,
-              max: SpeedLevel.THOROUGH,
-            },
+          priceRange: {
+            min: PriceLevel.CHEAP,
+            max: PriceLevel.PREMIUM,
+          },
+          contentRange: {
+            min: ContentLevel.MAINSTREAM,
+            max: ContentLevel.UNCENSORED,
+          },
+          speedRange: {
+            min: SpeedLevel.FAST,
+            max: SpeedLevel.THOROUGH,
           },
         },
       },
@@ -728,8 +716,15 @@ const { GET } = createEndpoint({
       }),
 
       modelSelection: responseField({
-        type: WidgetType.CUSTOM_WIDGET,
-        schema: modelSelectionSchemaWithCharacter,
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.OBJECT,
+        schema: modelSelectionSchemaSimple.nullable(),
+      }),
+
+      characterModelSelection: responseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.OBJECT,
+        schema: modelSelectionSchemaSimple,
       }),
     },
   }),
@@ -808,24 +803,41 @@ const { GET } = createEndpoint({
           "app.api.agent.chat.characters.characters.thea.description" as const,
         voice: null,
         modelSelection: {
-          currentSelection: {
-            selectionType: ModelSelectionType.FILTERS,
-            priceRange: {
-              min: PriceLevel.CHEAP,
-              max: PriceLevel.STANDARD,
-            },
-            intelligenceRange: {
-              min: IntelligenceLevel.SMART,
-              max: IntelligenceLevel.BRILLIANT,
-            },
-            contentRange: {
-              min: ContentLevel.OPEN,
-              max: ContentLevel.UNCENSORED,
-            },
-            speedRange: {
-              min: SpeedLevel.FAST,
-              max: SpeedLevel.THOROUGH,
-            },
+          selectionType: ModelSelectionType.FILTERS,
+          priceRange: {
+            min: PriceLevel.CHEAP,
+            max: PriceLevel.STANDARD,
+          },
+          intelligenceRange: {
+            min: IntelligenceLevel.SMART,
+            max: IntelligenceLevel.BRILLIANT,
+          },
+          contentRange: {
+            min: ContentLevel.OPEN,
+            max: ContentLevel.UNCENSORED,
+          },
+          speedRange: {
+            min: SpeedLevel.FAST,
+            max: SpeedLevel.THOROUGH,
+          },
+        },
+        characterModelSelection: {
+          selectionType: ModelSelectionType.FILTERS,
+          priceRange: {
+            min: PriceLevel.CHEAP,
+            max: PriceLevel.STANDARD,
+          },
+          intelligenceRange: {
+            min: IntelligenceLevel.SMART,
+            max: IntelligenceLevel.BRILLIANT,
+          },
+          contentRange: {
+            min: ContentLevel.OPEN,
+            max: ContentLevel.UNCENSORED,
+          },
+          speedRange: {
+            min: SpeedLevel.FAST,
+            max: SpeedLevel.THOROUGH,
           },
         },
       },
@@ -873,17 +885,17 @@ export type FavoriteGetModelSelection =
   FavoriteGetResponseOutput["modelSelection"];
 
 export type FavoriteGetFiltersModelSelection = Extract<
-  FavoriteGetModelSelection["currentSelection"],
+  FavoriteGetModelSelection,
   { selectionType: typeof ModelSelectionType.FILTERS }
 >;
 
 export type FavoriteGetManualModelSelection = Extract<
-  FavoriteGetModelSelection["currentSelection"],
+  FavoriteGetModelSelection,
   { selectionType: typeof ModelSelectionType.MANUAL }
 >;
 
 export type FavoriteGetCharacterBasedModelSelection = Extract<
-  FavoriteGetModelSelection["currentSelection"],
+  FavoriteGetModelSelection,
   { selectionType: typeof ModelSelectionType.CHARACTER_BASED }
 >;
 
@@ -901,17 +913,17 @@ const _test_get_3: {
 type FavoriteModelSelection = FavoriteUpdateRequestOutput["modelSelection"];
 
 type FavoriteFiltersModelSelection = Extract<
-  FavoriteModelSelection["currentSelection"],
+  FavoriteModelSelection,
   { selectionType: typeof ModelSelectionType.FILTERS }
 >;
 
 type FavoriteManualModelSelection = Extract<
-  FavoriteModelSelection["currentSelection"],
+  FavoriteModelSelection,
   { selectionType: typeof ModelSelectionType.MANUAL }
 >;
 
 type FavoriteCharacterBasedModelSelection = Extract<
-  FavoriteModelSelection["currentSelection"],
+  FavoriteModelSelection,
   { selectionType: typeof ModelSelectionType.CHARACTER_BASED }
 >;
 

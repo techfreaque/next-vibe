@@ -789,13 +789,7 @@ function StackEntryLayer({
             create: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.data,
-              mutationOptions: (() => {
-                console.log(
-                  "EndpointsPage: entry.endpoint.options?.mutationOptions =",
-                  entry.endpoint.options?.mutationOptions,
-                );
-                return entry.endpoint.options?.mutationOptions;
-              })(),
+              mutationOptions: entry.endpoint.options?.mutationOptions,
             },
           }}
           submitButton={submitButton}

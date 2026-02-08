@@ -4,37 +4,45 @@ import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { Check } from "next-vibe-ui/ui/icons/Check";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Settings } from "next-vibe-ui/ui/icons/Settings";
-import { Input } from "next-vibe-ui/ui/input";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
+import { H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
+import { useTourState } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-state-context";
 import { NO_CHARACTER } from "@/app/api/[locale]/agent/chat/characters/config";
 import type { CharacterListItem as CharacterListItemType } from "@/app/api/[locale]/agent/chat/characters/definition";
+import favoriteEditDefinition from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import favoritesCreateDefinition from "@/app/api/[locale]/agent/chat/favorites/create/definition";
 import type { FavoriteCard } from "@/app/api/[locale]/agent/chat/favorites/definition";
 import {
   modelOptions,
   modelProviders,
 } from "@/app/api/[locale]/agent/models/models";
+import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useIsMobile } from "@/hooks/use-media-query";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { CATEGORY_CONFIG, CharacterCategory } from "../enum";
+import {
+  CATEGORY_CONFIG,
+  CharacterCategory,
+  ModelSelectionType,
+} from "../enum";
 import { useCharacters } from "../hooks";
 
 interface CharacterBrowserProps {
   onAddWithDefaults: (characterId: string) => void;
-  onCustomize: (characterId: string) => void;
   onCreateCustom?: () => void;
   onBack?: () => void;
   locale: CountryLanguage;
@@ -123,38 +131,38 @@ export function CharacterListItem({
         {/* Title row with name and tagline */}
         <Div className="flex items-baseline gap-1.5 min-w-0">
           <Span className="font-medium text-base shrink-0">
-            {t(character.content.name)}
+            {t(character.name)}
           </Span>
-          {character.content.tagline && (
+          {character.tagline && (
             <Span className="text-xs text-muted-foreground truncate">
-              {t(character.content.tagline)}
+              {t(character.tagline)}
             </Span>
           )}
         </Div>
 
         {/* Description */}
         <Span className="text-xs text-muted-foreground block mt-1 truncate">
-          {t(character.content.description)}
+          {t(character.description)}
         </Span>
 
         {/* Model row - model info, provider, credits */}
         <Div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
-          {character.content.modelInfo && (
+          {character.modelInfo && (
             <>
-              <Icon icon={character.content.modelIcon} className="h-4 w-4" />
-              <Span className="truncate">{character.content.modelInfo}</Span>
+              <Icon icon={character.modelIcon} className="h-4 w-4" />
+              <Span className="truncate">{character.modelInfo}</Span>
               <Span className="text-muted-foreground/40">•</Span>
             </>
           )}
-          {character.content.modelProvider && (
+          {character.modelProvider && (
             <>
               <Span className="shrink-0">
-                {modelProviders[character.content.modelProvider]?.name}
+                {modelProviders[character.modelProvider]?.name}
               </Span>
               <Span className="text-muted-foreground/40">•</Span>
             </>
           )}
-          <Span className="shrink-0">{character.content.creditCost}</Span>
+          <Span className="shrink-0">{character.creditCost}</Span>
         </Div>
       </Div>
     </Div>
@@ -238,13 +246,18 @@ export function CategorySection({
 
 interface CharacterBrowserCoreProps {
   onAdd: (characterId: string) => void;
-  onCustomize: (characterId: string) => void;
   favorites: FavoriteCard[];
   locale: CountryLanguage;
   searchQuery?: string;
   hideCompanions?: boolean;
   logger: EndpointLogger;
   user: JwtPayloadType;
+  /** Selected character ID for showing success indicator */
+  selectedCharacterId?: string;
+  /** Characters map for displaying selected character name */
+  characters?: Record<string, CharacterListItemType>;
+  /** Show specialist step wrapper (header + footer) */
+  showSpecialistWrapper?: boolean;
 }
 
 /**
@@ -252,19 +265,35 @@ interface CharacterBrowserCoreProps {
  */
 export function CharacterBrowserCore({
   onAdd,
-  onCustomize,
   favorites,
   locale,
   searchQuery = "",
   hideCompanions = false,
   logger,
   user,
+  selectedCharacterId,
+  characters,
+  showSpecialistWrapper = false,
 }: CharacterBrowserCoreProps): JSX.Element {
   const { t } = simpleT(locale);
+  const setPopoverOpen = useTourState((state) => state.setModelSelectorOpen);
 
   const [expandedCategories, setExpandedCategories] = useState<
     Set<(typeof CharacterCategory)[keyof typeof CharacterCategory]>
   >(new Set());
+  const [customizeCharacterId, setCustomizeCharacterId] = useState<
+    string | null
+  >(null);
+
+  const handleStartChatting = useCallback(() => {
+    setPopoverOpen(false);
+  }, [setPopoverOpen]);
+
+  const character =
+    selectedCharacterId && characters
+      ? characters[selectedCharacterId]
+      : undefined;
+  const characterName = character ? t(character.name) : "";
 
   // Fetch characters from API
   const charactersEndpoint = useCharacters(user, logger);
@@ -280,10 +309,10 @@ export function CharacterBrowserCore({
 
   // Get all characters as flat array
   const allCharacters = useMemo(() => {
-    if (!charactersEndpoint.read?.data?.container?.sections) {
+    if (!charactersEndpoint.read?.data?.sections) {
       return [];
     }
-    return charactersEndpoint.read.data.container?.sections.flatMap(
+    return charactersEndpoint.read.data.sections.flatMap(
       (section: { characters: CharacterListItemType[] }) => section.characters,
     );
   }, [charactersEndpoint.read?.data]);
@@ -324,8 +353,8 @@ export function CharacterBrowserCore({
     const query = searchQuery.toLowerCase();
     return allCharacters.filter(
       (p: CharacterListItemType) =>
-        t(p.content.name).toLowerCase().includes(query) ||
-        t(p.content.description).toLowerCase().includes(query),
+        t(p.name).toLowerCase().includes(query) ||
+        t(p.description).toLowerCase().includes(query),
     );
   }, [searchQuery, t, allCharacters]);
 
@@ -344,7 +373,85 @@ export function CharacterBrowserCore({
     [],
   );
 
-  return searchFilteredCharacters ? (
+  const handleCustomize = useCallback((characterId: string) => {
+    setCustomizeCharacterId(characterId);
+  }, []);
+
+  // If customizing, replace entire view with EndpointsPage
+  if (customizeCharacterId) {
+    const character = allCharacters.find((c) => c.id === customizeCharacterId);
+
+    const prefillData = character
+      ? {
+          characterId: character.id,
+          container: {
+            character: {
+              icon: character.icon,
+              info: {
+                titleRow: {
+                  name: character.name,
+                  tagline: character.tagline,
+                },
+                description: character.description,
+              },
+            },
+            voice: null,
+            modelSelection: {
+              currentSelection: {
+                selectionType: ModelSelectionType.CHARACTER_BASED,
+              },
+            },
+          },
+        }
+      : undefined;
+
+    // Replace the entire CharacterBrowserCore view with EndpointsPage
+    return (
+      <EndpointsPage
+        endpoint={{
+          POST: favoritesCreateDefinition.POST,
+          GET: favoriteEditDefinition.GET,
+        }}
+        forceMethod={Methods.POST}
+        user={user}
+        locale={locale}
+        navigationOverride={{
+          pop: () => {
+            setCustomizeCharacterId(null);
+          },
+          canGoBack: true,
+          stack: [
+            {
+              endpoint: favoritesCreateDefinition.POST,
+              params: {
+                data: prefillData,
+              },
+              timestamp: Date.now(),
+              popNavigationOnSuccess: 1,
+            },
+          ],
+        }}
+        endpointOptions={{
+          read: {
+            urlPathParams: {
+              id: customizeCharacterId,
+            },
+          },
+          create: {
+            autoPrefillData: prefillData,
+            initialState: prefillData,
+            mutationOptions: {
+              onSuccess: async () => {
+                setCustomizeCharacterId(null);
+              },
+            },
+          },
+        }}
+      />
+    );
+  }
+
+  const browserContent = searchFilteredCharacters ? (
     // Search results
     <>
       <Div className="flex flex-col gap-3 p-4">
@@ -361,7 +468,7 @@ export function CharacterBrowserCore({
                   key={character.id}
                   character={character}
                   onAdd={() => onAdd(character.id)}
-                  onCustomize={() => onCustomize(character.id)}
+                  onCustomize={() => handleCustomize(character.id)}
                   locale={locale}
                   isAdded={addedCharacterIds?.has(character.id) ?? false}
                 />
@@ -406,7 +513,7 @@ export function CharacterBrowserCore({
                 "border-primary/30 bg-gradient-to-br from-primary/5 to-background/50",
                 "hover:border-primary/40 hover:shadow-md cursor-pointer group",
               )}
-              onClick={() => onCustomize(NO_CHARACTER.id)}
+              onClick={() => handleCustomize(NO_CHARACTER.id)}
             >
               {/* Icon */}
               <Div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
@@ -430,24 +537,6 @@ export function CharacterBrowserCore({
                   )}
                 </Span>
               </Div>
-
-              {/* Button */}
-              {onCustomize && (
-                <Button
-                  type="button"
-                  variant="default"
-                  size="sm"
-                  className="shrink-0 self-center"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onCustomize(NO_CHARACTER.id);
-                  }}
-                >
-                  {t(
-                    "app.api.agent.chat.characters.get.browser.configureButton",
-                  )}
-                </Button>
-              )}
             </Div>
           </Div>
 
@@ -497,7 +586,7 @@ export function CharacterBrowserCore({
                 category={item.category}
                 characters={item.characters}
                 onAdd={onAdd}
-                onCustomize={onCustomize}
+                onCustomize={handleCustomize}
                 onExpand={() => handleCategoryExpand(item.category)}
                 expanded={expandedCategories.has(item.category)}
                 locale={locale}
@@ -511,79 +600,77 @@ export function CharacterBrowserCore({
         })}
     </Div>
   );
+
+  // Wrap with specialist step UI if requested
+  if (showSpecialistWrapper) {
+    return (
+      <Div className="flex flex-col flex-1 overflow-hidden">
+        {/* Scrollable content - includes header and character browser */}
+        <Div className="flex-1 overflow-y-auto min-h-0">
+          {/* Success indicator */}
+          {selectedCharacterId && (
+            <Div className="flex justify-center p-3 border-b bg-card">
+              <Div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full text-sm font-medium">
+                <Check className="h-4 w-4" />
+                {t("app.chat.onboarding.specialists.chosen", {
+                  name: characterName,
+                })}
+              </Div>
+            </Div>
+          )}
+
+          {/* Title + Description - inside scroll */}
+          <Div className="p-4 pb-2 border-b bg-card">
+            <H3 className="text-base font-semibold mb-1 text-center">
+              {t("app.chat.onboarding.specialists.title")}
+            </H3>
+            <P className="text-xs text-muted-foreground text-center">
+              {t("app.chat.onboarding.specialists.subtitle")}
+            </P>
+          </Div>
+
+          {/* Character browser content */}
+          {browserContent}
+        </Div>
+
+        {/* Sticky footer at bottom */}
+        <Div className="p-4 border-t bg-card shrink-0">
+          <Button
+            type="button"
+            className="w-full h-10"
+            onClick={handleStartChatting}
+          >
+            {t("app.chat.onboarding.specialists.start")}
+          </Button>
+        </Div>
+      </Div>
+    );
+  }
+
+  return browserContent;
 }
 
 /**
  * Character browser component - modal for adding new favorites
+ * Provides NavigationStackProvider for EndpointsPage instances
  */
 export function CharacterBrowser({
   onAddWithDefaults,
-  onCustomize,
-  onCreateCustom,
-  onBack,
   locale,
   favorites = [],
   logger,
   user,
 }: CharacterBrowserProps): JSX.Element {
-  const { t } = simpleT(locale);
-  const [searchQuery, setSearchQuery] = useState("");
-
   return (
-    <Div className="flex flex-col max-h-[70vh] overflow-hidden">
-      {/* Header with search and create custom */}
-      <Div className="flex flex-col gap-2 p-4 border-b bg-card shrink-0">
-        <Div className="flex items-center gap-3">
-          {onBack && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 shrink-0"
-              onClick={onBack}
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          )}
-          <Div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder={t("app.chat.selector.searchCharacters")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9"
-            />
-          </Div>
-          {onCreateCustom && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={onCreateCustom}
-              className="h-9 gap-1.5 shrink-0"
-            >
-              <Plus className="h-4 w-4" />
-              <Span className="hidden sm:inline">
-                {t("app.chat.selector.createCustom")}
-              </Span>
-            </Button>
-          )}
-        </Div>
-      </Div>
-
-      {/* Scrollable content with core */}
-      <Div className="flex-1 overflow-y-auto min-h-0">
-        <CharacterBrowserCore
-          onAdd={onAddWithDefaults}
-          onCustomize={onCustomize}
-          favorites={favorites}
-          locale={locale}
-          searchQuery={searchQuery}
-          logger={logger}
-          user={user}
-        />
-      </Div>
-    </Div>
+    <NavigationStackProvider>
+      <CharacterBrowserCore
+        onAdd={onAddWithDefaults}
+        favorites={favorites}
+        locale={locale}
+        hideCompanions={false}
+        logger={logger}
+        user={user}
+      />
+    </NavigationStackProvider>
   );
 }

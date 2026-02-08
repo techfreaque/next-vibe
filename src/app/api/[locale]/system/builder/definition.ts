@@ -161,7 +161,7 @@ const { POST } = createEndpoint({
       // ========================================================================
       configObject: objectOptionalField(
         {
-          type: WidgetType.ACCORDION,
+          type: WidgetType.CONTAINER,
           title: "app.api.system.builder.post.fields.configObject.title",
           description:
             "app.api.system.builder.post.fields.configObject.description",
@@ -305,7 +305,7 @@ const { POST } = createEndpoint({
             },
             objectField(
               {
-                type: WidgetType.DATA_CARDS,
+                type: WidgetType.CONTAINER,
                 title: "app.api.system.builder.post.fields.fileToCompile.title",
                 layoutType: LayoutType.GRID,
                 columns: 12,
@@ -1099,7 +1099,7 @@ const { POST } = createEndpoint({
             },
             objectField(
               {
-                type: WidgetType.DATA_CARDS,
+                type: WidgetType.CONTAINER,
                 title: "app.api.system.builder.post.fields.copyConfig.title",
                 layoutType: LayoutType.GRID,
                 columns: 12,
@@ -1155,7 +1155,7 @@ const { POST } = createEndpoint({
           // ==================================================================
           npmPackage: objectOptionalField(
             {
-              type: WidgetType.ACCORDION,
+              type: WidgetType.CONTAINER,
               title: "app.api.system.builder.post.fields.npmPackage.title",
               description:
                 "app.api.system.builder.post.fields.npmPackage.description",
@@ -1410,7 +1410,7 @@ const { POST } = createEndpoint({
 
       filesBuilt: responseArrayOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           items: [],
           optional: true,
           icon: "file-check",
@@ -1424,7 +1424,7 @@ const { POST } = createEndpoint({
 
       filesCopied: responseArrayOptionalField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CONTAINER,
           items: [],
           optional: true,
           icon: "file-copy",

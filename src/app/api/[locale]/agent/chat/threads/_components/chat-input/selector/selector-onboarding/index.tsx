@@ -6,7 +6,6 @@ import type { JSX } from "react";
 import { useCallback, useState } from "react";
 
 import { CharacterBrowserCore } from "@/app/api/[locale]/agent/chat/characters/components/character-browser";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/characters/enum";
 import type { FavoriteCard } from "@/app/api/[locale]/agent/chat/favorites/definition";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -96,11 +95,8 @@ export function SelectorOnboarding({
         tagline: character.tagline,
         description: character.description,
         voice: null,
-        modelSelection: {
-          currentSelection: {
-            selectionType: ModelSelectionType.CHARACTER_BASED,
-          },
-        },
+        modelSelection: null,
+        characterModelSelection: undefined,
       });
 
       if (createdId) {
@@ -135,11 +131,8 @@ export function SelectorOnboarding({
         tagline: character.tagline,
         description: character.description,
         voice: null,
-        modelSelection: {
-          currentSelection: {
-            selectionType: ModelSelectionType.CHARACTER_BASED,
-          },
-        },
+        modelSelection: null,
+        characterModelSelection: undefined,
       });
     },
     [addFavorite, characters, logger],

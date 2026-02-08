@@ -71,7 +71,7 @@ export function useChatFavorites({
 
   // Extract favorites from flat array
   const favorites = useMemo(() => {
-    return endpoint.read?.data?.favoritesList ?? [];
+    return endpoint.read?.data?.favorites ?? [];
   }, [endpoint.read?.data]);
 
   return {

@@ -10,7 +10,6 @@ import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
 import type { CreditsHistoryGetResponseOutput } from "@/app/api/[locale]/credits/history/definition";
-import type { CreditBalance } from "@/app/api/[locale]/credits/repository";
 import {
   ProductIds,
   productsRepository,
@@ -20,6 +19,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { CreditsGetResponseOutput } from "../../credits/definition";
 import { BuyCreditsTab } from "./buy-credits-tab";
 import { CreditBalanceCard } from "./credit-balance-card";
 import { HistoryTab } from "./history-tab";
@@ -30,7 +30,7 @@ import { SubscriptionStatusCard } from "./subscription-status-card";
 
 export interface SubscriptionClientContentProps {
   locale: CountryLanguage;
-  initialCredits: CreditBalance | null;
+  initialCredits: CreditsGetResponseOutput | null;
   initialHistory: CreditsHistoryGetResponseOutput | null;
   initialSubscription: SubscriptionGetResponseOutput | null;
   isAuthenticated: boolean;

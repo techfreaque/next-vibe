@@ -5,21 +5,21 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 
 import { simpleT } from "@/i18n/core/shared";
-import { useWidgetLocale } from "../../../../system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetForm,
+  useWidgetLocale,
+} from "../../../../system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { calculatePasswordStrength } from "./calculate-password-strenght";
-
-interface PasswordStrengthIndicatorProps {
-  password: string;
-}
 
 /**
  * Displays a visual indicator of password strength.
  */
-export function PasswordStrengthIndicator({
-  password,
-}: PasswordStrengthIndicatorProps): React.JSX.Element | null {
+export function PasswordStrengthIndicator(): React.JSX.Element | null {
   const locale = useWidgetLocale();
   const { t: globalT } = simpleT(locale);
+  const form = useWidgetForm();
+  // Watch password value for strength indicator
+  const password = form?.watch("password") || "";
 
   if (!password) {
     return null;

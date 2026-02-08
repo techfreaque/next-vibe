@@ -6,11 +6,7 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
-import type {
-  AnyChildrenConstrain,
-  ConstrainedChildUsage,
-  FieldUsageConfig,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
@@ -18,23 +14,10 @@ import type { PaginationWidgetConfig } from "./types";
 
 export function PaginationWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
   TUsage extends FieldUsageConfig,
-  TSchemaType extends "object" | "object-optional" | "widget-object",
-  TChildren extends {
-    page: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
-    limit: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
-    totalCount: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
-    pageCount?: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
-    offset?: AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>;
-  },
 >(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- props not needed
-  _props: InkWidgetProps<
-    TEndpoint,
-    TUsage,
-    PaginationWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
-  >,
+  _props: InkWidgetProps<TEndpoint, TUsage, PaginationWidgetConfig>,
 ): JSX.Element {
   const t = useInkWidgetTranslation();
   return (

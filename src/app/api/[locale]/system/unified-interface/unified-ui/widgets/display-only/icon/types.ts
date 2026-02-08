@@ -6,6 +6,7 @@
 import type { z } from "zod";
 
 import type {
+  IconSchemaGenericType,
   IconSchemaNullishType,
   IconSchemaOptionalType,
   IconSchemaType,
@@ -27,7 +28,8 @@ export interface IconWidgetConfig<
   TSchema extends
     | IconSchemaType
     | IconSchemaOptionalType
-    | IconSchemaNullishType,
+    | IconSchemaNullishType
+    | IconSchemaGenericType,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive" | "widget",
 > extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {

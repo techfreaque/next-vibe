@@ -1,8 +1,8 @@
 /**
- * Model Selection Field Widget - React implementation
- * Comprehensive model selection with CHARACTER_BASED, FILTERS, and MANUAL modes
+ * Model Selector Component
+ * Standalone, reusable model selection with CHARACTER_BASED, FILTERS, and MANUAL modes
  *
- * Uses react-hook-form as single source of truth - no local state syncing
+ * Accepts state from outside - can be used with any state management
  */
 
 "use client";
@@ -26,10 +26,13 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/characters/enum";
 import {
   CONTENT_DISPLAY,
   INTELLIGENCE_DISPLAY,
+  ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
+  ModelSortFieldOptions,
   PRICE_DISPLAY,
   SPEED_DISPLAY,
 } from "@/app/api/[locale]/agent/chat/characters/enum";
@@ -42,29 +45,10 @@ import {
   modelOptions,
   modelProviders,
 } from "@/app/api/[locale]/agent/models/models";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { ReactFormFieldProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
-import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
-import {
-  useWidgetForm,
-  useWidgetTranslation,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { TParams } from "@/i18n/core/static-types";
 
-import type {
-  FiltersModelSelection,
-  ManualModelSelection,
-  ModelSelectionFieldWidgetConfigAny,
-  ModelSelectionSimple,
-  ModelSelectionWithCharacter,
-} from "./types";
-import {
-  ModelSortDirection,
-  ModelSortField,
-  ModelSortFieldOptions,
-} from "./types";
-
-type ModelSelectionValue = ModelSelectionWithCharacter | ModelSelectionSimple;
+import type { FiltersModelSelection, ModelSelectionSimple } from "./types";
 
 interface ModelCardProps {
   model: ModelOption;
@@ -72,6 +56,7 @@ interface ModelCardProps {
   selected: boolean;
   onClick: () => void;
   dimmed?: boolean;
+  disabled?: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
@@ -81,16 +66,18 @@ function ModelCard({
   selected,
   onClick,
   dimmed = false,
+  disabled = false,
   t,
 }: ModelCardProps): JSX.Element {
   const cost = getCreditCostFromModel(model);
 
   return (
     <Div
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
       className={cn(
-        "flex items-center gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all",
-        "hover:bg-muted/50 hover:border-primary/30",
+        "flex items-center gap-2.5 p-2.5 rounded-lg border transition-all",
+        !disabled && "cursor-pointer hover:bg-muted/50 hover:border-primary/30",
+        disabled && "cursor-not-allowed opacity-60",
         selected && "bg-primary/10 border-primary/40 shadow-sm",
         dimmed && !selected && "opacity-40 hover:opacity-70",
       )}
@@ -179,64 +166,68 @@ function getRangeFromIndices<T extends string>(
   };
 }
 
-interface ModelSelectionInnerProps {
-  value: ModelSelectionValue | ModelSelectionWithCharacter | undefined;
-  onUpdateValue: (value: ModelSelectionValue) => void;
-  includeCharacterBased: boolean;
-  hasCharacterModelSelection: boolean;
-  t: (key: string, params?: Record<string, string | number>) => string;
+/**
+ * Standalone Model Selector Component
+ */
+export interface ModelSelectorProps {
+  /**
+   * Current model selection
+   */
+  modelSelection: ModelSelectionSimple | undefined;
+
+  /**
+   * Callback when selection changes (optional for read-only mode)
+   */
+  onChange?: (selection: ModelSelectionSimple) => void;
+
+  /**
+   * Character's model selection (optional, for CHARACTER_BASED mode)
+   */
+  characterModelSelection?: ModelSelectionSimple | undefined;
+
+  /**
+   * Read-only mode - disables all interactions
+   */
+  readOnly?: boolean;
+
+  /**
+   * Translation function
+   */
+  t: (key: string, params?: TParams) => string;
 }
 
-function ModelSelectionInner({
-  value,
-  onUpdateValue,
-  includeCharacterBased,
-  hasCharacterModelSelection,
+export function ModelSelector({
+  modelSelection,
+  onChange,
+  characterModelSelection,
+  readOnly = false,
   t,
-}: ModelSelectionInnerProps): JSX.Element {
-  // UI state only (not form state)
+}: ModelSelectorProps): JSX.Element {
+  // UI state
+  const [useCharacterBased, setUseCharacterBased] = useState(false);
   const [showAllModels, setShowAllModels] = useState(false);
   const [showUnfilteredModels, setShowUnfilteredModels] = useState(false);
   const [showLegacyByGroup, setShowLegacyByGroup] = useState<
     Record<string, boolean>
   >({});
 
-  // Extract current selection from form value
-  const currentSelection = useMemo(() => {
-    if (!value) {
-      // Default to CHARACTER_BASED only if we have character model selection
-      // Otherwise default to FILTERS
-      return includeCharacterBased && hasCharacterModelSelection
-        ? { selectionType: ModelSelectionType.CHARACTER_BASED }
-        : { selectionType: ModelSelectionType.FILTERS };
-    }
-    if ("currentSelection" in value) {
-      return value.currentSelection;
-    }
-    return value;
-  }, [value, includeCharacterBased, hasCharacterModelSelection]);
-
-  // Get character model selection
-  const characterModelSelection = useMemo(() => {
-    if (value && "characterModelSelection" in value) {
-      return value.characterModelSelection;
-    }
-    return undefined;
-  }, [value]);
+  // Current selection - use character's selection if in CHARACTER_BASED mode
+  const currentSelection =
+    useCharacterBased && characterModelSelection
+      ? characterModelSelection
+      : (modelSelection ?? { selectionType: ModelSelectionType.FILTERS });
 
   // Determine current mode
-  const mode = currentSelection.selectionType;
+  const mode = useCharacterBased
+    ? ModelSelectionType.CHARACTER_BASED
+    : currentSelection.selectionType;
 
-  // Get filter ranges from current selection or character
-  const activeSelection =
-    mode === ModelSelectionType.CHARACTER_BASED
-      ? characterModelSelection
-      : currentSelection;
+  // activeSelection is same as currentSelection now
+  const activeSelection = currentSelection;
 
   const intelligenceIndices = useMemo(
     () =>
-      activeSelection?.selectionType === ModelSelectionType.FILTERS ||
-      activeSelection?.selectionType === ModelSelectionType.MANUAL
+      activeSelection?.selectionType === ModelSelectionType.FILTERS
         ? getIndicesFromRange(
             activeSelection.intelligenceRange,
             INTELLIGENCE_DISPLAY,
@@ -247,8 +238,7 @@ function ModelSelectionInner({
 
   const contentIndices = useMemo(
     () =>
-      activeSelection?.selectionType === ModelSelectionType.FILTERS ||
-      activeSelection?.selectionType === ModelSelectionType.MANUAL
+      activeSelection?.selectionType === ModelSelectionType.FILTERS
         ? getIndicesFromRange(activeSelection.contentRange, CONTENT_DISPLAY)
         : { min: 0, max: CONTENT_DISPLAY.length - 1 },
     [activeSelection],
@@ -256,8 +246,7 @@ function ModelSelectionInner({
 
   const speedIndices = useMemo(
     () =>
-      activeSelection?.selectionType === ModelSelectionType.FILTERS ||
-      activeSelection?.selectionType === ModelSelectionType.MANUAL
+      activeSelection?.selectionType === ModelSelectionType.FILTERS
         ? getIndicesFromRange(activeSelection.speedRange, SPEED_DISPLAY)
         : { min: 0, max: SPEED_DISPLAY.length - 1 },
     [activeSelection],
@@ -265,8 +254,7 @@ function ModelSelectionInner({
 
   const priceIndices = useMemo(
     () =>
-      activeSelection?.selectionType === ModelSelectionType.FILTERS ||
-      activeSelection?.selectionType === ModelSelectionType.MANUAL
+      activeSelection?.selectionType === ModelSelectionType.FILTERS
         ? getIndicesFromRange(activeSelection.priceRange, PRICE_DISPLAY)
         : { min: 0, max: PRICE_DISPLAY.length - 1 },
     [activeSelection],
@@ -277,20 +265,12 @@ function ModelSelectionInner({
       ? currentSelection.manualModelId
       : undefined;
 
-  // Helper to create new value with updated selection
-  const createUpdatedValue = (
-    newSelection:
-      | FiltersModelSelection
-      | ManualModelSelection
-      | { selectionType: typeof ModelSelectionType.CHARACTER_BASED },
-  ): ModelSelectionValue => {
-    if (includeCharacterBased) {
-      return {
-        currentSelection: newSelection,
-        characterModelSelection,
-      } as ModelSelectionWithCharacter;
+  // Helper to update value
+  const updateValue = (newSelection: ModelSelectionSimple): void => {
+    if (readOnly || !onChange) {
+      return;
     }
-    return newSelection as ModelSelectionSimple;
+    onChange(newSelection);
   };
 
   // Mode change handlers
@@ -301,158 +281,142 @@ function ModelSelectionInner({
       | typeof ModelSelectionType.MANUAL,
   ): void => {
     if (newMode === ModelSelectionType.CHARACTER_BASED) {
-      // When switching to CHARACTER_BASED, reset to character's defaults
-      onUpdateValue(
-        createUpdatedValue({
-          selectionType: ModelSelectionType.CHARACTER_BASED,
-        }),
-      );
-    } else if (newMode === ModelSelectionType.MANUAL) {
-      // When switching to manual, preserve current filter/sort settings
-      const baseProps = {
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy,
-        sortDirection,
-      };
+      // Just toggle the UI state
+      setUseCharacterBased(true);
+    } else {
+      setUseCharacterBased(false);
 
-      // Try to keep current model if available, otherwise use best filtered model
-      const currentModel =
-        manualModelId ??
-        bestFilteredModel?.id ??
-        Object.values(modelOptions)[0]?.id;
-      onUpdateValue(
-        createUpdatedValue({
+      if (newMode === ModelSelectionType.MANUAL) {
+        // When switching to manual, preserve current filter/sort settings
+        const baseProps = {
+          intelligenceRange: getRangeFromIndices(
+            intelligenceIndices,
+            INTELLIGENCE_DISPLAY,
+          ),
+          priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+          contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+          speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+          sortBy,
+          sortDirection,
+        };
+
+        // Try to keep current model if available, otherwise use best filtered model
+        const currentModel =
+          manualModelId ??
+          bestFilteredModel?.id ??
+          Object.values(modelOptions)[0]?.id;
+        updateValue({
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: currentModel,
           ...baseProps,
-        }),
-      );
-    } else {
-      // Filters mode - preserve current filter/sort settings
-      const baseProps = {
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy,
-        sortDirection,
-      };
+        });
+      } else {
+        // Filters mode - preserve current filter/sort settings
+        const baseProps = {
+          intelligenceRange: getRangeFromIndices(
+            intelligenceIndices,
+            INTELLIGENCE_DISPLAY,
+          ),
+          priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+          contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+          speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+          sortBy,
+          sortDirection,
+        };
 
-      onUpdateValue(
-        createUpdatedValue({
+        updateValue({
           selectionType: ModelSelectionType.FILTERS,
           ...baseProps,
-        }),
-      );
+        });
+      }
     }
   };
 
   // Range change handlers - automatically switch to FILTERS mode when editing
   const handleIntelligenceChange = (min: number, max: number): void => {
-    onUpdateValue(
-      createUpdatedValue({
-        selectionType: ModelSelectionType.FILTERS,
-        intelligenceRange: getRangeFromIndices(
-          { min, max },
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy,
-        sortDirection,
-      }),
-    );
+    updateValue({
+      selectionType: ModelSelectionType.FILTERS,
+      intelligenceRange: getRangeFromIndices(
+        { min, max },
+        INTELLIGENCE_DISPLAY,
+      ),
+      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+      sortBy,
+      sortDirection,
+    });
   };
 
   const handleContentChange = (min: number, max: number): void => {
-    onUpdateValue(
-      createUpdatedValue({
-        selectionType: ModelSelectionType.FILTERS,
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices({ min, max }, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy,
-        sortDirection,
-      }),
-    );
+    updateValue({
+      selectionType: ModelSelectionType.FILTERS,
+      intelligenceRange: getRangeFromIndices(
+        intelligenceIndices,
+        INTELLIGENCE_DISPLAY,
+      ),
+      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+      contentRange: getRangeFromIndices({ min, max }, CONTENT_DISPLAY),
+      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+      sortBy,
+      sortDirection,
+    });
   };
 
   const handleSpeedChange = (min: number, max: number): void => {
-    onUpdateValue(
-      createUpdatedValue({
-        selectionType: ModelSelectionType.FILTERS,
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices({ min, max }, SPEED_DISPLAY),
-        sortBy,
-        sortDirection,
-      }),
-    );
+    updateValue({
+      selectionType: ModelSelectionType.FILTERS,
+      intelligenceRange: getRangeFromIndices(
+        intelligenceIndices,
+        INTELLIGENCE_DISPLAY,
+      ),
+      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+      speedRange: getRangeFromIndices({ min, max }, SPEED_DISPLAY),
+      sortBy,
+      sortDirection,
+    });
   };
 
   const handlePriceChange = (min: number, max: number): void => {
-    onUpdateValue(
-      createUpdatedValue({
-        selectionType: ModelSelectionType.FILTERS,
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices({ min, max }, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy,
-        sortDirection,
-      }),
-    );
+    updateValue({
+      selectionType: ModelSelectionType.FILTERS,
+      intelligenceRange: getRangeFromIndices(
+        intelligenceIndices,
+        INTELLIGENCE_DISPLAY,
+      ),
+      priceRange: getRangeFromIndices({ min, max }, PRICE_DISPLAY),
+      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+      sortBy,
+      sortDirection,
+    });
   };
 
   const handleModelSelect = (modelId: ModelId): void => {
     // When selecting a model, preserve current filter/sort settings
-    onUpdateValue(
-      createUpdatedValue({
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: modelId,
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy,
-        sortDirection,
-      }),
-    );
+    updateValue({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: modelId,
+      intelligenceRange: getRangeFromIndices(
+        intelligenceIndices,
+        INTELLIGENCE_DISPLAY,
+      ),
+      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+      sortBy,
+      sortDirection,
+    });
   };
 
   // Get current sort settings from activeSelection (respects CHARACTER_BASED mode)
   const sortBy =
-    activeSelection?.selectionType === ModelSelectionType.FILTERS ||
-    activeSelection?.selectionType === ModelSelectionType.MANUAL
+    activeSelection?.selectionType === ModelSelectionType.FILTERS
       ? activeSelection.sortBy
       : undefined;
   const sortDirection =
-    activeSelection?.selectionType === ModelSelectionType.FILTERS ||
-    activeSelection?.selectionType === ModelSelectionType.MANUAL
+    activeSelection?.selectionType === ModelSelectionType.FILTERS
       ? activeSelection.sortDirection
       : undefined;
 
@@ -464,20 +428,18 @@ function ModelSelectionInner({
     // All fields default to DESC (highest/best first, including most expensive for price)
     const defaultDirection = ModelSortDirection.DESC;
 
-    onUpdateValue(
-      createUpdatedValue({
-        selectionType: ModelSelectionType.FILTERS,
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy: field,
-        sortDirection: defaultDirection,
-      }),
-    );
+    updateValue({
+      selectionType: ModelSelectionType.FILTERS,
+      intelligenceRange: getRangeFromIndices(
+        intelligenceIndices,
+        INTELLIGENCE_DISPLAY,
+      ),
+      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+      sortBy: field,
+      sortDirection: defaultDirection,
+    });
   };
 
   const handleSortDirectionToggle = (): void => {
@@ -485,20 +447,18 @@ function ModelSelectionInner({
       sortDirection === ModelSortDirection.ASC
         ? ModelSortDirection.DESC
         : ModelSortDirection.ASC;
-    onUpdateValue(
-      createUpdatedValue({
-        selectionType: ModelSelectionType.FILTERS,
-        intelligenceRange: getRangeFromIndices(
-          intelligenceIndices,
-          INTELLIGENCE_DISPLAY,
-        ),
-        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-        sortBy: sortBy ?? ModelSortField.INTELLIGENCE,
-        sortDirection: newDirection,
-      }),
-    );
+    updateValue({
+      selectionType: ModelSelectionType.FILTERS,
+      intelligenceRange: getRangeFromIndices(
+        intelligenceIndices,
+        INTELLIGENCE_DISPLAY,
+      ),
+      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+      sortBy: sortBy ?? ModelSortField.INTELLIGENCE,
+      sortDirection: newDirection,
+    });
   };
 
   // Calculate filtered models and best model
@@ -646,16 +606,11 @@ function ModelSelectionInner({
     return sortedAndGroupedModels;
   }, [sortedAndGroupedModels, showAllModels]);
 
-  // Determine if we should show the CHARACTER_BASED tab
-  // Only show it if includeCharacterBased is true AND hasCharacterModelSelection is true
-  const showCharacterBasedTab =
-    includeCharacterBased && hasCharacterModelSelection;
-
   return (
     <Div className="flex flex-col gap-4 border rounded-lg p-4">
       {/* Model selection mode tabs */}
       <Div className="flex items-center gap-1.5 p-1 bg-muted/50 rounded-lg">
-        {showCharacterBasedTab && (
+        {characterModelSelection && (
           <Button
             type="button"
             variant={
@@ -664,6 +619,7 @@ function ModelSelectionInner({
             size="sm"
             className="flex-1 h-8 text-xs"
             onClick={() => handleModeChange(ModelSelectionType.CHARACTER_BASED)}
+            disabled={readOnly}
           >
             {t("app.chat.selector.characterMode")}
           </Button>
@@ -674,6 +630,7 @@ function ModelSelectionInner({
           size="sm"
           className="flex-1 h-8 text-xs"
           onClick={() => handleModeChange(ModelSelectionType.FILTERS)}
+          disabled={readOnly}
         >
           {t("app.chat.selector.autoMode")}
         </Button>
@@ -683,6 +640,7 @@ function ModelSelectionInner({
           size="sm"
           className="flex-1 h-8 text-xs"
           onClick={() => handleModeChange(ModelSelectionType.MANUAL)}
+          disabled={readOnly}
         >
           {t("app.chat.selector.manualMode")}
         </Button>
@@ -760,6 +718,7 @@ function ModelSelectionInner({
           maxLabel={t(
             "app.api.agent.chat.characters.post.intelligenceRange.maxLabel",
           )}
+          disabled={readOnly}
           t={t}
         />
 
@@ -774,6 +733,7 @@ function ModelSelectionInner({
           maxLabel={t(
             "app.api.agent.chat.characters.post.contentRange.maxLabel",
           )}
+          disabled={readOnly}
           t={t}
         />
 
@@ -784,6 +744,7 @@ function ModelSelectionInner({
           onChange={handleSpeedChange}
           minLabel={t("app.api.agent.chat.characters.post.speedRange.minLabel")}
           maxLabel={t("app.api.agent.chat.characters.post.speedRange.maxLabel")}
+          disabled={readOnly}
           t={t}
         />
 
@@ -794,6 +755,7 @@ function ModelSelectionInner({
           onChange={handlePriceChange}
           minLabel={t("app.api.agent.chat.characters.post.priceRange.minLabel")}
           maxLabel={t("app.api.agent.chat.characters.post.priceRange.maxLabel")}
+          disabled={readOnly}
           t={t}
         />
       </Div>
@@ -820,6 +782,7 @@ function ModelSelectionInner({
               onClick={() => {
                 setShowUnfilteredModels(!showUnfilteredModels);
               }}
+              disabled={readOnly}
             >
               <Filter className="h-3 w-3" />
               {showUnfilteredModels
@@ -845,6 +808,7 @@ function ModelSelectionInner({
                 size="sm"
                 className="h-6 text-[11px] px-2"
                 onClick={() => handleSortFieldChange(option.value)}
+                disabled={readOnly}
               >
                 {t(option.label)}
               </Button>
@@ -856,7 +820,7 @@ function ModelSelectionInner({
             size="sm"
             className="h-6 w-6 p-0 shrink-0"
             onClick={handleSortDirectionToggle}
-            disabled={!sortBy}
+            disabled={!sortBy || readOnly}
           >
             {sortDirection === ModelSortDirection.ASC ? (
               <ArrowUp className="h-3.5 w-3.5" />
@@ -886,6 +850,7 @@ function ModelSelectionInner({
                     }
                     onClick={() => handleModelSelect(model.id)}
                     dimmed={isOutsideFilter}
+                    disabled={readOnly}
                     t={t}
                   />
                 );
@@ -897,6 +862,7 @@ function ModelSelectionInner({
                   size="sm"
                   className="w-full h-8 text-xs"
                   onClick={() => setShowAllModels(!showAllModels)}
+                  disabled={readOnly}
                 >
                   {showAllModels ? (
                     <>
@@ -963,6 +929,7 @@ function ModelSelectionInner({
                           }
                           onClick={() => handleModelSelect(model.id)}
                           dimmed={isOutsideFilter}
+                          disabled={readOnly}
                           t={t}
                         />
                       );
@@ -1002,70 +969,3 @@ function ModelSelectionInner({
     </Div>
   );
 }
-
-export function ModelSelectionFieldWidget<
-  TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
-  TUsage extends FieldUsageConfig,
->({
-  field,
-  fieldName,
-}: ReactFormFieldProps<
-  TEndpoint,
-  TUsage,
-  ModelSelectionFieldWidgetConfigAny<TKey, TUsage>
->): JSX.Element {
-  const t = useWidgetTranslation();
-  const form = useWidgetForm();
-
-  // Determine if we should include character-based mode from config
-  const includeCharacterBased = field.includeCharacterBased ?? false;
-
-  if (!form || !fieldName) {
-    return (
-      <Div>
-        {t(
-          "app.api.system.unifiedInterface.react.widgets.formField.requiresContext",
-        )}
-      </Div>
-    );
-  }
-
-  // Read from form state (single source of truth)
-  const value =
-    form.watch(fieldName) ||
-    (field.value as
-      | ModelSelectionValue
-      | ModelSelectionWithCharacter
-      | undefined);
-
-  // Determine if character model selection is available based on the actual data
-  // Show CHARACTER_BASED tab only when:
-  // 1. includeCharacterBased is true (config allows it)
-  // 2. value has characterModelSelection property AND it's defined
-  const hasCharacterModelSelection =
-    includeCharacterBased &&
-    value !== undefined &&
-    "characterModelSelection" in value &&
-    value.characterModelSelection !== undefined;
-
-  // Update form state directly
-  const handleUpdate = (newValue: ModelSelectionValue): void => {
-    form.setValue(fieldName as never, newValue as never, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-  };
-
-  return (
-    <ModelSelectionInner
-      value={value}
-      onUpdateValue={handleUpdate}
-      includeCharacterBased={includeCharacterBased}
-      hasCharacterModelSelection={hasCharacterModelSelection}
-      t={t}
-    />
-  );
-}
-
-export default ModelSelectionFieldWidget;

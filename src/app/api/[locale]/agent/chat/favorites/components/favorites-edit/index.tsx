@@ -29,6 +29,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/characters/enum";
 import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
 import type { FavoriteGetResponseOutput } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import type { FiltersModelSelection } from "@/app/api/[locale]/agent/models/components/types";
 import {
   getCreditCostFromModel,
   getModelById,
@@ -39,10 +40,6 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import type {
-  FiltersModelSelection,
-  ManualModelSelection,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/model-selection-field/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -106,14 +103,13 @@ export function QuickSettingsPanel({
     speedRange: FiltersModelSelection["speedRange"];
   } => {
     const sel = favorite.modelSelection;
-    const currentSel = sel.currentSelection;
 
-    if (currentSel.selectionType === ModelSelectionType.FILTERS) {
+    if (sel && sel.selectionType === ModelSelectionType.FILTERS) {
       return {
-        intelligenceRange: currentSel.intelligenceRange,
-        priceRange: currentSel.priceRange,
-        contentRange: currentSel.contentRange,
-        speedRange: currentSel.speedRange,
+        intelligenceRange: sel.intelligenceRange,
+        priceRange: sel.priceRange,
+        contentRange: sel.contentRange,
+        speedRange: sel.speedRange,
       };
     }
 
@@ -162,22 +158,21 @@ export function QuickSettingsPanel({
     getInitialIndices(initialState.priceRange, PRICE_DISPLAY),
   );
   // For model-only favorites, never default to CHARACTER_BASED mode
+  // null modelSelection means CHARACTER_BASED mode
   const initialMode = useMemo(() => {
-    if (
-      isModelOnly &&
-      favorite.modelSelection.currentSelection.selectionType ===
-        ModelSelectionType.CHARACTER_BASED
-    ) {
-      return ModelSelectionType.FILTERS;
+    if (!favorite.modelSelection) {
+      // null = CHARACTER_BASED
+      return isModelOnly
+        ? ModelSelectionType.FILTERS
+        : ModelSelectionType.CHARACTER_BASED;
     }
-    return favorite.modelSelection.currentSelection.selectionType;
-  }, [favorite.modelSelection.currentSelection.selectionType, isModelOnly]);
+    return favorite.modelSelection.selectionType;
+  }, [favorite.modelSelection, isModelOnly]);
 
   const [mode, setMode] = useState(initialMode);
   const [manualModelId, setManualModelId] = useState<ModelId | undefined>(
-    favorite.modelSelection.currentSelection.selectionType ===
-      ModelSelectionType.MANUAL
-      ? favorite.modelSelection.currentSelection.manualModelId
+    favorite.modelSelection?.selectionType === ModelSelectionType.MANUAL
+      ? favorite.modelSelection.manualModelId
       : undefined,
   );
   const [previousMode, setPreviousMode] = useState(initialMode);
@@ -335,24 +330,18 @@ export function QuickSettingsPanel({
 
   const handleSaveWithMode = useCallback(
     (saveMode: SaveMode) => {
-      const charModelSel = favorite.modelSelection.characterModelSelection;
-
-      let currentSelection:
-        | FiltersModelSelection
-        | ManualModelSelection
-        | { selectionType: typeof ModelSelectionType.CHARACTER_BASED };
+      let modelSelection: FavoriteGetResponseOutput["modelSelection"];
 
       if (mode === ModelSelectionType.MANUAL && manualModelId) {
-        currentSelection = {
+        modelSelection = {
           selectionType: ModelSelectionType.MANUAL,
           manualModelId,
         };
       } else if (mode === ModelSelectionType.CHARACTER_BASED) {
-        currentSelection = {
-          selectionType: ModelSelectionType.CHARACTER_BASED,
-        };
+        // null means use character defaults
+        modelSelection = null;
       } else {
-        currentSelection = {
+        modelSelection = {
           selectionType: ModelSelectionType.FILTERS,
           intelligenceRange,
           priceRange,
@@ -361,15 +350,9 @@ export function QuickSettingsPanel({
         };
       }
 
-      const modelSelection: FavoriteGetResponseOutput["modelSelection"] = {
-        currentSelection,
-        characterModelSelection: charModelSel,
-      };
-
       onSave(modelSelection, saveMode);
     },
     [
-      favorite.modelSelection.characterModelSelection,
       onSave,
       mode,
       manualModelId,

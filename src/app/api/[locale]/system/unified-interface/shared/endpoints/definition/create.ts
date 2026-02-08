@@ -77,22 +77,14 @@ type InferUrlParamsSchema<TFields> = InferSchemaFromField<
  * Helper types that combine InferSchemaFromField + ExtractInput/Output
  * This reduces repetition and improves type performance
  */
-type InferRequestInput<TFields> = ExtractInput<InferRequestDataSchema<TFields>>;
-type InferRequestOutput<TFields> = ExtractOutput<
-  InferRequestDataSchema<TFields>
->;
-type InferResponseInput<TFields> = ExtractInput<
+type InferRequestInput<TFields> = z.input<InferRequestDataSchema<TFields>>;
+type InferRequestOutput<TFields> = z.output<InferRequestDataSchema<TFields>>;
+type InferResponseInput<TFields> = z.input<InferResponseDataSchema<TFields>>;
+export type InferResponseOutput<TFields> = z.output<
   InferResponseDataSchema<TFields>
 >;
-type InferResponseOutput<TFields> = ExtractOutput<
-  InferResponseDataSchema<TFields>
->;
-type InferUrlVariablesInput<TFields> = ExtractInput<
-  InferUrlParamsSchema<TFields>
->;
-type InferUrlVariablesOutput<TFields> = ExtractOutput<
-  InferUrlParamsSchema<TFields>
->;
+type InferUrlVariablesInput<TFields> = z.input<InferUrlParamsSchema<TFields>>;
+type InferUrlVariablesOutput<TFields> = z.output<InferUrlParamsSchema<TFields>>;
 
 /**
  * Options for read (GET) operations at the endpoint level
