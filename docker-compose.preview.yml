@@ -33,6 +33,8 @@ services:
       NEXT_PUBLIC_DEBUG_PRODUCTION: "false"
       ENABLE_ANALYTICS: "false"
       NODE_TLS_REJECT_UNAUTHORIZED: "0"
+      CHAT_STORAGE_TYPE: ${CHAT_STORAGE_TYPE:-filesystem}
+      CHAT_STORAGE_PATH: ${CHAT_STORAGE_PATH:-/app/uploads/chat}
     volumes:
       - .:/app
       - /app/node_modules
