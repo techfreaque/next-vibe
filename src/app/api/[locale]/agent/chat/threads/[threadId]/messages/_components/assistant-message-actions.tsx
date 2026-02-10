@@ -7,6 +7,7 @@ import type React from "react";
 
 import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/hooks/store";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import {
   prepareTextForTTS,
   stripThinkTags,
@@ -47,8 +48,13 @@ export function AssistantMessageActions({
   const { t } = simpleT(locale);
   const isTouch = useTouchDevice();
 
-  // Get ttsAutoplay, ttsVoice, deductCredits from context
-  const { ttsAutoplay, ttsVoice, deductCredits, user } = useChatContext();
+  // Get deductCredits and user from context
+  const { deductCredits, user } = useChatContext();
+
+  // Get settings directly
+  const { settings } = useChatSettings(user, logger);
+  const ttsAutoplay = settings?.ttsAutoplay ?? false;
+  const ttsVoice = settings?.ttsVoice;
 
   // Check if this message is currently streaming
   const streamingMessage = useAIStreamStore(

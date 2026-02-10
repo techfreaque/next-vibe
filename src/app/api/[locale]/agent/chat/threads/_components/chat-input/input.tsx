@@ -23,6 +23,7 @@ import type { JSX } from "react";
 import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatPermissions } from "@/app/api/[locale]/agent/chat/hooks/use-chat-permissions";
+import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { useVoiceRuntimeState } from "@/app/api/[locale]/agent/chat/voice-mode/store";
 import { getModelById } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -68,9 +69,11 @@ export function ChatInput({
     selectedCharacter,
     selectedModel,
     deductCredits,
-    ttsAutoplay,
-    setTTSAutoplay,
   } = chat;
+
+  // Get settings directly
+  const { settings, setTTSAutoplay } = useChatSettings(user, logger);
+  const ttsAutoplay = settings?.ttsAutoplay ?? false;
 
   const { canPost, noPermissionReason } = useChatPermissions(chat, locale);
   const { t } = simpleT(locale);

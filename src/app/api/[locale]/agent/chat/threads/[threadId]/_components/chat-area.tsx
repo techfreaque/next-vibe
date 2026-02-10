@@ -4,12 +4,12 @@ import { useSafeAreaInsets } from "next-vibe-ui/hooks/use-safe-area-insets";
 import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
 import { KeyboardAvoidingView } from "next-vibe-ui/ui/keyboard-avoiding-view";
 import type { JSX } from "react";
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
+import { LAYOUT } from "@/app/[locale]/chat/lib/config/constants";
 import { NEW_MESSAGE_ID, ViewMode } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { useInputHeight } from "@/app/api/[locale]/agent/chat/hooks/use-input-height";
 import { ChatInputContainer } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/input-container";
 import { ChatEmptyState } from "@/app/api/[locale]/agent/chat/threads/_components/new-thread/empty-state";
 import { PublicFeed } from "@/app/api/[locale]/agent/chat/threads/_components/public-feed/public-feed";
@@ -124,4 +124,43 @@ export function ChatArea({ locale, logger, user }: ChatAreaProps): JSX.Element {
       </Div>
     </KeyboardAvoidingView>
   );
+}
+
+/**
+ * Hook to dynamically measure input container height using ResizeObserver.
+ * This is used to calculate proper spacing for the messages area.
+ *
+ * @param inputContainerRef - Ref to the input container element
+ * @returns Current height of the input container
+ */
+export function useInputHeight(
+  inputContainerRef: React.RefObject<DivRefObject | null>,
+): number {
+  const [inputHeight, setInputHeight] = useState<number>(
+    LAYOUT.DEFAULT_INPUT_HEIGHT,
+  );
+
+  useEffect(() => {
+    if (platform.isReactNative) {
+      // TODO: Handle dynamic input height on native
+      return;
+    }
+    if (!inputContainerRef.current) {
+      return;
+    }
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setInputHeight(entry.contentRect.height);
+      }
+    });
+
+    resizeObserver.observe(inputContainerRef.current as Element);
+
+    return (): void => {
+      resizeObserver.disconnect();
+    };
+  }, [inputContainerRef]);
+
+  return inputHeight;
 }

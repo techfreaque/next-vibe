@@ -8,6 +8,8 @@ import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { DollarSign, TrendingUp, Users, Wallet } from "next-vibe-ui/ui/icons";
 
+import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+
 import type definition from "./definition";
 import type { StatsGetResponseOutput } from "./definition";
 
@@ -72,6 +74,7 @@ export function ReferralStatsContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const stats = field.value;
+  const t = useWidgetTranslation();
 
   if (!stats) {
     return <Div />;
@@ -80,43 +83,43 @@ export function ReferralStatsContainer({
   return (
     <Div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard
-        title={stats.totalSignupsTitle}
+        title={t(stats.totalSignupsTitle)}
         IconComponent={Users}
         iconColorClassName={"text-slate-700 dark:text-slate-300"}
         iconBgClassName={"bg-slate-100 dark:bg-slate-800"}
         value={stats.totalSignupsValue}
         valueColorClassName={"text-foreground"}
-        description={stats.totalSignupsDescription}
+        description={t(stats.totalSignupsDescription)}
       />
 
       <StatCard
-        title={stats.totalRevenueTitle}
+        title={t(stats.totalRevenueTitle)}
         IconComponent={TrendingUp}
         iconColorClassName={"text-emerald-700 dark:text-emerald-300"}
         iconBgClassName={"bg-emerald-100 dark:bg-emerald-900/30"}
         value={stats.totalRevenueValue}
         valueColorClassName={"text-emerald-600 dark:text-emerald-400"}
-        description={stats.totalRevenueDescription}
+        description={t(stats.totalRevenueDescription)}
       />
 
       <StatCard
-        title={stats.totalEarnedTitle}
+        title={t(stats.totalEarnedTitle)}
         IconComponent={DollarSign}
         iconColorClassName={"text-blue-700 dark:text-blue-300"}
         iconBgClassName={"bg-blue-100 dark:bg-blue-900/30"}
         value={stats.totalEarnedValue}
         valueColorClassName={"text-blue-600 dark:text-blue-400"}
-        description={stats.totalEarnedDescription}
+        description={t(stats.totalEarnedDescription)}
       />
 
       <StatCard
-        title={stats.availableCreditsTitle}
+        title={t(stats.availableCreditsTitle)}
         IconComponent={Wallet}
         iconColorClassName={"text-violet-700 dark:text-violet-300"}
         iconBgClassName={"bg-violet-100 dark:bg-violet-900/30"}
         value={stats.availableCreditsValue}
         valueColorClassName={"text-violet-600 dark:text-violet-400"}
-        description={stats.availableCreditsDescription}
+        description={t(stats.availableCreditsDescription)}
       />
     </Div>
   );

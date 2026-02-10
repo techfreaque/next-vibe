@@ -98,22 +98,24 @@ export const { GET } = createEndpoint({
   examples: {
     responses: {
       default: {
-        totalSignupsTitle: "app.user.referral.stats.totalSignups",
+        totalSignupsTitle: "app.api.referral.stats.fields.totalSignups",
         totalSignupsValue: 10,
-        totalSignupsDescription: "app.user.referral.stats.totalSignupsDesc",
+        totalSignupsDescription:
+          "app.api.referral.stats.fields.totalSignupsDescription",
 
-        totalRevenueTitle: "app.user.referral.stats.totalRevenue",
+        totalRevenueTitle: "app.api.referral.stats.fields.totalRevenue",
         totalRevenueValue: 8000,
-        totalRevenueDescription: "app.user.referral.stats.totalRevenueDesc",
+        totalRevenueDescription:
+          "app.api.referral.stats.fields.totalRevenueDescription",
 
-        totalEarnedTitle: "app.user.referral.stats.totalEarned",
+        totalEarnedTitle: "app.api.referral.stats.fields.totalEarned",
         totalEarnedValue: 1600,
-        totalEarnedDescription: "app.user.referral.stats.totalEarnedDesc",
+        totalEarnedDescription: "app.api.referral.stats.fields.totalEarnedDescription",
 
-        availableCreditsTitle: "app.user.referral.stats.availableBalance",
+        availableCreditsTitle: "app.api.referral.stats.fields.availableBalance",
         availableCreditsValue: 1600,
         availableCreditsDescription:
-          "app.user.referral.stats.availableBalanceDesc",
+          "app.api.referral.stats.fields.availableBalanceDescription",
       },
     },
   },

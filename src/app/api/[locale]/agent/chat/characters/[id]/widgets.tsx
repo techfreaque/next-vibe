@@ -14,8 +14,11 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Sparkles, User, Users, Volume2 } from "next-vibe-ui/ui/icons";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Star } from "next-vibe-ui/ui/icons/Star";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Span } from "next-vibe-ui/ui/span";
 import { useState } from "react";
@@ -55,6 +58,7 @@ import {
   CharacterOwnershipType,
   type CharacterOwnershipTypeValue,
 } from "../../characters/enum";
+import { useAddToFavorites } from "../../favorites/use-add-to-favorites";
 import type definitionGet from "./definition";
 import type definitionPatch from "./definition";
 import type {
@@ -62,6 +66,17 @@ import type {
   CharacterUpdateResponseOutput,
 } from "./definition";
 import { useCharacter } from "./hooks";
+
+/**
+ * Design version selector constants
+ */
+const DESIGN_VERSIONS = {
+  current: "current",
+  a: "a",
+  c: "c",
+  d: "d",
+} as const;
+type DesignVersion = (typeof DESIGN_VERSIONS)[keyof typeof DESIGN_VERSIONS];
 
 /**
  * Props for PATCH custom widget
@@ -130,12 +145,12 @@ export function CharacterEditContainer({
           <Button
             type="button"
             variant="destructive"
-            size="default"
+            size="icon"
             onClick={handleDelete}
             className="ml-auto"
           >
             <Trash2 className="h-4 w-4" />
-            {t("app.api.agent.chat.characters.id.patch.deleteButton.label")}
+            {/* {t("app.api.agent.chat.characters.id.patch.deleteButton.label")} */}
           </Button>
         )}
 
@@ -208,6 +223,8 @@ export function CharacterViewContainer({
   const children = field.children;
   const [systemPromptOpen, setSystemPromptOpen] = useState(false);
   const navigation = useWidgetNavigation();
+  const context = useWidgetContext();
+  const { logger, user } = context;
   const locale = useWidgetLocale();
   const t = useWidgetTranslation();
   const modelSelection = field.value?.modelSelection;
@@ -216,39 +233,12 @@ export function CharacterViewContainer({
     | string
     | undefined;
 
-  const handleEdit = async (): Promise<void> => {
-    if (!characterId) {
-      return;
-    }
-
-    // If user owns the character, go to edit page
-    if (characterOwnership === CharacterOwnershipType.USER) {
-      const patchDefinition = await import("./definition");
-      navigation.push(patchDefinition.default.PATCH, {
-        urlPathParams: { id: characterId },
-        popNavigationOnSuccess: 1,
-        prefillFromGet: true,
-        getEndpoint: patchDefinition.default.GET,
-      });
-    } else {
-      // Navigate to create favorite (allowed for all users)
-      const favoritesCreateDefinition =
-        await import("../../favorites/create/definition");
-
-      navigation.push(favoritesCreateDefinition.default.POST, {
-        data: {
-          characterId: characterId,
-          icon: field.value?.icon,
-          name: field.value?.name,
-          tagline: field.value?.tagline,
-          description: field.value?.description,
-          voice: field.value?.voice,
-          modelSelection: field.value?.modelSelection,
-        },
-        popNavigationOnSuccess: 1,
-      });
-    }
-  };
+  const { isLoading, isAddedToFav, addToFavorites } = useAddToFavorites({
+    characterId: characterId ?? "",
+    logger,
+    user,
+    locale,
+  });
 
   const handleDelete = async (): Promise<void> => {
     if (!characterId) {
@@ -263,66 +253,99 @@ export function CharacterViewContainer({
     });
   };
 
-  const editButtonLabel =
-    characterOwnership === CharacterOwnershipType.USER
-      ? t("app.api.agent.chat.characters.id.get.editButton.label")
-      : t("app.api.agent.chat.characters.id.get.customizeButton.label");
+  const handleCustomizeAndAdd = async (): Promise<void> => {
+    if (!characterId) {
+      return;
+    }
 
-  const isLoading = !field.value;
+    const createFavoriteDefinitions =
+      await import("../../favorites/create/definition");
+    const { DEFAULT_TTS_VOICE } = await import("../../../text-to-speech/enum");
+
+    navigation.push(createFavoriteDefinitions.default.POST, {
+      data: {
+        characterId: characterId,
+        icon: field.value?.icon,
+        name: field.value?.name,
+        tagline: field.value?.tagline,
+        description: field.value?.description,
+        voice: field.value?.voice ?? DEFAULT_TTS_VOICE,
+        modelSelection: null,
+      },
+      popNavigationOnSuccess: 1,
+    });
+  };
+
+  const handleEditCharacter = async (): Promise<void> => {
+    if (!characterId) {
+      return;
+    }
+
+    const patchDefinition = await import("./definition");
+    navigation.push(patchDefinition.default.PATCH, {
+      urlPathParams: { id: characterId },
+      popNavigationOnSuccess: 1,
+      prefillFromGet: true,
+      getEndpoint: patchDefinition.default.GET,
+    });
+  };
+
+  const isOwner = characterOwnership === CharacterOwnershipType.USER;
+
+  // Shared content section (system prompt + model)
+  const ContentSection = (
+    <>
+      {/* System Prompt Collapsible */}
+      {(field.value?.systemPrompt || !field.value) && (
+        <Collapsible open={systemPromptOpen} onOpenChange={setSystemPromptOpen}>
+          <Div className="rounded-lg border">
+            <CollapsibleTrigger asChild>
+              <Div className="flex items-start gap-4 p-4 cursor-pointer hover:bg-accent transition-colors">
+                <Div className="flex-1 flex items-center justify-between">
+                  <Div className="text-base font-bold">
+                    {t(
+                      "app.api.agent.chat.characters.id.get.systemPrompt.label",
+                    )}
+                  </Div>
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 transition-transform",
+                      systemPromptOpen && "rotate-180",
+                    )}
+                  />
+                </Div>
+              </Div>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <Div className="px-4 pb-4">
+                <MarkdownWidget
+                  fieldName="systemPrompt"
+                  field={withValue(
+                    children.systemPrompt,
+                    field.value?.systemPrompt,
+                    null,
+                  )}
+                />
+              </Div>
+            </CollapsibleContent>
+          </Div>
+        </Collapsible>
+      )}
+
+      {/* Model Selection - View Only */}
+      <ModelSelector modelSelection={modelSelection} readOnly={true} t={t} />
+    </>
+  );
 
   return (
     <Div className="flex flex-col gap-0">
-      {/* Top Actions: Back, Edit, Delete */}
       <Div className="flex flex-row gap-2 px-4 pt-4 pb-4">
-        {/* Back Button */}
         <NavigateButtonWidget
-          field={{
-            icon: "arrow-left",
-            variant: "outline",
-          }}
+          field={{ icon: "arrow-left", variant: "outline" }}
         />
-
-        {/* Only show action buttons after data has loaded */}
-        {!isLoading && (
-          <>
-            {/* Add to Favorites Button - only show for system/public characters */}
-            {characterOwnership !== CharacterOwnershipType.USER &&
-              characterId && <AddToFavoritesButton characterId={characterId} />}
-
-            {/* Edit/Customize Button */}
-            <Button
-              type="button"
-              variant="outline"
-              size="default"
-              className={
-                characterOwnership === CharacterOwnershipType.USER
-                  ? "ml-auto"
-                  : ""
-              }
-              onClick={handleEdit}
-            >
-              {editButtonLabel}
-            </Button>
-
-            {/* Delete Button - only show if user owns the character */}
-            {characterOwnership === CharacterOwnershipType.USER && (
-              <Button
-                type="button"
-                variant="destructive"
-                size="default"
-                onClick={handleDelete}
-              >
-                <Trash2 className="h-4 w-4" />
-                {t("app.api.agent.chat.characters.id.get.deleteButton.label")}
-              </Button>
-            )}
-          </>
-        )}
       </Div>
 
-      {/* Scrollable Content Container */}
       <Div className="group overflow-y-auto max-h-[min(800px,calc(100dvh-180px))] px-4 pb-4 flex flex-col gap-4">
-        {/* Character Info Card */}
         <CharacterCard
           icon={field.value?.icon ?? null}
           name={field.value?.name ?? null}
@@ -334,211 +357,16 @@ export function CharacterViewContainer({
           }
           locale={locale}
           isLoading={!field.value}
+          isAddedToFav={isAddedToFav}
+          addToFavorites={addToFavorites}
+          handleCustomizeAndAdd={handleCustomizeAndAdd}
+          isOwner={isOwner}
+          handleEditCharacter={handleEditCharacter}
+          handleDelete={handleDelete}
         />
-
-        {/* System Prompt Collapsible */}
-        {(field.value?.systemPrompt || !field.value) && (
-          <Collapsible
-            open={systemPromptOpen}
-            onOpenChange={setSystemPromptOpen}
-          >
-            <Div className="rounded-lg border">
-              <CollapsibleTrigger asChild>
-                <Div className="flex items-start gap-4 p-4 cursor-pointer hover:bg-accent transition-colors">
-                  <Div className="flex-1 flex items-center justify-between">
-                    <Div className="text-base font-bold">
-                      {t(
-                        "app.api.agent.chat.characters.id.get.systemPrompt.label",
-                      )}
-                    </Div>
-                    <ChevronDown
-                      className={cn(
-                        "h-4 w-4 transition-transform",
-                        systemPromptOpen && "rotate-180",
-                      )}
-                    />
-                  </Div>
-                </Div>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <Div className="px-4 pb-4">
-                  <MarkdownWidget
-                    fieldName="systemPrompt"
-                    field={withValue(
-                      children.systemPrompt,
-                      field.value?.systemPrompt,
-                      null,
-                    )}
-                  />
-                </Div>
-              </CollapsibleContent>
-            </Div>
-          </Collapsible>
-        )}
-
-        {/* Model Selection - View Only */}
-        <ModelSelector modelSelection={modelSelection} readOnly={true} t={t} />
+        {ContentSection}
       </Div>
     </Div>
-  );
-}
-
-/**
- * Add to Favorites Button - adds character to favorites
- * Isolated component for loading state
- */
-function AddToFavoritesButton({
-  characterId,
-}: {
-  characterId: string;
-}): React.JSX.Element {
-  const [isLoading, setIsLoading] = useState(false);
-  const context = useWidgetContext();
-  const { logger, user, locale } = context;
-  const t = useWidgetTranslation();
-
-  const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
-    e.stopPropagation();
-    setIsLoading(true);
-
-    try {
-      const { apiClient } =
-        await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
-      const createFavoriteDefinition =
-        await import("../../favorites/create/definition");
-      const characterSingleDefinitions = await import("./definition");
-      const favoritesDefinition = await import("../../favorites/definition");
-      const charactersDefinition = await import("../../characters/definition");
-      const { ChatFavoritesRepositoryClient } =
-        await import("../../favorites/repository-client");
-
-      // Get character data from cache (should already be loaded)
-      const characterData = apiClient.getEndpointData(
-        characterSingleDefinitions.default.GET,
-        logger,
-        { id: characterId },
-      );
-
-      if (!characterData?.success) {
-        logger.error("Character data not found in cache");
-        return;
-      }
-
-      const fullChar = characterData.data;
-
-      // Create the favorite
-      const createResponse = await apiClient.mutate(
-        createFavoriteDefinition.default.POST,
-        logger,
-        user,
-        {
-          characterId: characterId,
-          icon: fullChar.icon,
-          name: fullChar.name,
-          tagline: fullChar.tagline,
-          description: fullChar.description,
-          voice: null,
-          modelSelection: null,
-        },
-        undefined,
-        locale,
-      );
-
-      if (!createResponse.success) {
-        logger.error("Failed to add to favorites");
-        return;
-      }
-
-      // Optimistically update favorites list
-      const newFavoriteConfig = {
-        id: createResponse.data.id,
-        characterId: characterId,
-        customIcon: null,
-        voice: null,
-        modelSelection: null,
-        position: 0,
-      };
-
-      apiClient.updateEndpointData(
-        favoritesDefinition.default.GET,
-        logger,
-        (oldData) => {
-          if (!oldData?.success) {
-            return oldData;
-          }
-
-          const newFavorite =
-            ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
-              newFavoriteConfig,
-              fullChar.modelSelection,
-              fullChar.icon,
-              fullChar.name,
-              fullChar.tagline,
-              fullChar.description,
-              null,
-            );
-
-          return {
-            success: true,
-            data: {
-              favorites: [...oldData.data.favorites, newFavorite],
-            },
-          };
-        },
-        undefined,
-      );
-
-      // Optimistically update characters list
-      apiClient.updateEndpointData(
-        charactersDefinition.default.GET,
-        logger,
-        (oldData) => {
-          if (!oldData?.success) {
-            return oldData;
-          }
-
-          return {
-            success: true,
-            data: {
-              ...oldData.data,
-              sections: oldData.data.sections.map((section) => ({
-                ...section,
-                characters: section.characters.map((char) =>
-                  char.id === characterId
-                    ? { ...char, addedToFav: true }
-                    : char,
-                ),
-              })),
-            },
-          };
-        },
-        undefined,
-      );
-    } catch (error) {
-      logger.error("Failed to add to favorites", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      size="default"
-      onClick={handleClick}
-      disabled={isLoading}
-      className="ml-auto gap-2"
-    >
-      {isLoading ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
-      ) : (
-        <Star className="h-4 w-4" />
-      )}
-      {t("app.api.agent.chat.characters.id.get.addToFavoritesButton.label")}
-    </Button>
   );
 }
 
@@ -557,9 +385,18 @@ interface CharacterCardProps {
   characterOwnership: typeof CharacterOwnershipTypeValue;
   locale: CountryLanguage;
   isLoading?: boolean;
-  className?: string;
+  isAddedToFav?: boolean;
+  addToFavorites: (e?: ButtonMouseEvent) => Promise<void>;
+  handleCustomizeAndAdd: (e?: ButtonMouseEvent) => void;
+  isOwner: boolean;
+  handleEditCharacter: (e?: ButtonMouseEvent) => void;
+  handleDelete: (e?: ButtonMouseEvent) => void;
 }
 
+/**
+ * Default Character Card - Standard layout with side icon
+ * Used by: current, design A
+ */
 export function CharacterCard({
   icon,
   name,
@@ -569,81 +406,319 @@ export function CharacterCard({
   characterOwnership,
   locale,
   isLoading = false,
-  className = "",
+  isAddedToFav = false,
+  addToFavorites,
+  handleCustomizeAndAdd,
+  isOwner,
+  handleDelete,
+  handleEditCharacter,
 }: CharacterCardProps): React.JSX.Element {
   const { t } = simpleT(locale);
-  const IconComponent = ownershipIcon[characterOwnership];
+  const IconComponent =
+    ownershipIcon[characterOwnership] ??
+    ownershipIcon[CharacterOwnershipType.SYSTEM];
+
   return (
     <Div
-      className={`group relative rounded-lg border bg-gradient-to-br from-card to-card/50 hover:shadow-sm transition-all ${className}`}
+      className={cn(
+        "rounded-lg border bg-card p-5",
+        isAddedToFav && "border-l-4 border-l-primary bg-primary/5",
+      )}
     >
-      <Div className="p-5">
-        {/* Main Content */}
-        <Div className="flex gap-4 mb-4">
-          {/* Large Icon */}
-          <Div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 flex items-center justify-center flex-shrink-0 shadow-sm">
-            {icon ? (
-              <Icon icon={icon} className="w-7 h-7 text-primary" />
-            ) : (
-              <Skeleton className="h-7 w-7 rounded-full" />
-            )}
-          </Div>
-
-          {/* Text Content */}
-          <Div className="flex-1 min-w-0">
-            {/* Name and Tagline on same line */}
-            <Div className="flex items-baseline gap-2 mb-2 flex-wrap">
-              <Span className="font-semibold text-lg text-foreground">
-                {name ? t(name) : <Skeleton className="h-[1.75rem] w-48" />}
-              </Span>
-              <Span className="text-sm text-muted-foreground/80">
-                {tagline ? t(tagline) : <Skeleton className="h-5 w-32" />}
-              </Span>
-            </Div>
-
-            {/* Description */}
-            <Div className="text-sm text-muted-foreground/70 leading-relaxed line-clamp-3">
-              {description ? (
-                t(description)
-              ) : (
-                <>
-                  <Skeleton className="h-5 w-full" />
-                  <Skeleton className="h-5 w-full" />
-                  <Skeleton className="h-5 w-3/4" />
-                </>
-              )}
-            </Div>
-          </Div>
-        </Div>
-
-        {/* Footer Metadata */}
-        <Div className="flex items-center gap-3 pt-3 border-t border-border/50">
-          {/* Voice */}
-          <Div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Volume2 className="w-3.5 h-3.5" />
-            <Span className="font-medium">
-              {voice ? t(voice) : <Skeleton className="h-5 w-24" />}
-            </Span>
-          </Div>
-
-          {!isLoading ? (
-            <Div
-              className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ml-auto ${
-                characterOwnership === CharacterOwnershipType.USER
-                  ? "bg-primary/10 text-primary"
-                  : characterOwnership === CharacterOwnershipType.SYSTEM
-                    ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                    : "bg-purple-500/10 text-purple-600 dark:text-purple-400"
-              }`}
-            >
-              <IconComponent className="w-3 h-3" />
-              <Span>{t(characterOwnership)}</Span>
-            </Div>
+      <Div className="flex gap-4 mb-4">
+        <Div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 flex items-center justify-center flex-shrink-0 shadow-sm">
+          {icon ? (
+            <Icon icon={icon} className="w-7 h-7 text-primary" />
           ) : (
-            <Skeleton className="h-6 w-32 ml-auto rounded-md" />
+            <Skeleton className="h-7 w-7 rounded-full" />
           )}
         </Div>
+        <Div className="flex-1 min-w-0">
+          <Div className="flex items-center gap-2 mb-1">
+            <Span className="font-semibold text-lg">
+              {name ? t(name) : <Skeleton className="h-7 w-48" />}
+            </Span>
+            {isAddedToFav && (
+              <Star className="h-4 w-4 fill-primary text-primary" />
+            )}
+          </Div>
+          <Div className="text-sm text-muted-foreground mb-2">
+            {tagline ? t(tagline) : <Skeleton className="h-5 w-32" />}
+          </Div>
+          <Div className="text-sm text-muted-foreground/70 line-clamp-2">
+            {description ? (
+              t(description)
+            ) : (
+              <Skeleton className="h-10 w-full" />
+            )}
+          </Div>
+        </Div>
       </Div>
+      <Div className="flex items-center gap-3 pt-3 border-t">
+        <Div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Volume2 className="w-3.5 h-3.5" />
+          <Span>{voice ? t(voice) : <Skeleton className="h-4 w-16" />}</Span>
+        </Div>
+        {!isLoading && (
+          <Div
+            className={cn(
+              "flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ml-auto",
+              characterOwnership === CharacterOwnershipType.USER
+                ? "bg-primary/10 text-primary"
+                : characterOwnership === CharacterOwnershipType.SYSTEM
+                  ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                  : "bg-purple-500/10 text-purple-600 dark:text-purple-400",
+            )}
+          >
+            <IconComponent className="w-3 h-3" />
+            <Span>{t(characterOwnership)}</Span>
+          </Div>
+        )}
+      </Div>
+      {!isLoading && (
+        <Div className="mt-2 pt-2 border-t bg-muted/10 flex items-center gap-1 flex-wrap">
+          {!isAddedToFav && (
+            <Button
+              variant="default"
+              size="xs"
+              className="gap-1"
+              onClick={addToFavorites}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Zap className="h-4 w-4" />
+              )}
+              {t("app.api.agent.chat.characters.id.get.quickAdd")}
+            </Button>
+          )}
+          <Button
+            variant={isAddedToFav ? "default" : "outline"}
+            size="xs"
+            className="gap-1"
+            onClick={handleCustomizeAndAdd}
+          >
+            <Plus className="h-4 w-4" />
+            {t("app.api.agent.chat.characters.id.get.tweakAndAdd")}
+          </Button>
+          {isOwner ? (
+            <>
+              <Div className="flex-1" />
+              <Button
+                variant="outline"
+                size="xs"
+                className="gap-1"
+                onClick={handleEditCharacter}
+              >
+                <Pencil className="h-4 w-4" />
+                {t("app.api.agent.chat.characters.id.get.edit")}
+              </Button>
+              <Button
+                variant="outline"
+                size="xs"
+                className="gap-1 text-destructive hover:bg-destructive/10"
+                onClick={handleDelete}
+              >
+                <Trash2 className="h-4 w-4" />
+                {t("app.api.agent.chat.characters.id.get.delete")}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Div className="flex-1" />
+              <Button
+                variant="outline"
+                size="xs"
+                className="gap-1"
+                onClick={handleEditCharacter}
+              >
+                <Pencil className="h-4 w-4" />
+                {t("app.api.agent.chat.characters.id.get.copyAndCustomize")}
+              </Button>
+            </>
+          )}
+        </Div>
+      )}
     </Div>
+  );
+}
+
+/**
+ * Customize & Add Button - navigates to create favorite form with character data
+ * Used for "Customize before add" - goes to create favorite for customization
+ * Used by "current" design only
+ */
+function CustomizeAndAddButton({
+  characterId,
+  field,
+  navigation,
+  logger,
+  user,
+  locale,
+  t,
+  variant = "outline",
+  className = "",
+  size = "sm",
+  iconOnly = false,
+}: {
+  characterId: string;
+  field: { value: CharacterGetResponseOutput | null | undefined };
+  navigation: ReturnType<typeof useWidgetNavigation>;
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
+  locale: CountryLanguage;
+  t: ReturnType<typeof useWidgetTranslation>;
+  variant?: "outline" | "default" | "ghost";
+  className?: string;
+  size?: "sm" | "lg" | "default" | "icon";
+  iconOnly?: boolean;
+}): React.JSX.Element {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
+    e.stopPropagation();
+    setIsLoading(true);
+
+    try {
+      const { apiClient } =
+        await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+      const characterSingleDefinitions = await import("./definition");
+      const createFavoriteDefinitions =
+        await import("../../favorites/create/definition");
+      const { DEFAULT_TTS_VOICE } =
+        await import("../../../text-to-speech/enum");
+
+      // Use field data if available, otherwise fetch
+      let fullChar = field.value;
+
+      if (!fullChar) {
+        const cachedData = apiClient.getEndpointData(
+          characterSingleDefinitions.default.GET,
+          logger,
+          { id: characterId },
+        );
+        if (cachedData?.success) {
+          fullChar = cachedData.data;
+        } else {
+          const characterResponse = await apiClient.fetch(
+            characterSingleDefinitions.default.GET,
+            logger,
+            user,
+            undefined,
+            { id: characterId },
+            locale,
+          );
+          if (!characterResponse.success) {
+            return;
+          }
+          fullChar = characterResponse.data;
+        }
+      }
+
+      navigation.push(createFavoriteDefinitions.default.POST, {
+        data: {
+          characterId: characterId,
+          icon: fullChar.icon,
+          name: fullChar.name,
+          tagline: fullChar.tagline,
+          description: fullChar.description,
+          voice: fullChar.voice ?? DEFAULT_TTS_VOICE,
+          modelSelection: null,
+        },
+        popNavigationOnSuccess: 1,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const iconSize = size === "lg" ? "h-5 w-5" : "h-3.5 w-3.5";
+
+  return (
+    <Button
+      variant={variant}
+      size={iconOnly ? "icon" : size}
+      onClick={handleClick}
+      disabled={isLoading}
+      className={cn(
+        !iconOnly && "gap-1.5",
+        size === "sm" && !iconOnly && "h-8 text-xs",
+        iconOnly && "h-9 w-9",
+        className,
+      )}
+    >
+      {isLoading ? (
+        <Loader2 className={cn(iconSize, "animate-spin")} />
+      ) : (
+        <Plus className={iconSize} />
+      )}
+      {!iconOnly &&
+        t("app.api.agent.chat.characters.id.get.customizeButton.label")}
+    </Button>
+  );
+}
+
+/**
+ * Edit Character Button - navigates to character edit form (owner only)
+ */
+function EditCharacterButton({
+  characterId,
+  navigation,
+  t,
+  variant = "outline",
+  className = "",
+  size = "sm",
+  iconOnly = false,
+}: {
+  characterId: string;
+  navigation: ReturnType<typeof useWidgetNavigation>;
+  t: ReturnType<typeof useWidgetTranslation>;
+  variant?: "outline" | "default" | "ghost";
+  className?: string;
+  size?: "sm" | "lg" | "default" | "icon";
+  iconOnly?: boolean;
+}): React.JSX.Element {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
+    e.stopPropagation();
+    setIsLoading(true);
+
+    try {
+      const patchDefinition = await import("./definition");
+      navigation.push(patchDefinition.default.PATCH, {
+        urlPathParams: { id: characterId },
+        popNavigationOnSuccess: 1,
+        prefillFromGet: true,
+        getEndpoint: patchDefinition.default.GET,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const iconSize = size === "lg" ? "h-5 w-5" : "h-3.5 w-3.5";
+
+  return (
+    <Button
+      variant={variant}
+      size={iconOnly ? "icon" : size}
+      onClick={handleClick}
+      disabled={isLoading}
+      className={cn(
+        !iconOnly && "gap-1.5",
+        size === "sm" && !iconOnly && "h-8 text-xs",
+        iconOnly && "h-9 w-9",
+        className,
+      )}
+    >
+      {isLoading ? (
+        <Loader2 className={cn(iconSize, "animate-spin")} />
+      ) : (
+        <Pencil className={iconSize} />
+      )}
+      {!iconOnly && t("app.api.agent.chat.characters.id.get.editButton.label")}
+    </Button>
   );
 }

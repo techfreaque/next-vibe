@@ -23,6 +23,7 @@ import { useState } from "react";
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { CallModeIndicator } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/call-mode-indicator";
 import { FileUploadButton } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/file-upload-button";
 import { useVoiceRecording } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/hooks/use-voice-recording";
@@ -60,13 +61,12 @@ export function MessageEditor({
   logger,
   user,
 }: MessageEditorProps): JSX.Element {
-  const {
-    selectedModel,
-    selectedCharacter,
-    deductCredits,
-    ttsAutoplay,
-    setTTSAutoplay,
-  } = useChatContext();
+  const { selectedModel, selectedCharacter, deductCredits } = useChatContext();
+
+  // Get settings directly
+  const { settings, setTTSAutoplay } = useChatSettings(user, logger);
+  const ttsAutoplay = settings?.ttsAutoplay ?? false;
+
   const { t } = simpleT(locale);
 
   // Local state for selector popover to avoid conflict with chat input selector

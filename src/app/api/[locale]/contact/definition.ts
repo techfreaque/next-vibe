@@ -19,6 +19,7 @@ import {
   scopedObjectField,
   scopedRequestField,
   scopedResponseField,
+  widgetField,
 } from "../system/unified-interface/shared/field/utils-new";
 import {
   ContactPriority,
@@ -73,7 +74,7 @@ const { POST } = createEndpoint({
         label: "form.fields.name.label",
         description: "form.fields.name.description",
         placeholder: "form.fields.name.placeholder",
-        columns: 6,
+        columns: 12,
       }),
       email: scopedRequestField(scopedTranslation, {
         schema: z.string().email(),
@@ -82,19 +83,10 @@ const { POST } = createEndpoint({
         label: "form.fields.email.label",
         description: "form.fields.email.description",
         placeholder: "form.fields.email.placeholder",
-        columns: 6,
-      }),
-      company: scopedRequestField(scopedTranslation, {
-        schema: z.string().optional(),
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "form.fields.company.label",
-        description: "form.fields.company.description",
-        placeholder: "form.fields.company.placeholder",
         columns: 12,
       }),
       subject: scopedRequestField(scopedTranslation, {
-        schema: z.enum(ContactSubject),
+        schema: z.enum(ContactSubject).default(ContactSubject.HELP_SUPPORT),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "form.fields.subject.label",
@@ -125,9 +117,19 @@ const { POST } = createEndpoint({
 
       // === RESPONSE FIELDS ===
       success: scopedResponseField(scopedTranslation, {
-        schema: z.boolean(),
-        type: WidgetType.TEXT,
-        content: "response.success",
+        schema: z.string(),
+        type: WidgetType.ALERT,
+        columns: 12,
+      }),
+
+      submitButton: widgetField({
+        type: WidgetType.SUBMIT_BUTTON,
+        text: "form.submitButton.label",
+        loadingText: "form.submitButton.loadingText",
+        icon: "send",
+        variant: "default",
+        size: "default",
+        columns: 12,
       }),
     },
   }),
@@ -136,7 +138,6 @@ const { POST } = createEndpoint({
       default: {
         name: "John Doe",
         email: "john.doe@example.com",
-        company: "Acme Corp",
         subject: ContactSubject.GENERAL_INQUIRY,
         message:
           "I would like to learn more about your social media management services.",
@@ -145,7 +146,6 @@ const { POST } = createEndpoint({
       success: {
         name: "Jane Smith",
         email: "jane.smith@company.com",
-        company: "Tech Corp",
         subject: ContactSubject.PARTNERSHIP,
         message: "We are interested in discussing a potential partnership.",
         priority: ContactPriority.HIGH,
@@ -160,13 +160,13 @@ const { POST } = createEndpoint({
     },
     responses: {
       default: {
-        success: true,
+        success: "response.success",
       },
       success: {
-        success: true,
+        success: "response.success",
       },
       general: {
-        success: true,
+        success: "response.success",
       },
     },
   },

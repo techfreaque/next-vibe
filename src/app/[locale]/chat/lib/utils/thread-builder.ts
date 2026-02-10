@@ -22,15 +22,6 @@ export function getRootMessages(
 }
 
 /**
- * Sort messages by timestamp (oldest first)
- */
-export function sortMessagesByTime(messages: ChatMessage[]): ChatMessage[] {
-  return [...messages].toSorted(
-    (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
-  );
-}
-
-/**
  * Build a linear path through the message tree
  * Follows parent-child relationships, selecting branches based on branchIndices
  * Returns the path and information about available branches at each level

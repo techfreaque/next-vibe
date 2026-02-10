@@ -7,7 +7,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
@@ -18,8 +17,6 @@ import {
   MessageSquarePlus,
   PanelLeft,
   Settings,
-  Volume2,
-  VolumeX,
 } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
@@ -43,8 +40,6 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
   const {
     messages,
     activeThreadId,
-    ttsAutoplay,
-    setTTSAutoplay,
     sidebarCollapsed,
     setSidebarCollapsed,
     handleCreateThread,
@@ -96,26 +91,6 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
           <DropdownMenuContent align="start" className="w-56">
             {/* Theme Toggle */}
             <ThemeToggleDropdown locale={locale} />
-
-            {/* TTS Autoplay Toggle */}
-            <DropdownMenuItem
-              onClick={() => setTTSAutoplay(!ttsAutoplay)}
-              className="cursor-pointer"
-            >
-              {ttsAutoplay ? (
-                <>
-                  <VolumeX className="h-4 w-4 mr-2" />
-                  {t("app.chat.common.disableTTSAutoplay")}
-                </>
-              ) : (
-                <>
-                  <Volume2 className="h-4 w-4 mr-2" />
-                  {t("app.chat.common.enableTTSAutoplay")}
-                </>
-              )}
-            </DropdownMenuItem>
-
-            <DropdownMenuSeparator />
 
             {/* Locale Selector - Desktop: Sub-menu, Mobile: Dialog */}
             <Div className="hidden md:block">

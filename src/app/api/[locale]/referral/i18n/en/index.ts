@@ -115,14 +115,14 @@ export const translations = {
     },
     fields: {
       totalSignups: "Total Signups",
-      totalSignupsDesc:
+      totalSignupsDescription:
         "Number of users who signed up using your referral code",
       totalRevenue: "Total Revenue",
-      totalRevenueDesc: "Total revenue generated from your referrals",
+      totalRevenueDescription: "Total revenue generated from your referrals",
       totalEarned: "Total Earned",
-      totalEarnedDesc: "Total commission earned from referrals",
+      totalEarnedDescription: "Total commission earned from referrals",
       availableBalance: "Available Balance",
-      availableBalanceDesc: "Available balance ready for payout",
+      availableBalanceDescription: "Available balance ready for payout",
       totalRevenueCredits: "Total Revenue (Credits)",
       totalEarnedCredits: "Total Earned (Credits)",
       totalPaidOutCredits: "Total Paid Out (Credits)",

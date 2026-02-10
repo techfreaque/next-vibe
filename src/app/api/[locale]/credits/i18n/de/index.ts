@@ -3,6 +3,12 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   purchase: purchaseTranslations,
+  repository: {
+    tts: "Text-zu-Sprache",
+    stt: "Sprache-zu-Text",
+    search: "Suche",
+    sttHotkey: "Sprache-zu-Text (Tastenkombination)",
+  },
   enums: {
     creditType: {
       userSubscription: "Benutzer-Abonnement-Credits",

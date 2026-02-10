@@ -4,6 +4,7 @@
  */
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
@@ -25,6 +26,8 @@ export interface RetryMessageDeps {
     selectedModel: ModelId;
     selectedCharacter: string;
     enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
+    ttsAutoplay: boolean;
+    ttsVoice: typeof TtsVoiceValue;
   };
   deductCredits: (creditCost: number, feature: string) => void;
 }

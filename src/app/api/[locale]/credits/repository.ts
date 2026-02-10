@@ -1939,7 +1939,7 @@ export class CreditRepository {
    * - User wallet's paid transactions
    * - Aggregated usage from other linked leads (summed as "usage from other devices")
    */
-  static async getTransactions(
+  private static async getTransactions(
     userId: string,
     leadId: string,
     limit: number,
@@ -2123,7 +2123,7 @@ export class CreditRepository {
       case "stt-hotkey":
         return t("app.api.credits.repository.sttHotkey");
       default:
-        return getModelById(feature).name;
+        return getModelById(feature)?.name || t(feature);
     }
   }
 
@@ -2180,7 +2180,7 @@ export class CreditRepository {
    * Get transactions by lead ID
    * Shows only current lead wallet's transactions + summary of other devices' spending
    */
-  static async getTransactionsByLeadId(
+  private static async getTransactionsByLeadId(
     leadId: string,
     limit: number,
     offset: number,
@@ -2332,113 +2332,6 @@ export class CreditRepository {
       });
     } catch (error) {
       logger.error("Failed to get transactions", parseError(error), { leadId });
-      return fail({
-        message: "app.api.credits.errors.getTransactionsFailed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-  }
-
-  /**
-   * Get transactions by user ID
-   * Shows user wallet's transactions + summary of linked leads' spending
-   */
-  static async getTransactionsByUserId(
-    userId: string,
-    limit: number,
-    offset: number,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<
-    ResponseType<{
-      transactions: CreditTransactionOutput[];
-      totalCount: number;
-    }>
-  > {
-    try {
-      // Get user pool (user wallet + all linked lead wallets)
-      const poolResult = await CreditRepository.getUserPool(userId, logger);
-      if (!poolResult.success) {
-        return poolResult;
-      }
-
-      const pool = poolResult.data;
-      if (!pool.userWallet) {
-        return success({
-          transactions: [],
-          totalCount: 0,
-        });
-      }
-
-      // Get current period
-      const now = new Date();
-      const currentPeriodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-
-      // Fetch transactions from user wallet
-      const transactions = await db
-        .select()
-        .from(creditTransactions)
-        .where(eq(creditTransactions.walletId, pool.userWallet.id))
-        .orderBy(desc(creditTransactions.createdAt))
-        .limit(limit)
-        .offset(offset);
-
-      const [{ count }] = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(creditTransactions)
-        .where(eq(creditTransactions.walletId, pool.userWallet.id));
-
-      // Calculate total spending from linked lead wallets in current period
-      let linkedLeadsSpending = 0;
-
-      if (pool.leadWallets.length > 0) {
-        const leadWalletIds = pool.leadWallets.map((w) => w.id);
-        const leadTransactions = await db
-          .select()
-          .from(creditTransactions)
-          .where(
-            and(
-              inArray(creditTransactions.walletId, leadWalletIds),
-              eq(creditTransactions.freePeriodId, currentPeriodId),
-              eq(creditTransactions.type, CreditTransactionType.USAGE),
-            ),
-          );
-
-        linkedLeadsSpending = leadTransactions.reduce(
-          (sum, t) => sum + Math.abs(t.amount),
-          0,
-        );
-      }
-
-      const result: CreditTransactionOutput[] = transactions.map((t) => ({
-        id: t.id,
-        amount: t.amount,
-        balanceAfter: t.balanceAfter,
-        type: t.type,
-        modelId: t.modelId,
-        messageId: t.messageId,
-        createdAt: t.createdAt.toISOString(),
-      }));
-
-      // Add summary entry for linked leads' spending if > 0
-      if (linkedLeadsSpending > 0 && offset === 0) {
-        const { t } = simpleT(locale);
-        result.unshift({
-          id: "linked-leads-summary",
-          amount: -linkedLeadsSpending,
-          balanceAfter: pool.userWallet.balance,
-          type: t(CreditTransactionType.OTHER_DEVICES),
-          messageId: null,
-          createdAt: new Date().toISOString(),
-        });
-      }
-
-      return success({
-        transactions: result,
-        totalCount: count + (linkedLeadsSpending > 0 ? 1 : 0),
-      });
-    } catch (error) {
-      logger.error("Failed to get transactions", parseError(error), { userId });
       return fail({
         message: "app.api.credits.errors.getTransactionsFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

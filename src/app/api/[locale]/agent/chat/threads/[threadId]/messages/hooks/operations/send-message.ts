@@ -7,6 +7,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { getLastMessageInBranch } from "@/app/[locale]/chat/lib/utils/thread-builder";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
@@ -46,6 +47,8 @@ export interface SendMessageDeps {
     selectedModel: ModelId;
     selectedCharacter: string;
     enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
+    ttsAutoplay: boolean;
+    ttsVoice: typeof TtsVoiceValue;
   };
   setInput: (input: string) => void;
   setAttachments: (attachments: File[] | ((prev: File[]) => File[])) => void;

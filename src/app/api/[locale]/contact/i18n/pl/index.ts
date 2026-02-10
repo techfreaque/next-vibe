@@ -25,8 +25,8 @@ export const translations: typeof enTranslations = {
     description: "Wypełnij formularz, aby skontaktować się z naszym zespołem",
     fields: {
       name: {
-        label: "Pełne imię i nazwisko",
-        description: "Wprowadź swoje pełne imię i nazwisko",
+        label: "Twoje imię i nazwisko",
+        description: "Wprowadź swoje imię i nazwisko",
         placeholder: "Jan Kowalski",
       },
       email: {
@@ -60,6 +60,10 @@ export const translations: typeof enTranslations = {
         description: "Wewnętrzne ID śledzenia leada (wypełniane automatycznie)",
         placeholder: "lead_123",
       },
+    },
+    submitButton: {
+      label: "Wyślij wiadomość",
+      loadingText: "Wysyłanie...",
     },
   },
 
@@ -95,7 +99,7 @@ export const translations: typeof enTranslations = {
   response: {
     label: "Odpowiedź na przesłanie kontaktu",
     description: "Aktualizacje statusu dla Twojego przesłania kontaktu",
-    success: "Formularz kontaktowy przesłany pomyślnie",
+    success: "Dziękujemy za kontakt! Otrzymaliśmy Twoją wiadomość i wkrótce się z Tobą skontaktujemy.",
     messageId: "ID wiadomości do śledzenia",
     status: "Aktualny status kontaktu",
   },

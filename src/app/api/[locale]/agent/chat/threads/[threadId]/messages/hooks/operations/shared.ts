@@ -9,13 +9,11 @@ import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
-import { DEFAULT_TTS_VOICE } from "../../../../../../text-to-speech/enum";
+import type { TtsVoiceValue } from "../../../../../../text-to-speech/enum";
 import { DefaultFolderId } from "../../../../../config";
 import type { ChatMessage } from "../../../../../db";
 import { ChatMessageRole } from "../../../../../enum";
 import { useChatStore } from "../../../../../hooks/store";
-import { useVoiceModeStore } from "../../../../../voice-mode/store";
-import { getCallModeKey } from "../../../../../voice-mode/types";
 
 export interface CreateMessageParams {
   content: string;
@@ -42,6 +40,8 @@ export interface MessageOperationDeps {
     selectedModel: ModelId;
     selectedCharacter: string;
     enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
+    ttsAutoplay: boolean;
+    ttsVoice: typeof TtsVoiceValue;
   };
   deductCredits: (creditCost: number, feature: string) => void;
 }
@@ -208,19 +208,11 @@ export async function createAndSendUserMessage(
       });
     }
 
-    // Voice mode settings
-    const voiceModeSettings = useVoiceModeStore.getState().settings;
-    const callModeKey = getCallModeKey(
-      settings.selectedModel,
-      settings.selectedCharacter,
-    );
-    const isCallModeEnabled =
-      voiceModeSettings.callModeByConfig?.[callModeKey] ?? false;
-
-    const effectiveVoiceMode = isCallModeEnabled
+    // Voice mode settings - use ttsAutoplay and ttsVoice from chat settings
+    const effectiveVoiceMode = settings.ttsAutoplay
       ? {
           enabled: true,
-          voice: DEFAULT_TTS_VOICE,
+          voice: settings.ttsVoice,
         }
       : null;
 

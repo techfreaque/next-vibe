@@ -4,43 +4,6 @@
  */
 
 /**
- * UI configuration constants
- */
-export const UI_CONFIG = {
-  /** Sidebar width when expanded (in pixels) */
-  SIDEBAR_WIDTH: "w-[290px]",
-
-  /** Sidebar width when collapsed (in pixels) */
-  SIDEBAR_COLLAPSED_WIDTH: 0,
-
-  /** Transition duration for animations (in milliseconds) */
-  TRANSITION_DURATION: 200,
-} as const;
-
-/**
- * Timing constants (in milliseconds)
- */
-export const TIMING = {
-  /** Delay for message editor focus (ms) */
-  MESSAGE_EDITOR_FOCUS_DELAY: 100,
-
-  /** Debounce delay for draft saving */
-  DRAFT_SAVE_DEBOUNCE: 500,
-
-  /** UI update interval during streaming */
-  STREAM_UPDATE_INTERVAL: 100,
-
-  /** Tooltip delay duration */
-  TOOLTIP_DELAY: 500,
-
-  /** Debounce delay for localStorage writes */
-  STORAGE_DEBOUNCE: 500,
-
-  /** Delay before submitting suggested prompt */
-  SUGGESTED_PROMPT_SUBMIT_DELAY: 100,
-} as const;
-
-/**
  * DOM element IDs used for scrolling and targeting
  */
 export const DOM_IDS = {
@@ -66,9 +29,6 @@ export const LAYOUT = {
 
   /** Minimum viewport height for suggestions (in vh units) */
   SUGGESTIONS_MIN_HEIGHT: 60,
-
-  /** Minimum touch target size (px) - WCAG AA standard */
-  MIN_TOUCH_TARGET: 44,
 
   /** Thread indentation per level (px) */
   THREAD_INDENT: 8,

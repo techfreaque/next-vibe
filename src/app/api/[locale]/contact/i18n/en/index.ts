@@ -22,8 +22,8 @@ export const translations = {
     description: "Fill out the form to get in touch with our team",
     fields: {
       name: {
-        label: "Full Name",
-        description: "Enter your full name",
+        label: "Your Name",
+        description: "Enter your name",
         placeholder: "John Doe",
       },
       email: {
@@ -56,6 +56,10 @@ export const translations = {
         description: "Internal lead tracking ID (auto-filled)",
         placeholder: "lead_123",
       },
+    },
+    submitButton: {
+      label: "Send Message",
+      loadingText: "Sending...",
     },
   },
 
@@ -91,7 +95,7 @@ export const translations = {
   response: {
     label: "Contact Submission Response",
     description: "Status updates for your contact submission",
-    success: "Contact form submitted successfully",
+    success: "Thank you for contacting us! We've received your message and will get back to you soon.",
     messageId: "Message ID for tracking",
     status: "Current status of the contact",
   },

@@ -173,7 +173,7 @@ const { POST } = createEndpoint({
       icon: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ICON,
-        schema: iconSchema.nullable(),
+        schema: iconSchema.nullable().optional(),
         theme: {
           style: "none",
         } as const,
@@ -181,17 +181,17 @@ const { POST } = createEndpoint({
 
       name: requestField({
         type: WidgetType.TEXT,
-        schema: z.string().nullable(),
+        schema: z.string().nullable().optional(),
       }),
 
       tagline: requestField({
         type: WidgetType.TEXT,
-        schema: z.string().nullable(),
+        schema: z.string().nullable().optional(),
       }),
 
       description: requestField({
         type: WidgetType.TEXT,
-        schema: z.string().nullable(),
+        schema: z.string().nullable().optional(),
       }),
 
       voice: requestField({

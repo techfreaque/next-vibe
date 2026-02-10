@@ -117,14 +117,14 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       totalSignups: "Łączne rejestracje",
-      totalSignupsDesc:
+      totalSignupsDescription:
         "Liczba użytkowników, którzy zarejestrowali się za pomocą Twojego kodu polecającego",
       totalRevenue: "Łączny przychód",
-      totalRevenueDesc: "Całkowity przychód wygenerowany z Twoich poleceń",
+      totalRevenueDescription: "Całkowity przychód wygenerowany z Twoich poleceń",
       totalEarned: "Łącznie zarobione",
-      totalEarnedDesc: "Całkowita prowizja zarobiona z poleceń",
+      totalEarnedDescription: "Całkowita prowizja zarobiona z poleceń",
       availableBalance: "Dostępne saldo",
-      availableBalanceDesc: "Dostępne saldo gotowe do wypłaty",
+      availableBalanceDescription: "Dostępne saldo gotowe do wypłaty",
       totalRevenueCredits: "Łączny przychód (Kredyty)",
       totalEarnedCredits: "Łącznie zarobione (Kredyty)",
       totalPaidOutCredits: "Łącznie wypłacone (Kredyty)",

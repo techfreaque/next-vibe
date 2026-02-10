@@ -100,25 +100,3 @@ export function getNewFolderTranslationKey(
       return "app.chat.folderList.newFolder";
   }
 }
-
-/**
- * Get the translation key for "Create New Folder" dialog title based on root folder
- * @param rootFolderId - ID of the root folder
- * @returns Translation key like "app.chat.common.createNewPrivateFolder"
- */
-export function getCreateFolderTranslationKey(
-  rootFolderId: DefaultFolderId,
-): TranslationKey {
-  switch (rootFolderId) {
-    case DefaultFolderId.PRIVATE:
-      return "app.chat.common.createNewPrivateFolder";
-    case DefaultFolderId.SHARED:
-      return "app.chat.common.createNewSharedFolder";
-    case DefaultFolderId.PUBLIC:
-      return "app.chat.common.createNewPublicFolder";
-    case DefaultFolderId.INCOGNITO:
-      return "app.chat.common.createNewIncognitoFolder";
-    default:
-      return "app.chat.newFolder.title";
-  }
-}

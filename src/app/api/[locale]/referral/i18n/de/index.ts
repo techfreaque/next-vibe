@@ -117,14 +117,14 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       totalSignups: "Anmeldungen gesamt",
-      totalSignupsDesc:
+      totalSignupsDescription:
         "Anzahl der Nutzer, die sich mit Ihrem Empfehlungscode angemeldet haben",
       totalRevenue: "Gesamtumsatz",
-      totalRevenueDesc: "Gesamtumsatz aus Ihren Empfehlungen",
+      totalRevenueDescription: "Gesamtumsatz aus Ihren Empfehlungen",
       totalEarned: "Gesamt verdient",
-      totalEarnedDesc: "Gesamte Provision aus Empfehlungen",
+      totalEarnedDescription: "Gesamte Provision aus Empfehlungen",
       availableBalance: "Verfügbares Guthaben",
-      availableBalanceDesc: "Verfügbares Guthaben für Auszahlung",
+      availableBalanceDescription: "Verfügbares Guthaben für Auszahlung",
       totalRevenueCredits: "Gesamtumsatz (Credits)",
       totalEarnedCredits: "Gesamt verdient (Credits)",
       totalPaidOutCredits: "Gesamt ausgezahlt (Credits)",

@@ -3,9 +3,9 @@
  * Helper functions for working with folders in the new API structure
  */
 
+import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import {
   DEFAULT_FOLDER_CONFIGS,
-  DefaultFolderId,
   isDefaultFolderId,
 } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
@@ -69,122 +69,4 @@ export function getFolderDisplayName(
 
   // For custom folders, use the stored name
   return folder.name;
-}
-
-/**
- * Get the number of direct children (subfolders) for a folder
- */
-export function getDirectChildrenCount(
-  folderId: string,
-  folders: Record<string, ChatFolder>,
-): number {
-  return Object.values(folders).filter((f) => f.parentId === folderId).length;
-}
-
-/**
- * Check if a folder can be deleted
- * Default folders cannot be deleted
- */
-export function canDeleteFolder(folderId: string): boolean {
-  return !isDefaultFolder(folderId);
-}
-
-/**
- * Check if a folder can be renamed
- * Default folders cannot be renamed
- */
-export function canRenameFolder(folderId: string): boolean {
-  return !isDefaultFolder(folderId);
-}
-
-/**
- * Check if a folder can be moved to another parent
- * Default folders cannot be moved
- */
-export function canMoveFolder(folderId: string): boolean {
-  return !isDefaultFolder(folderId);
-}
-
-/**
- * Get all ancestor folder IDs for a folder (from parent to root)
- */
-export function getAncestorFolderIds(
-  folderId: string,
-  folders: Record<string, ChatFolder>,
-): string[] {
-  const ancestors: string[] = [];
-  let currentId: string | null = folderId;
-
-  while (currentId) {
-    const folder: ChatFolder | undefined = folders[currentId];
-    if (!folder?.parentId) {
-      break;
-    }
-    ancestors.push(folder.parentId);
-    currentId = folder.parentId;
-  }
-
-  return ancestors;
-}
-
-/**
- * Check if a folder is a descendant of another folder
- */
-export function isFolderDescendant(
-  folderId: string,
-  ancestorId: string,
-  folders: Record<string, ChatFolder>,
-): boolean {
-  if (folderId === ancestorId) {
-    return true;
-  }
-
-  const folder = folders[folderId];
-  if (!folder?.parentId) {
-    return false;
-  }
-
-  return isFolderDescendant(folder.parentId, ancestorId, folders);
-}
-
-/**
- * Get all child folder IDs (recursive)
- */
-export function getAllChildFolderIds(
-  folderId: string,
-  folders: Record<string, ChatFolder>,
-): string[] {
-  const children: string[] = [];
-  const directChildren = Object.values(folders).filter(
-    (f) => f.parentId === folderId,
-  );
-
-  for (const child of directChildren) {
-    children.push(child.id);
-    children.push(...getAllChildFolderIds(child.id, folders));
-  }
-
-  return children;
-}
-
-/**
- * Get the root folder ID for a given folder
- * This returns the DefaultFolderId (private, incognito, shared, public)
- */
-export function getRootFolderIdForFolder(
-  folderId: string,
-  folders: Record<string, ChatFolder>,
-): DefaultFolderId {
-  // Check if this is already a root folder - type guard narrows the type
-  if (isDefaultFolder(folderId)) {
-    return folderId;
-  }
-
-  // Find the folder and get its rootFolderId
-  const folder = folders[folderId];
-  if (!folder) {
-    return DefaultFolderId.PRIVATE;
-  }
-
-  return folder.rootFolderId;
 }

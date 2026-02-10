@@ -56,7 +56,6 @@ export class ContactRepository {
           leadId,
           email: data.email,
           name: data.name,
-          company: data.company,
         });
 
         // Note: Lead conversion logic would go here if needed
@@ -78,7 +77,6 @@ export class ContactRepository {
         .values({
           name: data.name,
           email: data.email,
-          company: data.company,
           subject: data.subject,
           message: data.message,
           status: ContactStatus.NEW,
@@ -123,7 +121,7 @@ export class ContactRepository {
       });
 
       return success({
-        success: true,
+        success: "response.success",
         messageId: contact.id,
         status: [ContactStatus.NEW],
       });
@@ -185,7 +183,7 @@ export class ContactRepository {
       }
 
       return success({
-        success: true,
+        success: "response.success",
         messageId: contact.id,
         status: [data.status || ContactStatus.NEW],
       });

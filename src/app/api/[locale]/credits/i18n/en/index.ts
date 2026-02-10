@@ -3,6 +3,12 @@
  */
 
 export const translations = {
+  repository: {
+    tts: "Text-to-Speech",
+    stt: "Speech-to-Text",
+    search: "Search",
+    sttHotkey: "Speech-to-Text (Hotkey)",
+  },
   enums: {
     creditType: {
       userSubscription: "User Subscription Credits",

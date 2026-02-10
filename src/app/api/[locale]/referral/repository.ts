@@ -491,22 +491,24 @@ export class ReferralRepository {
       const availableCredits = totalEarnedCredits - totalPaidOutCredits;
 
       return success({
-        totalSignupsTitle: "app.user.referral.stats.totalSignups",
+        totalSignupsTitle: "app.api.referral.stats.fields.totalSignups",
         totalSignupsValue: totalSignups,
-        totalSignupsDescription: "app.user.referral.stats.totalSignupsDesc",
+        totalSignupsDescription:
+          "app.api.referral.stats.fields.totalSignupsDescription",
 
-        totalRevenueTitle: "app.user.referral.stats.totalRevenue",
+        totalRevenueTitle: "app.api.referral.stats.fields.totalRevenue",
         totalRevenueValue: totalRevenueCredits,
-        totalRevenueDescription: "app.user.referral.stats.totalRevenueDesc",
+        totalRevenueDescription:
+          "app.api.referral.stats.fields.totalRevenueDescription",
 
-        totalEarnedTitle: "app.user.referral.stats.totalEarned",
+        totalEarnedTitle: "app.api.referral.stats.fields.totalEarned",
         totalEarnedValue: totalEarnedCredits,
-        totalEarnedDescription: "app.user.referral.stats.totalEarnedDesc",
+        totalEarnedDescription: "app.api.referral.stats.fields.totalEarnedDescription",
 
-        availableCreditsTitle: "app.user.referral.stats.availableBalance",
+        availableCreditsTitle: "app.api.referral.stats.fields.availableBalance",
         availableCreditsValue: availableCredits,
         availableCreditsDescription:
-          "app.user.referral.stats.availableBalanceDesc",
+          "app.api.referral.stats.fields.availableBalanceDescription",
       });
     } catch (error) {
       logger.error("Failed to get referral stats", parseError(error));

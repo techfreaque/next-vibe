@@ -27,8 +27,8 @@ export const translations: typeof enTranslations = {
       "Füllen Sie das Formular aus, um mit unserem Team in Kontakt zu treten",
     fields: {
       name: {
-        label: "Vollständiger Name",
-        description: "Geben Sie Ihren vollständigen Namen ein",
+        label: "Ihr Name",
+        description: "Geben Sie Ihren Namen ein",
         placeholder: "Max Mustermann",
       },
       email: {
@@ -62,6 +62,10 @@ export const translations: typeof enTranslations = {
         description: "Interne Lead-Tracking-ID (automatisch ausgefüllt)",
         placeholder: "lead_123",
       },
+    },
+    submitButton: {
+      label: "Nachricht senden",
+      loadingText: "Wird gesendet...",
     },
   },
 
@@ -97,7 +101,7 @@ export const translations: typeof enTranslations = {
   response: {
     label: "Kontakt-Einreichung Antwort",
     description: "Status-Updates für Ihre Kontakt-Einreichung",
-    success: "Kontaktformular erfolgreich eingereicht",
+    success: "Vielen Dank für Ihre Kontaktaufnahme! Wir haben Ihre Nachricht erhalten und werden uns bald bei Ihnen melden.",
     messageId: "Nachrichten-ID zur Verfolgung",
     status: "Aktueller Status des Kontakts",
   },

@@ -57,6 +57,7 @@ export function FavoriteCreateContainer({
 
   const characterEndpoint = useCharacter(characterId ?? "", user, logger);
   const characterData = characterEndpoint.read?.data;
+
   return (
     <Div className="flex flex-col gap-0">
       {/* Top Actions: Back + Submit */}
@@ -78,7 +79,6 @@ export function FavoriteCreateContainer({
           }}
         />
       </Div>
-
       {/* Scrollable Form Container */}
       <Div className="group overflow-y-auto max-h-[min(800px,calc(100dvh-180px))] px-4 pb-4">
         <FormAlertWidget field={{}} />

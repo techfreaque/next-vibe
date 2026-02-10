@@ -85,11 +85,7 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
       : null;
 
   // Fetch character name from character ID
-  const characterHook = useCharacter(
-    character || undefined,
-    user,
-    logger,
-  );
+  const characterHook = useCharacter(character || undefined, user, logger);
   const characterName = characterHook.read?.data?.name ?? null;
 
   // Get display name for assistant

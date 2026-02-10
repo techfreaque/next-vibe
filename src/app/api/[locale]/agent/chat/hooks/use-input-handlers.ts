@@ -94,7 +94,12 @@ export function useInputHandlers({
           const url = subFolderId
             ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
             : `/${locale}/threads/${rootFolderId}/${threadId}`;
-          router.push(url);
+
+          // CRITICAL: Use history.replaceState for SYNCHRONOUS navigation
+          // router.push/replace are async and won't update activeThreadId before messages are created
+          window.history.replaceState(null, "", url);
+          // Still call router for Next.js state management
+          router.replace(url);
         },
       );
       // Clear the draft after successful send

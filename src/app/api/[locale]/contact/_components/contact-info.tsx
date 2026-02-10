@@ -2,9 +2,9 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Globe, Mail, MessageCircle, Twitter } from "next-vibe-ui/ui/icons";
+import { Globe, Mail } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
-import { H2, H3, P } from "next-vibe-ui/ui/typography";
+import { H2, H3 } from "next-vibe-ui/ui/typography";
 import { openUrl } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 
@@ -69,7 +69,7 @@ export default function ContactInfo({
         </Div>
       </Div>
 
-      <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
+      {/* <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
         <H2 className="text-2xl font-bold mb-6">
           {t("app.api.contact._components.pages.help.info.community")}
         </H2>
@@ -114,7 +114,7 @@ export default function ContactInfo({
             </Link>
           </Div>
         </Div>
-      </Div>
+      </Div> */}
     </Div>
   );
 }

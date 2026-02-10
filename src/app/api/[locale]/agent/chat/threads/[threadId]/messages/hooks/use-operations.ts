@@ -8,6 +8,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { useCallback } from "react";
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -98,6 +99,8 @@ interface MessageOperationsDeps {
     selectedModel: ModelId;
     selectedCharacter: string;
     enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
+    ttsAutoplay: boolean;
+    ttsVoice: typeof TtsVoiceValue;
   };
   setInput: (input: string) => void;
   setAttachments: (attachments: File[] | ((prev: File[]) => File[])) => void;

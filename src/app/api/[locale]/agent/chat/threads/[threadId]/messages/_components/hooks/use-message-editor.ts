@@ -7,7 +7,6 @@
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { TIMING } from "@/app/[locale]/chat/lib/config/constants";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import {
   clearDraft,
@@ -55,6 +54,9 @@ export interface UseMessageEditorReturn {
   handleKeyDown: (e: TextareaKeyboardEvent) => void;
   handleCancel: () => void;
 }
+
+/** Delay for message editor focus (ms) */
+const MESSAGE_EDITOR_FOCUS_DELAY = 100;
 
 /**
  * Hook for managing message editor state and actions
@@ -127,7 +129,7 @@ export function useMessageEditor({
         // Select all text for easy editing
         textareaRef.current.select();
       }
-    }, TIMING.MESSAGE_EDITOR_FOCUS_DELAY);
+    }, MESSAGE_EDITOR_FOCUS_DELAY);
 
     return (): void => clearTimeout(timeoutId);
   }, []);

@@ -36,6 +36,7 @@ import { useTouchDevice } from "@/hooks/use-touch-device";
 
 import { cn } from "../../../shared/utils";
 import { useTourState } from "../_components/welcome-tour/tour-state-context";
+import { useAddToFavorites } from "../favorites/use-add-to-favorites";
 import { useSelectorOnboardingContext } from "../threads/_components/chat-input/selector/selector-onboarding/context";
 import characterDetailDefinitions from "./[id]/definition";
 import { COMPANION_CHARACTERS } from "./config";
@@ -185,208 +186,549 @@ export function CharactersListContainer({
       )}
 
       {/* Scrollable Content */}
-      <Div className="border-t border-border p-4 overflow-y-auto max-h-[min(800px,calc(100dvh-180px))]">
-        {/* Direct Model Access Section */}
-        <TextWidget field={children.title} fieldName="title" />
-        <TextWidget field={children.description} fieldName="description" />
-
-        {/* Direct Model Card */}
-        <Div className="flex items-start gap-4 p-4 rounded-lg border border-primary/30 hover:border-primary/40 hover:shadow-md transition-colors mb-6">
-          <IconWidget field={children.icon} fieldName="icon" />
-          <Div className="flex-1 flex flex-col gap-1">
-            <TextWidget field={children.name} fieldName="name" />
-            <TextWidget
-              field={children.modelDescription}
-              fieldName="modelDescription"
-            />
-          </Div>
-          <NavigateButtonWidget field={children.selectButton} />
-        </Div>
-
-        <SeparatorWidget field={children.separator} />
-
-        {/* Characters Section */}
-        <TextWidget
-          field={children.charactersTitle}
-          fieldName="charactersTitle"
-        />
-        <TextWidget
-          field={children.charactersDesc}
-          fieldName="charactersDesc"
-        />
-
-        {/* Sections */}
-        <Div className="flex flex-col gap-6">
-          {field.value?.sections?.map((section, idx) => (
-            <Div key={idx} className="flex flex-col gap-4">
-              {/* Section Header */}
-              <Div className="flex items-center gap-2">
-                <IconWidget
-                  field={withValue(
-                    children.sections.child.children.sectionIcon,
-                    section.sectionIcon,
-                    section,
-                  )}
-                  fieldName={`sections.${idx}.sectionIcon`}
-                />
-                <TextWidget
-                  field={withValue(
-                    children.sections.child.children.sectionTitle,
-                    section.sectionTitle,
-                    section,
-                  )}
-                  fieldName={`sections.${idx}.sectionTitle`}
-                />
-                <BadgeWidget
-                  field={withValue(
-                    children.sections.child.children.sectionCount,
-                    section.sectionCount,
-                    section,
-                  )}
-                  fieldName={`sections.${idx}.sectionCount`}
-                />
-              </Div>
-
-              {/* Characters */}
-              <Div className="flex flex-col gap-3">
-                {section.characters?.map((char) => {
-                  const isActive = char.addedToFav;
-                  return (
-                    <Div
-                      key={char.id}
-                      className={cn(
-                        "group relative flex items-start gap-4 p-4 rounded-lg border cursor-pointer transition-colors",
-                        isActive
-                          ? "bg-primary/5 border-primary/20"
-                          : "hover:bg-accent",
-                      )}
-                      onClick={() =>
-                        navigate(characterDetailDefinitions.GET, {
-                          urlPathParams: { id: char.id },
-                        })
-                      }
-                    >
-                      <IconWidget
-                        field={withValue(
-                          children.sections.child.children.characters.child
-                            .children.icon,
-                          char.icon,
-                          char,
-                        )}
-                        fieldName={`sections.${idx}.characters.${char.id}.icon`}
-                      />
-                      <Div className="flex-1 flex flex-col gap-1">
-                        <Div className="inline-flex items-center gap-2 flex-wrap">
-                          <TextWidget
-                            field={withValue(
-                              children.sections.child.children.characters.child
-                                .children.name,
-                              char.name,
-                              char,
-                            )}
-                            fieldName={`sections.${idx}.characters.${char.id}.name`}
-                          />
-                          <TextWidget
-                            field={withValue(
-                              children.sections.child.children.characters.child
-                                .children.tagline,
-                              char.tagline,
-                              char,
-                            )}
-                            fieldName={`sections.${idx}.characters.${char.id}.tagline`}
-                          />
-                        </Div>
-                        <TextWidget
-                          field={withValue(
-                            children.sections.child.children.characters.child
-                              .children.description,
-                            char.description,
-                            char,
-                          )}
-                          fieldName={`sections.${idx}.characters.${char.id}.description`}
-                        />
-                        <Div className="inline-flex items-center gap-1 text-xs text-muted-foreground flex-wrap">
-                          <IconWidget
-                            field={withValue(
-                              children.sections.child.children.characters.child
-                                .children.modelIcon,
-                              char.modelIcon,
-                              char,
-                            )}
-                            fieldName={`sections.${idx}.characters.${char.id}.modelIcon`}
-                          />
-                          <TextWidget
-                            field={withValue(
-                              children.sections.child.children.characters.child
-                                .children.modelInfo,
-                              char.modelInfo,
-                              char,
-                            )}
-                            fieldName={`sections.${idx}.characters.${char.id}.modelInfo`}
-                          />
-                          <TextWidget
-                            field={
-                              children.sections.child.children.characters.child
-                                .children.separator1
-                            }
-                            fieldName={`sections.${idx}.characters.${char.id}.separator1`}
-                          />
-                          <TextWidget
-                            field={withValue(
-                              children.sections.child.children.characters.child
-                                .children.modelProvider,
-                              char.modelProvider,
-                              char,
-                            )}
-                            fieldName={`sections.${idx}.characters.${char.id}.modelProvider`}
-                          />
-                          <TextWidget
-                            field={
-                              children.sections.child.children.characters.child
-                                .children.separator2
-                            }
-                            fieldName={`sections.${idx}.characters.${char.id}.separator2`}
-                          />
-                          <TextWidget
-                            field={withValue(
-                              children.sections.child.children.characters.child
-                                .children.creditCost,
-                              char.creditCost,
-                              char,
-                            )}
-                            fieldName={`sections.${idx}.characters.${char.id}.creditCost`}
-                          />
-                        </Div>
-                      </Div>
-                      <Div
-                        className={cn(
-                          "absolute top-1 right-1 flex gap-0.5",
-                          isTouch
-                            ? "opacity-100"
-                            : "opacity-0 group-hover:opacity-100 transition-opacity",
-                        )}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <AddToFavoritesButton
-                          char={char}
-                          logger={logger}
-                          user={user}
-                          locale={locale}
-                        />
-                        <EditFavBeforeAddButton
-                          char={char}
-                          navigate={navigate}
-                          logger={logger}
-                          user={user}
-                          locale={locale}
-                        />
-                      </Div>
-                    </Div>
-                  );
-                })}
+      <Div className="border-t border-border overflow-y-auto flex-1">
+        <Div className="p-4">
+          {/* Onboarding Success Banner */}
+          {isOnboarding && companionCharacter && (
+            <Div className="bg-gradient-to-r from-primary/15 to-primary/5 border border-primary/30 rounded-lg px-4 py-4 mb-6 shadow-sm">
+              <Div className="flex flex-col items-center text-center gap-3">
+                <Div className="rounded-full bg-primary/20 p-3">
+                  <CheckCircle2 className="h-6 w-6 text-primary" />
+                </Div>
+                <Div className="flex flex-col gap-1">
+                  <Div className="text-base font-semibold text-primary">
+                    {t(
+                      "app.api.agent.chat.characters.onboarding.success.title",
+                      {
+                        companion: t(companionCharacter.name),
+                      },
+                    )}
+                  </Div>
+                  <Div className="text-sm text-muted-foreground">
+                    {t(
+                      "app.api.agent.chat.characters.onboarding.success.subtitle",
+                    )}
+                  </Div>
+                </Div>
               </Div>
             </Div>
+          )}
+          {/* Direct Model Access Section */}
+          <TextWidget field={children.title} fieldName="title" />
+          <TextWidget field={children.description} fieldName="description" />
+
+          {/* Direct Model Card - Optimized for narrow width */}
+          <Div className="rounded-lg border border-primary/30 hover:border-primary/40 hover:shadow-md transition-colors mb-6 p-3">
+            <Div className="flex flex-col gap-3">
+              {/* Header: Icon + Name */}
+              <Div className="flex items-center gap-2">
+                <IconWidget field={children.icon} fieldName="icon" />
+                <TextWidget field={children.name} fieldName="name" />
+              </Div>
+
+              {/* Description */}
+              <TextWidget
+                field={children.modelDescription}
+                fieldName="modelDescription"
+              />
+
+              {/* Button - Full Width */}
+              <NavigateButtonWidget field={children.selectButton} />
+            </Div>
+          </Div>
+
+          <SeparatorWidget field={children.separator} />
+
+          {/* Characters Section */}
+          <TextWidget
+            field={children.charactersTitle}
+            fieldName="charactersTitle"
+          />
+          <TextWidget
+            field={children.charactersDesc}
+            fieldName="charactersDesc"
+          />
+
+          {/* Sections */}
+          <Div className="flex flex-col gap-6">
+            {field.value?.sections?.map((section, idx) => (
+              <Div key={idx} className="flex flex-col gap-4">
+                {/* Section Header */}
+                <Div className="flex items-center gap-2">
+                  <IconWidget
+                    field={withValue(
+                      children.sections.child.children.sectionIcon,
+                      section.sectionIcon,
+                      section,
+                    )}
+                    fieldName={`sections.${idx}.sectionIcon`}
+                  />
+                  <TextWidget
+                    field={withValue(
+                      children.sections.child.children.sectionTitle,
+                      section.sectionTitle,
+                      section,
+                    )}
+                    fieldName={`sections.${idx}.sectionTitle`}
+                  />
+                  <BadgeWidget
+                    field={withValue(
+                      children.sections.child.children.sectionCount,
+                      section.sectionCount,
+                      section,
+                    )}
+                    fieldName={`sections.${idx}.sectionCount`}
+                  />
+                </Div>
+
+                {/* Characters with Show More */}
+                {section.characters && section.characters.length > 0 && (
+                  <CollapsibleCharacterSection
+                    characters={section.characters}
+                    idx={idx}
+                    navigate={navigate}
+                    logger={logger}
+                    user={user}
+                    locale={locale}
+                    isTouch={isTouch}
+                    t={t}
+                  >
+                    {children}
+                  </CollapsibleCharacterSection>
+                )}
+              </Div>
+            ))}
+          </Div>
+        </Div>
+      </Div>
+
+      {/* Onboarding Sticky Bottom Section */}
+      {isOnboarding && (
+        <Div className="flex flex-row gap-2 px-4 py-4 shrink-0 border-t">
+          <Button
+            type="button"
+            variant="outline"
+            size="default"
+            onClick={handleCreateCustomClick}
+            className="ml-auto"
+          >
+            {t("app.api.agent.chat.characters.get.createButton.label")}
+          </Button>
+          <Button
+            type="button"
+            variant="default"
+            size="lg"
+            className="w-full"
+            onClick={() => {
+              // Close the selector modal
+              setModelSelectorOpen(false);
+              logger.info("Onboarding complete");
+            }}
+          >
+            {t("app.api.agent.chat.characters.onboarding.bottom.button")}
+          </Button>
+        </Div>
+      )}
+    </Div>
+  );
+}
+
+/**
+ * Collapsible Character Section Component
+ *
+ * Features:
+ * - Shows first 3 characters by default
+ * - Elegant "Show X more" button with smooth animation
+ * - Gradient fade hint when collapsed
+ * - Animated expand/collapse with height transition
+ */
+const INITIAL_VISIBLE_COUNT = 3;
+
+function CollapsibleCharacterSection({
+  characters,
+  idx,
+  children,
+  navigate,
+  logger,
+  user,
+  locale,
+  isTouch,
+  t,
+}: {
+  characters: CharacterListItem[];
+  idx: number;
+  children: (typeof definition.GET)["fields"]["children"];
+  navigate: ReturnType<typeof useWidgetNavigation>["push"];
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
+  locale: ReturnType<typeof useWidgetContext>["locale"];
+  isTouch: boolean;
+  t: ReturnType<typeof useWidgetTranslation>;
+}): React.JSX.Element {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const totalCount = characters.length;
+  const hasMore = totalCount > INITIAL_VISIBLE_COUNT;
+  const hiddenCount = totalCount - INITIAL_VISIBLE_COUNT;
+  const visibleCharacters = isExpanded
+    ? characters
+    : characters.slice(0, INITIAL_VISIBLE_COUNT);
+
+  return (
+    <Div className="flex flex-col gap-3">
+      {/* Character Cards */}
+      <Div className="relative">
+        <Div
+          className={cn(
+            "flex flex-col gap-3 transition-all duration-300 ease-out",
+          )}
+        >
+          {visibleCharacters.map((char) => (
+            <CharacterCard
+              key={char.id}
+              char={char}
+              idx={idx}
+              navigate={navigate}
+              logger={logger}
+              user={user}
+              locale={locale}
+              isTouch={isTouch}
+              t={t}
+            >
+              {children}
+            </CharacterCard>
           ))}
+        </Div>
+      </Div>
+
+      {/* Show More / Show Less Button */}
+      {hasMore && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className={cn(
+            "w-full h-9 gap-2 text-sm font-medium",
+            "text-muted-foreground hover:text-foreground",
+            "border border-dashed border-muted-foreground/30 hover:border-muted-foreground/50",
+            "rounded-lg transition-all duration-200",
+            "hover:bg-muted/50",
+            isExpanded && "-mt-1",
+          )}
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          {isExpanded ? (
+            <>
+              <ChevronUp className="h-4 w-4" />
+              <Span>
+                {t("app.api.agent.chat.characters.get.section.showLess")}
+              </Span>
+            </>
+          ) : (
+            <>
+              <ChevronDown className="h-4 w-4" />
+              <Span>
+                {t("app.api.agent.chat.characters.get.section.showMore", {
+                  count: String(hiddenCount),
+                })}
+              </Span>
+            </>
+          )}
+        </Button>
+      )}
+    </Div>
+  );
+}
+
+/**
+ * Character Card Component
+ *
+ * Split Actions Bar design:
+ * - Compact main content area (same as original height)
+ * - Small action bar appears below on hover/touch
+ * - Clear visual state with left border accent
+ * - Actions slide in smoothly
+ * - Status shown in action bar text
+ */
+function CharacterCard({
+  char,
+  idx,
+  children,
+  navigate,
+  logger,
+  user,
+  locale,
+  isTouch,
+  t,
+}: {
+  char: CharacterListItem;
+  idx: number;
+  children: (typeof definition.GET)["fields"]["children"];
+  navigate: ReturnType<typeof useWidgetNavigation>["push"];
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
+  locale: ReturnType<typeof useWidgetContext>["locale"];
+  isTouch: boolean;
+  t: ReturnType<typeof useWidgetTranslation>;
+}): React.JSX.Element {
+  const isActive = char.addedToFav;
+  const [showActions, setShowActions] = useState(false);
+
+  return (
+    <Div
+      key={char.id}
+      className={cn(
+        "group relative rounded-lg border overflow-hidden transition-all",
+        isActive
+          ? "border-l-4 border-l-primary border-primary/20 bg-primary/5"
+          : "hover:shadow-sm",
+      )}
+      onMouseEnter={() => !isTouch && setShowActions(true)}
+      onMouseLeave={() => !isTouch && setShowActions(false)}
+    >
+      {/* Main content - always visible, clickable */}
+      <Div
+        className="flex items-start gap-3 p-3 cursor-pointer"
+        onClick={() =>
+          navigate(characterDetailDefinitions.GET, {
+            urlPathParams: { id: char.id },
+          })
+        }
+      >
+        {/* Icon */}
+        <Div className="flex-shrink-0 pt-0.5">
+          <IconWidget
+            field={withValue(
+              children.sections.child.children.characters.child.children.icon,
+              char.icon,
+              char,
+            )}
+            fieldName={`sections.${idx}.characters.${char.id}.icon`}
+          />
+        </Div>
+
+        {/* Content */}
+        <Div className="flex-1 min-w-0 flex flex-col gap-0.5">
+          {/* Name + Tagline + Status badge */}
+          <Div className="flex items-center gap-2 flex-wrap">
+            <TextWidget
+              field={withValue(
+                children.sections.child.children.characters.child.children.name,
+                char.name,
+                char,
+              )}
+              fieldName={`sections.${idx}.characters.${char.id}.name`}
+            />
+            <TextWidget
+              field={withValue(
+                children.sections.child.children.characters.child.children
+                  .tagline,
+                char.tagline,
+                char,
+              )}
+              fieldName={`sections.${idx}.characters.${char.id}.tagline`}
+            />
+            {isActive && (
+              <Div className="flex items-center gap-1 text-xs text-primary">
+                <Star className="h-3 w-3 fill-primary" />
+              </Div>
+            )}
+          </Div>
+
+          {/* Description */}
+          <TextWidget
+            field={withValue(
+              children.sections.child.children.characters.child.children
+                .description,
+              char.description,
+              char,
+            )}
+            fieldName={`sections.${idx}.characters.${char.id}.description`}
+          />
+
+          {/* Model info */}
+          <Div className="flex items-center gap-1 text-xs text-muted-foreground flex-wrap">
+            <IconWidget
+              field={withValue(
+                children.sections.child.children.characters.child.children
+                  .modelIcon,
+                char.modelIcon,
+                char,
+              )}
+              fieldName={`sections.${idx}.characters.${char.id}.modelIcon`}
+            />
+            <TextWidget
+              field={withValue(
+                children.sections.child.children.characters.child.children
+                  .modelInfo,
+                char.modelInfo,
+                char,
+              )}
+              fieldName={`sections.${idx}.characters.${char.id}.modelInfo`}
+            />
+            <TextWidget
+              field={
+                children.sections.child.children.characters.child.children
+                  .separator1
+              }
+              fieldName={`sections.${idx}.characters.${char.id}.separator1`}
+            />
+            <TextWidget
+              field={withValue(
+                children.sections.child.children.characters.child.children
+                  .modelProvider,
+                char.modelProvider,
+                char,
+              )}
+              fieldName={`sections.${idx}.characters.${char.id}.modelProvider`}
+            />
+            <TextWidget
+              field={
+                children.sections.child.children.characters.child.children
+                  .separator2
+              }
+              fieldName={`sections.${idx}.characters.${char.id}.separator2`}
+            />
+            <TextWidget
+              field={withValue(
+                children.sections.child.children.characters.child.children
+                  .creditCost,
+                char.creditCost,
+                char,
+              )}
+              fieldName={`sections.${idx}.characters.${char.id}.creditCost`}
+            />
+          </Div>
+        </Div>
+
+        {/* Touch device: show toggle button */}
+        {isTouch && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 w-7 p-0 flex-shrink-0"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowActions(!showActions);
+            }}
+          >
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 transition-transform",
+                showActions && "rotate-180",
+              )}
+            />
+          </Button>
+        )}
+      </Div>
+
+      {/* Action bar - slides in on hover/tap */}
+      <Div
+        className={cn(
+          "overflow-hidden transition-all duration-200 ease-out",
+          showActions || isTouch ? "max-h-12" : "max-h-0",
+          !isTouch && "group-hover:max-h-12",
+        )}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Div className="flex items-center gap-2 px-3 py-2 bg-muted/50 border-t">
+          {isActive ? (
+            <>
+              <Div className="flex items-center gap-1.5 text-xs text-primary font-medium">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                <Span>
+                  {t(
+                    "app.api.agent.chat.characters.get.card.actions.inCollection",
+                  )}
+                </Span>
+              </Div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="ml-auto h-7 gap-1.5 text-xs"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  const { apiClient } =
+                    await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+                  const characterSingleDefinitions =
+                    await import("./[id]/definition");
+                  const createFavoriteDefinitions =
+                    await import("../favorites/create/definition");
+                  const { DEFAULT_TTS_VOICE } =
+                    await import("../../text-to-speech/enum");
+
+                  const cachedData = apiClient.getEndpointData(
+                    characterSingleDefinitions.default.GET,
+                    logger,
+                    { id: char.id },
+                  );
+                  let fullChar = cachedData?.success
+                    ? cachedData.data
+                    : undefined;
+
+                  if (!fullChar) {
+                    const characterResponse = await apiClient.fetch(
+                      characterSingleDefinitions.default.GET,
+                      logger,
+                      user,
+                      undefined,
+                      { id: char.id },
+                      locale,
+                    );
+                    if (!characterResponse.success) {
+                      return;
+                    }
+                    fullChar = characterResponse.data;
+                  }
+
+                  navigate(createFavoriteDefinitions.default.POST, {
+                    data: {
+                      characterId: char.id,
+                      icon: fullChar.icon,
+                      name: fullChar.name,
+                      tagline: fullChar.tagline,
+                      description: fullChar.description,
+                      voice: fullChar.voice ?? DEFAULT_TTS_VOICE,
+                      modelSelection: null,
+                    },
+                    popNavigationOnSuccess: 1,
+                  });
+                }}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                {t("app.api.agent.chat.characters.get.card.actions.addAnother")}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Div className="text-xs text-muted-foreground">
+                {t(
+                  "app.api.agent.chat.characters.get.card.actions.addToCollection",
+                )}
+              </Div>
+              <AddToFavoritesButton
+                char={char}
+                logger={logger}
+                user={user}
+                locale={locale}
+                variant="default"
+                className="h-7 gap-1.5 text-xs ml-auto"
+              >
+                <Zap className="h-3.5 w-3.5" />
+                {t("app.api.agent.chat.characters.get.card.actions.quick")}
+              </AddToFavoritesButton>
+              <EditFavBeforeAddButton
+                char={char}
+                navigate={navigate}
+                logger={logger}
+                user={user}
+                locale={locale}
+                variant="outline"
+                className="h-7 gap-1.5 text-xs"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                {t("app.api.agent.chat.characters.get.card.actions.customize")}
+              </EditFavBeforeAddButton>
+            </>
+          )}
         </Div>
       </Div>
     </Div>
@@ -403,12 +745,18 @@ function EditFavBeforeAddButton({
   logger,
   user,
   locale,
+  variant = "ghost",
+  className = "",
+  children,
 }: {
   char: CharacterListItem;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
   logger: ReturnType<typeof useWidgetContext>["logger"];
   user: ReturnType<typeof useWidgetContext>["user"];
   locale: ReturnType<typeof useWidgetContext>["locale"];
+  variant?: "ghost" | "outline" | "default";
+  className?: string;
+  children?: React.ReactNode;
 }): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -465,13 +813,16 @@ function EditFavBeforeAddButton({
 
   return (
     <Button
-      variant="ghost"
+      variant={variant}
       size="sm"
       onClick={handleClick}
       disabled={isLoading}
+      className={className}
     >
       {isLoading ? (
         <Loader2 className="h-4 w-4 animate-spin" />
+      ) : children ? (
+        children
       ) : (
         <Pencil className="h-4 w-4" />
       )}
@@ -481,118 +832,44 @@ function EditFavBeforeAddButton({
 
 /**
  * Add to Favorites Button - adds character to favorites
- * Isolated component for loading state
+ * Uses shared hook for consistent behavior across views
  */
 function AddToFavoritesButton({
   char,
   logger,
   user,
   locale,
+  variant = "ghost",
+  className = "",
+  children,
 }: {
   char: CharacterListItem;
   logger: ReturnType<typeof useWidgetContext>["logger"];
   user: ReturnType<typeof useWidgetContext>["user"];
   locale: ReturnType<typeof useWidgetContext>["locale"];
+  variant?: "ghost" | "outline" | "default";
+  className?: string;
+  children?: React.ReactNode;
 }): React.JSX.Element {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
-    e.stopPropagation();
-    setIsLoading(true);
-
-    try {
-      const { apiClient } =
-        await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
-      const favoritesDefinition = await import("../favorites/definition");
-      const createFavoriteDefinition =
-        await import("../favorites/create/definition");
-      const charactersDefinition = await import("./definition");
-      const characterSingleDefinitions = await import("./[id]/definition");
-
-      // Fetch full character data to get properly typed fields
-      const characterResponse = await apiClient.fetch(
-        characterSingleDefinitions.default.GET,
-        logger,
-        user,
-        undefined,
-        { id: char.id },
-        locale,
-      );
-
-      if (!characterResponse.success) {
-        logger.error("Failed to fetch character data");
-        return;
-      }
-
-      const fullChar = characterResponse.data;
-
-      // Create the favorite
-      const createResponse = await apiClient.mutate(
-        createFavoriteDefinition.default.POST,
-        logger,
-        user,
-        {
-          characterId: char.id,
-          icon: fullChar.icon,
-          name: fullChar.name,
-          tagline: fullChar.tagline,
-          description: fullChar.description,
-          voice: fullChar.voice,
-          modelSelection: fullChar.modelSelection,
-        },
-        undefined,
-        locale,
-      );
-
-      if (!createResponse.success) {
-        logger.error("Failed to add to favorites");
-        return;
-      }
-
-      // Optimistically update characters list to mark as added to favorites
-      apiClient.updateEndpointData(
-        charactersDefinition.default.GET,
-        logger,
-        (oldData) => {
-          if (!oldData?.success) {
-            return oldData;
-          }
-
-          return {
-            success: true,
-            data: {
-              sections: oldData.data.sections.map((section) => ({
-                ...section,
-                characters: section.characters.map((c) =>
-                  c.id === char.id ? { ...c, addedToFav: true } : c,
-                ),
-              })),
-            },
-          };
-        },
-        undefined,
-      );
-
-      // Refetch favorites list to update the cache
-      void apiClient.refetchEndpoint(favoritesDefinition.default.GET, logger);
-    } catch (error) {
-      logger.error("Failed to add to favorites", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { isLoading, addToFavorites } = useAddToFavorites({
+    characterId: char.id,
+    logger,
+    user,
+    locale,
+  });
 
   return (
     <Button
-      variant="ghost"
+      variant={variant}
       size="sm"
-      onClick={handleClick}
-      disabled={isLoading}
+      onClick={addToFavorites}
+      disabled={isLoading || char.addedToFav}
+      className={className}
     >
       {isLoading ? (
         <Loader2 className="h-4 w-4 animate-spin" />
+      ) : children ? (
+        children
       ) : (
         <Star className="h-4 w-4" />
       )}

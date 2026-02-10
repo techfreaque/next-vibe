@@ -12,7 +12,7 @@ import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 /**
  * Parsed URL result
  */
-export interface ParsedChatUrl {
+interface ParsedChatUrl {
   initialRootFolderId: DefaultFolderId;
   initialSubFolderId: string | null;
   initialThreadId: string | null;
@@ -96,25 +96,4 @@ export function parseChatUrl(urlPath: string[] | undefined): ParsedChatUrl {
     initialSubFolderId: subFolderId,
     initialThreadId: null,
   };
-}
-
-/**
- * Build chat URL path from components
- */
-export function buildChatUrl(
-  rootFolderId: DefaultFolderId,
-  subFolderId: string | null,
-  threadId: string | null,
-): string {
-  const parts = ["/threads", rootFolderId];
-
-  if (subFolderId) {
-    parts.push(subFolderId);
-  }
-
-  if (threadId) {
-    parts.push(threadId);
-  }
-
-  return parts.join("/");
 }
