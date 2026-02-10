@@ -1,10 +1,18 @@
 ALTER TABLE "custom_characters" ALTER COLUMN "voice" SET DEFAULT 'app.api.agent.textToSpeech.voices.FEMALE';--> statement-breakpoint
 ALTER TABLE "custom_characters" ALTER COLUMN "voice" SET NOT NULL;--> statement-breakpoint
 ALTER TABLE "custom_characters" ALTER COLUMN "suggested_prompts" SET NOT NULL;--> statement-breakpoint
-ALTER TABLE "custom_characters" ADD COLUMN "model_selection" jsonb NOT NULL;--> statement-breakpoint
-ALTER TABLE "custom_characters" ADD COLUMN "ownership_type" text NOT NULL;--> statement-breakpoint
-ALTER TABLE "chat_favorites" ADD COLUMN "model_selection" jsonb NOT NULL;--> statement-breakpoint
-ALTER TABLE "chat_favorites" ADD COLUMN "position" integer NOT NULL;--> statement-breakpoint
+ALTER TABLE "custom_characters" ADD COLUMN "model_selection" jsonb;--> statement-breakpoint
+UPDATE "custom_characters" SET "model_selection" = '{}'::jsonb WHERE "model_selection" IS NULL;--> statement-breakpoint
+ALTER TABLE "custom_characters" ALTER COLUMN "model_selection" SET NOT NULL;--> statement-breakpoint
+ALTER TABLE "custom_characters" ADD COLUMN "ownership_type" text;--> statement-breakpoint
+UPDATE "custom_characters" SET "ownership_type" = 'system' WHERE "ownership_type" IS NULL;--> statement-breakpoint
+ALTER TABLE "custom_characters" ALTER COLUMN "ownership_type" SET NOT NULL;--> statement-breakpoint
+ALTER TABLE "chat_favorites" ADD COLUMN "model_selection" jsonb;--> statement-breakpoint
+UPDATE "chat_favorites" SET "model_selection" = '{}'::jsonb WHERE "model_selection" IS NULL;--> statement-breakpoint
+ALTER TABLE "chat_favorites" ALTER COLUMN "model_selection" SET NOT NULL;--> statement-breakpoint
+ALTER TABLE "chat_favorites" ADD COLUMN "position" integer;--> statement-breakpoint
+UPDATE "chat_favorites" SET "position" = 0 WHERE "position" IS NULL;--> statement-breakpoint
+ALTER TABLE "chat_favorites" ALTER COLUMN "position" SET NOT NULL;--> statement-breakpoint
 ALTER TABLE "chat_favorites" ADD COLUMN "color" text;--> statement-breakpoint
 ALTER TABLE "custom_characters" DROP COLUMN "preferred_model";--> statement-breakpoint
 ALTER TABLE "custom_characters" DROP COLUMN "requirements";--> statement-breakpoint
