@@ -618,11 +618,10 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
     ];
 
     for (const mod of modules) {
-      // Import examples from the module
-      const moduleImport = await import(mod.filePath);
-      const examples = moduleImport[mod.examplesExportName];
+      // Use pre-extracted env example entries from static analysis
+      const entries = mod.envExampleEntries;
 
-      if (!examples || examples.length === 0) {
+      if (!entries || entries.length === 0) {
         continue;
       }
 
@@ -634,11 +633,11 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
       lines.push(`# ${mod.moduleName}`);
 
       // Add each example
-      for (const entry of examples) {
+      for (const entry of entries) {
         if (entry.comment) {
           lines.push(`# ${entry.comment}`);
         }
-        lines.push(`${entry.key}="${entry.example}"`);
+        lines.push(`${entry.key}="${entry.exampleValue}"`);
       }
 
       lines.push("");
