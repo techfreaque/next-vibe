@@ -196,6 +196,7 @@
     "chalk": "5.6.2",
     "chrome-devtools-mcp": "0.12.1",
     "class-variance-authority": "0.7.1",
+    "cli-boxes": "^4.0.1",
     "clsx": "2.1.1",
     "cmdk": "1.1.1",
     "commander": "14.0.2",
