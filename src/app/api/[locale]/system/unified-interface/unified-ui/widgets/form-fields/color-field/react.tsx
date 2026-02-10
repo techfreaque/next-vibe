@@ -34,6 +34,7 @@ import {
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
@@ -60,6 +61,7 @@ export function ColorFieldWidget<
   const t = useWidgetTranslation();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
+  const isDisabled = useWidgetDisabled();
   if (!form || !fieldName) {
     return (
       <Div>
@@ -161,7 +163,7 @@ export function ColorFieldWidget<
                     value={String(formField.value ?? "#000000")}
                     onChange={(e) => formField.onChange(e.target.value)}
                     onBlur={formField.onBlur}
-                    disabled={field.disabled || field.readonly}
+                    disabled={isDisabled || field.disabled || field.readonly}
                     className={cn(
                       styleClassName.inputClassName,
                       "w-16 h-10 cursor-pointer",
@@ -176,7 +178,7 @@ export function ColorFieldWidget<
                     placeholder={
                       field.placeholder ? t(field.placeholder) : "#000000"
                     }
-                    disabled={field.disabled || field.readonly}
+                    disabled={isDisabled || field.disabled || field.readonly}
                     className={cn(styleClassName.inputClassName, "font-mono")}
                   />
                 </Div>

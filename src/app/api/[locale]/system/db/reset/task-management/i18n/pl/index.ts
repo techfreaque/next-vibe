@@ -147,7 +147,7 @@ export const translations: typeof enTranslations = {
     taskDoesNotExist: "Zadanie '{taskName}' nie istnieje",
     taskStatusRetrieved: "Status zadania '{taskName}' pobrany",
     failedToGetTaskStatus: "Nie udało się pobrać statusu zadania",
-    foundTasks: "Znaleziono {count} zadań",
+    foundTasks: "Znaleziono {{count}} zadań",
     failedToListTasks: "Nie udało się wyświetlić listy zadań",
   },
   tasks: {

@@ -8,8 +8,8 @@ import { Switch } from "next-vibe-ui/ui/switch";
 import type { JSX } from "react";
 import React from "react";
 
-import { SEARCH_ALIAS } from "@/app/api/[locale]/agent/brave-search/definition";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { SEARCH_ALIAS } from "@/app/api/[locale]/agent/search/brave/definition";
 import { aliasToPathMap } from "@/app/api/[locale]/system/generated/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

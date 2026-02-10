@@ -23,13 +23,13 @@ export function useLeadsListEndpoint(
   return useEndpoint(
     definitions,
     {
-      queryOptions: {
-        enabled: true,
-        refetchOnWindowFocus: false, // Disable to prevent conflicts
-        staleTime: 1 * 60 * 1000, // 1 minute
-      },
-      filterOptions: {
-        initialFilters: {
+      read: {
+        queryOptions: {
+          enabled: true,
+          refetchOnWindowFocus: false, // Disable to prevent conflicts
+          staleTime: 1 * 60 * 1000, // 1 minute
+        },
+        initialState: {
           paginationInfo: {
             page: 1,
             limit: 20,

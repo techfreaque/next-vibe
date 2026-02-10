@@ -8,13 +8,28 @@ export const translations = {
     memories: "Memories",
   },
   category: "Chat",
+  searchPlaceholder: "Search memories by content or tags...",
+  showing: "Showing {{count}} of {{total}} memories",
+  stats: {
+    total: "Total",
+    highPriority: "High Priority",
+    avgPriority: "Avg Priority",
+    size: "Size",
+  },
   get: {
     title: "List Memories",
     description: "Retrieves all memories for the current user",
     container: {
-      title: "Memory List",
-      description: "View all stored memories",
+      title: "Memories",
     },
+    createButton: {
+      label: "Create Memory",
+    },
+    stats: {
+      title: "Overview",
+    },
+    emptyState: "No memories yet. Create your first memory to get started.",
+    emptySearch: "No memories found matching your search.",
     columns: {
       memoryNumber: "#",
       content: "Content",

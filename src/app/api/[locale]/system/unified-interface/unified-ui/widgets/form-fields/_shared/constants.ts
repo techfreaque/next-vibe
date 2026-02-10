@@ -13,6 +13,7 @@ export const DEFAULT_THEME: RequiredFieldTheme = {
   requiredColor: "blue",
   completedColor: "green",
   descriptionStyle: "tooltip",
+  optionalColor: "none",
 };
 
 export function getTheme(

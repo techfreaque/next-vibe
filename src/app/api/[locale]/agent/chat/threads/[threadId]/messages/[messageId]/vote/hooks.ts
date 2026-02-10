@@ -35,12 +35,14 @@ export function useMessageVote(
   return useEndpoint(
     definitions,
     {
-      urlPathParams: {
-        threadId: params.threadId,
-        messageId: params.messageId,
-      },
-      formOptions: {
-        persistForm: false,
+      create: {
+        urlPathParams: {
+          threadId: params.threadId,
+          messageId: params.messageId,
+        },
+        formOptions: {
+          persistForm: false,
+        },
       },
     },
     logger,

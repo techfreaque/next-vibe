@@ -1801,6 +1801,7 @@ export function submitButton<TUsage extends FieldUsageConfig>(config: {
   iconSpacing?: SpacingSize;
   usage: TUsage;
   className?: string;
+  inline?: boolean;
 }): SubmitButtonWidgetConfig<TranslationKey, TUsage, "widget"> {
   return {
     schemaType: "widget" as const,
@@ -1814,5 +1815,6 @@ export function submitButton<TUsage extends FieldUsageConfig>(config: {
     iconSize: config.iconSize,
     iconSpacing: config.iconSpacing,
     className: config.className,
+    inline: config.inline,
   };
 }

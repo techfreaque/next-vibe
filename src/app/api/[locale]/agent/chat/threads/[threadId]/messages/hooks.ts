@@ -35,11 +35,13 @@ export function useMessagesList(
   return useEndpoint(
     definitions,
     {
-      urlPathParams: { threadId: params.threadId },
-      queryOptions: {
-        enabled: params.enabled ?? true,
-        refetchOnWindowFocus: true,
-        staleTime: 5 * 1000, // 5 seconds
+      read: {
+        urlPathParams: { threadId: params.threadId },
+        queryOptions: {
+          enabled: params.enabled ?? true,
+          refetchOnWindowFocus: true,
+          staleTime: 5 * 1000, // 5 seconds
+        },
       },
     },
     logger,
@@ -70,9 +72,11 @@ export function useCreateMessage(
   return useEndpoint(
     definitions,
     {
-      urlPathParams: { threadId: params.threadId },
-      formOptions: {
-        persistForm: false,
+      create: {
+        urlPathParams: { threadId: params.threadId },
+        formOptions: {
+          persistForm: false,
+        },
       },
     },
     logger,

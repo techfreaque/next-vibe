@@ -74,8 +74,10 @@ export function useTTSAudio({
   const endpoint = useEndpoint(
     textToSpeechDefinitions,
     {
-      queryOptions: {
-        enabled: false, // Manual control
+      read: {
+        queryOptions: {
+          enabled: false, // Manual control
+        },
       },
     },
     logger,

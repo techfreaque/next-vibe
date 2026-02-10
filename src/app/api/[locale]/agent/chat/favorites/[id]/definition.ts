@@ -18,6 +18,7 @@ import {
   deleteButton,
   navigateButtonField,
   objectField,
+  objectFieldNew,
   requestField,
   requestUrlPathParamsField,
   responseField,
@@ -46,7 +47,7 @@ import {
   PriceLevel,
   SpeedLevel,
 } from "../../characters/enum";
-import { FavoriteEditContainer, FavoriteViewContainer } from "./widgets";
+import { FavoriteEditContainer } from "./widgets";
 
 /**
  * Delete Favorite Endpoint (DELETE)
@@ -293,7 +294,7 @@ const { PATCH } = createEndpoint({
 
   options: {
     mutationOptions: {
-      onSuccess: async (data) => {
+      onSuccess: async ({ logger, pathParams, requestData }) => {
         // Import dependencies
         const { apiClient } =
           await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
@@ -301,23 +302,10 @@ const { PATCH } = createEndpoint({
         const { ChatFavoritesRepositoryClient } =
           await import("../repository-client");
 
-        // Load the updated favorite config from localStorage for cache updates
-        const updatedConfig = ChatFavoritesRepositoryClient.loadLocalFavorite(
-          data.pathParams.id,
-        );
-
-        if (!updatedConfig) {
-          // Config not found - skip cache update, server will handle it
-          data.logger.error("Favorite config not found in localStorage", {
-            id: data.pathParams.id,
-          });
-          return;
-        }
-
         // Optimistically update the favorite in the list with proper recomputation
         apiClient.updateEndpointData(
           favoritesDefinition.default.GET,
-          data.logger,
+          logger,
           (oldData) => {
             if (!oldData?.success) {
               return oldData;
@@ -327,26 +315,25 @@ const { PATCH } = createEndpoint({
               success: true,
               data: {
                 favorites: oldData.data.favorites.map((fav) => {
-                  if (fav.id !== data.pathParams.id) {
+                  if (fav.id !== pathParams.id) {
                     return fav;
                   }
 
                   // For PATCH, character display fields (name/tagline/description) are widget-only
                   // and not in the request. Keep them from the existing favorite card.
                   // Only update icon (from request) and modelSelection (from updatedConfig).
-                  const characterIcon = data.requestData.icon ?? null;
+                  const characterIcon = requestData.icon ?? null;
 
                   // Extract character info from existing favorite
-                  const characterName = data.requestData.name ?? null;
-                  const characterTagline = data.requestData.tagline ?? null;
-                  const characterDescription =
-                    data.requestData.description ?? null;
+                  const characterName = requestData.name ?? null;
+                  const characterTagline = requestData.tagline ?? null;
+                  const characterDescription = requestData.description ?? null;
 
                   // Get characterModelSelection from GET endpoint cache
                   const getEndpointData = apiClient.getEndpointData(
                     definitions.GET,
-                    data.logger,
-                    { id: data.pathParams.id },
+                    logger,
+                    { id: pathParams.id },
                   );
                   const characterModelSelection = getEndpointData?.success
                     ? getEndpointData.data.characterModelSelection
@@ -355,7 +342,14 @@ const { PATCH } = createEndpoint({
                   // Recompute display fields with updated config
                   const updatedFavorite =
                     ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
-                      updatedConfig,
+                      {
+                        id: pathParams.id,
+                        characterId: fav.characterId,
+                        customIcon: requestData.icon ?? null,
+                        voice: requestData.voice ?? null,
+                        modelSelection: requestData.modelSelection,
+                        position: fav.position,
+                      },
                       characterModelSelection,
                       characterIcon,
                       characterName,
@@ -378,7 +372,7 @@ const { PATCH } = createEndpoint({
         const favoriteByIdDefinition = await import("./definition");
         apiClient.updateEndpointData(
           favoriteByIdDefinition.default.GET,
-          data.logger,
+          logger,
           (prevData) => {
             if (!prevData?.success) {
               return prevData;
@@ -387,18 +381,17 @@ const { PATCH } = createEndpoint({
               success: true,
               data: {
                 ...prevData.data,
-                characterIcon: data.requestData.icon ?? prevData.data.icon,
-                characterName: data.requestData.name ?? prevData.data.name,
-                characterTagline:
-                  data.requestData.tagline ?? prevData.data.tagline,
+                characterIcon: requestData.icon ?? prevData.data.icon,
+                characterName: requestData.name ?? prevData.data.name,
+                characterTagline: requestData.tagline ?? prevData.data.tagline,
                 characterDescription:
-                  data.requestData.description ?? prevData.data.description,
-                voice: data.requestData.voice ?? null,
-                modelSelection: data.requestData.modelSelection,
+                  requestData.description ?? prevData.data.description,
+                voice: requestData.voice ?? null,
+                modelSelection: requestData.modelSelection,
               },
             };
           },
-          { id: data.pathParams.id },
+          { id: pathParams.id },
         );
       },
     },
@@ -462,21 +455,21 @@ const { PATCH } = createEndpoint({
 
       name: requestField({
         type: WidgetType.TEXT,
-        schema: z.string(),
+        schema: z.string().nullable(),
         size: "base",
         emphasis: "bold",
       }),
 
       tagline: requestField({
         type: WidgetType.TEXT,
-        schema: z.string(),
+        schema: z.string().nullable(),
         size: "sm",
         variant: "muted",
       }),
 
       description: requestField({
         type: WidgetType.TEXT,
-        schema: z.string(),
+        schema: z.string().nullable(),
         size: "xs",
         variant: "muted",
       }),
@@ -489,6 +482,10 @@ const { PATCH } = createEndpoint({
           "app.api.agent.chat.favorites.id.patch.voice.description" as const,
         options: TtsVoiceOptions,
         columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
         schema: z.enum(TtsVoiceDB).nullable().optional(),
       }),
 
@@ -619,8 +616,8 @@ const { GET } = createEndpoint({
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.favorites" as const],
 
-  fields: customWidgetObject({
-    render: FavoriteViewContainer,
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
       // === URL PARAMETERS ===
@@ -724,7 +721,7 @@ const { GET } = createEndpoint({
       characterModelSelection: responseField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.OBJECT,
-        schema: modelSelectionSchemaSimple,
+        schema: modelSelectionSchemaSimple.nullable().optional(),
       }),
     },
   }),

@@ -26,14 +26,18 @@ export function useImapMessageById(
   return useEndpoint(
     definitions,
     {
-      urlPathParams: { id: params.messageId },
-      queryOptions: {
-        enabled: params.enabled ?? true,
-        refetchOnWindowFocus: false,
-        staleTime: 30 * 1000, // 30 seconds
+      read: {
+        urlPathParams: { id: params.messageId },
+        queryOptions: {
+          enabled: params.enabled ?? true,
+          refetchOnWindowFocus: false,
+          staleTime: 30 * 1000, // 30 seconds
+        },
       },
-      formOptions: {
-        persistForm: false,
+      update: {
+        formOptions: {
+          persistForm: false,
+        },
       },
     },
     logger,

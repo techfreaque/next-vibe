@@ -40,6 +40,7 @@ export class InitialEventsHandler {
       wasTranscribed: boolean;
       confidence: number | null;
       durationSeconds: number | null;
+      creditCost?: number | null;
     } | null;
     /** User message metadata (including attachments) */
     userMessageMetadata?: {
@@ -89,6 +90,19 @@ export class InitialEventsHandler {
       });
       controller.enqueue(encoder.encode(formatSSEEvent(voiceTranscribedEvent)));
       logger.debug("VOICE_TRANSCRIBED event emitted");
+
+      // Emit CREDITS_DEDUCTED event for STT if credits were consumed
+      if (voiceTranscription.creditCost && voiceTranscription.creditCost > 0) {
+        const creditEvent = createStreamEvent.creditsDeducted({
+          amount: voiceTranscription.creditCost,
+          feature: "stt",
+          type: "tool",
+        });
+        controller.enqueue(encoder.encode(formatSSEEvent(creditEvent)));
+        logger.debug("CREDITS_DEDUCTED event emitted for STT", {
+          amount: voiceTranscription.creditCost,
+        });
+      }
     }
 
     // Emit TOOL_RESULT events for batch confirmations to update frontend

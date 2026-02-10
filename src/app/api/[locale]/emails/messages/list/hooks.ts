@@ -28,14 +28,16 @@ export function useEmailMessagesList(
   return useEndpoint(
     definitions,
     {
-      persistForm: false,
-      queryOptions: {
-        enabled: true,
-        refetchOnWindowFocus: false,
-        staleTime: 1 * 60 * 1000, // 1 minute
-      },
-      filterOptions: {
-        initialFilters: {
+      read: {
+        formOptions: {
+          persistForm: false,
+        },
+        queryOptions: {
+          enabled: true,
+          refetchOnWindowFocus: false,
+          staleTime: 1 * 60 * 1000, // 1 minute
+        },
+        initialState: {
           filters: {
             search: undefined,
             status: EmailStatusFilter.ANY,

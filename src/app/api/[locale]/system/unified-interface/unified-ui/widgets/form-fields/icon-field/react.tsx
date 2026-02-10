@@ -40,6 +40,7 @@ import {
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
@@ -68,6 +69,7 @@ export function IconFieldWidget<
   const t = useWidgetTranslation();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
+  const isDisabled = useWidgetDisabled();
   if (!form || !fieldName) {
     return (
       <Div>
@@ -161,6 +163,7 @@ export function IconFieldWidget<
                 className={styleClassName.inputClassName}
                 size={field.size || "default"}
                 name={formField.name}
+                disabled={isDisabled || field.disabled || field.readonly}
               />
             </FormControl>
 

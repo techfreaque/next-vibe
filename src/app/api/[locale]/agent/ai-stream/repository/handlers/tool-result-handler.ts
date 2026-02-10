@@ -392,6 +392,41 @@ export class ToolResultHandler {
       }
     }
 
+    // Emit credit deduction event if tool consumed credits (only for successful execution)
+    if (
+      toolCallWithResult.creditsUsed &&
+      toolCallWithResult.creditsUsed > 0 &&
+      !toolError
+    ) {
+      const creditEvent = createStreamEvent.creditsDeducted({
+        amount: toolCallWithResult.creditsUsed,
+        feature: part.toolName, // Use tool name, not model name
+        type: "tool",
+      });
+
+      try {
+        controller.enqueue(encoder.encode(formatSSEEvent(creditEvent)));
+        logger.debug("[AI Stream] CREDITS_DEDUCTED event sent for tool", {
+          toolName: part.toolName,
+          creditsUsed: toolCallWithResult.creditsUsed,
+        });
+      } catch (e) {
+        if (
+          e instanceof TypeError &&
+          e.message.includes("Controller is already closed")
+        ) {
+          logger.info("[AI Stream] Controller closed - skipping credit event", {
+            toolName: part.toolName,
+          });
+        } else {
+          logger.error(
+            "[AI Stream] Failed to enqueue credit event",
+            parseError(e),
+          );
+        }
+      }
+    }
+
     // NOW update parent chain: tool message is in DB, next message can be its child
     // Return the tool message's depth (not +1) because processToolCall will increment it
     return {

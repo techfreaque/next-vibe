@@ -34,6 +34,7 @@ export class OperationHandler {
         wasTranscribed: boolean;
         confidence: number | null;
         durationSeconds: number | null;
+        creditCost: number | null; // STT credit cost for event emission
       } | null;
     }>
   > {
@@ -43,6 +44,7 @@ export class OperationHandler {
       wasTranscribed: boolean;
       confidence: number | null;
       durationSeconds: number | null;
+      creditCost: number | null;
     } | null = null;
 
     let operationResult: {
@@ -82,16 +84,19 @@ export class OperationHandler {
           const transcribedText = transcriptionResult.data.response.text;
           const confidence =
             transcriptionResult.data.response.confidence ?? null;
+          const creditCost = transcriptionResult.data.creditCost ?? null;
           logger.debug("[Setup] Audio transcription successful", {
             textLength: transcribedText.length,
             confidence,
+            creditCost,
           });
 
-          // Store transcription metadata for VOICE_TRANSCRIBED event
+          // Store transcription metadata for VOICE_TRANSCRIBED event and credit emission
           voiceTranscription = {
             wasTranscribed: true,
             confidence,
             durationSeconds: null, // STT response doesn't expose duration here
+            creditCost, // Track STT credit cost for CREDITS_DEDUCTED event
           };
 
           // Use transcribed text as content

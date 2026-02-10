@@ -24,9 +24,13 @@ export function useUserSearchEndpoint(
   return useEndpoint(
     userSearchEndpoints,
     {
-      enabled: true, // Always enabled to show all users initially
-      refetchOnWindowFocus: false,
-      staleTime: 30000, // 30 seconds
+      read: {
+        queryOptions: {
+          enabled: true, // Always enabled to show all users initially
+          refetchOnWindowFocus: false,
+          staleTime: 30000, // 30 seconds
+        },
+      },
     },
     logger,
     user,

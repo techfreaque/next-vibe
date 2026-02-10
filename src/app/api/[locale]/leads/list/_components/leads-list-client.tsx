@@ -27,10 +27,12 @@ export function LeadsListClient({
       locale={locale}
       user={user}
       endpointOptions={{
-        queryOptions: {
-          enabled: true,
-          refetchOnWindowFocus: false,
-          staleTime: 1 * 60 * 1000, // 1 minute
+        read: {
+          queryOptions: {
+            enabled: true,
+            refetchOnWindowFocus: false,
+            staleTime: 1 * 60 * 1000, // 1 minute
+          },
         },
       }}
     />

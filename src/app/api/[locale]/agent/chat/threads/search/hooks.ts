@@ -34,10 +34,12 @@ export function useThreadSearch(
   return useEndpoint(
     definitions,
     {
-      queryOptions: {
-        enabled: false, // Disabled by default, enable when search query is provided
-        refetchOnWindowFocus: false,
-        staleTime: 60 * 1000, // 1 minute - search results can be cached longer
+      read: {
+        queryOptions: {
+          enabled: false, // Disabled by default, enable when search query is provided
+          refetchOnWindowFocus: false,
+          staleTime: 60 * 1000, // 1 minute - search results can be cached longer
+        },
       },
     },
     logger,

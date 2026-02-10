@@ -8,7 +8,6 @@ import {
   closestCenter,
   DndContext,
   type DragEndEvent,
-  type DraggableAttributes,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -21,12 +20,13 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Button } from "next-vibe-ui/ui/button";
+import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Span } from "next-vibe-ui/ui/span";
-import { createContext, useContext, useState } from "react";
+import { useState } from "react";
 
 import {
   arrayFieldPath,
@@ -49,12 +49,6 @@ import { useTourState } from "../_components/welcome-tour/tour-state-context";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import type definition from "./definition";
 import type { FavoriteCard, FavoritesListResponseOutput } from "./definition";
-
-// Context for drag handle props
-const DragHandleContext = createContext<{
-  attributes: DraggableAttributes;
-  listeners: ReturnType<typeof useSortable>["listeners"];
-} | null>(null);
 
 /**
  * Props for custom widget
@@ -178,28 +172,36 @@ export function FavoritesListContainer({
     item: FavoriteCard;
     index: number;
   }): React.JSX.Element => {
-    const { attributes, listeners, setNodeRef, transform, transition } =
-      useSortable({ id: item.id });
-    const dragHandleProps = useContext(DragHandleContext);
-
-    const transformStyle = transform
-      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-      : undefined;
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: item.id });
 
     const isActive = Boolean(item.activeBadge);
 
     return (
-      <DragHandleContext.Provider value={{ attributes, listeners }}>
+      <Div
+        ref={setNodeRef}
+        key={item.id}
+        style={{
+          // Only allow vertical movement (Y axis), ignore horizontal (X axis)
+          transform: transform
+            ? `translate3d(0, ${transform.y}px, 0)`
+            : undefined,
+          transition,
+        }}
+      >
         <Div
-          ref={setNodeRef}
-          key={item.id}
           className={cn(
             "group relative flex items-start gap-4 p-4 rounded-lg border transition-colors",
             isActive
               ? "bg-primary/5 border-primary/20"
               : "hover:bg-accent cursor-pointer",
-            transformStyle && `[transform:${transformStyle}]`,
-            transition && `[transition:${transition}]`,
+            isDragging && "opacity-50 z-[999]",
           )}
           onClick={() => !isActive && void handleSelectFavorite(item)}
         >
@@ -310,15 +312,13 @@ export function FavoritesListContainer({
             )}
             onClick={(e) => e.stopPropagation()}
           >
-            {dragHandleProps && (
-              <Div
-                {...dragHandleProps.attributes}
-                {...dragHandleProps.listeners}
-                className="cursor-grab active:cursor-grabbing inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
-              >
-                <Icon icon={"grip"} className="h-4 w-4" />
-              </Div>
-            )}
+            <Div
+              {...attributes}
+              {...listeners}
+              className="cursor-grab active:cursor-grabbing inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              <Icon icon={"grip"} className="h-4 w-4" />
+            </Div>
             {!isActive && (
               <Button
                 type="button"
@@ -333,24 +333,10 @@ export function FavoritesListContainer({
                 <Zap className="h-4 w-4" />
               </Button>
             )}
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={async (e) => {
-                e.stopPropagation();
-                const favoriteDetailDefinitions =
-                  await import("./[id]/definition");
-                navigate(favoriteDetailDefinitions.default.PATCH, {
-                  urlPathParams: { id: item.id },
-                });
-              }}
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
+            <EditFavoriteButton item={item} navigate={navigate} />
           </Div>
         </Div>
-      </DragHandleContext.Provider>
+      </Div>
     );
   };
 
@@ -366,7 +352,7 @@ export function FavoritesListContainer({
       </Div>
 
       {/* Favorites List */}
-      <Div className="px-4 pb-4 overflow-y-auto max-h-[calc(100dvh-180px)]">
+      <Div className="px-4 pb-4 overflow-y-auto max-h-[min(800px,calc(100dvh-180px))]">
         {favoritesList.length > 0 ? (
           <DndContext
             sensors={sensors}
@@ -391,5 +377,59 @@ export function FavoritesListContainer({
         )}
       </Div>
     </Div>
+  );
+}
+
+/**
+ * Edit Favorite Button - navigates to edit favorite
+ * Isolated component for loading state
+ */
+function EditFavoriteButton({
+  navigate,
+  item,
+}: {
+  item: FavoriteCard;
+  navigate: ReturnType<typeof useWidgetNavigation>["push"];
+}): React.JSX.Element {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
+    e.stopPropagation();
+    setIsLoading(true);
+
+    try {
+      const favoriteDetailDefinitions = await import("./[id]/definition");
+      navigate(favoriteDetailDefinitions.default.PATCH, {
+        urlPathParams: { id: item.id },
+        data: {
+          characterId: item.characterId ?? undefined,
+          icon: item.icon,
+          name: item.name,
+          description: item.description,
+          tagline: item.tagline,
+        },
+        prefillFromGet: true,
+        getEndpoint: favoriteDetailDefinitions.default.GET,
+        popNavigationOnSuccess: 1,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={handleClick}
+      disabled={isLoading}
+    >
+      {isLoading ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <Pencil className="h-4 w-4" />
+      )}
+    </Button>
   );
 }

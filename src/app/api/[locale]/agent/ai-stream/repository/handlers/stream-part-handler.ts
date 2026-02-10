@@ -9,6 +9,7 @@ import type { ReadableStreamDefaultController } from "node:stream/web";
 import type { JSONValue, streamText, TextStreamPart, ToolSet } from "ai";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { ModelId } from "../../../models/models";
 import type { StreamContext } from "../core/stream-context";
@@ -36,6 +37,7 @@ export class StreamPartHandler {
     character: string;
     isIncognito: boolean;
     userId: string | undefined;
+    user: JwtPayloadType;
     toolsConfig: Map<string, { requiresConfirmation: boolean }>;
     streamAbortController: AbortController;
     emittedToolResultIds: Set<string> | undefined;
@@ -53,6 +55,7 @@ export class StreamPartHandler {
       character,
       isIncognito,
       userId,
+      user,
       toolsConfig,
       streamAbortController,
       emittedToolResultIds,
@@ -198,6 +201,7 @@ export class StreamPartHandler {
           sequenceId: ctx.sequenceId,
           isIncognito,
           userId,
+          user,
           toolsConfig,
           streamAbortController,
           controller,

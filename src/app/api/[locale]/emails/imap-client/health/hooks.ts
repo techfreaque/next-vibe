@@ -22,7 +22,11 @@ export function useImapHealth(
   return useEndpoint(
     definitions,
     {
-      persistForm: false,
+      create: {
+        formOptions: {
+          persistForm: false,
+        },
+      },
     },
     logger,
     user,

@@ -26,7 +26,7 @@ import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { definitionsRegistry } from "../../../unified-interface/shared/endpoints/definitions/registry";
-import { Methods } from "../../../unified-interface/shared/types/enums";
+import type { Methods } from "../../../unified-interface/shared/types/enums";
 import { Platform } from "../../../unified-interface/shared/types/platform";
 
 type GroupingMode = "category" | "tags" | "path";
@@ -117,11 +117,11 @@ function SelectedEndpointPage({
       user={user}
       forceMethod={currentMethod}
       endpointOptions={{
-        queryOptions: {
-          enabled:
-            currentMethod === Methods.GET || currentMethod === Methods.POST,
-          refetchOnWindowFocus: false,
-          staleTime: 5 * 60 * 1000, // 5 minutes
+        read: {
+          queryOptions: {
+            refetchOnWindowFocus: false,
+            staleTime: 5 * 60 * 1000, // 5 minutes
+          },
         },
       }}
     />

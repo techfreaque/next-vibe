@@ -22,13 +22,13 @@ export function useUsersListEndpoint(
   return useEndpoint(
     definitions,
     {
-      queryOptions: {
-        enabled: true,
-        refetchOnWindowFocus: false, // Disable to prevent conflicts
-        staleTime: 1 * 60 * 1000, // 1 minute
-      },
-      filterOptions: {
-        initialFilters: {
+      read: {
+        queryOptions: {
+          enabled: true,
+          refetchOnWindowFocus: false, // Disable to prevent conflicts
+          staleTime: 1 * 60 * 1000, // 1 minute
+        },
+        initialState: {
           searchFilters: {
             search: undefined,
             status: undefined,

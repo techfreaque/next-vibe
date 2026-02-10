@@ -14,7 +14,7 @@ import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { FileAttachments } from "../../../_components/message-display/file-attachments";
+import { FileAttachments } from "./file-attachments";
 import { MessageAuthorInfo } from "./message-author";
 import { TranscribingIndicator } from "./transcribing-indicator";
 import { UserMessageActions } from "./user-message-actions";

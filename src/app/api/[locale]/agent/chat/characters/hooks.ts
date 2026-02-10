@@ -24,9 +24,11 @@ export function useCharacters(
   return useEndpoint(
     definitions,
     {
-      queryOptions: {
-        refetchOnWindowFocus: false,
-        staleTime: 5 * 60 * 1000, // 5 minutes
+      read: {
+        queryOptions: {
+          refetchOnWindowFocus: false,
+          staleTime: 5 * 60 * 1000, // 5 minutes
+        },
       },
     },
     logger,

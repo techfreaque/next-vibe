@@ -38,6 +38,7 @@ import {
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
@@ -63,6 +64,7 @@ export function FilterPillsFieldWidget<
   const t = useWidgetTranslation();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
+  const isDisabled = useWidgetDisabled();
 
   if (!form || !fieldName) {
     return (
@@ -155,11 +157,17 @@ export function FilterPillsFieldWidget<
                         type="button"
                         variant={isSelected ? "default" : "outline"}
                         onClick={() => {
-                          if (!field.disabled && !field.readonly) {
+                          if (
+                            !isDisabled &&
+                            !field.disabled &&
+                            !field.readonly
+                          ) {
                             formField.onChange(option.value);
                           }
                         }}
-                        disabled={field.disabled || field.readonly}
+                        disabled={
+                          isDisabled || field.disabled || field.readonly
+                        }
                         size="sm"
                         className={cn(
                           "flex items-center gap-1.5 h-9 px-3 transition-all",

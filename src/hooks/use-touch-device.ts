@@ -1,24 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { create } from "zustand";
 
 import { platform } from "@/config/env-client";
 
 /**
- * Detects if the device supports touch input
- * This works on any screen size - tablets, 2-in-1 laptops, phones, etc.
- *
- * @returns true if the device supports touch input
+ * Touch Device Store
+ * Centralized touch device detection that runs once and shares state
  */
-export function useTouchDevice(): boolean {
-  const [isTouch, setIsTouch] = useState(false);
+interface TouchDeviceStore {
+  isTouch: boolean;
+  isInitialized: boolean;
+  initialize: () => void;
+}
 
-  useEffect(() => {
-    if (platform.isReactNative) {
-      setIsTouch(true);
+const useTouchDeviceStore = create<TouchDeviceStore>((set, get) => ({
+  isTouch: false,
+  isInitialized: false,
+
+  initialize: (): void => {
+    // Only initialize once
+    if (get().isInitialized) {
       return;
     }
-    // Check if touch is supported
+
+    // React Native is always touch
+    if (platform.isReactNative) {
+      set({ isTouch: true, isInitialized: true });
+      return;
+    }
+
+    // Browser environment - check touch support
+    if (typeof window === "undefined") {
+      return; // Skip during SSR
+    }
+
     const checkTouch = (): void => {
       // Multiple checks for better compatibility
       const hasTouch =
@@ -28,44 +45,40 @@ export function useTouchDevice(): boolean {
           (navigator as Navigator & { msMaxTouchPoints: number })
             .msMaxTouchPoints > 0);
 
-      setIsTouch(hasTouch);
+      set({ isTouch: hasTouch, isInitialized: true });
     };
 
     checkTouch();
 
     // Re-check on resize (for 2-in-1 devices that can switch modes)
-    window.addEventListener("resize", checkTouch);
-    return (): void => window.removeEventListener("resize", checkTouch);
-  }, []);
+    const handleResize = (): void => {
+      checkTouch();
+    };
 
-  return isTouch;
-}
+    window.addEventListener("resize", handleResize);
+
+    // Note: We don't clean up the event listener because this is a singleton store
+    // that persists for the lifetime of the app
+  },
+}));
 
 /**
- * CSS class helper for touch-aware opacity transitions
- * Use this to make elements visible on touch devices but hover-only on pointer devices
+ * Detects if the device supports touch input
+ * This works on any screen size - tablets, 2-in-1 laptops, phones, etc.
  *
- * @param alwaysVisibleOnTouch - If true, element is always visible on touch devices
- * @returns CSS classes for touch-aware visibility
+ * Uses a centralized store so the check only runs once, no matter how many
+ * components call this hook.
+ *
+ * @returns true if the device supports touch input
  */
-export function getTouchAwareClasses(alwaysVisibleOnTouch = true): string {
-  if (typeof window === "undefined") {
-    return ""; // SSR
-  }
+export function useTouchDevice(): boolean {
+  const isTouch = useTouchDeviceStore((state) => state.isTouch);
+  const initialize = useTouchDeviceStore((state) => state.initialize);
 
-  const isTouch =
-    "ontouchstart" in window ||
-    navigator.maxTouchPoints > 0 ||
-    ("msMaxTouchPoints" in navigator &&
-      (navigator as Navigator & { msMaxTouchPoints: number }).msMaxTouchPoints >
-        0);
+  // Initialize on first mount
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
 
-  if (isTouch && alwaysVisibleOnTouch) {
-    // On touch devices: always visible but slightly transparent for better UX
-    // eslint-disable-next-line i18next/no-literal-string -- CSS class names, not user-facing text
-    return "opacity-70 active:opacity-100";
-  }
-  // On pointer devices: hidden until hover
-  // eslint-disable-next-line i18next/no-literal-string -- CSS class names, not user-facing text
-  return "opacity-0 group-hover:opacity-100 focus-within:opacity-100";
+  return isTouch;
 }

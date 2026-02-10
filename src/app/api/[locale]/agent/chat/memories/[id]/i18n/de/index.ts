@@ -27,6 +27,15 @@ export const translations: typeof enTranslations = {
       description:
         "Höhere Priorität Erinnerungen erscheinen zuerst (leer lassen, um aktuellen Wert zu behalten)",
     },
+    backButton: {
+      label: "Zurück",
+    },
+    submitButton: {
+      label: "Erinnerung aktualisieren",
+    },
+    deleteButton: {
+      label: "Erinnerung löschen",
+    },
     response: {
       success: {
         content: "Erfolgreich aktualisiert",
@@ -84,11 +93,17 @@ export const translations: typeof enTranslations = {
     description: "Entfernt eine Erinnerung anhand der ID",
     container: {
       title: "Erinnerung löschen",
-      description: "Eine Erinnerung dauerhaft entfernen",
+      description: "Diese Erinnerung dauerhaft entfernen",
     },
     id: {
       label: "Erinnerungs-ID",
       description: "Die eindeutige Kennung der zu löschenden Erinnerung",
+    },
+    backButton: {
+      label: "Zurück",
+    },
+    deleteButton: {
+      label: "Löschen",
     },
     response: {
       success: {

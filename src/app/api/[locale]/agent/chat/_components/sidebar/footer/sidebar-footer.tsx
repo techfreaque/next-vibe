@@ -18,7 +18,6 @@ import { User } from "next-vibe-ui/ui/icons/User";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import { useEffect } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -26,8 +25,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { TOUR_DATA_ATTRS } from "../../../_components/welcome-tour/tour-config";
-import { useTourState } from "../../../_components/welcome-tour/tour-state-context";
-import { useBottomSheetExpanded } from "../../../hooks/use-bottom-sheet-expanded";
+import { useSidebarFooterStore } from "./store";
 import { UserMenu } from "./user-menu";
 
 interface SidebarFooterProps {
@@ -51,20 +49,14 @@ export function SidebarFooter({
   logger,
 }: SidebarFooterProps): JSX.Element {
   const { t } = simpleT(locale);
-  const [isExpanded, setIsExpanded] = useBottomSheetExpanded();
 
-  // Tour state - expand when tour needs the footer elements visible
-  const tourIsActive = useTourState((state) => state.isActive);
-  const tourBottomSheetExpanded = useTourState(
-    (state) => state.bottomSheetExpanded,
+  // Bottom sheet expanded state
+  const isExpanded = useSidebarFooterStore(
+    (state) => state.isBottomSheetExpanded,
   );
-
-  // Expand collapsible when tour requests it
-  useEffect(() => {
-    if (tourIsActive && tourBottomSheetExpanded && !isExpanded) {
-      setIsExpanded(true);
-    }
-  }, [tourIsActive, tourBottomSheetExpanded, isExpanded, setIsExpanded]);
+  const setIsExpanded = useSidebarFooterStore(
+    (state) => state.setBottomSheetExpanded,
+  );
 
   // Determine if user is logged in
   const isLoggedIn = user && !user.isPublic;

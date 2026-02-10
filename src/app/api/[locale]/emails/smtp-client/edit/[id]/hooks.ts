@@ -26,13 +26,21 @@ export function useSmtpAccountById(
   return useEndpoint(
     definitions,
     {
-      urlPathParams: { id: params.accountId },
-      enabled: params.enabled,
-      staleTime: 5 * 60 * 1000,
-      refetchOnWindowFocus: false,
-      persistForm: false,
-      // eslint-disable-next-line i18next/no-literal-string
-      persistenceKey: `smtp-account-${params.accountId}-form`,
+      read: {
+        urlPathParams: { id: params.accountId },
+        queryOptions: {
+          enabled: params.enabled,
+          staleTime: 5 * 60 * 1000,
+          refetchOnWindowFocus: false,
+        },
+      },
+      update: {
+        formOptions: {
+          persistForm: false,
+          // eslint-disable-next-line i18next/no-literal-string
+          persistenceKey: `smtp-account-${params.accountId}-form`,
+        },
+      },
     },
     logger,
     user,

@@ -27,10 +27,12 @@ export function useThreadsList(
   return useEndpoint(
     definitions,
     {
-      queryOptions: {
-        enabled: true,
-        refetchOnWindowFocus: true,
-        staleTime: 5 * 1000, // 5 seconds
+      read: {
+        queryOptions: {
+          enabled: true,
+          refetchOnWindowFocus: true,
+          staleTime: 5 * 1000, // 5 seconds
+        },
       },
     },
     logger,
@@ -51,8 +53,10 @@ export function useCreateThread(
   return useEndpoint(
     definitions,
     {
-      formOptions: {
-        persistForm: false,
+      create: {
+        formOptions: {
+          persistForm: false,
+        },
       },
     },
     logger,

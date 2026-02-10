@@ -12,8 +12,42 @@ export const translations = {
     editButton: {
       label: "Edit Character",
     },
+    customizeButton: {
+      label: "Customize Character",
+    },
     deleteButton: {
       label: "Delete Character",
+    },
+    addToFavoritesButton: {
+      label: "Add to Favorites",
+    },
+    inCollection: "In collection",
+    addAnother: "Add another",
+    addAnotherTooltip:
+      "Add another instance of this character to your collection",
+    addToCollection: "Add to your collection:",
+    quickAdd: "Quick Add",
+    tweakAndAdd: "Tweak & Add",
+    edit: "Edit",
+    copyAndCustomize: "Copy & Customize",
+    delete: "Delete",
+    actions: "Actions",
+    designSelector: {
+      label: "Design:",
+      current: "Current",
+      a: "A: App Store",
+      b: "B: Split Header",
+      c: "C: Card Hero",
+      d: "D: Two-Row",
+    },
+    yourCharacter: "Your character",
+    signupPrompt: {
+      title: "Customize this character",
+      description:
+        "Create a personalized version with your own settings and preferences. Sign up to get started.",
+      backButton: "Back",
+      signupButton: "Create Account",
+      loginButton: "Log In",
     },
     id: {
       label: "Character ID",

@@ -31,12 +31,12 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../../shared/types/common.schema";
 import {
-  DEFAULT_TTS_VOICE,
   TtsVoice,
   TtsVoiceDB,
   TtsVoiceOptions,
 } from "../../../text-to-speech/enum";
 import {
+  CharacterOwnershipType,
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
@@ -249,6 +249,41 @@ const { PATCH } = createEndpoint({
         const { getCreditCostFromModel } =
           await import("../../../models/models");
 
+        const characterSingleDefinitions = await import("./definition");
+
+        // Optimistically update the character GET endpoint cache
+        apiClient.updateEndpointData(
+          characterSingleDefinitions.default.GET,
+          data.logger,
+          (oldData) => {
+            if (!oldData?.success) {
+              return oldData;
+            }
+
+            // Update with new data from the request
+            return {
+              success: true,
+              data: {
+                ...oldData.data,
+                icon: data.requestData.icon ?? oldData.data.icon,
+                name: data.requestData.name ?? oldData.data.name,
+                tagline: data.requestData.tagline ?? oldData.data.tagline,
+                description:
+                  data.requestData.description ?? oldData.data.description,
+                category: data.requestData.category ?? oldData.data.category,
+                isPublic: data.requestData.isPublic ?? oldData.data.isPublic,
+                voice: data.requestData.voice ?? oldData.data.voice,
+                systemPrompt:
+                  data.requestData.systemPrompt ?? oldData.data.systemPrompt,
+                modelSelection:
+                  data.requestData.modelSelection ??
+                  oldData.data.modelSelection,
+              },
+            };
+          },
+          { id: data.pathParams.id },
+        );
+
         // Optimistically update the character in the list
         apiClient.updateEndpointData(
           charactersDefinition.default.GET,
@@ -438,32 +473,21 @@ const { PATCH } = createEndpoint({
         } as const,
       }),
       voice: requestField({
-        schema: z.enum(TtsVoiceDB).default(DEFAULT_TTS_VOICE),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.agent.chat.characters.post.voice.label" as const,
+        label: "app.api.agent.chat.favorites.id.patch.voice.label" as const,
         description:
-          "app.api.agent.chat.characters.post.voice.description" as const,
+          "app.api.agent.chat.favorites.id.patch.voice.description" as const,
         options: TtsVoiceOptions,
         columns: 6,
-        order: 6,
         theme: {
           descriptionStyle: "inline",
-        } as const,
+          optionalColor: "transparent",
+        },
+        schema: z.enum(TtsVoiceDB).nullable().optional(),
       }),
       systemPrompt: requestField({
-        schema: z
-          .string()
-          .min(10, {
-            message:
-              "app.api.agent.chat.characters.id.patch.systemPrompt.validation.minLength" as const,
-          })
-          .max(5000, {
-            message:
-              "app.api.agent.chat.characters.id.patch.systemPrompt.validation.maxLength" as const,
-          })
-          .optional()
-          .nullable(),
+        schema: z.string().nullable(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label:
@@ -642,8 +666,8 @@ const { GET } = createEndpoint({
         schema: z.enum(CharacterCategory),
       }),
       isPublic: responseField({
-        type: WidgetType.BADGE,
-        variant: "info",
+        type: WidgetType.TEXT,
+        hidden: true,
         schema: z.boolean(),
       }),
       voice: responseField({
@@ -653,12 +677,17 @@ const { GET } = createEndpoint({
       }),
       systemPrompt: responseField({
         type: WidgetType.MARKDOWN,
-        schema: z.string().min(1).max(5000).nullable(),
+        schema: z.string().nullable(),
       }),
       modelSelection: responseField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.OBJECT,
         schema: modelSelectionSchemaSimple,
+      }),
+      characterOwnership: responseField({
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(CharacterOwnershipType),
       }),
     },
   }),
@@ -735,6 +764,7 @@ const { GET } = createEndpoint({
         description: "The models unmodified behavior",
         category: CharacterCategory.ASSISTANT,
         isPublic: false,
+        characterOwnership: CharacterOwnershipType.SYSTEM,
         voice: "app.api.agent.textToSpeech.voices.FEMALE",
         systemPrompt: "",
         modelSelection: {
@@ -764,6 +794,7 @@ const { GET } = createEndpoint({
         description: "Expert at reviewing code",
         category: CharacterCategory.CODING,
         isPublic: true,
+        characterOwnership: CharacterOwnershipType.PUBLIC,
         voice: "app.api.agent.textToSpeech.voices.MALE",
         systemPrompt: "You are an expert code reviewer...",
         modelSelection: {

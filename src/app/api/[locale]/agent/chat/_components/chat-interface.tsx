@@ -20,7 +20,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { platform } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
 
-import { ChatArea } from "./chat-area/chat-area";
+import { ChatArea } from "../threads/[threadId]/_components/chat-area";
 import { SidebarWrapper } from "./sidebar/sidebar-wrapper";
 import { TopBar } from "./sidebar/top-area/top-bar";
 import { WelcomeTour } from "./welcome-tour/welcome-tour";

@@ -33,13 +33,17 @@ export function useBatchUpdateEndpoint(user: JwtPayloadType): EndpointReturn<{
   return useEndpoint(
     { PATCH: definitions.PATCH },
     {
-      queryOptions: {
-        enabled: false, // Only run when explicitly triggered
-        refetchOnWindowFocus: false,
-        staleTime: 0, // Don't cache mutations
+      read: {
+        queryOptions: {
+          enabled: false, // Only run when explicitly triggered
+          refetchOnWindowFocus: false,
+          staleTime: 0, // Don't cache mutations
+        },
       },
-      formOptions: {
-        persistForm: false,
+      update: {
+        formOptions: {
+          persistForm: false,
+        },
       },
     },
     logger,
@@ -63,13 +67,12 @@ export function useBatchDeleteEndpoint(user: JwtPayloadType): EndpointReturn<{
       DELETE: definitions.DELETE,
     },
     {
-      queryOptions: {
-        enabled: false, // Only run when explicitly triggered
-        refetchOnWindowFocus: false,
-        staleTime: 0, // Don't cache mutations
-      },
-      formOptions: {
-        persistForm: false,
+      read: {
+        queryOptions: {
+          enabled: false, // Only run when explicitly triggered
+          refetchOnWindowFocus: false,
+          staleTime: 0, // Don't cache mutations
+        },
       },
     },
     logger,

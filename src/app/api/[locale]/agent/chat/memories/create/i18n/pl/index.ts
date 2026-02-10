@@ -22,6 +22,12 @@ export const translations: typeof enTranslations = {
       description:
         "Wspomnienia o wyższym priorytecie pojawiają się pierwsze (0-100)",
     },
+    backButton: {
+      label: "Wstecz",
+    },
+    submitButton: {
+      label: "Utwórz wspomnienie",
+    },
     response: {
       id: { content: "ID wspomnienia" },
     },

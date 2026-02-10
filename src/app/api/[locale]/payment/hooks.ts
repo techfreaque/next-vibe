@@ -23,10 +23,12 @@ export function usePayment(
   return useEndpoint(
     definitions,
     {
-      queryOptions: {
-        enabled: true,
-        refetchOnWindowFocus: true,
-        staleTime: 60 * 1000, // 60 seconds
+      read: {
+        queryOptions: {
+          enabled: true,
+          refetchOnWindowFocus: true,
+          staleTime: 60 * 1000, // 60 seconds
+        },
       },
     },
     logger,

@@ -10,6 +10,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { authClientRepository } from "@/app/api/[locale]/user/auth/repository-client";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint-base";
@@ -120,6 +121,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   logger.debug("callApi", {
     endpoint: endpoint.path.join("/"),
     method: endpoint.method,
+    pathParams,
   });
   // Check if we should use client route based on user roles and endpoint allowedClientRoles
   if (endpoint.allowedClientRoles) {
@@ -181,7 +183,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     // For React Native and mobile platforms, check for stored token and add Authorization header
     // This allows React Native apps to authenticate using Bearer tokens stored in AsyncStorage
     // Web apps will continue to use httpOnly cookies automatically sent with credentials: "include"
-    if (endpoint.requiresAuthentication()) {
+    if (platform.isReactNative && endpoint.requiresAuthentication()) {
       const storedToken = await authClientRepository.getAuthToken(logger);
       if (storedToken.success && storedToken.data) {
         headers.Authorization = `Bearer ${storedToken.data}`;

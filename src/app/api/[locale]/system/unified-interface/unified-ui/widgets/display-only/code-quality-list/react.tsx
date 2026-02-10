@@ -56,7 +56,7 @@ export default function CodeQualityListWidget<
   const { usage } = field;
 
   // Get value from form for request fields, otherwise from field.value
-  let value: typeof field.value | undefined;
+  let value: CodeQualityListSchema | undefined;
   if (usage.request && fieldName && form) {
     value = form.watch(fieldName);
     if (!value) {

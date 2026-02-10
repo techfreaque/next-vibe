@@ -11,6 +11,17 @@ export const translations = {
     deleteButton: {
       label: "Delete Favorite",
     },
+    customizeCharacterButton: {
+      label: "Customize Character's Personality",
+    },
+    signupPrompt: {
+      title: "Customize the character's personality",
+      description:
+        "Edit the character's system prompt and behavior. Sign up to get started.",
+      backButton: "Back",
+      signupButton: "Create Account",
+      loginButton: "Log In",
+    },
     id: {
       label: "Favorite ID",
     },
@@ -143,6 +154,17 @@ export const translations = {
     deleteButton: {
       label: "Delete Favorite",
     },
+    customizeCharacterButton: {
+      label: "Customize Character's Personality",
+    },
+    signupPrompt: {
+      title: "Customize the character's personality",
+      description:
+        "Edit the character's system prompt and behavior. Sign up to get started.",
+      backButton: "Back",
+      signupButton: "Create Account",
+      loginButton: "Log In",
+    },
     submitButton: {
       label: "Save Changes",
       loadingText: "Saving...",
@@ -157,8 +179,8 @@ export const translations = {
       label: "Custom Name",
     },
     voice: {
-      label: "Voice",
-      description: "Text-to-speech voice preference",
+      label: "AI Voice",
+      description: "Choose the voice for your AI assistant",
     },
     mode: {
       label: "Selection Mode",

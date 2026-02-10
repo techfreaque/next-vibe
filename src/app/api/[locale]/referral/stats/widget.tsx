@@ -27,18 +27,18 @@ interface CustomWidgetProps {
 function StatCard({
   title,
   IconComponent,
-  iconColor,
-  iconBg,
+  iconColorClassName: iconColor,
+  iconBgClassName: iconBg,
   value,
-  valueColor,
+  valueColorClassName: valueColor,
   description,
 }: {
   title: string;
   IconComponent: React.ComponentType<{ className?: string }>;
-  iconColor: string;
-  iconBg: string;
+  iconColorClassName: string;
+  iconBgClassName: string;
   value: number;
-  valueColor: string;
+  valueColorClassName: string;
   description: string;
 }): React.JSX.Element {
   const valueClassName = `text-2xl font-bold tabular-nums tracking-tight ${valueColor}`;
@@ -82,40 +82,40 @@ export function ReferralStatsContainer({
       <StatCard
         title={stats.totalSignupsTitle}
         IconComponent={Users}
-        iconColor={"text-slate-700 dark:text-slate-300"}
-        iconBg={"bg-slate-100 dark:bg-slate-800"}
+        iconColorClassName={"text-slate-700 dark:text-slate-300"}
+        iconBgClassName={"bg-slate-100 dark:bg-slate-800"}
         value={stats.totalSignupsValue}
-        valueColor={"text-foreground"}
+        valueColorClassName={"text-foreground"}
         description={stats.totalSignupsDescription}
       />
 
       <StatCard
         title={stats.totalRevenueTitle}
         IconComponent={TrendingUp}
-        iconColor={"text-emerald-700 dark:text-emerald-300"}
-        iconBg={"bg-emerald-100 dark:bg-emerald-900/30"}
+        iconColorClassName={"text-emerald-700 dark:text-emerald-300"}
+        iconBgClassName={"bg-emerald-100 dark:bg-emerald-900/30"}
         value={stats.totalRevenueValue}
-        valueColor={"text-emerald-600 dark:text-emerald-400"}
+        valueColorClassName={"text-emerald-600 dark:text-emerald-400"}
         description={stats.totalRevenueDescription}
       />
 
       <StatCard
         title={stats.totalEarnedTitle}
         IconComponent={DollarSign}
-        iconColor={"text-blue-700 dark:text-blue-300"}
-        iconBg={"bg-blue-100 dark:bg-blue-900/30"}
+        iconColorClassName={"text-blue-700 dark:text-blue-300"}
+        iconBgClassName={"bg-blue-100 dark:bg-blue-900/30"}
         value={stats.totalEarnedValue}
-        valueColor={"text-blue-600 dark:text-blue-400"}
+        valueColorClassName={"text-blue-600 dark:text-blue-400"}
         description={stats.totalEarnedDescription}
       />
 
       <StatCard
         title={stats.availableCreditsTitle}
         IconComponent={Wallet}
-        iconColor={"text-violet-700 dark:text-violet-300"}
-        iconBg={"bg-violet-100 dark:bg-violet-900/30"}
+        iconColorClassName={"text-violet-700 dark:text-violet-300"}
+        iconBgClassName={"bg-violet-100 dark:bg-violet-900/30"}
         value={stats.availableCreditsValue}
-        valueColor={"text-violet-600 dark:text-violet-400"}
+        valueColorClassName={"text-violet-600 dark:text-violet-400"}
         description={stats.availableCreditsDescription}
       />
     </Div>

@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
@@ -29,6 +30,7 @@ import {
 
 import { dateSchema, iconSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../config";
+import { FoldersListContainer } from "./widget";
 
 /**
  * Get Folders List Endpoint (GET)
@@ -48,16 +50,10 @@ const { GET } = createEndpoint({
   tags: ["app.api.agent.chat.tags.folders" as const],
   icon: "folder" as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.agent.chat.folders.get.container.title" as const,
-      description:
-        "app.api.agent.chat.folders.get.container.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: FoldersListContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
       // === REQUEST FILTERS ===
       rootFolderId: requestField({
         type: WidgetType.FORM_FIELD,
@@ -321,7 +317,7 @@ const { GET } = createEndpoint({
         ),
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

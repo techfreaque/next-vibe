@@ -22,10 +22,12 @@ export function useImapAccountsList(
   return useEndpoint(
     definitions,
     {
-      queryOptions: {
-        enabled: true,
-        refetchOnWindowFocus: false,
-        staleTime: 1 * 60 * 1000,
+      read: {
+        queryOptions: {
+          enabled: true,
+          refetchOnWindowFocus: false,
+          staleTime: 1 * 60 * 1000,
+        },
       },
     },
     logger,

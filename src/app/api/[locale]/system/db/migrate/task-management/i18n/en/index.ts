@@ -128,7 +128,7 @@ export const translations = {
     migrationTaskStatusRetrieved:
       "Migration task '{taskName}' status retrieved successfully",
     failedToGetMigrationTaskStatus: "Failed to get migration task status",
-    foundMigrationTasks: "Found {count} migration tasks",
+    foundMigrationTasks: "Found {{count}} migration tasks",
     failedToListMigrationTasks: "Failed to list migration tasks",
   },
   tasks: {

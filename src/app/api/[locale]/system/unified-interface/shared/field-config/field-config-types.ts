@@ -289,6 +289,7 @@ export type DescriptionStyle =
 export interface RequiredFieldTheme {
   style: RequiredFieldStyle;
   showAllRequired: boolean; // If true, show required styling even when all fields are required
+  optionalColor: "none" | "transparent" | "amber" | "red" | "blue" | "green";
   requiredColor: "amber" | "red" | "blue" | "green"; // Color theme for required field highlighting
   completedColor: "green" | "blue" | "purple"; // Color theme for completed required fields
   descriptionStyle: DescriptionStyle; // How to display field descriptions (default: "tooltip")

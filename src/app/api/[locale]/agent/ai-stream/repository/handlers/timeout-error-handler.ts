@@ -72,6 +72,8 @@ export class TimeoutErrorHandler {
       parentId: lastParentId,
       depth: lastDepth,
       sequenceId: lastSequenceId,
+      model: null,
+      character: null,
     });
     controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
 

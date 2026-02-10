@@ -200,7 +200,7 @@ export const modelProviders: Record<string, ModelProvider> = {
   cognitiveComputations: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "Cognitive Computations",
-    icon: "ocean",
+    icon: "venice-ai-logo",
   },
   freedomGPT: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
@@ -313,7 +313,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     description: "app.chat.models.descriptions.veniceUncensored",
     parameterCount: 24,
     contextWindow: 32768,
-    icon: "ocean",
+    icon: "venice-ai-logo",
     openRouterModel:
       "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
     creditCost: 1,

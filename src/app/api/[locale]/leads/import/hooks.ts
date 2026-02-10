@@ -38,14 +38,18 @@ export function useLeadsImportEndpoint(
   const form = useEndpoint(
     definitions,
     {
-      queryOptions: {
-        enabled: params?.enabled !== false,
-        refetchOnWindowFocus: false,
-        staleTime: 0,
+      read: {
+        queryOptions: {
+          enabled: params?.enabled !== false,
+          refetchOnWindowFocus: false,
+          staleTime: 0,
+        },
       },
-      formOptions: {
-        persistForm: false,
-        persistenceKey: "leads-import-form",
+      create: {
+        formOptions: {
+          persistForm: false,
+          persistenceKey: "leads-import-form",
+        },
       },
     },
     logger,

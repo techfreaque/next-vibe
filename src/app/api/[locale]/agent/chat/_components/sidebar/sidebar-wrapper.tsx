@@ -4,8 +4,8 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
 import { ResizableContainer } from "next-vibe-ui/ui/resizable";
-import type { JSX } from "react";
-import React from "react";
+import type { JSX, ReactNode } from "react";
+import { useEffect, useState } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatSidebar } from "@/app/api/[locale]/agent/chat/threads/_components/sidebar";
@@ -21,7 +21,7 @@ const SIDEBAR_MAX_WIDTH_VW = 90; // Maximum 90vw
 interface SidebarWrapperProps {
   locale: CountryLanguage;
   logger: EndpointLogger;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 export function SidebarWrapper({
@@ -32,9 +32,9 @@ export function SidebarWrapper({
   const { sidebarCollapsed: collapsed, setSidebarCollapsed } = useChatContext();
   const { t } = simpleT(locale);
 
-  const [isMobile, setIsMobile] = React.useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (platform.isReactNative) {
       setIsMobile(true);
       return;

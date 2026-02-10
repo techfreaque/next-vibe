@@ -22,8 +22,12 @@ export class FinalizationHandler {
     currentAssistantContent: string;
     isInReasoningBlock: boolean;
     streamResult: {
-      finishReason: Awaited<ReturnType<typeof streamText>["finishReason"]>;
-      usage: Awaited<ReturnType<typeof streamText>["usage"]>;
+      finishReason:
+        | Awaited<ReturnType<typeof streamText>["finishReason"]>
+        | ReturnType<typeof streamText>["finishReason"];
+      usage:
+        | Awaited<ReturnType<typeof streamText>["usage"]>
+        | ReturnType<typeof streamText>["usage"];
     };
     isIncognito: boolean;
     controller: ReadableStreamDefaultController<Uint8Array>;
@@ -55,27 +59,22 @@ export class FinalizationHandler {
       controller.enqueue(encoder.encode(formatSSEEvent(thinkCloseDelta)));
     }
 
-    // Emit CONTENT_DONE event
-    const [finishReason, usage] = await Promise.all([
-      streamResult.finishReason,
-      streamResult.usage,
-    ]);
-
+    // Emit CONTENT_DONE event immediately without waiting for usage/finishReason
+    // These will be null during mid-stream finalization (between steps)
     const contentDoneEvent = createStreamEvent.contentDone({
       messageId: currentAssistantMessageId,
       content: currentAssistantContent,
-      totalTokens: usage.totalTokens ?? null,
-      finishReason: finishReason || null,
+      totalTokens: null, // Will be updated at stream completion
+      finishReason: null, // Will be known at stream completion
     });
     controller.enqueue(encoder.encode(formatSSEEvent(contentDoneEvent)));
 
-    // Update ASSISTANT message in database with final content
+    // Update ASSISTANT message in database with current content (no tokens yet)
     if (!isIncognito && currentAssistantContent) {
       await db
         .update(chatMessages)
         .set({
           content: currentAssistantContent.trim() || null,
-          tokens: usage.totalTokens,
           updatedAt: new Date(),
         })
         .where(eq(chatMessages.id, currentAssistantMessageId));
@@ -86,10 +85,32 @@ export class FinalizationHandler {
       });
     }
 
-    logger.info("Finalized ASSISTANT message", {
-      messageId: currentAssistantMessageId,
-      contentLength: currentAssistantContent.length,
-      tokens: usage.totalTokens,
-    });
+    // Try to get usage/finishReason for logging, but don't block if not available
+    void Promise.all([streamResult.finishReason, streamResult.usage])
+      .then(([finishReason, usage]) => {
+        logger.info("Finalized ASSISTANT message", {
+          messageId: currentAssistantMessageId,
+          contentLength: currentAssistantContent.length,
+          tokens: usage.totalTokens,
+          finishReason: finishReason || "unknown",
+        });
+
+        // Update with final token count if we have it
+        if (!isIncognito && usage.totalTokens) {
+          void db
+            .update(chatMessages)
+            .set({ tokens: usage.totalTokens })
+            .where(eq(chatMessages.id, currentAssistantMessageId));
+        }
+        return undefined;
+      })
+      .catch(() => {
+        // Promises may not resolve during mid-stream, that's OK
+        logger.info("Finalized ASSISTANT message (usage pending)", {
+          messageId: currentAssistantMessageId,
+          contentLength: currentAssistantContent.length,
+        });
+        return undefined;
+      });
   }
 }

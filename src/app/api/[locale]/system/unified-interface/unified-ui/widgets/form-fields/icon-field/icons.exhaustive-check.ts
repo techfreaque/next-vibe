@@ -282,6 +282,7 @@ const {
   SiTypescript,
   SiX,
   SiZendesk,
+  VeniceAILogo,
   ...exhaustiveCheck
 } = Icons;
 /* eslint-enable @typescript-eslint/no-unused-vars */

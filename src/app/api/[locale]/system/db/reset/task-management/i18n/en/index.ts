@@ -134,7 +134,7 @@ export const translations = {
     taskDoesNotExist: "Task '{taskName}' does not exist",
     taskStatusRetrieved: "Task '{taskName}' status retrieved",
     failedToGetTaskStatus: "Failed to get task status",
-    foundTasks: "Found {count} tasks",
+    foundTasks: "Found {{count}} tasks",
     failedToListTasks: "Failed to list tasks",
   },
   tasks: {

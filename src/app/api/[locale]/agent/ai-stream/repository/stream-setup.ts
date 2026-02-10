@@ -78,6 +78,8 @@ export interface StreamSetupResult {
     confidence: number | null;
     /** Audio duration in seconds */
     durationSeconds: number | null;
+    /** Credit cost for STT transcription */
+    creditCost?: number | null;
   } | null;
   /** User message metadata (including attachments) to include in MESSAGE_CREATED event */
   userMessageMetadata?: {

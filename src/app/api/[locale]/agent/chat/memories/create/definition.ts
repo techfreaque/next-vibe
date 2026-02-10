@@ -7,9 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   objectField,
   requestField,
   responseField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -40,6 +42,45 @@ const { POST } = createEndpoint({
   icon: "brain",
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.memories" as const],
+
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        // Import apiClient and memories list GET endpoint
+        const { apiClient } =
+          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+        const memoriesDefinition = await import("../definition");
+
+        // Create new memory object for optimistic update
+        const newMemory = {
+          memoryNumber: data.responseData.id,
+          content: data.requestData.content,
+          tags: data.requestData.tags ?? [],
+          priority: data.requestData.priority ?? 0,
+          createdAt: new Date(),
+        };
+
+        // Optimistically add the new memory to the list
+        apiClient.updateEndpointData(
+          memoriesDefinition.default.GET,
+          data.logger,
+          (oldData) => {
+            if (!oldData?.success) {
+              return oldData;
+            }
+
+            return {
+              success: true,
+              data: {
+                memories: [...oldData.data.memories, newMemory],
+              },
+            };
+          },
+          undefined,
+        );
+      },
+    },
+  },
 
   fields: objectField(
     {
@@ -81,11 +122,26 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().min(0).max(100).optional(),
       }),
 
+      // Back button
+      backButton: backButton({
+        label:
+          "app.api.agent.chat.memories.create.post.backButton.label" as const,
+        className: "ml-auto",
+        inline: true,
+        usage: { request: "data", response: true } as const,
+      }),
+
+      // Submit button
+      submitButton: submitButton({
+        label:
+          "app.api.agent.chat.memories.create.post.submitButton.label" as const,
+        inline: true,
+        usage: { request: "data" },
+      }),
+
       // === RESPONSE ===
       id: responseField({
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.memories.create.post.response.id.content" as const,
         schema: z.coerce.number().int(),
       }),
     },

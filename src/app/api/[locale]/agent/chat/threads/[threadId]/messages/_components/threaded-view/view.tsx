@@ -27,6 +27,7 @@ import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { useCharacter } from "../../../../../characters/[id]/hooks";
 import type { useCollapseState } from "../hooks/use-collapse-state";
 import { useMessageActions } from "../hooks/use-message-actions";
 import { MessageEditor } from "../message-editor";
@@ -75,7 +76,6 @@ export function ThreadedMessage({
     answerAsAI: onAnswerAsModel,
     voteMessage: onVoteMessage,
     ttsVoice,
-    characters,
   } = useChatContext();
 
   const { t } = simpleT(locale);
@@ -145,11 +145,12 @@ export function ThreadedMessage({
   // Get vote status
   const { userVote, voteScore } = getVoteStatus(message);
 
-  // Resolve character name from ID for assistant messages
-  const characterName =
-    message.role === "assistant" && message.character
-      ? (characters[message.character]?.name ?? null)
-      : null;
+  const characterHook = useCharacter(
+    message.character || undefined,
+    user,
+    logger,
+  );
+  const characterName = characterHook.read?.data?.name ?? null;
 
   // Minimal fixed indent - just THREAD_INDENT for any nested level (no increase with depth)
   const indent = depth > 0 ? LAYOUT.THREAD_INDENT * 2 : 0;

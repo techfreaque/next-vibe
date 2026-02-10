@@ -140,7 +140,7 @@ export const translations: typeof enTranslations = {
       "Status zadania migracji '{taskName}' pobrany pomyślnie",
     failedToGetMigrationTaskStatus:
       "Nie udało się pobrać statusu zadania migracji",
-    foundMigrationTasks: "Znaleziono {count} zadań migracji",
+    foundMigrationTasks: "Znaleziono {{count}} zadań migracji",
     failedToListMigrationTasks: "Nie udało się wylistować zadań migracji",
   },
   tasks: {

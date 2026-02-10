@@ -36,6 +36,7 @@ import {
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
@@ -66,6 +67,7 @@ export function RangeSliderFieldWidget<
   const t = useWidgetTranslation();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
+  const isDisabled = useWidgetDisabled();
   if (!form || !fieldName) {
     return (
       <Div>
@@ -204,7 +206,7 @@ export function RangeSliderFieldWidget<
                     max: field.options[newMaxIndex].value,
                   });
                 }}
-                disabled={field.disabled || field.readonly}
+                disabled={isDisabled || field.disabled || field.readonly}
                 minLabel={field.minLabel ? t(field.minLabel) : undefined}
                 maxLabel={field.maxLabel ? t(field.maxLabel) : undefined}
                 t={t}

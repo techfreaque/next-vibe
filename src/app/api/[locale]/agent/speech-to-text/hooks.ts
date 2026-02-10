@@ -68,8 +68,10 @@ export function useEdenAISpeech({
   const endpoint = useEndpoint(
     speechToTextDefinitions,
     {
-      queryOptions: {
-        enabled: false, // Manual control
+      read: {
+        queryOptions: {
+          enabled: false, // Manual control
+        },
       },
     },
     logger,

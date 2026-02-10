@@ -13,6 +13,17 @@ export const translations: typeof enTranslations = {
     deleteButton: {
       label: "Favoriten löschen",
     },
+    customizeCharacterButton: {
+      label: "Charakter-Persönlichkeit anpassen",
+    },
+    signupPrompt: {
+      title: "Charakter-Persönlichkeit anpassen",
+      description:
+        "Bearbeite den System-Prompt und das Verhalten des Charakters. Melde dich an, um zu beginnen.",
+      backButton: "Zurück",
+      signupButton: "Konto erstellen",
+      loginButton: "Anmelden",
+    },
     id: {
       label: "Favoriten-ID",
     },
@@ -149,6 +160,17 @@ export const translations: typeof enTranslations = {
     deleteButton: {
       label: "Favorit löschen",
     },
+    customizeCharacterButton: {
+      label: "Charakter-Persönlichkeit anpassen",
+    },
+    signupPrompt: {
+      title: "Charakter-Persönlichkeit anpassen",
+      description:
+        "Bearbeite den System-Prompt und das Verhalten des Charakters. Melde dich an, um zu beginnen.",
+      backButton: "Zurück",
+      signupButton: "Konto erstellen",
+      loginButton: "Anmelden",
+    },
     submitButton: {
       label: "Änderungen speichern",
       loadingText: "Speichern...",
@@ -163,8 +185,8 @@ export const translations: typeof enTranslations = {
       label: "Benutzerdefinierter Name",
     },
     voice: {
-      label: "Stimme",
-      description: "Text-to-Speech-Stimmpräferenz",
+      label: "KI-Stimme",
+      description: "Wählen Sie die Stimme für Ihren KI-Assistenten",
     },
     mode: {
       label: "Auswahlmodus",

@@ -1,6 +1,5 @@
 import { translations as creditsTranslations } from "../../../../credits/i18n/en";
 import { translations as aiStreamTranslations } from "../../../ai-stream/i18n/en";
-import { translations as braveSearchTranslations } from "../../../brave-search/i18n/en";
 import { translations as fetchUrlContentTranslations } from "../../../fetch-url-content/i18n/en";
 import { translations as charactersTranslations } from "../../characters/i18n/en";
 import { translations as favoritesTranslations } from "../../favorites/i18n/en";
@@ -309,7 +308,6 @@ export const translations = {
     messages: messagesTranslations,
   },
   tools: {
-    braveSearch: braveSearchTranslations,
     fetchUrl: fetchUrlContentTranslations,
   },
   models: {

@@ -22,7 +22,11 @@ export function useEmailMessagesStats(
   return useEndpoint(
     definitions,
     {
-      persistForm: false,
+      read: {
+        formOptions: {
+          persistForm: false,
+        },
+      },
     },
     logger,
     user,

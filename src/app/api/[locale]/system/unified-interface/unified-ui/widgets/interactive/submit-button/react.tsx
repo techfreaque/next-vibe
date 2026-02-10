@@ -18,6 +18,7 @@ import {
 import type { ReactStaticWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
@@ -40,9 +41,10 @@ export function SubmitButtonWidget<
   TEndpoint,
   TUsage,
   SubmitButtonWidgetConfig<TKey, TUsage, TSchemaType>
->): JSX.Element {
+>): JSX.Element | null {
   const locale = useWidgetLocale();
   const t = useWidgetTranslation();
+  const isDisabled = useWidgetDisabled();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
   const isSubmitting = useWidgetIsSubmitting();
@@ -76,13 +78,16 @@ export function SubmitButtonWidget<
         "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting",
       );
 
+  // Hide submit button when form is undefined (e.g., when data is already loaded)
+  if (!form || !onSubmit || isDisabled) {
+    return null;
+  }
+
   return (
     <Button
       type="button"
       onClick={(): void => {
-        if (form && onSubmit) {
-          form.handleSubmit(onSubmit)();
-        }
+        form.handleSubmit(onSubmit)();
       }}
       disabled={isSubmitting}
       variant={variant === "primary" ? "default" : variant}

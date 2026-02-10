@@ -213,12 +213,10 @@ export function useEndpointManaged<
 ): EndpointReturn<T> {
   // Extract urlPathParams from options (try different locations)
   const urlPathParams =
-    options?.urlPathParams ??
     options?.read?.urlPathParams ??
     options?.create?.urlPathParams ??
     options?.update?.urlPathParams ??
-    options?.delete?.urlPathParams ??
-    options?.queryOptions?.urlPathParams;
+    options?.delete?.urlPathParams;
 
   // Generate unique instance key
   const instanceKey = useMemo(

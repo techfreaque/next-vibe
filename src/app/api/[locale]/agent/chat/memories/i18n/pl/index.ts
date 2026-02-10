@@ -9,13 +9,28 @@ export const translations: typeof enTranslations = {
     memories: "Wspomnienia",
   },
   category: "Czat",
+  searchPlaceholder: "Szukaj wspomnień według treści lub tagów...",
+  showing: "Pokazuje {{count}} z {{total}} wspomnień",
+  stats: {
+    total: "Łącznie",
+    highPriority: "Wysoki priorytet",
+    avgPriority: "Śr. priorytet",
+    size: "Rozmiar",
+  },
   get: {
     title: "Lista wspomnień",
     description: "Pobiera wszystkie wspomnienia dla bieżącego użytkownika",
     container: {
-      title: "Lista wspomnień",
-      description: "Wyświetl wszystkie zapisane wspomnienia",
+      title: "Wspomnienia",
     },
+    createButton: {
+      label: "Utwórz wspomnienie",
+    },
+    stats: {
+      title: "Przegląd",
+    },
+    emptyState: "Brak wspomnień. Utwórz swoje pierwsze wspomnienie.",
+    emptySearch: "Nie znaleziono wspomnień pasujących do wyszukiwania.",
     columns: {
       memoryNumber: "#",
       content: "Treść",

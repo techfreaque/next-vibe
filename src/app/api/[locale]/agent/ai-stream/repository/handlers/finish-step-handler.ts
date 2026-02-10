@@ -39,16 +39,14 @@ export class FinishStepHandler {
 
     // Finalize current ASSISTANT message before resetting for next step
     if (ctx.currentAssistantMessageId && ctx.currentAssistantContent) {
-      const usage = await streamResult.usage;
-      const finishReason = await streamResult.finishReason;
-
+      // Pass promises directly - don't await them here as they may not resolve until later
       await FinalizationHandler.finalizeAssistantMessage({
         currentAssistantMessageId: ctx.currentAssistantMessageId,
         currentAssistantContent: ctx.currentAssistantContent,
         isInReasoningBlock: ctx.isInReasoningBlock,
         streamResult: {
-          finishReason,
-          usage,
+          finishReason: streamResult.finishReason,
+          usage: streamResult.usage,
         },
         isIncognito,
         controller,

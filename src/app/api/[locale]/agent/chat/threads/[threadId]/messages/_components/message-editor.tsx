@@ -19,19 +19,23 @@ import {
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
+import { useState } from "react";
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { CallModeIndicator } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/call-mode-indicator";
 import { FileUploadButton } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/file-upload-button";
 import { useVoiceRecording } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/hooks/use-voice-recording";
-import { RecordingModal } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/recording-modal";
+import { SearchToggle } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/search-toggle";
 import { Selector } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/selector";
+import { ToolsButton } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/tools-button";
+import { getModelById } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { RecordingInputArea } from "../../../_components/chat-input/recording-input-area";
 import { useMessageEditor } from "./hooks/use-message-editor";
 
 interface MessageEditorProps {
@@ -65,6 +69,13 @@ export function MessageEditor({
   } = useChatContext();
   const { t } = simpleT(locale);
 
+  // Local state for selector popover to avoid conflict with chat input selector
+  const [selectorOpen, setSelectorOpen] = useState(false);
+
+  // Check if current model supports tools
+  const currentModel = getModelById(selectedModel);
+  const modelSupportsTools = currentModel?.supportsTools ?? false;
+
   // Message editor logic
   const editor = useMessageEditor({
     message,
@@ -97,24 +108,24 @@ export function MessageEditor({
   const showTextarea = !voice.isRecording && !voice.isProcessing;
 
   return (
-    <Div ref={editor.editorRef} className="w-full relative z-10">
+    <Div ref={editor.editorRef} className="w-full relative z-10 bg-background">
       <Form
         onSubmit={editor.handleBranch}
         className={cn(
           "@container",
-          "p-4 backdrop-blur",
+          "p-2 @sm:p-3 @md:p-4",
           "border border-border rounded-lg shadow-lg",
           "w-full",
           ttsAutoplay
             ? "bg-green-100/70 dark:bg-green-950/70 border-green-300 dark:border-green-800"
-            : "bg-card",
+            : "",
         )}
       >
         {/* Call mode indicator */}
         <CallModeIndicator show={ttsAutoplay} locale={locale} />
 
         {/* Recording modal */}
-        <RecordingModal
+        <RecordingInputArea
           isRecording={voice.isRecording}
           isPaused={voice.isPaused}
           isProcessing={voice.isProcessing}
@@ -129,7 +140,7 @@ export function MessageEditor({
 
         {/* Textarea */}
         {showTextarea && (
-          <Div className="relative mb-3">
+          <Div className="relative mb-2 @sm:mb-3">
             <Textarea
               ref={editor.textareaRef}
               value={editor.content}
@@ -137,14 +148,14 @@ export function MessageEditor({
               onKeyDown={editor.handleKeyDown}
               placeholder=""
               disabled={editor.isLoading}
-              className="px-0 text-base"
+              className="px-0 text-base pl-3"
               variant="ghost"
               rows={3}
             />
 
             {/* Hint text */}
             {!editor.content && (
-              <Div className="absolute top-2 left-0 pointer-events-none text-sm text-muted-foreground hidden sm:block">
+              <Div className="absolute pl-3 top-2 left-0 pointer-events-none text-sm text-muted-foreground hidden @sm:block">
                 {t("app.chat.input.keyboardShortcuts.press")}{" "}
                 <Kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
                   {t("app.chat.input.keyboardShortcuts.enter")}
@@ -160,21 +171,43 @@ export function MessageEditor({
         )}
 
         {/* Controls */}
-        <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 flex-nowrap">
-          {/* Left: Selector */}
-          <Div className="flex flex-row items-center gap-0.5 sm:gap-1 md:gap-1.5 flex-1 min-w-0">
+        <Div className="flex flex-row items-center gap-1 @sm:gap-1.5 @md:gap-2 flex-nowrap">
+          {/* Left: Selector + Tools + File Upload */}
+          <Div className="flex flex-row items-center gap-0.5 @sm:gap-1 @md:gap-1.5 flex-1 min-w-0">
             <Selector
               characterId={selectedCharacter}
               modelId={selectedModel}
               locale={locale}
               logger={logger}
-              buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
+              buttonClassName="px-1.5 @sm:px-2 @md:px-3 min-h-8 h-8 @sm:min-h-9 @sm:h-9"
               user={user}
+              open={selectorOpen}
+              onOpenChange={setSelectorOpen}
+            />
+
+            {modelSupportsTools && (
+              <>
+                <SearchToggle disabled={editor.isLoading} locale={locale} />
+                <ToolsButton disabled={editor.isLoading} locale={locale} />
+              </>
+            )}
+
+            <FileUploadButton
+              locale={locale}
+              attachments={editor.attachments}
+              onFilesSelected={editor.setAttachments}
+              onRemoveFile={(index) =>
+                editor.setAttachments((prev) =>
+                  // oxlint-disable-next-line no-unused-vars
+                  prev.filter((_file, i) => i !== index),
+                )
+              }
+              disabled={editor.isLoading}
             />
           </Div>
 
-          {/* Right: Call Mode + File + Mic + Branch/Cancel */}
-          <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 shrink-0">
+          {/* Right: Call Mode + Mic + Branch/Cancel */}
+          <Div className="flex flex-row items-center gap-0.5 shrink-0">
             {/* Call mode toggle */}
             <TooltipProvider>
               <Tooltip>
@@ -185,7 +218,7 @@ export function MessageEditor({
                     variant={ttsAutoplay ? "default" : "ghost"}
                     onClick={() => setTTSAutoplay(!ttsAutoplay)}
                     className={cn(
-                      "h-8 w-8 sm:h-9 sm:w-9",
+                      "h-8 w-8 @sm:h-9 @sm:w-9",
                       ttsAutoplay &&
                         "bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500",
                     )}
@@ -201,20 +234,6 @@ export function MessageEditor({
               </Tooltip>
             </TooltipProvider>
 
-            {/* File upload button */}
-            <FileUploadButton
-              locale={locale}
-              attachments={editor.attachments}
-              onFilesSelected={editor.setAttachments}
-              onRemoveFile={(index) =>
-                editor.setAttachments((prev) =>
-                  // oxlint-disable-next-line no-unused-vars
-                  prev.filter((_file, i) => i !== index),
-                )
-              }
-              disabled={editor.isLoading}
-            />
-
             {/* Mic button */}
             {showMicButton && (
               <TooltipProvider>
@@ -225,7 +244,7 @@ export function MessageEditor({
                       size="icon"
                       variant="ghost"
                       onClick={() => void voice.startRecording()}
-                      className="h-8 w-8 sm:h-9 sm:w-9"
+                      className="h-8 w-8 @sm:h-9 @sm:w-9"
                     >
                       <Mic className="h-4 w-4" />
                     </Button>
@@ -243,10 +262,10 @@ export function MessageEditor({
               disabled={!editor.content.trim() || editor.isLoading}
               size="icon"
               variant="default"
-              className="h-8 w-8 sm:h-9 sm:w-9 shrink-0"
+              className="h-8 w-8 @sm:h-9 @sm:w-9 shrink-0"
               title={t("app.chat.messageEditor.titles.branch")}
             >
-              <GitBranch className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <GitBranch className="h-3.5 w-3.5 @sm:h-4 @sm:w-4" />
             </Button>
 
             {/* Cancel button */}
@@ -256,10 +275,10 @@ export function MessageEditor({
               disabled={editor.isLoading}
               size="icon"
               variant="destructive"
-              className="h-8 w-8 sm:h-9 sm:w-9 shrink-0"
+              className="h-8 w-8 @sm:h-9 @sm:w-9 shrink-0"
               title={t("app.chat.messageEditor.titles.cancel")}
             >
-              <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <X className="h-3.5 w-3.5 @sm:h-4 @sm:w-4" />
             </Button>
           </Div>
         </Div>

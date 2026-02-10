@@ -223,6 +223,7 @@ export { UserPlus } from "./UserPlus";
 export { Users } from "./Users";
 export { UserX } from "./UserX";
 export { Utensils } from "./Utensils";
+export { VeniceAILogo } from "./VeniceAiLogo";
 export { Video } from "./Video";
 export { Volume2 } from "./Volume2";
 export { VolumeX } from "./VolumeX";

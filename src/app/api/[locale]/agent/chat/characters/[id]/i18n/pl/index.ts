@@ -14,8 +14,41 @@ export const translations: typeof enTranslations = {
     editButton: {
       label: "Edytuj postać",
     },
+    customizeButton: {
+      label: "Dostosuj postać",
+    },
     deleteButton: {
       label: "Usuń postać",
+    },
+    addToFavoritesButton: {
+      label: "Dodaj do ulubionych",
+    },
+    inCollection: "W kolekcji",
+    addAnother: "Dodaj kolejną",
+    addAnotherTooltip: "Dodaj kolejną instancję tej postaci do swojej kolekcji",
+    addToCollection: "Dodaj do swojej kolekcji:",
+    quickAdd: "Szybko dodaj",
+    tweakAndAdd: "Dostosuj i dodaj",
+    edit: "Edytuj",
+    copyAndCustomize: "Kopiuj i dostosuj",
+    delete: "Usuń",
+    actions: "Akcje",
+    designSelector: {
+      label: "Design:",
+      current: "Obecny",
+      a: "A: App Store",
+      b: "B: Split Header",
+      c: "C: Card Hero",
+      d: "D: Two-Row",
+    },
+    yourCharacter: "Twoja postać",
+    signupPrompt: {
+      title: "Dostosuj tę postać",
+      description:
+        "Stwórz spersonalizowaną wersję z własnymi ustawieniami i preferencjami. Zarejestruj się, aby rozpocząć.",
+      backButton: "Wstecz",
+      signupButton: "Utwórz konto",
+      loginButton: "Zaloguj się",
     },
     id: {
       label: "ID postaciy",

@@ -159,6 +159,12 @@ export interface ApiStore {
     ) => ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined,
     urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
   ) => void;
+
+  getEndpointData: <TEndpoint extends CreateApiEndpointAny>(
+    endpoint: TEndpoint,
+    logger: EndpointLogger,
+    urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
+  ) => ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined;
 }
 
 export interface QueryStoreType<TResponse> {
@@ -299,6 +305,20 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         return updater(oldData);
       },
     );
+  },
+
+  getEndpointData: <TEndpoint extends CreateApiEndpointAny>(
+    endpoint: TEndpoint,
+    logger: EndpointLogger,
+    urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
+  ): ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined => {
+    // buildKey returns string, wrap in array for React Query
+    const builtKey = buildKey("query", endpoint, urlPathParams, logger);
+    const stateKey = [builtKey];
+
+    return queryClient.getQueryData<
+      ResponseType<TEndpoint["types"]["ResponseOutput"]>
+    >(stateKey);
   },
 }));
 
@@ -553,5 +573,15 @@ export const apiClient = {
     useApiStore
       .getState()
       .updateEndpointData(endpoint, logger, updater, urlPathParams);
+  },
+
+  getEndpointData: <TEndpoint extends CreateApiEndpointAny>(
+    endpoint: TEndpoint,
+    logger: EndpointLogger,
+    urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
+  ): ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined => {
+    return useApiStore
+      .getState()
+      .getEndpointData(endpoint, logger, urlPathParams);
   },
 };

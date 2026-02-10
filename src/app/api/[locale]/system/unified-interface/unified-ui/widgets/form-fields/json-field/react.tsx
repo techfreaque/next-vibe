@@ -34,6 +34,7 @@ import {
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
@@ -60,6 +61,7 @@ export function JsonFieldWidget<
   const t = useWidgetTranslation();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
+  const isDisabled = useWidgetDisabled();
   if (!form || !fieldName) {
     return (
       <Div>
@@ -162,7 +164,7 @@ export function JsonFieldWidget<
                   placeholder={
                     field.placeholder ? t(field.placeholder) : undefined
                   }
-                  disabled={field.disabled || field.readonly}
+                  disabled={isDisabled || field.disabled || field.readonly}
                   rows={field.rows ?? 6}
                   className={cn(styleClassName.inputClassName, "font-mono")}
                   name={formField.name}

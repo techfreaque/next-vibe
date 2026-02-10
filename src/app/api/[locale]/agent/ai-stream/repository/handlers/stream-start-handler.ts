@@ -9,6 +9,7 @@ import type { ReadableStreamDefaultController } from "node:stream/web";
 import type { ModelMessage } from "ai";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { DefaultFolderId } from "../../../chat/config";
@@ -89,7 +90,7 @@ export class StreamStartHandler {
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
     locale: CountryLanguage;
-    userId: string | undefined;
+    user: JwtPayloadType;
     logger: EndpointLogger;
   }): {
     ctx: StreamContext;
@@ -116,7 +117,7 @@ export class StreamStartHandler {
       controller,
       encoder,
       locale,
-      userId,
+      user,
       logger,
     } = params;
 
@@ -138,7 +139,7 @@ export class StreamStartHandler {
         logger,
         locale,
         voice: voiceMode.voice,
-        userId,
+        user,
         enabled: true,
       });
       logger.info("[AI Stream] Voice mode enabled - streaming TTS active", {

@@ -93,7 +93,7 @@ export const translations = {
               invalidDataFormat: "Invalid data format",
               info: "Info",
               items: "items",
-              andMoreItems: "and {count} more items",
+              andMoreItems: "and {{count}} more items",
               affectedFiles: "Affected Files",
               summary: "Summary",
               files: "Files",

@@ -55,7 +55,7 @@ import { simpleT } from "@/i18n/core/shared";
 import type { DivMouseEvent } from "@/packages/next-vibe-ui/web/ui/div";
 import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
-import { ThreadPermissionsDialog } from "./thread-permissions-dialog";
+import { ThreadPermissionsDialog } from "../../[threadId]/permissions/components/thread-permissions-dialog";
 import { ThreadShareDialog } from "./thread-share-dialog";
 
 export interface ThreadItemProps {

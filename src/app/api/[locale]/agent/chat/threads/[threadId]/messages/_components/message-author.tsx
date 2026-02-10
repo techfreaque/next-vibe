@@ -14,6 +14,7 @@ import {
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 interface MessageAuthorProps {
   authorName: string | null;
@@ -27,8 +28,8 @@ interface MessageAuthorProps {
   className?: string;
   /** Character used for this message */
   character?: string | null;
-  /** Character name from API data */
-  characterName?: string | null;
+  /** Character name from API data (translation key) */
+  characterName?: TranslationKey | null;
   locale: CountryLanguage;
   rootFolderId: DefaultFolderId;
 }
@@ -97,7 +98,7 @@ export function MessageAuthorInfo({
         {characterName && (
           <Span className="text-xs text-muted-foreground truncate">
             {/* eslint-disable-next-line i18next/no-literal-string -- Formatting characters */}
-            {`(${characterName})`}
+            {`(${t(characterName)})`}
           </Span>
         )}
 

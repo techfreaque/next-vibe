@@ -8,10 +8,13 @@ import { Div } from "next-vibe-ui/ui/div";
 
 import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/config";
 import { ModelSelector } from "@/app/api/[locale]/agent/models/components/model-selector";
+import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/components/types";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
   useWidgetForm,
+  useWidgetLogger,
   useWidgetTranslation,
+  useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react";
 import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/react";
@@ -21,6 +24,7 @@ import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
+import { useCharacter } from "../../characters/[id]/hooks";
 import type definition from "./definition";
 import type { FavoriteCreateResponseOutput } from "./definition";
 
@@ -41,11 +45,18 @@ export function FavoriteCreateContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const characterId = field.value?.id;
-  const showCharacterInfo = characterId !== NO_CHARACTER_ID;
   const form = useWidgetForm();
   const t = useWidgetTranslation();
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const characterId = form?.watch("characterId");
+  const isNoCharacter = characterId === NO_CHARACTER_ID;
 
+  const favoriteModelSelection: ModelSelectionSimple | undefined =
+    form?.watch("modelSelection");
+
+  const characterEndpoint = useCharacter(characterId ?? "", user, logger);
+  const characterData = characterEndpoint.read?.data;
   return (
     <Div className="flex flex-col gap-0">
       {/* Top Actions: Back + Submit */}
@@ -69,7 +80,7 @@ export function FavoriteCreateContainer({
       </Div>
 
       {/* Scrollable Form Container */}
-      <Div className="group overflow-y-auto max-h-[calc(100dvh-180px)] px-4 pb-4">
+      <Div className="group overflow-y-auto max-h-[min(800px,calc(100dvh-180px))] px-4 pb-4">
         <FormAlertWidget field={{}} />
 
         <AlertWidget
@@ -78,24 +89,24 @@ export function FavoriteCreateContainer({
         />
 
         <Div className="flex flex-col gap-4">
-          {/* Character Info (hidden for default character) */}
-          {showCharacterInfo && (
-            <Div className="flex items-start gap-4">
-              <IconFieldWidget
-                fieldName="characterIcon"
-                field={children.icon}
-              />
-              <Div className="flex flex-col gap-2">
-                <Div className="flex gap-2 items-center">
-                  <TextWidget fieldName="characterName" field={children.name} />
+          {/* Character Info Card (hidden for default character) */}
+          {!isNoCharacter && (
+            <Div className="flex items-start gap-4 p-4 rounded-lg border">
+              <IconFieldWidget fieldName="icon" field={children.icon} />
+              <Div className="flex-1 flex flex-col gap-2">
+                <Div className="flex flex-col gap-1">
                   <TextWidget
-                    fieldName="characterTagline"
-                    field={children.tagline}
+                    fieldName="name"
+                    field={withValue(children.name, undefined, null)}
+                  />
+                  <TextWidget
+                    fieldName="tagline"
+                    field={withValue(children.tagline, undefined, null)}
                   />
                 </Div>
                 <TextWidget
-                  fieldName="characterDescription"
-                  field={children.description}
+                  fieldName="description"
+                  field={withValue(children.description, undefined, null)}
                 />
               </Div>
             </Div>
@@ -104,16 +115,12 @@ export function FavoriteCreateContainer({
           <SelectFieldWidget fieldName="voice" field={children.voice} />
           {form && (
             <ModelSelector
-              modelSelection={form.watch("modelSelection")?.currentSelection}
+              modelSelection={favoriteModelSelection}
               onChange={(selection) =>
-                form.setValue("modelSelection", {
-                  currentSelection: selection,
-                  characterModelSelection:
-                    form.watch("modelSelection")?.characterModelSelection,
-                })
+                form.setValue("modelSelection", selection)
               }
               characterModelSelection={
-                form.watch("modelSelection")?.characterModelSelection
+                isNoCharacter ? undefined : characterData?.modelSelection
               }
               t={t}
             />

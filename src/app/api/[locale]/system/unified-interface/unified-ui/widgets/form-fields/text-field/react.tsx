@@ -36,6 +36,7 @@ import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-bas
 import { FieldDataType } from "../../../../shared/types/enums";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
@@ -86,17 +87,19 @@ export function TextFieldWidget<
   const t = useWidgetTranslation();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
+  const isDisabled = useWidgetDisabled();
+
+  const { t: globalT } = simpleT(locale);
+
   if (!form || !fieldName) {
     return (
       <Div>
-        {t(
+        {globalT(
           "app.api.system.unifiedInterface.react.widgets.formField.requiresContext",
         )}
       </Div>
     );
   }
-
-  const { t: globalT } = simpleT(locale);
 
   // Get theme from config or use default
   const theme = getTheme(field.theme);
@@ -196,7 +199,7 @@ export function TextFieldWidget<
                   placeholder={
                     field.placeholder ? t(field.placeholder) : undefined
                   }
-                  disabled={field.disabled || field.readonly}
+                  disabled={isDisabled || field.disabled || field.readonly}
                   className={cn(styleClassName.inputClassName, "h-10")}
                 />
               )}

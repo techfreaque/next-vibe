@@ -2,6 +2,7 @@
 
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
+import { memo } from "react";
 import type { FieldValues } from "react-hook-form";
 
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
@@ -81,7 +82,7 @@ interface ToolDisplayProps {
  * @param props - Component props
  * @returns Rendered tool call or null if no tool call
  */
-export function ToolDisplay({
+export const ToolDisplay = memo(function ToolDisplay({
   toolCall,
   locale,
   user,
@@ -121,4 +122,4 @@ export function ToolDisplay({
       />
     </Div>
   );
-}
+});

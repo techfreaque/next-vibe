@@ -81,6 +81,11 @@ const { POST } = createEndpoint({
         content: "app.api.agent.textToSpeech.post.response.audioUrl",
         schema: z.string(),
       }),
+      creditCost: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.agent.textToSpeech.post.response.creditCost",
+        schema: z.number().optional(),
+      }),
     },
   ),
 

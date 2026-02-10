@@ -31,7 +31,6 @@ import { ModelId, TOTAL_MODEL_COUNT } from "../../models/models";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import createFavoriteDefinitions from "../favorites/create/definition";
 import { NO_CHARACTER_ID } from "./config";
-import createCharacterDefinitions from "./create/definition";
 import {
   CharacterCategoryDB,
   ModelSelectionType,
@@ -101,15 +100,6 @@ const { GET } = createEndpoint({
       backButton: backButton({
         usage: { response: true },
       }),
-      createButton: navigateButtonField({
-        targetEndpoint: createCharacterDefinitions.POST,
-        extractParams: () => ({}),
-        prefillFromGet: false,
-        label: "app.api.agent.chat.characters.get.createButton.label" as const,
-        icon: "plus",
-        className: "ml-auto",
-        usage: { response: true },
-      }),
 
       // Flattened fields (no container wrapper)
       title: widgetField({
@@ -166,10 +156,10 @@ const { GET } = createEndpoint({
           return {
             data: {
               characterId: NO_CHARACTER_ID,
-              icon: "sparkles" as const,
-              name: "",
-              tagline: "",
-              description: "",
+              icon: undefined,
+              name: undefined,
+              tagline: undefined,
+              description: undefined,
               voice: DEFAULT_TTS_VOICE,
               modelSelection: {
                 selectionType: ModelSelectionType.FILTERS,
@@ -179,6 +169,7 @@ const { GET } = createEndpoint({
             },
           };
         },
+        popNavigationOnSuccess: 1,
         label:
           "app.api.agent.chat.characters.get.browser.selectButton.label" as const,
         icon: "flame",

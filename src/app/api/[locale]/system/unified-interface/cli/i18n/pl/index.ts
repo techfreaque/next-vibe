@@ -96,7 +96,7 @@ export const translations: typeof enTranslations = {
               invalidDataFormat: "Nieprawidłowy format danych",
               info: "Info",
               items: "elementy",
-              andMoreItems: "i {count} więcej elementów",
+              andMoreItems: "i {{count}} więcej elementów",
               affectedFiles: "Pliki, których dotyczy problem",
               summary: "Podsumowanie",
               files: "Pliki",

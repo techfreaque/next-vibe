@@ -29,8 +29,7 @@ import { type CreditsGetResponseOutput } from "../../../credits/definition";
 import { useCredits } from "../../../credits/hooks";
 import { useAIStreamStore } from "../../ai-stream/hooks/store";
 import { useAIStream } from "../../ai-stream/hooks/use-ai-stream";
-import type { CharacterListItem } from "../characters/definition";
-import { useCharacters } from "../characters/hooks";
+import { useStreamSync } from "../../ai-stream/hooks/use-stream-sync";
 import type { DefaultFolderId } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import { NEW_MESSAGE_ID, type ViewModeValue } from "../enum";
@@ -60,9 +59,7 @@ import { useMessageActions as useMessageEditorActions } from "./use-message-edit
 import { useMessageLoader } from "./use-message-loader";
 import { useNavigation } from "./use-navigation";
 import { useSidebarCollapsed } from "./use-sidebar-collapsed";
-import { useStreamSync } from "./use-stream-sync";
 import { useThreadNavigation } from "./use-thread-navigation";
-import { useUIState } from "./use-ui-state";
 /**
  * Return type for useChat hook
  */
@@ -72,7 +69,6 @@ export interface UseChatReturn {
   messages: Record<string, ChatMessage>;
   folders: Record<string, ChatFolder>;
   rootFolderPermissions: RootFolderPermissions; // Server-computed permissions for current root folder
-  characters: Record<string, CharacterListItem>;
   activeThread: ChatThread | null;
   activeThreadMessages: ChatMessage[];
   isLoading: boolean;
@@ -247,12 +243,6 @@ export interface UseChatReturn {
   handleKeyDown: (e: TextareaKeyboardEvent) => void;
   handleScreenshot: () => Promise<void>;
 
-  // UI State
-  isToolsModalOpen: boolean;
-  openToolsModal: () => void;
-  closeToolsModal: () => void;
-  setToolsModalOpen: (open: boolean) => void;
-
   // Search
   searchThreads: (query: string) => Array<{ id: string; title: string }>;
 
@@ -331,9 +321,6 @@ export function useChat(
 
   // Get AI stream hook
   const aiStream = useAIStream(locale, logger, t);
-
-  // Fetch characters
-  const charactersEndpoint = useCharacters(user, logger);
 
   // Local state
   const [input, setInput] = useState("");
@@ -424,26 +411,7 @@ export function useChat(
     isDataLoaded,
   );
 
-  // Compute characters map - flatten sections array into character cards
-  const characters = useMemo(() => {
-    const response = charactersEndpoint.read?.response;
-    const charactersMap: Record<string, CharacterListItem> = {};
-
-    if (response?.success && response.data?.sections) {
-      response.data.sections.forEach((section) => {
-        section.characters.forEach((char) => {
-          charactersMap[char.id] = char;
-        });
-      });
-    }
-
-    return charactersMap;
-  }, [charactersEndpoint.read?.response]);
-
-  const settingsOps = useChatSettings({
-    user,
-    logger,
-  });
+  const settingsOps = useChatSettings(user, logger);
 
   // Use default settings if none are loaded yet
   const effectiveSettings = useMemo(() => {
@@ -576,9 +544,6 @@ export function useChat(
     draftKey,
   });
 
-  // UI State
-  const uiState = useUIState();
-
   // Sidebar collapsed state
   const [sidebarCollapsed, setSidebarCollapsed] = useSidebarCollapsed();
 
@@ -625,7 +590,6 @@ export function useChat(
     messages,
     folders,
     rootFolderPermissions, // Server-computed permissions passed as prop
-    characters: characters,
     activeThread,
     activeThreadMessages,
     isLoading,
@@ -741,12 +705,6 @@ export function useChat(
     handleSubmit: inputHandlers.handleSubmit,
     handleKeyDown: inputHandlers.handleKeyDown,
     handleScreenshot: inputHandlers.handleScreenshot,
-
-    // UI State
-    isToolsModalOpen: uiState.isToolsModalOpen,
-    openToolsModal: uiState.openToolsModal,
-    closeToolsModal: uiState.closeToolsModal,
-    setToolsModalOpen: uiState.setToolsModalOpen,
 
     // Search
     searchThreads,

@@ -34,6 +34,7 @@ import {
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
@@ -70,6 +71,7 @@ export function DateRangeFieldWidget<
   const t = useWidgetTranslation();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
+  const isDisabled = useWidgetDisabled();
   if (!form || !fieldName) {
     return (
       <Div>
@@ -169,7 +171,7 @@ export function DateRangeFieldWidget<
                   <Input
                     type="date"
                     placeholder="Start date"
-                    disabled={field.disabled || field.readonly}
+                    disabled={isDisabled || field.disabled || field.readonly}
                     min={field.minDate ? formatDate(field.minDate) : undefined}
                     max={field.maxDate ? formatDate(field.maxDate) : undefined}
                     className={styleClassName.inputClassName}
@@ -178,7 +180,7 @@ export function DateRangeFieldWidget<
                   <Input
                     type="date"
                     placeholder="End date"
-                    disabled={field.disabled || field.readonly}
+                    disabled={isDisabled || field.disabled || field.readonly}
                     min={field.minDate ? formatDate(field.minDate) : undefined}
                     max={field.maxDate ? formatDate(field.maxDate) : undefined}
                     className={styleClassName.inputClassName}

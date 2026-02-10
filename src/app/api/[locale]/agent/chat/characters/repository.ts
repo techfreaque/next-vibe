@@ -287,6 +287,7 @@ export class CharactersRepository {
           voice: defaultCharacter.voice,
           systemPrompt: defaultCharacter.systemPrompt,
           modelSelection: defaultCharacter.modelSelection,
+          characterOwnership: CharacterOwnershipType.SYSTEM,
         });
       }
 
@@ -303,6 +304,7 @@ export class CharactersRepository {
           voice: NO_CHARACTER.voice,
           systemPrompt: null,
           modelSelection: NO_CHARACTER.modelSelection,
+          characterOwnership: CharacterOwnershipType.SYSTEM,
         });
       }
 
@@ -352,6 +354,7 @@ export class CharactersRepository {
         voice: customCharacter.voice || DEFAULT_TTS_VOICE,
         systemPrompt: customCharacter.systemPrompt,
         modelSelection: customCharacter.modelSelection,
+        characterOwnership: customCharacter.ownershipType,
       });
     } catch (error) {
       logger.error("Failed to get character by ID", parseError(error));

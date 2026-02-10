@@ -5,8 +5,8 @@
 
 import { CONTACT_FORM_ALIAS } from "../../contact/definition";
 import { aliasToPathMap } from "../../system/generated/endpoint";
-import { SEARCH_ALIAS } from "../brave-search/definition";
 import { FETCH_URL_ALIAS } from "../fetch-url-content/definition";
+import { SEARCH_ALIAS } from "../search/brave/definition";
 import {
   MEMORY_DELETE_ALIAS,
   MEMORY_UPDATE_ALIAS,

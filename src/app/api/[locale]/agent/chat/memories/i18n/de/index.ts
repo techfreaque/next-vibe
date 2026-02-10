@@ -9,13 +9,28 @@ export const translations: typeof enTranslations = {
     memories: "Erinnerungen",
   },
   category: "Chat",
+  searchPlaceholder: "Erinnerungen nach Inhalt oder Tags durchsuchen...",
+  showing: "{{count}} von {{total}} Erinnerungen werden angezeigt",
+  stats: {
+    total: "Gesamt",
+    highPriority: "Hohe Priorität",
+    avgPriority: "Durchschn. Priorität",
+    size: "Größe",
+  },
   get: {
     title: "Erinnerungen auflisten",
     description: "Ruft alle Erinnerungen für den aktuellen Benutzer ab",
     container: {
-      title: "Erinnerungsliste",
-      description: "Alle gespeicherten Erinnerungen anzeigen",
+      title: "Erinnerungen",
     },
+    createButton: {
+      label: "Erinnerung erstellen",
+    },
+    stats: {
+      title: "Übersicht",
+    },
+    emptyState: "Noch keine Erinnerungen. Erstellen Sie Ihre erste Erinnerung.",
+    emptySearch: "Keine Erinnerungen gefunden, die Ihrer Suche entsprechen.",
     columns: {
       memoryNumber: "#",
       content: "Inhalt",

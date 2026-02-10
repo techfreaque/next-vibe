@@ -152,7 +152,7 @@ export class AiStreamRepository {
               controller,
               encoder,
               locale,
-              userId,
+              user,
               logger,
             });
 

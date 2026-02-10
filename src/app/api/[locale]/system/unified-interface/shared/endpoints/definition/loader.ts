@@ -44,15 +44,10 @@ export class DefinitionLoader implements IDefinitionLoader {
   ): Promise<ResponseType<TEndpoint>> {
     const { identifier, platform, user, logger } = options;
 
-    logger.debug(
-      `[Definition Loader] Loading endpoint definition (identifier: ${identifier}, hasUser: ${!!user})`,
-    );
-
     try {
       const endpoint = await getEndpoint(identifier);
 
       if (!endpoint) {
-        logger.debug(`[Definition Loader] No endpoint found: ${identifier}`);
         return fail({
           message:
             "app.api.system.unifiedInterface.shared.endpoints.definition.loader.errors.endpointNotFound",
@@ -69,16 +64,12 @@ export class DefinitionLoader implements IDefinitionLoader {
       );
 
       if (!accessValidation.success) {
-        logger.debug(
-          `[Definition Loader] Endpoint access denied (identifier: ${identifier}, userId: ${user.isPublic ? "public" : user.id}, reason: ${accessValidation.message})`,
-        );
         return accessValidation;
       }
 
-      logger.debug(`[Definition Loader] Found definition: ${identifier}`);
       return success(endpoint as TEndpoint);
     } catch (error) {
-      logger.debug(
+      logger.error(
         `[Definition Loader] Failed to load definition (identifier: ${identifier}, error: ${parseError(error).message})`,
       );
       return fail({

@@ -54,13 +54,13 @@ export function ImapAccountsList({
   const accountsEndpoint = useEndpoint(
     imapAccountsListDefinitions,
     {
-      queryOptions: {
-        enabled: true,
-        refetchOnWindowFocus: false,
-        staleTime: 1 * 60 * 1000, // 1 minute
-      },
-      filterOptions: {
-        initialFilters: {
+      read: {
+        queryOptions: {
+          enabled: true,
+          refetchOnWindowFocus: false,
+          staleTime: 1 * 60 * 1000, // 1 minute
+        },
+        initialState: {
           page: 1,
           limit: 20,
         },

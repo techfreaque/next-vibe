@@ -216,15 +216,15 @@ export function NavigateButtonWidget<
           const clickX = e.clientX ?? 0;
           const clickY = e.clientY ?? 0;
 
-          navigation.push(
-            targetEndpoint,
-            params,
+          navigation.push(targetEndpoint, {
+            urlPathParams: params.urlPathParams,
+            data: params.data,
             prefillFromGet,
-            effectiveGetEndpoint,
+            getEndpoint: effectiveGetEndpoint,
             renderInModal,
             popNavigationOnSuccess,
-            { x: clickX, y: clickY },
-          );
+            modalPosition: { x: clickX, y: clickY },
+          });
         } catch (error) {
           logger.error("NavigateButtonWidget: Failed to extract params", {
             error: error instanceof Error ? error.message : String(error),
@@ -248,15 +248,15 @@ export function NavigateButtonWidget<
       const clickX = e.clientX ?? 0;
       const clickY = e.clientY ?? 0;
 
-      navigation.push(
-        targetEndpoint,
-        params,
+      navigation.push(targetEndpoint, {
+        urlPathParams: params.urlPathParams,
+        data: params.data,
         prefillFromGet,
-        effectiveGetEndpoint,
+        getEndpoint: effectiveGetEndpoint,
         renderInModal,
         popNavigationOnSuccess,
-        { x: clickX, y: clickY },
-      );
+        modalPosition: { x: clickX, y: clickY },
+      });
     }
   };
 

@@ -64,7 +64,11 @@ export function ImapSyncOperations({
   const accountsEndpoint = useEndpoint(
     imapAccountsListDefinition,
     {
-      enabled: true,
+      read: {
+        queryOptions: {
+          enabled: true,
+        },
+      },
     },
     logger,
     user,
@@ -74,7 +78,11 @@ export function ImapSyncOperations({
   const syncEndpoint = useEndpoint(
     imapSyncDefinition,
     {
-      enabled: false,
+      read: {
+        queryOptions: {
+          enabled: false,
+        },
+      },
     },
     logger,
     user,

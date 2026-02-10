@@ -22,9 +22,17 @@ export function useRetryImportJobEndpoint(
   return useEndpoint(
     definitions,
     {
-      staleTime: 0, // Always fresh for actions
-      refetchOnWindowFocus: false,
-      persistForm: false,
+      read: {
+        queryOptions: {
+          staleTime: 0, // Always fresh for actions
+          refetchOnWindowFocus: false,
+        },
+      },
+      create: {
+        formOptions: {
+          persistForm: false,
+        },
+      },
     },
     logger,
     user,

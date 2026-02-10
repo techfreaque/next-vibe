@@ -12,6 +12,7 @@ import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { useSidebarFooterStore } from "../sidebar/footer/store";
 import type { TourStepConfig } from "./tour-config";
 import {
   getJoyrideLabels,
@@ -60,7 +61,9 @@ export function WelcomeTour({
   );
   const setAdvanceTour = useTourState((state) => state.setAdvanceTour);
   const modelSelectorOpen = useTourState((state) => state.modelSelectorOpen);
-  const setBottomSheetExpanded = useTourState(
+
+  // Sidebar footer state (for expanding bottom sheet during tour)
+  const setBottomSheetExpanded = useSidebarFooterStore(
     (state) => state.setBottomSheetExpanded,
   );
 

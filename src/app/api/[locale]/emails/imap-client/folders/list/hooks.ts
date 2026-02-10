@@ -24,8 +24,8 @@ export function useImapFoldersList(
   return useEndpoint(
     definitions,
     {
-      queryOptions: {
-        requestData: {
+      read: {
+        initialState: {
           accountId,
           page: 1,
           limit: 20,

@@ -32,9 +32,13 @@ export const translations: typeof enTranslations = {
       community: "Społeczność",
     },
     ownershipType: {
-      system: "System",
-      user: "Użytkownik",
-      public: "Publiczny",
+      system: "Wbudowana postać",
+      user: "Utworzone przez ciebie",
+      public: "Ze społeczności",
+    },
+    voice: {
+      male: "Męski głos",
+      female: "Damski głos",
     },
   },
   tags: {
@@ -643,7 +647,7 @@ export const translations: typeof enTranslations = {
       description: "Wszystkie dostępne postaciy dla użytkownika",
     },
     createButton: {
-      label: "Utwórz postać",
+      label: "Utwórz Własną Postać",
     },
     browser: {
       advancedModelAccess: "Wybierz swoje doświadczenie AI",
@@ -662,35 +666,26 @@ export const translations: typeof enTranslations = {
       pickCharacterText:
         "Zacznij od ekspercko dostrojonych postaci z już wybranym idealnym modelem. Dostosuj w dowolnym momencie.",
     },
-    marketing: {
-      title: "Postacie AI i Niestandardowe Modele",
+    signupPrompt: {
+      title: "Twórz własne postacie AI",
       description:
-        "Twórz spersonalizowane asystenty AI z unikalnymi osobowościami, głosami i konfiguracjami modeli. Wybieraj spośród setek modeli lub pozwól naszemu inteligentnemu systemowi wybrać najlepszy dla Twoich potrzeb.",
-      feature1: {
-        title: "Niestandardowe Postacie",
-        description:
-          "Projektuj osobowości AI z niestandardowymi promptami systemowymi, ikonami i głosami",
+        "Projektuj niestandardowe postacie z unikalnymi osobowościami i zachowaniami. Zarejestruj się, aby rozpocząć.",
+      backButton: "Przeglądaj Postacie",
+      signupButton: "Utwórz Konto",
+      loginButton: "Zaloguj Się",
+    },
+    card: {
+      actions: {
+        inCollection: "W twojej kolekcji",
+        addAnother: "Dodaj kolejną",
+        addToCollection: "Dodaj do kolekcji:",
+        quick: "Szybko",
+        customize: "Dostosuj",
       },
-      feature2: {
-        title: "Inteligentny Wybór Modelu",
-        description:
-          "Filtruj według inteligencji, szybkości, ceny i typu treści, aby znaleźć idealny model",
-      },
-      feature3: {
-        title: "System Ulubionych",
-        description:
-          "Zapisuj ulubione konfiguracje dla szybkiego dostępu i organizuj według priorytetu",
-      },
-      feature4: {
-        title: "Dostęp do",
-        titleSuffix: "+ Modeli",
-        description:
-          "Wybieraj spośród najnowszych modeli od Anthropic, OpenAI, Google i innych",
-      },
-      cta: {
-        signup: "Zarejestruj się, aby zacząć",
-        login: "Zaloguj się",
-      },
+    },
+    section: {
+      showMore: "Pokaż {{count}} więcej",
+      showLess: "Pokaż mniej",
     },
     response: {
       characters: {
@@ -983,6 +978,19 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Postać utworzona",
       description: "Twoja niestandardowa postacia została pomyślnie utworzona",
+    },
+  },
+  onboarding: {
+    success: {
+      title: "{{companion}} jest gotowy do rozmowy!",
+      subtitle:
+        "Teraz wybierz specjalistów do konkretnych zadań - lub pomiń i dodaj ich w dowolnym momencie później",
+    },
+    bottom: {
+      title: "Gotowy do rozmowy?",
+      description:
+        "Zawsze możesz wrócić i dodać więcej specjalistów, kiedy tylko ich potrzebujesz",
+      button: "Zacznij Rozmawiać",
     },
   },
 };

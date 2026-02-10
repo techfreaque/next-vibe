@@ -13,6 +13,17 @@ export const translations: typeof enTranslations = {
     deleteButton: {
       label: "Usuń ulubiony",
     },
+    customizeCharacterButton: {
+      label: "Dostosuj osobowość postaci",
+    },
+    signupPrompt: {
+      title: "Dostosuj osobowość postaci",
+      description:
+        "Edytuj prompt systemowy i zachowanie postaci. Zarejestruj się, aby rozpocząć.",
+      backButton: "Wstecz",
+      signupButton: "Utwórz konto",
+      loginButton: "Zaloguj się",
+    },
     id: {
       label: "ID ulubionego",
     },
@@ -145,6 +156,17 @@ export const translations: typeof enTranslations = {
     deleteButton: {
       label: "Usuń ulubiony",
     },
+    customizeCharacterButton: {
+      label: "Dostosuj osobowość postaci",
+    },
+    signupPrompt: {
+      title: "Dostosuj osobowość postaci",
+      description:
+        "Edytuj prompt systemowy i zachowanie postaci. Zarejestruj się, aby rozpocząć.",
+      backButton: "Wstecz",
+      signupButton: "Utwórz konto",
+      loginButton: "Zaloguj się",
+    },
     submitButton: {
       label: "Zapisz zmiany",
       loadingText: "Zapisywanie...",
@@ -159,8 +181,8 @@ export const translations: typeof enTranslations = {
       label: "Nazwa niestandardowa",
     },
     voice: {
-      label: "Głos",
-      description: "Preferencje głosu text-to-speech",
+      label: "Głos AI",
+      description: "Wybierz głos dla swojego asystenta AI",
     },
     mode: {
       label: "Tryb wyboru",

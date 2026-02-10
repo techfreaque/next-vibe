@@ -36,6 +36,8 @@ export interface IconPickerProps {
   className?: string;
   /** Trigger button size */
   size?: "sm" | "default" | "lg";
+  /** Disabled state */
+  disabled?: boolean;
 }
 
 /**
@@ -47,6 +49,7 @@ export function IconPicker({
   className,
   size = "default",
   name,
+  disabled = false,
 }: IconPickerProps): JSX.Element {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -84,9 +87,11 @@ export function IconPicker({
       <DialogTrigger asChild>
         <button
           type="button"
+          disabled={disabled}
           className={cn(
             sizeClasses[size],
             "rounded-lg bg-primary/20 hover:bg-primary/30 transition-colors flex items-center justify-center shrink-0 cursor-pointer relative group border-none outline-none",
+            disabled && "opacity-50 cursor-not-allowed",
             className,
           )}
           title={t("app.ui.iconPicker.selectIcon")}

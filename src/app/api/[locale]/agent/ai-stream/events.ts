@@ -35,6 +35,8 @@ export enum StreamEventType {
   AUDIO_CHUNK = "audio-chunk",
   // File upload event
   FILES_UPLOADED = "files-uploaded",
+  // Credit deduction event
+  CREDITS_DEDUCTED = "credits-deducted",
 }
 
 /**
@@ -47,8 +49,8 @@ export interface MessageCreatedEventData {
   parentId: string | null;
   depth: number;
   content: string | null;
-  model?: ModelId;
-  character?: string;
+  model: ModelId | null;
+  character: string | null;
   sequenceId?: string | null; // Links messages in the same AI response sequence
   toolCall?: ToolCall; // Tool call for TOOL role messages (singular - each TOOL message has exactly one tool call)
   metadata?: MessageMetadata; // Message metadata including attachments, tokens, etc.
@@ -176,6 +178,21 @@ export interface FilesUploadedEventData {
 }
 
 /**
+ * Credits deducted event data
+ * Emitted when credits are deducted for tool calls or model usage
+ */
+export interface CreditsDeductedEventData {
+  /** Amount of credits deducted */
+  amount: number;
+  /** Feature/model that consumed the credits */
+  feature: string;
+  /** Type of deduction: tool or model */
+  type: "tool" | "model";
+  /** Whether this was a partial deduction (insufficient funds) */
+  partial?: boolean;
+}
+
+/**
  * Event type to data mapping
  */
 export interface StreamEventDataMap {
@@ -193,6 +210,8 @@ export interface StreamEventDataMap {
   [StreamEventType.AUDIO_CHUNK]: AudioChunkEventData;
   // File upload event
   [StreamEventType.FILES_UPLOADED]: FilesUploadedEventData;
+  // Credit deduction event
+  [StreamEventType.CREDITS_DEDUCTED]: CreditsDeductedEventData;
 }
 
 /**
@@ -287,6 +306,13 @@ export const createStreamEvent = {
     data: FilesUploadedEventData,
   ): StreamEvent<StreamEventType.FILES_UPLOADED> => ({
     type: StreamEventType.FILES_UPLOADED,
+    data,
+  }),
+
+  creditsDeducted: (
+    data: CreditsDeductedEventData,
+  ): StreamEvent<StreamEventType.CREDITS_DEDUCTED> => ({
+    type: StreamEventType.CREDITS_DEDUCTED,
     data,
   }),
 };

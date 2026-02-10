@@ -32,8 +32,10 @@ export function useEmailPreviewSendTest(
   return useEndpoint(
     definitions,
     {
-      formOptions: {
-        persistForm: false,
+      create: {
+        formOptions: {
+          persistForm: false,
+        },
       },
     },
     logger,

@@ -31,9 +31,13 @@ export const translations = {
       community: "Community",
     },
     ownershipType: {
-      system: "System",
-      user: "User",
-      public: "Public",
+      system: "Built-in character",
+      user: "Created by you",
+      public: "From community",
+    },
+    voice: {
+      male: "Male voice",
+      female: "Female voice",
     },
   },
   tags: {
@@ -637,7 +641,7 @@ export const translations = {
       description: "All available characters for the user",
     },
     createButton: {
-      label: "Create Character",
+      label: "Create Custom Character",
     },
     browser: {
       advancedModelAccess: "Choose Your AI Experience",
@@ -656,35 +660,26 @@ export const translations = {
       pickCharacterText:
         "Start with expert-tuned characters that have the perfect model already selected. Fine-tune settings anytime.",
     },
-    marketing: {
-      title: "AI Characters & Custom Models",
+    signupPrompt: {
+      title: "Create your own AI characters",
       description:
-        "Create personalized AI assistants with unique personalities, voices, and model configurations. Choose from hundreds of models or let our intelligent system select the best one for your needs.",
-      feature1: {
-        title: "Custom Characters",
-        description:
-          "Design AI personalities with custom system prompts, icons, and voices",
+        "Design custom characters with unique personalities and behaviors. Sign up to get started.",
+      backButton: "Browse Characters",
+      signupButton: "Create Account",
+      loginButton: "Log In",
+    },
+    card: {
+      actions: {
+        inCollection: "In your collection",
+        addAnother: "Add another",
+        addToCollection: "Add to collection:",
+        quick: "Quick",
+        customize: "Customize",
       },
-      feature2: {
-        title: "Smart Model Selection",
-        description:
-          "Filter by intelligence, speed, price, and content type to find the perfect model",
-      },
-      feature3: {
-        title: "Favorites System",
-        description:
-          "Save your favorite configurations for quick access and organize by priority",
-      },
-      feature4: {
-        title: "Access",
-        titleSuffix: "+ Models",
-        description:
-          "Choose from the latest models from Anthropic, OpenAI, Google, and more",
-      },
-      cta: {
-        signup: "Sign Up to Get Started",
-        login: "Log In",
-      },
+    },
+    section: {
+      showMore: "Show {{count}} more",
+      showLess: "Show less",
     },
     response: {
       characters: {
@@ -986,6 +981,19 @@ export const translations = {
     success: {
       title: "Character Created",
       description: "Your custom character has been created successfully",
+    },
+  },
+  onboarding: {
+    success: {
+      title: "{{companion}} is ready to chat!",
+      subtitle:
+        "Now pick specialists for specific tasks - or skip and add them anytime later",
+    },
+    bottom: {
+      title: "Ready to start chatting?",
+      description:
+        "You can always come back to add more specialists whenever you need them",
+      button: "Start Chatting",
     },
   },
 };

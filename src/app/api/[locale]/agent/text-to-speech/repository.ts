@@ -19,7 +19,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import { CreditRepository } from "../../credits/repository";
-import { TTS_COST_PER_CHARACTER } from "../../products/repository-client";
+import {
+  TTS_COST_PER_CHARACTER,
+  TTS_MINIMUM_BALANCE,
+} from "../../products/repository-client";
 import type { JwtPayloadType } from "../../user/auth/types";
 import type {
   TextToSpeechPostRequestOutput,
@@ -101,6 +104,41 @@ export class TextToSpeechRepository {
       });
     }
 
+    // Check minimum balance upfront (cost of ~50 characters)
+    const balanceResult = await CreditRepository.getBalance(
+      user.isPublic && user.leadId
+        ? { leadId: user.leadId }
+        : user.id
+          ? { userId: user.id, leadId: user.leadId }
+          : { leadId: user.leadId! },
+      logger,
+    );
+
+    if (!balanceResult.success) {
+      logger.error("Failed to check balance for TTS", {
+        error: balanceResult.message,
+      });
+      return fail({
+        message: "app.api.agent.textToSpeech.post.errors.balanceCheckFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    if (balanceResult.data.total < TTS_MINIMUM_BALANCE) {
+      logger.warn("Insufficient credits for TTS", {
+        balance: balanceResult.data.total,
+        minimum: TTS_MINIMUM_BALANCE,
+      });
+      return fail({
+        message: "app.api.agent.textToSpeech.post.errors.insufficientCredits",
+        errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+        messageParams: {
+          balance: balanceResult.data.total.toString(),
+          minimum: TTS_MINIMUM_BALANCE.toString(),
+        },
+      });
+    }
+
     // Calculate credits based on character count
     // Amazon TTS: $4 per 1M chars + 30% markup = $5.20 per 1M chars
     const characterCount = data.text.length;
@@ -111,31 +149,6 @@ export class TextToSpeechRepository {
       creditsNeeded,
       costPerCharacter: TTS_COST_PER_CHARACTER,
     });
-
-    // Deduct credits BEFORE making the API call
-    // This ensures credits are deducted even if the request is interrupted
-    try {
-      await CreditRepository.deductCreditsForFeature(
-        user,
-        creditsNeeded,
-        "tts",
-        logger,
-      );
-    } catch (error) {
-      const errorMessage = parseError(error).message;
-      logger.error("Failed to deduct credits", {
-        error: errorMessage,
-        creditsNeeded,
-        characterCount,
-      });
-      return fail({
-        message: "app.api.agent.textToSpeech.post.errors.creditsFailed",
-        errorType: ErrorResponseTypes.PAYMENT_ERROR,
-        messageParams: {
-          error: errorMessage,
-        },
-      });
-    }
 
     try {
       logger.debug("Sending request to Eden AI", {
@@ -256,8 +269,37 @@ export class TextToSpeechRepository {
         provider,
       });
 
+      // Deduct credits AFTER successful completion (graceful - allows partial to 0)
+      const deductResult = await CreditRepository.deductCreditsForTTS(
+        user,
+        creditsNeeded,
+        logger,
+      );
+
+      if (!deductResult.success) {
+        logger.error("Failed to deduct TTS credits", {
+          creditsNeeded,
+          characterCount,
+        });
+        return fail({
+          message: "app.api.agent.textToSpeech.post.errors.creditsFailed",
+          errorType: ErrorResponseTypes.PAYMENT_ERROR,
+        });
+      }
+
+      if (deductResult.partialDeduction) {
+        logger.info(
+          "TTS: Partial credit deduction (insufficient funds, deducted to 0)",
+          {
+            requestedCost: creditsNeeded,
+            characterCount,
+          },
+        );
+      }
+
       return success({
         audioUrl,
+        creditCost: creditsNeeded,
       });
     } catch (error) {
       const errorMessage = parseError(error).message;

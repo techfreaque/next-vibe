@@ -34,6 +34,7 @@ import {
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
@@ -61,6 +62,7 @@ export function TimeRangeFieldWidget<
   const t = useWidgetTranslation();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
+  const isDisabled = useWidgetDisabled();
   if (!form || !fieldName) {
     return (
       <Div>
@@ -160,7 +162,7 @@ export function TimeRangeFieldWidget<
                   <Input
                     type="time"
                     placeholder="Start time"
-                    disabled={field.disabled || field.readonly}
+                    disabled={isDisabled || field.disabled || field.readonly}
                     min={field.minTime}
                     max={field.maxTime}
                     step={field.step}
@@ -170,7 +172,7 @@ export function TimeRangeFieldWidget<
                   <Input
                     type="time"
                     placeholder="End time"
-                    disabled={field.disabled || field.readonly}
+                    disabled={isDisabled || field.disabled || field.readonly}
                     min={field.minTime}
                     max={field.maxTime}
                     step={field.step}

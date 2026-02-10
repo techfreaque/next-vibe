@@ -90,7 +90,7 @@ const { GET } = createEndpoint({
             characterId: responseField({
               type: WidgetType.TEXT,
               hidden: true,
-              schema: z.string().nullable(),
+              schema: z.string(),
             }),
             modelId: responseField({
               type: WidgetType.TEXT,

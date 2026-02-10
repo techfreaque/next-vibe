@@ -15,7 +15,6 @@ import { useMemo } from "react";
 import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 import { useTourState } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-state-context";
 import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/config";
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import {
   type ModelId,
   modelOptions,
@@ -26,6 +25,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { useCharacter } from "../../../../characters/[id]/hooks";
 import { SelectorContent } from "./selector-content";
 
 interface SelectorProps {
@@ -35,6 +35,8 @@ interface SelectorProps {
   user: JwtPayloadType;
   logger: EndpointLogger;
   buttonClassName?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function Selector({
@@ -44,27 +46,29 @@ export function Selector({
   user,
   logger,
   buttonClassName,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
 }: SelectorProps): JSX.Element {
   const { t } = simpleT(locale);
 
-  // Get characters from chat context (already fetched by useChat)
-  const chat = useChatContext();
-  const characters = chat.characters;
-
-  // Tour state
-  const popoverOpen = useTourState((state) => state.modelSelectorOpen);
-  const setPopoverOpen = useTourState((state) => state.setModelSelectorOpen);
-
-  // Use tour state if active
-
-  // Get current character and model for display
-  const currentCharacter = useMemo(
-    () => characters[characterId] ?? null,
-    [characters, characterId],
+  // Tour state (for uncontrolled mode)
+  const tourPopoverOpen = useTourState((state) => state.modelSelectorOpen);
+  const setTourPopoverOpen = useTourState(
+    (state) => state.setModelSelectorOpen,
   );
+
+  // Use controlled state if provided, otherwise use tour state, otherwise use local state
+  const popoverOpen = controlledOnOpenChange ? controlledOpen : tourPopoverOpen;
+  const setPopoverOpen = controlledOnOpenChange ?? setTourPopoverOpen;
+  const isModelOnly = characterId === NO_CHARACTER_ID;
+  const currentCharaterHook = useCharacter(
+    isModelOnly ? undefined : characterId,
+    user,
+    logger,
+  );
+  const currentCharacter = currentCharaterHook.read?.data ?? null;
   const currentModel = useMemo(() => modelOptions[modelId], [modelId]);
   const modelSupportsTools = currentModel?.supportsTools ?? false;
-  const isModelOnly = characterId === NO_CHARACTER_ID;
 
   return (
     <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
@@ -82,7 +86,7 @@ export function Selector({
           suppressHydrationWarning
         >
           {/* Character icon - hidden for model-only */}
-          {!isModelOnly && (
+          {!isModelOnly && currentCharacter?.icon && (
             <Span className="flex items-center justify-center w-5 h-5 shrink-0">
               {currentCharacter ? (
                 <Icon icon={currentCharacter.icon} className="h-4 w-4" />
@@ -91,19 +95,19 @@ export function Selector({
           )}
 
           {/* Character name - hidden when container is narrow, always shown when no tools, hidden for model-only */}
-          {!isModelOnly && (
+          {!isModelOnly && currentCharacter?.name && (
             <Span
               className={cn(
                 "max-w-[80px] @xl:max-w-[100px] truncate",
                 modelSupportsTools ? "hidden @md:inline" : "hidden @xs:inline",
               )}
             >
-              {currentCharacter?.name ? t(currentCharacter.name) : ""}
+              {t(currentCharacter.name)}
             </Span>
           )}
 
           {/* Separator - hidden when container is narrow, always shown when no tools, hidden for model-only */}
-          {!isModelOnly && (
+          {!isModelOnly && currentCharacter && (
             <Span
               className={cn(
                 "text-muted-foreground/50",
@@ -136,12 +140,12 @@ export function Selector({
       </PopoverTrigger>
 
       <PopoverContent
-        className="p-0 w-[480px] max-w-screen"
+        className="p-0 w-[480px] max-w-[calc(100vw-10px)] mx-[5px]"
         align="start"
         side="top"
         sideOffset={8}
       >
-        {/* Only render content when popover is open - this is where all data fetching happens */}
+        {/* Only render content when popover is open - so we don't fetch data until needed */}
         {popoverOpen && (
           <SelectorContent locale={locale} user={user} logger={logger} />
         )}

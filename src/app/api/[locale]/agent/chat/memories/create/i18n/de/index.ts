@@ -21,6 +21,12 @@ export const translations: typeof enTranslations = {
       label: "Priorität",
       description: "Höhere Priorität Erinnerungen erscheinen zuerst (0-100)",
     },
+    backButton: {
+      label: "Zurück",
+    },
+    submitButton: {
+      label: "Erinnerung erstellen",
+    },
     response: {
       id: { content: "Erinnerungs-ID" },
     },

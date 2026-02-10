@@ -32,9 +32,13 @@ export const translations: typeof enTranslations = {
       community: "Community",
     },
     ownershipType: {
-      system: "System",
-      user: "Benutzer",
-      public: "Öffentlich",
+      system: "Integrierter Charakter",
+      user: "Von dir erstellt",
+      public: "Aus der Community",
+    },
+    voice: {
+      male: "Männliche Stimme",
+      female: "Weibliche Stimme",
     },
   },
   tags: {
@@ -641,7 +645,7 @@ export const translations: typeof enTranslations = {
       description: "Alle verfügbaren Charaktere für den Benutzer",
     },
     createButton: {
-      label: "Charakter erstellen",
+      label: "Eigenen Charakter Erstellen",
     },
     browser: {
       advancedModelAccess: "Wähle deine KI-Erfahrung",
@@ -660,35 +664,26 @@ export const translations: typeof enTranslations = {
       pickCharacterText:
         "Starte mit professionell abgestimmten Charakteren, die bereits das perfekte Modell nutzen. Jederzeit anpassbar.",
     },
-    marketing: {
-      title: "KI-Charaktere & Benutzerdefinierte Modelle",
+    signupPrompt: {
+      title: "Erstelle deine eigenen KI-Charaktere",
       description:
-        "Erstelle personalisierte KI-Assistenten mit einzigartigen Persönlichkeiten, Stimmen und Modellkonfigurationen. Wähle aus Hunderten von Modellen oder lass unser intelligentes System das beste für dich auswählen.",
-      feature1: {
-        title: "Benutzerdefinierte Charaktere",
-        description:
-          "Gestalte KI-Persönlichkeiten mit benutzerdefinierten System-Prompts, Icons und Stimmen",
+        "Gestalte individuelle Charaktere mit einzigartigen Persönlichkeiten und Verhaltensweisen. Jetzt registrieren.",
+      backButton: "Charaktere Durchsuchen",
+      signupButton: "Konto Erstellen",
+      loginButton: "Anmelden",
+    },
+    card: {
+      actions: {
+        inCollection: "In deiner Sammlung",
+        addAnother: "Weitere hinzufügen",
+        addToCollection: "Zur Sammlung hinzufügen:",
+        quick: "Schnell",
+        customize: "Anpassen",
       },
-      feature2: {
-        title: "Intelligente Modellauswahl",
-        description:
-          "Filtere nach Intelligenz, Geschwindigkeit, Preis und Inhaltstyp, um das perfekte Modell zu finden",
-      },
-      feature3: {
-        title: "Favoriten-System",
-        description:
-          "Speichere deine Lieblingskonfigurationen für schnellen Zugriff und organisiere nach Priorität",
-      },
-      feature4: {
-        title: "Zugriff auf",
-        titleSuffix: "+ Modelle",
-        description:
-          "Wähle aus den neuesten Modellen von Anthropic, OpenAI, Google und mehr",
-      },
-      cta: {
-        signup: "Jetzt Registrieren",
-        login: "Anmelden",
-      },
+    },
+    section: {
+      showMore: "{count} weitere anzeigen",
+      showLess: "Weniger anzeigen",
     },
     response: {
       characters: {
@@ -989,6 +984,19 @@ export const translations: typeof enTranslations = {
       title: "Charakter erstellt",
       description:
         "Ihr benutzerdefinierter Charakter wurde erfolgreich erstellt",
+    },
+  },
+  onboarding: {
+    success: {
+      title: "{{companion}} ist bereit zu chatten!",
+      subtitle:
+        "Jetzt kannst du Spezialisten für bestimmte Aufgaben auswählen - oder überspringen und sie jederzeit später hinzufügen",
+    },
+    bottom: {
+      title: "Bereit loszuchatten?",
+      description:
+        "Du kannst jederzeit zurückkommen und weitere Spezialisten hinzufügen, wann immer du sie brauchst",
+      button: "Jetzt Chatten",
     },
   },
 };

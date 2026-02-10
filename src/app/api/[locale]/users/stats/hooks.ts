@@ -42,7 +42,9 @@ export function useUsersStatsEndpoint(
   return useEndpoint(
     definitions,
     {
-      queryOptions,
+      read: {
+        queryOptions,
+      },
     },
     logger,
     user,

@@ -1456,6 +1456,7 @@ export class CreditRepository {
     feature: ModelId | "tts" | "stt" | "search" | "stt-hotkey",
     messageId: string,
     logger: EndpointLogger,
+    allowPartial = false, //  allow deducting less than requested
   ): Promise<ResponseType<void>> {
     // Input validation
     if (amount <= 0) {
@@ -1869,10 +1870,35 @@ export class CreditRepository {
         }
 
         if (remaining > 0) {
-          return {
-            success: false as const,
-            error: "app.api.credits.errors.insufficientCredits" as const,
-          };
+          if (allowPartial) {
+            // For model/TTS/STT: deduct what we can, commit the transaction
+            logger.info("Partial credit deduction (graceful)", {
+              requested: amount,
+              deducted: amount - remaining,
+              remaining,
+              poolId: pool.poolId,
+              feature,
+            });
+            // Return success - we deducted what was available
+            return { success: true as const };
+          } else {
+            // For tools/endpoints: insufficient credits, rollback without creating record
+            const availableCredits = [
+              ...(pool.userWallet ? [pool.userWallet] : []),
+              ...pool.leadWallets,
+            ].reduce((sum, wallet) => sum + wallet.balance, 0);
+
+            logger.warn("Insufficient credits for tool/endpoint", {
+              requested: amount,
+              available: availableCredits,
+              poolId: pool.poolId,
+              feature,
+            });
+            return {
+              success: false as const,
+              error: "app.api.credits.errors.insufficientCredits" as const,
+            };
+          }
         }
 
         return { success: true as const };
@@ -2629,6 +2655,227 @@ export class CreditRepository {
       logger.error(`Error deducting credits for ${feature}`, {
         error: error instanceof Error ? error.message : String(error),
         cost,
+      });
+      return { success: false };
+    }
+  }
+
+  /**
+   * Deduct credits for TTS (graceful - allows partial deduction to 0)
+   */
+  static async deductCreditsForTTS(
+    user: JwtPayloadType,
+    cost: number,
+    logger: EndpointLogger,
+  ): Promise<{
+    success: boolean;
+    messageId?: string;
+    partialDeduction?: boolean;
+  }> {
+    if (cost <= 0) {
+      logger.debug("Skipping TTS credit deduction - zero cost", { cost });
+      return { success: true };
+    }
+
+    try {
+      const creditMessageId = crypto.randomUUID();
+      let identifier: CreditIdentifier;
+
+      if (user.isPublic && user.leadId) {
+        identifier = { leadId: user.leadId };
+      } else if (user.id) {
+        identifier = { userId: user.id, leadId: user.leadId };
+      } else if (user.leadId) {
+        identifier = { leadId: user.leadId };
+      } else {
+        logger.error("No identifier for TTS credit deduction", { cost });
+        return { success: false };
+      }
+
+      const result = await CreditRepository.deductCredits(
+        identifier,
+        cost,
+        "tts",
+        creditMessageId,
+        logger,
+        true, // allowPartial = true for TTS
+      );
+
+      if (!result.success) {
+        logger.warn("TTS credit deduction failed", {
+          ...identifier,
+          cost,
+        });
+        return { success: false };
+      }
+
+      logger.debug("TTS credits deducted", {
+        ...identifier,
+        cost,
+        messageId: creditMessageId,
+      });
+
+      return {
+        success: true,
+        messageId: creditMessageId,
+        partialDeduction: false,
+      };
+    } catch (error) {
+      logger.error("Failed to deduct TTS credits", parseError(error), {
+        cost,
+      });
+      return { success: false };
+    }
+  }
+
+  /**
+   * Deduct credits for STT (graceful - allows partial deduction to 0)
+   */
+  static async deductCreditsForSTT(
+    user: JwtPayloadType,
+    cost: number,
+    logger: EndpointLogger,
+  ): Promise<{
+    success: boolean;
+    messageId?: string;
+    partialDeduction?: boolean;
+  }> {
+    if (cost <= 0) {
+      logger.debug("Skipping STT credit deduction - zero cost", { cost });
+      return { success: true };
+    }
+
+    try {
+      const creditMessageId = crypto.randomUUID();
+      let identifier: CreditIdentifier;
+
+      if (user.isPublic && user.leadId) {
+        identifier = { leadId: user.leadId };
+      } else if (user.id) {
+        identifier = { userId: user.id, leadId: user.leadId };
+      } else if (user.leadId) {
+        identifier = { leadId: user.leadId };
+      } else {
+        logger.error("No identifier for STT credit deduction", { cost });
+        return { success: false };
+      }
+
+      const result = await CreditRepository.deductCredits(
+        identifier,
+        cost,
+        "stt",
+        creditMessageId,
+        logger,
+        true, // allowPartial = true for STT
+      );
+
+      if (!result.success) {
+        logger.warn("STT credit deduction failed", {
+          ...identifier,
+          cost,
+        });
+        return { success: false };
+      }
+
+      logger.debug("STT credits deducted", {
+        ...identifier,
+        cost,
+        messageId: creditMessageId,
+      });
+
+      return {
+        success: true,
+        messageId: creditMessageId,
+        partialDeduction: false,
+      };
+    } catch (error) {
+      logger.error("Failed to deduct STT credits", parseError(error), {
+        cost,
+      });
+      return { success: false };
+    }
+  }
+
+  /**
+   * Deduct credits for model usage with partial deduction allowed
+   * If full amount cannot be deducted, deducts what's available (to 0) and returns success
+   * This is ONLY for model costs at the end of streaming - we eat the cost difference
+   */
+  static async deductCreditsForModelUsage(
+    user: JwtPayloadType,
+    cost: number,
+    model: ModelId,
+    logger: EndpointLogger,
+  ): Promise<{
+    success: boolean;
+    messageId?: string;
+    partialDeduction?: boolean;
+  }> {
+    if (cost <= 0) {
+      logger.debug("Skipping credit deduction - zero or negative cost", {
+        model,
+        cost,
+      });
+      return { success: true };
+    }
+
+    try {
+      const creditMessageId = crypto.randomUUID();
+      let identifier: CreditIdentifier;
+
+      if (user.isPublic && user.leadId) {
+        identifier = { leadId: user.leadId };
+      } else if (user.id) {
+        identifier = { userId: user.id, leadId: user.leadId };
+      } else if (user.leadId) {
+        identifier = { leadId: user.leadId };
+      } else {
+        logger.error("No identifier for credit deduction", { model, cost });
+        return { success: false };
+      }
+
+      // Call internal deduct method with allowPartial=true for model usage
+      const result = await CreditRepository.deductCredits(
+        identifier,
+        cost,
+        model,
+        creditMessageId,
+        logger,
+        true, // Allow partial deduction for model usage
+      );
+
+      // For model usage, treat partial deduction as success
+      // The transaction will have committed whatever was available
+      if (!result.success) {
+        logger.warn(
+          `Model usage: Insufficient credits, deducted what was available`,
+          {
+            ...identifier,
+            requestedCost: cost,
+            model,
+          },
+        );
+        // Return success with partial flag - we eat the cost difference
+        return {
+          success: true,
+          messageId: creditMessageId,
+          partialDeduction: true,
+        };
+      }
+
+      logger.debug(`Credits deducted for model usage`, {
+        ...identifier,
+        cost,
+        model,
+        messageId: creditMessageId,
+      });
+
+      return { success: true, messageId: creditMessageId };
+    } catch (error) {
+      logger.error(`Error deducting credits for model`, {
+        error: error instanceof Error ? error.message : String(error),
+        cost,
+        model,
       });
       return { success: false };
     }

@@ -7,9 +7,13 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
+  navigateButtonField,
   objectField,
   responseArrayField,
   responseField,
+  widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,6 +24,8 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema } from "../../../shared/types/common.schema";
+import createDefinition from "./create/definition";
+import { MemoriesListContainer } from "./widget";
 
 /**
  * Memory tool aliases for AI tool calling
@@ -42,16 +48,29 @@ const { GET } = createEndpoint({
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.memories" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.agent.chat.memories.get.container.title" as const,
-      description:
-        "app.api.agent.chat.memories.get.container.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { response: true },
-    {
+  fields: customWidgetObject({
+    render: MemoriesListContainer,
+    usage: { response: true } as const,
+    children: {
+      // Top action buttons
+      backButton: backButton({ usage: { response: true } }),
+      title: widgetField({
+        type: WidgetType.TEXT,
+        content: "app.api.agent.chat.memories.get.container.title" as const,
+        usage: { response: true },
+      }),
+      createButton: navigateButtonField({
+        targetEndpoint: createDefinition.POST,
+        extractParams: () => ({}),
+        prefillFromGet: false,
+        label: "app.api.agent.chat.memories.get.createButton.label" as const,
+        icon: "plus",
+        variant: "default",
+        className: "ml-auto",
+        popNavigationOnSuccess: 1,
+        usage: { response: true },
+      }),
+
       // === RESPONSE ===
       memories: responseArrayField(
         {
@@ -106,7 +125,7 @@ const { GET } = createEndpoint({
         ),
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

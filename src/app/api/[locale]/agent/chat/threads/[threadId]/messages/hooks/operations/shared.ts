@@ -11,7 +11,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
 import { DEFAULT_TTS_VOICE } from "../../../../../../text-to-speech/enum";
 import { DefaultFolderId } from "../../../../../config";
-import { createCreditUpdateCallback } from "../../../../../credit-updater";
 import type { ChatMessage } from "../../../../../db";
 import { ChatMessageRole } from "../../../../../enum";
 import { useChatStore } from "../../../../../hooks/store";
@@ -250,10 +249,16 @@ export async function createAndSendUserMessage(
         audioInput: audioInput ?? { file: null },
       },
       {
-        onContentDone: createCreditUpdateCallback(
-          settings.selectedModel,
-          deductCredits,
-        ),
+        onCreditsDeducted: (data) => {
+          // Optimistically deduct credits when server emits CREDITS_DEDUCTED event
+          logger.debug("[Credits] Deducting credits from SSE event", {
+            amount: data.amount,
+            feature: data.feature,
+            type: data.type,
+            partial: data.partial,
+          });
+          deductCredits(data.amount, data.feature);
+        },
       },
     );
   } catch (error) {

@@ -22,8 +22,8 @@ export interface StreamingMessage {
   reasoning?: string; // Reasoning/thinking content (o1-style models)
   parentId: string | null;
   depth: number;
-  model?: ModelId | null;
-  character?: string | null;
+  model: ModelId | null;
+  character: string | null;
   totalTokens?: number;
   finishReason?: string | null;
   isStreaming: boolean;

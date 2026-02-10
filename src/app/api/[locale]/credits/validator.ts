@@ -93,6 +93,7 @@ class CreditValidator implements CreditValidatorInterface {
       }
 
       const balance = balanceResult.data.total;
+      // Check if we have ENOUGH credits upfront for model cost
       const hasCredits = balance >= cost;
 
       logger.debug("Validated user credits", {
@@ -146,6 +147,7 @@ class CreditValidator implements CreditValidatorInterface {
       }
 
       const balance = balanceResult.data;
+      // Check if we have ENOUGH credits upfront for model cost
       const hasCredits = balance >= cost;
 
       logger.debug("Validated lead credits", {
@@ -208,6 +210,7 @@ class CreditValidator implements CreditValidatorInterface {
 
       // Validate credits
       const cost = getModelCost(modelId);
+      // Check if we have ENOUGH credits upfront for model cost
       const hasCredits = credits >= cost;
 
       logger.debug("Validated lead by IP", {

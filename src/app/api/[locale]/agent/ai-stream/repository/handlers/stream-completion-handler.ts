@@ -11,6 +11,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { ModelId } from "../../../models/models";
+import { createStreamEvent, formatSSEEvent } from "../../events";
 import type { StreamContext } from "../core/stream-context";
 import type { StreamingTTSHandler } from "../streaming-tts";
 import { FinalizationHandler } from "./finalization-handler";
@@ -96,12 +97,34 @@ export class StreamCompletionHandler {
     });
 
     // Deduct credits AFTER successful completion (not optimistically)
-    await CreditRepository.deductCreditsForFeature(
+    // Use deductCreditsForModelUsage which allows partial deduction (deduct to 0)
+    const deductResult = await CreditRepository.deductCreditsForModelUsage(
       user,
       modelCost,
       model,
       logger,
     );
+
+    if (deductResult.success) {
+      // Emit credit deduction event for frontend optimistic update
+      const creditEvent = createStreamEvent.creditsDeducted({
+        amount: modelCost,
+        feature: model,
+        type: "model",
+        partial: deductResult.partialDeduction,
+      });
+      controller.enqueue(encoder.encode(formatSSEEvent(creditEvent)));
+
+      if (deductResult.partialDeduction) {
+        logger.debug(
+          "[AI Stream] Model usage: Partial credit deduction (insufficient funds, deducted to 0)",
+          {
+            model,
+            requestedCost: modelCost,
+          },
+        );
+      }
+    }
 
     // Cleanup stream context
     ctx.cleanup();

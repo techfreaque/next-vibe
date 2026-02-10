@@ -12,7 +12,6 @@ import { useMemo, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils/utils";
 import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
-import { deepMerge } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-utils";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
   NavigationStackProvider,
@@ -140,70 +139,61 @@ function EndpointsPageInternal<
 
   // Build mutation options with onSuccess callback for finalNavigation
   const mutationOptionsWithNav = useMemo(() => {
-    // Collect all onSuccess callbacks to chain them
-    const endpointOnSuccess =
-      endpoint.POST?.options?.mutationOptions?.onSuccess;
-    const callerOnSuccess = endpointOptions?.create?.mutationOptions?.onSuccess;
+    // Only work with caller's options - don't merge with endpoint options here
+    // (useEndpointCreate will do that merge)
+    const callerMutationOptions = endpointOptions?.create?.mutationOptions;
 
-    // Deep merge mutation options (endpoint options as base, caller options override)
-    const baseMutationOptions = endpoint.POST?.options?.mutationOptions ?? {};
-    const callerMutationOptions =
-      endpointOptions?.create?.mutationOptions ?? {};
-    const mergedMutationOptions = deepMerge(
-      baseMutationOptions,
-      callerMutationOptions,
-    );
+    // For POST endpoints, wrap to add navigation AFTER onSuccess
+    if (isMutationEndpoint && endpoint.POST && finalNavigation) {
+      const callerOnSuccess = callerMutationOptions?.onSuccess;
 
-    // For POST endpoints, navigate to GET endpoint after successful creation if GET exists
-    if (isMutationEndpoint && endpoint.POST) {
       return {
-        ...mergedMutationOptions,
+        ...callerMutationOptions,
         onSuccess: async ({
           responseData,
           requestData,
           pathParams,
           logger,
         }): Promise<void | ErrorResponseType> => {
-          const endpointResult = await endpointOnSuccess?.({
+          // Call caller's onSuccess if it exists
+          const result = await callerOnSuccess?.({
             responseData,
             requestData,
             pathParams,
             logger,
           });
 
-          // If endpoint's onSuccess returned an error, return it
-          if (endpointResult) {
-            return endpointResult;
+          if (result) {
+            return result;
           }
 
-          // Call caller's onSuccess second (from endpointOptions)
-          const callerResult = await callerOnSuccess?.({
-            responseData,
-            requestData,
-            pathParams,
-            logger,
-          });
-
-          // If caller's onSuccess returned an error, return it
-          if (callerResult) {
-            return callerResult;
-          }
-
-          // Handle popNavigationOnSuccess from finalNavigation entry
+          // Handle navigation pop or replace
           const currentEntry =
             finalNavigation.stack[finalNavigation.stack.length - 1];
           const popCount = currentEntry?.popNavigationOnSuccess;
-          if (popCount && popCount > 0) {
+          const replaceConfig = currentEntry?.replaceOnSuccess;
+
+          if (replaceConfig) {
+            const urlPathParams = replaceConfig.getUrlPathParams
+              ? replaceConfig.getUrlPathParams(responseData)
+              : undefined;
+            finalNavigation.replace(replaceConfig.endpoint, {
+              urlPathParams,
+              prefillFromGet: replaceConfig.prefillFromGet,
+              getEndpoint: replaceConfig.prefillFromGet
+                ? replaceConfig.getEndpoint
+                : undefined,
+            });
+          } else if (popCount && popCount > 0) {
             for (let i = 0; i < popCount; i++) {
               finalNavigation.pop();
             }
-            return;
           }
         },
       };
     }
 
-    return mergedMutationOptions;
+    return callerMutationOptions;
   }, [
     isMutationEndpoint,
     endpoint.POST,
@@ -216,7 +206,7 @@ function EndpointsPageInternal<
     const patchEndpoint = endpoint.PATCH;
     const existingPatchOptions = endpointOptions?.update?.mutationOptions;
 
-    if (!patchEndpoint || !existingPatchOptions) {
+    if (!patchEndpoint || !finalNavigation) {
       return existingPatchOptions;
     }
 
@@ -241,11 +231,24 @@ function EndpointsPageInternal<
           }
         }
 
-        // Handle popNavigationOnSuccess from finalNavigation entry
+        // Handle popNavigationOnSuccess or replaceOnSuccess from finalNavigation entry
         const currentEntry =
           finalNavigation.stack[finalNavigation.stack.length - 1];
         const popCount = currentEntry?.popNavigationOnSuccess;
-        if (popCount && popCount > 0) {
+        const replaceConfig = currentEntry?.replaceOnSuccess;
+
+        if (replaceConfig) {
+          const urlPathParams = replaceConfig.getUrlPathParams
+            ? replaceConfig.getUrlPathParams(responseData)
+            : undefined;
+          finalNavigation.replace(replaceConfig.endpoint, {
+            urlPathParams,
+            prefillFromGet: replaceConfig.prefillFromGet,
+            getEndpoint: replaceConfig.prefillFromGet
+              ? replaceConfig.getEndpoint
+              : undefined,
+          });
+        } else if (popCount && popCount > 0) {
           for (let i = 0; i < popCount; i++) {
             finalNavigation.pop();
           }
@@ -263,7 +266,7 @@ function EndpointsPageInternal<
     const deleteEndpoint = endpoint.DELETE;
     const existingDeleteOptions = endpointOptions?.delete?.mutationOptions;
 
-    if (!deleteEndpoint || !existingDeleteOptions) {
+    if (!deleteEndpoint || !finalNavigation) {
       return existingDeleteOptions;
     }
 
@@ -288,11 +291,24 @@ function EndpointsPageInternal<
           }
         }
 
-        // Handle popNavigationOnSuccess from finalNavigation entry
+        // Handle popNavigationOnSuccess or replaceOnSuccess from finalNavigation entry
         const currentEntry =
           finalNavigation.stack[finalNavigation.stack.length - 1];
         const popCount = currentEntry?.popNavigationOnSuccess;
-        if (popCount && popCount > 0) {
+        const replaceConfig = currentEntry?.replaceOnSuccess;
+
+        if (replaceConfig) {
+          const urlPathParams = replaceConfig.getUrlPathParams
+            ? replaceConfig.getUrlPathParams(responseData)
+            : undefined;
+          finalNavigation.replace(replaceConfig.endpoint, {
+            urlPathParams,
+            prefillFromGet: replaceConfig.prefillFromGet,
+            getEndpoint: replaceConfig.prefillFromGet
+              ? replaceConfig.getEndpoint
+              : undefined,
+          });
+        } else if (popCount && popCount > 0) {
           for (let i = 0; i < popCount; i++) {
             finalNavigation.pop();
           }
@@ -789,7 +805,14 @@ function StackEntryLayer({
             create: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.data,
-              mutationOptions: entry.endpoint.options?.mutationOptions,
+              mutationOptions: entry.endpoint.options?.mutationOptions
+                ? (() => {
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    const { onSuccess, ...rest } =
+                      entry.endpoint.options.mutationOptions;
+                    return Object.keys(rest).length > 0 ? rest : undefined;
+                  })()
+                : undefined,
             },
           }}
           submitButton={submitButton}
@@ -833,7 +856,14 @@ function StackEntryLayer({
             update: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.data,
-              mutationOptions: entry.endpoint.options?.mutationOptions,
+              mutationOptions: entry.endpoint.options?.mutationOptions
+                ? (() => {
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    const { onSuccess, ...rest } =
+                      entry.endpoint.options.mutationOptions;
+                    return Object.keys(rest).length > 0 ? rest : undefined;
+                  })()
+                : undefined,
             },
           }}
           submitButton={submitButton}
@@ -864,7 +894,14 @@ function StackEntryLayer({
             delete: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.urlPathParams,
-              mutationOptions: entry.endpoint.options?.mutationOptions,
+              mutationOptions: entry.endpoint.options?.mutationOptions
+                ? (() => {
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    const { onSuccess, ...rest } =
+                      entry.endpoint.options.mutationOptions;
+                    return Object.keys(rest).length > 0 ? rest : undefined;
+                  })()
+                : undefined,
             },
           }}
           debug={debug}

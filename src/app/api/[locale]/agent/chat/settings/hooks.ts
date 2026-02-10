@@ -21,11 +21,6 @@ import type {
 } from "./definition";
 import settingsDefinition from "./definition";
 
-interface UseChatSettingsOptions {
-  user: JwtPayloadType;
-  logger: EndpointLogger;
-}
-
 interface UseChatSettingsReturn {
   settings: ChatSettingsGetResponseOutput | null;
   isLoading: boolean;
@@ -52,10 +47,10 @@ interface UseChatSettingsReturn {
  * - Authenticated users: server storage via API
  * - Non-authenticated users: localStorage with callbacks
  */
-export function useChatSettings({
-  user,
-  logger,
-}: UseChatSettingsOptions): UseChatSettingsReturn {
+export function useChatSettings(
+  user: JwtPayloadType,
+  logger: EndpointLogger,
+): UseChatSettingsReturn {
   const isAuthenticated = useMemo(
     () => user !== undefined && !user.isPublic,
     [user],
@@ -65,9 +60,11 @@ export function useChatSettings({
   const endpoint = useEndpoint(
     settingsDefinition,
     {
-      queryOptions: {
-        enabled: true,
-        refetchOnWindowFocus: false,
+      read: {
+        queryOptions: {
+          enabled: true,
+          refetchOnWindowFocus: false,
+        },
       },
     },
     logger,

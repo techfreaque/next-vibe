@@ -55,26 +55,30 @@ export function TestEmailForm({
   const currentLanguage = getLanguageFromLocale(locale);
 
   const endpoint = useTestEmailEndpoint(user, logger, {
-    defaultValues: {
-      testEmail: "test@example.com",
-      // Prefill SMTP account criteria based on template context
-      campaignType: CampaignType.LEAD_CAMPAIGN,
-      emailJourneyVariant: emailJourneyVariant,
-      emailCampaignStage: emailCampaignStage,
-      leadData: {
-        /* eslint-disable i18next/no-literal-string -- Mock data for email preview */
-        businessName: "Acme Digital Solutions",
-        contactName: "Jane Smith",
-        website: "https://acme-digital.com",
-        /* eslint-enable i18next/no-literal-string */
-        country: currentCountry,
-        language: currentLanguage,
-        status: LeadStatus.NEW,
-        source: LeadSource.WEBSITE,
-        /* eslint-disable i18next/no-literal-string -- Mock data for email preview */
-        notes:
-          "Interested in premium social media management services. High potential client with established business.",
-        /* eslint-enable i18next/no-literal-string */
+    create: {
+      formOptions: {
+        defaultValues: {
+          testEmail: "test@example.com",
+          // Prefill SMTP account criteria based on template context
+          campaignType: CampaignType.LEAD_CAMPAIGN,
+          emailJourneyVariant: emailJourneyVariant,
+          emailCampaignStage: emailCampaignStage,
+          leadData: {
+            /* eslint-disable i18next/no-literal-string -- Mock data for email preview */
+            businessName: "Acme Digital Solutions",
+            contactName: "Jane Smith",
+            website: "https://acme-digital.com",
+            /* eslint-enable i18next/no-literal-string */
+            country: currentCountry,
+            language: currentLanguage,
+            status: LeadStatus.NEW,
+            source: LeadSource.WEBSITE,
+            /* eslint-disable i18next/no-literal-string -- Mock data for email preview */
+            notes:
+              "Interested in premium social media management services. High potential client with established business.",
+            /* eslint-enable i18next/no-literal-string */
+          },
+        },
       },
     },
   });

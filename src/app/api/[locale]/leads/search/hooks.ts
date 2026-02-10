@@ -22,9 +22,13 @@ export function useLeadSearchEndpoint(
   return useEndpoint(
     leadSearchEndpoints,
     {
-      enabled: true, // Always enabled to show all leads initially
-      refetchOnWindowFocus: false,
-      staleTime: 30000, // 30 seconds
+      read: {
+        queryOptions: {
+          enabled: true, // Always enabled to show all leads initially
+          refetchOnWindowFocus: false,
+          staleTime: 30000, // 30 seconds
+        },
+      },
     },
     logger,
     user,

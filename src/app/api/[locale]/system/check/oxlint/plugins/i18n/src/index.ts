@@ -304,6 +304,26 @@ const noLiteralStringRule = {
       "JSXExpressionContainer > Literal"(node: OxlintASTNode): void {
         const value = (node as JSXLiteral).value;
         if (typeof value === "string" && !shouldExcludeString(value)) {
+          // Check if this literal is inside a JSXAttribute with an excluded name
+          // Walk up the AST to find the parent JSXAttribute
+          let parent = node.parent;
+          while (parent) {
+            if (parent.type === "JSXAttribute") {
+              const attrNode = parent as JSXAttribute;
+              const nameNode = attrNode.name;
+              if (nameNode) {
+                const attrName: string =
+                  (nameNode as JSXIdentifier).name ?? String(nameNode);
+                // Skip if this is an excluded attribute
+                if (isExcludedAttribute(attrName)) {
+                  return;
+                }
+              }
+              break;
+            }
+            parent = parent.parent;
+          }
+
           context.report({
             node,
             message: formatMessage(messages.jsxExpression, value),

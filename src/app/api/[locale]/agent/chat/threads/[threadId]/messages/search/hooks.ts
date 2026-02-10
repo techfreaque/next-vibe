@@ -38,11 +38,13 @@ export function useMessageSearch(
   return useEndpoint(
     definitions,
     {
-      urlPathParams: { threadId: params.threadId },
-      queryOptions: {
-        enabled: params.enabled ?? false, // Disabled by default
-        refetchOnWindowFocus: false,
-        staleTime: 60 * 1000, // 1 minute - search results can be cached longer
+      read: {
+        urlPathParams: { threadId: params.threadId },
+        queryOptions: {
+          enabled: params.enabled ?? false, // Disabled by default
+          refetchOnWindowFocus: false,
+          staleTime: 60 * 1000, // 1 minute - search results can be cached longer
+        },
       },
     },
     logger,

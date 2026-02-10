@@ -35,14 +35,18 @@ export function useThread(
   return useEndpoint(
     definitions,
     {
-      urlPathParams: { threadId: params.threadId },
-      queryOptions: {
-        enabled: params.enabled ?? true,
-        refetchOnWindowFocus: false,
-        staleTime: 30 * 1000, // 30 seconds
+      read: {
+        urlPathParams: { threadId: params.threadId },
+        queryOptions: {
+          enabled: params.enabled ?? true,
+          refetchOnWindowFocus: false,
+          staleTime: 30 * 1000, // 30 seconds
+        },
       },
-      formOptions: {
-        persistForm: false,
+      update: {
+        formOptions: {
+          persistForm: false,
+        },
       },
     },
     logger,

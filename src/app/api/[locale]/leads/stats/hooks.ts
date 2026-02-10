@@ -30,10 +30,12 @@ export function useLeadsStatsEndpoint(
 ): LeadsStatsEndpointReturn {
   const queryOptions = useMemo(
     () => ({
-      queryOptions: {
-        enabled: enabled !== false,
-        refetchOnWindowFocus: false,
-        staleTime: 30 * 1000, // 30 seconds
+      read: {
+        queryOptions: {
+          enabled: enabled !== false,
+          refetchOnWindowFocus: false,
+          staleTime: 30 * 1000, // 30 seconds
+        },
       },
       user,
     }),

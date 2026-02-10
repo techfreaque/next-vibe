@@ -24,7 +24,7 @@ import { RangeSlider } from "next-vibe-ui/ui/range-slider";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   CONTENT_DISPLAY,
@@ -203,8 +203,18 @@ export function ModelSelector({
   readOnly = false,
   t,
 }: ModelSelectorProps): JSX.Element {
-  // UI state
-  const [useCharacterBased, setUseCharacterBased] = useState(false);
+  // UI state - initialize to CHARACTER_BASED if modelSelection is null and we have character defaults
+  const [useCharacterBased, setUseCharacterBased] = useState(
+    !modelSelection && !!characterModelSelection,
+  );
+
+  // Reset to CHARACTER_BASED when characterModelSelection changes and we have no modelSelection
+  useEffect(() => {
+    if (!modelSelection && characterModelSelection) {
+      setUseCharacterBased(true);
+    }
+  }, [characterModelSelection, modelSelection]);
+
   const [showAllModels, setShowAllModels] = useState(false);
   const [showUnfilteredModels, setShowUnfilteredModels] = useState(false);
   const [showLegacyByGroup, setShowLegacyByGroup] = useState<
@@ -222,42 +232,49 @@ export function ModelSelector({
     ? ModelSelectionType.CHARACTER_BASED
     : currentSelection.selectionType;
 
-  // activeSelection is same as currentSelection now
+  // activeSelection is used for filtering models - use currentSelection
   const activeSelection = currentSelection;
+
+  // For slider UI, show character filters when in CHARACTER_BASED, otherwise show modelSelection filters
+  // Both FILTERS and MANUAL types store filter ranges
+  const sliderSource =
+    useCharacterBased && characterModelSelection
+      ? characterModelSelection
+      : modelSelection;
 
   const intelligenceIndices = useMemo(
     () =>
-      activeSelection?.selectionType === ModelSelectionType.FILTERS
+      sliderSource && sliderSource.intelligenceRange
         ? getIndicesFromRange(
-            activeSelection.intelligenceRange,
+            sliderSource.intelligenceRange,
             INTELLIGENCE_DISPLAY,
           )
         : { min: 0, max: INTELLIGENCE_DISPLAY.length - 1 },
-    [activeSelection],
+    [sliderSource],
   );
 
   const contentIndices = useMemo(
     () =>
-      activeSelection?.selectionType === ModelSelectionType.FILTERS
-        ? getIndicesFromRange(activeSelection.contentRange, CONTENT_DISPLAY)
+      sliderSource && sliderSource.contentRange
+        ? getIndicesFromRange(sliderSource.contentRange, CONTENT_DISPLAY)
         : { min: 0, max: CONTENT_DISPLAY.length - 1 },
-    [activeSelection],
+    [sliderSource],
   );
 
   const speedIndices = useMemo(
     () =>
-      activeSelection?.selectionType === ModelSelectionType.FILTERS
-        ? getIndicesFromRange(activeSelection.speedRange, SPEED_DISPLAY)
+      sliderSource && sliderSource.speedRange
+        ? getIndicesFromRange(sliderSource.speedRange, SPEED_DISPLAY)
         : { min: 0, max: SPEED_DISPLAY.length - 1 },
-    [activeSelection],
+    [sliderSource],
   );
 
   const priceIndices = useMemo(
     () =>
-      activeSelection?.selectionType === ModelSelectionType.FILTERS
-        ? getIndicesFromRange(activeSelection.priceRange, PRICE_DISPLAY)
+      sliderSource && sliderSource.priceRange
+        ? getIndicesFromRange(sliderSource.priceRange, PRICE_DISPLAY)
         : { min: 0, max: PRICE_DISPLAY.length - 1 },
-    [activeSelection],
+    [sliderSource],
   );
 
   const manualModelId =
@@ -281,25 +298,25 @@ export function ModelSelector({
       | typeof ModelSelectionType.MANUAL,
   ): void => {
     if (newMode === ModelSelectionType.CHARACTER_BASED) {
-      // Just toggle the UI state
+      // Just toggle the UI state - don't change form value
       setUseCharacterBased(true);
     } else {
       setUseCharacterBased(false);
 
-      if (newMode === ModelSelectionType.MANUAL) {
-        // When switching to manual, preserve current filter/sort settings
-        const baseProps = {
-          intelligenceRange: getRangeFromIndices(
-            intelligenceIndices,
-            INTELLIGENCE_DISPLAY,
-          ),
-          priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-          contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-          speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-          sortBy,
-          sortDirection,
-        };
+      // Use current slider values (which reflect character filters if coming from CHARACTER_BASED)
+      const baseProps = {
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      };
 
+      if (newMode === ModelSelectionType.MANUAL) {
         // Try to keep current model if available, otherwise use best filtered model
         const currentModel =
           manualModelId ??
@@ -311,19 +328,6 @@ export function ModelSelector({
           ...baseProps,
         });
       } else {
-        // Filters mode - preserve current filter/sort settings
-        const baseProps = {
-          intelligenceRange: getRangeFromIndices(
-            intelligenceIndices,
-            INTELLIGENCE_DISPLAY,
-          ),
-          priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-          contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-          speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-          sortBy,
-          sortDirection,
-        };
-
         updateValue({
           selectionType: ModelSelectionType.FILTERS,
           ...baseProps,
@@ -332,69 +336,158 @@ export function ModelSelector({
     }
   };
 
-  // Range change handlers - automatically switch to FILTERS mode when editing
+  // Range change handlers - switch to FILTERS mode when editing (unless already in MANUAL)
   const handleIntelligenceChange = (min: number, max: number): void => {
-    updateValue({
-      selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: getRangeFromIndices(
-        { min, max },
-        INTELLIGENCE_DISPLAY,
-      ),
-      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-      sortBy,
-      sortDirection,
-    });
+    setUseCharacterBased(false);
+    const newType =
+      mode === ModelSelectionType.MANUAL
+        ? ModelSelectionType.MANUAL
+        : ModelSelectionType.FILTERS;
+
+    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+      updateValue({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId,
+        intelligenceRange: getRangeFromIndices(
+          { min, max },
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      });
+    } else {
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange: getRangeFromIndices(
+          { min, max },
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      });
+    }
   };
 
   const handleContentChange = (min: number, max: number): void => {
-    updateValue({
-      selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: getRangeFromIndices(
-        intelligenceIndices,
-        INTELLIGENCE_DISPLAY,
-      ),
-      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-      contentRange: getRangeFromIndices({ min, max }, CONTENT_DISPLAY),
-      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-      sortBy,
-      sortDirection,
-    });
+    setUseCharacterBased(false);
+    const newType =
+      mode === ModelSelectionType.MANUAL
+        ? ModelSelectionType.MANUAL
+        : ModelSelectionType.FILTERS;
+
+    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+      updateValue({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices({ min, max }, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      });
+    } else {
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices({ min, max }, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      });
+    }
   };
 
   const handleSpeedChange = (min: number, max: number): void => {
-    updateValue({
-      selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: getRangeFromIndices(
-        intelligenceIndices,
-        INTELLIGENCE_DISPLAY,
-      ),
-      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-      speedRange: getRangeFromIndices({ min, max }, SPEED_DISPLAY),
-      sortBy,
-      sortDirection,
-    });
+    setUseCharacterBased(false);
+    const newType =
+      mode === ModelSelectionType.MANUAL
+        ? ModelSelectionType.MANUAL
+        : ModelSelectionType.FILTERS;
+
+    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+      updateValue({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices({ min, max }, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      });
+    } else {
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices({ min, max }, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      });
+    }
   };
 
   const handlePriceChange = (min: number, max: number): void => {
-    updateValue({
-      selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: getRangeFromIndices(
-        intelligenceIndices,
-        INTELLIGENCE_DISPLAY,
-      ),
-      priceRange: getRangeFromIndices({ min, max }, PRICE_DISPLAY),
-      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-      sortBy,
-      sortDirection,
-    });
+    setUseCharacterBased(false);
+    const newType =
+      mode === ModelSelectionType.MANUAL
+        ? ModelSelectionType.MANUAL
+        : ModelSelectionType.FILTERS;
+
+    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+      updateValue({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices({ min, max }, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      });
+    } else {
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices({ min, max }, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      });
+    }
   };
 
   const handleModelSelect = (modelId: ModelId): void => {
     // When selecting a model, preserve current filter/sort settings
+    setUseCharacterBased(false);
     updateValue({
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: modelId,
@@ -410,17 +503,19 @@ export function ModelSelector({
     });
   };
 
-  // Get current sort settings from activeSelection (respects CHARACTER_BASED mode)
+  // Get current sort settings from activeSelection (works for both FILTERS and MANUAL)
   const sortBy =
-    activeSelection?.selectionType === ModelSelectionType.FILTERS
+    activeSelection?.selectionType === ModelSelectionType.FILTERS ||
+    activeSelection?.selectionType === ModelSelectionType.MANUAL
       ? activeSelection.sortBy
       : undefined;
   const sortDirection =
-    activeSelection?.selectionType === ModelSelectionType.FILTERS
+    activeSelection?.selectionType === ModelSelectionType.FILTERS ||
+    activeSelection?.selectionType === ModelSelectionType.MANUAL
       ? activeSelection.sortDirection
       : undefined;
 
-  // Sort change handlers - automatically switch to FILTERS mode when editing
+  // Sort change handlers - switch to FILTERS mode when editing (unless already in MANUAL)
   const handleSortFieldChange = (
     field: (typeof ModelSortField)[keyof typeof ModelSortField],
   ): void => {
@@ -428,18 +523,40 @@ export function ModelSelector({
     // All fields default to DESC (highest/best first, including most expensive for price)
     const defaultDirection = ModelSortDirection.DESC;
 
-    updateValue({
-      selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: getRangeFromIndices(
-        intelligenceIndices,
-        INTELLIGENCE_DISPLAY,
-      ),
-      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-      sortBy: field,
-      sortDirection: defaultDirection,
-    });
+    setUseCharacterBased(false);
+    const newType =
+      mode === ModelSelectionType.MANUAL
+        ? ModelSelectionType.MANUAL
+        : ModelSelectionType.FILTERS;
+
+    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+      updateValue({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy: field,
+        sortDirection: defaultDirection,
+      });
+    } else {
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy: field,
+        sortDirection: defaultDirection,
+      });
+    }
   };
 
   const handleSortDirectionToggle = (): void => {
@@ -447,18 +564,41 @@ export function ModelSelector({
       sortDirection === ModelSortDirection.ASC
         ? ModelSortDirection.DESC
         : ModelSortDirection.ASC;
-    updateValue({
-      selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: getRangeFromIndices(
-        intelligenceIndices,
-        INTELLIGENCE_DISPLAY,
-      ),
-      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
-      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
-      sortBy: sortBy ?? ModelSortField.INTELLIGENCE,
-      sortDirection: newDirection,
-    });
+
+    setUseCharacterBased(false);
+    const newType =
+      mode === ModelSelectionType.MANUAL
+        ? ModelSelectionType.MANUAL
+        : ModelSelectionType.FILTERS;
+
+    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+      updateValue({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy: sortBy ?? ModelSortField.INTELLIGENCE,
+        sortDirection: newDirection,
+      });
+    } else {
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy: sortBy ?? ModelSortField.INTELLIGENCE,
+        sortDirection: newDirection,
+      });
+    }
   };
 
   // Calculate filtered models and best model

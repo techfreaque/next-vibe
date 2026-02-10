@@ -34,6 +34,7 @@ import {
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetTranslation,
 } from "../../_shared/use-widget-context";
@@ -55,6 +56,7 @@ export function BooleanFieldWidget<
 >): JSX.Element {
   const t = useWidgetTranslation();
   const form = useWidgetForm();
+  const isDisabled = useWidgetDisabled();
   if (!form || !fieldName) {
     return (
       <Div>
@@ -85,7 +87,7 @@ export function BooleanFieldWidget<
                       name={formField.name}
                       checked={formField.value}
                       onCheckedChange={(checked) => formField.onChange(checked)}
-                      disabled={field.disabled || field.readonly}
+                      disabled={isDisabled || field.disabled || field.readonly}
                       className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                     />
                   </FormControl>
@@ -138,7 +140,7 @@ export function BooleanFieldWidget<
                       name={formField.name}
                       checked={formField.value}
                       onCheckedChange={(checked) => formField.onChange(checked)}
-                      disabled={field.disabled || field.readonly}
+                      disabled={isDisabled || field.disabled || field.readonly}
                       className="data-[state=checked]:bg-blue-600"
                     />
                   </FormControl>

@@ -72,6 +72,8 @@ export class StreamErrorHandler {
       parentId: lastParentId,
       depth: lastDepth,
       sequenceId: lastSequenceId,
+      model: null,
+      character: null,
     });
     controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
 

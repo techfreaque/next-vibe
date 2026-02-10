@@ -46,6 +46,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { NavigationStackProvider } from "../../../react/hooks/use-navigation-stack";
 import { EndpointRenderer } from "./EndpointRenderer";
 
 type ToolDecision =
@@ -228,6 +229,11 @@ export function ToolCallRenderer({
   ]);
 
   useEffect(() => {
+    // Skip if definition is already loaded
+    if (definition) {
+      return;
+    }
+
     const loadDef = async (): Promise<void> => {
       // toolCall.toolName comes from AI SDK, which uses path_with_underscores format
       // We need to try multiple formats to find the definition:
@@ -237,10 +243,6 @@ export function ToolCallRenderer({
 
       const logger = createEndpointLogger(true, Date.now(), locale);
 
-      logger.debug("[ToolCallRenderer] Loading definition", {
-        toolName: toolCall.toolName,
-      });
-
       let result = await definitionLoader.load({
         identifier: toolCall.toolName,
         platform: Platform.NEXT_PAGE,
@@ -248,57 +250,32 @@ export function ToolCallRenderer({
         logger,
       });
 
-      logger.debug("[ToolCallRenderer] First attempt", {
-        success: result.success,
-        identifier: toolCall.toolName,
-      });
-
       if (!result.success && toolCall.toolName.includes("_")) {
         const convertedPath = `${toolCall.toolName.replaceAll("_", "/")}/GET`;
-        logger.debug("[ToolCallRenderer] Trying converted GET path", {
-          convertedPath,
-        });
         result = await definitionLoader.load({
           identifier: convertedPath,
           platform: Platform.NEXT_PAGE,
           user,
           logger,
-        });
-        logger.debug("[ToolCallRenderer] Converted GET result", {
-          success: result.success,
         });
       }
 
       if (!result.success && toolCall.toolName.includes("_")) {
         const convertedPath = `${toolCall.toolName.replaceAll("_", "/")}/POST`;
-        logger.debug("[ToolCallRenderer] Trying converted POST path", {
-          convertedPath,
-        });
         result = await definitionLoader.load({
           identifier: convertedPath,
           platform: Platform.NEXT_PAGE,
           user,
           logger,
         });
-        logger.debug("[ToolCallRenderer] Converted POST result", {
-          success: result.success,
-        });
       }
 
       if (result.success) {
-        logger.info("[ToolCallRenderer] Definition loaded", {
-          hasFields: !!result.data.fields,
-          fieldsType: typeof result.data.fields,
-        });
         setDefinition(result.data);
-      } else {
-        logger.error("[ToolCallRenderer] Failed to load definition", {
-          message: result.message,
-        });
       }
     };
     void loadDef();
-  }, [toolCall.toolName, locale, user]);
+  }, [toolCall.toolName, locale, user, definition]);
 
   const hasResult = Boolean(toolCall.result);
   const hasError = Boolean(toolCall.error);
@@ -517,7 +494,6 @@ export function ToolCallRenderer({
                 // - Declined: disabled form with error message, no buttons
                 // - Complete: read-only display
                 const isDeclined = Boolean(hasError && toolCall.args);
-                const isEditable = isWaitingForConfirmation && !isDeclined;
                 const needsConfirmation =
                   isWaitingForConfirmation && !isDeclined;
 
@@ -589,7 +565,7 @@ export function ToolCallRenderer({
                 return (
                   <Div
                     className="p-4 space-y-4"
-                    data-tool-editable={isEditable}
+                    data-tool-editable={needsConfirmation}
                   >
                     {/* Show pending confirmation banner */}
                     {isWaitingForConfirmation && isPendingConfirm && (
@@ -641,43 +617,44 @@ export function ToolCallRenderer({
                         </Span>
                       </Div>
                     )}
-
-                    <EndpointRenderer
-                      user={user}
-                      endpoint={definition}
-                      locale={locale}
-                      data={mergedData}
-                      logger={logger}
-                      disabled={!isEditable || isDeclined || hasPendingDecision}
-                      form={
-                        needsConfirmation || isDeclined
-                          ? confirmationForm
-                          : undefined
-                      }
-                      onSubmit={needsConfirmation ? handleConfirm : undefined}
-                      onCancel={needsConfirmation ? handleCancel : undefined}
-                      submitButton={
-                        needsConfirmation
-                          ? {
-                              text: "app.api.system.unifiedInterface.react.widgets.toolCall.actions.confirm",
-                              variant:
-                                decision?.type === "confirmed"
-                                  ? "default"
-                                  : "ghost",
-                            }
-                          : undefined
-                      }
-                      cancelButton={
-                        needsConfirmation
-                          ? {
-                              variant:
-                                decision?.type === "declined"
-                                  ? "destructive"
-                                  : "ghost",
-                            }
-                          : undefined
-                      }
-                    />
+                    <NavigationStackProvider>
+                      <EndpointRenderer
+                        user={user}
+                        endpoint={definition}
+                        locale={locale}
+                        data={mergedData}
+                        logger={logger}
+                        disabled={!needsConfirmation || hasPendingDecision}
+                        form={
+                          needsConfirmation || isDeclined
+                            ? confirmationForm
+                            : undefined
+                        }
+                        onSubmit={needsConfirmation ? handleConfirm : undefined}
+                        onCancel={needsConfirmation ? handleCancel : undefined}
+                        submitButton={
+                          needsConfirmation
+                            ? {
+                                text: "app.api.system.unifiedInterface.react.widgets.toolCall.actions.confirm",
+                                variant:
+                                  decision?.type === "confirmed"
+                                    ? "default"
+                                    : "ghost",
+                              }
+                            : undefined
+                        }
+                        cancelButton={
+                          needsConfirmation
+                            ? {
+                                variant:
+                                  decision?.type === "declined"
+                                    ? "destructive"
+                                    : "ghost",
+                              }
+                            : undefined
+                        }
+                      />
+                    </NavigationStackProvider>
                   </Div>
                 );
               })()}

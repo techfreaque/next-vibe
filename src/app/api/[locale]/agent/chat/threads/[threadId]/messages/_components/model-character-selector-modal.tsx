@@ -54,6 +54,7 @@ export function ModelCharacterSelectorModal({
 
   const { t } = simpleT(locale);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectorOpen, setSelectorOpen] = useState(false);
   const title = t(titleKey);
   const description = t(descriptionKey);
   const finalConfirmLabel = confirmLabelKey
@@ -75,10 +76,10 @@ export function ModelCharacterSelectorModal({
   const isDisabled = isLoading || isSubmitting;
 
   return (
-    <Div className="w-full max-h-[calc(100dvh-180px)] overflow-y-auto relative z-10">
+    <Div className="w-full max-h-[min(800px,calc(100dvh-180px))] overflow-y-auto relative z-10">
       <Div
         className={cn(
-          "p-4 bg-card backdrop-blur",
+          "p-4 bg-background",
           "border border-border rounded-lg shadow-lg",
           "w-full",
         )}
@@ -113,6 +114,8 @@ export function ModelCharacterSelectorModal({
               logger={logger}
               buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
               user={user}
+              open={selectorOpen}
+              onOpenChange={setSelectorOpen}
             />
           </Div>
 

@@ -75,35 +75,47 @@ export function useEndpoint<
 
   const deleteEndpoint = endpoints.DELETE ?? null;
 
-  // Use hook options directly (endpoint-level options not accessible due to dynamic endpoint selection)
+  // Merge endpoint-level options with hook options (hook options take precedence)
+  // Extract endpoint read options if it's a GET endpoint
+  const endpointReadOptions =
+    readEndpoint?.options && "queryOptions" in readEndpoint.options
+      ? readEndpoint.options
+      : undefined;
+
   const readQueryEnabled =
     options?.read?.queryOptions?.enabled ??
-    options?.enabled ??
-    options?.queryOptions?.enabled ??
+    endpointReadOptions?.queryOptions?.enabled ??
     true;
-  const readUrlPathParams =
-    options?.read?.urlPathParams ??
-    options?.urlPathParams ??
-    options?.queryOptions?.urlPathParams;
+  const readUrlPathParams = options?.read?.urlPathParams;
   const readStaleTime =
     options?.read?.queryOptions?.staleTime ??
-    options?.staleTime ??
-    options?.queryOptions?.staleTime ??
+    endpointReadOptions?.queryOptions?.staleTime ??
     5 * 60 * 1000;
   const readRefetchOnWindowFocus =
     options?.read?.queryOptions?.refetchOnWindowFocus ??
-    options?.refetchOnWindowFocus ??
-    options?.queryOptions?.refetchOnWindowFocus ??
+    endpointReadOptions?.queryOptions?.refetchOnWindowFocus ??
     true;
   const autoPrefillEnabled = options?.autoPrefill ?? true;
 
   // Use read hook for GET endpoints - route to client or server
+  // Extract form options carefully handling the union type
+  const endpointAutoSubmit =
+    endpointReadOptions?.formOptions &&
+    "autoSubmit" in endpointReadOptions.formOptions
+      ? endpointReadOptions.formOptions.autoSubmit
+      : undefined;
+  const endpointDebounceMs =
+    endpointReadOptions?.formOptions &&
+    "debounceMs" in endpointReadOptions.formOptions
+      ? endpointReadOptions.formOptions.debounceMs
+      : undefined;
+
   const read = useEndpointRead(readEndpoint, logger, user, {
     formOptions: {
       persistForm: options?.read?.formOptions?.persistForm ?? false,
       persistenceKey: options?.read?.formOptions?.persistenceKey,
-      autoSubmit: options?.read?.formOptions?.autoSubmit,
-      debounceMs: options?.read?.formOptions?.debounceMs,
+      autoSubmit: options?.read?.formOptions?.autoSubmit ?? endpointAutoSubmit,
+      debounceMs: options?.read?.formOptions?.debounceMs ?? endpointDebounceMs,
     },
     queryOptions: {
       enabled: readQueryEnabled,
@@ -117,8 +129,7 @@ export function useEndpoint<
       showUnsavedChangesAlert: false,
       clearStorageAfterSubmit: false,
     },
-    initialState:
-      options?.read?.initialState ?? options?.filterOptions?.initialFilters,
+    initialState: options?.read?.initialState,
     initialData: options?.read?.initialData,
   });
 
@@ -132,18 +143,14 @@ export function useEndpoint<
 
   // Merge create options - only use hook-provided options (endpoint-level options not accessible due to dynamic endpoint selection)
   const createFormOptions = useMemo(() => {
-    const hookOpts = options?.create?.formOptions ?? options?.formOptions;
+    const hookOpts = options?.create?.formOptions;
 
     return {
       persistForm: hookOpts?.persistForm ?? false,
       persistenceKey: hookOpts?.persistenceKey,
-      defaultValues: hookOpts?.defaultValues ?? options?.defaultValues,
+      defaultValues: hookOpts?.defaultValues,
     };
-  }, [
-    options?.create?.formOptions,
-    options?.formOptions,
-    options?.defaultValues,
-  ]);
+  }, [options?.create?.formOptions]);
 
   const createMutationOptions = useMemo(():
     | ApiMutationOptions<
@@ -168,9 +175,7 @@ export function useEndpoint<
   }, [autoPrefillData, options?.create?.autoPrefillData]);
 
   const createUrlPathParams =
-    options?.create?.urlPathParams ??
-    options?.urlPathParams ??
-    readUrlPathParams;
+    options?.create?.urlPathParams ?? readUrlPathParams;
 
   // Always call the hook unconditionally - it handles null endpoints internally
   const createOperation = useEndpointCreate(primaryEndpoint, logger, user, {
@@ -200,8 +205,7 @@ export function useEndpoint<
     return options?.delete?.mutationOptions;
   }, [options?.delete?.mutationOptions]);
 
-  const deleteUrlPathParams =
-    options?.delete?.urlPathParams ?? options?.urlPathParams;
+  const deleteUrlPathParams = options?.delete?.urlPathParams;
 
   const deleteAutoPrefillData = useMemo(():
     | DeepPartial<DeleteRequest<T>>
@@ -319,18 +323,14 @@ export function useEndpoint<
 
   // Merge update options - only use hook-provided options (endpoint-level options not accessible due to dynamic endpoint selection)
   const updateFormOptions = useMemo(() => {
-    const hookOpts = options?.update?.formOptions ?? options?.formOptions;
+    const hookOpts = options?.update?.formOptions;
 
     return {
       persistForm: hookOpts?.persistForm ?? false,
       persistenceKey: hookOpts?.persistenceKey,
-      defaultValues: hookOpts?.defaultValues ?? options?.defaultValues,
+      defaultValues: hookOpts?.defaultValues,
     };
-  }, [
-    options?.update?.formOptions,
-    options?.formOptions,
-    options?.defaultValues,
-  ]);
+  }, [options?.update?.formOptions]);
 
   const updateMutationOptions = useMemo(():
     | ApiMutationOptions<
@@ -355,9 +355,7 @@ export function useEndpoint<
   }, [autoPrefillData, options?.update?.autoPrefillData]);
 
   const updateUrlPathParams =
-    options?.update?.urlPathParams ??
-    options?.urlPathParams ??
-    readUrlPathParams;
+    options?.update?.urlPathParams ?? readUrlPathParams;
 
   // Hook will merge endpoint options with passed options internally
   const updateOperation = useEndpointCreate(patchEndpoint, logger, user, {

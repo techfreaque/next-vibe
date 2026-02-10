@@ -22,9 +22,17 @@ export function useImapJobEndpoint(
   return useEndpoint(
     definitions,
     {
-      staleTime: 0, // Always fresh for job operations
-      refetchOnWindowFocus: false,
-      persistForm: false,
+      read: {
+        queryOptions: {
+          staleTime: 0, // Always fresh for job operations
+          refetchOnWindowFocus: false,
+        },
+      },
+      update: {
+        formOptions: {
+          persistForm: false,
+        },
+      },
     },
     logger,
     user,

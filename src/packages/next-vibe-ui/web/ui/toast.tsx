@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
-import { useIsMobile } from "@/hooks/use-media-query";
+import { useTouchDevice } from "@/hooks/use-touch-device";
 
 import type { StyleType } from "../utils/style-type";
 
@@ -152,7 +152,7 @@ export function ToastClose({
   style,
   children,
 }: ToastCloseProps): React.JSX.Element {
-  const isTouchDevice = useIsMobile();
+  const isTouchDevice = useTouchDevice();
 
   return (
     <ToastPrimitives.Close

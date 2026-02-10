@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   objectField,
   requestField,
   requestUrlPathParamsField,
@@ -20,6 +21,8 @@ import {
   UserRole,
   UserRoleDB,
 } from "@/app/api/[locale]/user/user-roles/enum";
+
+import { FolderPermissionsContainer } from "./widget";
 
 /**
  * Get Folder Permissions Endpoint (GET)
@@ -40,17 +43,10 @@ const { GET } = createEndpoint({
     "app.api.agent.chat.tags.permissions" as const,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.agent.chat.folders.id.permissions.get.container.title" as const,
-      description:
-        "app.api.agent.chat.folders.id.permissions.get.container.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "urlPathParams", response: true },
-    {
+  fields: customWidgetObject({
+    render: FolderPermissionsContainer,
+    usage: { response: true, request: "urlPathParams" } as const,
+    children: {
       // === REQUEST URL PARAMS ===
       id: requestUrlPathParamsField({
         type: WidgetType.FORM_FIELD,
@@ -124,7 +120,7 @@ const { GET } = createEndpoint({
         }),
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

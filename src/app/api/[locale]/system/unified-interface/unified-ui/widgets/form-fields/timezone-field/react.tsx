@@ -40,6 +40,7 @@ import {
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
@@ -81,6 +82,7 @@ export function TimezoneFieldWidget<
   const t = useWidgetTranslation();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
+  const isDisabled = useWidgetDisabled();
   if (!form || !fieldName) {
     return (
       <Div>
@@ -173,7 +175,7 @@ export function TimezoneFieldWidget<
                     ? formField.value
                     : undefined
                 }
-                disabled={field.disabled || field.readonly}
+                disabled={isDisabled || field.disabled || field.readonly}
                 name={formField.name}
               >
                 <SelectTrigger

@@ -10,7 +10,10 @@ import "server-only";
 import { parseError } from "next-vibe/shared/utils";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { TTS_COST_PER_CHARACTER } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
@@ -53,8 +56,9 @@ export class StreamingTTSHandler {
   private readonly logger: EndpointLogger;
   private readonly locale: CountryLanguage;
   private readonly voice: typeof TtsVoiceValue;
-  private readonly userId: string | undefined;
+  private readonly user: JwtPayloadType;
   private isEnabled: boolean;
+  private totalCharactersProcessed = 0;
 
   constructor(params: {
     controller: ReadableStreamDefaultController<Uint8Array>;
@@ -62,7 +66,7 @@ export class StreamingTTSHandler {
     logger: EndpointLogger;
     locale: CountryLanguage;
     voice: typeof TtsVoiceValue;
-    userId: string | undefined;
+    user: JwtPayloadType;
     enabled: boolean;
   }) {
     this.controller = params.controller;
@@ -70,7 +74,7 @@ export class StreamingTTSHandler {
     this.logger = params.logger;
     this.locale = params.locale;
     this.voice = params.voice;
-    this.userId = params.userId;
+    this.user = params.user;
     this.isEnabled = params.enabled;
   }
 
@@ -232,6 +236,42 @@ export class StreamingTTSHandler {
           textLength: cleanText.length,
           audioDataLength: audioDataUrl.length,
         });
+
+        // Track character count for credit deduction
+        this.totalCharactersProcessed += cleanText.length;
+
+        // Deduct credits for TTS (with partial deduction allowed - graceful to 0)
+        const creditsNeeded = cleanText.length * TTS_COST_PER_CHARACTER;
+        if (creditsNeeded > 0) {
+          const deductResult = await CreditRepository.deductCreditsForTTS(
+            this.user,
+            creditsNeeded,
+            this.logger,
+          );
+
+          if (deductResult.success) {
+            // Emit credit deduction event
+            const creditEvent = createStreamEvent.creditsDeducted({
+              amount: creditsNeeded,
+              feature: "tts",
+              type: "tool",
+              partial: deductResult.partialDeduction,
+            });
+            this.controller.enqueue(
+              this.encoder.encode(formatSSEEvent(creditEvent)),
+            );
+            this.logger.debug("[Streaming TTS] Credits deducted", {
+              characters: cleanText.length,
+              credits: creditsNeeded,
+              partial: deductResult.partialDeduction,
+            });
+          } else {
+            this.logger.warn("[Streaming TTS] Failed to deduct credits", {
+              characters: cleanText.length,
+              creditsNeeded,
+            });
+          }
+        }
       } else {
         this.logger.warn("[Streaming TTS] TTS conversion returned null", {
           text: cleanText.substring(0, 100),
@@ -501,7 +541,7 @@ export function createStreamingTTSHandler(params: {
   logger: EndpointLogger;
   locale: CountryLanguage;
   voice: typeof TtsVoiceValue;
-  userId: string | undefined;
+  user: JwtPayloadType;
   enabled: boolean;
 }): StreamingTTSHandler {
   return new StreamingTTSHandler(params);

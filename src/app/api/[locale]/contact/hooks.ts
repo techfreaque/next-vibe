@@ -29,14 +29,18 @@ export function useContactEndpoint(
   return useEndpoint(
     definitions,
     {
-      queryOptions: {
-        enabled: params?.enabled !== false,
-        refetchOnWindowFocus: false,
-        staleTime: 0, // Don't cache contact form submissions
+      read: {
+        queryOptions: {
+          enabled: params?.enabled !== false,
+          refetchOnWindowFocus: false,
+          staleTime: 0, // Don't cache contact form submissions
+        },
       },
-      formOptions: {
-        persistForm: false, // Don't persist contact forms
-        persistenceKey: "contact-form",
+      create: {
+        formOptions: {
+          persistForm: false, // Don't persist contact forms
+          persistenceKey: "contact-form",
+        },
       },
     },
     logger,

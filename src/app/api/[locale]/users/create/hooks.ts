@@ -21,9 +21,11 @@ export function useUsersCreateEndpoint(
   return useEndpoint(
     definitions,
     {
-      formOptions: {
-        persistForm: true,
-        persistenceKey: "users-create-form",
+      create: {
+        formOptions: {
+          persistForm: true,
+          persistenceKey: "users-create-form",
+        },
       },
     },
     logger,

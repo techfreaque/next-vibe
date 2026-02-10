@@ -438,8 +438,6 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   );
 
   // Use API query with form values as parameters from the store
-  const finalEnabled = queryOptions.enabled !== false;
-
   const query = useApiQuery({
     endpoint,
     requestData: queryParams,
@@ -448,7 +446,6 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     user,
     options: {
       ...queryOptions,
-      enabled: finalEnabled,
       // Respect staleTime and cacheTime from queryOptions
       // Don't hardcode to 0 as this breaks caching for all read endpoints
       // Custom onSuccess handler to merge response data into form

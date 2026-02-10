@@ -26,12 +26,20 @@ export function useUserByIdEndpoint(
   return useEndpoint(
     definitions,
     {
-      urlPathParams: { id: params.userId }, // URL parameters as top-level option
-      enabled: params.enabled,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      refetchOnWindowFocus: false,
-      persistForm: false,
-      persistenceKey: `user-edit-${params.userId}-form`, // eslint-disable-line i18next/no-literal-string -- Form persistence key
+      read: {
+        urlPathParams: { id: params.userId },
+        queryOptions: {
+          enabled: params.enabled,
+          staleTime: 5 * 60 * 1000, // 5 minutes
+          refetchOnWindowFocus: false,
+        },
+      },
+      update: {
+        formOptions: {
+          persistForm: false,
+          persistenceKey: `user-edit-${params.userId}-form`, // eslint-disable-line i18next/no-literal-string -- Form persistence key
+        },
+      },
     },
     logger,
     user,

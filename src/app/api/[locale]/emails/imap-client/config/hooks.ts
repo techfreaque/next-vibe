@@ -22,10 +22,12 @@ export function useImapConfig(
   return useEndpoint(
     definitions,
     {
-      queryOptions: {
-        enabled: true,
-        refetchOnWindowFocus: false,
-        staleTime: 60 * 1000, // 60 seconds
+      read: {
+        queryOptions: {
+          enabled: true,
+          refetchOnWindowFocus: false,
+          staleTime: 60 * 1000, // 60 seconds
+        },
       },
     },
     logger,

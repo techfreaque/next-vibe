@@ -39,11 +39,13 @@ export function useMessagePath(
   return useEndpoint(
     definitions,
     {
-      urlPathParams: { threadId: params.threadId },
-      queryOptions: {
-        enabled: params.enabled ?? false, // Disabled by default
-        refetchOnWindowFocus: false,
-        staleTime: 30 * 1000, // 30 seconds
+      read: {
+        urlPathParams: { threadId: params.threadId },
+        queryOptions: {
+          enabled: params.enabled ?? false, // Disabled by default
+          refetchOnWindowFocus: false,
+          staleTime: 30 * 1000, // 30 seconds
+        },
       },
     },
     logger,

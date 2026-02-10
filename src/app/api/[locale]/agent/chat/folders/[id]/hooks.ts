@@ -35,14 +35,18 @@ export function useFolder(
   return useEndpoint(
     definitions,
     {
-      urlPathParams: { id: params.folderId },
-      queryOptions: {
-        enabled: params.enabled ?? true,
-        refetchOnWindowFocus: false,
-        staleTime: 30 * 1000, // 30 seconds
+      read: {
+        urlPathParams: { id: params.folderId },
+        queryOptions: {
+          enabled: params.enabled ?? true,
+          refetchOnWindowFocus: false,
+          staleTime: 30 * 1000, // 30 seconds
+        },
       },
-      formOptions: {
-        persistForm: false,
+      create: {
+        formOptions: {
+          persistForm: false,
+        },
       },
     },
     logger,

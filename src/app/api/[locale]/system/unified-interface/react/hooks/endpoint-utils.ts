@@ -108,7 +108,7 @@ export function deepMerge<T>(...sources: (T | null | undefined)[]): T {
         typeof resultValue === "function"
       ) {
         // Create a chained function that calls both
-        result[key] = (async (...args: unknown[]) => {
+        result[key] = (async (...args) => {
           // Call first function
           const firstResult = await resultValue(...args);
           // If first function returned an error/truthy value, return it

@@ -4,11 +4,12 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
-import { type JSX, useEffect, useMemo } from "react";
+import { type JSX, memo, useEffect, useMemo } from "react";
 import { useCallback, useRef, useState } from "react";
 import type { FieldValues } from "react-hook-form";
 
 import { chatProse } from "@/app/[locale]/chat/lib/design-tokens";
+import { useCharacter } from "@/app/api/[locale]/agent/chat/characters/[id]/hooks";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { getModelById } from "@/app/api/[locale]/agent/models/models";
 import {
@@ -19,8 +20,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { FileAttachments } from "../../../_components/message-display/file-attachments";
 import { AssistantMessageActions } from "./assistant-message-actions";
+import { FileAttachments } from "./file-attachments";
 import { MessageAuthorInfo } from "./message-author";
 import type { MessageGroup } from "./message-grouping";
 import { type ToolDecision, ToolDisplay } from "./tool-display";
@@ -58,7 +59,7 @@ interface GroupedAssistantMessageProps {
  * Displays a sequence of AI messages as a single grouped message
  * Shows one header/avatar for the entire sequence
  */
-export function GroupedAssistantMessage({
+export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
   group,
   locale,
   onAnswerAsModel,
@@ -82,6 +83,14 @@ export function GroupedAssistantMessage({
     primary.role === "assistant" || primary.role === "user"
       ? primary.character
       : null;
+
+  // Fetch character name from character ID
+  const characterHook = useCharacter(
+    character || undefined,
+    user,
+    logger,
+  );
+  const characterName = characterHook.read?.data?.name ?? null;
 
   // Get display name for assistant
   const displayName = primary.model
@@ -324,6 +333,7 @@ export function GroupedAssistantMessage({
               timestamp={primary.createdAt}
               edited={primary.edited}
               character={character}
+              characterName={characterName}
               locale={locale}
               rootFolderId={rootFolderId}
               compact
@@ -454,4 +464,4 @@ export function GroupedAssistantMessage({
       </Div>
     </Div>
   );
-}
+});

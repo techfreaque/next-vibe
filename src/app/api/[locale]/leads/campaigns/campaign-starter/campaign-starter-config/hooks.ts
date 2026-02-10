@@ -25,14 +25,18 @@ export function useCampaignStarterConfigEndpoint(
   return useEndpoint(
     definitions,
     {
-      queryOptions: {
-        enabled: params?.enabled !== false,
-        refetchOnWindowFocus: true,
-        staleTime: 5 * 60 * 1000, // 5 minutes
+      read: {
+        queryOptions: {
+          enabled: params?.enabled !== false,
+          refetchOnWindowFocus: true,
+          staleTime: 5 * 60 * 1000, // 5 minutes
+        },
       },
-      formOptions: {
-        persistForm: false,
-        persistenceKey: "campaign-starter-config-form",
+      update: {
+        formOptions: {
+          persistForm: false,
+          persistenceKey: "campaign-starter-config-form",
+        },
       },
     },
     logger,

@@ -40,6 +40,11 @@ const baseFields = {
     example: "your-brave-search-key",
     comment: "Brave Search API key",
   },
+  KAGI_API_KEY: {
+    schema: z.string(),
+    example: "your-kagi-api-key",
+    comment: "Kagi API key",
+  },
   SCRAPPEY_API_KEY: {
     schema: z.string(),
     example: "your-scrappey-key",

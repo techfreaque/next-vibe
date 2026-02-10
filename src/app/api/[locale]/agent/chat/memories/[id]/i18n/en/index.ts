@@ -23,6 +23,15 @@ export const translations = {
       description:
         "Higher priority memories appear first (leave empty to keep current)",
     },
+    backButton: {
+      label: "Back",
+    },
+    submitButton: {
+      label: "Update Memory",
+    },
+    deleteButton: {
+      label: "Delete Memory",
+    },
     response: {
       success: {
         content: "Updated successfully",
@@ -76,11 +85,17 @@ export const translations = {
     description: "Removes a memory by ID",
     container: {
       title: "Delete Memory",
-      description: "Remove a memory permanently",
+      description: "Remove this memory permanently",
     },
     id: {
       label: "Memory ID",
       description: "The unique identifier of the memory to delete",
+    },
+    backButton: {
+      label: "Back",
+    },
+    deleteButton: {
+      label: "Delete",
     },
     response: {
       success: {

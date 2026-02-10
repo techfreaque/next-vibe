@@ -86,11 +86,7 @@ export const NO_CHARACTER = {
   },
 };
 
-/**
- * Default characters available in the application
- * These are read-only and defined in code
- */
-export const DEFAULT_CHARACTERS: Character[] = [
+export const COMPANION_CHARACTERS: Character[] = [
   {
     id: "thea",
     name: "app.api.agent.chat.characters.characters.thea.name" as const,
@@ -226,6 +222,14 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       sortDirection: ModelSortDirection.DESC,
     },
   },
+] as const;
+
+/**
+ * Default characters available in the application
+ * These are read-only and defined in code
+ */
+export const DEFAULT_CHARACTERS: Character[] = [
+  ...COMPANION_CHARACTERS,
   {
     id: "technical",
     name: "app.api.agent.chat.characters.characters.technical.name" as const,

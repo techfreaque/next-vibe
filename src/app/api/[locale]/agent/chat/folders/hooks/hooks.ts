@@ -29,17 +29,21 @@ export function useFoldersList(
   return useEndpoint(
     definitions,
     {
-      queryOptions: {
-        enabled: true,
-        refetchOnWindowFocus: true,
-        staleTime: 10 * 1000, // 10 seconds
+      read: {
+        queryOptions: {
+          enabled: true,
+          refetchOnWindowFocus: true,
+          staleTime: 10 * 1000, // 10 seconds
+        },
       },
-      formOptions: {
-        defaultValues: {
-          folder: {
-            rootFolderId: DefaultFolderId.PRIVATE,
-            name: "",
-            icon: "folder",
+      create: {
+        formOptions: {
+          defaultValues: {
+            folder: {
+              rootFolderId: DefaultFolderId.PRIVATE,
+              name: "",
+              icon: "folder",
+            },
           },
         },
       },
@@ -65,8 +69,10 @@ export function useCreateFolder(
   return useEndpoint(
     definitions,
     {
-      formOptions: {
-        persistForm: false,
+      create: {
+        formOptions: {
+          persistForm: false,
+        },
       },
     },
     logger,

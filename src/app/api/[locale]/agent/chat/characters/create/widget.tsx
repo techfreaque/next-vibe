@@ -5,6 +5,7 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
+import { type JSX, useCallback } from "react";
 
 import { ModelSelector } from "@/app/api/[locale]/agent/models/components/model-selector";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
@@ -21,7 +22,9 @@ import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import type { TParams } from "@/i18n/core/static-types";
 
+import type { ModelSelectionSimple } from "../../../models/components/types";
 import type defintion from "./definition";
 import type { CharacterCreateResponseOutput } from "./definition";
 
@@ -41,9 +44,9 @@ interface CustomWidgetProps {
  */
 export function CharacterCreateContainer({
   field,
-}: CustomWidgetProps): React.JSX.Element {
+}: CustomWidgetProps): JSX.Element {
   const children = field.children;
-  const form = useWidgetForm();
+  const form = useWidgetForm<typeof defintion.POST>();
   const t = useWidgetTranslation();
 
   return (
@@ -72,7 +75,7 @@ export function CharacterCreateContainer({
       </Div>
 
       {/* Scrollable Form Container */}
-      <Div className="group overflow-y-auto max-h-[calc(100dvh-180px)] px-4 pb-4">
+      <Div className="group overflow-y-auto max-h-[min(800px,calc(100dvh-180px))] px-4 pb-4">
         {/* Form Alert */}
         <FormAlertWidget field={{}} />
 
@@ -98,17 +101,37 @@ export function CharacterCreateContainer({
             fieldName="systemPrompt"
             field={children.systemPrompt}
           />
-          {form && (
-            <ModelSelector
-              modelSelection={form.watch("modelSelection")}
-              onChange={(selection) =>
-                form.setValue("modelSelection", selection)
-              }
-              t={t}
-            />
-          )}
+          <ModelSelectorWrapper form={form} t={t} />
         </Div>
       </Div>
     </Div>
+  );
+}
+
+function ModelSelectorWrapper({
+  form,
+  t,
+}: {
+  form: ReturnType<typeof useWidgetForm<typeof defintion.POST>>;
+  t: (key: string, params?: TParams) => string;
+}): JSX.Element {
+  const modelSelection = form.watch("modelSelection");
+  const error = form.formState.errors.modelSelection;
+  const onChange = useCallback(
+    (selection: ModelSelectionSimple) =>
+      form.setValue("modelSelection", selection),
+    [form],
+  );
+  return (
+    <>
+      {error && (
+        <Div className="text-red-500 text-sm mb-2">{error.message}</Div>
+      )}
+      <ModelSelector
+        modelSelection={modelSelection}
+        onChange={onChange}
+        t={t}
+      />
+    </>
   );
 }

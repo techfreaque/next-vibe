@@ -47,37 +47,53 @@ const { POST } = createEndpoint({
 
   options: {
     mutationOptions: {
-      onSuccess: async (data) => {
+      onSuccess: async ({ requestData, responseData, logger }) => {
         const { apiClient } =
           await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
         const favoritesDefinition = await import("../definition");
         const charactersDefinition =
           await import("../../characters/definition");
+        const characterSingleDefinitions =
+          await import("../../characters/[id]/definition");
         const { ChatFavoritesRepositoryClient } =
           await import("../repository-client");
 
         // Get character data from request
-        const characterIcon = data.requestData.icon;
-        const characterName = data.requestData.name;
-        const characterTagline = data.requestData.tagline;
-        const characterDescription = data.requestData.description;
-        const characterModelSelection =
-          data.requestData.characterModelSelection;
+        const characterIcon = requestData.icon;
+        const characterName = requestData.name;
+        const characterTagline = requestData.tagline;
+        const characterDescription = requestData.description;
+        const character = apiClient.getEndpointData(
+          characterSingleDefinitions.default.GET,
+          logger,
+          { id: requestData.characterId },
+        );
+        if (!character?.success) {
+          logger.error(
+            "Failed to fetch character data in create favorite onSuccess",
+            {
+              characterId: requestData.characterId,
+            },
+          );
+          return;
+        }
+
+        const characterModelSelection = character.data.modelSelection;
 
         // Create new favorite config for optimistic update
         const newFavoriteConfig = {
-          id: data.responseData.id,
-          characterId: data.requestData.characterId ?? "default",
+          id: responseData.id,
+          characterId: requestData.characterId ?? "default",
           customIcon: null,
-          voice: data.requestData.voice ?? null,
-          modelSelection: data.requestData.modelSelection,
+          voice: requestData.voice ?? null,
+          modelSelection: requestData.modelSelection,
           position: 0, // Will be set correctly by the list
         };
 
         // Optimistically add the new favorite to the list
         apiClient.updateEndpointData(
           favoritesDefinition.default.GET,
-          data.logger,
+          logger,
           (oldData) => {
             if (!oldData?.success) {
               return oldData;
@@ -107,7 +123,7 @@ const { POST } = createEndpoint({
         // Optimistically update characters list addedToFav
         apiClient.updateEndpointData(
           charactersDefinition.default.GET,
-          data.logger,
+          logger,
           (oldData) => {
             if (!oldData?.success) {
               return oldData;
@@ -120,7 +136,7 @@ const { POST } = createEndpoint({
                 sections: oldData.data.sections.map((section) => ({
                   ...section,
                   characters: section.characters.map((char) =>
-                    char.id === data.requestData.characterId
+                    char.id === requestData.characterId
                       ? { ...char, addedToFav: true }
                       : char,
                   ),
@@ -181,11 +197,15 @@ const { POST } = createEndpoint({
       voice: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.agent.chat.favorites.post.voice.label" as const,
+        label: "app.api.agent.chat.favorites.id.patch.voice.label" as const,
         description:
-          "app.api.agent.chat.favorites.post.voice.description" as const,
+          "app.api.agent.chat.favorites.id.patch.voice.description" as const,
         options: TtsVoiceOptions,
         columns: 6,
+        theme: {
+          descriptionStyle: "inline",
+          optionalColor: "transparent",
+        },
         schema: z.enum(TtsVoiceDB).nullable().optional(),
       }),
 

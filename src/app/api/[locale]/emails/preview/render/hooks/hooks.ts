@@ -32,9 +32,11 @@ export function useEmailPreviewRender(
   return useEndpoint(
     definitions,
     {
-      queryOptions: {
-        enabled: false, // Manual trigger
-        staleTime: 30 * 1000, // 30 seconds
+      read: {
+        queryOptions: {
+          enabled: false, // Manual trigger
+          staleTime: 30 * 1000, // 30 seconds
+        },
       },
     },
     logger,

@@ -317,6 +317,7 @@ export const CLI_ICONS: Record<IconKey, string> = {
   "si-alibabadotcom": "🛒",
   "freedom-gpt-logo": "🦅",
   "gab-ai-logo": "💬",
+  "venice-ai-logo": "🌊",
 
   // Moon & Night
   moon: "🌙",

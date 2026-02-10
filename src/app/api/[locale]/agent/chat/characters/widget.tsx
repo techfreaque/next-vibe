@@ -4,16 +4,22 @@
 
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Bot } from "next-vibe-ui/ui/icons/Bot";
-import { Globe } from "next-vibe-ui/ui/icons/Globe";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
-import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Star } from "next-vibe-ui/ui/icons/Star";
 import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
+import { Span } from "next-vibe-ui/ui/span";
+import { useState } from "react";
 
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
@@ -27,14 +33,12 @@ import { SeparatorWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { useTouchDevice } from "@/hooks/use-touch-device";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
-import { success } from "../../../shared/types/response.schema";
 import { cn } from "../../../shared/utils";
-import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { type ModelId, TOTAL_MODEL_COUNT } from "../../models/models";
-import type { FavoritesListResponseOutput } from "../favorites/definition";
+import { useTourState } from "../_components/welcome-tour/tour-state-context";
+import { useSelectorOnboardingContext } from "../threads/_components/chat-input/selector/selector-onboarding/context";
 import characterDetailDefinitions from "./[id]/definition";
+import { COMPANION_CHARACTERS } from "./config";
 import type { CharacterListItem } from "./definition";
 import type definition from "./definition";
 import type { CharacterListResponseOutput } from "./definition";
@@ -62,321 +66,97 @@ export function CharactersListContainer({
   const t = useWidgetTranslation();
   const isTouch = useTouchDevice();
   const isPublic = user.isPublic;
+  const [showSignupPrompt, setShowSignupPrompt] = useState(false);
+  const router = useRouter();
+  const { isOnboarding, companionCharacterId } = useSelectorOnboardingContext();
+  const setModelSelectorOpen = useTourState(
+    (state) => state.setModelSelectorOpen,
+  );
 
-  const handleEditCharacter = async (
-    char: CharacterListItem,
-  ): Promise<void> => {
-    const { apiClient } =
-      await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
-    const characterSingleDefinitions = await import("./[id]/definition");
-    const createFavoriteDefinitions =
-      await import("../favorites/create/definition");
-    const { DEFAULT_TTS_VOICE } = await import("../../text-to-speech/enum");
+  // Get companion character name for onboarding banner
+  const companionCharacter = companionCharacterId
+    ? COMPANION_CHARACTERS.find((c) => c.id === companionCharacterId)
+    : null;
 
-    // Fetch full character data
-    const characterResponse = await apiClient.fetch(
-      characterSingleDefinitions.default.GET,
-      logger,
-      user,
-      undefined,
-      { id: char.id },
-      locale,
-    );
-
-    if (!characterResponse.success) {
-      logger.error("Failed to fetch character data");
-      return;
-    }
-
-    const fullChar = characterResponse.data;
-
-    // Navigate to create favorite with character data
-    navigate(createFavoriteDefinitions.default.POST, {
-      data: {
-        characterId: char.id,
-        icon: fullChar.icon,
-        name: fullChar.name,
-        tagline: fullChar.tagline,
-        description: fullChar.description,
-        voice: fullChar.voice ?? DEFAULT_TTS_VOICE,
-        modelSelection: null,
-        characterModelSelection: fullChar.modelSelection,
-      },
-    });
-  };
-
-  const handleAddToFavorites = async (char: {
-    id: string;
-    icon: string;
-    modelId: ModelId;
-    name: TranslationKey;
-    tagline: TranslationKey;
-    description: TranslationKey;
-    modelIcon: IconKey;
-    modelInfo: string;
-    modelProvider: string;
-    creditCost: string;
-  }): Promise<void> => {
-    const { apiClient } =
-      await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
-    const favoritesDefinition = await import("../favorites/definition");
-    const createFavoriteDefinition =
-      await import("../favorites/create/definition");
-    const charactersDefinition = await import("./definition");
-    const characterSingleDefinitions = await import("./[id]/definition");
-
-    // Fetch full character data to get properly typed fields
-    const characterResponse = await apiClient.fetch(
-      characterSingleDefinitions.default.GET,
-      logger,
-      user,
-      undefined,
-      { id: char.id },
-      locale,
-    );
-
-    if (!characterResponse.success) {
-      logger.error("Failed to fetch character data");
-      return;
-    }
-
-    const fullChar = characterResponse.data;
-
-    // Optimistically update characters list addedToFav
-    apiClient.updateEndpointData(
-      charactersDefinition.default.GET,
-      logger,
-      (oldData) => {
-        if (!oldData?.success) {
-          return oldData;
-        }
-
-        return {
-          success: true,
-          data: {
-            sections: oldData.data.sections.map((section) => ({
-              ...section,
-              characters: section.characters.map((character) =>
-                character.id === char.id
-                  ? {
-                      ...character,
-                      addedToFav: true,
-                    }
-                  : character,
-              ),
-            })),
-          },
-        };
-      },
-      undefined,
-    );
-
-    // Create favorite
-    try {
-      const response = await apiClient.mutate(
-        createFavoriteDefinition.default.POST,
-        logger,
-        user,
-        {
-          characterId: char.id,
-          icon: fullChar.icon,
-          name: fullChar.name,
-          tagline: fullChar.tagline,
-          description: fullChar.description,
-          voice: fullChar.voice ?? undefined,
-          modelSelection: null,
-          characterModelSelection: fullChar.modelSelection,
+  const handleCreateCustomClick = async (): Promise<void> => {
+    if (isPublic) {
+      // Show signup prompt for public users
+      setShowSignupPrompt(true);
+    } else {
+      // Navigate to character create for authenticated users
+      const createCharacterDefinitions = await import("./create/definition");
+      navigate(createCharacterDefinitions.default.POST, {
+        replaceOnSuccess: {
+          endpoint: characterDetailDefinitions.GET,
+          getUrlPathParams: (responseData) => ({ id: responseData.id }),
+          prefillFromGet: true,
+          getEndpoint: characterDetailDefinitions.GET,
         },
-        undefined,
-        locale,
-      );
-
-      // Do optimistic update with real ID from server
-      if (response.success) {
-        apiClient.updateEndpointData(
-          favoritesDefinition.default.GET,
-          logger,
-          (oldData) => {
-            if (!oldData?.success) {
-              return oldData;
-            }
-
-            const newFavorite: FavoritesListResponseOutput["favorites"][number] =
-              {
-                id: response.data.id,
-                characterId: char.id,
-                modelId: char.modelId,
-                position: oldData.data.favorites.length,
-                icon: fullChar.icon ?? char.modelIcon,
-                name: fullChar.name ?? char.modelInfo,
-                tagline: fullChar.tagline,
-                activeBadge: null,
-                description: fullChar.description,
-                modelIcon: char.modelIcon,
-                modelInfo: char.modelInfo,
-                modelProvider: char.modelProvider,
-                creditCost: char.creditCost,
-              };
-
-            return success<FavoritesListResponseOutput>({
-              favorites: [...oldData.data.favorites, newFavorite],
-            });
-          },
-          undefined,
-        );
-      }
-
-      logger.info("Favorite created successfully");
-    } catch (error) {
-      logger.error("Failed to create favorite", {
-        errorMessage: error instanceof Error ? error.message : String(error),
       });
-      // Refetch to ensure consistency
-      await apiClient.refetchEndpoint(favoritesDefinition.default.GET, logger);
-      // Revert optimistic update on error
-      await apiClient.refetchEndpoint(charactersDefinition.default.GET, logger);
     }
   };
 
-  // Public user view - show marketing content
-  if (isPublic) {
-    const handleSignup = async (e: ButtonMouseEvent): Promise<void> => {
-      e.stopPropagation();
-      const signupDefinition =
-        await import("../../../user/public/signup/definition");
-      navigate(signupDefinition.default.POST, {});
-    };
+  const handleSignup = (): void => {
+    router.push(`/${locale}/user/signup`);
+  };
 
-    const handleLogin = async (e: ButtonMouseEvent): Promise<void> => {
-      e.stopPropagation();
-      const loginDefinition =
-        await import("../../../user/public/login/definition");
-      navigate(loginDefinition.default.POST, {});
-    };
+  const handleLogin = (): void => {
+    router.push(`/${locale}/user/login`);
+  };
 
+  // Show signup prompt if public user clicked create
+  if (isPublic && showSignupPrompt) {
     return (
       <Div className="flex flex-col gap-0">
-        {/* Top Actions: Back only */}
+        {/* Top Actions: Back */}
         <Div className="flex flex-row gap-2 px-4 py-4">
-          <NavigateButtonWidget field={children.backButton} />
+          <Button
+            type="button"
+            variant="outline"
+            size="default"
+            onClick={() => setShowSignupPrompt(false)}
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {t("app.api.agent.chat.characters.get.signupPrompt.backButton")}
+          </Button>
         </Div>
 
-        {/* Marketing Content */}
-        <Div className="border-t border-border p-6 overflow-y-auto max-h-[calc(100dvh-180px)]">
-          <Div className="max-w-2xl mx-auto flex flex-col gap-6">
-            {/* Hero Section */}
-            <Div className="flex flex-col gap-3 text-center">
-              <Div className="w-20 h-20 rounded-2xl flex items-center justify-center text-primary bg-primary/10 mx-auto">
-                <Sparkles className="h-10 w-10" />
-              </Div>
-              <Div className="text-2xl font-bold">
-                {t("app.api.agent.chat.characters.get.marketing.title")}
-              </Div>
-              <Div className="text-muted-foreground">
-                {t("app.api.agent.chat.characters.get.marketing.description")}
-              </Div>
+        {/* Signup Prompt */}
+        <Div className="border-t border-border p-6 overflow-y-auto max-h-[min(800px,calc(100dvh-180px))]">
+          <Div className="max-w-md mx-auto flex flex-col gap-6 text-center">
+            <Div className="text-xl font-semibold">
+              {t("app.api.agent.chat.characters.get.signupPrompt.title")}
             </Div>
-
-            {/* Features Grid */}
-            <Div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <Div className="flex items-start gap-3 p-4 rounded-lg border bg-card">
-                <Div className="w-12 h-12 rounded-lg flex items-center justify-center text-primary bg-primary/10 shrink-0">
-                  <Bot className="h-6 w-6" />
-                </Div>
-                <Div className="flex-1">
-                  <Div className="font-semibold mb-1">
-                    {t(
-                      "app.api.agent.chat.characters.get.marketing.feature1.title",
-                    )}
-                  </Div>
-                  <Div className="text-sm text-muted-foreground">
-                    {t(
-                      "app.api.agent.chat.characters.get.marketing.feature1.description",
-                    )}
-                  </Div>
-                </Div>
-              </Div>
-
-              <Div className="flex items-start gap-3 p-4 rounded-lg border bg-card">
-                <Div className="w-12 h-12 rounded-lg flex items-center justify-center text-primary bg-primary/10 shrink-0">
-                  <Zap className="h-6 w-6" />
-                </Div>
-                <Div className="flex-1">
-                  <Div className="font-semibold mb-1">
-                    {t(
-                      "app.api.agent.chat.characters.get.marketing.feature2.title",
-                    )}
-                  </Div>
-                  <Div className="text-sm text-muted-foreground">
-                    {t(
-                      "app.api.agent.chat.characters.get.marketing.feature2.description",
-                    )}
-                  </Div>
-                </Div>
-              </Div>
-
-              <Div className="flex items-start gap-3 p-4 rounded-lg border bg-card">
-                <Div className="w-12 h-12 rounded-lg flex items-center justify-center text-primary bg-primary/10 shrink-0">
-                  <Star className="h-6 w-6" />
-                </Div>
-                <Div className="flex-1">
-                  <Div className="font-semibold mb-1">
-                    {t(
-                      "app.api.agent.chat.characters.get.marketing.feature3.title",
-                    )}
-                  </Div>
-                  <Div className="text-sm text-muted-foreground">
-                    {t(
-                      "app.api.agent.chat.characters.get.marketing.feature3.description",
-                    )}
-                  </Div>
-                </Div>
-              </Div>
-
-              <Div className="flex items-start gap-3 p-4 rounded-lg border bg-card">
-                <Div className="w-12 h-12 rounded-lg flex items-center justify-center text-primary bg-primary/10 shrink-0">
-                  <Globe className="h-6 w-6" />
-                </Div>
-                <Div className="flex-1">
-                  <Div className="font-semibold mb-1">
-                    {t(
-                      "app.api.agent.chat.characters.get.marketing.feature4.title",
-                    )}{" "}
-                    {TOTAL_MODEL_COUNT}
-                    {t(
-                      "app.api.agent.chat.characters.get.marketing.feature4.titleSuffix",
-                    )}
-                  </Div>
-                  <Div className="text-sm text-muted-foreground">
-                    {t(
-                      "app.api.agent.chat.characters.get.marketing.feature4.description",
-                    )}
-                  </Div>
-                </Div>
-              </Div>
+            <Div className="text-muted-foreground">
+              {t("app.api.agent.chat.characters.get.signupPrompt.description")}
             </Div>
 
             {/* CTA Buttons */}
-            <Div className="flex flex-col sm:flex-row gap-3 mt-6 justify-center">
+            <Div className="flex flex-col gap-3 mt-4">
               <Button
                 type="button"
                 variant="default"
-                size="default"
+                size="lg"
                 onClick={handleSignup}
                 className="gap-2"
               >
                 <UserPlus className="h-4 w-4" />
-                {t("app.api.agent.chat.characters.get.marketing.cta.signup")}
+                {t(
+                  "app.api.agent.chat.characters.get.signupPrompt.signupButton",
+                )}
               </Button>
               <Button
                 type="button"
                 variant="outline"
-                size="default"
+                size="lg"
                 onClick={handleLogin}
                 className="gap-2"
               >
                 <LogIn className="h-4 w-4" />
-                {t("app.api.agent.chat.characters.get.marketing.cta.login")}
+                {t(
+                  "app.api.agent.chat.characters.get.signupPrompt.loginButton",
+                )}
               </Button>
             </Div>
           </Div>
@@ -385,17 +165,27 @@ export function CharactersListContainer({
     );
   }
 
-  // Authenticated user view
+  // Both public and authenticated users see the same character list
   return (
-    <Div className="flex flex-col gap-0">
+    <Div className="flex flex-col gap-0 max-h-[min(800px,calc(100dvh-100px))]">
       {/* Top Actions: Back + Create */}
-      <Div className="flex flex-row gap-2 px-4 py-4">
-        <NavigateButtonWidget field={children.backButton} />
-        <NavigateButtonWidget field={children.createButton} />
-      </Div>
+      {!isOnboarding && (
+        <Div className="flex flex-row gap-2 px-4 py-4 shrink-0">
+          <NavigateButtonWidget field={children.backButton} />
+          <Button
+            type="button"
+            variant="outline"
+            size="default"
+            onClick={handleCreateCustomClick}
+            className="ml-auto"
+          >
+            {t("app.api.agent.chat.characters.get.createButton.label")}
+          </Button>
+        </Div>
+      )}
 
       {/* Scrollable Content */}
-      <Div className="border-t border-border p-4 overflow-y-auto max-h-[calc(100dvh-180px)]">
+      <Div className="border-t border-border p-4 overflow-y-auto max-h-[min(800px,calc(100dvh-180px))]">
         {/* Direct Model Access Section */}
         <TextWidget field={children.title} fieldName="title" />
         <TextWidget field={children.description} fieldName="description" />
@@ -577,26 +367,19 @@ export function CharactersListContainer({
                         )}
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            void handleAddToFavorites(char);
-                          }}
-                        >
-                          <Star className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            void handleEditCharacter(char);
-                          }}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
+                        <AddToFavoritesButton
+                          char={char}
+                          logger={logger}
+                          user={user}
+                          locale={locale}
+                        />
+                        <EditFavBeforeAddButton
+                          char={char}
+                          navigate={navigate}
+                          logger={logger}
+                          user={user}
+                          locale={locale}
+                        />
                       </Div>
                     </Div>
                   );
@@ -607,5 +390,212 @@ export function CharactersListContainer({
         </Div>
       </Div>
     </Div>
+  );
+}
+
+/**
+ * Edit Character Button - navigates to create favorite with character data
+ * Isolated component for loading state
+ */
+function EditFavBeforeAddButton({
+  char,
+  navigate,
+  logger,
+  user,
+  locale,
+}: {
+  char: CharacterListItem;
+  navigate: ReturnType<typeof useWidgetNavigation>["push"];
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
+  locale: ReturnType<typeof useWidgetContext>["locale"];
+}): React.JSX.Element {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
+    e.stopPropagation();
+    setIsLoading(true);
+
+    try {
+      const { apiClient } =
+        await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+      const characterSingleDefinitions = await import("./[id]/definition");
+      const createFavoriteDefinitions =
+        await import("../favorites/create/definition");
+      const { DEFAULT_TTS_VOICE } = await import("../../text-to-speech/enum");
+
+      // Fetch full character data
+      const characterResponse = await apiClient.fetch(
+        characterSingleDefinitions.default.GET,
+        logger,
+        user,
+        undefined,
+        { id: char.id },
+        locale,
+      );
+
+      if (!characterResponse.success) {
+        logger.error("Failed to fetch character data");
+        return;
+      }
+
+      const fullChar = characterResponse.data;
+
+      // Navigate to create favorite with character data
+      navigate(createFavoriteDefinitions.default.POST, {
+        data: {
+          characterId: char.id,
+          icon: fullChar.icon,
+          name: fullChar.name,
+          tagline: fullChar.tagline,
+          description: fullChar.description,
+          voice: fullChar.voice ?? DEFAULT_TTS_VOICE,
+          modelSelection: null,
+        },
+        popNavigationOnSuccess: 1,
+      });
+    } catch (error) {
+      logger.error("Failed to edit character", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={handleClick}
+      disabled={isLoading}
+    >
+      {isLoading ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <Pencil className="h-4 w-4" />
+      )}
+    </Button>
+  );
+}
+
+/**
+ * Add to Favorites Button - adds character to favorites
+ * Isolated component for loading state
+ */
+function AddToFavoritesButton({
+  char,
+  logger,
+  user,
+  locale,
+}: {
+  char: CharacterListItem;
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
+  locale: ReturnType<typeof useWidgetContext>["locale"];
+}): React.JSX.Element {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
+    e.stopPropagation();
+    setIsLoading(true);
+
+    try {
+      const { apiClient } =
+        await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+      const favoritesDefinition = await import("../favorites/definition");
+      const createFavoriteDefinition =
+        await import("../favorites/create/definition");
+      const charactersDefinition = await import("./definition");
+      const characterSingleDefinitions = await import("./[id]/definition");
+
+      // Fetch full character data to get properly typed fields
+      const characterResponse = await apiClient.fetch(
+        characterSingleDefinitions.default.GET,
+        logger,
+        user,
+        undefined,
+        { id: char.id },
+        locale,
+      );
+
+      if (!characterResponse.success) {
+        logger.error("Failed to fetch character data");
+        return;
+      }
+
+      const fullChar = characterResponse.data;
+
+      // Create the favorite
+      const createResponse = await apiClient.mutate(
+        createFavoriteDefinition.default.POST,
+        logger,
+        user,
+        {
+          characterId: char.id,
+          icon: fullChar.icon,
+          name: fullChar.name,
+          tagline: fullChar.tagline,
+          description: fullChar.description,
+          voice: fullChar.voice,
+          modelSelection: fullChar.modelSelection,
+        },
+        undefined,
+        locale,
+      );
+
+      if (!createResponse.success) {
+        logger.error("Failed to add to favorites");
+        return;
+      }
+
+      // Optimistically update characters list to mark as added to favorites
+      apiClient.updateEndpointData(
+        charactersDefinition.default.GET,
+        logger,
+        (oldData) => {
+          if (!oldData?.success) {
+            return oldData;
+          }
+
+          return {
+            success: true,
+            data: {
+              sections: oldData.data.sections.map((section) => ({
+                ...section,
+                characters: section.characters.map((c) =>
+                  c.id === char.id ? { ...c, addedToFav: true } : c,
+                ),
+              })),
+            },
+          };
+        },
+        undefined,
+      );
+
+      // Refetch favorites list to update the cache
+      void apiClient.refetchEndpoint(favoritesDefinition.default.GET, logger);
+    } catch (error) {
+      logger.error("Failed to add to favorites", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={handleClick}
+      disabled={isLoading}
+    >
+      {isLoading ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <Star className="h-4 w-4" />
+      )}
+    </Button>
   );
 }

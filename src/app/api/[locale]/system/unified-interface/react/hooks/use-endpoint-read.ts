@@ -128,7 +128,8 @@ export function useEndpointRead<TEndpoint extends CreateApiEndpointAny>(
       ...queryOptions,
       // Keep query enabled so it gets cached properly in React Query
       // This allows optimistic updates (updateEndpointData) to find the cached data
-      enabled: queryOptions.enabled ?? true,
+      // Use explicit check to preserve false values (e.g., for search endpoints)
+      enabled: queryOptions.enabled !== undefined ? queryOptions.enabled : true,
       // Pass initial data for the query
       // This will be wrapped in a success response by useApiQuery
       initialData: initialData,

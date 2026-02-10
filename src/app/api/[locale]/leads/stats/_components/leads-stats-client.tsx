@@ -27,10 +27,12 @@ export function LeadsStatsClient({
       locale={locale}
       user={user}
       endpointOptions={{
-        queryOptions: {
-          enabled: true,
-          refetchOnWindowFocus: false,
-          staleTime: 5 * 60 * 1000, // 5 minutes
+        read: {
+          queryOptions: {
+            enabled: true,
+            refetchOnWindowFocus: false,
+            staleTime: 5 * 60 * 1000, // 5 minutes
+          },
         },
       }}
     />

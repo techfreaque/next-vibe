@@ -9,6 +9,7 @@ import type { JSX } from "react";
 import React from "react";
 
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { useToolsModalStore } from "@/app/api/[locale]/agent/tools/store";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -25,14 +26,15 @@ export function ToolsButton({
   disabled = false,
   locale,
 }: ToolsButtonProps): JSX.Element {
-  const { enabledTools, openToolsModal: onOpenToolsModal } = useChatContext();
+  const { enabledTools } = useChatContext();
+  const openToolsModal = useToolsModalStore((state) => state.open);
   const activeToolCount = enabledTools.length;
   const { t } = simpleT(locale);
 
   return (
     <Button
       type="button"
-      onClick={onOpenToolsModal}
+      onClick={openToolsModal}
       disabled={disabled}
       variant="outline"
       size="sm"

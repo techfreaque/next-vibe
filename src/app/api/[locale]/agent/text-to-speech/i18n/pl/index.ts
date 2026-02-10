@@ -99,8 +99,8 @@ export const translations: typeof enTranslations = {
     lovoai: "Lovo AI",
   },
   voices: {
-    MALE: "Męski",
-    FEMALE: "Żeński",
+    MALE: "Męski głos",
+    FEMALE: "Damski głos",
   },
   languages: {
     en: "Angielski",

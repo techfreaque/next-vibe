@@ -34,7 +34,7 @@ import { AGENT_MESSAGE_LENGTH } from "../../../constants";
 import { CallModeIndicator } from "./call-mode-indicator";
 import { FileUploadButton } from "./file-upload-button";
 import { useVoiceRecording } from "./hooks/use-voice-recording";
-import { RecordingModal } from "./recording-modal";
+import { RecordingInputArea } from "./recording-input-area";
 import { SearchToggle } from "./search-toggle";
 import { Selector } from "./selector";
 import { ToolsButton } from "./tools-button";
@@ -117,7 +117,7 @@ export function ChatInput({
       <CallModeIndicator show={ttsAutoplay} locale={locale} />
 
       {/* Recording modal */}
-      <RecordingModal
+      <RecordingInputArea
         isRecording={voice.isRecording}
         isPaused={voice.isPaused}
         isProcessing={voice.isProcessing}
@@ -233,7 +233,7 @@ export function ChatInput({
         </Div>
 
         {/* Right: Call Mode + Mic + Send/Stop */}
-        <Div className="flex flex-row items-center gap-1 shrink-0">
+        <Div className="flex flex-row items-center gap-0.5 shrink-0">
           {/* Call mode toggle */}
           <TooltipProvider>
             <Tooltip>

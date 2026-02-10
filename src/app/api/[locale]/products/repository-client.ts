@@ -46,6 +46,12 @@ export const TTS_COST_PER_CHARACTER =
   TTS_COST_WITH_MARKUP_USD / 1_000_000 / CREDIT_VALUE_USD;
 
 /**
+ * Minimum balance required for HTTP TTS endpoint
+ * Cost of ~50 characters (a short sentence)
+ */
+export const TTS_MINIMUM_BALANCE = Math.ceil(TTS_COST_PER_CHARACTER * 50);
+
+/**
  * STT Pricing (OpenAI Whisper)
  * Base: $0.006/60 seconds (per minute)
  * With 30% markup: $0.0078/60 seconds
@@ -56,6 +62,12 @@ const STT_COST_WITH_MARKUP_USD =
   STT_BASE_COST_PER_MINUTE_USD * (1 + STANDARD_MARKUP_PERCENTAGE);
 const STT_COST_PER_SECOND_USD = STT_COST_WITH_MARKUP_USD / 60;
 export const STT_COST_PER_SECOND = STT_COST_PER_SECOND_USD / CREDIT_VALUE_USD;
+
+/**
+ * Minimum balance required for HTTP STT endpoint
+ * Cost of ~5 seconds (a short audio clip)
+ */
+export const STT_MINIMUM_BALANCE = Math.ceil(STT_COST_PER_SECOND * 5);
 
 /**
  * Brave Search Pricing
@@ -93,6 +105,22 @@ export const SCRAPPEY_COST_PER_REQUEST =
   Math.round(SCRAPPEY_COST_CALCULATED * 100) / 100;
 
 /**
+ * Kagi Search Pricing
+ * Base: $0.015 per request (1.5 cents)
+ * With 30% markup: $0.0195 per request
+ * Per request: $0.0195 = 1.95 credits
+ *
+ * NOTE: Rounded to 2 decimal places to avoid floating point display issues
+ */
+const KAGI_SEARCH_BASE_COST_PER_REQUEST_USD = 0.015;
+const KAGI_SEARCH_COST_WITH_MARKUP_USD =
+  KAGI_SEARCH_BASE_COST_PER_REQUEST_USD * (1 + STANDARD_MARKUP_PERCENTAGE);
+const KAGI_SEARCH_COST_CALCULATED =
+  KAGI_SEARCH_COST_WITH_MARKUP_USD / CREDIT_VALUE_USD;
+export const KAGI_SEARCH_COST_PER_REQUEST =
+  Math.round(KAGI_SEARCH_COST_CALCULATED * 100) / 100;
+
+/**
  * Feature Costs Object
  * Consolidated pricing for all non-model features
  */
@@ -102,6 +130,12 @@ export const FEATURE_COSTS = {
    * Based on $5/1000 requests + 30% markup
    */
   BRAVE_SEARCH: BRAVE_SEARCH_COST_PER_REQUEST,
+
+  /**
+   * Kagi Search: 1.95 credits per search
+   * Based on $0.015/request (1.5 cents) + 30% markup
+   */
+  KAGI_SEARCH: KAGI_SEARCH_COST_PER_REQUEST,
 
   /**
    * Fetch URL Content (Scrappey): 0.13 credits per request

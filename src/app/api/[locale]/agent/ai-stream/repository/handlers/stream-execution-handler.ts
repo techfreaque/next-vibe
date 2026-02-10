@@ -106,6 +106,7 @@ export class StreamExecutionHandler {
         character,
         isIncognito,
         userId,
+        user,
         toolsConfig,
         streamAbortController,
         emittedToolResultIds,

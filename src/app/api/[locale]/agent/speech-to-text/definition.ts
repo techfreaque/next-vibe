@@ -106,6 +106,11 @@ const { POST } = createEndpoint({
       // ),
 
       // === RESPONSE FIELDS ===
+      creditCost: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.agent.speechToText.post.response.creditCost",
+        schema: z.number().optional(),
+      }),
       response: objectField(
         {
           type: WidgetType.CONTAINER,

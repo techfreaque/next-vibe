@@ -36,17 +36,21 @@ export function useMessage(
   return useEndpoint(
     definitions,
     {
-      urlPathParams: {
-        threadId: params.threadId,
-        messageId: params.messageId,
+      read: {
+        urlPathParams: {
+          threadId: params.threadId,
+          messageId: params.messageId,
+        },
+        queryOptions: {
+          enabled: params.enabled ?? true,
+          refetchOnWindowFocus: false,
+          staleTime: 30 * 1000, // 30 seconds
+        },
       },
-      queryOptions: {
-        enabled: params.enabled ?? true,
-        refetchOnWindowFocus: false,
-        staleTime: 30 * 1000, // 30 seconds
-      },
-      formOptions: {
-        persistForm: false,
+      update: {
+        formOptions: {
+          persistForm: false,
+        },
       },
     },
     logger,

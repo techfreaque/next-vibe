@@ -8,20 +8,13 @@
 
 import { useCallback } from "react";
 
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import favoritesGetDefinition from "../definition";
 import favoritesDefinition, {
   type FavoriteCreateRequestOutput,
 } from "./definition";
-
-interface UseFavoriteCreateOptions {
-  user: JwtPayloadType;
-  logger: EndpointLogger;
-}
 
 export interface UseFavoriteCreateReturn {
   isLoading: boolean;
@@ -33,10 +26,10 @@ export interface UseFavoriteCreateReturn {
  * - Authenticated users: server storage via API
  * - Non-authenticated users: localStorage via callbacks
  */
-export function useFavoriteCreate({
-  user,
-  logger,
-}: UseFavoriteCreateOptions): UseFavoriteCreateReturn {
+export function useFavoriteCreate(
+  user: JwtPayloadType,
+  logger: EndpointLogger,
+): UseFavoriteCreateReturn {
   const endpoint = useEndpoint(favoritesDefinition, undefined, logger, user);
 
   // Create operation
@@ -46,15 +39,13 @@ export function useFavoriteCreate({
       return new Promise<string | null>((resolve, reject) => {
         endpoint.create.submitForm({
           onSuccess: ({ responseData }) => {
-            void apiClient.refetchEndpoint(favoritesGetDefinition.GET, logger);
-
             resolve(responseData.id);
           },
-          onError: ({ error }): void => reject(error),
+          onError: ({ error }) => reject(error),
         });
       });
     },
-    [endpoint, logger],
+    [endpoint.create],
   );
 
   return {

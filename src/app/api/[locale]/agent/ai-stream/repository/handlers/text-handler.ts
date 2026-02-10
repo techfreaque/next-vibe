@@ -80,7 +80,8 @@ export class TextHandler {
         // Otherwise the chunk will be skipped because messageId is not set
         if (ttsHandler) {
           ttsHandler.setMessageId(result.messageId);
-          await ttsHandler.addDelta(textDelta);
+          // Don't await - let TTS process in background to avoid blocking stream
+          void ttsHandler.addDelta(textDelta);
         }
 
         return {
@@ -103,8 +104,9 @@ export class TextHandler {
       });
 
       // Send delta to TTS handler for audio generation
+      // Don't await - let TTS process in background to avoid blocking stream
       if (ttsHandler) {
-        await ttsHandler.addDelta(textDelta);
+        void ttsHandler.addDelta(textDelta);
       }
 
       return {

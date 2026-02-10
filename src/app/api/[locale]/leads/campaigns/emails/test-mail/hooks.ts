@@ -21,14 +21,18 @@ import definitions from "./definition";
 export function useTestEmailEndpoint(
   user: JwtPayloadType,
   logger: EndpointLogger,
-  options: UseEndpointOptions<typeof definitions>,
+  options?: UseEndpointOptions<typeof definitions>,
 ): TestEmailEndpointHook {
   return useEndpoint(
     definitions,
     {
-      enabled: options?.enabled !== false,
-      refetchOnWindowFocus: false,
-      staleTime: 0, // Don't cache test email results
+      read: {
+        queryOptions: {
+          enabled: true,
+          refetchOnWindowFocus: false,
+          staleTime: 0, // Don't cache test email results
+        },
+      },
       ...options,
     },
     logger,

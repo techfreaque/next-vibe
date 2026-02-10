@@ -22,6 +22,7 @@ import {
   type AudioChunkEventData,
   type ContentDeltaEventData,
   type ContentDoneEventData,
+  type CreditsDeductedEventData,
   type ErrorEventData,
   type FilesUploadedEventData,
   type MessageCreatedEventData,
@@ -48,6 +49,7 @@ export interface StreamOptions {
   onToolCall?: (data: ToolCallEventData) => void;
   onToolWaiting?: (data: ToolWaitingEventData) => void;
   onToolResult?: (data: ToolResultEventData) => void;
+  onCreditsDeducted?: (data: CreditsDeductedEventData) => void;
   onError?: (data: ErrorEventData) => void;
   signal?: AbortSignal;
 }
@@ -1103,6 +1105,20 @@ export function useAIStream(
                 }
 
                 options.onError?.(eventData);
+                break;
+              }
+
+              case StreamEventType.CREDITS_DEDUCTED: {
+                const eventData = event.data as CreditsDeductedEventData;
+                logger.debug("[CREDITS_DEDUCTED] Event received", {
+                  amount: eventData.amount,
+                  feature: eventData.feature,
+                  type: eventData.type,
+                  partial: eventData.partial,
+                });
+
+                // Call the callback to trigger optimistic credit update
+                options.onCreditsDeducted?.(eventData);
                 break;
               }
             }

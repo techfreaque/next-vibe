@@ -57,9 +57,11 @@ export function useNewsletterStatus(
   return useEndpoint(
     statusEndpoints,
     {
-      queryOptions: {
-        enabled: params.enabled !== false,
-        requestData: { email: params.email },
+      read: {
+        queryOptions: {
+          enabled: params.enabled !== false,
+        },
+        initialState: { email: params.email },
       },
     },
     logger,
@@ -82,11 +84,13 @@ export function useNewsletterSubscription(
   return useEndpoint(
     subscribeEndpoints,
     {
-      formOptions: {
-        defaultValues: {
-          email: "",
-          name: "",
-          preferences: [],
+      create: {
+        formOptions: {
+          defaultValues: {
+            email: "",
+            name: "",
+            preferences: [],
+          },
         },
       },
     },
@@ -110,9 +114,11 @@ export function useNewsletterUnsubscription(
   return useEndpoint(
     unsubscribeEndpoints,
     {
-      formOptions: {
-        defaultValues: {
-          email: "",
+      create: {
+        formOptions: {
+          defaultValues: {
+            email: "",
+          },
         },
       },
     },

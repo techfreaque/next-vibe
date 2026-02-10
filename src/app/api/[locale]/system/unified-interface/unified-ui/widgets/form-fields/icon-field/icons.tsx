@@ -476,6 +476,8 @@ const ICON_LOADERS: Record<IconLibraryName, IconLoader> = {
     await import("@/packages/next-vibe-ui/web/ui/icons/UncensoredAILogo"),
   Upload: async () =>
     await import("@/packages/next-vibe-ui/web/ui/icons/Upload"),
+  VeniceAILogo: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/VeniceAiLogo"),
   User: async () => await import("@/packages/next-vibe-ui/web/ui/icons/User"),
   UserCheck: async () =>
     await import("@/packages/next-vibe-ui/web/ui/icons/UserCheck"),
@@ -878,6 +880,7 @@ export const ICON_REGISTRY = {
   "si-alibabadotcom": "SiAlibabadotcom",
   "freedom-gpt-logo": "FreedomGptLogo",
   "gab-ai-logo": "GabAILogo",
+  "venice-ai-logo": "VeniceAILogo",
   moon: "Moon",
   "moon-icon": "MoonIcon",
 
@@ -1352,6 +1355,7 @@ export const ICON_CATEGORIES = {
       "si-openai",
       "freedom-gpt-logo",
       "gab-ai-logo",
+      "venice-ai-logo",
     ],
   },
   media: {

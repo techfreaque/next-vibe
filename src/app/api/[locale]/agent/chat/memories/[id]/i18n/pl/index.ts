@@ -27,6 +27,15 @@ export const translations: typeof enTranslations = {
       description:
         "Wspomnienia o wyższym priorytecie pojawiają się pierwsze (pozostaw puste, aby zachować bieżący)",
     },
+    backButton: {
+      label: "Wstecz",
+    },
+    submitButton: {
+      label: "Aktualizuj wspomnienie",
+    },
+    deleteButton: {
+      label: "Usuń wspomnienie",
+    },
     response: {
       success: {
         content: "Zaktualizowano pomyślnie",
@@ -80,11 +89,17 @@ export const translations: typeof enTranslations = {
     description: "Usuwa wspomnienie według ID",
     container: {
       title: "Usuń wspomnienie",
-      description: "Usuń wspomnienie na stałe",
+      description: "Usuń to wspomnienie na stałe",
     },
     id: {
       label: "ID wspomnienia",
       description: "Unikalny identyfikator wspomnienia do usunięcia",
+    },
+    backButton: {
+      label: "Wstecz",
+    },
+    deleteButton: {
+      label: "Usuń",
     },
     response: {
       success: {

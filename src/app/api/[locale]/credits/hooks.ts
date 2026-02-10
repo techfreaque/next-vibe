@@ -191,10 +191,12 @@ export function useCreditHistory(
   return useEndpoint(
     historyDefinitions,
     {
-      queryOptions: {
-        enabled: true,
-        refetchOnWindowFocus: false,
-        staleTime: 30 * 1000, // 30 seconds
+      read: {
+        queryOptions: {
+          enabled: true,
+          refetchOnWindowFocus: false,
+          staleTime: 30 * 1000, // 30 seconds
+        },
       },
     },
     logger,

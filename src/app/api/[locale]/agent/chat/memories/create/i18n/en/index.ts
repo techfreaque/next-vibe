@@ -19,6 +19,12 @@ export const translations = {
       label: "Priority",
       description: "Higher priority memories appear first (0-100)",
     },
+    backButton: {
+      label: "Back",
+    },
+    submitButton: {
+      label: "Create Memory",
+    },
     response: {
       id: { content: "Memory ID" },
     },

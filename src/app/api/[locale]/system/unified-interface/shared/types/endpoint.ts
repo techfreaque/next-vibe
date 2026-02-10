@@ -298,6 +298,14 @@ export interface NavigationStackEntry<
   prefillFromGet?: boolean;
   renderInModal?: boolean;
   popNavigationOnSuccess?: number;
+  replaceOnSuccess?: {
+    endpoint: CreateApiEndpointAny;
+    getUrlPathParams?: (
+      responseData: TEndpoint["types"]["ResponseOutput"],
+    ) => Record<string, string> | undefined;
+    prefillFromGet?: boolean;
+    getEndpoint?: CreateApiEndpointAny;
+  };
   modalPosition?: { x: number; y: number };
 }
 

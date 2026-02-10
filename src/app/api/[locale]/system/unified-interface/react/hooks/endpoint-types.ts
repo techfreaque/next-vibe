@@ -178,62 +178,6 @@ export interface UseEndpointOptions<T> {
    * @default true
    */
   autoPrefill?: boolean;
-
-  // ============================================================================
-  // DEPRECATED OPTIONS - Use operation-specific options above instead
-  // ============================================================================
-
-  /** @deprecated Use read.urlPathParams, create.urlPathParams, or delete.urlPathParams instead */
-  urlPathParams?: EndpointUrlVariables<T>;
-
-  /** @deprecated Use read.queryOptions.enabled instead */
-  enabled?: boolean;
-  /** @deprecated Use read.queryOptions.staleTime instead */
-  staleTime?: number;
-  /** @deprecated Use read.queryOptions.refetchOnWindowFocus instead */
-  refetchOnWindowFocus?: boolean;
-
-  /** @deprecated Use create.formOptions.defaultValues instead */
-  defaultValues?: PrimaryMutationRequest<T> extends never
-    ? undefined
-    : Partial<PrimaryMutationRequest<T>>;
-
-  /** @deprecated Use read.initialState instead */
-  filterOptions?: {
-    initialFilters?: GetRequest<T> extends never
-      ? undefined
-      : Partial<GetRequest<T>>;
-  };
-
-  /** @deprecated Use read.queryOptions instead */
-  queryOptions?: {
-    enabled?: boolean;
-    requestData?: GetRequest<T> extends never ? undefined : GetRequest<T>;
-    urlPathParams?: EndpointUrlVariables<T>;
-    staleTime?: number;
-    refetchOnWindowFocus?: boolean;
-  };
-
-  /** @deprecated Use create.formOptions instead */
-  formOptions?: {
-    defaultValues?: PrimaryMutationRequest<T> extends never
-      ? undefined
-      : PrimaryMutationRequest<T>;
-    persistForm?: boolean;
-    persistenceKey?: string;
-  };
-
-  // Deprecated local storage options (no longer functional)
-  /** @deprecated Local storage functionality has been removed */
-  persistForm?: boolean;
-  /** @deprecated Local storage functionality has been removed */
-  persistenceKey?: string;
-  /** @deprecated Local storage functionality has been removed */
-  autoPrefillFromLocalStorage?: boolean;
-  /** @deprecated Local storage functionality has been removed */
-  showUnsavedChangesAlert?: boolean;
-  /** @deprecated Local storage functionality has been removed */
-  clearStorageAfterSubmit?: boolean;
 }
 
 // Alert state interface for FormAlert component

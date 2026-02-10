@@ -22,6 +22,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { useCharacter } from "../../../../../characters/[id]/hooks";
 import type { useCollapseState } from "../hooks/use-collapse-state";
 import type { useMessageActions } from "../hooks/use-message-actions";
 import { MessageEditor } from "../message-editor";
@@ -75,13 +76,14 @@ export function FlatMessage({
 }: FlatMessageProps): JSX.Element {
   // Get callbacks and state from context
   const {
-    characters,
     branchMessage: onBranchMessage,
     retryMessage: onRetryMessage,
     answerAsAI: onAnswerAsModel,
     handleDeleteMessage: onDeleteMessage,
   } = useChatContext();
   const { t } = simpleT(locale);
+
+  const character = useCharacter(message.character || undefined, user, logger);
 
   // TTS support for assistant messages is handled by the message action buttons
 
@@ -109,11 +111,13 @@ export function FlatMessage({
       : null;
   const modelDisplayName =
     modelData?.name || t("app.chat.flatView.assistantFallback");
-  // Get character name from characters map (fetched from server)
+  // Get character name from characters map (fetched from server) and translate it
+  const characterName = character.read?.data?.name;
   const characterDisplayName =
     (message.role === "user" || message.role === "assistant") &&
-    message.character
-      ? characters[message.character]?.name || message.character
+    message.character &&
+    characterName
+      ? t(characterName)
       : t("app.chat.flatView.anonymous");
 
   // Determine display name for user messages

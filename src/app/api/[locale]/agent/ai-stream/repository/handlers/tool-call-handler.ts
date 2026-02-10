@@ -7,7 +7,11 @@ import type { ReadableStreamDefaultController } from "node:stream/web";
 import type { JSONValue } from "ai";
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { definitionsRegistry } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definitions/registry";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { ToolCall, ToolCallResult } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
@@ -43,6 +47,7 @@ export class ToolCallHandler {
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
+    user: JwtPayloadType;
     toolsConfig: Map<string, { requiresConfirmation: boolean }>;
     streamAbortController: AbortController;
     controller: ReadableStreamDefaultController<Uint8Array>;
@@ -226,6 +231,17 @@ export class ToolCallHandler {
     const toolConfig = toolsConfig.get(part.toolName);
     const requiresConfirmation = toolConfig?.requiresConfirmation ?? false;
 
+    // Look up endpoint to get credit cost
+    const allEndpoints = definitionsRegistry.getEndpointsForUser(
+      Platform.AI,
+      params.user,
+    );
+    const endpoint = allEndpoints.find((e) => {
+      const preferredName = getPreferredToolName(e);
+      return preferredName === part.toolName;
+    });
+    const creditCost = endpoint?.credits ?? 0;
+
     // Update parent chain: TOOL message is always child of the ASSISTANT message
     // currentParentId now points to the ASSISTANT message (either existing or just created)
     // This creates the chain: USER → ASSISTANT → TOOL1 → TOOL2 → ASSISTANT (next step)
@@ -237,6 +253,7 @@ export class ToolCallHandler {
       toolConfigFound: !!toolConfig,
       requiresConfirmation,
       toolsConfigSize: toolsConfig.size,
+      creditCost,
     });
 
     // Extract tool call ID from AI SDK (used for matching tool results)
@@ -247,7 +264,7 @@ export class ToolCallHandler {
       toolCallId, // CRITICAL: Store AI SDK tool call ID for proper result matching
       toolName: part.toolName,
       args: toolCallArgs,
-      creditsUsed: 0,
+      creditsUsed: creditCost,
       requiresConfirmation,
       isConfirmed: false,
       waitingForConfirmation: requiresConfirmation, // Set to true if confirmation needed
@@ -267,6 +284,8 @@ export class ToolCallHandler {
       depth: newCurrentDepth,
       sequenceId,
       toolCall: toolCallData, // Include tool call data for frontend rendering (singular - each TOOL message has exactly one tool call)
+      model,
+      character,
     });
     controller.enqueue(encoder.encode(formatSSEEvent(toolMessageEvent)));
 

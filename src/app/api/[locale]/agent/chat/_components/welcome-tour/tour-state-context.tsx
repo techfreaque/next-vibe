@@ -8,8 +8,6 @@ interface TourState {
   isPaused: boolean;
   // Current tour step index (for coordination)
   currentStepIndex: number;
-  // Control sidebar footer expansion during tour
-  bottomSheetExpanded: boolean;
   // Callback to advance tour (set by welcome-tour)
   advanceTour: (() => void) | null;
   setTourActive: (active: boolean) => void;
@@ -17,7 +15,6 @@ interface TourState {
   setModelSelectorOnboarding: (onboarding: boolean) => void;
   setIsPaused: (paused: boolean) => void;
   setCurrentStepIndex: (index: number) => void;
-  setBottomSheetExpanded: (expanded: boolean) => void;
   setAdvanceTour: (callback: (() => void) | null) => void;
 }
 
@@ -27,7 +24,6 @@ export const useTourState = create<TourState>((set) => ({
   modelSelectorOnboarding: false,
   isPaused: false,
   currentStepIndex: 0,
-  bottomSheetExpanded: false,
   advanceTour: null,
   setTourActive: (active): void => {
     set({ isActive: active });
@@ -43,9 +39,6 @@ export const useTourState = create<TourState>((set) => ({
   },
   setCurrentStepIndex: (index): void => {
     set({ currentStepIndex: index });
-  },
-  setBottomSheetExpanded: (expanded): void => {
-    set({ bottomSheetExpanded: expanded });
   },
   setAdvanceTour: (callback): void => {
     set({ advanceTour: callback });

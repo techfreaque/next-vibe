@@ -403,6 +403,56 @@ export class CreditRepository {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("getReferralTransactions is not implemented on native");
   }
+
+  static async deductCreditsForTTS(
+    // oxlint-disable-next-line no-unused-vars
+    _user: JwtPayloadType,
+    // oxlint-disable-next-line no-unused-vars
+    _cost: number,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<{
+    success: boolean;
+    messageId?: string;
+    partialDeduction?: boolean;
+  }> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("deductCreditsForTTS is not implemented on native");
+  }
+
+  static async deductCreditsForSTT(
+    // oxlint-disable-next-line no-unused-vars
+    _user: JwtPayloadType,
+    // oxlint-disable-next-line no-unused-vars
+    _cost: number,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<{
+    success: boolean;
+    messageId?: string;
+    partialDeduction?: boolean;
+  }> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("deductCreditsForSTT is not implemented on native");
+  }
+
+  static async deductCreditsForModelUsage(
+    // oxlint-disable-next-line no-unused-vars
+    _user: JwtPayloadType,
+    // oxlint-disable-next-line no-unused-vars
+    _cost: number,
+    // oxlint-disable-next-line no-unused-vars
+    _model: ModelId,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<{
+    success: boolean;
+    messageId?: string;
+    partialDeduction?: boolean;
+  }> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("deductCreditsForModelUsage is not implemented on native");
+  }
 }
 
 // Compile-time type check

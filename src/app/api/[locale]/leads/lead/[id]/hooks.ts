@@ -26,12 +26,20 @@ export function useLeadByIdEndpoint(
   return useEndpoint(
     definitions,
     {
-      urlPathParams: { id: params.leadId }, // URL parameters as top-level option
-      enabled: params.enabled,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      refetchOnWindowFocus: false,
-      persistForm: false,
-      persistenceKey: `lead-edit-${params.leadId}-form`, // eslint-disable-line i18next/no-literal-string -- Form persistence key
+      read: {
+        urlPathParams: { id: params.leadId },
+        queryOptions: {
+          enabled: params.enabled,
+          staleTime: 5 * 60 * 1000, // 5 minutes
+          refetchOnWindowFocus: false,
+        },
+      },
+      update: {
+        formOptions: {
+          persistForm: false,
+          persistenceKey: `lead-edit-${params.leadId}-form`, // eslint-disable-line i18next/no-literal-string -- Form persistence key
+        },
+      },
     },
     logger,
     user,

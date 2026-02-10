@@ -101,8 +101,8 @@ export const translations = {
     lovoai: "Lovo AI",
   },
   voices: {
-    MALE: "Männlich",
-    FEMALE: "Weiblich",
+    MALE: "Männliche Stimme",
+    FEMALE: "Weibliche Stimme",
   },
   languages: {
     en: "Englisch",

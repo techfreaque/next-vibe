@@ -7,6 +7,27 @@ import type { NavigationStackEntry } from "../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 
 /**
+ * Navigation options
+ */
+interface NavigationOptions<TEndpoint extends CreateApiEndpointAny> {
+  urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
+  data?: Partial<TEndpoint["types"]["RequestOutput"]>;
+  prefillFromGet?: boolean;
+  getEndpoint?: CreateApiEndpointAny;
+  renderInModal?: boolean;
+  popNavigationOnSuccess?: number;
+  replaceOnSuccess?: {
+    endpoint: CreateApiEndpointAny;
+    getUrlPathParams?: (
+      responseData: TEndpoint["types"]["ResponseOutput"],
+    ) => Record<string, string> | undefined;
+    prefillFromGet?: boolean;
+    getEndpoint?: CreateApiEndpointAny;
+  };
+  modalPosition?: { x: number; y: number };
+}
+
+/**
  * Navigation stack store interface
  */
 interface NavigationStackStore {
@@ -20,15 +41,7 @@ interface NavigationStackStore {
    */
   push: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
-    params: {
-      urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
-      data?: Partial<TEndpoint["types"]["RequestOutput"]>;
-    },
-    prefillFromGet?: boolean,
-    getEndpoint?: CreateApiEndpointAny,
-    renderInModal?: boolean,
-    popNavigationOnSuccess?: number,
-    modalPosition?: { x: number; y: number },
+    options?: NavigationOptions<TEndpoint>,
   ) => void;
 
   /**
@@ -37,21 +50,13 @@ interface NavigationStackStore {
    */
   replace: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
-    params: {
-      urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
-      data?: Partial<TEndpoint["types"]["RequestOutput"]>;
-    },
-    prefillFromGet?: boolean,
-    getEndpoint?: CreateApiEndpointAny,
-    renderInModal?: boolean,
-    popNavigationOnSuccess?: number,
-    modalPosition?: { x: number; y: number },
+    options?: NavigationOptions<TEndpoint>,
   ) => void;
 
   /**
    * Go back to previous endpoint in navigation stack
    */
-  pop: () => void;
+  pop: (count?: number) => void;
 }
 
 /**
@@ -65,24 +70,28 @@ function createNavigationStackStore() {
 
     push: <TEndpoint extends CreateApiEndpointAny>(
       endpoint: TEndpoint,
-      params: {
-        urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
-        data?: Partial<TEndpoint["types"]["RequestOutput"]>;
-      },
-      prefillFromGet = false,
-      getEndpoint?: CreateApiEndpointAny,
-      renderInModal = false,
-      popNavigationOnSuccess?: number,
-      modalPosition?: { x: number; y: number },
+      options: NavigationOptions<TEndpoint> = {},
     ): void => {
+      const {
+        urlPathParams,
+        data,
+        prefillFromGet = false,
+        getEndpoint,
+        renderInModal = false,
+        popNavigationOnSuccess,
+        replaceOnSuccess,
+        modalPosition,
+      } = options;
+
       const entry: NavigationStackEntry<TEndpoint> = {
         endpoint,
-        params,
+        params: { urlPathParams, data },
         timestamp: Date.now(),
         prefillFromGet,
         getEndpoint,
         renderInModal,
         popNavigationOnSuccess,
+        replaceOnSuccess,
         modalPosition,
       };
 
@@ -104,24 +113,28 @@ function createNavigationStackStore() {
 
     replace: <TEndpoint extends CreateApiEndpointAny>(
       endpoint: TEndpoint,
-      params: {
-        urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
-        data?: Partial<TEndpoint["types"]["RequestOutput"]>;
-      },
-      prefillFromGet = false,
-      getEndpoint?: CreateApiEndpointAny,
-      renderInModal = false,
-      popNavigationOnSuccess?: number,
-      modalPosition?: { x: number; y: number },
+      options: NavigationOptions<TEndpoint> = {},
     ): void => {
+      const {
+        urlPathParams,
+        data,
+        prefillFromGet = false,
+        getEndpoint,
+        renderInModal = false,
+        popNavigationOnSuccess,
+        replaceOnSuccess,
+        modalPosition,
+      } = options;
+
       const entry: NavigationStackEntry<TEndpoint> = {
         endpoint,
-        params,
+        params: { urlPathParams, data },
         timestamp: Date.now(),
         prefillFromGet,
         getEndpoint,
         renderInModal,
         popNavigationOnSuccess,
+        replaceOnSuccess,
         modalPosition,
       };
 
@@ -139,15 +152,16 @@ function createNavigationStackStore() {
       });
     },
 
-    pop: (): void => {
+    pop: (count = 1): void => {
       set((state) => {
         if (state.stack.length === 0) {
           // eslint-disable-next-line no-console
           console.warn("Navigation: Cannot pop - stack is empty");
           return state;
         }
+        const newLength = Math.max(0, state.stack.length - count);
         return {
-          stack: state.stack.slice(0, -1),
+          stack: state.stack.slice(0, newLength),
         };
       });
     },
@@ -233,29 +247,13 @@ export function NavigationStackProvider({
 export function useNavigationStack(): {
   push: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
-    params: {
-      urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
-      data?: Partial<TEndpoint["types"]["RequestOutput"]>;
-    },
-    prefillFromGet?: boolean,
-    getEndpoint?: CreateApiEndpointAny,
-    renderInModal?: boolean,
-    popNavigationOnSuccess?: number,
-    modalPosition?: { x: number; y: number },
+    options?: NavigationOptions<TEndpoint>,
   ) => void;
   replace: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
-    params: {
-      urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
-      data?: Partial<TEndpoint["types"]["RequestOutput"]>;
-    },
-    prefillFromGet?: boolean,
-    getEndpoint?: CreateApiEndpointAny,
-    renderInModal?: boolean,
-    popNavigationOnSuccess?: number,
-    modalPosition?: { x: number; y: number },
+    options?: NavigationOptions<TEndpoint>,
   ) => void;
-  pop: () => void;
+  pop: (count?: number) => void;
   stack: NavigationStackEntry[];
   canGoBack: boolean;
   current: NavigationStackEntry | null;

@@ -6,7 +6,11 @@
 import { z } from "zod";
 
 import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/components/types";
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import {
+  getCreditCostFromModel,
+  ModelId,
+} from "@/app/api/[locale]/agent/models/models";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -28,6 +32,7 @@ import {
   TtsVoiceOptions,
 } from "../../../text-to-speech/enum";
 import {
+  CATEGORY_CONFIG,
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
@@ -36,6 +41,7 @@ import {
 } from "../../characters/enum";
 import { CategoryOptions } from "../enum";
 import { CharacterCategory, CharacterCategoryDB } from "../enum";
+import { CharactersRepositoryClient } from "../repository-client";
 import { CharacterCreateContainer } from "./widget";
 
 /**
@@ -52,6 +58,99 @@ const { POST } = createEndpoint({
   icon: "sparkle" as const,
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.characters" as const],
+
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const charactersDefinition = await import("../definition");
+
+        // Optimistically add the new character to the list
+        apiClient.updateEndpointData(
+          charactersDefinition.default.GET,
+          data.logger,
+          (oldData) => {
+            if (!oldData?.success) {
+              return oldData;
+            }
+
+            type CharacterSection = (typeof oldData.data.sections)[number];
+            type CharacterListItem = CharacterSection["characters"][number];
+
+            // Find the section matching the character's category
+            const targetSection = oldData.data.sections.find((section) => {
+              // Get category from first character in section to match
+              const firstChar = section.characters[0];
+              return firstChar?.category === data.requestData.category;
+            });
+
+            // Get best model for the new character
+            const bestModel = data.requestData.modelSelection
+              ? CharactersRepositoryClient.getBestModelForCharacter(
+                  data.requestData.modelSelection,
+                )
+              : null;
+
+            // Create the new character card (only if we have a model)
+            if (!bestModel) {
+              return oldData;
+            }
+
+            const newCharacter: CharacterListItem = {
+              id: data.responseData.id,
+              icon: data.requestData.icon,
+              category: data.requestData.category,
+              modelId: bestModel.id,
+              name: data.requestData.name,
+              tagline: data.requestData.tagline,
+              description: data.requestData.description,
+              addedToFav: false,
+              modelIcon: bestModel.icon,
+              modelInfo: bestModel.name,
+              modelProvider: bestModel.provider,
+              creditCost: `${getCreditCostFromModel(bestModel)} credits`,
+            };
+
+            // Add to existing section or create new section for this category
+            if (targetSection) {
+              return {
+                success: true,
+                data: {
+                  sections: oldData.data.sections.map(
+                    (section): CharacterSection =>
+                      section === targetSection
+                        ? {
+                            ...section,
+                            characters: [newCharacter, ...section.characters],
+                            sectionCount: section.characters.length + 1,
+                          }
+                        : section,
+                  ),
+                },
+              };
+            } else {
+              // Create new section for this category
+              const categoryConfig = CATEGORY_CONFIG[data.requestData.category];
+
+              const newSection: CharacterSection = {
+                sectionIcon: categoryConfig.icon,
+                sectionTitle: categoryConfig.label,
+                sectionCount: 1,
+                characters: [newCharacter],
+              };
+
+              return {
+                success: true,
+                data: {
+                  sections: [...oldData.data.sections, newSection],
+                },
+              };
+            }
+          },
+          undefined,
+        );
+      },
+    },
+  },
 
   fields: customWidgetObject({
     render: CharacterCreateContainer,
@@ -112,7 +211,7 @@ const { POST } = createEndpoint({
         } as const,
       }),
       icon: requestField({
-        schema: iconSchema,
+        schema: iconSchema.default("sparkles"),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ICON,
         label: "app.api.agent.chat.characters.post.icon.label" as const,
@@ -177,30 +276,21 @@ const { POST } = createEndpoint({
         },
       }),
       voice: requestField({
-        schema: z.enum(TtsVoiceDB).default(DEFAULT_TTS_VOICE),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.agent.chat.characters.post.voice.label" as const,
+        label: "app.api.agent.chat.favorites.id.patch.voice.label" as const,
         description:
-          "app.api.agent.chat.characters.post.voice.description" as const,
+          "app.api.agent.chat.favorites.id.patch.voice.description" as const,
         options: TtsVoiceOptions,
         columns: 6,
-        order: 6,
         theme: {
           descriptionStyle: "inline",
+          optionalColor: "transparent",
         },
+        schema: z.enum(TtsVoiceDB).default(DEFAULT_TTS_VOICE),
       }),
       systemPrompt: requestField({
-        schema: z
-          .string()
-          .min(10, {
-            message:
-              "app.api.agent.chat.characters.post.systemPrompt.validation.minLength" as const,
-          })
-          .max(5000, {
-            message:
-              "app.api.agent.chat.characters.post.systemPrompt.validation.maxLength" as const,
-          }),
+        schema: z.string().nullable(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "app.api.agent.chat.characters.post.systemPrompt.label" as const,
@@ -218,7 +308,9 @@ const { POST } = createEndpoint({
       modelSelection: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.OBJECT,
-        schema: modelSelectionSchemaSimple,
+        schema: modelSelectionSchemaSimple.default({
+          selectionType: ModelSelectionType.FILTERS,
+        }),
       }),
 
       // === RESPONSE ===

@@ -8,18 +8,12 @@
 
 import { useMemo } from "react";
 
-import type { CharacterListItem } from "@/app/api/[locale]/agent/chat/characters/definition";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { UseEndpointOptions } from "../../../system/unified-interface/react/hooks/endpoint-types";
 import favoritesDefinition, { type FavoriteCard } from "./definition";
-
-interface UseChatFavoritesOptions {
-  logger: EndpointLogger;
-  characters: Record<string, CharacterListItem>;
-}
 
 export interface UseChatFavoritesReturn {
   favorites: FavoriteCard[];
@@ -34,18 +28,14 @@ export interface UseChatFavoritesReturn {
  * - Authenticated users: server storage via API
  * - Non-authenticated users: localStorage via callbacks
  */
-export function useChatFavorites({
-  logger,
-  characters,
-}: UseChatFavoritesOptions): UseChatFavoritesReturn {
+export function useChatFavorites(
+  logger: EndpointLogger,
+): UseChatFavoritesReturn {
   const { activeFavoriteId, user } = useChatContext();
   const isAuthenticated = useMemo(
     () => user !== undefined && !user.isPublic,
     [user],
   );
-
-  // Only enable query when characters are loaded (needed for localStorage mode)
-  const hasCharacters = Object.keys(characters).length > 0;
 
   const endpointOptions: UseEndpointOptions<typeof favoritesDefinition> =
     useMemo(
@@ -53,13 +43,13 @@ export function useChatFavorites({
         ({
           read: {
             queryOptions: {
-              enabled: hasCharacters,
+              enabled: true,
               refetchOnWindowFocus: true,
               staleTime: 60 * 1000,
             },
           },
         }) satisfies UseEndpointOptions<typeof favoritesDefinition>,
-      [hasCharacters],
+      [],
     );
 
   const endpoint = useEndpoint(

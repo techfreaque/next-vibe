@@ -35,6 +35,7 @@ import {
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
@@ -61,6 +62,7 @@ export function TextArrayFieldWidget<
   const t = useWidgetTranslation();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
+  const isDisabled = useWidgetDisabled();
   if (!form || !fieldName) {
     return (
       <Div>
@@ -158,7 +160,7 @@ export function TextArrayFieldWidget<
                 placeholder={field.placeholder}
                 maxTags={field.maxTags}
                 allowCustom={field.allowCustom ?? true}
-                disabled={field.disabled || field.readonly}
+                disabled={isDisabled || field.disabled || field.readonly}
                 className={styleClassName.inputClassName}
                 name={formField.name}
                 t={t}

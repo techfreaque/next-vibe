@@ -34,6 +34,7 @@ import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-bas
 import type { ReactFormFieldProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
@@ -61,6 +62,7 @@ export function UuidFieldWidget<
   const t = useWidgetTranslation();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
+  const isDisabled = useWidgetDisabled();
   if (!form || !fieldName) {
     return (
       <Div>
@@ -164,7 +166,7 @@ export function UuidFieldWidget<
                   placeholder={
                     field.placeholder ? t(field.placeholder) : undefined
                   }
-                  disabled={field.disabled || field.readonly}
+                  disabled={isDisabled || field.disabled || field.readonly}
                   className={cn(styleClassName.inputClassName, "font-mono")}
                   name={formField.name}
                 />

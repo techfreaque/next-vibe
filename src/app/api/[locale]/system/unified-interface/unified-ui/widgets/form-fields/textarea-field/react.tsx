@@ -34,6 +34,7 @@ import {
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
@@ -60,6 +61,7 @@ export function TextareaFieldWidget<
   const t = useWidgetTranslation();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
+  const isDisabled = useWidgetDisabled();
 
   if (!form || !fieldName) {
     return (
@@ -170,7 +172,7 @@ export function TextareaFieldWidget<
                   }
                   rows={field.rows || 3}
                   maxLength={field.maxLength}
-                  disabled={field.disabled || field.readonly}
+                  disabled={isDisabled || field.disabled || field.readonly}
                 />
               )}
             </FormControl>

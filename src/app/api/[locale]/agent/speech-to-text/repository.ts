@@ -19,7 +19,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import { CreditRepository } from "../../credits/repository";
-import { STT_COST_PER_SECOND } from "../../products/repository-client";
+import {
+  STT_COST_PER_SECOND,
+  STT_MINIMUM_BALANCE,
+} from "../../products/repository-client";
 import type { JwtPayloadType } from "../../user/auth/types";
 import type { SpeechToTextPostResponseOutput } from "./definition";
 
@@ -61,6 +64,41 @@ export class SpeechToTextRepository {
       fileName: file.name,
       mimeType: file.type,
     });
+
+    // Check minimum balance upfront (cost of ~5 seconds)
+    const balanceResult = await CreditRepository.getBalance(
+      user.isPublic && user.leadId
+        ? { leadId: user.leadId }
+        : user.id
+          ? { userId: user.id, leadId: user.leadId }
+          : { leadId: user.leadId! },
+      logger,
+    );
+
+    if (!balanceResult.success) {
+      logger.error("Failed to check balance for STT", {
+        error: balanceResult.message,
+      });
+      return fail({
+        message: "app.api.agent.speechToText.post.errors.balanceCheckFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    if (balanceResult.data.total < STT_MINIMUM_BALANCE) {
+      logger.warn("Insufficient credits for STT", {
+        balance: balanceResult.data.total,
+        minimum: STT_MINIMUM_BALANCE,
+      });
+      return fail({
+        message: "app.api.agent.speechToText.post.errors.insufficientCredits",
+        errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+        messageParams: {
+          balance: balanceResult.data.total.toString(),
+          minimum: STT_MINIMUM_BALANCE.toString(),
+        },
+      });
+    }
 
     try {
       // Convert File to Buffer for Eden AI
@@ -159,31 +197,36 @@ export class SpeechToTextRepository {
         costPerSecond: STT_COST_PER_SECOND,
       });
 
-      // Deduct credits AFTER successful completion based on actual duration
-      try {
-        await CreditRepository.deductCreditsForFeature(
-          user,
-          creditsNeeded,
-          "stt",
-          logger,
-        );
-      } catch (error) {
-        const errorMessage = parseError(error).message;
-        logger.error("Failed to deduct credits", {
-          error: errorMessage,
+      // Deduct credits AFTER successful completion based on actual duration (graceful - allows partial to 0)
+      const deductResult = await CreditRepository.deductCreditsForSTT(
+        user,
+        creditsNeeded,
+        logger,
+      );
+
+      if (!deductResult.success) {
+        logger.error("Failed to deduct STT credits", {
           creditsNeeded,
           audioDurationSeconds,
         });
         return fail({
           message: "app.api.agent.speechToText.post.errors.creditsFailed",
           errorType: ErrorResponseTypes.PAYMENT_ERROR,
-          messageParams: {
-            error: errorMessage,
-          },
         });
       }
 
+      if (deductResult.partialDeduction) {
+        logger.info(
+          "STT: Partial credit deduction (insufficient funds, deducted to 0)",
+          {
+            requestedCost: creditsNeeded,
+            audioDurationSeconds,
+          },
+        );
+      }
+
       return success({
+        creditCost: creditsNeeded,
         response: {
           success: true,
           text: pollResult.data.text,

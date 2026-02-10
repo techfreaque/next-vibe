@@ -16,6 +16,7 @@ import {
 import type { ReactRequestResponseWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetIsInteractive,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -45,6 +46,7 @@ export function MarkdownEditorWidget<
   MarkdownEditorWidgetConfig<TKey, TSchema, TUsage, "primitive">
 >): JSX.Element {
   const isInteractive = useWidgetIsInteractive();
+  const isDisabled = useWidgetDisabled();
   const {
     gap = "md",
     inputHeight = "sm",
@@ -128,6 +130,7 @@ export function MarkdownEditorWidget<
           onChange={(e): void => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
           className={inputHeightClass}
+          disabled={isDisabled}
         />
         <Button
           size="sm"

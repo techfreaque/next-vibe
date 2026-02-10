@@ -20,13 +20,13 @@ export function useImportJobsStatusEndpoint(
   return useEndpoint(
     definitions,
     {
-      queryOptions: {
-        enabled: true,
-        refetchOnWindowFocus: false,
-        staleTime: 10 * 1000, // 10 seconds (for real-time monitoring)
-      },
-      filterOptions: {
-        initialFilters: {
+      read: {
+        queryOptions: {
+          enabled: true,
+          refetchOnWindowFocus: false,
+          staleTime: 10 * 1000, // 10 seconds (for real-time monitoring)
+        },
+        initialState: {
           filters: {
             status: undefined,
             limit: 50,

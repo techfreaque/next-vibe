@@ -22,7 +22,11 @@ export function useImapMessagesList(
   return useEndpoint(
     definitions,
     {
-      persistForm: false,
+      read: {
+        formOptions: {
+          persistForm: false,
+        },
+      },
     },
     logger,
     user,
