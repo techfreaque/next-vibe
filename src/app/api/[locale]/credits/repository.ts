@@ -353,6 +353,13 @@ export class CreditRepository {
       return;
     }
 
+    // TODO: Remove this migration code after all old format packs are normalized
+    // Normalize old format "subscription" to new format "app.api.credits.enums.packType.subscription"
+    await db
+      .update(creditPacks)
+      .set({ type: CreditPackType.SUBSCRIPTION })
+      .where(eq(creditPacks.type, "subscription"));
+
     const now = new Date();
 
     // Find all expired packs across these wallets

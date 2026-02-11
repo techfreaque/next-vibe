@@ -112,7 +112,7 @@ export function SubscriptionCreateContainer({
   );
   const yearlySubscriptionPrice = yearlyProduct.price;
 
-  const isAuthenticated = true;
+  const isAuthenticated = !user.isPublic;
   const hasActiveSubscription =
     currentSubscription?.status === SubscriptionStatus.ACTIVE;
 

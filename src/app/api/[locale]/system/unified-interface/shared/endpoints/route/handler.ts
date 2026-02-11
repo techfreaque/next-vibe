@@ -334,6 +334,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       endpoint,
       user,
       platform,
+      locale,
     );
 
     if (!accessValidation.success) {

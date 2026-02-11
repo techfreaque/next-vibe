@@ -8,6 +8,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
@@ -19,6 +20,7 @@ export interface LoadEndpointOptions {
   platform: Platform;
   user: JwtPayloadType;
   logger: EndpointLogger;
+  locale: CountryLanguage;
 }
 
 export interface LoadEndpointsOptions {
@@ -26,6 +28,7 @@ export interface LoadEndpointsOptions {
   platform: Platform;
   user: JwtPayloadType;
   logger: EndpointLogger;
+  locale: CountryLanguage;
 }
 
 export interface IDefinitionLoader {
@@ -42,7 +45,7 @@ export class DefinitionLoader implements IDefinitionLoader {
   async load<TEndpoint extends CreateApiEndpointAny = CreateApiEndpointAny>(
     options: LoadEndpointOptions,
   ): Promise<ResponseType<TEndpoint>> {
-    const { identifier, platform, user, logger } = options;
+    const { identifier, platform, user, logger, locale } = options;
 
     try {
       const endpoint = await getEndpoint(identifier);
@@ -61,6 +64,7 @@ export class DefinitionLoader implements IDefinitionLoader {
         endpoint,
         user,
         platform,
+        locale,
       );
 
       if (!accessValidation.success) {
@@ -84,7 +88,7 @@ export class DefinitionLoader implements IDefinitionLoader {
   async loadMany<TEndpoint extends CreateApiEndpointAny = CreateApiEndpointAny>(
     options: LoadEndpointsOptions,
   ): Promise<ResponseType<TEndpoint[]>> {
-    const { identifiers, platform, user, logger } = options;
+    const { identifiers, platform, user, logger, locale } = options;
 
     try {
       const results = await Promise.all(
@@ -94,6 +98,7 @@ export class DefinitionLoader implements IDefinitionLoader {
             platform,
             user,
             logger,
+            locale,
           }),
         ),
       );

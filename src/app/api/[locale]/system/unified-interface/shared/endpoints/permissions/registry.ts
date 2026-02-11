@@ -20,6 +20,8 @@ import {
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
@@ -60,6 +62,7 @@ interface IPermissionsRegistry {
     endpoint: CreateApiEndpointAny,
     user: JwtPayloadType,
     platform: Platform,
+    locale: CountryLanguage,
   ): ResponseType<true>;
 
   // === Endpoint Discovery & Filtering ===
@@ -249,6 +252,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
     user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
     userRoles: (typeof UserPermissionRoleValue)[],
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<true>> {
     // Separate concerns: filter platform markers and permission roles
     const platformMarkers = filterPlatformMarkers(allowedRoles);
@@ -307,14 +311,19 @@ class PermissionsRegistry implements IPermissionsRegistry {
           : undefined,
       });
 
+      const { t } = simpleT(locale);
       return {
         success: false,
         message:
           "app.api.system.unifiedInterface.shared.permissions.errors.insufficientRoles",
         errorType: ErrorResponseTypes.FORBIDDEN,
         messageParams: {
-          userRoles: (roleAccess.userRoles || []).join(", ") || "none",
-          requiredRoles: (roleAccess.requiredRoles || []).join(", "),
+          userRoles: roleAccess.userRoles?.length
+            ? roleAccess.userRoles.map((role) => t(role)).join(", ")
+            : "none",
+          requiredRoles: roleAccess.requiredRoles
+            ? roleAccess.requiredRoles.map((role) => t(role)).join(", ")
+            : "",
         },
       };
     }
@@ -331,6 +340,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
     endpoint: CreateApiEndpointAny,
     user: JwtPayloadType,
     platform: Platform,
+    locale: CountryLanguage,
   ): ResponseType<true> {
     // Safety check: if allowedRoles is undefined or not an array, deny access
     if (!endpoint.allowedRoles || !Array.isArray(endpoint.allowedRoles)) {
@@ -366,6 +376,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
     // 2. Check user permissions
     const hasPermission = this.hasEndpointPermission(endpoint, user, platform);
     if (!hasPermission) {
+      const { t } = simpleT(locale);
       return {
         success: false,
         message:
@@ -373,8 +384,12 @@ class PermissionsRegistry implements IPermissionsRegistry {
         errorType: ErrorResponseTypes.FORBIDDEN,
         messageParams: {
           userId: user.isPublic ? "public" : user.id,
-          requiredRoles: endpoint.allowedRoles.join(", "),
-          userRoles: user.roles?.join(", ") || "none",
+          requiredRoles: endpoint.allowedRoles
+            .map((role) => t(role))
+            .join(", "),
+          userRoles: user.roles?.length
+            ? user.roles.map((role) => t(role)).join(", ")
+            : "none",
         },
       };
     }
