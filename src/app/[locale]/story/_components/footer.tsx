@@ -72,7 +72,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
               </Div>
               <Div role="listitem">
                 <Link
-                  href={`/${locale}/subscription/buy-credits`}
+                  href={`/${locale}/subscription/buy`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
                 >
                   <Tag className="h-4 w-4" />

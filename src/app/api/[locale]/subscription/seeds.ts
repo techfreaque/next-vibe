@@ -116,12 +116,20 @@ export async function dev(
           `✅ Created development subscription for demo user: ${createdSubscription.id}`,
         );
         subscription = {
-          ...createdSubscription,
+          id: createdSubscription.id,
           plan: createdSubscription.planId,
+          billingInterval: createdSubscription.billingInterval,
+          status: createdSubscription.status,
           currentPeriodStart:
             createdSubscription.currentPeriodStart?.toISOString() ?? "",
           currentPeriodEnd:
             createdSubscription.currentPeriodEnd?.toISOString() ?? "",
+          cancelAtPeriodEnd: createdSubscription.cancelAtPeriodEnd,
+          cancelAt: createdSubscription.cancelAt?.toISOString(),
+          canceledAt: createdSubscription.canceledAt?.toISOString(),
+          endedAt: createdSubscription.endedAt?.toISOString(),
+          provider: createdSubscription.provider,
+          providerSubscriptionId: createdSubscription.providerSubscriptionId || undefined,
           createdAt: createdSubscription.createdAt.toISOString(),
           updatedAt: createdSubscription.updatedAt.toISOString(),
         };
@@ -223,11 +231,13 @@ export async function dev(
           );
           adminSubscriptionData = {
             id: adminCreatedSubscription.id,
-            userId: adminCreatedSubscription.userId,
             plan: adminCreatedSubscription.planId,
             billingInterval: adminCreatedSubscription.billingInterval,
             status: adminCreatedSubscription.status,
             cancelAtPeriodEnd: adminCreatedSubscription.cancelAtPeriodEnd,
+            cancelAt: adminCreatedSubscription.cancelAt?.toISOString(),
+            canceledAt: adminCreatedSubscription.canceledAt?.toISOString(),
+            endedAt: adminCreatedSubscription.endedAt?.toISOString(),
             provider: adminCreatedSubscription.provider,
             providerSubscriptionId:
               adminCreatedSubscription.providerSubscriptionId || undefined,
@@ -364,11 +374,13 @@ export async function dev(
           );
           subscription = {
             id: createdSubscription.id,
-            userId: createdSubscription.userId,
             plan: createdSubscription.planId,
             billingInterval: createdSubscription.billingInterval,
             status: createdSubscription.status,
             cancelAtPeriodEnd: createdSubscription.cancelAtPeriodEnd,
+            cancelAt: createdSubscription.cancelAt?.toISOString(),
+            canceledAt: createdSubscription.canceledAt?.toISOString(),
+            endedAt: createdSubscription.endedAt?.toISOString(),
             provider: createdSubscription.provider,
             providerSubscriptionId:
               createdSubscription.providerSubscriptionId || undefined,

@@ -29,8 +29,16 @@ const { POST } = createEndpoint({
   category: "app.api.system.db.category",
   tags: ["app.api.system.db.sql.tag"],
   icon: "terminal",
-  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["sql", "db:sql"],
+  cli: {
+    firstCliArgKey: "query",
+  },
 
   fields: objectField(
     {
@@ -45,11 +53,21 @@ const { POST } = createEndpoint({
       // === REQUEST FIELDS ===
       query: requestField({
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.TEXTAREA,
         label: "app.api.system.db.sql.fields.query.title",
         description: "app.api.system.db.sql.fields.query.description",
         columns: 12,
-        schema: z.string().min(1),
+        schema: z.string().optional(),
+      }),
+
+      queryFile: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.db.sql.fields.queryFile.title",
+        description: "app.api.system.db.sql.fields.queryFile.description",
+        placeholder: "app.api.system.db.sql.fields.queryFile.placeholder",
+        columns: 12,
+        schema: z.string().optional(),
       }),
 
       dryRun: requestField({
@@ -82,31 +100,31 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       success: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.system.db.sql.fields.success.title",
+        label: "app.api.system.db.sql.fields.success.title",
         schema: z.boolean(),
       }),
 
       output: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.system.db.sql.fields.output.title",
+        label: "app.api.system.db.sql.fields.output.title",
         schema: z.string(),
       }),
 
       results: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.system.db.sql.fields.results.title",
+        label: "app.api.system.db.sql.fields.results.title",
         schema: z.array(z.record(z.string(), z.any())).optional(),
       }),
 
       rowCount: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.system.db.sql.fields.rowCount.title",
+        label: "app.api.system.db.sql.fields.rowCount.title",
         schema: z.coerce.number().optional(),
       }),
 
       queryType: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.system.db.sql.fields.queryType.title",
+        label: "app.api.system.db.sql.fields.queryType.title",
         schema: z.string().optional(),
       }),
     },
@@ -163,6 +181,12 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         query: "SELECT * FROM users LIMIT 10",
+        dryRun: false,
+        verbose: false,
+        limit: 100,
+      },
+      fileUpload: {
+        queryFile: "./queries/weekly-users.sql",
         dryRun: false,
         verbose: false,
         limit: 100,

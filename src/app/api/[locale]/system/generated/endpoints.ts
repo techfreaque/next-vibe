@@ -159,101 +159,102 @@ import { default as endpointDefinition_GET_146 } from "../../referral/earnings/l
 import { default as endpointDefinition_POST_147 } from "../../referral/definition";
 import { default as endpointDefinition_GET_148 } from "../../referral/codes/list/definition";
 import { default as endpointDefinition_GET_149 } from "../../referral/stats/definition";
-import { default as endpointDefinition_GET_150 } from "../../users/user/[id]/definition";
-import { default as endpointDefinition_PUT_151 } from "../../users/user/[id]/definition";
-import { default as endpointDefinition_DELETE_152 } from "../../users/user/[id]/definition";
-import { default as endpointDefinition_GET_153 } from "../../users/list/definition";
-import { default as endpointDefinition_GET_154 } from "../../users/stats/definition";
-import { default as endpointDefinition_POST_155 } from "../../users/create/definition";
-import { default as endpointDefinition_POST_156 } from "../../user/private/logout/definition";
-import { default as endpointDefinition_GET_157 } from "../../user/private/me/definition";
-import { default as endpointDefinition_POST_158 } from "../../user/private/me/definition";
-import { default as endpointDefinition_DELETE_159 } from "../../user/private/me/definition";
-import { default as endpointDefinition_POST_160 } from "../../user/private/me/password/definition";
-import { default as endpointDefinition_POST_161 } from "../../user/private/me/avatar/definition";
-import { default as endpointDefinition_DELETE_162 } from "../../user/private/me/avatar/definition";
-import { default as endpointDefinition_POST_163 } from "../../user/public/login/definition";
-import { default as endpointDefinition_GET_164 } from "../../user/public/login/options/definition";
-import { default as endpointDefinition_POST_165 } from "../../user/public/signup/definition";
-import { default as endpointDefinition_GET_166 } from "../../user/public/reset-password/validate/definition";
-import { default as endpointDefinition_POST_167 } from "../../user/public/reset-password/request/definition";
-import { default as endpointDefinition_POST_168 } from "../../user/public/reset-password/confirm/definition";
-import { default as endpointDefinition_GET_169 } from "../../user/search/definition";
-import { default as endpointDefinition_GET_170 } from "../../user/auth/check/definition";
-import { default as endpointDefinition_GET_171 } from "../../subscription/definition";
-import { default as endpointDefinition_POST_172 } from "../../subscription/definition";
-import { default as endpointDefinition_PUT_173 } from "../../subscription/definition";
-import { default as endpointDefinition_DELETE_174 } from "../../subscription/definition";
-import { default as endpointDefinition_GET_175 } from "../../payment/definition";
-import { default as endpointDefinition_POST_176 } from "../../payment/definition";
-import { default as endpointDefinition_POST_177 } from "../../payment/portal/definition";
-import { default as endpointDefinition_POST_178 } from "../../payment/invoice/definition";
-import { default as endpointDefinition_POST_179 } from "../../payment/providers/stripe/cli/definition";
-import { default as endpointDefinition_POST_180 } from "../../payment/providers/nowpayments/cli/definition";
-import { default as endpointDefinition_POST_181 } from "../../payment/checkout/definition";
-import { default as endpointDefinition_POST_182 } from "../../payment/refund/definition";
-import { default as endpointDefinition_GET_183 } from "../../credits/definition";
-import { default as endpointDefinition_GET_184 } from "../../credits/history/definition";
-import { default as endpointDefinition_POST_185 } from "../../credits/purchase/definition";
-import { default as endpointDefinition_POST_186 } from "../../contact/definition";
-import { default as endpointDefinition_GET_187 } from "../../emails/smtp-client/list/definition";
-import { default as endpointDefinition_GET_188 } from "../../emails/smtp-client/edit/[id]/definition";
-import { default as endpointDefinition_PUT_189 } from "../../emails/smtp-client/edit/[id]/definition";
-import { default as endpointDefinition_POST_190 } from "../../emails/smtp-client/create/definition";
-import { default as endpointDefinition_POST_191 } from "../../emails/send/definition";
-import { default as endpointDefinition_GET_192 } from "../../emails/messages/[id]/definition";
-import { default as endpointDefinition_GET_193 } from "../../emails/messages/list/definition";
-import { default as endpointDefinition_GET_194 } from "../../emails/messages/stats/definition";
-import { default as endpointDefinition_GET_195 } from "../../emails/imap-client/messages/[id]/definition";
-import { default as endpointDefinition_PATCH_196 } from "../../emails/imap-client/messages/[id]/definition";
-import { default as endpointDefinition_GET_197 } from "../../emails/imap-client/messages/list/definition";
-import { default as endpointDefinition_POST_198 } from "../../emails/imap-client/messages/sync/definition";
-import { default as endpointDefinition_GET_199 } from "../../emails/imap-client/folders/list/definition";
-import { default as endpointDefinition_POST_200 } from "../../emails/imap-client/folders/sync/definition";
-import { default as endpointDefinition_GET_201 } from "../../emails/imap-client/config/definition";
-import { default as endpointDefinition_POST_202 } from "../../emails/imap-client/config/definition";
-import { default as endpointDefinition_GET_203 } from "../../emails/imap-client/health/definition";
-import { default as endpointDefinition_POST_204 } from "../../emails/imap-client/sync/definition";
-import { default as endpointDefinition_GET_205 } from "../../emails/imap-client/accounts/[id]/definition";
-import { default as endpointDefinition_PUT_206 } from "../../emails/imap-client/accounts/[id]/definition";
-import { default as endpointDefinition_DELETE_207 } from "../../emails/imap-client/accounts/[id]/definition";
-import { default as endpointDefinition_GET_208 } from "../../emails/imap-client/accounts/list/definition";
-import { default as endpointDefinition_POST_209 } from "../../emails/imap-client/accounts/create/definition";
-import { default as endpointDefinition_POST_210 } from "../../emails/imap-client/accounts/test/definition";
-import { default as endpointDefinition_POST_211 } from "../../emails/preview/send-test/definition";
-import { default as endpointDefinition_POST_212 } from "../../emails/preview/render/definition";
-import { default as endpointDefinition_POST_213 } from "../../import/definition";
-import { default as endpointDefinition_GET_214 } from "../../import/definition";
-import { default as endpointDefinition_POST_215 } from "../../newsletter/unsubscribe/definition";
-import { default as endpointDefinition_POST_216 } from "../../newsletter/subscribe/definition";
-import { default as endpointDefinition_GET_217 } from "../../newsletter/status/definition";
-import { default as endpointDefinition_POST_218 } from "../../browser/performance-analyze-insight/definition";
-import { default as endpointDefinition_POST_219 } from "../../browser/get-console-message/definition";
-import { default as endpointDefinition_POST_220 } from "../../browser/new-page/definition";
-import { default as endpointDefinition_POST_221 } from "../../browser/take-snapshot/definition";
-import { default as endpointDefinition_POST_222 } from "../../browser/drag/definition";
-import { default as endpointDefinition_POST_223 } from "../../browser/definition";
-import { default as endpointDefinition_POST_224 } from "../../browser/get-network-request/definition";
-import { default as endpointDefinition_POST_225 } from "../../browser/list-pages/definition";
-import { default as endpointDefinition_POST_226 } from "../../browser/close-page/definition";
-import { default as endpointDefinition_POST_227 } from "../../browser/resize-page/definition";
-import { default as endpointDefinition_POST_228 } from "../../browser/fill/definition";
-import { default as endpointDefinition_POST_229 } from "../../browser/hover/definition";
-import { default as endpointDefinition_POST_230 } from "../../browser/upload-file/definition";
-import { default as endpointDefinition_POST_231 } from "../../browser/handle-dialog/definition";
-import { default as endpointDefinition_POST_232 } from "../../browser/select-page/definition";
-import { default as endpointDefinition_POST_233 } from "../../browser/navigate-page/definition";
-import { default as endpointDefinition_POST_234 } from "../../browser/press-key/definition";
-import { default as endpointDefinition_POST_235 } from "../../browser/fill-form/definition";
-import { default as endpointDefinition_POST_236 } from "../../browser/performance-stop-trace/definition";
-import { default as endpointDefinition_POST_237 } from "../../browser/performance-start-trace/definition";
-import { default as endpointDefinition_POST_238 } from "../../browser/emulate/definition";
-import { default as endpointDefinition_POST_239 } from "../../browser/take-screenshot/definition";
-import { default as endpointDefinition_POST_240 } from "../../browser/list-network-requests/definition";
-import { default as endpointDefinition_POST_241 } from "../../browser/evaluate-script/definition";
-import { default as endpointDefinition_POST_242 } from "../../browser/list-console-messages/definition";
-import { default as endpointDefinition_POST_243 } from "../../browser/wait-for/definition";
-import { default as endpointDefinition_POST_244 } from "../../browser/click/definition";
+import { default as endpointDefinition_GET_150 } from "../../users/view/definition";
+import { default as endpointDefinition_GET_151 } from "../../users/user/[id]/definition";
+import { default as endpointDefinition_PUT_152 } from "../../users/user/[id]/definition";
+import { default as endpointDefinition_DELETE_153 } from "../../users/user/[id]/definition";
+import { default as endpointDefinition_GET_154 } from "../../users/list/definition";
+import { default as endpointDefinition_GET_155 } from "../../users/stats/definition";
+import { default as endpointDefinition_POST_156 } from "../../users/create/definition";
+import { default as endpointDefinition_POST_157 } from "../../user/private/logout/definition";
+import { default as endpointDefinition_GET_158 } from "../../user/private/me/definition";
+import { default as endpointDefinition_POST_159 } from "../../user/private/me/definition";
+import { default as endpointDefinition_DELETE_160 } from "../../user/private/me/definition";
+import { default as endpointDefinition_POST_161 } from "../../user/private/me/password/definition";
+import { default as endpointDefinition_POST_162 } from "../../user/private/me/avatar/definition";
+import { default as endpointDefinition_DELETE_163 } from "../../user/private/me/avatar/definition";
+import { default as endpointDefinition_POST_164 } from "../../user/public/login/definition";
+import { default as endpointDefinition_GET_165 } from "../../user/public/login/options/definition";
+import { default as endpointDefinition_POST_166 } from "../../user/public/signup/definition";
+import { default as endpointDefinition_GET_167 } from "../../user/public/reset-password/validate/definition";
+import { default as endpointDefinition_POST_168 } from "../../user/public/reset-password/request/definition";
+import { default as endpointDefinition_POST_169 } from "../../user/public/reset-password/confirm/definition";
+import { default as endpointDefinition_GET_170 } from "../../user/search/definition";
+import { default as endpointDefinition_GET_171 } from "../../user/auth/check/definition";
+import { default as endpointDefinition_GET_172 } from "../../subscription/definition";
+import { default as endpointDefinition_PUT_173 } from "../../subscription/update/definition";
+import { default as endpointDefinition_DELETE_174 } from "../../subscription/cancel/definition";
+import { default as endpointDefinition_POST_175 } from "../../subscription/create/definition";
+import { default as endpointDefinition_GET_176 } from "../../payment/definition";
+import { default as endpointDefinition_POST_177 } from "../../payment/definition";
+import { default as endpointDefinition_POST_178 } from "../../payment/portal/definition";
+import { default as endpointDefinition_POST_179 } from "../../payment/invoice/definition";
+import { default as endpointDefinition_POST_180 } from "../../payment/providers/stripe/cli/definition";
+import { default as endpointDefinition_POST_181 } from "../../payment/providers/nowpayments/cli/definition";
+import { default as endpointDefinition_POST_182 } from "../../payment/checkout/definition";
+import { default as endpointDefinition_POST_183 } from "../../payment/refund/definition";
+import { default as endpointDefinition_GET_184 } from "../../credits/definition";
+import { default as endpointDefinition_GET_185 } from "../../credits/history/definition";
+import { default as endpointDefinition_POST_186 } from "../../credits/purchase/definition";
+import { default as endpointDefinition_POST_187 } from "../../contact/definition";
+import { default as endpointDefinition_GET_188 } from "../../emails/smtp-client/list/definition";
+import { default as endpointDefinition_GET_189 } from "../../emails/smtp-client/edit/[id]/definition";
+import { default as endpointDefinition_PUT_190 } from "../../emails/smtp-client/edit/[id]/definition";
+import { default as endpointDefinition_POST_191 } from "../../emails/smtp-client/create/definition";
+import { default as endpointDefinition_POST_192 } from "../../emails/send/definition";
+import { default as endpointDefinition_GET_193 } from "../../emails/messages/[id]/definition";
+import { default as endpointDefinition_GET_194 } from "../../emails/messages/list/definition";
+import { default as endpointDefinition_GET_195 } from "../../emails/messages/stats/definition";
+import { default as endpointDefinition_GET_196 } from "../../emails/imap-client/messages/[id]/definition";
+import { default as endpointDefinition_PATCH_197 } from "../../emails/imap-client/messages/[id]/definition";
+import { default as endpointDefinition_GET_198 } from "../../emails/imap-client/messages/list/definition";
+import { default as endpointDefinition_POST_199 } from "../../emails/imap-client/messages/sync/definition";
+import { default as endpointDefinition_GET_200 } from "../../emails/imap-client/folders/list/definition";
+import { default as endpointDefinition_POST_201 } from "../../emails/imap-client/folders/sync/definition";
+import { default as endpointDefinition_GET_202 } from "../../emails/imap-client/config/definition";
+import { default as endpointDefinition_POST_203 } from "../../emails/imap-client/config/definition";
+import { default as endpointDefinition_GET_204 } from "../../emails/imap-client/health/definition";
+import { default as endpointDefinition_POST_205 } from "../../emails/imap-client/sync/definition";
+import { default as endpointDefinition_GET_206 } from "../../emails/imap-client/accounts/[id]/definition";
+import { default as endpointDefinition_PUT_207 } from "../../emails/imap-client/accounts/[id]/definition";
+import { default as endpointDefinition_DELETE_208 } from "../../emails/imap-client/accounts/[id]/definition";
+import { default as endpointDefinition_GET_209 } from "../../emails/imap-client/accounts/list/definition";
+import { default as endpointDefinition_POST_210 } from "../../emails/imap-client/accounts/create/definition";
+import { default as endpointDefinition_POST_211 } from "../../emails/imap-client/accounts/test/definition";
+import { default as endpointDefinition_POST_212 } from "../../emails/preview/send-test/definition";
+import { default as endpointDefinition_POST_213 } from "../../emails/preview/render/definition";
+import { default as endpointDefinition_POST_214 } from "../../import/definition";
+import { default as endpointDefinition_GET_215 } from "../../import/definition";
+import { default as endpointDefinition_POST_216 } from "../../newsletter/unsubscribe/definition";
+import { default as endpointDefinition_POST_217 } from "../../newsletter/subscribe/definition";
+import { default as endpointDefinition_GET_218 } from "../../newsletter/status/definition";
+import { default as endpointDefinition_POST_219 } from "../../browser/performance-analyze-insight/definition";
+import { default as endpointDefinition_POST_220 } from "../../browser/get-console-message/definition";
+import { default as endpointDefinition_POST_221 } from "../../browser/new-page/definition";
+import { default as endpointDefinition_POST_222 } from "../../browser/take-snapshot/definition";
+import { default as endpointDefinition_POST_223 } from "../../browser/drag/definition";
+import { default as endpointDefinition_POST_224 } from "../../browser/definition";
+import { default as endpointDefinition_POST_225 } from "../../browser/get-network-request/definition";
+import { default as endpointDefinition_POST_226 } from "../../browser/list-pages/definition";
+import { default as endpointDefinition_POST_227 } from "../../browser/close-page/definition";
+import { default as endpointDefinition_POST_228 } from "../../browser/resize-page/definition";
+import { default as endpointDefinition_POST_229 } from "../../browser/fill/definition";
+import { default as endpointDefinition_POST_230 } from "../../browser/hover/definition";
+import { default as endpointDefinition_POST_231 } from "../../browser/upload-file/definition";
+import { default as endpointDefinition_POST_232 } from "../../browser/handle-dialog/definition";
+import { default as endpointDefinition_POST_233 } from "../../browser/select-page/definition";
+import { default as endpointDefinition_POST_234 } from "../../browser/navigate-page/definition";
+import { default as endpointDefinition_POST_235 } from "../../browser/press-key/definition";
+import { default as endpointDefinition_POST_236 } from "../../browser/fill-form/definition";
+import { default as endpointDefinition_POST_237 } from "../../browser/performance-stop-trace/definition";
+import { default as endpointDefinition_POST_238 } from "../../browser/performance-start-trace/definition";
+import { default as endpointDefinition_POST_239 } from "../../browser/emulate/definition";
+import { default as endpointDefinition_POST_240 } from "../../browser/take-screenshot/definition";
+import { default as endpointDefinition_POST_241 } from "../../browser/list-network-requests/definition";
+import { default as endpointDefinition_POST_242 } from "../../browser/evaluate-script/definition";
+import { default as endpointDefinition_POST_243 } from "../../browser/list-console-messages/definition";
+import { default as endpointDefinition_POST_244 } from "../../browser/wait-for/definition";
+import { default as endpointDefinition_POST_245 } from "../../browser/click/definition";
 
 /**
  * Singleton instance for endpoints registry
@@ -1075,466 +1076,471 @@ function initializeEndpoints(): Record<string, ApiSection> {
   );
   setNestedPath(
     endpoints,
-    ["users", "user", "[id]", "GET"],
+    ["users", "view", "GET"],
     endpointDefinition_GET_150.GET,
   );
   setNestedPath(
     endpoints,
+    ["users", "user", "[id]", "GET"],
+    endpointDefinition_GET_151.GET,
+  );
+  setNestedPath(
+    endpoints,
     ["users", "user", "[id]", "PUT"],
-    endpointDefinition_PUT_151.PUT,
+    endpointDefinition_PUT_152.PUT,
   );
   setNestedPath(
     endpoints,
     ["users", "user", "[id]", "DELETE"],
-    endpointDefinition_DELETE_152.DELETE,
+    endpointDefinition_DELETE_153.DELETE,
   );
   setNestedPath(
     endpoints,
     ["users", "list", "GET"],
-    endpointDefinition_GET_153.GET,
-  );
-  setNestedPath(
-    endpoints,
-    ["users", "stats", "GET"],
     endpointDefinition_GET_154.GET,
   );
   setNestedPath(
     endpoints,
-    ["users", "create", "POST"],
-    endpointDefinition_POST_155.POST,
+    ["users", "stats", "GET"],
+    endpointDefinition_GET_155.GET,
   );
   setNestedPath(
     endpoints,
-    ["user", "private", "logout", "POST"],
+    ["users", "create", "POST"],
     endpointDefinition_POST_156.POST,
   );
   setNestedPath(
     endpoints,
+    ["user", "private", "logout", "POST"],
+    endpointDefinition_POST_157.POST,
+  );
+  setNestedPath(
+    endpoints,
     ["user", "private", "me", "GET"],
-    endpointDefinition_GET_157.GET,
+    endpointDefinition_GET_158.GET,
   );
   setNestedPath(
     endpoints,
     ["user", "private", "me", "POST"],
-    endpointDefinition_POST_158.POST,
+    endpointDefinition_POST_159.POST,
   );
   setNestedPath(
     endpoints,
     ["user", "private", "me", "DELETE"],
-    endpointDefinition_DELETE_159.DELETE,
+    endpointDefinition_DELETE_160.DELETE,
   );
   setNestedPath(
     endpoints,
     ["user", "private", "me", "password", "POST"],
-    endpointDefinition_POST_160.POST,
-  );
-  setNestedPath(
-    endpoints,
-    ["user", "private", "me", "avatar", "POST"],
     endpointDefinition_POST_161.POST,
   );
   setNestedPath(
     endpoints,
+    ["user", "private", "me", "avatar", "POST"],
+    endpointDefinition_POST_162.POST,
+  );
+  setNestedPath(
+    endpoints,
     ["user", "private", "me", "avatar", "DELETE"],
-    endpointDefinition_DELETE_162.DELETE,
+    endpointDefinition_DELETE_163.DELETE,
   );
   setNestedPath(
     endpoints,
     ["user", "public", "login", "POST"],
-    endpointDefinition_POST_163.POST,
+    endpointDefinition_POST_164.POST,
   );
   setNestedPath(
     endpoints,
     ["user", "public", "login", "options", "GET"],
-    endpointDefinition_GET_164.GET,
+    endpointDefinition_GET_165.GET,
   );
   setNestedPath(
     endpoints,
     ["user", "public", "signup", "POST"],
-    endpointDefinition_POST_165.POST,
+    endpointDefinition_POST_166.POST,
   );
   setNestedPath(
     endpoints,
     ["user", "public", "reset-password", "validate", "GET"],
-    endpointDefinition_GET_166.GET,
+    endpointDefinition_GET_167.GET,
   );
   setNestedPath(
     endpoints,
     ["user", "public", "reset-password", "request", "POST"],
-    endpointDefinition_POST_167.POST,
-  );
-  setNestedPath(
-    endpoints,
-    ["user", "public", "reset-password", "confirm", "POST"],
     endpointDefinition_POST_168.POST,
   );
   setNestedPath(
     endpoints,
-    ["user", "search", "GET"],
-    endpointDefinition_GET_169.GET,
+    ["user", "public", "reset-password", "confirm", "POST"],
+    endpointDefinition_POST_169.POST,
   );
   setNestedPath(
     endpoints,
-    ["user", "auth", "check", "GET"],
+    ["user", "search", "GET"],
     endpointDefinition_GET_170.GET,
   );
   setNestedPath(
     endpoints,
-    ["subscription", "GET"],
+    ["user", "auth", "check", "GET"],
     endpointDefinition_GET_171.GET,
   );
   setNestedPath(
     endpoints,
-    ["subscription", "POST"],
-    endpointDefinition_POST_172.POST,
+    ["subscription", "GET"],
+    endpointDefinition_GET_172.GET,
   );
   setNestedPath(
     endpoints,
-    ["subscription", "PUT"],
+    ["subscription", "update", "PUT"],
     endpointDefinition_PUT_173.PUT,
   );
   setNestedPath(
     endpoints,
-    ["subscription", "DELETE"],
+    ["subscription", "cancel", "DELETE"],
     endpointDefinition_DELETE_174.DELETE,
   );
-  setNestedPath(endpoints, ["payment", "GET"], endpointDefinition_GET_175.GET);
+  setNestedPath(
+    endpoints,
+    ["subscription", "create", "POST"],
+    endpointDefinition_POST_175.POST,
+  );
+  setNestedPath(endpoints, ["payment", "GET"], endpointDefinition_GET_176.GET);
   setNestedPath(
     endpoints,
     ["payment", "POST"],
-    endpointDefinition_POST_176.POST,
-  );
-  setNestedPath(
-    endpoints,
-    ["payment", "portal", "POST"],
     endpointDefinition_POST_177.POST,
   );
   setNestedPath(
     endpoints,
-    ["payment", "invoice", "POST"],
+    ["payment", "portal", "POST"],
     endpointDefinition_POST_178.POST,
   );
   setNestedPath(
     endpoints,
-    ["payment", "providers", "stripe", "cli", "POST"],
+    ["payment", "invoice", "POST"],
     endpointDefinition_POST_179.POST,
   );
   setNestedPath(
     endpoints,
-    ["payment", "providers", "nowpayments", "cli", "POST"],
+    ["payment", "providers", "stripe", "cli", "POST"],
     endpointDefinition_POST_180.POST,
   );
   setNestedPath(
     endpoints,
-    ["payment", "checkout", "POST"],
+    ["payment", "providers", "nowpayments", "cli", "POST"],
     endpointDefinition_POST_181.POST,
   );
   setNestedPath(
     endpoints,
-    ["payment", "refund", "POST"],
+    ["payment", "checkout", "POST"],
     endpointDefinition_POST_182.POST,
   );
-  setNestedPath(endpoints, ["credits", "GET"], endpointDefinition_GET_183.GET);
+  setNestedPath(
+    endpoints,
+    ["payment", "refund", "POST"],
+    endpointDefinition_POST_183.POST,
+  );
+  setNestedPath(endpoints, ["credits", "GET"], endpointDefinition_GET_184.GET);
   setNestedPath(
     endpoints,
     ["credits", "history", "GET"],
-    endpointDefinition_GET_184.GET,
+    endpointDefinition_GET_185.GET,
   );
   setNestedPath(
     endpoints,
     ["credits", "purchase", "POST"],
-    endpointDefinition_POST_185.POST,
-  );
-  setNestedPath(
-    endpoints,
-    ["contact", "POST"],
     endpointDefinition_POST_186.POST,
   );
   setNestedPath(
     endpoints,
-    ["emails", "smtp-client", "list", "GET"],
-    endpointDefinition_GET_187.GET,
+    ["contact", "POST"],
+    endpointDefinition_POST_187.POST,
   );
   setNestedPath(
     endpoints,
-    ["emails", "smtp-client", "edit", "[id]", "GET"],
+    ["emails", "smtp-client", "list", "GET"],
     endpointDefinition_GET_188.GET,
   );
   setNestedPath(
     endpoints,
+    ["emails", "smtp-client", "edit", "[id]", "GET"],
+    endpointDefinition_GET_189.GET,
+  );
+  setNestedPath(
+    endpoints,
     ["emails", "smtp-client", "edit", "[id]", "PUT"],
-    endpointDefinition_PUT_189.PUT,
+    endpointDefinition_PUT_190.PUT,
   );
   setNestedPath(
     endpoints,
     ["emails", "smtp-client", "create", "POST"],
-    endpointDefinition_POST_190.POST,
-  );
-  setNestedPath(
-    endpoints,
-    ["emails", "send", "POST"],
     endpointDefinition_POST_191.POST,
   );
   setNestedPath(
     endpoints,
-    ["emails", "messages", "[id]", "GET"],
-    endpointDefinition_GET_192.GET,
+    ["emails", "send", "POST"],
+    endpointDefinition_POST_192.POST,
   );
   setNestedPath(
     endpoints,
-    ["emails", "messages", "list", "GET"],
+    ["emails", "messages", "[id]", "GET"],
     endpointDefinition_GET_193.GET,
   );
   setNestedPath(
     endpoints,
-    ["emails", "messages", "stats", "GET"],
+    ["emails", "messages", "list", "GET"],
     endpointDefinition_GET_194.GET,
   );
   setNestedPath(
     endpoints,
-    ["emails", "imap-client", "messages", "[id]", "GET"],
+    ["emails", "messages", "stats", "GET"],
     endpointDefinition_GET_195.GET,
   );
   setNestedPath(
     endpoints,
+    ["emails", "imap-client", "messages", "[id]", "GET"],
+    endpointDefinition_GET_196.GET,
+  );
+  setNestedPath(
+    endpoints,
     ["emails", "imap-client", "messages", "[id]", "PATCH"],
-    endpointDefinition_PATCH_196.PATCH,
+    endpointDefinition_PATCH_197.PATCH,
   );
   setNestedPath(
     endpoints,
     ["emails", "imap-client", "messages", "list", "GET"],
-    endpointDefinition_GET_197.GET,
+    endpointDefinition_GET_198.GET,
   );
   setNestedPath(
     endpoints,
     ["emails", "imap-client", "messages", "sync", "POST"],
-    endpointDefinition_POST_198.POST,
+    endpointDefinition_POST_199.POST,
   );
   setNestedPath(
     endpoints,
     ["emails", "imap-client", "folders", "list", "GET"],
-    endpointDefinition_GET_199.GET,
+    endpointDefinition_GET_200.GET,
   );
   setNestedPath(
     endpoints,
     ["emails", "imap-client", "folders", "sync", "POST"],
-    endpointDefinition_POST_200.POST,
+    endpointDefinition_POST_201.POST,
   );
   setNestedPath(
     endpoints,
     ["emails", "imap-client", "config", "GET"],
-    endpointDefinition_GET_201.GET,
+    endpointDefinition_GET_202.GET,
   );
   setNestedPath(
     endpoints,
     ["emails", "imap-client", "config", "POST"],
-    endpointDefinition_POST_202.POST,
+    endpointDefinition_POST_203.POST,
   );
   setNestedPath(
     endpoints,
     ["emails", "imap-client", "health", "GET"],
-    endpointDefinition_GET_203.GET,
+    endpointDefinition_GET_204.GET,
   );
   setNestedPath(
     endpoints,
     ["emails", "imap-client", "sync", "POST"],
-    endpointDefinition_POST_204.POST,
+    endpointDefinition_POST_205.POST,
   );
   setNestedPath(
     endpoints,
     ["emails", "imap-client", "accounts", "[id]", "GET"],
-    endpointDefinition_GET_205.GET,
+    endpointDefinition_GET_206.GET,
   );
   setNestedPath(
     endpoints,
     ["emails", "imap-client", "accounts", "[id]", "PUT"],
-    endpointDefinition_PUT_206.PUT,
+    endpointDefinition_PUT_207.PUT,
   );
   setNestedPath(
     endpoints,
     ["emails", "imap-client", "accounts", "[id]", "DELETE"],
-    endpointDefinition_DELETE_207.DELETE,
+    endpointDefinition_DELETE_208.DELETE,
   );
   setNestedPath(
     endpoints,
     ["emails", "imap-client", "accounts", "list", "GET"],
-    endpointDefinition_GET_208.GET,
+    endpointDefinition_GET_209.GET,
   );
   setNestedPath(
     endpoints,
     ["emails", "imap-client", "accounts", "create", "POST"],
-    endpointDefinition_POST_209.POST,
-  );
-  setNestedPath(
-    endpoints,
-    ["emails", "imap-client", "accounts", "test", "POST"],
     endpointDefinition_POST_210.POST,
   );
   setNestedPath(
     endpoints,
-    ["emails", "preview", "send-test", "POST"],
+    ["emails", "imap-client", "accounts", "test", "POST"],
     endpointDefinition_POST_211.POST,
   );
   setNestedPath(
     endpoints,
-    ["emails", "preview", "render", "POST"],
+    ["emails", "preview", "send-test", "POST"],
     endpointDefinition_POST_212.POST,
   );
   setNestedPath(
     endpoints,
-    ["import", "POST"],
+    ["emails", "preview", "render", "POST"],
     endpointDefinition_POST_213.POST,
   );
-  setNestedPath(endpoints, ["import", "GET"], endpointDefinition_GET_214.GET);
+  setNestedPath(
+    endpoints,
+    ["import", "POST"],
+    endpointDefinition_POST_214.POST,
+  );
+  setNestedPath(endpoints, ["import", "GET"], endpointDefinition_GET_215.GET);
   setNestedPath(
     endpoints,
     ["newsletter", "unsubscribe", "POST"],
-    endpointDefinition_POST_215.POST,
-  );
-  setNestedPath(
-    endpoints,
-    ["newsletter", "subscribe", "POST"],
     endpointDefinition_POST_216.POST,
   );
   setNestedPath(
     endpoints,
+    ["newsletter", "subscribe", "POST"],
+    endpointDefinition_POST_217.POST,
+  );
+  setNestedPath(
+    endpoints,
     ["newsletter", "status", "GET"],
-    endpointDefinition_GET_217.GET,
+    endpointDefinition_GET_218.GET,
   );
   setNestedPath(
     endpoints,
     ["browser", "performance-analyze-insight", "POST"],
-    endpointDefinition_POST_218.POST,
-  );
-  setNestedPath(
-    endpoints,
-    ["browser", "get-console-message", "POST"],
     endpointDefinition_POST_219.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "new-page", "POST"],
+    ["browser", "get-console-message", "POST"],
     endpointDefinition_POST_220.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "take-snapshot", "POST"],
+    ["browser", "new-page", "POST"],
     endpointDefinition_POST_221.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "drag", "POST"],
+    ["browser", "take-snapshot", "POST"],
     endpointDefinition_POST_222.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "POST"],
+    ["browser", "drag", "POST"],
     endpointDefinition_POST_223.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "get-network-request", "POST"],
+    ["browser", "POST"],
     endpointDefinition_POST_224.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "list-pages", "POST"],
+    ["browser", "get-network-request", "POST"],
     endpointDefinition_POST_225.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "close-page", "POST"],
+    ["browser", "list-pages", "POST"],
     endpointDefinition_POST_226.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "resize-page", "POST"],
+    ["browser", "close-page", "POST"],
     endpointDefinition_POST_227.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "fill", "POST"],
+    ["browser", "resize-page", "POST"],
     endpointDefinition_POST_228.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "hover", "POST"],
+    ["browser", "fill", "POST"],
     endpointDefinition_POST_229.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "upload-file", "POST"],
+    ["browser", "hover", "POST"],
     endpointDefinition_POST_230.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "handle-dialog", "POST"],
+    ["browser", "upload-file", "POST"],
     endpointDefinition_POST_231.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "select-page", "POST"],
+    ["browser", "handle-dialog", "POST"],
     endpointDefinition_POST_232.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "navigate-page", "POST"],
+    ["browser", "select-page", "POST"],
     endpointDefinition_POST_233.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "press-key", "POST"],
+    ["browser", "navigate-page", "POST"],
     endpointDefinition_POST_234.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "fill-form", "POST"],
+    ["browser", "press-key", "POST"],
     endpointDefinition_POST_235.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "performance-stop-trace", "POST"],
+    ["browser", "fill-form", "POST"],
     endpointDefinition_POST_236.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "performance-start-trace", "POST"],
+    ["browser", "performance-stop-trace", "POST"],
     endpointDefinition_POST_237.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "emulate", "POST"],
+    ["browser", "performance-start-trace", "POST"],
     endpointDefinition_POST_238.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "take-screenshot", "POST"],
+    ["browser", "emulate", "POST"],
     endpointDefinition_POST_239.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "list-network-requests", "POST"],
+    ["browser", "take-screenshot", "POST"],
     endpointDefinition_POST_240.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "evaluate-script", "POST"],
+    ["browser", "list-network-requests", "POST"],
     endpointDefinition_POST_241.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "list-console-messages", "POST"],
+    ["browser", "evaluate-script", "POST"],
     endpointDefinition_POST_242.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "wait-for", "POST"],
+    ["browser", "list-console-messages", "POST"],
     endpointDefinition_POST_243.POST,
   );
   setNestedPath(
     endpoints,
-    ["browser", "click", "POST"],
+    ["browser", "wait-for", "POST"],
     endpointDefinition_POST_244.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["browser", "click", "POST"],
+    endpointDefinition_POST_245.POST,
   );
 
   endpointsInstance = endpoints;

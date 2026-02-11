@@ -6,15 +6,14 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectFieldNew } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -25,6 +24,7 @@ import {
   PaymentProviderDB,
   PaymentProviderOptions,
 } from "../../payment/enum";
+import { CreditsPurchaseContainer } from "./widget";
 
 /**
  * Purchase Credits Endpoint (POST)
@@ -40,15 +40,12 @@ const { POST } = createEndpoint({
   icon: "dollar-sign",
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  fields: objectFieldNew({
-    type: WidgetType.CONTAINER,
-    title: "app.api.credits.purchase.post.container.title",
-    description: "app.api.credits.purchase.post.container.description",
-    layoutType: LayoutType.STACKED,
+  fields: customWidgetObject({
+    render: CreditsPurchaseContainer,
     usage: {
       request: "data",
       response: true,
-    },
+    } as const,
     children: {
       // === REQUEST FIELDS ===
       quantity: requestField({

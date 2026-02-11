@@ -20,26 +20,33 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { SubscriptionCheckoutRepositoryImpl } from "../payment/checkout/repository";
 import { PaymentProvider, type PaymentProviderValue } from "../payment/enum";
 import { getPaymentProvider } from "../payment/providers";
 import { stripe as getStripe } from "../payment/providers/stripe/repository";
 import type { WebhookData } from "../payment/providers/types";
+import type { JwtPrivatePayloadType } from "../user/auth/types";
+import type {
+  SubscriptionCancelDeleteRequestOutput,
+  SubscriptionCancelDeleteResponseOutput,
+} from "./cancel/definition";
+import type {
+  SubscriptionCreatePostRequestOutput,
+  SubscriptionCreatePostResponseOutput,
+} from "./create/definition";
 import type { NewSubscription } from "./db";
 import { subscriptions } from "./db";
-import type {
-  SubscriptionDeleteRequestOutput,
-  SubscriptionGetResponseOutput,
-  SubscriptionPostRequestOutput,
-  SubscriptionPostResponseOutput,
-  SubscriptionPutRequestOutput,
-  SubscriptionPutResponseOutput,
-} from "./definition";
+import type { SubscriptionGetResponseOutput } from "./definition";
 import type {
   BillingIntervalDB,
   SubscriptionPlanDB,
   SubscriptionStatusValue,
 } from "./enum";
 import { SubscriptionPlan, SubscriptionStatus } from "./enum";
+import type {
+  SubscriptionUpdatePutRequestOutput,
+  SubscriptionUpdatePutResponseOutput,
+} from "./update/definition";
 
 /**
  * Calculate current period dates from Stripe subscription
@@ -193,6 +200,7 @@ export class SubscriptionRepository {
                   status: SubscriptionStatus.CANCELED,
                   canceledAt: new Date(),
                   endedAt: subscription.currentPeriodEnd || new Date(),
+                  providerSubscriptionId: null, // Clear invalid subscription ID
                   updatedAt: new Date(),
                 })
                 .where(eq(subscriptions.id, subscription.id))
@@ -214,7 +222,6 @@ export class SubscriptionRepository {
 
       return success({
         id: subscription.id,
-        userId: subscription.userId,
         plan: subscription.planId,
         billingInterval: subscription.billingInterval,
         status: subscription.status,
@@ -245,32 +252,38 @@ export class SubscriptionRepository {
   }
 
   static async createSubscription(
-    data: SubscriptionPostRequestOutput,
-    userId: string,
+    data: SubscriptionCreatePostRequestOutput,
+    user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionPostResponseOutput>> {
-    const { t } = simpleT(locale);
-    logger.debug("Subscription creation attempted via API (not supported)", {
-      userId,
+  ): Promise<ResponseType<SubscriptionCreatePostResponseOutput>> {
+    logger.debug("Proxying subscription creation to checkout flow", {
+      userId: user.id,
       plan: data.plan,
       billingInterval: data.billingInterval,
+      provider: data.provider,
     });
-    return fail({
-      message: "app.api.subscription.errors.use_checkout_flow",
-      errorType: ErrorResponseTypes.BAD_REQUEST,
-      messageParams: {
-        error: t("app.api.subscription.errors.use_checkout_flow_description"),
+
+    // Create checkout session via checkout repository
+    const checkoutRepo = new SubscriptionCheckoutRepositoryImpl();
+    return await checkoutRepo.createCheckoutSession(
+      {
+        planId: data.plan,
+        billingInterval: data.billingInterval,
+        provider: data.provider,
       },
-    });
+      user,
+      locale,
+      logger,
+    );
   }
 
   static async updateSubscription(
-    data: SubscriptionPutRequestOutput,
+    data: SubscriptionUpdatePutRequestOutput,
     userId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionPutResponseOutput>> {
+  ): Promise<ResponseType<SubscriptionUpdatePutResponseOutput>> {
     const { t } = simpleT(locale);
     try {
       const currentSubscription = await db
@@ -319,9 +332,8 @@ export class SubscriptionRepository {
       const updatedSubscription = results[0];
       return success({
         id: updatedSubscription.id,
-        userId: updatedSubscription.userId,
-        responsePlan: updatedSubscription.planId,
-        responseBillingInterval: updatedSubscription.billingInterval,
+        plan: updatedSubscription.planId,
+        billingInterval: updatedSubscription.billingInterval,
         status: updatedSubscription.status,
         currentPeriodStart:
           updatedSubscription.currentPeriodStart?.toISOString() ||
@@ -329,7 +341,7 @@ export class SubscriptionRepository {
         currentPeriodEnd:
           updatedSubscription.currentPeriodEnd?.toISOString() ||
           new Date().toISOString(),
-        responseCancelAtPeriodEnd: updatedSubscription.cancelAtPeriodEnd,
+        cancelAtPeriodEnd: updatedSubscription.cancelAtPeriodEnd,
         createdAt: updatedSubscription.createdAt.toISOString(),
         updatedAt: updatedSubscription.updatedAt.toISOString(),
         message: "app.api.subscription.update.success",
@@ -345,11 +357,11 @@ export class SubscriptionRepository {
   }
 
   static async cancelSubscription(
-    data: SubscriptionDeleteRequestOutput,
+    data: SubscriptionCancelDeleteRequestOutput,
     userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<{ success: boolean; message: string }>> {
+  ): Promise<ResponseType<SubscriptionCancelDeleteResponseOutput>> {
     try {
       const { t } = simpleT(locale);
 
@@ -577,6 +589,18 @@ export class SubscriptionRepository {
     logger: EndpointLogger,
   ): Promise<void> {
     try {
+      const invoiceData = invoice as Stripe.Invoice & {
+        billing_reason?: string;
+      };
+      const invoiceId = invoiceData.id;
+      const billingReason = invoiceData.billing_reason;
+
+      logger.info("Processing invoice payment", {
+        invoiceId,
+        subscriptionId,
+        billingReason,
+      });
+
       const [subscription] = await db
         .select()
         .from(subscriptions)
@@ -586,9 +610,16 @@ export class SubscriptionRepository {
       if (!subscription) {
         logger.error("Subscription not found for invoice payment", {
           subscriptionId,
+          invoiceId,
         });
         return;
       }
+
+      logger.info("Found subscription for invoice", {
+        subscriptionId,
+        userId: subscription.userId,
+        currentStatus: subscription.status,
+      });
 
       const providerName = subscription.provider || "stripe";
       const provider = getPaymentProvider(providerName);
@@ -605,7 +636,7 @@ export class SubscriptionRepository {
         return;
       }
 
-      // Update subscription period
+      // Update subscription period and clear grace period if it was set
       await db
         .update(subscriptions)
         .set({
@@ -616,20 +647,23 @@ export class SubscriptionRepository {
             ? new Date(subscriptionResult.data.currentPeriodEnd)
             : undefined,
           status: SubscriptionStatus.ACTIVE,
+          paymentFailedAt: null, // Clear grace period fields
+          gracePeriodEndsAt: null,
           updatedAt: new Date(),
         })
         .where(eq(subscriptions.providerSubscriptionId, subscriptionId));
 
       // Add monthly credits for renewal (skip if this is the first payment - handled by checkout)
       // Check if this is a renewal by looking at billing_reason
-      const billingReason = (
-        invoice as Stripe.Invoice & { billing_reason?: string }
-      ).billing_reason;
-
       if (
         billingReason === "subscription_cycle" ||
         billingReason === "subscription_update"
       ) {
+        logger.info("Billing reason indicates renewal - processing credits", {
+          billingReason,
+          invoiceId,
+        });
+
         // This is a renewal - add monthly credits with expiration
         const { CreditRepository } = await import("../credits/repository");
         const { productsRepository, ProductIds } =
@@ -648,7 +682,6 @@ export class SubscriptionRepository {
 
           // IDEMPOTENCY CHECK: Verify credits haven't been added for this invoice already
           // Use invoice ID as sessionId for idempotency tracking
-          const invoiceId = (invoice as { id?: string }).id;
           if (invoiceId) {
             const { creditPacks } = await import("../credits/db");
             const { sql } = await import("drizzle-orm");
@@ -668,6 +701,13 @@ export class SubscriptionRepository {
             }
           }
 
+          logger.info("Granting renewal credits", {
+            userId: subscription.userId,
+            credits: product.credits,
+            expiresAt: expiresAt?.toISOString(),
+            invoiceId,
+          });
+
           await CreditRepository.addUserCredits(
             subscription.userId,
             product.credits,
@@ -676,22 +716,107 @@ export class SubscriptionRepository {
             expiresAt ?? undefined,
             invoiceId, // Pass invoiceId as sessionId for idempotency tracking
           );
-          logger.debug("Added renewal credits", {
+
+          logger.info("Successfully granted renewal credits", {
             userId: subscription.userId,
             credits: product.credits,
-            expiresAt: expiresAt?.toISOString(),
-            billingReason,
+            invoiceId,
+          });
+        } else {
+          logger.warn("No product ID found for subscription plan", {
+            planId: subscription.planId,
             invoiceId,
           });
         }
+      } else {
+        logger.info("Skipping credit grant - not a renewal", {
+          billingReason,
+          invoiceId,
+        });
       }
 
-      logger.debug("Invoice payment processed successfully", {
+      logger.info("Invoice payment processed successfully", {
         subscriptionId,
         billingReason,
+        invoiceId,
       });
     } catch (error) {
       logger.error("Failed to process invoice payment", {
+        error: parseError(error),
+        subscriptionId,
+      });
+    }
+  }
+
+  /**
+   * Handle invoice payment failure
+   * Called when invoice.payment_failed webhook is received
+   * Sets grace period during which user keeps credits but subscription is in PAST_DUE
+   */
+  static async handleInvoicePaymentFailed(
+    invoice: WebhookData,
+    subscriptionId: string,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      const invoiceId = (invoice as { id?: string }).id;
+
+      logger.info("Processing invoice payment failure", {
+        invoiceId,
+        subscriptionId,
+      });
+
+      const [subscription] = await db
+        .select()
+        .from(subscriptions)
+        .where(eq(subscriptions.providerSubscriptionId, subscriptionId))
+        .limit(1);
+
+      if (!subscription) {
+        logger.error("Subscription not found for failed invoice payment", {
+          subscriptionId,
+          invoiceId,
+        });
+        return;
+      }
+
+      logger.info("Found subscription for failed payment", {
+        subscriptionId,
+        userId: subscription.userId,
+        currentStatus: subscription.status,
+      });
+
+      // Set grace period: 7 days from now
+      const GRACE_PERIOD_DAYS = 7;
+      const now = new Date();
+      const gracePeriodEndsAt = new Date(now);
+      gracePeriodEndsAt.setDate(
+        gracePeriodEndsAt.getDate() + GRACE_PERIOD_DAYS,
+      );
+
+      // Update subscription to PAST_DUE with grace period
+      await db
+        .update(subscriptions)
+        .set({
+          status: SubscriptionStatus.PAST_DUE,
+          paymentFailedAt: now,
+          gracePeriodEndsAt,
+          updatedAt: now,
+        })
+        .where(eq(subscriptions.providerSubscriptionId, subscriptionId));
+
+      logger.info("Set subscription to PAST_DUE with grace period", {
+        subscriptionId,
+        userId: subscription.userId,
+        gracePeriodEndsAt: gracePeriodEndsAt.toISOString(),
+        gracePeriodDays: GRACE_PERIOD_DAYS,
+      });
+
+      // IMPORTANT: User still has access during grace period
+      // Credits have already been granted for this period
+      // They will expire when the subscription period ends, not when grace period ends
+    } catch (error) {
+      logger.error("Failed to process invoice payment failure", {
         error: parseError(error),
         subscriptionId,
       });
@@ -945,6 +1070,7 @@ export class SubscriptionRepository {
               status: SubscriptionStatus.CANCELED,
               canceledAt: new Date(),
               endedAt: localSubscription.currentPeriodEnd || new Date(),
+              providerSubscriptionId: null, // Clear invalid subscription ID
               updatedAt: new Date(),
             })
             .where(eq(subscriptions.id, localSubscription.id));

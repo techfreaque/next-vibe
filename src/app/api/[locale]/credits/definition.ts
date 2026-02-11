@@ -7,18 +7,18 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectFieldNew,
+  customWidgetObject,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema } from "../shared/types/common.schema";
+import { CreditsBalanceContainer } from "./widget";
 
 /**
  * Get Credit Balance Endpoint (GET)
@@ -34,12 +34,9 @@ const { GET } = createEndpoint({
   icon: "coins",
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  fields: objectFieldNew({
-    type: WidgetType.CONTAINER,
-    title: "app.api.agent.chat.credits.get.response.title",
-    description: "app.api.agent.chat.credits.get.response.description",
-    layoutType: LayoutType.STACKED,
-    usage: { response: true },
+  fields: customWidgetObject({
+    render: CreditsBalanceContainer,
+    usage: { response: true } as const,
     children: {
       // Total credits available
       total: responseField({

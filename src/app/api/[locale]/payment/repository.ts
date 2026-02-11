@@ -428,6 +428,9 @@ export class PaymentRepository {
         case "invoice.paid":
           await this.handleInvoicePaymentSucceeded(eventData, logger);
           break;
+        case "invoice.payment_failed":
+          await this.handleInvoicePaymentFailed(eventData, logger);
+          break;
         case "customer.subscription.deleted":
           await this.handleSubscriptionDeleted(eventData, logger);
           break;
@@ -524,18 +527,21 @@ export class PaymentRepository {
     try {
       const invoiceId = data.id;
 
-      logger.debug(
-        "Invoice payment succeeded - delegating to subscription module",
-        {
-          invoiceId,
-        },
-      );
+      logger.info("Invoice payment succeeded - extracting subscription ID", {
+        invoiceId,
+        hasRootSubscription: "subscription" in data,
+        hasParent: "parent" in data,
+      });
 
       // Try to get subscription ID from various possible fields
       let subscriptionId: string | undefined;
 
       if ("subscription" in data && data.subscription) {
         subscriptionId = data.subscription;
+        logger.info("Found subscription ID at root level", {
+          invoiceId,
+          subscriptionId,
+        });
       }
 
       if (
@@ -544,24 +550,52 @@ export class PaymentRepository {
         data.parent &&
         typeof data.parent === "object"
       ) {
+        logger.info("Parent object found in invoice", {
+          invoiceId,
+          parentKeys: Object.keys(data.parent),
+          parentType: typeof data.parent,
+        });
+
         if (
           "subscription_details" in data.parent &&
           data.parent.subscription_details &&
           typeof data.parent.subscription_details === "object"
         ) {
-          if ("subscription" in data.parent.subscription_details) {
-            subscriptionId = String(
-              data.parent.subscription_details.subscription,
+          const subDetails = data.parent.subscription_details as {
+            subscription?: string;
+            [key: string]: string | number | boolean | null | undefined;
+          };
+          logger.info("subscription_details found", {
+            invoiceId,
+            subscriptionDetailsKeys: Object.keys(subDetails),
+            hasSubscription: "subscription" in subDetails,
+          });
+
+          if ("subscription" in subDetails && subDetails.subscription) {
+            subscriptionId = String(subDetails.subscription);
+            logger.info(
+              "Found subscription ID in parent.subscription_details",
+              {
+                invoiceId,
+                subscriptionId,
+              },
             );
           }
+        } else {
+          logger.warn("subscription_details not found or invalid in parent", {
+            invoiceId,
+            hasSubscriptionDetails: "subscription_details" in data.parent,
+            typeOfSubscriptionDetails: typeof data.parent.subscription_details,
+          });
         }
       }
 
       if (!subscriptionId) {
-        logger.debug(
+        logger.warn(
           "No subscription ID found in invoice - skipping subscription processing",
           {
             invoiceId,
+            dataKeys: Object.keys(data),
           },
         );
         return;
@@ -583,6 +617,95 @@ export class PaymentRepository {
         });
       } else {
         logger.error("Failed to process invoice payment succeeded", {
+          error: parseError(error),
+        });
+      }
+    }
+  }
+
+  private static async handleInvoicePaymentFailed(
+    data: WebhookData,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      const invoiceId = (data as { id?: string }).id;
+
+      logger.info("Invoice payment failed - extracting subscription ID", {
+        invoiceId,
+        hasRootSubscription: "subscription" in data,
+        hasParent: "parent" in data,
+      });
+
+      // Try to get subscription ID from various possible fields
+      let subscriptionId: string | undefined;
+
+      if ("subscription" in data && data.subscription) {
+        subscriptionId = data.subscription;
+        logger.info("Found subscription ID at root level", {
+          invoiceId,
+          subscriptionId,
+        });
+      }
+
+      if (
+        !subscriptionId &&
+        "parent" in data &&
+        data.parent &&
+        typeof data.parent === "object"
+      ) {
+        logger.info("Parent object found in invoice", {
+          invoiceId,
+          parentKeys: Object.keys(data.parent),
+        });
+
+        if (
+          "subscription_details" in data.parent &&
+          data.parent.subscription_details &&
+          typeof data.parent.subscription_details === "object"
+        ) {
+          const subDetails = data.parent.subscription_details as {
+            subscription?: string;
+            [key: string]: string | number | boolean | null | undefined;
+          };
+          if ("subscription" in subDetails && subDetails.subscription) {
+            subscriptionId = String(subDetails.subscription);
+            logger.info(
+              "Found subscription ID in parent.subscription_details",
+              {
+                invoiceId,
+                subscriptionId,
+              },
+            );
+          }
+        }
+      }
+
+      if (!subscriptionId) {
+        logger.warn(
+          "No subscription ID found in failed invoice - skipping subscription processing",
+          {
+            invoiceId,
+          },
+        );
+        return;
+      }
+
+      // Subscription module handles its own business logic
+      const { SubscriptionRepository } =
+        await import("../subscription/repository");
+      await SubscriptionRepository.handleInvoicePaymentFailed(
+        data,
+        subscriptionId,
+        logger,
+      );
+    } catch (error) {
+      if (typeof error === "object" && error && "id" in error) {
+        logger.error("Failed to process invoice payment failed", {
+          error: parseError(error),
+          invoiceId: String(error.id),
+        });
+      } else {
+        logger.error("Failed to process invoice payment failed", {
           error: parseError(error),
         });
       }

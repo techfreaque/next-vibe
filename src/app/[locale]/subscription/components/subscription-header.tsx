@@ -1,0 +1,73 @@
+"use client";
+
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { ArrowLeft } from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
+import { H1, P } from "next-vibe-ui/ui/typography";
+import type { JSX } from "react";
+
+import { useTranslation } from "@/i18n/core/client";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+interface SubscriptionHeaderProps {
+  locale: CountryLanguage;
+  isAuthenticated: boolean;
+}
+
+export function SubscriptionHeader({
+  locale,
+  isAuthenticated,
+}: SubscriptionHeaderProps): JSX.Element {
+  const { t } = useTranslation();
+
+  return (
+    <>
+      {/* Back Button and Auth Buttons */}
+      <Div className="flex justify-between items-center gap-4">
+        <Link
+          href={`/${locale}`}
+          className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t("app.subscription.subscription.backToChat")}
+        </Link>
+
+        {/* Auth Buttons for Public Users */}
+        {!isAuthenticated && (
+          <Div className="flex gap-2">
+            <Button variant="ghost" asChild className="hidden sm:inline-flex">
+              <Link href={`/${locale}/user/login`}>
+                {t("app.story._components.nav.user.login")}
+              </Link>
+            </Button>
+            <Button
+              asChild
+              className="bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
+            >
+              <Link href={`/${locale}/user/signup`}>
+                {t("app.story._components.nav.user.signup")}
+              </Link>
+            </Button>
+          </Div>
+        )}
+      </Div>
+
+      {/* Header Section - Title and Description */}
+      <MotionDiv
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="text-center flex flex-col gap-4"
+      >
+        <H1 className="text-4xl font-bold tracking-tight">
+          {t("app.subscription.subscription.title")}
+        </H1>
+        <P className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          {t("app.subscription.subscription.description")}
+        </P>
+      </MotionDiv>
+    </>
+  );
+}

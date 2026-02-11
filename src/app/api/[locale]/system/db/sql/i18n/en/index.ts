@@ -63,6 +63,11 @@ export const translations = {
       title: "SQL Query",
       description: "The SQL query to execute",
     },
+    queryFile: {
+      title: "Query File Path",
+      description: "Path to a SQL file to execute",
+      placeholder: "/path/to/query.sql",
+    },
     dryRun: {
       title: "Dry Run",
       description: "Preview query without executing",

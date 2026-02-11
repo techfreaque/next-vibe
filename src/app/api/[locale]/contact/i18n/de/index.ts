@@ -101,7 +101,8 @@ export const translations: typeof enTranslations = {
   response: {
     label: "Kontakt-Einreichung Antwort",
     description: "Status-Updates für Ihre Kontakt-Einreichung",
-    success: "Vielen Dank für Ihre Kontaktaufnahme! Wir haben Ihre Nachricht erhalten und werden uns bald bei Ihnen melden.",
+    success:
+      "Vielen Dank für Ihre Kontaktaufnahme! Wir haben Ihre Nachricht erhalten und werden uns bald bei Ihnen melden.",
     messageId: "Nachrichten-ID zur Verfolgung",
     status: "Aktueller Status des Kontakts",
   },

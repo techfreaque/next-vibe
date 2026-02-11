@@ -95,7 +95,8 @@ export const translations = {
   response: {
     label: "Contact Submission Response",
     description: "Status updates for your contact submission",
-    success: "Thank you for contacting us! We've received your message and will get back to you soon.",
+    success:
+      "Thank you for contacting us! We've received your message and will get back to you soon.",
     messageId: "Message ID for tracking",
     status: "Current status of the contact",
   },

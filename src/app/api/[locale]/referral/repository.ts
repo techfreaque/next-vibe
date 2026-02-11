@@ -503,7 +503,8 @@ export class ReferralRepository {
 
         totalEarnedTitle: "app.api.referral.stats.fields.totalEarned",
         totalEarnedValue: totalEarnedCredits,
-        totalEarnedDescription: "app.api.referral.stats.fields.totalEarnedDescription",
+        totalEarnedDescription:
+          "app.api.referral.stats.fields.totalEarnedDescription",
 
         availableCreditsTitle: "app.api.referral.stats.fields.availableBalance",
         availableCreditsValue: availableCredits,

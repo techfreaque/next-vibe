@@ -65,6 +65,11 @@ export const translations: typeof enTranslations = {
       title: "Zapytanie SQL",
       description: "Zapytanie SQL do wykonania",
     },
+    queryFile: {
+      title: "Ścieżka pliku zapytania",
+      description: "Ścieżka do pliku SQL do wykonania",
+      placeholder: "/ścieżka/do/zapytania.sql",
+    },
     dryRun: {
       title: "Próbny przebieg",
       description: "Podgląd zapytania bez wykonywania",

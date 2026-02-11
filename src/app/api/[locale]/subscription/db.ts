@@ -56,6 +56,10 @@ export const subscriptions = pgTable("subscriptions", {
     enum: CancellationReasonDB,
   }),
 
+  // Grace period for failed payments
+  paymentFailedAt: timestamp("payment_failed_at", { withTimezone: true }), // When the last payment failed
+  gracePeriodEndsAt: timestamp("grace_period_ends_at", { withTimezone: true }), // When grace period ends (user loses access)
+
   // Trial information
   trialStart: timestamp("trial_start", { withTimezone: true }),
   trialEnd: timestamp("trial_end", { withTimezone: true }),

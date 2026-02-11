@@ -1,7 +1,4 @@
-import { translations as historyTranslations } from "../../history/i18n/en";
-
 export const translations = {
-  history: historyTranslations,
   subscription: {
     title: "Credits & Subscription",
     description: "Manage your credits and monthly subscription",

@@ -120,7 +120,8 @@ export const translations: typeof enTranslations = {
       totalSignupsDescription:
         "Liczba użytkowników, którzy zarejestrowali się za pomocą Twojego kodu polecającego",
       totalRevenue: "Łączny przychód",
-      totalRevenueDescription: "Całkowity przychód wygenerowany z Twoich poleceń",
+      totalRevenueDescription:
+        "Całkowity przychód wygenerowany z Twoich poleceń",
       totalEarned: "Łącznie zarobione",
       totalEarnedDescription: "Całkowita prowizja zarobiona z poleceń",
       availableBalance: "Dostępne saldo",

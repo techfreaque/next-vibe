@@ -507,6 +507,42 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       // Show all Stripe output as debug logs so they're visible
       logger.debug(`[Stripe] ${output}`);
 
+      // Check for expired API key error
+      // eslint-disable-next-line i18next/no-literal-string
+      if (
+        output.includes("api_key_expired") ||
+        output.includes("Expired API Key provided")
+      ) {
+        logger.error("❌ Stripe API key has expired!");
+        logger.error("");
+        logger.error("Your Stripe CLI is using an expired API key.");
+        logger.error("");
+        logger.error("To fix this issue:");
+        logger.error("  1. Go to Stripe Dashboard → Developers → API keys");
+        logger.error("     https://dashboard.stripe.com/test/apikeys");
+        logger.error("");
+        logger.error("  2. Rotate your keys if you haven't already:");
+        logger.error(
+          "     - Click the three dots (...) next to your Secret key",
+        );
+        logger.error("     - Select 'Roll key' to generate new keys");
+        logger.error("");
+        logger.error("  3. Update your .env file with the new keys:");
+        logger.error(
+          '     STRIPE_SECRET_KEY="sk_test_..." (your new secret key)',
+        );
+        logger.error(
+          '     STRIPE_PUBLISHABLE_KEY="pk_test_..." (your new publishable key)',
+        );
+        logger.error("");
+        logger.error("  4. Re-authenticate the Stripe CLI:");
+        logger.error("     Run: stripe login");
+        logger.error(
+          "     This will open your browser and update ~/.config/stripe/config.toml",
+        );
+        logger.error("");
+      }
+
       // Look for the webhook signing secret
       // eslint-disable-next-line i18next/no-literal-string
       const whsecPattern = "whsec_";

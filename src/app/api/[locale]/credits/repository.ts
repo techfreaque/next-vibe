@@ -382,7 +382,15 @@ export class CreditRepository {
     for (const pack of expiredPacks) {
       try {
         await withTransaction(logger, async (tx) => {
-          if (pack.remaining <= 0) {
+          // Re-read pack with lock to prevent race conditions
+          const [lockedPack] = await tx
+            .select()
+            .from(creditPacks)
+            .where(eq(creditPacks.id, pack.id))
+            .for("update")
+            .limit(1);
+
+          if (!lockedPack || lockedPack.remaining <= 0) {
             return;
           }
 
@@ -390,7 +398,7 @@ export class CreditRepository {
           const [wallet] = await tx
             .select()
             .from(creditWallets)
-            .where(eq(creditWallets.id, pack.walletId))
+            .where(eq(creditWallets.id, lockedPack.walletId))
             .for("update")
             .limit(1);
 
@@ -398,7 +406,7 @@ export class CreditRepository {
             return;
           }
 
-          const newBalance = Math.max(0, wallet.balance - pack.remaining);
+          const newBalance = Math.max(0, wallet.balance - lockedPack.remaining);
 
           // Update wallet balance
           await tx
@@ -416,22 +424,22 @@ export class CreditRepository {
               remaining: 0,
               updatedAt: new Date(),
             })
-            .where(eq(creditPacks.id, pack.id));
+            .where(eq(creditPacks.id, lockedPack.id));
 
           // Create expiry transaction
           await tx.insert(creditTransactions).values({
             walletId: wallet.id,
-            amount: -pack.remaining,
+            amount: -lockedPack.remaining,
             balanceAfter: newBalance,
             type: CreditTransactionType.EXPIRY,
-            packId: pack.id,
+            packId: lockedPack.id,
             freePeriodId: wallet.freePeriodId,
             metadata: {
-              expiredPackId: pack.id,
-              expiredAmount: pack.remaining,
+              expiredPackId: lockedPack.id,
+              expiredAmount: lockedPack.remaining,
               packType: "subscription",
-              originalAmount: pack.originalAmount,
-              expiresAt: pack.expiresAt?.toISOString() || null,
+              originalAmount: lockedPack.originalAmount,
+              expiresAt: lockedPack.expiresAt?.toISOString() || null,
               expiredAt: now.toISOString(),
             },
           });
@@ -1648,7 +1656,8 @@ export class CreditRepository {
                 gte(creditPacks.expiresAt, new Date()),
               ),
             )
-            .orderBy(sql`${creditPacks.expiresAt} ASC`);
+            .orderBy(sql`${creditPacks.expiresAt} ASC`)
+            .for("update"); // Lock packs to prevent race conditions
 
           for (const pack of expiringPacks) {
             if (remaining <= 0) {
@@ -1725,7 +1734,8 @@ export class CreditRepository {
                 isNull(creditPacks.expiresAt),
               ),
             )
-            .orderBy(desc(creditPacks.createdAt));
+            .orderBy(desc(creditPacks.createdAt))
+            .for("update"); // Lock packs to prevent race conditions
 
           for (const pack of permanentPacks) {
             if (remaining <= 0) {
@@ -1803,7 +1813,8 @@ export class CreditRepository {
                 eq(creditPacks.type, CreditPackType.EARNED),
               ),
             )
-            .orderBy(creditPacks.createdAt); // FIFO for earned credits
+            .orderBy(creditPacks.createdAt) // FIFO for earned credits
+            .for("update"); // Lock packs to prevent race conditions
 
           for (const pack of earnedPacks) {
             if (remaining <= 0) {

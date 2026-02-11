@@ -5,20 +5,23 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
+import type { WebhookData } from "@/app/api/[locale]/payment/providers/types";
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { type CountryLanguage } from "@/i18n/core/config";
 
+import type { SubscriptionCancelDeleteRequestOutput } from "./cancel/definition";
 import type {
-  SubscriptionDeleteRequestOutput,
-  SubscriptionGetResponseOutput,
-  SubscriptionPostRequestOutput,
-  SubscriptionPostResponseOutput,
-  SubscriptionPutRequestOutput,
-  SubscriptionPutResponseOutput,
-} from "./definition";
+  SubscriptionCreatePostRequestOutput,
+  SubscriptionCreatePostResponseOutput,
+} from "./create/definition";
+import type { SubscriptionGetResponseOutput } from "./definition";
 import subscriptionEndpoints from "./definition";
 import type { SubscriptionRepositoryType } from "./repository";
+import type {
+  SubscriptionUpdatePutRequestOutput,
+  SubscriptionUpdatePutResponseOutput,
+} from "./update/definition";
 
 /**
  * Native Subscription Repository - Static class pattern
@@ -55,35 +58,35 @@ export class SubscriptionRepository {
 
   static async createSubscription(
     // oxlint-disable-next-line no-unused-vars
-    _data: SubscriptionPostRequestOutput,
+    _data: SubscriptionCreatePostRequestOutput,
     // oxlint-disable-next-line no-unused-vars
     _userId: string,
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionPostResponseOutput>> {
+  ): Promise<ResponseType<SubscriptionCreatePostResponseOutput>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("createSubscription is not implemented on native");
   }
 
   static async updateSubscription(
     // oxlint-disable-next-line no-unused-vars
-    _data: SubscriptionPutRequestOutput,
+    _data: SubscriptionUpdatePutRequestOutput,
     // oxlint-disable-next-line no-unused-vars
     _userId: string,
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionPutResponseOutput>> {
+  ): Promise<ResponseType<SubscriptionUpdatePutResponseOutput>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("updateSubscription is not implemented on native");
   }
 
   static async cancelSubscription(
     // oxlint-disable-next-line no-unused-vars
-    _data: SubscriptionDeleteRequestOutput,
+    _data: SubscriptionCancelDeleteRequestOutput,
     // oxlint-disable-next-line no-unused-vars
     _userId: string,
     // oxlint-disable-next-line no-unused-vars
@@ -125,6 +128,18 @@ export class SubscriptionRepository {
   ): Promise<ResponseType<{ message: string; changes: string[] }>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("syncSubscriptionWithStripe is not implemented on native");
+  }
+
+  static async handleInvoicePaymentFailed(
+    // oxlint-disable-next-line no-unused-vars
+    _invoice: WebhookData,
+    // oxlint-disable-next-line no-unused-vars
+    _subscriptionId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<void> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("handleInvoicePaymentFailed is not implemented on native");
   }
 }
 

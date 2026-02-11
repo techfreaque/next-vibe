@@ -5,45 +5,22 @@ import { Div } from "next-vibe-ui/ui/div";
 import { H2, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import {
-  ProductIds,
-  productsRepository,
-} from "@/app/api/[locale]/products/repository-client";
-import { BuyCreditsTab } from "@/app/api/[locale]/subscription/_components/buy-credits-tab";
-import { OverviewTab } from "@/app/api/[locale]/subscription/_components/overview-tab";
-import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { BuyTab } from "../../subscription/components/buy-tab";
+import { OverviewTab } from "../../subscription/components/overview-tab";
 
 interface StoryPricingSectionProps {
   locale: CountryLanguage;
-  isAuthenticated: boolean;
-  initialSubscription: SubscriptionGetResponseOutput | null;
   user: JwtPayloadType;
 }
 
 export function StoryPricingSection({
   locale,
-  isAuthenticated,
-  initialSubscription,
   user,
 }: StoryPricingSectionProps): JSX.Element {
   const { t } = useTranslation();
-
-  // Get pricing from centralized products repository with proper locale
-  const products = productsRepository.getProducts(locale);
-  const SUBSCRIPTION_PRICE = products[ProductIds.SUBSCRIPTION].price;
-  const SUBSCRIPTION_CREDITS = products[ProductIds.SUBSCRIPTION].credits;
-  const YEARLY_SUBSCRIPTION_PRICE = productsRepository.getProduct(
-    ProductIds.SUBSCRIPTION,
-    locale,
-    "year",
-  ).price;
-  const PACK_PRICE = products[ProductIds.CREDIT_PACK].price;
-  const PACK_CREDITS = products[ProductIds.CREDIT_PACK].credits;
-  const FREE_CREDITS = products[ProductIds.FREE_TIER].credits;
-
   return (
     <Container className="py-16 flex flex-col gap-12">
       {/* Section Header */}
@@ -60,11 +37,6 @@ export function StoryPricingSection({
       <Div className="flex flex-col gap-6">
         <OverviewTab
           locale={locale}
-          subscriptionPrice={SUBSCRIPTION_PRICE}
-          subscriptionCredits={SUBSCRIPTION_CREDITS}
-          packPrice={PACK_PRICE}
-          packCredits={PACK_CREDITS}
-          freeCredits={FREE_CREDITS}
           onSwitchTab={(): void => {
             /* no-op */
           }}
@@ -73,17 +45,7 @@ export function StoryPricingSection({
 
       {/* Buy Credits Section */}
       <Div className="flex flex-col gap-6">
-        <BuyCreditsTab
-          locale={locale}
-          isAuthenticated={isAuthenticated}
-          initialSubscription={initialSubscription}
-          subscriptionPrice={SUBSCRIPTION_PRICE}
-          subscriptionCredits={SUBSCRIPTION_CREDITS}
-          yearlySubscriptionPrice={YEARLY_SUBSCRIPTION_PRICE}
-          packPrice={PACK_PRICE}
-          packCredits={PACK_CREDITS}
-          user={user}
-        />
+        <BuyTab locale={locale} user={user} />
       </Div>
     </Container>
   );

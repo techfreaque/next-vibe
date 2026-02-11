@@ -99,7 +99,8 @@ export const translations: typeof enTranslations = {
   response: {
     label: "Odpowiedź na przesłanie kontaktu",
     description: "Aktualizacje statusu dla Twojego przesłania kontaktu",
-    success: "Dziękujemy za kontakt! Otrzymaliśmy Twoją wiadomość i wkrótce się z Tobą skontaktujemy.",
+    success:
+      "Dziękujemy za kontakt! Otrzymaliśmy Twoją wiadomość i wkrótce się z Tobą skontaktujemy.",
     messageId: "ID wiadomości do śledzenia",
     status: "Aktualny status kontaktu",
   },

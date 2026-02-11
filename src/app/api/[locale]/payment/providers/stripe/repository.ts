@@ -345,6 +345,29 @@ export class StripeProvider implements PaymentProvider {
             ? eventData.subscription
             : undefined;
       }
+      if (
+        "billing_reason" in eventData &&
+        typeof eventData.billing_reason === "string"
+      ) {
+        webhookData.billing_reason = eventData.billing_reason;
+      }
+      if ("parent" in eventData && typeof eventData.parent === "object") {
+        webhookData.parent = eventData.parent as
+          | Stripe.InvoiceItem.Parent
+          | Stripe.Invoice.Parent;
+        logger.info("Extracted parent from webhook event", {
+          eventType: event.type,
+          hasParent: true,
+          parentKeys: Object.keys(eventData.parent || {}),
+        });
+      } else {
+        if (event.type.includes("invoice")) {
+          logger.warn("No parent in invoice event", {
+            eventType: event.type,
+            eventDataKeys: Object.keys(eventData),
+          });
+        }
+      }
 
       return success<WebhookEvent>({
         id: event.id,

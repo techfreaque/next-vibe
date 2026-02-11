@@ -339,7 +339,6 @@ export const renderCompanyMail: EmailFunctionType<
     const templateProps: ContactFormProps = {
       name: requestData.name,
       email: requestData.email,
-      company: requestData.company,
       subject: requestData.subject,
       message: requestData.message,
       isForCompany: true,
@@ -382,7 +381,6 @@ export const renderPartnerMail: EmailFunctionType<
     const templateProps: ContactFormProps = {
       name: requestData.name,
       email: requestData.email,
-      company: requestData.company,
       subject: requestData.subject,
       message: requestData.message,
       isForCompany: false,

@@ -110,7 +110,8 @@ export const { GET } = createEndpoint({
 
         totalEarnedTitle: "app.api.referral.stats.fields.totalEarned",
         totalEarnedValue: 1600,
-        totalEarnedDescription: "app.api.referral.stats.fields.totalEarnedDescription",
+        totalEarnedDescription:
+          "app.api.referral.stats.fields.totalEarnedDescription",
 
         availableCreditsTitle: "app.api.referral.stats.fields.availableBalance",
         availableCreditsValue: 1600,

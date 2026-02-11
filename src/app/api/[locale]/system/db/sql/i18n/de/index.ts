@@ -66,6 +66,11 @@ export const translations: typeof enTranslations = {
       title: "SQL-Abfrage",
       description: "Die auszuführende SQL-Abfrage",
     },
+    queryFile: {
+      title: "Abfragedateipfad",
+      description: "Pfad zu einer auszuführenden SQL-Datei",
+      placeholder: "/pfad/zur/abfrage.sql",
+    },
     dryRun: {
       title: "Testlauf",
       description: "Abfrage ohne Ausführung anzeigen",
