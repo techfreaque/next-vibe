@@ -25,6 +25,7 @@ import {
   EmailCampaignStage,
   EmailCampaignStageOptions,
   EngagementTypes,
+  EngagementTypesDB,
   EngagementTypesOptions,
   LeadSource,
   LeadSourceOptions,
@@ -129,7 +130,7 @@ const { POST } = createEndpoint({
           "app.api.leads.tracking.engagement.post.engagementType.helpText" as const,
         options: EngagementTypesOptions,
         columns: 6,
-        schema: z.enum(EngagementTypes),
+        schema: z.enum(EngagementTypesDB),
       }),
       campaignId: requestField({
         type: WidgetType.FORM_FIELD,
@@ -188,7 +189,7 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content:
           "app.api.leads.tracking.engagement.post.response.engagementType" as const,
-        schema: z.enum(EngagementTypes),
+        schema: z.enum(EngagementTypesDB),
       }),
       responseCampaignId: responseField({
         type: WidgetType.TEXT,

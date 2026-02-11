@@ -341,7 +341,6 @@ export function SubscriptionCreateContainer({
               </Span>
             </Div>
           </Div>
-          <FormAlertWidget field={{}} />
 
           {/* Action Button or Form */}
           {!isAuthenticated ? (
@@ -370,9 +369,12 @@ export function SubscriptionCreateContainer({
               </Div>
             </Div>
           ) : (
-            <Button className="w-full" size="lg" onClick={handleSubscribe}>
-              {t("app.subscription.subscription.buy.subscription.button")}
-            </Button>
+            <>
+              <FormAlertWidget field={{}} />
+              <Button className="w-full" size="lg" onClick={handleSubscribe}>
+                {t("app.subscription.subscription.buy.subscription.button")}
+              </Button>
+            </>
           )}
         </CardContent>
       </Card>

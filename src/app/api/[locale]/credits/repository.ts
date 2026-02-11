@@ -466,6 +466,105 @@ export class CreditRepository {
         // Continue with other packs even if one fails
       }
     }
+
+    // Check for expired grace periods and cancel subscriptions
+    // Get user IDs from wallets to check their subscriptions
+    const { subscriptions } = await import("../subscription/db");
+    const userWallets = await db
+      .select({ userId: creditWallets.userId })
+      .from(creditWallets)
+      .where(
+        and(
+          inArray(creditWallets.id, walletIds),
+          not(isNull(creditWallets.userId)),
+        ),
+      );
+
+    const userIds = userWallets
+      .map((w) => w.userId)
+      .filter((id): id is string => id !== null);
+
+    if (userIds.length > 0) {
+      const { SubscriptionStatus } = await import("../subscription/enum");
+      const GRACE_PERIOD_DAYS = 7;
+
+      // Calculate cutoff date for missed webhooks (7 days ago)
+      const gracePeriodCutoff = new Date(now);
+      gracePeriodCutoff.setDate(gracePeriodCutoff.getDate() - GRACE_PERIOD_DAYS);
+
+      logger.info("Checking for expired subscriptions", {
+        userIds,
+        userIdsCount: userIds.length,
+        gracePeriodCutoff,
+      });
+
+      // Find subscriptions with expired grace periods OR expired without grace period set (missed webhooks)
+      const expiredSubscriptions = await db
+        .select()
+        .from(subscriptions)
+        .where(
+          and(
+            inArray(subscriptions.userId, userIds),
+            or(
+              // Grace period explicitly set and expired
+              and(
+                eq(subscriptions.status, SubscriptionStatus.PAST_DUE),
+                not(isNull(subscriptions.gracePeriodEndsAt)),
+                lt(subscriptions.gracePeriodEndsAt, now),
+              ),
+              // OR: Period ended more than grace period ago without grace period set (missed webhook case)
+              and(
+                or(
+                  eq(subscriptions.status, SubscriptionStatus.ACTIVE),
+                  eq(subscriptions.status, SubscriptionStatus.PAST_DUE),
+                ),
+                not(isNull(subscriptions.currentPeriodEnd)),
+                isNull(subscriptions.gracePeriodEndsAt),
+                lt(subscriptions.currentPeriodEnd, gracePeriodCutoff),
+              ),
+            ),
+          ),
+        );
+
+      logger.info("Found expired subscriptions", {
+        count: expiredSubscriptions.length,
+        subscriptions: expiredSubscriptions.map((s) => ({
+          id: s.id,
+          userId: s.userId,
+          status: s.status,
+          currentPeriodEnd: s.currentPeriodEnd,
+          gracePeriodEndsAt: s.gracePeriodEndsAt,
+        })),
+      });
+
+      // Cancel expired subscriptions
+      for (const sub of expiredSubscriptions) {
+        try {
+          await db
+            .update(subscriptions)
+            .set({
+              status: SubscriptionStatus.CANCELED,
+              updatedAt: new Date(),
+            })
+            .where(eq(subscriptions.id, sub.id));
+
+          logger.info("Auto-canceled subscription after grace period", {
+            subscriptionId: sub.id,
+            userId: sub.userId,
+            gracePeriodEndsAt: sub.gracePeriodEndsAt,
+            currentPeriodEnd: sub.currentPeriodEnd,
+            reason: sub.gracePeriodEndsAt
+              ? "grace_period_expired"
+              : "missed_webhook_period_expired",
+          });
+        } catch (error) {
+          logger.error("Failed to cancel subscription after grace period", {
+            subscriptionId: sub.id,
+            error: parseError(error),
+          });
+        }
+      }
+    }
   }
 
   /**

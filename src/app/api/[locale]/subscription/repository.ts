@@ -56,10 +56,19 @@ function calculateSubscriptionPeriod(subscription: Stripe.Subscription): {
   currentPeriodStart: number;
   currentPeriodEnd: number;
 } {
-  const currentPeriodStart = subscription.start_date || subscription.created;
+  // Prefer actual period dates from subscription item (most accurate)
+  const item = subscription.items.data[0];
+  if (item?.current_period_start && item?.current_period_end) {
+    return {
+      currentPeriodStart: item.current_period_start,
+      currentPeriodEnd: item.current_period_end,
+    };
+  }
 
-  const billingInterval = subscription.items.data[0]?.plan.interval || "month";
-  const intervalCount = subscription.items.data[0]?.plan.interval_count || 1;
+  // Fallback: Calculate from subscription start date and billing interval
+  const currentPeriodStart = subscription.start_date || subscription.created;
+  const billingInterval = item?.plan.interval || "month";
+  const intervalCount = item?.plan.interval_count || 1;
 
   const periodStartDate = new Date(currentPeriodStart * 1000);
   let periodEndDate: Date;
@@ -155,12 +164,21 @@ export class SubscriptionRepository {
               currentPeriodEnd * 1000 !==
                 subscription.currentPeriodEnd.getTime();
 
+            // Check if period advanced forward (renewal happened)
+            const periodAdvanced =
+              periodChanged &&
+              subscription.currentPeriodEnd &&
+              currentPeriodEnd * 1000 > subscription.currentPeriodEnd.getTime();
+
             if (newStatus !== subscription.status || periodChanged) {
               logger.info("Auto-syncing subscription from Stripe", {
                 userId,
                 oldStatus: subscription.status,
                 newStatus,
                 periodChanged,
+                periodAdvanced,
+                oldPeriodEnd: subscription.currentPeriodEnd,
+                newPeriodEnd: new Date(currentPeriodEnd * 1000),
               });
 
               const [updated] = await db
@@ -173,6 +191,9 @@ export class SubscriptionRepository {
                   cancelAt: stripeResponse.cancel_at
                     ? new Date(stripeResponse.cancel_at * 1000)
                     : null,
+                  // Clear grace period fields on successful renewal
+                  paymentFailedAt: null,
+                  gracePeriodEndsAt: null,
                   updatedAt: new Date(),
                 })
                 .where(eq(subscriptions.id, subscription.id))
@@ -180,6 +201,66 @@ export class SubscriptionRepository {
 
               if (updated) {
                 subscription = updated;
+              }
+
+              // Grant renewal credits if period advanced (missed webhook recovery)
+              if (periodAdvanced && newStatus === SubscriptionStatus.ACTIVE) {
+                try {
+                  const { CreditRepository } = await import(
+                    "../credits/repository"
+                  );
+                  const { productsRepository, ProductIds } = await import(
+                    "../products/repository-client"
+                  );
+
+                  const productId =
+                    subscription.planId === SubscriptionPlan.SUBSCRIPTION
+                      ? ProductIds.SUBSCRIPTION
+                      : null;
+
+                  if (productId) {
+                    const product = productsRepository.getProduct(
+                      productId,
+                      locale,
+                    );
+                    const expiresAt = new Date(currentPeriodEnd * 1000);
+
+                    // Use period start timestamp as sessionId for idempotency
+                    // This prevents duplicate credits if auto-sync runs multiple times
+                    const sessionId = `auto-sync-${currentPeriodStart}`;
+
+                    logger.info("Auto-granting renewal credits (missed webhook)", {
+                      userId,
+                      credits: product.credits,
+                      expiresAt: expiresAt.toISOString(),
+                      sessionId,
+                    });
+
+                    await CreditRepository.addUserCredits(
+                      userId,
+                      product.credits,
+                      "subscription",
+                      logger,
+                      expiresAt,
+                      sessionId,
+                    );
+
+                    logger.info(
+                      "Successfully auto-granted renewal credits",
+                      {
+                        userId,
+                        credits: product.credits,
+                        sessionId,
+                      },
+                    );
+                  }
+                } catch (creditError) {
+                  logger.error("Failed to auto-grant renewal credits", {
+                    error: parseError(creditError),
+                    userId,
+                  });
+                  // Don't fail the whole sync if credit granting fails
+                }
               }
             }
           } catch (error) {
