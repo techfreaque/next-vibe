@@ -19,9 +19,11 @@ import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
 import { H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
+import { useState } from "react";
 
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/components/model-credit-display";
+import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
 import {
-  getCreditCostFromModel,
   modelOptions,
   modelProviders,
   TOTAL_MODEL_COUNT,
@@ -47,6 +49,7 @@ export function OverviewTab({
   onSwitchTab,
 }: OverviewTabProps): JSX.Element {
   const { t } = useTranslation();
+  const [showLegacyModels, setShowLegacyModels] = useState(false);
 
   const products = productsRepository.getProducts(locale);
   const subscriptionProduct = products[ProductIds.SUBSCRIPTION];
@@ -185,14 +188,46 @@ export function OverviewTab({
         <CardContent>
           <Div className="flex flex-col gap-4">
             <Div>
-              <H4 className="font-semibold mb-2">
-                {t("app.subscription.subscription.overview.costs.models.title")}
-              </H4>
+              <Div className="flex items-center justify-between mb-2">
+                <H4 className="font-semibold">
+                  {t(
+                    "app.subscription.subscription.overview.costs.models.title",
+                  )}
+                </H4>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowLegacyModels(!showLegacyModels)}
+                >
+                  {showLegacyModels
+                    ? t(
+                        "app.subscription.subscription.overview.costs.models.hideLegacy",
+                      )
+                    : t(
+                        "app.subscription.subscription.overview.costs.models.showLegacy",
+                      )}
+                </Button>
+              </Div>
               <Div className="flex flex-col gap-4">
                 {Object.entries(modelProviders).map(
                   ([providerId, provider]) => {
                     const providerModels = Object.values(modelOptions).filter(
-                      (model) => model.provider === providerId,
+                      (model) => {
+                        // Filter by provider
+                        if (model.provider !== providerId) {
+                          return false;
+                        }
+
+                        // Filter legacy models if toggle is off
+                        const isLegacy = model.utilities.includes(
+                          ModelUtility.LEGACY,
+                        );
+                        if (!showLegacyModels && isLegacy) {
+                          return false;
+                        }
+
+                        return true;
+                      },
                     );
                     if (providerModels.length === 0) {
                       return null;
@@ -205,18 +240,33 @@ export function OverviewTab({
                         </H4>
                         <Div className="grid grid-cols-2 gap-2 text-sm">
                           {providerModels.map((model) => {
-                            const creditCost = getCreditCostFromModel(model);
-                            const creditText =
-                              creditCost === 1
-                                ? `${creditCost} credit`
-                                : `${creditCost} credits`;
+                            const isLegacy = model.utilities.includes(
+                              ModelUtility.LEGACY,
+                            );
                             return (
                               <Div
                                 key={model.id}
                                 className="flex justify-between p-2 rounded bg-accent"
                               >
-                                <Span>{model.name}</Span>
-                                <Span className="font-mono">{creditText}</Span>
+                                <Span className="flex items-center gap-1">
+                                  {model.name}
+                                  {isLegacy && (
+                                    <Span className="text-xs text-muted-foreground">
+                                      (
+                                      {t(
+                                        "app.subscription.subscription.overview.costs.models.legacyBadge",
+                                      )}
+                                      )
+                                    </Span>
+                                  )}
+                                </Span>
+                                <ModelCreditDisplay
+                                  modelId={model.id}
+                                  variant="text"
+                                  className="font-mono"
+                                  t={t}
+                                  locale={locale}
+                                />
                               </Div>
                             );
                           })}

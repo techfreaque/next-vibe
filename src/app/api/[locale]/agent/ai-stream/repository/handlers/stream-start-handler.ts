@@ -32,6 +32,7 @@ export class StreamStartHandler {
    */
   static initializeStream(params: {
     userMessageId: string | null;
+    aiMessageId: string;
     effectiveParentMessageId: string | null | undefined;
     messageDepth: number;
     toolConfirmationResults: Array<{
@@ -99,6 +100,7 @@ export class StreamStartHandler {
   } {
     const {
       userMessageId,
+      aiMessageId,
       effectiveParentMessageId,
       messageDepth,
       toolConfirmationResults,
@@ -127,6 +129,7 @@ export class StreamStartHandler {
       effectiveParentMessageId,
       messageDepth,
       toolConfirmationResults,
+      aiMessageId,
       logger,
     });
 
@@ -181,7 +184,7 @@ export class StreamStartHandler {
     });
 
     // Log message structure being sent to AI SDK
-    logger.info("[AI Stream] Messages structure for AI SDK", {
+    logger.debug("[AI Stream] Messages structure for AI SDK", {
       messageCount: messages.length,
       messageRoles: messages.map((m, i) => `${i}:${m.role}`).join(", "),
       lastFiveMessages: messages.slice(-5).map((m, i) => ({

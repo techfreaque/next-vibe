@@ -13,6 +13,10 @@ import type {
   FiltersModelSelection,
   ManualModelSelection,
 } from "@/app/api/[locale]/agent/models/components/types";
+import {
+  DEFAULT_INPUT_TOKENS,
+  DEFAULT_OUTPUT_TOKENS,
+} from "@/app/api/[locale]/agent/models/constants";
 import type { ModelOption } from "@/app/api/[locale]/agent/models/models";
 import {
   getCreditCostFromModel,
@@ -35,14 +39,19 @@ export class CharactersRepositoryClient {
   /**
    * Format credit cost for display (server-side version, no i18n)
    */
-  static formatCreditCost(cost: number, t: TFunction): string {
+  static formatCreditCost(
+    cost: number,
+    t: TFunction,
+    isTokenBased = false,
+  ): string {
+    const prefix = isTokenBased ? "~" : "";
     if (cost === 0) {
-      return t("app.api.agent.chat.selector.free");
+      return t("app.chat.selector.free");
     }
     if (cost === 1) {
-      return t("app.api.agent.chat.selector.creditsSingle");
+      return `${prefix}${t("app.chat.credits.credit", { count: cost })}`;
     }
-    return t("app.api.agent.chat.selector.creditsExact", { cost });
+    return `${prefix}${t("app.chat.credits.credits", { count: cost })}`;
   }
   /**
    * Convert model credit cost to price level
@@ -101,7 +110,11 @@ export class CharactersRepositoryClient {
         return idx === -1 ? 0 : idx;
       }
       case ModelSortField.PRICE:
-        return getCreditCostFromModel(model);
+        return getCreditCostFromModel(
+          model,
+          DEFAULT_INPUT_TOKENS,
+          DEFAULT_OUTPUT_TOKENS,
+        );
       case ModelSortField.CONTENT: {
         const idx = ContentLevelDB.indexOf(model.content);
         return idx === -1 ? 0 : idx;
@@ -118,7 +131,13 @@ export class CharactersRepositoryClient {
     filters: FiltersModelSelection,
   ): ModelOption[] {
     const filtered = Object.values(modelOptions).filter((model) => {
-      const modelPrice = this.getModelPriceLevel(getCreditCostFromModel(model));
+      const modelPrice = this.getModelPriceLevel(
+        getCreditCostFromModel(
+          model,
+          DEFAULT_INPUT_TOKENS,
+          DEFAULT_OUTPUT_TOKENS,
+        ),
+      );
 
       return (
         this.meetsRangeConstraint(

@@ -9,7 +9,6 @@ import "server-only";
 import type { NextRequest } from "next/server";
 import type { z } from "zod";
 
-import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { emailHandlingRepository } from "@/app/api/[locale]/emails/smtp-client/email-handling/repository";
 import type { EmailHandleRequestOutput } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
@@ -391,13 +390,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       const deductResult = await CreditRepository.deductCreditsForFeature(
         user,
         endpoint.credits,
-        (endpoint.aliases?.[0] ||
-          `${endpoint.path.join("/")}/${endpoint.method}`) as
-          | ModelId
-          | "tts"
-          | "stt"
-          | "search"
-          | "stt-hotkey",
+        t(endpoint.title),
         logger,
       );
 
@@ -430,13 +423,13 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
 
     // 5. Handle file responses - return immediately without email/SMS processing
     if (isFileResponse(result)) {
-      logger.info("File response detected - returning immediately");
+      logger.debug("File response detected - returning immediately");
       return result;
     }
 
     // 6. Handle streaming responses - return immediately without email/SMS processing
     if (isStreamingResponse(result)) {
-      logger.info("Streaming response detected - returning immediately");
+      logger.debug("Streaming response detected - returning immediately");
       return result;
     }
 

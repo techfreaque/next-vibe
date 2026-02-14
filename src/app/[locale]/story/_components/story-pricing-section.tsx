@@ -8,6 +8,7 @@ import type { JSX } from "react";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import { BuyTab } from "../../subscription/components/buy-tab";
 import { OverviewTab } from "../../subscription/components/overview-tab";
 

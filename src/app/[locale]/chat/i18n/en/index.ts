@@ -67,6 +67,10 @@ export const translations = {
       cancelLoading: "Cancel loading",
       answerAsAI: "Answer as AI model",
       deleteMessage: "Delete message",
+      actualCostUsed: "Actual credits used for this message",
+      tokensUsed: "Total tokens used",
+      credits: "credits",
+      tokens: "tokens",
     },
 
     // User Message Actions
@@ -222,6 +226,8 @@ export const translations = {
     buyMore: "Buy credits",
     viewDetails: "Details",
     breakdown: "Credit Breakdown",
+    approximateCost:
+      "Approximate cost based on {{inputTokens}} input and {{outputTokens}} output tokens. Actual cost may vary.",
     navigation: {
       profile: "Profile",
       subscription: "Subscription & Credits",
@@ -513,6 +519,39 @@ export const translations = {
     browseAllCharacters: "Browse all characters...",
     customSetup: "Custom setup...",
     selectCharacter: "Select Character",
+    modelCreditDisplay: {
+      tokenBased: {
+        header: "Cost varies based on conversation length",
+        costRangeLabel: "Cost range:",
+        costRangeValue: "{{min}} - {{max}} credits",
+        examplesLabel: "Cost examples:",
+        examples: {
+          short: "Short conversation",
+          medium: "Medium conversation",
+          long: "Long conversation",
+        },
+        triggersCompacting: "⚡ Triggers compacting",
+        tokensCount: "{{count}} tokens",
+        explanation:
+          "The AI processes your entire conversation history with each message, so costs increase as conversations grow longer.",
+        compactingLabel: "✨ Auto-compacting:",
+        compactingExplanation:
+          " At {{threshold}} tokens, older messages are automatically summarized to reduce costs while preserving context.",
+      },
+      fixed: {
+        title: "Pricing for {{model}}",
+        freeDescription: "This model is completely free with no credit cost.",
+        fixedDescription:
+          "This model has a fixed cost per message, regardless of length.",
+        costPerMessage: "Cost per message:",
+        freeExplanation: "This is a free model with no usage limits.",
+        freeHighlight: "Perfect for testing and experimentation.",
+        simpleLabel: "Simple pricing:",
+        simpleExplanation:
+          " Every message costs the same, whether short or long. No token counting needed.",
+      },
+      creditValue: "1 credit = {{value}}",
+    },
     all: "All",
     buildMode: "Build Mode",
     forCharacter: "for {{character}}",

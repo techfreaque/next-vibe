@@ -68,17 +68,6 @@ import type {
 import { useCharacter } from "./hooks";
 
 /**
- * Design version selector constants
- */
-const DESIGN_VERSIONS = {
-  current: "current",
-  a: "a",
-  c: "c",
-  d: "d",
-} as const;
-type DesignVersion = (typeof DESIGN_VERSIONS)[keyof typeof DESIGN_VERSIONS];
-
-/**
  * Props for PATCH custom widget
  */
 interface PatchWidgetProps {

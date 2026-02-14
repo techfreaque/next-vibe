@@ -29,7 +29,6 @@ import type { DivRefObject } from "@/packages/next-vibe-ui/web/ui/div";
 import { ViewMode } from "../../../../enum";
 import { FlatMessageView } from "./flat-view/view";
 import { LinearMessageView } from "./linear-view/view";
-import { LoadingIndicator } from "./loading-indicator";
 import { groupMessagesBySequence } from "./message-grouping";
 import { ThreadedMessage } from "./threaded-view/view";
 
@@ -81,7 +80,6 @@ export function ChatMessages({
   const streamingMessages = useAIStreamStore(
     (state) => state.streamingMessages,
   );
-  const isStreamingActive = useAIStreamStore((state) => state.isStreaming);
 
   // Merge streaming messages with persisted messages for instant UI updates
   // NOTE: Removed useMemo because it wasn't recalculating when streamingMessages changed
@@ -106,9 +104,19 @@ export function ChatMessages({
       messageMap.set(streamMsg.messageId, {
         ...existingMsg,
         content: streamMsg.content,
-        metadata: streamMsg.toolCall
-          ? { ...existingMsg.metadata, toolCall: streamMsg.toolCall }
-          : existingMsg.metadata,
+        metadata: {
+          ...existingMsg.metadata,
+          ...(streamMsg.toolCall ? { toolCall: streamMsg.toolCall } : {}),
+          ...(streamMsg.isCompacting !== undefined
+            ? { isCompacting: streamMsg.isCompacting }
+            : {}),
+          ...(streamMsg.compactedMessageCount !== undefined
+            ? { compactedMessageCount: streamMsg.compactedMessageCount }
+            : {}),
+          ...(streamMsg.isStreaming !== undefined
+            ? { isStreaming: streamMsg.isStreaming }
+            : {}),
+        },
       });
     } else {
       // Add new streaming message with all required fields
@@ -136,7 +144,18 @@ export function ChatMessages({
         edited: false,
         originalId: null,
         tokens: null,
-        metadata: streamMsg.toolCall ? { toolCall: streamMsg.toolCall } : {},
+        metadata: {
+          ...(streamMsg.toolCall ? { toolCall: streamMsg.toolCall } : {}),
+          ...(streamMsg.isCompacting !== undefined
+            ? { isCompacting: streamMsg.isCompacting }
+            : {}),
+          ...(streamMsg.compactedMessageCount !== undefined
+            ? { compactedMessageCount: streamMsg.compactedMessageCount }
+            : {}),
+          ...(streamMsg.isStreaming !== undefined
+            ? { isStreaming: streamMsg.isStreaming }
+            : {}),
+        },
         upvotes: 0,
         downvotes: 0,
         searchVector: null,
@@ -482,9 +501,6 @@ export function ChatMessages({
               );
             })()
           )}
-
-          {/* Show loading indicator while streaming */}
-          {isStreamingActive && <LoadingIndicator />}
 
           <Div ref={messagesEndRef} />
         </Div>

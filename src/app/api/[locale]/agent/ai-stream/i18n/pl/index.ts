@@ -263,7 +263,8 @@ export const translations: typeof enTranslations = {
       uncensoredApiKeyMissing:
         "Klucz API Uncensored.ai nie został skonfigurowany",
       openrouterApiKeyMissing: "Klucz API OpenRouter nie został skonfigurowany",
-      streamCreationFailed: "Nie udało się utworzyć strumienia",
+      streamCreationFailed:
+        "Nie udało się połączyć z usługą AI. Spróbuj ponownie.",
       unknownError: "Wystąpił błąd",
       creditValidationFailed: "Nie udało się zweryfikować salda kredytów",
       authenticationRequired:
@@ -284,13 +285,34 @@ export const translations: typeof enTranslations = {
     title: "Błąd strumienia",
   },
   errors: {
-    toolExecutionError: "Błąd wykonania narzędzia: {{error}}",
-    toolExecutionFailed: "Wykonanie narzędzia nie powiodło się",
-    userDeclinedTool: "Użytkownik odrzucił wykonanie tego narzędzia.",
-    streamError: "Błąd strumienia: {{error}}",
-    streamProcessingError: "Błąd przetwarzania strumienia",
+    toolExecutionError:
+      "Narzędzie nie zostało poprawnie wykonane. Spróbuj ponownie.",
+    toolExecutionFailed:
+      "Wykonanie narzędzia nie powiodło się. Spróbuj ponownie.",
+    userDeclinedTool: "Wykonanie narzędzia zostało anulowane.",
+    streamError: "Odpowiedź AI nie mogła zostać ukończona. Spróbuj ponownie.",
+    streamProcessingError:
+      "Nie udało się przetworzyć odpowiedzi AI. Spróbuj ponownie.",
     timeout:
-      "Odpowiedź przekroczyła limit czasu po {{seconds}} sekundach. AI mogło generować bardzo długą odpowiedź. Spróbuj ponownie z krótszym promptem.",
+      "AI zajęło zbyt dużo czasu na odpowiedź (przekroczono limit po {{maxDuration}} sekundach). Spróbuj ponownie z krótszą wiadomością.",
+    noResponse: "AI nie wygenerowało odpowiedzi. Spróbuj ponownie.",
+    modelUnavailable:
+      "Wybrany model AI jest obecnie niedostępny. Spróbuj innego modelu.",
+    rateLimitExceeded: "Zbyt wiele żądań. Poczekaj chwilę i spróbuj ponownie.",
+    insufficientCredits:
+      "Niewystarczająca liczba kredytów do wykonania tego żądania.",
+    connectionFailed:
+      "Nie udało się połączyć z usługą AI. Sprawdź połączenie i spróbuj ponownie.",
+    invalidRequest:
+      "Nieprawidłowe żądanie. Sprawdź swoje dane i spróbuj ponownie.",
+    compactingStreamError:
+      "Błąd podczas kompresji historii: {{error}}. Twoja rozmowa nie została skompresowana.",
+    compactingException:
+      "Nie udało się skompresować historii rozmowy: {{error}}. Spróbuj ponownie.",
+    compactingRebuildFailed:
+      "Nie udało się odbudować rozmowy po kompresji. Spróbuj ponownie.",
+    unexpectedError:
+      "Wystąpił nieoczekiwany błąd: {{error}}. Spróbuj ponownie.",
   },
   providers: {
     uncensoredHandler: {

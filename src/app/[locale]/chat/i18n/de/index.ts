@@ -69,6 +69,10 @@ export const translations: typeof enTranslations = {
       cancelLoading: "Laden abbrechen",
       answerAsAI: "Als KI-Modell antworten",
       deleteMessage: "Nachricht löschen",
+      actualCostUsed: "Tatsächlich verwendete Credits für diese Nachricht",
+      tokensUsed: "Verwendete Tokens insgesamt",
+      credits: "Credits",
+      tokens: "Tokens",
     },
 
     // User Message Actions
@@ -223,6 +227,8 @@ export const translations: typeof enTranslations = {
     permanentCredits: "{{count}} dauerhafte Credits",
     expiresOn: "Läuft ab am {{date}}",
     expiresAt: "Läuft ab",
+    approximateCost:
+      "Ungefähre Kosten basierend auf {{inputTokens}} Eingabe- und {{outputTokens}} Ausgabe-Tokens. Tatsächliche Kosten können variieren.",
     buyMore: "Credits kaufen",
     viewDetails: "Details",
     breakdown: "Credit-Aufschlüsselung",
@@ -518,6 +524,41 @@ export const translations: typeof enTranslations = {
     browseAllCharacters: "Alle Characters durchsuchen...",
     customSetup: "Benutzerdefinierte Einrichtung...",
     selectCharacter: "Character auswählen",
+    modelCreditDisplay: {
+      tokenBased: {
+        header: "Kosten variieren je nach Gesprächslänge",
+        costRangeLabel: "Kostenbereich:",
+        costRangeValue: "{{min}} - {{max}} Credits",
+        examplesLabel: "Kostenbeispiele:",
+        examples: {
+          short: "Kurzes Gespräch",
+          medium: "Mittleres Gespräch",
+          long: "Langes Gespräch",
+        },
+        triggersCompacting: "⚡ Aktiviert Komprimierung",
+        tokensCount: "{{count}} Tokens",
+        explanation:
+          "Die KI verarbeitet bei jeder Nachricht den gesamten Gesprächsverlauf, daher steigen die Kosten mit längeren Gesprächen.",
+        compactingLabel: "✨ Auto-Komprimierung:",
+        compactingExplanation:
+          " Bei {{threshold}} Tokens werden ältere Nachrichten automatisch zusammengefasst, um Kosten zu reduzieren und gleichzeitig den Kontext zu bewahren.",
+      },
+      fixed: {
+        title: "Preise für {{model}}",
+        freeDescription:
+          "Dieses Modell ist vollständig kostenlos ohne Credit-Kosten.",
+        fixedDescription:
+          "Dieses Modell hat fixe Kosten pro Nachricht, unabhängig von der Länge.",
+        costPerMessage: "Kosten pro Nachricht:",
+        freeExplanation:
+          "Dies ist ein kostenloses Modell ohne Nutzungsbeschränkungen.",
+        freeHighlight: "Perfekt zum Testen und Experimentieren.",
+        simpleLabel: "Einfache Preise:",
+        simpleExplanation:
+          " Jede Nachricht kostet gleich viel, egal ob kurz oder lang. Kein Token-Zählen erforderlich.",
+      },
+      creditValue: "1 Credit = {{value}}",
+    },
     all: "Alle",
     buildMode: "Erstellungsmodus",
     forCharacter: "für {{character}}",

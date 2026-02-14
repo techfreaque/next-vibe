@@ -9,7 +9,8 @@ export const translations = {
       invalidRequestData: "Invalid request data",
       uncensoredApiKeyMissing: "Uncensored.ai API key not configured",
       openrouterApiKeyMissing: "OpenRouter API key not configured",
-      streamCreationFailed: "Failed to create stream",
+      streamCreationFailed:
+        "Failed to connect to the AI service. Please try again.",
       unknownError: "An error occurred",
       creditValidationFailed: "Failed to validate credit balance",
       noIdentifier: "No user or lead identifier provided",
@@ -276,13 +277,30 @@ export const translations = {
     title: "Stream Error",
   },
   errors: {
-    toolExecutionError: "Tool execution error: {{error}}",
-    toolExecutionFailed: "Tool execution failed",
-    userDeclinedTool: "User declined to execute this tool.",
-    streamError: "Stream error: {{error}}",
-    streamProcessingError: "Error processing stream",
+    toolExecutionError: "A tool failed to execute properly. Please try again.",
+    toolExecutionFailed: "Tool execution failed. Please try again.",
+    userDeclinedTool: "Tool execution was cancelled.",
+    streamError: "The AI response failed to complete. Please try again.",
+    streamProcessingError:
+      "Failed to process the AI response. Please try again.",
     timeout:
-      "The response timed out after {{seconds}} seconds. The AI may have been generating a very long response. Please try again with a shorter prompt.",
+      "The AI took too long to respond (timeout after {{maxDuration}} seconds). Please try again with a shorter message.",
+    noResponse: "The AI did not generate a response. Please try again.",
+    modelUnavailable:
+      "The selected AI model is currently unavailable. Please try a different model.",
+    rateLimitExceeded: "Too many requests. Please wait a moment and try again.",
+    insufficientCredits: "Not enough credits to complete this request.",
+    connectionFailed:
+      "Failed to connect to the AI service. Please check your connection and try again.",
+    invalidRequest: "Invalid request. Please check your input and try again.",
+    compactingStreamError:
+      "Error during history compacting: {{error}}. Your conversation was not compacted.",
+    compactingException:
+      "Failed to compact conversation history: {{error}}. Please try again.",
+    compactingRebuildFailed:
+      "Failed to rebuild conversation after compacting. Please try again.",
+    unexpectedError:
+      "An unexpected error occurred: {{error}}. Please try again.",
   },
   providers: {
     uncensoredHandler: {

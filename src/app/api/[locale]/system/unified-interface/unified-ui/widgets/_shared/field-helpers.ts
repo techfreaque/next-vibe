@@ -162,6 +162,7 @@ export function withValue<
   string,
   ZodTypeAny,
   infer TUsage,
+  // oxlint-disable-next-line no-unused-vars
   infer TChildren
 >
   ? BaseWidgetFieldProps<TUsage, TField>

@@ -22,6 +22,7 @@ export class StreamContextInitializer {
       sequenceId: string;
       toolCall: ToolCall;
     }>;
+    aiMessageId: string;
     logger: EndpointLogger;
   }): StreamContext {
     const {
@@ -29,6 +30,7 @@ export class StreamContextInitializer {
       effectiveParentMessageId,
       messageDepth,
       toolConfirmationResults,
+      aiMessageId,
       logger,
     } = params;
 
@@ -51,12 +53,13 @@ export class StreamContextInitializer {
       sequenceId,
       initialParentId: initialParentForContext,
       initialDepth: initialDepthForContext,
+      initialAssistantMessageId: aiMessageId,
     });
 
     // Update last known values for error handling (accessible in catch blocks)
     ctx.updateErrorTracking();
 
-    logger.info("[AI Stream] Sequence ID initialized", {
+    logger.debug("[AI Stream] Sequence ID initialized", {
       sequenceId: ctx.sequenceId,
       isToolContinuation: !!lastConfirmedTool,
       toolMessageId: lastConfirmedTool?.messageId,

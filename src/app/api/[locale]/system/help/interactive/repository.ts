@@ -895,6 +895,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       platform: this.session.platform,
       user: this.session.user,
       logger: logger,
+      locale: this.session.locale,
     });
 
     if (!result.success) {

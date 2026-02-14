@@ -1,7 +1,3 @@
-/**
- * CreditValidatorHandler - Handles credit validation for AI streaming
- */
-
 import "server-only";
 
 import {
@@ -11,22 +7,23 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import {
-  getModelCost,
-  type ModelId,
+  DEFAULT_INPUT_TOKENS,
+  DEFAULT_OUTPUT_TOKENS,
+} from "@/app/api/[locale]/agent/models/constants";
+import {
+  calculateCreditCost,
+  type ModelOption,
 } from "@/app/api/[locale]/agent/models/models";
 import { creditValidator } from "@/app/api/[locale]/credits/validator";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 export class CreditValidatorHandler {
-  /**
-   * Validate credits for user/lead/IP and return validation result
-   */
   static async validateCredits(params: {
     userId: string | undefined;
     leadId: string | undefined;
     ipAddress: string | undefined;
-    model: ModelId;
+    modelInfo: ModelOption;
     locale: CountryLanguage;
     logger: EndpointLogger;
   }): Promise<
@@ -35,28 +32,35 @@ export class CreditValidatorHandler {
       modelCost: number;
     }>
   > {
-    const { userId, leadId, ipAddress, model, locale, logger } = params;
+    const { userId, leadId, ipAddress, modelInfo, locale, logger } = params;
 
-    const modelCost = getModelCost(model);
+    const modelCost = calculateCreditCost(
+      modelInfo,
+      DEFAULT_INPUT_TOKENS,
+      DEFAULT_OUTPUT_TOKENS,
+    );
     let validationResult;
     let effectiveLeadId = leadId;
 
     if (userId) {
       validationResult = await creditValidator.validateUserCredits(
         userId,
-        model,
+        modelInfo.id,
+        modelCost,
         logger,
       );
     } else if (leadId) {
       validationResult = await creditValidator.validateLeadCredits(
         leadId,
-        model,
+        modelInfo.id,
+        modelCost,
         logger,
       );
     } else if (ipAddress) {
       const leadByIpResult = await creditValidator.validateLeadByIp(
         ipAddress,
-        model,
+        modelInfo.id,
+        modelCost,
         locale,
         logger,
       );
@@ -94,7 +98,7 @@ export class CreditValidatorHandler {
       logger.warn("Insufficient credits", {
         userId,
         leadId: effectiveLeadId,
-        model,
+        modelId: modelInfo.id,
         cost: modelCost,
         balance: validationResult.data.balance,
       });

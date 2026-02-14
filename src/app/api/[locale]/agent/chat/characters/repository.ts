@@ -24,11 +24,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
 import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import {
-  defaultModel,
-  getCreditCostFromModel,
-  modelProviders,
-} from "../../models/models";
+import { defaultModel, modelProviders } from "../../models/models";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import { chatFavorites } from "../favorites/db";
 import type {
@@ -639,19 +635,12 @@ export class CharactersRepository {
           modelIcon: bestModel.icon,
           modelInfo: bestModel.name,
           modelProvider: modelProviders[bestModel.provider].name,
-          creditCost: CharactersRepositoryClient.formatCreditCost(
-            getCreditCostFromModel(bestModel),
-            t,
-          ),
         }
       : {
           modelIcon: "sparkles" as const,
           modelInfo: t("app.api.agent.chat.characters.fallbacks.unknownModel"),
           modelProvider: t(
             "app.api.agent.chat.characters.fallbacks.unknownProvider",
-          ),
-          creditCost: t(
-            "app.api.agent.chat.characters.fallbacks.unknownCreditCost",
           ),
         };
 

@@ -24,6 +24,9 @@ import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
 } from "../definition";
+import { createStreamEvent, formatSSEEvent } from "../events";
+import { CompactingHandler } from "./handlers/compacting-handler";
+import { MessageContextBuilder } from "./handlers/message-context-builder";
 import { StreamErrorCatchHandler } from "./handlers/stream-error-catch-handler";
 import { StreamExecutionHandler } from "./handlers/stream-execution-handler";
 import { StreamStartHandler } from "./handlers/stream-start-handler";
@@ -103,7 +106,6 @@ export class AiStreamRepository {
 
     const {
       isIncognito,
-      modelCost,
       effectiveParentMessageId,
       effectiveContent,
       effectiveRole,
@@ -111,6 +113,7 @@ export class AiStreamRepository {
       isNewThread,
       messageDepth,
       userMessageId,
+      aiMessageId,
       messages,
       systemPrompt,
       toolConfirmationResults,
@@ -134,6 +137,7 @@ export class AiStreamRepository {
           const { ctx, ttsHandler, emittedToolResultIds } =
             StreamStartHandler.initializeStream({
               userMessageId,
+              aiMessageId,
               effectiveParentMessageId,
               messageDepth,
               toolConfirmationResults,
@@ -157,6 +161,142 @@ export class AiStreamRepository {
             });
 
           try {
+            // Check if compacting is needed (fetches branch messages from DB/storage)
+            const compactingCheck =
+              await MessageContextBuilder.shouldTriggerCompacting({
+                threadId: threadResultThreadId,
+                currentUserMessageId: userMessageId,
+                currentUserContent: effectiveContent,
+                currentUserRole: effectiveRole,
+                currentUserMetadata: userMessageMetadata,
+                userId,
+                parentMessageId: effectiveParentMessageId,
+                isIncognito,
+                messageHistory: data.messageHistory ?? undefined,
+                systemPrompt,
+                tools,
+                model: data.model,
+                logger,
+              });
+
+            logger.info("[Compacting] Check result", {
+              shouldCompact: compactingCheck.shouldCompact,
+              totalTokens: compactingCheck.totalTokens,
+              messagesToCompactCount: compactingCheck.messagesToCompact.length,
+              lastCompactingMessage: compactingCheck.lastCompactingMessage?.id,
+            });
+
+            if (compactingCheck.shouldCompact) {
+              logger.info("[Compacting] Starting compacting operation");
+
+              const compactingMessageCreatedAt = new Date();
+              const compactingResult =
+                await CompactingHandler.executeCompacting({
+                  messagesToCompact: compactingCheck.messagesToCompact,
+                  branchMessages: compactingCheck.branchMessages,
+                  currentUserMessage: compactingCheck.currentUserMessage,
+                  threadId: threadResultThreadId,
+                  parentId: ctx.currentParentId,
+                  depth: ctx.currentDepth,
+                  sequenceId: ctx.sequenceId,
+                  ctx,
+                  controller,
+                  isIncognito,
+                  userId,
+                  user,
+                  model: data.model,
+                  character: data.character,
+                  systemPrompt,
+                  tools,
+                  providerModel: provider.chat(modelConfig.openRouterModel),
+                  abortSignal: streamAbortController.signal,
+                  logger,
+                  timezone: data.timezone,
+                  rootFolderId: data.rootFolderId,
+                  compactingMessageCreatedAt,
+                });
+
+              // Check if compacting failed
+              if (!compactingResult.success) {
+                logger.error("[AI Stream] Compacting failed, stopping stream", {
+                  compactingMessageId: compactingResult.compactingMessageId,
+                });
+
+                // STOP - don't continue with broken state
+                ctx.cleanup();
+                controller.close();
+                return;
+              }
+
+              // Rebuild message history with compacted version
+              const rebuiltHistory =
+                await MessageContextBuilder.rebuildWithCompactedHistory({
+                  compactedSummary: compactingResult.compactedSummary,
+                  compactingMessageId: compactingResult.compactingMessageId,
+                  currentUserMessage: compactingCheck.currentUserMessage,
+                  threadId: threadResultThreadId,
+                  isIncognito,
+                  messageHistory: data.messageHistory ?? undefined,
+                  logger,
+                  upcomingAssistantMessageId: aiMessageId,
+                  upcomingAssistantMessageCreatedAt: new Date(),
+                  model: data.model,
+                  character: data.character,
+                  timezone: data.timezone,
+                  rootFolderId: data.rootFolderId,
+                });
+
+              // Check if rebuilding failed
+              if (!rebuiltHistory) {
+                const error = new Error(
+                  "rebuildWithCompactedHistory returned null",
+                );
+                logger.error(
+                  "[AI Stream] Failed to rebuild history after compacting",
+                  error,
+                );
+
+                // Emit error event to frontend
+                const errorResponse = fail({
+                  message:
+                    "app.api.agent.chat.aiStream.errors.compactingRebuildFailed" as const,
+                  errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                });
+                const errorEvent = createStreamEvent.error(errorResponse);
+                controller.enqueue(encoder.encode(formatSSEEvent(errorEvent)));
+
+                // STOP - don't continue with broken state
+                ctx.cleanup();
+                controller.close();
+                return;
+              }
+
+              // Update messages array and context for main stream
+              messages.length = 0;
+              messages.push(...rebuiltHistory);
+
+              // Update ctx so the AI response is a child of the compacting message
+              ctx.currentParentId = compactingResult.compactingMessageId;
+              ctx.currentDepth = compactingResult.newDepth;
+
+              logger.info("[Compacting] Updated messages for main stream", {
+                messageCount: messages.length,
+                compactingMessageId: compactingResult.compactingMessageId,
+                contextParentId: ctx.currentParentId,
+                contextDepth: ctx.currentDepth,
+              });
+            }
+
+            logger.info(
+              "[AI Stream] Calling StreamExecutionHandler.executeStream",
+              {
+                messageCount: messages.length,
+                hasTools: !!tools,
+                modelId: data.model,
+              },
+            );
+
+            // Execute main AI stream
             await StreamExecutionHandler.executeStream({
               provider,
               modelConfig,
@@ -174,7 +314,6 @@ export class AiStreamRepository {
               emittedToolResultIds,
               ttsHandler,
               user,
-              modelCost,
               controller,
               encoder,
               logger,
@@ -225,9 +364,6 @@ export class AiStreamRepository {
         message:
           "app.api.agent.chat.aiStream.route.errors.streamCreationFailed",
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: {
-          error: errorMessage,
-        },
       });
     }
   }

@@ -1,14 +1,12 @@
-/**
- * ProviderFactory - Creates AI provider instances based on model
- */
+import { createWriteStream, existsSync, mkdirSync } from "node:fs";
 
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import type { JSONValue } from "ai";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import {
   ApiProvider,
-  getModelById,
-  type ModelId,
+  type ModelOption,
 } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -17,11 +15,8 @@ import { createGabAI } from "../../providers/gab-ai";
 import { createUncensoredAI } from "../../providers/uncensored-ai";
 
 export class ProviderFactory {
-  /**
-   * Get the appropriate provider for a given model
-   */
   static getProviderForModel(
-    model: ModelId,
+    modelOption: ModelOption,
     logger: EndpointLogger,
   ): ReturnType<
     | typeof createOpenRouter
@@ -29,8 +24,6 @@ export class ProviderFactory {
     | typeof createFreedomGPT
     | typeof createGabAI
   > {
-    const modelOption = getModelById(model);
-
     switch (modelOption.apiProvider) {
       case ApiProvider.UNCENSORED_AI:
         return createUncensoredAI(logger);

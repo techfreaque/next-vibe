@@ -26,6 +26,7 @@ export class ReasoningHandler {
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
+    getNextAssistantMessageId: () => string;
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
     logger: EndpointLogger;
@@ -45,6 +46,7 @@ export class ReasoningHandler {
       sequenceId,
       isIncognito,
       userId,
+      getNextAssistantMessageId,
       controller,
       encoder,
       logger,
@@ -56,6 +58,7 @@ export class ReasoningHandler {
 
     // Create ASSISTANT message if it doesn't exist yet
     if (!currentAssistantMessageId) {
+      const messageId = getNextAssistantMessageId();
       const result = await this.createAssistantMessage({
         initialContent: thinkTag,
         threadId,
@@ -66,6 +69,7 @@ export class ReasoningHandler {
         sequenceId,
         isIncognito,
         userId,
+        messageId,
         controller,
         encoder,
         logger,
@@ -194,6 +198,7 @@ export class ReasoningHandler {
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
+    messageId: string;
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
     logger: EndpointLogger;
@@ -208,12 +213,11 @@ export class ReasoningHandler {
       sequenceId,
       isIncognito,
       userId,
+      messageId,
       controller,
       encoder,
       logger,
     } = params;
-
-    const messageId = crypto.randomUUID();
 
     logger.info("[AI Stream] Creating ASSISTANT message (reasoning)", {
       messageId,

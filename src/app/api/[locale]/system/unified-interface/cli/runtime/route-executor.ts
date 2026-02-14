@@ -189,6 +189,7 @@ export class RouteDelegationHandler {
         platform: options.platform,
         user: cliUser,
         logger,
+        locale: options.locale,
       });
       const endpoint = endpointResult.success ? endpointResult.data : null;
 

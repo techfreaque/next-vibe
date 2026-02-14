@@ -23,11 +23,52 @@ import {
   type ToolCallResult,
 } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
-import {
-  createErrorMessage,
-  createToolMessage,
-} from "../../../chat/threads/[threadId]/messages/repository";
+import { createToolMessage } from "../../../chat/threads/[threadId]/messages/repository";
 import { createStreamEvent, formatSSEEvent } from "../../events";
+
+/**
+ * Recursively sort object keys for stable serialization (cache-friendly)
+ * Also handles strings that contain JSON (like tool args/results)
+ */
+function sortObjectKeys(obj: JSONValue): JSONValue {
+  if (obj === null) {
+    return obj;
+  }
+
+  // Handle strings that might contain JSON
+  if (typeof obj === "string") {
+    if (
+      (obj.startsWith("{") && obj.endsWith("}")) ||
+      (obj.startsWith("[") && obj.endsWith("]"))
+    ) {
+      try {
+        const parsed = JSON.parse(obj) as JSONValue;
+        const sorted = sortObjectKeys(parsed);
+        return JSON.stringify(sorted);
+      } catch {
+        return obj;
+      }
+    }
+    return obj;
+  }
+
+  if (typeof obj !== "object") {
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(sortObjectKeys);
+  }
+
+  const sorted: Record<string, JSONValue> = {};
+  for (const key of Object.keys(obj).toSorted()) {
+    const value = obj[key];
+    if (value !== undefined) {
+      sorted[key] = sortObjectKeys(value);
+    }
+  }
+  return sorted;
+}
 
 /**
  * Type guard for tool result values
@@ -128,14 +169,6 @@ export class ToolResultHandler {
 
     const { messageId: toolMessageId, toolCallData } = pendingToolMessage;
 
-    logger.info("[AI Stream] Processing tool result", {
-      toolCallId: part.toolCallId,
-      toolName: part.toolName,
-      messageId: toolMessageId,
-      hasOutput: "output" in part,
-      isError: part.isError,
-    });
-
     // If controller is closed (waiting for confirmation), skip processing
     // The tool result will be processed in the next stream after confirmation
     try {
@@ -159,16 +192,6 @@ export class ToolResultHandler {
     // AI SDK sets isError: true when tool throws an error
     const isError = "isError" in part ? part.isError : false;
 
-    logger.info("[AI Stream] Tool result RAW output", {
-      toolName: part.toolName,
-      toolCallId: part.toolCallId,
-      messageId: toolMessageId,
-      hasOutput: "output" in part,
-      isError: Boolean(isError),
-      outputType: typeof output,
-      outputStringified: (JSON.stringify(output) || "undefined").slice(0, 500),
-    });
-
     // Extract error message from AI SDK and structure it for translation
     let toolError: ErrorResponseType | undefined;
     if (isError) {
@@ -179,28 +202,27 @@ export class ToolResultHandler {
           : output && typeof output === "object" && "message" in output
             ? String(output.message)
             : JSON.stringify(output);
-
       toolError = fail({
         message:
           "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
-        errorType: ErrorResponseTypes.UNKNOWN_ERROR,
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: errorMessage },
       });
     }
 
     // Clean output by removing undefined values (they break validation)
+    // Sort object keys for stable serialization (cache-friendly)
     // Check for both undefined and null to avoid "Cannot convert null to object" error
-    const cleanedOutput =
+    const cleanedOutput: JSONValue | undefined =
       output !== null && output !== undefined
-        ? JSON.parse(JSON.stringify(output))
+        ? sortObjectKeys(JSON.parse(JSON.stringify(output)) as JSONValue)
         : undefined;
 
     // Validate and type the output using type guard
-    const validatedOutput: ToolCallResult | undefined = isValidToolResult(
-      cleanedOutput,
-    )
-      ? cleanedOutput
-      : undefined;
+    const validatedOutput: ToolCallResult | undefined =
+      cleanedOutput !== undefined && isValidToolResult(cleanedOutput)
+        ? cleanedOutput
+        : undefined;
 
     const toolCallWithResult: ToolCall = {
       ...toolCallData.toolCall,
@@ -247,50 +269,8 @@ export class ToolResultHandler {
       isIncognito,
     });
 
-    // Handle ERROR message if tool failed
-    if (toolError) {
-      const errorMessageId = crypto.randomUUID();
-      const { serializeError } = await import("../../error-utils");
-
-      // Emit ERROR MESSAGE_CREATED event
-      const errorMessageEvent = createStreamEvent.messageCreated({
-        messageId: errorMessageId,
-        threadId,
-        role: ChatMessageRole.ERROR,
-        content: serializeError(toolError),
-        parentId: toolMessageId,
-        depth: toolCallData.depth + 1,
-        model,
-        character,
-        sequenceId,
-      });
-      controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
-
-      logger.info("[AI Stream] ERROR MESSAGE_CREATED event sent", {
-        errorMessageId,
-        toolError,
-        isIncognito,
-      });
-
-      // Save ERROR message to DB (server mode only - incognito stores in localStorage)
-      if (!isIncognito) {
-        await createErrorMessage({
-          messageId: errorMessageId,
-          threadId,
-          content: serializeError(toolError),
-          errorType: "TOOL_ERROR",
-          parentId: toolMessageId,
-          depth: toolCallData.depth + 1,
-          userId,
-          sequenceId,
-          logger,
-        });
-
-        logger.debug("[AI Stream] ERROR message saved to DB", {
-          errorMessageId,
-        });
-      }
-    }
+    // Tool errors are displayed inline in the tool UI via toolCall.error
+    // No separate ERROR message needed
 
     // Update TOOL message in DB with result (server mode only - incognito stores in localStorage)
     if (!isIncognito) {
@@ -338,27 +318,9 @@ export class ToolResultHandler {
       }
     }
 
-    logger.info("[AI Stream] Tool result processed", {
-      messageId: toolMessageId,
-      toolCallId: part.toolCallId,
-      toolName: part.toolName,
-      hasResult: !!validatedOutput,
-      hasError: !!toolError,
-      resultType: typeof validatedOutput,
-      isValid: isValidToolResult(cleanedOutput),
-      wasCleaned: output !== cleanedOutput,
-    });
-
     // Emit TOOL_RESULT event for real-time UX with updated tool call data
     // SKIP if this tool result was already emitted in batch confirmation handler
     if (emittedToolResultIds && emittedToolResultIds.has(toolMessageId)) {
-      logger.info(
-        "[AI Stream] Skipping TOOL_RESULT emission - already emitted in batch confirmations",
-        {
-          messageId: toolMessageId,
-          toolName: part.toolName,
-        },
-      );
     } else {
       const toolResultEvent = createStreamEvent.toolResult({
         messageId: toolMessageId,

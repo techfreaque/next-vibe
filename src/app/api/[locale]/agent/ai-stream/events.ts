@@ -37,6 +37,11 @@ export enum StreamEventType {
   FILES_UPLOADED = "files-uploaded",
   // Credit deduction event
   CREDITS_DEDUCTED = "credits-deducted",
+  // Token metadata event
+  TOKENS_UPDATED = "tokens-updated",
+  // Compacting events
+  COMPACTING_DELTA = "compacting-delta",
+  COMPACTING_DONE = "compacting-done",
 }
 
 /**
@@ -129,6 +134,28 @@ export interface ErrorEventData {
 }
 
 /**
+ * Compacting delta event data
+ * Streamed as history is being compacted
+ */
+export interface CompactingDeltaEventData {
+  messageId: string;
+  delta: string;
+}
+
+/**
+ * Compacting done event data
+ * Emitted when history compacting completes
+ */
+export interface CompactingDoneEventData {
+  messageId: string;
+  content: string;
+  metadata: {
+    isCompacting: true;
+    compactedMessageCount: number;
+  };
+}
+
+/**
  * Voice transcribed event data
  * Emitted when STT completes in voice mode (before LLM processes)
  */
@@ -193,6 +220,25 @@ export interface CreditsDeductedEventData {
 }
 
 /**
+ * Tokens updated event data
+ * Emitted when final token counts are available for a message
+ */
+export interface TokensUpdatedEventData {
+  /** Message ID */
+  messageId: string;
+  /** Input/prompt tokens */
+  promptTokens: number;
+  /** Output/completion tokens */
+  completionTokens: number;
+  /** Total tokens */
+  totalTokens: number;
+  /** Finish reason */
+  finishReason: string | null;
+  /** Actual credit cost based on real token usage */
+  creditCost: number;
+}
+
+/**
  * Event type to data mapping
  */
 export interface StreamEventDataMap {
@@ -204,7 +250,7 @@ export interface StreamEventDataMap {
   [StreamEventType.TOOL_CALL]: ToolCallEventData;
   [StreamEventType.TOOL_WAITING]: ToolWaitingEventData;
   [StreamEventType.TOOL_RESULT]: ToolResultEventData;
-  [StreamEventType.ERROR]: ErrorEventData;
+  [StreamEventType.ERROR]: ErrorResponseType;
   // Voice mode events
   [StreamEventType.VOICE_TRANSCRIBED]: VoiceTranscribedEventData;
   [StreamEventType.AUDIO_CHUNK]: AudioChunkEventData;
@@ -212,6 +258,11 @@ export interface StreamEventDataMap {
   [StreamEventType.FILES_UPLOADED]: FilesUploadedEventData;
   // Credit deduction event
   [StreamEventType.CREDITS_DEDUCTED]: CreditsDeductedEventData;
+  // Token metadata event
+  [StreamEventType.TOKENS_UPDATED]: TokensUpdatedEventData;
+  // Compacting events
+  [StreamEventType.COMPACTING_DELTA]: CompactingDeltaEventData;
+  [StreamEventType.COMPACTING_DONE]: CompactingDoneEventData;
 }
 
 /**
@@ -282,7 +333,7 @@ export const createStreamEvent = {
     data,
   }),
 
-  error: (data: ErrorEventData): StreamEvent<StreamEventType.ERROR> => ({
+  error: (data: ErrorResponseType): StreamEvent<StreamEventType.ERROR> => ({
     type: StreamEventType.ERROR,
     data,
   }),
@@ -313,6 +364,27 @@ export const createStreamEvent = {
     data: CreditsDeductedEventData,
   ): StreamEvent<StreamEventType.CREDITS_DEDUCTED> => ({
     type: StreamEventType.CREDITS_DEDUCTED,
+    data,
+  }),
+
+  tokensUpdated: (
+    data: TokensUpdatedEventData,
+  ): StreamEvent<StreamEventType.TOKENS_UPDATED> => ({
+    type: StreamEventType.TOKENS_UPDATED,
+    data,
+  }),
+
+  compactingDelta: (
+    data: CompactingDeltaEventData,
+  ): StreamEvent<StreamEventType.COMPACTING_DELTA> => ({
+    type: StreamEventType.COMPACTING_DELTA,
+    data,
+  }),
+
+  compactingDone: (
+    data: CompactingDoneEventData,
+  ): StreamEvent<StreamEventType.COMPACTING_DONE> => ({
+    type: StreamEventType.COMPACTING_DONE,
     data,
   }),
 };

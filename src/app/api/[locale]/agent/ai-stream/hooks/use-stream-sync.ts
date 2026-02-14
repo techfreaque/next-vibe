@@ -54,16 +54,32 @@ export function useStreamSync(deps: StreamSyncDeps): void {
           existingMsg.tokens !== (streamMsg.totalTokens || null) ||
           existingMsg.character !== (streamMsg.character || null) ||
           JSON.stringify(existingMsg.metadata?.toolCall) !==
-            JSON.stringify(streamMsg.toolCall);
+            JSON.stringify(streamMsg.toolCall) ||
+          existingMsg.metadata?.promptTokens !== streamMsg.promptTokens ||
+          existingMsg.metadata?.completionTokens !== streamMsg.completionTokens;
 
         if (needsUpdate) {
           updateMessage(streamMsg.messageId, {
             content: streamMsg.content,
             tokens: streamMsg.totalTokens || null,
             character: streamMsg.character || null,
-            metadata: streamMsg.toolCall
-              ? { toolCall: streamMsg.toolCall }
-              : {},
+            metadata: {
+              ...existingMsg.metadata,
+              ...(streamMsg.toolCall ? { toolCall: streamMsg.toolCall } : {}),
+              ...(streamMsg.promptTokens !== undefined
+                ? { promptTokens: streamMsg.promptTokens }
+                : {}),
+              ...(streamMsg.completionTokens !== undefined
+                ? { completionTokens: streamMsg.completionTokens }
+                : {}),
+              ...(streamMsg.totalTokens !== undefined
+                ? { totalTokens: streamMsg.totalTokens }
+                : {}),
+              // Only include finishReason if it's a non-null string (MessageMetadata doesn't allow null)
+              ...(streamMsg.finishReason
+                ? { finishReason: streamMsg.finishReason }
+                : {}),
+            },
             errorType: streamMsg.error
               ? t("app.api.agent.chat.aiStream.errorTypes.streamError")
               : null,
@@ -93,7 +109,22 @@ export function useStreamSync(deps: StreamSyncDeps): void {
           edited: false,
           originalId: null,
           tokens: streamMsg.totalTokens || null,
-          metadata: streamMsg.toolCall ? { toolCall: streamMsg.toolCall } : {},
+          metadata: {
+            ...(streamMsg.toolCall ? { toolCall: streamMsg.toolCall } : {}),
+            ...(streamMsg.promptTokens !== undefined
+              ? { promptTokens: streamMsg.promptTokens }
+              : {}),
+            ...(streamMsg.completionTokens !== undefined
+              ? { completionTokens: streamMsg.completionTokens }
+              : {}),
+            ...(streamMsg.totalTokens !== undefined
+              ? { totalTokens: streamMsg.totalTokens }
+              : {}),
+            // Only include finishReason if it's a non-null string (MessageMetadata doesn't allow null)
+            ...(streamMsg.finishReason
+              ? { finishReason: streamMsg.finishReason }
+              : {}),
+          },
           upvotes: 0,
           downvotes: 0,
           sequenceId: streamMsg.sequenceId ?? null,

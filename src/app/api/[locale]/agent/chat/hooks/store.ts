@@ -177,6 +177,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const updatedMessage = {
         ...message,
         ...updates,
+        // Merge metadata instead of replacing it
+        metadata: updates.metadata
+          ? { ...message.metadata, ...updates.metadata }
+          : message.metadata,
         updatedAt: new Date(),
       };
 

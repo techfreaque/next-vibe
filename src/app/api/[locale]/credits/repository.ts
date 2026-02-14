@@ -68,9 +68,10 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 import { simpleT } from "@/i18n/core/shared";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import { getModelById, type ModelId } from "../agent/models/models";
+import sttDefinition from "../agent/speech-to-text/definition";
+import ttsDefinition from "../agent/text-to-speech/definition";
 import { ProductIds, productsRepository } from "../products/repository-client";
 import { payoutRequests } from "../referral/db";
 import { PayoutStatus } from "../referral/enum";
@@ -353,13 +354,6 @@ export class CreditRepository {
       return;
     }
 
-    // TODO: Remove this migration code after all old format packs are normalized
-    // Normalize old format "subscription" to new format "app.api.credits.enums.packType.subscription"
-    await db
-      .update(creditPacks)
-      .set({ type: CreditPackType.SUBSCRIPTION })
-      .where(eq(creditPacks.type, "subscription"));
-
     const now = new Date();
 
     // Find all expired packs across these wallets
@@ -490,7 +484,9 @@ export class CreditRepository {
 
       // Calculate cutoff date for missed webhooks (7 days ago)
       const gracePeriodCutoff = new Date(now);
-      gracePeriodCutoff.setDate(gracePeriodCutoff.getDate() - GRACE_PERIOD_DAYS);
+      gracePeriodCutoff.setDate(
+        gracePeriodCutoff.getDate() - GRACE_PERIOD_DAYS,
+      );
 
       logger.info("Checking for expired subscriptions", {
         userIds,
@@ -1567,7 +1563,8 @@ export class CreditRepository {
   private static async deductCredits(
     identifier: CreditIdentifier,
     amount: number,
-    feature: ModelId | "tts" | "stt" | "search" | "stt-hotkey",
+    modelId: ModelId | undefined,
+    feature: string | undefined,
     messageId: string,
     logger: EndpointLogger,
     allowPartial = false, //  allow deducting less than requested
@@ -1732,13 +1729,12 @@ export class CreditRepository {
               amount: -deduction,
               balanceAfter: lockedWallet.balance,
               type: CreditTransactionType.USAGE,
-              modelId: feature,
+              modelId,
+              feature,
               messageId,
               freePeriodId: lockedWallet.freePeriodId,
               metadata: {
-                feature: "credit_usage",
                 cost: amount,
-                modelId: feature,
                 messageId,
                 freeCreditsUsed: deduction,
                 packCreditsUsed: 0,
@@ -1811,14 +1807,13 @@ export class CreditRepository {
               amount: -deduction,
               balanceAfter: updatedWallet?.balance || 0,
               type: CreditTransactionType.USAGE,
-              modelId: feature,
+              modelId,
+              feature,
               messageId,
               packId: pack.id,
               freePeriodId: walletInfo?.freePeriodId || null,
               metadata: {
-                feature: "credit_usage",
                 cost: amount,
-                modelId: feature,
                 messageId,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
@@ -1889,14 +1884,13 @@ export class CreditRepository {
               amount: -deduction,
               balanceAfter: updatedWallet?.balance || 0,
               type: CreditTransactionType.USAGE,
-              modelId: feature,
+              modelId,
+              feature,
               messageId,
               packId: pack.id,
               freePeriodId: walletInfo?.freePeriodId || null,
               metadata: {
-                feature: "credit_usage",
                 cost: amount,
-                modelId: feature,
                 messageId,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
@@ -1968,14 +1962,13 @@ export class CreditRepository {
               amount: -deduction,
               balanceAfter: updatedWallet?.balance || 0,
               type: CreditTransactionType.USAGE,
-              modelId: feature,
+              modelId,
+              feature,
               messageId,
               packId: pack.id,
               freePeriodId: walletInfo?.freePeriodId || null,
               metadata: {
-                feature: "credit_usage",
                 cost: amount,
-                modelId: feature,
                 messageId,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
@@ -2192,7 +2185,7 @@ export class CreditRepository {
           type: transaction.modelId
             ? `${t(transaction.type)} (${CreditRepository.getFetaureLabel(
                 transaction.modelId,
-                t,
+                transaction.feature,
               )})`
             : transaction.type,
           modelId: transaction.modelId,
@@ -2227,21 +2220,10 @@ export class CreditRepository {
   }
 
   private static getFetaureLabel(
-    feature: ModelId | "tts" | "stt" | "search" | "stt-hotkey",
-    t: TFunction,
-  ): string {
-    switch (feature) {
-      case "tts":
-        return t("app.api.credits.repository.tts");
-      case "stt":
-        return t("app.api.credits.repository.stt");
-      case "search":
-        return t("app.api.credits.repository.search");
-      case "stt-hotkey":
-        return t("app.api.credits.repository.sttHotkey");
-      default:
-        return getModelById(feature)?.name || t(feature);
-    }
+    modelId: ModelId | null,
+    featureName: string | null,
+  ): string | null {
+    return modelId ? getModelById(modelId)?.name : featureName;
   }
 
   /**
@@ -2423,7 +2405,7 @@ export class CreditRepository {
           amount: transaction.amount,
           balanceAfter: transaction.balanceAfter,
           type: transaction.modelId
-            ? `${t(transaction.type)} (${CreditRepository.getFetaureLabel(transaction.modelId, t)})`
+            ? `${t(transaction.type)} (${CreditRepository.getFetaureLabel(transaction.modelId, transaction.feature)})`
             : transaction.type,
           messageId: transaction.messageId,
           createdAt: transaction.createdAt.toISOString(),
@@ -2609,7 +2591,7 @@ export class CreditRepository {
   static async deductCreditsForFeature(
     user: JwtPayloadType,
     cost: number,
-    feature: ModelId | "tts" | "stt" | "search" | "stt-hotkey",
+    feature: string,
     logger: EndpointLogger,
   ): Promise<{ success: boolean; messageId?: string }> {
     if (cost <= 0) {
@@ -2641,6 +2623,7 @@ export class CreditRepository {
       const result = await CreditRepository.deductCredits(
         identifier,
         cost,
+        undefined,
         feature,
         creditMessageId,
         logger,
@@ -2677,6 +2660,7 @@ export class CreditRepository {
     user: JwtPayloadType,
     cost: number,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<{
     success: boolean;
     messageId?: string;
@@ -2701,11 +2685,13 @@ export class CreditRepository {
         logger.error("No identifier for TTS credit deduction", { cost });
         return { success: false };
       }
+      const { t } = simpleT(locale);
 
       const result = await CreditRepository.deductCredits(
         identifier,
         cost,
-        "tts",
+        undefined,
+        t(ttsDefinition.POST.title),
         creditMessageId,
         logger,
         true, // allowPartial = true for TTS
@@ -2745,6 +2731,7 @@ export class CreditRepository {
     user: JwtPayloadType,
     cost: number,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<{
     success: boolean;
     messageId?: string;
@@ -2769,11 +2756,12 @@ export class CreditRepository {
         logger.error("No identifier for STT credit deduction", { cost });
         return { success: false };
       }
-
+      const { t } = simpleT(locale);
       const result = await CreditRepository.deductCredits(
         identifier,
         cost,
-        "stt",
+        undefined,
+        t(sttDefinition.POST.title),
         creditMessageId,
         logger,
         true, // allowPartial = true for STT
@@ -2849,6 +2837,7 @@ export class CreditRepository {
         identifier,
         cost,
         model,
+        undefined,
         creditMessageId,
         logger,
         true, // Allow partial deduction for model usage

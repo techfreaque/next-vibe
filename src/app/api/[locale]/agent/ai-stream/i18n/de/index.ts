@@ -264,7 +264,8 @@ export const translations: typeof enTranslations = {
       invalidRequestData: "Ungültige Anforderungsdaten",
       uncensoredApiKeyMissing: "Uncensored.ai API-Schlüssel nicht konfiguriert",
       openrouterApiKeyMissing: "OpenRouter API-Schlüssel nicht konfiguriert",
-      streamCreationFailed: "Fehler beim Erstellen des Streams",
+      streamCreationFailed:
+        "Verbindung zum KI-Dienst fehlgeschlagen. Bitte versuchen Sie es erneut.",
       unknownError: "Ein Fehler ist aufgetreten",
       creditValidationFailed: "Fehler bei der Validierung des Guthabens",
       noIdentifier: "Keine Benutzer- oder Lead-Kennung angegeben",
@@ -284,13 +285,36 @@ export const translations: typeof enTranslations = {
     title: "Stream-Fehler",
   },
   errors: {
-    toolExecutionError: "Werkzeug-Ausführungsfehler: {{error}}",
-    toolExecutionFailed: "Werkzeug-Ausführung fehlgeschlagen",
-    userDeclinedTool: "Benutzer hat die Ausführung dieses Werkzeugs abgelehnt.",
-    streamError: "Stream-Fehler: {{error}}",
-    streamProcessingError: "Fehler beim Verarbeiten des Streams",
+    toolExecutionError:
+      "Ein Werkzeug konnte nicht korrekt ausgeführt werden. Bitte versuchen Sie es erneut.",
+    toolExecutionFailed:
+      "Werkzeug-Ausführung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    userDeclinedTool: "Werkzeug-Ausführung wurde abgebrochen.",
+    streamError:
+      "Die KI-Antwort konnte nicht vollständig verarbeitet werden. Bitte versuchen Sie es erneut.",
+    streamProcessingError:
+      "Fehler beim Verarbeiten der KI-Antwort. Bitte versuchen Sie es erneut.",
     timeout:
-      "Die Antwort hat nach {{seconds}} Sekunden eine Zeitüberschreitung erreicht. Die KI hat möglicherweise eine sehr lange Antwort generiert. Bitte versuchen Sie es erneut mit einer kürzeren Eingabe.",
+      "Die KI brauchte zu lange für eine Antwort (Zeitüberschreitung nach {{maxDuration}} Sekunden). Bitte versuchen Sie es mit einer kürzeren Nachricht erneut.",
+    noResponse:
+      "Die KI hat keine Antwort generiert. Bitte versuchen Sie es erneut.",
+    modelUnavailable:
+      "Das ausgewählte KI-Modell ist derzeit nicht verfügbar. Bitte versuchen Sie ein anderes Modell.",
+    rateLimitExceeded:
+      "Zu viele Anfragen. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
+    insufficientCredits: "Nicht genügend Credits für diese Anfrage.",
+    connectionFailed:
+      "Verbindung zum KI-Dienst fehlgeschlagen. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    invalidRequest:
+      "Ungültige Anfrage. Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.",
+    compactingStreamError:
+      "Fehler beim Komprimieren der Verlauf: {{error}}. Ihre Konversation wurde nicht komprimiert.",
+    compactingException:
+      "Fehler beim Komprimieren des Konversationsverlaufs: {{error}}. Bitte versuchen Sie es erneut.",
+    compactingRebuildFailed:
+      "Fehler beim Wiederherstellen der Konversation nach dem Komprimieren. Bitte versuchen Sie es erneut.",
+    unexpectedError:
+      "Ein unerwarteter Fehler ist aufgetreten: {{error}}. Bitte versuchen Sie es erneut.",
   },
   providers: {
     uncensoredHandler: {

@@ -202,6 +202,7 @@ export class SpeechToTextRepository {
         user,
         creditsNeeded,
         logger,
+        locale,
       );
 
       if (!deductResult.success) {

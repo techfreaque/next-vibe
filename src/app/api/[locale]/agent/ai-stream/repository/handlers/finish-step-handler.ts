@@ -96,7 +96,7 @@ export class FinishStepHandler {
 
     // After a step finishes, update currentParentId/currentDepth to point to the last message
     // The next ASSISTANT message should be a CHILD of the last tool message, so increment depth
-    logger.info("[AI Stream] Step finished - updating parent chain", {
+    logger.debug("[AI Stream] Step finished - updating parent chain", {
       oldParentId: ctx.currentParentId,
       newParentId: ctx.lastParentId,
       oldDepth: ctx.currentDepth,

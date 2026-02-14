@@ -207,6 +207,7 @@ export class MCPRegistry implements IMCPRegistry {
           platform: Platform.MCP,
           user: context.user,
           logger,
+          locale: context.locale,
         });
         if (endpointResult.success) {
           endpoint = endpointResult.data;

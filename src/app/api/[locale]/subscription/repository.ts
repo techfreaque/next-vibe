@@ -206,12 +206,10 @@ export class SubscriptionRepository {
               // Grant renewal credits if period advanced (missed webhook recovery)
               if (periodAdvanced && newStatus === SubscriptionStatus.ACTIVE) {
                 try {
-                  const { CreditRepository } = await import(
-                    "../credits/repository"
-                  );
-                  const { productsRepository, ProductIds } = await import(
-                    "../products/repository-client"
-                  );
+                  const { CreditRepository } =
+                    await import("../credits/repository");
+                  const { productsRepository, ProductIds } =
+                    await import("../products/repository-client");
 
                   const productId =
                     subscription.planId === SubscriptionPlan.SUBSCRIPTION
@@ -229,12 +227,15 @@ export class SubscriptionRepository {
                     // This prevents duplicate credits if auto-sync runs multiple times
                     const sessionId = `auto-sync-${currentPeriodStart}`;
 
-                    logger.info("Auto-granting renewal credits (missed webhook)", {
-                      userId,
-                      credits: product.credits,
-                      expiresAt: expiresAt.toISOString(),
-                      sessionId,
-                    });
+                    logger.info(
+                      "Auto-granting renewal credits (missed webhook)",
+                      {
+                        userId,
+                        credits: product.credits,
+                        expiresAt: expiresAt.toISOString(),
+                        sessionId,
+                      },
+                    );
 
                     await CreditRepository.addUserCredits(
                       userId,
@@ -245,14 +246,11 @@ export class SubscriptionRepository {
                       sessionId,
                     );
 
-                    logger.info(
-                      "Successfully auto-granted renewal credits",
-                      {
-                        userId,
-                        credits: product.credits,
-                        sessionId,
-                      },
-                    );
+                    logger.info("Successfully auto-granted renewal credits", {
+                      userId,
+                      credits: product.credits,
+                      sessionId,
+                    });
                   }
                 } catch (creditError) {
                   logger.error("Failed to auto-grant renewal credits", {

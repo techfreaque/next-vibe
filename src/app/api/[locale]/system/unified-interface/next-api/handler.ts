@@ -108,7 +108,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
 
       // Handle file responses - return immediately
       if (isFileResponse(result)) {
-        logger.info("Returning file response");
+        logger.debug("Returning file response");
         const body = Buffer.isBuffer(result.buffer)
           ? new Blob([new Uint8Array(result.buffer)])
           : result.buffer;
@@ -123,7 +123,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
 
       // Handle streaming responses (Next.js-specific)
       if (isStreamingResponse(result)) {
-        logger.info("Returning streaming response");
+        logger.debug("Returning streaming response");
         return result.response;
       }
 

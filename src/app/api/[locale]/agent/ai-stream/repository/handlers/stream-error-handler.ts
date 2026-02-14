@@ -11,6 +11,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { ChatMessageRole } from "../../../chat/enum";
 import { createErrorMessage } from "../../../chat/threads/[threadId]/messages/repository";
@@ -48,17 +49,74 @@ export class StreamErrorHandler {
 
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : undefined;
+    const errorName =
+      error instanceof Error ? error.constructor.name : typeof error;
+
     logger.error("Stream error", {
       error: errorMessage,
       stack: errorStack,
-      errorType: error instanceof Error ? error.constructor.name : typeof error,
+      errorType: errorName,
     });
+
+    // Detect specific error types based on error message or name
+    let translationKey: TranslationKey;
+    let errorType = ErrorResponseTypes.UNKNOWN_ERROR;
+
+    if (errorMessage.toLowerCase().includes("rate limit")) {
+      translationKey =
+        "app.api.agent.chat.aiStream.errors.rateLimitExceeded" satisfies TranslationKey;
+      errorType = ErrorResponseTypes.EXTERNAL_SERVICE_ERROR;
+    } else if (
+      errorMessage.toLowerCase().includes("insufficient") &&
+      errorMessage.toLowerCase().includes("credit")
+    ) {
+      translationKey =
+        "app.api.agent.chat.aiStream.errors.insufficientCredits" satisfies TranslationKey;
+      errorType = ErrorResponseTypes.PAYMENT_REQUIRED;
+    } else if (
+      errorMessage.toLowerCase().includes("no output") ||
+      errorMessage.toLowerCase().includes("no response") ||
+      errorName === "AI_NoOutputGeneratedError"
+    ) {
+      translationKey =
+        "app.api.agent.chat.aiStream.errors.noResponse" satisfies TranslationKey;
+      errorType = ErrorResponseTypes.EXTERNAL_SERVICE_ERROR;
+    } else if (
+      errorMessage.toLowerCase().includes("model") &&
+      (errorMessage.toLowerCase().includes("not found") ||
+        errorMessage.toLowerCase().includes("unavailable"))
+    ) {
+      translationKey =
+        "app.api.agent.chat.aiStream.errors.modelUnavailable" satisfies TranslationKey;
+      errorType = ErrorResponseTypes.NOT_FOUND;
+    } else if (
+      errorMessage.toLowerCase().includes("connection") ||
+      errorMessage.toLowerCase().includes("network") ||
+      errorMessage.toLowerCase().includes("fetch failed") ||
+      errorMessage.toLowerCase().includes("econnrefused")
+    ) {
+      translationKey =
+        "app.api.agent.chat.aiStream.errors.connectionFailed" satisfies TranslationKey;
+      errorType = ErrorResponseTypes.EXTERNAL_SERVICE_ERROR;
+    } else if (
+      errorMessage.toLowerCase().includes("invalid") ||
+      errorMessage.toLowerCase().includes("malformed") ||
+      errorMessage.toLowerCase().includes("bad request")
+    ) {
+      translationKey =
+        "app.api.agent.chat.aiStream.errors.invalidRequest" satisfies TranslationKey;
+      errorType = ErrorResponseTypes.BAD_REQUEST;
+    } else {
+      // Generic stream error as fallback
+      translationKey =
+        "app.api.agent.chat.aiStream.errors.streamError" satisfies TranslationKey;
+      errorType = ErrorResponseTypes.UNKNOWN_ERROR;
+    }
 
     // Create structured error with translation key
     const structuredError = fail({
-      message: "app.api.agent.chat.aiStream.errors.streamError" as const,
-      errorType: ErrorResponseTypes.UNKNOWN_ERROR,
-      messageParams: { error: errorMessage },
+      message: translationKey,
+      errorType,
     });
 
     const errorMessageId = crypto.randomUUID();
@@ -93,10 +151,12 @@ export class StreamErrorHandler {
     }
 
     // Emit error event to update UI state
-    const errorEvent = createStreamEvent.error({
-      code: "STREAM_ERROR",
-      message: errorMessage,
-    });
+    const errorEvent = createStreamEvent.error(
+      fail({
+        message: errorMessage,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      }),
+    );
     controller.enqueue(encoder.encode(formatSSEEvent(errorEvent)));
     controller.close();
   }

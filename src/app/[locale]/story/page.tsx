@@ -8,8 +8,6 @@ import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
-import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
-import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
@@ -108,23 +106,6 @@ export default async function HomePage({
     );
   }
 
-  // Check if user is authenticated (not public)
-  const isAuthenticated = user !== undefined && !user.isPublic;
-
-  // For authenticated users, fetch subscription data
-  let subscription: SubscriptionGetResponseOutput | null = null;
-
-  if (isAuthenticated) {
-    const subscriptionResponse = await SubscriptionRepository.getSubscription(
-      user.id,
-      logger,
-      locale,
-    );
-    subscription = subscriptionResponse?.success
-      ? subscriptionResponse.data
-      : null;
-  }
-
   // Fetch stats for hero section (cached for 24h)
   const activeUserCountResponse =
     await UserRepository.getActiveUserCount(logger);
@@ -172,12 +153,7 @@ export default async function HomePage({
       />
 
       {/* Pricing Section with Overview and Buy Credits */}
-      <StoryPricingSection
-        locale={locale}
-        isAuthenticated={isAuthenticated}
-        initialSubscription={subscription}
-        user={user}
-      />
+      <StoryPricingSection locale={locale} user={user} />
 
       {/* Call to Action */}
       <CallToAction locale={locale} />

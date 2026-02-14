@@ -83,6 +83,9 @@ export const translations = {
           gpt35: "GPT-3.5",
           llama: "Llama 3",
           cost: "{{count}} credits",
+          showLegacy: "Show Legacy Models",
+          hideLegacy: "Hide Legacy Models",
+          legacyBadge: "Legacy",
         },
         features: {
           title: "Features",

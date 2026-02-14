@@ -24,12 +24,19 @@ export interface StreamingMessage {
   depth: number;
   model: ModelId | null;
   character: string | null;
+  promptTokens?: number;
+  completionTokens?: number;
   totalTokens?: number;
   finishReason?: string | null;
+  creditCost?: number;
   isStreaming: boolean;
   error?: string;
   toolCall?: ToolCall;
   sequenceId?: string | null; // Links messages in the same AI response sequence
+
+  // Compacting metadata
+  isCompacting?: boolean;
+  compactedMessageCount?: number;
 }
 
 /**
@@ -54,7 +61,6 @@ interface AIStreamState {
 
   // UI state
   isStreaming: boolean;
-  error: string | null;
 
   // Actions
   startStream: (streamId: string) => void;
@@ -67,6 +73,14 @@ interface AIStreamState {
   addMessage: (message: StreamingMessage) => void;
   updateMessageContent: (messageId: string, content: string) => void;
   setToolCall: (messageId: string, toolCall: ToolCall) => void;
+  updateTokens: (
+    messageId: string,
+    promptTokens: number,
+    completionTokens: number,
+    totalTokens: number,
+    creditCost: number,
+    finishReason: string | null,
+  ) => void;
   finalizeMessage: (
     messageId: string,
     content: string,
@@ -74,10 +88,6 @@ interface AIStreamState {
     finishReason?: string | null,
   ) => void;
   setMessageError: (messageId: string, error: string) => void;
-
-  // Error handling
-  setError: (error: string | null) => void;
-  clearError: () => void;
 
   // Reset
   reset: () => void;
@@ -92,14 +102,12 @@ export const useAIStreamStore = create<AIStreamState>((set) => ({
   streamingMessages: {},
   threads: {},
   isStreaming: false,
-  error: null,
 
   // Stream control
   startStream: (streamId: string): void =>
     set({
       activeStreamId: streamId,
       isStreaming: true,
-      error: null,
     }),
 
   stopStream: (): void =>
@@ -162,6 +170,35 @@ export const useAIStreamStore = create<AIStreamState>((set) => ({
       };
     }),
 
+  updateTokens: (
+    messageId: string,
+    promptTokens: number,
+    completionTokens: number,
+    totalTokens: number,
+    creditCost: number,
+    finishReason: string | null,
+  ): void =>
+    set((state) => {
+      const message = state.streamingMessages[messageId];
+      if (!message) {
+        return state;
+      }
+
+      return {
+        streamingMessages: {
+          ...state.streamingMessages,
+          [messageId]: {
+            ...message,
+            promptTokens,
+            completionTokens,
+            totalTokens,
+            creditCost,
+            finishReason,
+          },
+        },
+      };
+    }),
+
   finalizeMessage: (
     messageId: string,
     content: string,
@@ -205,20 +242,7 @@ export const useAIStreamStore = create<AIStreamState>((set) => ({
           },
         },
         isStreaming: false,
-        error,
       };
-    }),
-
-  // Error handling
-  setError: (error: string | null): void =>
-    set({
-      error,
-      isStreaming: false,
-    }),
-
-  clearError: (): void =>
-    set({
-      error: null,
     }),
 
   // Reset
@@ -228,6 +252,5 @@ export const useAIStreamStore = create<AIStreamState>((set) => ({
       streamingMessages: {},
       threads: {},
       isStreaming: false,
-      error: null,
     }),
 }));

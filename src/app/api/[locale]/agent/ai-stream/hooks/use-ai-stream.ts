@@ -4,6 +4,10 @@
  * NO Vercel AI SDK - custom implementation with 100% type safety
  */
 
+import {
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { toast } from "next-vibe-ui/hooks/use-toast";
 import { useCallback, useRef } from "react";
@@ -15,21 +19,24 @@ import type {
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
+import { serializeError } from "../../ai-stream/error-utils";
 import { ChatMessageRole } from "../../chat/enum";
 import { useChatStore } from "../../chat/hooks/store";
 import type { AiStreamPostRequestOutput } from "../definition";
 import {
   type AudioChunkEventData,
+  type CompactingDeltaEventData,
+  type CompactingDoneEventData,
   type ContentDeltaEventData,
   type ContentDoneEventData,
   type CreditsDeductedEventData,
-  type ErrorEventData,
   type FilesUploadedEventData,
   type MessageCreatedEventData,
   parseSSEEvent,
   type ReasoningDeltaEventData,
   type ReasoningDoneEventData,
   StreamEventType,
+  type TokensUpdatedEventData,
   type ToolCallEventData,
   type ToolResultEventData,
   type ToolWaitingEventData,
@@ -50,7 +57,6 @@ export interface StreamOptions {
   onToolWaiting?: (data: ToolWaitingEventData) => void;
   onToolResult?: (data: ToolResultEventData) => void;
   onCreditsDeducted?: (data: CreditsDeductedEventData) => void;
-  onError?: (data: ErrorEventData) => void;
   signal?: AbortSignal;
 }
 
@@ -64,7 +70,6 @@ export interface UseAIStreamReturn {
   ) => Promise<void>;
   stopStream: () => void;
   isStreaming: boolean;
-  error: string | null;
   streamingMessages: Record<string, StreamingMessage>;
   threads: Record<string, StreamingThread>;
 }
@@ -103,6 +108,8 @@ function handleMessageCreatedEvent(params: {
     isStreaming: eventData.role === ChatMessageRole.ASSISTANT,
     sequenceId: eventData.sequenceId,
     toolCall,
+    isCompacting: eventData.metadata?.isCompacting,
+    compactedMessageCount: eventData.metadata?.compactedMessageCount,
   });
 
   const streamThread = useAIStreamStore.getState().threads[eventData.threadId];
@@ -412,7 +419,64 @@ export function useAIStream(
             errorCode,
           });
 
-          store.setError(errorMessage);
+          // Create ERROR message in chat so users can see what went wrong
+          const activeThreadId = data.threadId;
+
+          if (activeThreadId) {
+            // Create structured error response
+            const errorResponse = fail({
+              message: errorMessage as Parameters<typeof fail>[0]["message"],
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            });
+
+            // Import chat store dynamically to avoid circular dependencies
+            void import("../../chat/hooks/store")
+              .then(({ useChatStore }) => {
+                const errorMessageId = crypto.randomUUID();
+
+                // Add error message to chat store with serialized ErrorResponseType
+                useChatStore.getState().addMessage({
+                  id: errorMessageId,
+                  threadId: activeThreadId,
+                  role: ChatMessageRole.ERROR,
+                  content: serializeError(errorResponse),
+                  parentId: null,
+                  depth: 0,
+                  sequenceId: null,
+                  authorId: "system",
+                  authorName: null,
+                  authorAvatar: null,
+                  authorColor: null,
+                  isAI: false,
+                  model: null,
+                  character: null,
+                  errorType: "HTTP_ERROR",
+                  errorMessage,
+                  errorCode: errorCode ?? null,
+                  edited: false,
+                  originalId: null,
+                  tokens: null,
+                  metadata: {},
+                  upvotes: 0,
+                  downvotes: 0,
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                  searchVector: null,
+                });
+
+                logger.info("Created ERROR message in chat", {
+                  messageId: errorMessageId,
+                  threadId: activeThreadId,
+                  error: errorMessage,
+                });
+                return undefined;
+              })
+              .catch((error: Error) => {
+                logger.error("Failed to create error message in chat", {
+                  error: parseError(error).message,
+                });
+              });
+          }
 
           // Show persistent toast notification for stream errors
           // The errorMessage from the server is already a translation key, just use t()
@@ -428,12 +492,64 @@ export function useAIStream(
         }
 
         if (!response.body) {
-          const errorMessage = t(
-            "app.api.agent.chat.aiStream.route.errors.noResponseBody",
-          );
           logger.error("Stream response has no body");
-          store.setError(errorMessage);
-          // Don't create error messages as chat messages - they're displayed in the global error banner
+
+          // Create ERROR message in chat so users can see what went wrong
+          const activeThreadId = data.threadId;
+
+          if (activeThreadId) {
+            const errorResponse = fail({
+              message:
+                "app.api.agent.chat.aiStream.route.errors.noResponseBody",
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            });
+
+            void import("../../chat/hooks/store")
+              .then(({ useChatStore }) => {
+                const errorMessageId = crypto.randomUUID();
+
+                useChatStore.getState().addMessage({
+                  id: errorMessageId,
+                  threadId: activeThreadId,
+                  role: ChatMessageRole.ERROR,
+                  content: serializeError(errorResponse),
+                  parentId: null,
+                  depth: 0,
+                  sequenceId: null,
+                  authorId: "system",
+                  authorName: null,
+                  authorAvatar: null,
+                  authorColor: null,
+                  isAI: false,
+                  model: null,
+                  character: null,
+                  errorType: "STREAM_ERROR",
+                  errorMessage: errorResponse.message,
+                  errorCode: null,
+                  edited: false,
+                  originalId: null,
+                  tokens: null,
+                  metadata: {},
+                  upvotes: 0,
+                  downvotes: 0,
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                  searchVector: null,
+                });
+
+                logger.info("Created ERROR message in chat (no body)", {
+                  messageId: errorMessageId,
+                  threadId: activeThreadId,
+                });
+                return undefined;
+              })
+              .catch((error: Error) => {
+                logger.error("Failed to create error message in chat", {
+                  error: parseError(error).message,
+                });
+              });
+          }
+
           store.stopStream();
           return;
         }
@@ -1016,6 +1132,28 @@ export function useAIStream(
                 break;
               }
 
+              case StreamEventType.TOKENS_UPDATED: {
+                const eventData = event.data as TokensUpdatedEventData;
+                logger.debug("[TOKENS_UPDATED] Updating message tokens", {
+                  messageId: eventData.messageId,
+                  promptTokens: eventData.promptTokens,
+                  completionTokens: eventData.completionTokens,
+                  totalTokens: eventData.totalTokens,
+                  creditCost: eventData.creditCost,
+                });
+
+                // Update streaming store with token metadata
+                store.updateTokens(
+                  eventData.messageId,
+                  eventData.promptTokens,
+                  eventData.completionTokens,
+                  eventData.totalTokens,
+                  eventData.creditCost,
+                  eventData.finishReason,
+                );
+                break;
+              }
+
               case StreamEventType.AUDIO_CHUNK: {
                 const eventData = event.data as AudioChunkEventData;
                 logger.debug("[AUDIO_CHUNK] Received", {
@@ -1045,9 +1183,159 @@ export function useAIStream(
                 break;
               }
 
+              case StreamEventType.COMPACTING_DELTA: {
+                const eventData = event.data as CompactingDeltaEventData;
+                // Get fresh state from store
+                const currentMessage =
+                  useAIStreamStore.getState().streamingMessages[
+                    eventData.messageId
+                  ];
+
+                if (currentMessage) {
+                  currentMessage.content += eventData.delta;
+                  store.updateMessageContent(
+                    eventData.messageId,
+                    currentMessage.content,
+                  );
+                }
+
+                // Update chat store with delta for real-time display
+                void (async (): Promise<void> => {
+                  try {
+                    const { useChatStore } =
+                      await import("../../chat/hooks/store");
+                    const chatMessage =
+                      useChatStore.getState().messages[eventData.messageId];
+                    if (chatMessage) {
+                      const newContent =
+                        (chatMessage.content || "") + eventData.delta;
+                      const isIncognito =
+                        chatMessage.threadId &&
+                        useChatStore.getState().threads[chatMessage.threadId]
+                          ?.rootFolderId === "incognito";
+
+                      useChatStore
+                        .getState()
+                        .updateMessage(eventData.messageId, {
+                          content: newContent,
+                          // Preserve compacting metadata during streaming
+                          metadata: {
+                            ...chatMessage.metadata,
+                            isStreaming: true,
+                          },
+                        });
+
+                      // Save to localStorage for incognito mode
+                      if (isIncognito) {
+                        const { saveMessage } =
+                          await import("../../chat/incognito/storage");
+                        saveMessage({
+                          ...chatMessage,
+                          content: newContent,
+                          metadata: {
+                            ...chatMessage.metadata,
+                            isStreaming: true,
+                          },
+                        });
+                      }
+                    }
+                  } catch (error) {
+                    logger.error(
+                      "[COMPACTING_DELTA] Failed to update chat store",
+                      error instanceof Error ? error : new Error(String(error)),
+                    );
+                  }
+                })();
+
+                break;
+              }
+
+              case StreamEventType.COMPACTING_DONE: {
+                const eventData = event.data as CompactingDoneEventData;
+                logger.debug(
+                  "[COMPACTING_DONE] Finalizing compacting message",
+                  {
+                    messageId: eventData.messageId,
+                    contentLength: eventData.content.length,
+                  },
+                );
+
+                const currentMessage =
+                  useAIStreamStore.getState().streamingMessages[
+                    eventData.messageId
+                  ];
+
+                if (currentMessage) {
+                  currentMessage.content = eventData.content;
+                  currentMessage.isStreaming = false;
+                  currentMessage.isCompacting = true;
+                  currentMessage.compactedMessageCount =
+                    eventData.metadata.compactedMessageCount;
+                  store.updateMessageContent(
+                    eventData.messageId,
+                    eventData.content,
+                  );
+                }
+
+                // Update chat store with compacting metadata
+                void (async (): Promise<void> => {
+                  try {
+                    const { useChatStore } =
+                      await import("../../chat/hooks/store");
+
+                    const chatMessage =
+                      useChatStore.getState().messages[eventData.messageId];
+                    const isIncognito =
+                      chatMessage?.threadId &&
+                      useChatStore.getState().threads[chatMessage.threadId]
+                        ?.rootFolderId === "incognito";
+
+                    useChatStore.getState().updateMessage(eventData.messageId, {
+                      content: eventData.content,
+                      metadata: {
+                        isCompacting: true,
+                        compactedMessageCount:
+                          eventData.metadata.compactedMessageCount,
+                        isStreaming: false,
+                      },
+                    });
+
+                    // Save to localStorage for incognito mode
+                    if (isIncognito && chatMessage) {
+                      const { saveMessage } =
+                        await import("../../chat/incognito/storage");
+                      saveMessage({
+                        ...chatMessage,
+                        content: eventData.content,
+                        metadata: {
+                          ...chatMessage.metadata,
+                          isCompacting: true,
+                          compactedMessageCount:
+                            eventData.metadata.compactedMessageCount,
+                          isStreaming: false,
+                        },
+                      });
+                    }
+
+                    logger.debug("[COMPACTING_DONE] Updated chat store", {
+                      messageId: eventData.messageId,
+                      isIncognito,
+                    });
+                  } catch (error) {
+                    logger.error(
+                      "[COMPACTING_DONE] Failed to update chat store",
+                      error instanceof Error ? error : new Error(String(error)),
+                    );
+                  }
+                })();
+
+                break;
+              }
+
               case StreamEventType.ERROR: {
-                const eventData = event.data as ErrorEventData;
-                store.setError(eventData.message);
+                // ERROR events use ErrorResponseType from the server
+                // We need to convert it to match the chat message error format
+                const errorResponse = event.data;
 
                 // Create ERROR message in chat so users can see what went wrong
                 // Get the current thread ID from the active stream
@@ -1060,12 +1348,27 @@ export function useAIStream(
                     .then(({ useChatStore }) => {
                       const errorMessageId = crypto.randomUUID();
 
+                      // ErrorResponseType has a different structure than our chat error messages
+                      // Extract the relevant fields
+                      const errorMessage =
+                        "message" in errorResponse
+                          ? errorResponse.message
+                          : "Unknown error";
+                      const errorType =
+                        "errorType" in errorResponse
+                          ? errorResponse.errorType.errorKey
+                          : "STREAM_ERROR";
+                      const errorCode =
+                        "errorType" in errorResponse
+                          ? errorResponse.errorType.errorCode.toString()
+                          : null;
+
                       // Add error message to chat store
                       useChatStore.getState().addMessage({
                         id: errorMessageId,
                         threadId: activeThreadId,
                         role: ChatMessageRole.ERROR,
-                        content: eventData.message,
+                        content: errorMessage,
                         parentId: null,
                         depth: 0,
                         sequenceId: null,
@@ -1076,9 +1379,9 @@ export function useAIStream(
                         isAI: false,
                         model: null,
                         character: null,
-                        errorType: eventData.code ?? "STREAM_ERROR",
-                        errorMessage: eventData.message,
-                        errorCode: eventData.code ?? null,
+                        errorType,
+                        errorMessage,
+                        errorCode,
                         edited: false,
                         originalId: null,
                         tokens: null,
@@ -1093,7 +1396,7 @@ export function useAIStream(
                       logger.info("Created ERROR message in chat", {
                         messageId: errorMessageId,
                         threadId: activeThreadId,
-                        error: eventData.message,
+                        error: errorMessage,
                       });
                       return undefined;
                     })
@@ -1104,7 +1407,6 @@ export function useAIStream(
                     });
                 }
 
-                options.onError?.(eventData);
                 break;
               }
 
@@ -1145,8 +1447,64 @@ export function useAIStream(
             });
           } else {
             logger.error("Stream error", { error: error.message });
-            store.setError(error.message);
-            // Don't create error messages as chat messages - they're displayed in the global error banner
+
+            // Create ERROR message in chat for unexpected errors
+            const activeThreadId = data.threadId;
+
+            if (activeThreadId) {
+              const errorResponse = fail({
+                message:
+                  "app.api.agent.chat.aiStream.errors.unexpectedError" as const,
+                errorType: ErrorResponseTypes.UNKNOWN_ERROR,
+                messageParams: { error: error.message },
+              });
+
+              void import("../../chat/hooks/store")
+                .then(({ useChatStore }) => {
+                  const errorMessageId = crypto.randomUUID();
+
+                  useChatStore.getState().addMessage({
+                    id: errorMessageId,
+                    threadId: activeThreadId,
+                    role: ChatMessageRole.ERROR,
+                    content: serializeError(errorResponse),
+                    parentId: null,
+                    depth: 0,
+                    sequenceId: null,
+                    authorId: "system",
+                    authorName: null,
+                    authorAvatar: null,
+                    authorColor: null,
+                    isAI: false,
+                    model: null,
+                    character: null,
+                    errorType: "STREAM_ERROR",
+                    errorMessage: error.message,
+                    errorCode: null,
+                    edited: false,
+                    originalId: null,
+                    tokens: null,
+                    metadata: {},
+                    upvotes: 0,
+                    downvotes: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    searchVector: null,
+                  });
+
+                  logger.info("Created ERROR message in chat (exception)", {
+                    messageId: errorMessageId,
+                    threadId: activeThreadId,
+                    error: error.message,
+                  });
+                  return undefined;
+                })
+                .catch((err: Error) => {
+                  logger.error("Failed to create error message in chat", {
+                    error: parseError(err).message,
+                  });
+                });
+            }
           }
         }
         store.stopStream();
@@ -1188,7 +1546,6 @@ export function useAIStream(
     startStream,
     stopStream,
     isStreaming: store.isStreaming,
-    error: store.error,
     streamingMessages: store.streamingMessages,
     threads: store.threads,
   };

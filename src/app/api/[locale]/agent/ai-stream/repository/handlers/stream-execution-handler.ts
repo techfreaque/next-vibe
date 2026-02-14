@@ -15,10 +15,12 @@ import type {
   ModelId,
   ModelOption,
 } from "@/app/api/[locale]/agent/models/models";
+import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import { createStreamEvent, formatSSEEvent } from "../../events";
 import { MAX_TOOL_CALLS } from "../core/constants";
 import type { ProviderFactory } from "../core/provider-factory";
 import type { StreamContext } from "../core/stream-context";
@@ -47,7 +49,6 @@ export class StreamExecutionHandler {
     emittedToolResultIds: Set<string> | undefined;
     ttsHandler: StreamingTTSHandler | null;
     user: JwtPayloadType;
-    modelCost: number;
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
     logger: EndpointLogger;
@@ -69,18 +70,31 @@ export class StreamExecutionHandler {
       emittedToolResultIds,
       ttsHandler,
       user,
-      modelCost,
       controller,
       encoder,
       logger,
     } = params;
+
+    const systemWithCacheControl = systemPrompt
+      ? [
+          {
+            role: "system" as const,
+            content: systemPrompt,
+            providerOptions: {
+              openrouter: {
+                cacheControl: { type: "ephemeral" as const, ttl: "1h" },
+              },
+            },
+          },
+        ]
+      : undefined;
 
     const streamResult = aiStreamText({
       model: provider.chat(modelConfig.openRouterModel),
       messages,
       temperature: DEFAULT_TEMPERATURE,
       abortSignal: streamAbortController.signal,
-      system: systemPrompt || undefined,
+      system: systemWithCacheControl,
       ...(tools
         ? {
             tools,
@@ -121,7 +135,63 @@ export class StreamExecutionHandler {
       }
     }
 
-    // Handle stream completion - finalize message, flush TTS, deduct credits, cleanup
+    const usageData = await streamResult.usage;
+    const inputTokens = usageData.inputTokens ?? 0;
+    const outputTokens = usageData.outputTokens ?? 0;
+    const cachedInputTokens =
+      usageData.cachedInputTokens ??
+      usageData.inputTokenDetails?.cacheReadTokens ??
+      0;
+    const reasoningTokens =
+      usageData.reasoningTokens ??
+      usageData.outputTokenDetails?.reasoningTokens ??
+      0;
+    const uncachedInputTokens = inputTokens - cachedInputTokens;
+
+    const actualCreditCost = calculateCreditCost(
+      modelConfig,
+      uncachedInputTokens,
+      outputTokens,
+    );
+
+    const cachePercentage =
+      inputTokens > 0 ? Math.round((cachedInputTokens / inputTokens) * 100) : 0;
+
+    logger.info("[CACHE DEBUG] Token usage from AI response", {
+      cachePercentage: `${cachePercentage}%`,
+      cachedInputTokens,
+      uncachedInputTokens,
+      inputTokens,
+      outputTokens,
+      reasoningTokens,
+      totalTokens: usageData.totalTokens,
+      actualCreditCost,
+      model,
+      threadId,
+      rawUsageData: JSON.stringify(usageData),
+    });
+
+    const messageIdForTokens =
+      ctx.lastAssistantMessageId || ctx.currentAssistantMessageId;
+
+    if (messageIdForTokens) {
+      const finishReason = await streamResult.finishReason;
+
+      const tokensEvent = createStreamEvent.tokensUpdated({
+        messageId: messageIdForTokens,
+        promptTokens: inputTokens,
+        completionTokens: outputTokens,
+        totalTokens: usageData.totalTokens ?? 0,
+        finishReason: finishReason || null,
+        creditCost: actualCreditCost,
+      });
+      controller.enqueue(encoder.encode(formatSSEEvent(tokensEvent)));
+    } else {
+      logger.warn(
+        "Cannot emit TOKENS_UPDATED: no assistant message ID available",
+      );
+    }
+
     await StreamCompletionHandler.handleCompletion({
       ctx,
       streamResult: {
@@ -130,7 +200,7 @@ export class StreamExecutionHandler {
       },
       ttsHandler,
       user,
-      modelCost,
+      modelCost: actualCreditCost,
       model,
       isIncognito,
       controller,

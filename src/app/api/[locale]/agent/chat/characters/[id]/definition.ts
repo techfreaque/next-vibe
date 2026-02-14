@@ -246,8 +246,6 @@ const { PATCH } = createEndpoint({
         const charactersDefinition = await import("../definition");
         const { CharactersRepositoryClient } =
           await import("../repository-client");
-        const { getCreditCostFromModel } =
-          await import("../../../models/models");
 
         const characterSingleDefinitions = await import("./definition");
 
@@ -325,7 +323,6 @@ const { PATCH } = createEndpoint({
                             modelIcon: bestModel.icon,
                             modelInfo: bestModel.name,
                             modelProvider: bestModel.provider,
-                            creditCost: `${getCreditCostFromModel(bestModel)} credits`,
                           }
                         : {}),
                     };

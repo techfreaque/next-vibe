@@ -5,7 +5,7 @@
 import type { ReadableStreamDefaultController } from "node:stream/web";
 
 import type { streamText } from "ai";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -88,25 +88,38 @@ export class FinalizationHandler {
     // Try to get usage/finishReason for logging, but don't block if not available
     void Promise.all([streamResult.finishReason, streamResult.usage])
       .then(([finishReason, usage]) => {
-        logger.info("Finalized ASSISTANT message", {
+        logger.debug("Finalized ASSISTANT message", {
           messageId: currentAssistantMessageId,
           contentLength: currentAssistantContent.length,
           tokens: usage.totalTokens,
           finishReason: finishReason || "unknown",
         });
 
-        // Update with final token count if we have it
+        // Update with final token count and metadata if we have it
         if (!isIncognito && usage.totalTokens) {
+          const inputTokens = usage.inputTokens ?? 0;
+          const outputTokens = usage.outputTokens ?? 0;
+
           void db
             .update(chatMessages)
-            .set({ tokens: usage.totalTokens })
+            .set({
+              tokens: usage.totalTokens,
+              metadata: sql`COALESCE(${chatMessages.metadata}, '{}') || ${JSON.stringify(
+                {
+                  promptTokens: inputTokens,
+                  completionTokens: outputTokens,
+                  totalTokens: usage.totalTokens,
+                  finishReason: finishReason || null,
+                },
+              )}::jsonb`,
+            })
             .where(eq(chatMessages.id, currentAssistantMessageId));
         }
         return undefined;
       })
       .catch(() => {
         // Promises may not resolve during mid-stream, that's OK
-        logger.info("Finalized ASSISTANT message (usage pending)", {
+        logger.debug("Finalized ASSISTANT message (usage pending)", {
           messageId: currentAssistantMessageId,
           contentLength: currentAssistantContent.length,
         });

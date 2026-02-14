@@ -173,6 +173,7 @@ export const translations: typeof enTranslations = {
         title: "Historia kredytów",
         description: "Zobacz swoją historię transakcji kredytowych",
       },
+      emptyState: "Brak transakcji kredytowych",
       limit: {
         label: "Limit",
         description: "Maksymalna liczba transakcji do zwrócenia (1-100)",

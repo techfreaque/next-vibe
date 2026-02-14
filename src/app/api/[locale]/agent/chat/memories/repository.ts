@@ -207,7 +207,7 @@ export async function generateMemorySummary(params: {
     await updateMemoryAccess({ userId, logger });
   }
 
-  logger.info("Generated memory summary", {
+  logger.debug("Generated memory summary", {
     userId,
     memoryCount: memoriesList.length,
   });

@@ -23,6 +23,7 @@ import { Label } from "next-vibe-ui/ui/label";
 import { RangeSlider } from "next-vibe-ui/ui/range-slider";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
+import { TooltipProvider } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -46,8 +47,11 @@ import {
   modelProviders,
 } from "@/app/api/[locale]/agent/models/models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { TParams } from "@/i18n/core/static-types";
 
+import { DEFAULT_INPUT_TOKENS, DEFAULT_OUTPUT_TOKENS } from "../constants";
+import { ModelCreditDisplay } from "./model-credit-display";
 import type { FiltersModelSelection, ModelSelectionSimple } from "./types";
 
 interface ModelCardProps {
@@ -58,6 +62,7 @@ interface ModelCardProps {
   dimmed?: boolean;
   disabled?: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
+  locale: CountryLanguage;
 }
 
 function ModelCard({
@@ -68,9 +73,8 @@ function ModelCard({
   dimmed = false,
   disabled = false,
   t,
+  locale,
 }: ModelCardProps): JSX.Element {
-  const cost = getCreditCostFromModel(model);
-
   return (
     <Div
       onClick={disabled ? undefined : onClick}
@@ -113,16 +117,14 @@ function ModelCard({
       </Div>
 
       <Div className="flex items-center gap-1.5 shrink-0">
-        <Badge
-          variant={selected ? "outline" : "secondary"}
+        <ModelCreditDisplay
+          modelId={model.id}
+          variant="badge"
+          badgeVariant={selected ? "outline" : "secondary"}
           className="text-[10px] h-5"
-        >
-          {cost === 0
-            ? t("app.chat.selector.free")
-            : cost === 1
-              ? t("app.chat.selector.creditsSingle")
-              : t("app.chat.selector.creditsExact", { cost })}
-        </Badge>
+          t={t}
+          locale={locale}
+        />
         {selected && <Check className="h-4 w-4 text-primary" />}
       </Div>
     </Div>
@@ -194,6 +196,11 @@ export interface ModelSelectorProps {
    * Translation function
    */
   t: (key: string, params?: TParams) => string;
+
+  /**
+   * User's locale for currency formatting
+   */
+  locale: CountryLanguage;
 }
 
 export function ModelSelector({
@@ -202,6 +209,7 @@ export function ModelSelector({
   characterModelSelection,
   readOnly = false,
   t,
+  locale,
 }: ModelSelectorProps): JSX.Element {
   // UI state - initialize to CHARACTER_BASED if modelSelection is null and we have character defaults
   const [useCharacterBased, setUseCharacterBased] = useState(
@@ -684,7 +692,11 @@ export function ModelSelector({
           };
         }
         case ModelSortField.PRICE: {
-          const cost = getCreditCostFromModel(model);
+          const cost = getCreditCostFromModel(
+            model,
+            DEFAULT_INPUT_TOKENS,
+            DEFAULT_OUTPUT_TOKENS,
+          );
           return {
             value: cost,
             label:
@@ -747,365 +759,379 @@ export function ModelSelector({
   }, [sortedAndGroupedModels, showAllModels]);
 
   return (
-    <Div className="flex flex-col gap-4 border rounded-lg p-4">
-      {/* Model selection mode tabs */}
-      <Div className="flex items-center gap-1.5 p-1 bg-muted/50 rounded-lg">
-        {characterModelSelection && (
+    <TooltipProvider>
+      <Div className="flex flex-col gap-4 border rounded-lg p-4">
+        {/* Model selection mode tabs */}
+        <Div className="flex items-center gap-1.5 p-1 bg-muted/50 rounded-lg">
+          {characterModelSelection && (
+            <Button
+              type="button"
+              variant={
+                mode === ModelSelectionType.CHARACTER_BASED
+                  ? "default"
+                  : "ghost"
+              }
+              size="sm"
+              className="flex-1 h-8 text-xs"
+              onClick={() =>
+                handleModeChange(ModelSelectionType.CHARACTER_BASED)
+              }
+              disabled={readOnly}
+            >
+              {t("app.chat.selector.characterMode")}
+            </Button>
+          )}
           <Button
             type="button"
-            variant={
-              mode === ModelSelectionType.CHARACTER_BASED ? "default" : "ghost"
-            }
+            variant={mode === ModelSelectionType.FILTERS ? "default" : "ghost"}
             size="sm"
             className="flex-1 h-8 text-xs"
-            onClick={() => handleModeChange(ModelSelectionType.CHARACTER_BASED)}
+            onClick={() => handleModeChange(ModelSelectionType.FILTERS)}
             disabled={readOnly}
           >
-            {t("app.chat.selector.characterMode")}
+            {t("app.chat.selector.autoMode")}
           </Button>
-        )}
-        <Button
-          type="button"
-          variant={mode === ModelSelectionType.FILTERS ? "default" : "ghost"}
-          size="sm"
-          className="flex-1 h-8 text-xs"
-          onClick={() => handleModeChange(ModelSelectionType.FILTERS)}
-          disabled={readOnly}
-        >
-          {t("app.chat.selector.autoMode")}
-        </Button>
-        <Button
-          type="button"
-          variant={mode === ModelSelectionType.MANUAL ? "default" : "ghost"}
-          size="sm"
-          className="flex-1 h-8 text-xs"
-          onClick={() => handleModeChange(ModelSelectionType.MANUAL)}
-          disabled={readOnly}
-        >
-          {t("app.chat.selector.manualMode")}
-        </Button>
-      </Div>
-
-      {/* Mode description */}
-      <Span className="text-xs text-center text-muted-foreground/70 -mt-2">
-        {mode === ModelSelectionType.CHARACTER_BASED
-          ? t("app.chat.selector.characterBasedModeDescription")
-          : mode === ModelSelectionType.FILTERS
-            ? t("app.chat.selector.autoModeDescription")
-            : t("app.chat.selector.manualModeDescription")}
-      </Span>
-
-      <Separator className="my-1" />
-
-      {/* Model preview card */}
-      {bestModel ? (
-        <Div className="sticky top-0 z-15 flex items-start gap-3 p-3 bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 border-2 border-primary/30 rounded-xl shadow-lg backdrop-blur-sm">
-          <Div className="w-10 h-10 rounded-lg bg-primary/30 flex items-center justify-center shrink-0 shadow-inner">
-            <Icon icon={bestModel.icon} className="h-5 w-5 text-primary" />
-          </Div>
-          <Div className="flex-1 min-w-0">
-            <Span className="block text-[10px] text-primary/80 uppercase tracking-wider font-bold mb-1">
-              {mode === ModelSelectionType.FILTERS
-                ? t("app.chat.selector.autoSelectedModel")
-                : mode === ModelSelectionType.MANUAL
-                  ? t("app.chat.selector.manualSelectedModel")
-                  : t("app.chat.selector.characterSelectedModel")}
-            </Span>
-            <Span className="text-sm font-bold text-primary block truncate">
-              {bestModel.name}
-            </Span>
-            <Span className="text-xs text-muted-foreground">
-              {bestModel.provider && modelProviders[bestModel.provider]
-                ? modelProviders[bestModel.provider].name
-                : "Unknown"}
-            </Span>
-          </Div>
-          <Badge
-            variant="secondary"
-            className="text-[10px] h-5 shrink-0 bg-background/60"
+          <Button
+            type="button"
+            variant={mode === ModelSelectionType.MANUAL ? "default" : "ghost"}
+            size="sm"
+            className="flex-1 h-8 text-xs"
+            onClick={() => handleModeChange(ModelSelectionType.MANUAL)}
+            disabled={readOnly}
           >
-            {(() => {
-              const cost = getCreditCostFromModel(bestModel);
-              return cost === 0
-                ? t("app.chat.selector.free")
-                : cost === 1
-                  ? t("app.chat.selector.creditsSingle")
-                  : t("app.chat.selector.creditsExact", { cost });
-            })()}
-          </Badge>
+            {t("app.chat.selector.manualMode")}
+          </Button>
         </Div>
-      ) : (
-        <Div className="flex items-center gap-2 p-3 bg-destructive/10 border-2 border-destructive/30 rounded-xl">
-          <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
-          <Span className="text-xs font-medium text-destructive">
-            {mode === ModelSelectionType.MANUAL
-              ? t("app.chat.selector.selectModelBelow")
-              : t("app.chat.selector.noModelsWarning")}
-          </Span>
+
+        {/* Mode description */}
+        <Span className="text-xs text-center text-muted-foreground/70 -mt-2">
+          {mode === ModelSelectionType.CHARACTER_BASED
+            ? t("app.chat.selector.characterBasedModeDescription")
+            : mode === ModelSelectionType.FILTERS
+              ? t("app.chat.selector.autoModeDescription")
+              : t("app.chat.selector.manualModeDescription")}
+        </Span>
+
+        <Separator className="my-1" />
+
+        {/* Model preview card */}
+        {bestModel ? (
+          <Div className="sticky top-0 z-15 flex items-start gap-3 p-3 bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 border-2 border-primary/30 rounded-xl shadow-lg backdrop-blur-sm">
+            <Div className="w-10 h-10 rounded-lg bg-primary/30 flex items-center justify-center shrink-0 shadow-inner">
+              <Icon icon={bestModel.icon} className="h-5 w-5 text-primary" />
+            </Div>
+            <Div className="flex-1 min-w-0">
+              <Span className="block text-[10px] text-primary/80 uppercase tracking-wider font-bold mb-1">
+                {mode === ModelSelectionType.FILTERS
+                  ? t("app.chat.selector.autoSelectedModel")
+                  : mode === ModelSelectionType.MANUAL
+                    ? t("app.chat.selector.manualSelectedModel")
+                    : t("app.chat.selector.characterSelectedModel")}
+              </Span>
+              <Span className="text-sm font-bold text-primary block truncate">
+                {bestModel.name}
+              </Span>
+              <Span className="text-xs text-muted-foreground">
+                {bestModel.provider && modelProviders[bestModel.provider]
+                  ? modelProviders[bestModel.provider].name
+                  : "Unknown"}
+              </Span>
+            </Div>
+            <ModelCreditDisplay
+              modelId={bestModel.id}
+              variant="badge"
+              badgeVariant="secondary"
+              className="text-[10px] h-5 shrink-0 bg-background/60"
+              t={t}
+              locale={locale}
+            />
+          </Div>
+        ) : (
+          <Div className="flex items-center gap-2 p-3 bg-destructive/10 border-2 border-destructive/30 rounded-xl">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+            <Span className="text-xs font-medium text-destructive">
+              {mode === ModelSelectionType.MANUAL
+                ? t("app.chat.selector.selectModelBelow")
+                : t("app.chat.selector.noModelsWarning")}
+            </Span>
+          </Div>
+        )}
+
+        {/* Filter sliders */}
+        <Div className="flex flex-col gap-3.5">
+          <RangeSlider
+            options={INTELLIGENCE_DISPLAY}
+            minIndex={intelligenceIndices.min}
+            maxIndex={intelligenceIndices.max}
+            onChange={handleIntelligenceChange}
+            minLabel={t(
+              "app.api.agent.chat.characters.post.intelligenceRange.minLabel",
+            )}
+            maxLabel={t(
+              "app.api.agent.chat.characters.post.intelligenceRange.maxLabel",
+            )}
+            disabled={readOnly}
+            t={t}
+          />
+
+          <RangeSlider
+            options={CONTENT_DISPLAY}
+            minIndex={contentIndices.min}
+            maxIndex={contentIndices.max}
+            onChange={handleContentChange}
+            minLabel={t(
+              "app.api.agent.chat.characters.post.contentRange.minLabel",
+            )}
+            maxLabel={t(
+              "app.api.agent.chat.characters.post.contentRange.maxLabel",
+            )}
+            disabled={readOnly}
+            t={t}
+          />
+
+          <RangeSlider
+            options={SPEED_DISPLAY}
+            minIndex={speedIndices.min}
+            maxIndex={speedIndices.max}
+            onChange={handleSpeedChange}
+            minLabel={t(
+              "app.api.agent.chat.characters.post.speedRange.minLabel",
+            )}
+            maxLabel={t(
+              "app.api.agent.chat.characters.post.speedRange.maxLabel",
+            )}
+            disabled={readOnly}
+            t={t}
+          />
+
+          <RangeSlider
+            options={PRICE_DISPLAY}
+            minIndex={priceIndices.min}
+            maxIndex={priceIndices.max}
+            onChange={handlePriceChange}
+            minLabel={t(
+              "app.api.agent.chat.characters.post.priceRange.minLabel",
+            )}
+            maxLabel={t(
+              "app.api.agent.chat.characters.post.priceRange.maxLabel",
+            )}
+            disabled={readOnly}
+            t={t}
+          />
         </Div>
-      )}
 
-      {/* Filter sliders */}
-      <Div className="flex flex-col gap-3.5">
-        <RangeSlider
-          options={INTELLIGENCE_DISPLAY}
-          minIndex={intelligenceIndices.min}
-          maxIndex={intelligenceIndices.max}
-          onChange={handleIntelligenceChange}
-          minLabel={t(
-            "app.api.agent.chat.characters.post.intelligenceRange.minLabel",
-          )}
-          maxLabel={t(
-            "app.api.agent.chat.characters.post.intelligenceRange.maxLabel",
-          )}
-          disabled={readOnly}
-          t={t}
-        />
+        {/* Models list */}
+        <Div className="flex flex-col gap-3">
+          {/* Filter and Sort Controls */}
+          <Div className="flex items-center justify-between gap-2 px-1">
+            <Label className="text-xs font-medium text-muted-foreground">
+              {showUnfilteredModels
+                ? t("app.chat.selector.allModelsCount", {
+                    count: Object.values(modelOptions).length,
+                  })
+                : t("app.chat.selector.filteredModelsCount", {
+                    count: filteredModels.length,
+                  })}
+            </Label>
+            <Div className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs gap-1"
+                onClick={() => {
+                  setShowUnfilteredModels(!showUnfilteredModels);
+                }}
+                disabled={readOnly}
+              >
+                <Filter className="h-3 w-3" />
+                {showUnfilteredModels
+                  ? t("app.chat.selector.showFiltered")
+                  : t("app.chat.selector.showAllModels", {
+                      count: Object.values(modelOptions).length,
+                    })}
+              </Button>
+            </Div>
+          </Div>
 
-        <RangeSlider
-          options={CONTENT_DISPLAY}
-          minIndex={contentIndices.min}
-          maxIndex={contentIndices.max}
-          onChange={handleContentChange}
-          minLabel={t(
-            "app.api.agent.chat.characters.post.contentRange.minLabel",
-          )}
-          maxLabel={t(
-            "app.api.agent.chat.characters.post.contentRange.maxLabel",
-          )}
-          disabled={readOnly}
-          t={t}
-        />
-
-        <RangeSlider
-          options={SPEED_DISPLAY}
-          minIndex={speedIndices.min}
-          maxIndex={speedIndices.max}
-          onChange={handleSpeedChange}
-          minLabel={t("app.api.agent.chat.characters.post.speedRange.minLabel")}
-          maxLabel={t("app.api.agent.chat.characters.post.speedRange.maxLabel")}
-          disabled={readOnly}
-          t={t}
-        />
-
-        <RangeSlider
-          options={PRICE_DISPLAY}
-          minIndex={priceIndices.min}
-          maxIndex={priceIndices.max}
-          onChange={handlePriceChange}
-          minLabel={t("app.api.agent.chat.characters.post.priceRange.minLabel")}
-          maxLabel={t("app.api.agent.chat.characters.post.priceRange.maxLabel")}
-          disabled={readOnly}
-          t={t}
-        />
-      </Div>
-
-      {/* Models list */}
-      <Div className="flex flex-col gap-3">
-        {/* Filter and Sort Controls */}
-        <Div className="flex items-center justify-between gap-2 px-1">
-          <Label className="text-xs font-medium text-muted-foreground">
-            {showUnfilteredModels
-              ? t("app.chat.selector.allModelsCount", {
-                  count: Object.values(modelOptions).length,
-                })
-              : t("app.chat.selector.filteredModelsCount", {
-                  count: filteredModels.length,
-                })}
-          </Label>
-          <Div className="flex items-center gap-1">
+          {/* Sort Controls */}
+          <Div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg border">
+            <Label className="text-[11px] font-medium text-muted-foreground shrink-0">
+              {t("app.chat.selector.sortBy")}:
+            </Label>
+            <Div className="flex items-center gap-1 flex-wrap flex-1">
+              {ModelSortFieldOptions.map((option) => (
+                <Button
+                  key={option.value}
+                  type="button"
+                  variant={sortBy === option.value ? "default" : "ghost"}
+                  size="sm"
+                  className="h-6 text-[11px] px-2"
+                  onClick={() => handleSortFieldChange(option.value)}
+                  disabled={readOnly}
+                >
+                  {t(option.label)}
+                </Button>
+              ))}
+            </Div>
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              className="h-7 text-xs gap-1"
-              onClick={() => {
-                setShowUnfilteredModels(!showUnfilteredModels);
-              }}
-              disabled={readOnly}
+              className="h-6 w-6 p-0 shrink-0"
+              onClick={handleSortDirectionToggle}
+              disabled={!sortBy || readOnly}
             >
-              <Filter className="h-3 w-3" />
-              {showUnfilteredModels
-                ? t("app.chat.selector.showFiltered")
-                : t("app.chat.selector.showAllModels", {
-                    count: Object.values(modelOptions).length,
-                  })}
+              {sortDirection === ModelSortDirection.ASC ? (
+                <ArrowUp className="h-3.5 w-3.5" />
+              ) : (
+                <ArrowDown className="h-3.5 w-3.5" />
+              )}
             </Button>
           </Div>
-        </Div>
 
-        {/* Sort Controls */}
-        <Div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg border">
-          <Label className="text-[11px] font-medium text-muted-foreground shrink-0">
-            {t("app.chat.selector.sortBy")}:
-          </Label>
-          <Div className="flex items-center gap-1 flex-wrap flex-1">
-            {ModelSortFieldOptions.map((option) => (
-              <Button
-                key={option.value}
-                type="button"
-                variant={sortBy === option.value ? "default" : "ghost"}
-                size="sm"
-                className="h-6 text-[11px] px-2"
-                onClick={() => handleSortFieldChange(option.value)}
-                disabled={readOnly}
-              >
-                {t(option.label)}
-              </Button>
-            ))}
-          </Div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-6 w-6 p-0 shrink-0"
-            onClick={handleSortDirectionToggle}
-            disabled={!sortBy || readOnly}
-          >
-            {sortDirection === ModelSortDirection.ASC ? (
-              <ArrowUp className="h-3.5 w-3.5" />
-            ) : (
-              <ArrowDown className="h-3.5 w-3.5" />
-            )}
-          </Button>
-        </Div>
-
-        {/* Model list */}
-        {Array.isArray(displayModels) ? (
-          // Ungrouped list
-          displayModels.length > 0 ? (
-            <Div className="flex flex-col gap-2">
-              {displayModels.map((model: ModelOption) => {
-                const isOutsideFilter =
-                  showUnfilteredModels &&
-                  !filteredModels.some((m: ModelOption) => m.id === model.id);
-                return (
-                  <ModelCard
-                    key={model.id}
-                    model={model}
-                    isBest={model.id === bestFilteredModel?.id}
-                    selected={
-                      mode === ModelSelectionType.MANUAL &&
-                      manualModelId === model.id
-                    }
-                    onClick={() => handleModelSelect(model.id)}
-                    dimmed={isOutsideFilter}
+          {/* Model list */}
+          {Array.isArray(displayModels) ? (
+            // Ungrouped list
+            displayModels.length > 0 ? (
+              <Div className="flex flex-col gap-2">
+                {displayModels.map((model: ModelOption) => {
+                  const isOutsideFilter =
+                    showUnfilteredModels &&
+                    !filteredModels.some((m: ModelOption) => m.id === model.id);
+                  return (
+                    <ModelCard
+                      key={model.id}
+                      model={model}
+                      isBest={model.id === bestFilteredModel?.id}
+                      selected={
+                        mode === ModelSelectionType.MANUAL &&
+                        manualModelId === model.id
+                      }
+                      onClick={() => handleModelSelect(model.id)}
+                      dimmed={isOutsideFilter}
+                      disabled={readOnly}
+                      t={t}
+                      locale={locale}
+                    />
+                  );
+                })}
+                {modelsToShow.length > 3 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="w-full h-8 text-xs"
+                    onClick={() => setShowAllModels(!showAllModels)}
                     disabled={readOnly}
-                    t={t}
-                  />
-                );
-              })}
-              {modelsToShow.length > 3 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="w-full h-8 text-xs"
-                  onClick={() => setShowAllModels(!showAllModels)}
-                  disabled={readOnly}
-                >
-                  {showAllModels ? (
-                    <>
-                      <ChevronUp className="h-3 w-3 mr-1" />
-                      {t("app.chat.selector.showLess")}
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="h-3 w-3 mr-1" />
-                      {t("app.chat.selector.showMore", {
-                        count: modelsToShow.length - 3,
-                      })}
-                    </>
-                  )}
-                </Button>
+                  >
+                    {showAllModels ? (
+                      <>
+                        <ChevronUp className="h-3 w-3 mr-1" />
+                        {t("app.chat.selector.showLess")}
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="h-3 w-3 mr-1" />
+                        {t("app.chat.selector.showMore", {
+                          count: modelsToShow.length - 3,
+                        })}
+                      </>
+                    )}
+                  </Button>
+                )}
+              </Div>
+            ) : (
+              <Div className="p-4 text-center text-sm text-muted-foreground border rounded-lg">
+                {t("app.chat.selector.noMatchingModels")}
+              </Div>
+            )
+          ) : (
+            // Grouped list
+            <Div className="flex flex-col gap-4">
+              {Object.entries(displayModels).map(
+                ([groupLabel, groupModels]) => {
+                  const models = groupModels as ModelOption[];
+
+                  // Separate legacy and non-legacy models
+                  const nonLegacyModels = models.filter(
+                    (model) => !model.utilities.includes(ModelUtility.LEGACY),
+                  );
+                  const legacyModels = models.filter((model) =>
+                    model.utilities.includes(ModelUtility.LEGACY),
+                  );
+
+                  const showingLegacy = showLegacyByGroup[groupLabel] ?? false;
+                  const visibleModels = showingLegacy
+                    ? models
+                    : nonLegacyModels;
+
+                  return (
+                    <Div key={groupLabel} className="flex flex-col gap-2">
+                      <Div className="flex items-center gap-2 px-1">
+                        <Separator className="flex-1" />
+                        <Label className="text-[11px] font-semibold text-primary uppercase tracking-wide">
+                          {groupLabel}
+                        </Label>
+                        <Separator className="flex-1" />
+                      </Div>
+                      <Div className="flex flex-col gap-2">
+                        {visibleModels.map((model) => {
+                          const isOutsideFilter =
+                            showUnfilteredModels &&
+                            !filteredModels.some(
+                              (m: ModelOption) => m.id === model.id,
+                            );
+                          return (
+                            <ModelCard
+                              key={model.id}
+                              model={model}
+                              isBest={model.id === bestFilteredModel?.id}
+                              selected={
+                                mode === ModelSelectionType.MANUAL &&
+                                manualModelId === model.id
+                              }
+                              onClick={() => handleModelSelect(model.id)}
+                              dimmed={isOutsideFilter}
+                              disabled={readOnly}
+                              t={t}
+                            />
+                          );
+                        })}
+
+                        {/* Show Legacy Models Button */}
+                        {legacyModels.length > 0 && !showingLegacy && (
+                          <Div
+                            className="flex items-center justify-center gap-2 p-3 rounded-xl border-2 border-dashed cursor-pointer transition-all hover:bg-muted/50 hover:border-primary/30 text-muted-foreground hover:text-foreground"
+                            onClick={() => {
+                              setShowLegacyByGroup((prev) => ({
+                                ...prev,
+                                [groupLabel]: true,
+                              }));
+                            }}
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                            <Span className="text-sm font-medium">
+                              {t(
+                                legacyModels.length === 1
+                                  ? "app.chat.selector.showLegacyModels_one"
+                                  : "app.chat.selector.showLegacyModels_other",
+                                {
+                                  count: legacyModels.length,
+                                },
+                              )}
+                            </Span>
+                          </Div>
+                        )}
+                      </Div>
+                    </Div>
+                  );
+                },
               )}
             </Div>
-          ) : (
-            <Div className="p-4 text-center text-sm text-muted-foreground border rounded-lg">
-              {t("app.chat.selector.noMatchingModels")}
-            </Div>
-          )
-        ) : (
-          // Grouped list
-          <Div className="flex flex-col gap-4">
-            {Object.entries(displayModels).map(([groupLabel, groupModels]) => {
-              const models = groupModels as ModelOption[];
-
-              // Separate legacy and non-legacy models
-              const nonLegacyModels = models.filter(
-                (model) => !model.utilities.includes(ModelUtility.LEGACY),
-              );
-              const legacyModels = models.filter((model) =>
-                model.utilities.includes(ModelUtility.LEGACY),
-              );
-
-              const showingLegacy = showLegacyByGroup[groupLabel] ?? false;
-              const visibleModels = showingLegacy ? models : nonLegacyModels;
-
-              return (
-                <Div key={groupLabel} className="flex flex-col gap-2">
-                  <Div className="flex items-center gap-2 px-1">
-                    <Separator className="flex-1" />
-                    <Label className="text-[11px] font-semibold text-primary uppercase tracking-wide">
-                      {groupLabel}
-                    </Label>
-                    <Separator className="flex-1" />
-                  </Div>
-                  <Div className="flex flex-col gap-2">
-                    {visibleModels.map((model) => {
-                      const isOutsideFilter =
-                        showUnfilteredModels &&
-                        !filteredModels.some(
-                          (m: ModelOption) => m.id === model.id,
-                        );
-                      return (
-                        <ModelCard
-                          key={model.id}
-                          model={model}
-                          isBest={model.id === bestFilteredModel?.id}
-                          selected={
-                            mode === ModelSelectionType.MANUAL &&
-                            manualModelId === model.id
-                          }
-                          onClick={() => handleModelSelect(model.id)}
-                          dimmed={isOutsideFilter}
-                          disabled={readOnly}
-                          t={t}
-                        />
-                      );
-                    })}
-
-                    {/* Show Legacy Models Button */}
-                    {legacyModels.length > 0 && !showingLegacy && (
-                      <Div
-                        className="flex items-center justify-center gap-2 p-3 rounded-xl border-2 border-dashed cursor-pointer transition-all hover:bg-muted/50 hover:border-primary/30 text-muted-foreground hover:text-foreground"
-                        onClick={() => {
-                          setShowLegacyByGroup((prev) => ({
-                            ...prev,
-                            [groupLabel]: true,
-                          }));
-                        }}
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                        <Span className="text-sm font-medium">
-                          {t(
-                            legacyModels.length === 1
-                              ? "app.chat.selector.showLegacyModels_one"
-                              : "app.chat.selector.showLegacyModels_other",
-                            {
-                              count: legacyModels.length,
-                            },
-                          )}
-                        </Span>
-                      </Div>
-                    )}
-                  </Div>
-                </Div>
-              );
-            })}
-          </Div>
-        )}
+          )}
+        </Div>
       </Div>
-    </Div>
+    </TooltipProvider>
   );
 }

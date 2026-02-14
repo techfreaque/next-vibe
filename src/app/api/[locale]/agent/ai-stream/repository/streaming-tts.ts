@@ -247,6 +247,7 @@ export class StreamingTTSHandler {
             this.user,
             creditsNeeded,
             this.logger,
+            this.locale,
           );
 
           if (deductResult.success) {

@@ -283,7 +283,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     apiProvider: ApiProvider.GAB_AI,
     description: "app.chat.models.descriptions.gabAiArya",
     parameterCount: undefined,
-    contextWindow: 8192,
+    contextWindow: 131072,
     icon: "gab-ai-logo",
     openRouterModel: "arya",
     creditCost: 7,
@@ -1410,54 +1410,68 @@ export const ModelIdOptions = Object.values(modelOptions).map((model) => ({
  * Get credit cost from a ModelOption object
  * Handles both function and number types
  * @param model - The model option object
+ * @param actualInputTokens - Actual input tokens used (required)
+ * @param actualOutputTokens - Actual output tokens used (required)
  * @returns Credit cost as a number
  */
-export function getCreditCostFromModel(model: ModelOption): number {
+export function getCreditCostFromModel(
+  model: ModelOption,
+  actualInputTokens: number,
+  actualOutputTokens: number,
+): number {
   return typeof model.creditCost === "number"
     ? model.creditCost
     : model.inputTokenCost !== undefined && model.outputTokenCost !== undefined
-      ? model.creditCost(model)
+      ? model.creditCost(model, actualInputTokens, actualOutputTokens)
       : 0;
 }
 
 /**
  * Get credit cost for a specific model
  * @param modelId - The model identifier
+ * @param actualInputTokens - Actual input tokens used (required)
+ * @param actualOutputTokens - Actual output tokens used (required)
  * @returns Credit cost (defaults to 1 if model not found)
  */
-export function getModelCost(modelId: ModelId): number {
-  try {
-    const model = getModelById(modelId);
-    return getCreditCostFromModel(model);
-  } catch {
-    // Fallback to 1 credit if model not found
-    return 1;
-  }
+export function getModelCost(
+  modelId: ModelId,
+  actualInputTokens: number,
+  actualOutputTokens: number,
+): number {
+  const model = getModelById(modelId);
+  return getCreditCostFromModel(model, actualInputTokens, actualOutputTokens);
 }
 
 /**
+ * Default token counts for credit cost estimation
+ */
+/**
  * Calculate credit cost based on token pricing
- * Uses 2000 input tokens and 800 output tokens as the base calculation
  * 1 credit = $0.01 (1 cent)
  * @param modelOption - The model option with pricing information
+ * @param actualInputTokens - Actual input tokens used (required)
+ * @param actualOutputTokens - Actual output tokens used (required)
  * @returns Calculated credit cost (0 for models with 0 token costs)
  */
-export function calculateCreditCost(modelOption: ModelOption): number {
-  const INPUT_TOKENS = 7000;
-  const OUTPUT_TOKENS = 500;
-  const DOLLARS_PER_CREDIT = 0.01; // 1 credit = $0.01 (1 cent)
-  // const
-
-  // If no token costs defined, return 0
-  if (!modelOption.inputTokenCost && !modelOption.outputTokenCost) {
-    return 0;
+export function calculateCreditCost(
+  modelOption: ModelOption,
+  actualInputTokens: number,
+  actualOutputTokens: number,
+): number {
+  // Handle credit-based models (fixed cost per message)
+  if (typeof modelOption.creditCost === "number") {
+    return modelOption.creditCost;
   }
+
+  // At this point, TypeScript knows it's ModelOptionTokenBased
+  const tokenModel = modelOption as ModelOptionTokenBased;
+  const DOLLARS_PER_CREDIT = 0.01; // 1 credit = $0.01 (1 cent)
 
   // Calculate cost in USD per message
   const inputCostPerMessage =
-    (modelOption.inputTokenCost / 1_000_000) * INPUT_TOKENS;
+    (tokenModel.inputTokenCost / 1_000_000) * actualInputTokens;
   const outputCostPerMessage =
-    (modelOption.outputTokenCost / 1_000_000) * OUTPUT_TOKENS;
+    (tokenModel.outputTokenCost / 1_000_000) * actualOutputTokens;
   const totalCostPerMessage = inputCostPerMessage + outputCostPerMessage;
 
   // Convert to credits (1 credit = $0.01)

@@ -248,6 +248,7 @@ export function ToolCallRenderer({
         platform: Platform.NEXT_PAGE,
         user,
         logger,
+        locale,
       });
 
       if (!result.success && toolCall.toolName.includes("_")) {
@@ -257,6 +258,7 @@ export function ToolCallRenderer({
           platform: Platform.NEXT_PAGE,
           user,
           logger,
+          locale,
         });
       }
 
@@ -267,6 +269,7 @@ export function ToolCallRenderer({
           platform: Platform.NEXT_PAGE,
           user,
           logger,
+          locale,
         });
       }
 

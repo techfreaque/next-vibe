@@ -167,54 +167,13 @@ export const Span = React.forwardRef<SpanRefObject, SpanProps>(
       dangerouslySetInnerHTML,
       tabIndex,
       onKeyDown,
+      ...rest
     },
     ref,
   ): JSX.Element => {
-    const spanRef = React.useRef<HTMLSpanElement>(null);
-
-    React.useImperativeHandle(ref, (): SpanRefObject => {
-      const element = spanRef.current;
-      if (!element) {
-        return {
-          ...document.createElement("span"),
-          focus: (): void => undefined,
-          blur: (): void => undefined,
-          scrollIntoView: (): void => undefined,
-          scrollTop: 0,
-          scrollHeight: 0,
-          clientHeight: 0,
-          addEventListener: (): void => undefined,
-          removeEventListener: (): void => undefined,
-        } as SpanRefObject;
-      }
-      return {
-        ...element,
-        focus: (): void => element.focus(),
-        blur: (): void => element.blur(),
-        scrollIntoView: (options?: {
-          behavior?: "auto" | "smooth";
-          block?: "start" | "center" | "end" | "nearest";
-          inline?: "start" | "center" | "end" | "nearest";
-        }): void => element.scrollIntoView(options),
-        scrollTop: element.scrollTop,
-        scrollHeight: element.scrollHeight,
-        clientHeight: element.clientHeight,
-        addEventListener: (
-          type: string,
-          listener: (event: Event) => void,
-          options?: boolean | AddEventListenerOptions,
-        ): void => element.addEventListener(type, listener, options),
-        removeEventListener: (
-          type: string,
-          listener: (event: Event) => void,
-          options?: boolean | EventListenerOptions,
-        ): void => element.removeEventListener(type, listener, options),
-      } as SpanRefObject;
-    }, []);
-
     return (
       <span
-        ref={spanRef}
+        ref={ref as React.Ref<HTMLSpanElement>}
         className={className}
         style={style}
         role={role}
@@ -233,6 +192,7 @@ export const Span = React.forwardRef<SpanRefObject, SpanProps>(
         dangerouslySetInnerHTML={dangerouslySetInnerHTML}
         tabIndex={tabIndex}
         onKeyDown={onKeyDown}
+        {...rest}
       >
         {children}
       </span>

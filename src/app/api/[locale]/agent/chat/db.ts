@@ -143,6 +143,16 @@ export interface MessageMetadata {
   // Tool call metadata (for TOOL messages)
   toolCall?: ToolCall;
 
+  // Compacting metadata (for ASSISTANT messages that contain compacted history)
+  isCompacting?: boolean;
+  compactedMessageCount?: number;
+  compactedTokenCount?: number;
+  compactedTimeRange?: {
+    start: string; // ISO timestamp
+    end: string; // ISO timestamp
+  };
+  originalMessageIds?: string[]; // For audit/debugging
+
   // Attachments
   attachments?: {
     id: string;

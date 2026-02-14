@@ -1,11 +1,4 @@
-/**
- * ToolsSetupHandler - Handles AI streaming tools setup
- */
-
-import {
-  getModelById,
-  type ModelId,
-} from "@/app/api/[locale]/agent/models/models";
+import type { ModelOption } from "@/app/api/[locale]/agent/models/models";
 import { getFullPath } from "@/app/api/[locale]/system/generated/endpoint";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
@@ -16,12 +9,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { ToolCall } from "../../../chat/db";
 
 export class ToolsSetupHandler {
-  /**
-   * Setup tools for OpenRouter streaming
-   * Returns tools and updated system prompt
-   */
   static async setupStreamingTools(params: {
-    model: ModelId;
+    modelConfig: ModelOption;
     requestedTools:
       | Array<{ toolId: string; requiresConfirmation: boolean }>
       | null
@@ -40,7 +29,7 @@ export class ToolsSetupHandler {
     toolsConfig: Map<string, { requiresConfirmation: boolean }>;
     systemPrompt: string;
   }> {
-    const modelConfig = getModelById(params.model);
+    const modelConfig = params.modelConfig;
 
     if (!modelConfig?.supportsTools) {
       return {
@@ -108,7 +97,7 @@ export class ToolsSetupHandler {
       }
     }
 
-    params.logger.info("[AI Stream] Tools loaded", {
+    params.logger.debug("[AI Stream] Tools loaded", {
       toolCount: toolsResult.tools ? Object.keys(toolsResult.tools).length : 0,
       hasTools: !!toolsResult.tools,
       requestedTools: toolIds,

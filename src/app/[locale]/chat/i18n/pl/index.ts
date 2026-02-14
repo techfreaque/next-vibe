@@ -69,6 +69,10 @@ export const translations: typeof enTranslations = {
       cancelLoading: "Anuluj ładowanie",
       answerAsAI: "Odpowiedz jako model AI",
       deleteMessage: "Usuń wiadomość",
+      actualCostUsed: "Rzeczywiste kredyty użyte dla tej wiadomości",
+      tokensUsed: "Użyte tokeny łącznie",
+      credits: "kredyty",
+      tokens: "tokeny",
     },
 
     // User Message Actions
@@ -223,6 +227,8 @@ export const translations: typeof enTranslations = {
     expiresOn: "Wygasa {{date}}",
     expiresAt: "Wygasa",
     buyMore: "Kup kredyty",
+    approximateCost:
+      "Przybliżony koszt na podstawie {{inputTokens}} tokenów wejściowych i {{outputTokens}} tokenów wyjściowych. Rzeczywisty koszt może się różnić.",
     viewDetails: "Szczegóły",
     breakdown: "Podział kredytów",
     navigation: {
@@ -516,6 +522,39 @@ export const translations: typeof enTranslations = {
     browseAllCharacters: "Przeglądaj wszystkie postacie...",
     customSetup: "Niestandardowa konfiguracja...",
     selectCharacter: "Wybierz postać",
+    modelCreditDisplay: {
+      tokenBased: {
+        header: "Koszt zależy od długości rozmowy",
+        costRangeLabel: "Zakres kosztów:",
+        costRangeValue: "{{min}} - {{max}} kredytów",
+        examplesLabel: "Przykłady kosztów:",
+        examples: {
+          short: "Krótka rozmowa",
+          medium: "Średnia rozmowa",
+          long: "Długa rozmowa",
+        },
+        triggersCompacting: "⚡ Aktywuje kompresję",
+        tokensCount: "{{count}} tokenów",
+        explanation:
+          "AI przetwarza całą historię rozmowy przy każdej wiadomości, więc koszty rosną wraz z dłuższymi rozmowami.",
+        compactingLabel: "✨ Auto-kompresja:",
+        compactingExplanation:
+          " Przy {{threshold}} tokenów starsze wiadomości są automatycznie streszczane, aby zmniejszyć koszty przy zachowaniu kontekstu.",
+      },
+      fixed: {
+        title: "Cennik dla {{model}}",
+        freeDescription: "Ten model jest całkowicie darmowy, bez kosztów.",
+        fixedDescription:
+          "Ten model ma stały koszt na wiadomość, niezależnie od długości.",
+        costPerMessage: "Koszt za wiadomość:",
+        freeExplanation: "To darmowy model bez ograniczeń użytkowania.",
+        freeHighlight: "Idealny do testowania i eksperymentowania.",
+        simpleLabel: "Prosty cennik:",
+        simpleExplanation:
+          " Każda wiadomość kosztuje tyle samo, niezależnie czy krótka czy długa. Nie trzeba liczyć tokenów.",
+      },
+      creditValue: "1 kredyt = {{value}}",
+    },
     all: "Wszystkie",
     buildMode: "Tryb budowania",
     forCharacter: "dla {{character}}",

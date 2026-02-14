@@ -58,6 +58,7 @@ export interface StreamSetupResult {
   messageDepth: number;
   userMessageId: string | null;
   aiMessageId: string;
+  aiMessageCreatedAt: Date;
   messages: ModelMessage[];
   systemPrompt: string;
   toolConfirmationResults: Array<{
@@ -197,12 +198,13 @@ export async function setupAiStream(params: {
       errorType: ErrorResponseTypes.AUTH_ERROR,
     });
   }
+  const modelConfig = getModelById(data.model);
 
   const creditValidation = await CreditValidatorHandler.validateCredits({
     userId,
     leadId,
     ipAddress,
-    model: data.model,
+    modelInfo: modelConfig,
     locale,
     logger,
   });
@@ -282,12 +284,8 @@ export async function setupAiStream(params: {
     data.toolConfirmations && data.toolConfirmations.length > 0
   );
 
-  // Only require userMessageId if we're NOT doing answer-as-ai AND NOT doing tool confirmations
-  if (
-    !data.userMessageId &&
-    data.operation !== "answer-as-ai" &&
-    !hasToolConfirmations
-  ) {
+  // Require userMessageId for all operations except answer-as-ai
+  if (!data.userMessageId && data.operation !== "answer-as-ai") {
     logger.error(
       "User message ID must be provided by client",
       data.userMessageId,
@@ -351,6 +349,17 @@ export async function setupAiStream(params: {
     hasCharacter: !!data.character,
   });
 
+  // Generate AI message ID and timestamp BEFORE building context
+  // CRITICAL: Use same timestamp for metadata AND database to ensure cache stability
+  const aiMessageId = crypto.randomUUID();
+  const aiMessageCreatedAt = new Date();
+  logger.debug("Generated AI message ID", {
+    messageId: aiMessageId,
+    createdAt: aiMessageCreatedAt.toISOString(),
+    operation: data.operation,
+    isIncognito,
+  });
+
   // Build complete message context for AI streaming
   const messages = await MessageContextBuilder.buildMessageContext({
     operation: data.operation,
@@ -363,29 +372,23 @@ export async function setupAiStream(params: {
     rootFolderId: data.rootFolderId,
     messageHistory: data.messageHistory,
     logger,
+    timezone: data.timezone,
     upcomingResponseContext: { model: data.model, character: data.character },
     userMessageMetadata,
     hasToolConfirmations,
     toolConfirmationResults,
+    userMessageId,
+    upcomingAssistantMessageId: aiMessageId,
+    upcomingAssistantMessageCreatedAt: aiMessageCreatedAt,
+    modelConfig,
   });
 
-  const aiMessageId = crypto.randomUUID();
-  logger.debug("Generated AI message ID", {
-    messageId: aiMessageId,
-    operation: data.operation,
-    isIncognito,
-  });
-
-  // Get model configuration
-  const modelConfig = getModelById(data.model);
-
-  // Setup tools and update system prompt with tool instructions
   const {
     tools,
     toolsConfig,
     systemPrompt: updatedSystemPrompt,
   } = await ToolsSetupHandler.setupStreamingTools({
-    model: data.model,
+    modelConfig,
     requestedTools: data.tools,
     user,
     locale,
@@ -394,10 +397,12 @@ export async function setupAiStream(params: {
     toolConfirmationResults,
   });
 
-  // Configure provider based on model
-  const provider = ProviderFactoryClass.getProviderForModel(data.model, logger);
+  const provider = ProviderFactoryClass.getProviderForModel(
+    modelConfig,
+    logger,
+  );
 
-  logger.info("[AI Stream] Starting OpenRouter stream", {
+  logger.debug("[AI Stream] Starting OpenRouter stream", {
     model: data.model,
     hasTools: !!tools,
     toolCount: tools ? Object.keys(tools).length : 0,
@@ -431,6 +436,7 @@ export async function setupAiStream(params: {
       messageDepth,
       userMessageId,
       aiMessageId,
+      aiMessageCreatedAt,
       messages,
       systemPrompt: updatedSystemPrompt,
       toolConfirmationResults,

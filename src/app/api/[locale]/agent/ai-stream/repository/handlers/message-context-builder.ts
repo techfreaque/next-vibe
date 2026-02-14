@@ -1,25 +1,36 @@
-/**
- * MessageContextBuilder - Builds message context for AI streaming
- */
-
 import "server-only";
 
-import type { ModelMessage } from "ai";
-import { eq } from "drizzle-orm";
+import type { ModelMessage, streamText } from "ai";
+import { asc, eq } from "drizzle-orm";
 
 import {
   getModelById,
   type ModelId,
+  type ModelOption,
 } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { db } from "../../../../system/db";
 import type { DefaultFolderId } from "../../../chat/config";
-import type { ChatMessage, ToolCall } from "../../../chat/db";
+import type { ChatMessage, MessageMetadata, ToolCall } from "../../../chat/db";
 import { chatMessages } from "../../../chat/db";
-import type { ChatMessageRole } from "../../../chat/enum";
+import { ChatMessageRole } from "../../../chat/enum";
 import { fetchMessageHistory } from "../../../chat/threads/[threadId]/messages/repository";
+import { COMPACT_TRIGGER, COMPACT_TRIGGER_PERCENTAGE } from "../core/constants";
+import { formatAbsoluteTimestamp } from "../system-prompt/message-metadata";
 import { MessageConverter } from "./message-converter";
+
+/**
+ * Result of compacting check
+ */
+export interface CompactingCheckResult {
+  shouldCompact: boolean;
+  totalTokens: number;
+  branchMessages: ChatMessage[]; // All messages from parent up to (including) last compacting
+  messagesToCompact: ChatMessage[]; // Messages after last compacting that need compacting
+  currentUserMessage: ChatMessage | null;
+  lastCompactingMessage: ChatMessage | null;
+}
 
 export class MessageContextBuilder {
   /**
@@ -102,7 +113,8 @@ export class MessageContextBuilder {
     rootFolderId?: DefaultFolderId;
     messageHistory?: ChatMessage[];
     logger: EndpointLogger;
-    upcomingResponseContext?: { model: string; character: string | null };
+    timezone: string;
+    upcomingResponseContext?: { model: ModelId; character: string | null };
     userMessageMetadata?: {
       attachments?: Array<{
         id: string;
@@ -119,6 +131,10 @@ export class MessageContextBuilder {
       sequenceId: string;
       toolCall: ToolCall;
     }>;
+    userMessageId: string | null;
+    upcomingAssistantMessageId: string;
+    upcomingAssistantMessageCreatedAt: Date;
+    modelConfig?: ModelOption;
   }): Promise<ModelMessage[]> {
     params.logger.debug("[BuildMessageContext] === FUNCTION CALLED ===", {
       operation: params.operation,
@@ -238,9 +254,6 @@ export class MessageContextBuilder {
       );
     }
 
-    // ============================================================================
-    // STEP 1: Build complete message context (ChatMessage format)
-    // ============================================================================
     const contextMessages: ChatMessage[] = [...history];
 
     // Add current user message to context (unless it's answer-as-ai or tool confirmations)
@@ -250,12 +263,16 @@ export class MessageContextBuilder {
       params.content.trim();
 
     if (shouldAddCurrentMessage) {
+      // userMessageId is guaranteed to be non-null here because:
+      // - answer-as-ai sets shouldAddCurrentMessage = false
+      // - all other operations require userMessageId (validated in stream-setup.ts)
+      const userMessageId = params.userMessageId!;
       const currentMessage: ChatMessage = {
-        id: crypto.randomUUID(),
+        id: userMessageId,
         threadId: params.threadId || "",
         parentId: params.parentMessageId || null,
         depth: 0,
-        sequenceId: crypto.randomUUID(),
+        sequenceId: userMessageId,
         role: params.role,
         content: params.content,
         metadata: params.userMessageMetadata || null,
@@ -295,15 +312,12 @@ export class MessageContextBuilder {
       isIncognito: params.isIncognito,
     });
 
-    // ============================================================================
-    // STEP 2: Process attachments for non-vision models (BEFORE conversion)
-    // ============================================================================
     let visionWarningMessage: string | null = null;
 
     if (params.upcomingResponseContext?.model) {
-      const modelConfig = getModelById(
-        params.upcomingResponseContext.model as ModelId,
-      );
+      const modelConfig =
+        params.modelConfig ??
+        getModelById(params.upcomingResponseContext.model);
 
       if (!modelConfig.features.imageInput) {
         const result = this.stripAttachmentsFromMessages(
@@ -325,14 +339,12 @@ export class MessageContextBuilder {
       }
     }
 
-    // ============================================================================
-    // STEP 3: Convert to AI SDK format
-    // ============================================================================
     const messages =
       contextMessages.length > 0
         ? await MessageConverter.toAiSdkMessages(
             contextMessages,
             params.logger,
+            params.timezone,
             params.rootFolderId,
           )
         : [];
@@ -349,11 +361,6 @@ export class MessageContextBuilder {
       });
     }
 
-    // ============================================================================
-    // STEP 4: Add tool confirmation results (already in AI SDK format)
-    // ============================================================================
-    // Tool messages are created in DB AFTER buildMessageContext is called (during streaming)
-    // So we need to manually add them here from toolConfirmationResults
     if (params.hasToolConfirmations && params.toolConfirmationResults?.length) {
       params.logger.debug(
         "[BuildMessageContext] Adding tool confirmation results",
@@ -419,11 +426,6 @@ export class MessageContextBuilder {
       );
     }
 
-    // ============================================================================
-    // STEP 5: Handle answer-as-ai operation
-    // ============================================================================
-    // For answer-as-ai operation, add CONTINUE_CONVERSATION_PROMPT as a system message
-    // User can optionally provide additional instructions via content
     if (params.operation === "answer-as-ai") {
       const { CONTINUE_CONVERSATION_PROMPT } =
         await import("../system-prompt/generator");
@@ -440,36 +442,462 @@ export class MessageContextBuilder {
       );
     }
 
-    // ============================================================================
-    // STEP 6: Add response context metadata (final system message)
-    // ============================================================================
-    // This tells the model what config will be used for its response
     if (params.upcomingResponseContext) {
-      const parts: string[] = [];
-      parts.push(`Model:${params.upcomingResponseContext.model}`);
+      const shortId = params.upcomingAssistantMessageId.slice(-8);
+      const metadataParts: string[] = [`ID:${shortId}`];
+      metadataParts.push(`Model:${params.upcomingResponseContext.model}`);
       if (params.upcomingResponseContext.character) {
-        parts.push(`Character:${params.upcomingResponseContext.character}`);
+        metadataParts.push(
+          `Character:${params.upcomingResponseContext.character}`,
+        );
       }
+
+      const timestamp = formatAbsoluteTimestamp(
+        params.upcomingAssistantMessageCreatedAt,
+        params.timezone,
+      );
+      metadataParts.push(`Posted:${timestamp}`);
 
       messages.push({
         role: "system",
-        content: `[Your response context: ${parts.join(" | ")}]`,
-      });
-
-      params.logger.debug("[BuildMessageContext] Added response context", {
-        model: params.upcomingResponseContext.model,
-        character: params.upcomingResponseContext.character,
+        content: `[Context: ${metadataParts.join(" | ")}]`,
       });
     }
 
-    // ============================================================================
-    // FINAL: Return complete message context
-    // ============================================================================
-    params.logger.debug("[BuildMessageContext] Complete", {
-      totalMessages: messages.length,
-      isIncognito: params.isIncognito,
+    const messageHashes = messages.map((msg, idx) => {
+      const content = JSON.stringify(msg);
+      const hash = Buffer.from(content).toString("base64").slice(0, 16);
+      const hasCacheControl = !!msg.providerOptions?.openrouter?.cacheControl;
+      return {
+        idx,
+        role: msg.role,
+        hash,
+        contentLength: content.length,
+        hasCacheControl,
+        preview:
+          msg.role === "user" ||
+          msg.role === "assistant" ||
+          msg.role === "system"
+            ? typeof msg.content === "string"
+              ? msg.content.slice(0, 100)
+              : "[complex content]"
+            : "[tool content]",
+      };
     });
 
+    const cacheBreakpoints = messageHashes
+      .filter((m: { hasCacheControl: boolean }) => m.hasCacheControl)
+      .map((m: { idx: number; role: string }) => `${m.idx}:${m.role}`);
+
+    let lastAssistantIdx = -1;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i]?.role === "assistant") {
+        lastAssistantIdx = i;
+        break;
+      }
+    }
+    if (lastAssistantIdx >= 0) {
+      cacheBreakpoints.push(`${lastAssistantIdx}:assistant (auto)`);
+    }
+
     return messages;
+  }
+
+  /**
+   * Calculate total tokens that will be sent in the next request
+   * Counts: system prompt + tools + all messages in the chain
+   */
+  static calculateTotalTokens(
+    messages: ChatMessage[],
+    systemPrompt: string,
+    tools: Parameters<typeof streamText>[0]["tools"],
+  ): number {
+    // System prompt tokens - use char/3.5 for structured text (more accurate than char/4)
+    const systemTokens = Math.ceil(systemPrompt.length / 3.5);
+
+    // Tools JSON tokens - JSON is dense, use char/2.5 (tools can be VERY large)
+    const toolsTokens = tools
+      ? Math.ceil(JSON.stringify(tools).length / 2.5)
+      : 0;
+
+    // Message tokens - different calculation based on content type
+    const messageTokens = messages.reduce((sum, msg) => {
+      const content = msg.content || "";
+
+      // Tool messages with JSON results - use char/2.5
+      if (msg.role === "tool" && content.includes("{")) {
+        return sum + Math.ceil(content.length / 2.5);
+      }
+
+      // Regular messages - use char/4
+      return sum + Math.ceil(content.length / 4);
+    }, 0);
+
+    return systemTokens + toolsTokens + messageTokens;
+  }
+
+  /**
+   * Fetch branch messages by walking up parent chain
+   * Works for both server (DB) and incognito (localStorage)
+   * Server: Fetches ALL thread messages in ONE query, then filters branch
+   */
+  private static async fetchBranchMessages(params: {
+    threadId: string;
+    parentMessageId: string | null | undefined;
+    isIncognito: boolean;
+    messageHistory?: ChatMessage[];
+    logger: EndpointLogger;
+  }): Promise<ChatMessage[]> {
+    const { threadId, parentMessageId, isIncognito, messageHistory, logger } =
+      params;
+
+    if (!parentMessageId) {
+      return [];
+    }
+
+    if (isIncognito && messageHistory) {
+      // For incognito: walk up parent chain in messageHistory array
+      const branchMessages: ChatMessage[] = [];
+      const messageMap = new Map(messageHistory.map((m) => [m.id, m]));
+
+      // Start from parentMessageId (the message the new user message will reply to)
+      // Walk up the chain INCLUDING this message
+      let currentId: string | null = parentMessageId;
+
+      while (currentId) {
+        const msg = messageMap.get(currentId);
+        if (!msg) {
+          break;
+        }
+        branchMessages.push(msg);
+
+        // Stop if we hit a compacting message (include it, then stop)
+        if (msg.metadata?.isCompacting) {
+          break;
+        }
+
+        currentId = msg.parentId;
+      }
+
+      branchMessages.reverse(); // Oldest first
+      logger.info("[fetchBranchMessages] Incognito branch messages fetched", {
+        count: branchMessages.length,
+        parentMessageId,
+      });
+      return branchMessages;
+    } else {
+      // For server: fetch ALL thread messages in ONE query, then filter branch
+      const allMessages = await db
+        .select()
+        .from(chatMessages)
+        .where(eq(chatMessages.threadId, threadId))
+        .orderBy(asc(chatMessages.createdAt));
+
+      logger.info("[fetchBranchMessages] Fetched all thread messages", {
+        totalMessages: allMessages.length,
+        threadId,
+      });
+
+      // Walk up parent chain
+      const branchMessages: ChatMessage[] = [];
+      const messageMap = new Map(allMessages.map((m) => [m.id, m]));
+
+      // Start from parentMessageId (the message the new user message will reply to)
+      // Walk up the chain INCLUDING this message
+      let currentId: string | null = parentMessageId;
+
+      while (currentId) {
+        const msg = messageMap.get(currentId);
+        if (!msg) {
+          break;
+        }
+        branchMessages.push(msg);
+
+        // Stop if we hit a compacting message (include it, then stop)
+        if (msg.metadata?.isCompacting) {
+          break;
+        }
+
+        currentId = msg.parentId;
+      }
+
+      branchMessages.reverse(); // Oldest first
+      logger.info("[fetchBranchMessages] Server branch messages filtered", {
+        count: branchMessages.length,
+        parentMessageId,
+        stoppedAtCompacting: branchMessages[branchMessages.length - 1]?.metadata
+          ?.isCompacting
+          ? branchMessages[branchMessages.length - 1]?.id
+          : null,
+      });
+      return branchMessages;
+    }
+  }
+
+  /**
+   * Check if history compacting should be triggered
+   * Fetches ONLY the branch messages (server DB or incognito storage)
+   */
+  static async shouldTriggerCompacting(params: {
+    threadId: string;
+    currentUserMessageId: string | null;
+    currentUserContent?: string; // Content of the current user message
+    currentUserRole?: ChatMessageRole; // Role of the current user message
+    currentUserMetadata?: MessageMetadata | null; // Metadata of the current user message
+    userId?: string; // User ID for the current message
+    parentMessageId: string | null | undefined;
+    isIncognito: boolean;
+    messageHistory?: ChatMessage[]; // For incognito mode
+    systemPrompt: string;
+    tools: Parameters<typeof streamText>[0]["tools"];
+    model: ModelId;
+    logger: EndpointLogger;
+  }): Promise<CompactingCheckResult> {
+    const {
+      threadId,
+      currentUserMessageId,
+      currentUserContent,
+      currentUserRole,
+      currentUserMetadata,
+      userId,
+      parentMessageId,
+      isIncognito,
+      messageHistory,
+      systemPrompt,
+      tools,
+      model,
+      logger,
+    } = params;
+
+    // Step 1: Get branch messages (server DB or incognito storage)
+    const branchMessages = await this.fetchBranchMessages({
+      threadId,
+      parentMessageId,
+      isIncognito,
+      messageHistory,
+      logger,
+    });
+
+    logger.info("[Compacting] Fetched branch messages", {
+      branchMessageCount: branchMessages.length,
+      isIncognito,
+    });
+
+    // Step 2: Find last compacting message in the branch
+    const lastCompactingMessage =
+      branchMessages
+        .toReversed()
+        .find((m) => m.metadata?.isCompacting === true) ?? null;
+
+    // Step 3: Get messages to compact (everything after last compacting, excluding current user message)
+    let messagesToCompact: ChatMessage[];
+    if (lastCompactingMessage) {
+      messagesToCompact = branchMessages.filter(
+        (m) =>
+          m.createdAt > lastCompactingMessage.createdAt &&
+          !m.metadata?.isCompacting &&
+          m.id !== currentUserMessageId,
+      );
+    } else {
+      messagesToCompact = branchMessages.filter(
+        (m) => !m.metadata?.isCompacting && m.id !== currentUserMessageId,
+      );
+    }
+
+    // Step 4: Create current user message from provided data
+    // The user message hasn't been created in DB yet, so we construct it from the data
+    const currentUserMessage =
+      currentUserMessageId && currentUserContent
+        ? ({
+            id: currentUserMessageId,
+            threadId,
+            parentId: parentMessageId || null,
+            depth: 0,
+            sequenceId: currentUserMessageId,
+            role: currentUserRole ?? ChatMessageRole.USER,
+            content: currentUserContent,
+            metadata: currentUserMetadata || null,
+            model: null,
+            character: null,
+            upvotes: 0,
+            downvotes: 0,
+            tokens: null,
+            edited: false,
+            originalId: null,
+            authorId: userId || null,
+            authorName: null,
+            authorAvatar: null,
+            authorColor: null,
+            isAI: false,
+            errorType: null,
+            errorMessage: null,
+            errorCode: null,
+            searchVector: null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          } satisfies ChatMessage)
+        : null;
+
+    logger.info("[Compacting] Created current user message", {
+      hasCurrentUserMessage: !!currentUserMessage,
+      currentUserMessageId,
+      currentUserContentLength: currentUserContent?.length ?? 0,
+      currentUserRole,
+    });
+
+    // Step 5: Calculate tokens for FULL context that would be sent to API
+    // This includes: system prompt + tools + last compacting message + messages to compact + current user message
+    const messagesForTokenCount: ChatMessage[] = [];
+
+    // Add last compacting message (if exists) - this is the context baseline
+    if (lastCompactingMessage) {
+      messagesForTokenCount.push(lastCompactingMessage);
+    }
+
+    // Add messages to compact
+    messagesForTokenCount.push(...messagesToCompact);
+
+    // Add current user message
+    if (currentUserMessage) {
+      messagesForTokenCount.push(currentUserMessage);
+    }
+
+    const totalTokens = this.calculateTotalTokens(
+      messagesForTokenCount,
+      systemPrompt,
+      tools,
+    );
+
+    // Calculate dynamic trigger based on model's context window
+    const modelConfig = getModelById(model);
+    const modelContextLimit = Math.floor(
+      modelConfig.contextWindow * COMPACT_TRIGGER_PERCENTAGE,
+    );
+    const effectiveTrigger = Math.min(COMPACT_TRIGGER, modelContextLimit);
+
+    const shouldCompact = totalTokens >= effectiveTrigger;
+
+    logger.info("[Compacting] Token calculation", {
+      totalTokens,
+      compactTriggerAbsolute: COMPACT_TRIGGER,
+      compactTriggerPercentage: COMPACT_TRIGGER_PERCENTAGE,
+      modelContextWindow: modelConfig.contextWindow,
+      modelContextLimit,
+      effectiveTrigger,
+      shouldCompact,
+      messagesToCompactCount: messagesToCompact.length,
+      lastCompactingMessageId: lastCompactingMessage?.id ?? null,
+      lastCompactingTokens: lastCompactingMessage?.content?.length
+        ? Math.ceil(lastCompactingMessage.content.length / 4)
+        : 0,
+      currentUserMessageTokens: currentUserMessage?.content?.length
+        ? Math.ceil(currentUserMessage.content.length / 4)
+        : 0,
+      systemPromptTokens: Math.ceil(systemPrompt.length / 4),
+      toolsTokens: tools ? Math.ceil(JSON.stringify(tools).length / 4) : 0,
+    });
+
+    return {
+      shouldCompact,
+      totalTokens,
+      branchMessages,
+      messagesToCompact,
+      currentUserMessage,
+      lastCompactingMessage,
+    };
+  }
+
+  /**
+   * Rebuild message history with compacted summary
+   * Replaces old messages with compacted summary as system message
+   */
+  static async rebuildWithCompactedHistory(params: {
+    compactedSummary: string;
+    compactingMessageId: string;
+    currentUserMessage: ChatMessage | null;
+    threadId: string;
+    isIncognito: boolean;
+    messageHistory?: ChatMessage[]; // For incognito mode
+    logger: EndpointLogger;
+    upcomingAssistantMessageId: string;
+    upcomingAssistantMessageCreatedAt: Date;
+    model: ModelId;
+    character: string | null;
+    timezone: string;
+    rootFolderId?: DefaultFolderId;
+  }): Promise<ModelMessage[] | null> {
+    const {
+      compactedSummary,
+      compactingMessageId,
+      currentUserMessage,
+      logger,
+    } = params;
+
+    // We just compacted everything up to (but not including) the current user message
+    // The compacting operation summarized all parent messages in the chain
+    // There are no messages "after compacting" - we go straight to the current user message
+    const messagesAfterCompacting: ChatMessage[] = [];
+
+    logger.debug(
+      "[Compacting] No messages between summary and current message",
+      {
+        compactingMessageId,
+        isIncognito: params.isIncognito,
+      },
+    );
+
+    logger.info("[Compacting] Rebuilding history", {
+      compactedSummaryLength: compactedSummary.length,
+      messagesAfterCompacting: messagesAfterCompacting.length,
+      hasCurrentUserMessage: !!currentUserMessage,
+      currentUserMessageContent: currentUserMessage?.content?.slice(0, 100),
+      currentUserMessageRole: currentUserMessage?.role,
+    });
+
+    // Build new message array for AI
+    const messages: ModelMessage[] = [];
+
+    // Add compacted history as system message
+    messages.push({
+      role: "system",
+      content: `Previous conversation summary:\n\n${compactedSummary}`,
+    });
+
+    // Convert messages after compacting and current user message
+    // Build array of ChatMessages, then convert all at once with context system messages
+    const messagesToConvert: ChatMessage[] = [
+      ...messagesAfterCompacting,
+      ...(currentUserMessage ? [currentUserMessage] : []),
+    ];
+
+    if (messagesToConvert.length > 0) {
+      const converted = await MessageConverter.toAiSdkMessages(
+        messagesToConvert,
+        logger,
+        params.timezone,
+        params.rootFolderId,
+      );
+      messages.push(...converted);
+    }
+
+    // Add context system message for upcoming AI response
+    const shortId = params.upcomingAssistantMessageId.slice(-8);
+    const metadataParts: string[] = [`ID:${shortId}`];
+    metadataParts.push(`Model:${params.model}`);
+    if (params.character) {
+      metadataParts.push(`Character:${params.character}`);
+    }
+    const timestamp = formatAbsoluteTimestamp(
+      params.upcomingAssistantMessageCreatedAt,
+      params.timezone,
+    );
+    metadataParts.push(`Posted:${timestamp}`);
+
+    messages.push({
+      role: "system",
+      content: `[Context: ${metadataParts.join(" | ")}]`,
+    });
+
+    return messages.filter(Boolean);
   }
 }

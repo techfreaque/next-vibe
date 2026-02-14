@@ -21,6 +21,7 @@ import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Span } from "next-vibe-ui/ui/span";
 import { useState } from "react";
 
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/components/model-credit-display";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
   useWidgetContext,
@@ -166,9 +167,37 @@ export function CharactersListContainer({
     );
   }
 
+  // Loading state - show spinner that fills the scrollable area
+  if (!field.value) {
+    return (
+      <Div className="flex flex-col gap-0 h-[min(800px,calc(100dvh-100px))]">
+        {/* Top Actions: Back + Create */}
+        {!isOnboarding && (
+          <Div className="flex flex-row gap-2 px-4 py-4 shrink-0">
+            <NavigateButtonWidget field={children.backButton} />
+            <Button
+              type="button"
+              variant="outline"
+              size="default"
+              onClick={handleCreateCustomClick}
+              className="ml-auto"
+            >
+              {t("app.api.agent.chat.characters.get.createButton.label")}
+            </Button>
+          </Div>
+        )}
+
+        {/* Loading Spinner - fills the scrollable space */}
+        <Div className="border-t border-border flex-1 flex items-center justify-center min-h-0">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </Div>
+      </Div>
+    );
+  }
+
   // Both public and authenticated users see the same character list
   return (
-    <Div className="flex flex-col gap-0 max-h-[min(800px,calc(100dvh-100px))]">
+    <Div className="flex flex-col gap-0 h-[min(800px,calc(100dvh-100px))]">
       {/* Top Actions: Back + Create */}
       {!isOnboarding && (
         <Div className="flex flex-row gap-2 px-4 py-4 shrink-0">
@@ -587,14 +616,12 @@ function CharacterCard({
               }
               fieldName={`sections.${idx}.characters.${char.id}.separator2`}
             />
-            <TextWidget
-              field={withValue(
-                children.sections.child.children.characters.child.children
-                  .creditCost,
-                char.creditCost,
-                char,
-              )}
-              fieldName={`sections.${idx}.characters.${char.id}.creditCost`}
+            <ModelCreditDisplay
+              modelId={char.modelId}
+              variant="text"
+              className="text-xs text-muted-foreground"
+              t={t}
+              locale={locale}
             />
           </Div>
         </Div>

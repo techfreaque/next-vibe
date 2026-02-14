@@ -78,29 +78,21 @@ export class ToolErrorHandler {
     // Extract error from the tool-error event and structure it for translation
     const error: ErrorResponseType =
       "error" in part && part.error
-        ? part.error instanceof Error
-          ? fail({
+        ? typeof part.error === "object" &&
+          part.error !== null &&
+          "message" in part.error &&
+          typeof part.error.message === "string"
+          ? // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+            (part.error as unknown as ErrorResponseType)
+          : fail({
               message:
                 "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
-              errorType: ErrorResponseTypes.UNKNOWN_ERROR,
-              messageParams: { error: part.error.message },
+              errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
             })
-          : typeof part.error === "object" &&
-              part.error !== null &&
-              "message" in part.error &&
-              typeof part.error.message === "string"
-            ? // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-              (part.error as unknown as ErrorResponseType)
-            : fail({
-                message:
-                  "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
-                errorType: ErrorResponseTypes.UNKNOWN_ERROR,
-                messageParams: { error: String(part.error) },
-              })
         : fail({
             message:
               "app.api.agent.chat.aiStream.errors.toolExecutionFailed" as const,
-            errorType: ErrorResponseTypes.UNKNOWN_ERROR,
+            errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
 
     logger.info("[AI Stream] Tool error event received", {

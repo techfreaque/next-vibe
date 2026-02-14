@@ -163,6 +163,7 @@ export async function extractToolCallText(
       platform: Platform.NEXT_PAGE,
       user,
       logger,
+      locale,
     });
 
     if (result.success && result.data) {

@@ -176,6 +176,7 @@ export const translations: typeof enTranslations = {
         title: "Credit-Verlauf",
         description: "Ihren Credit-Transaktionsverlauf anzeigen",
       },
+      emptyState: "Noch keine Credit-Transaktionen",
       limit: {
         label: "Limit",
         description: "Maximale Anzahl zurückzugebender Transaktionen (1-100)",

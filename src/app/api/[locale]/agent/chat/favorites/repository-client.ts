@@ -20,7 +20,7 @@ import type {
   FiltersModelSelection,
   ManualModelSelection,
 } from "../../models/components/types";
-import { getCreditCostFromModel, modelProviders } from "../../models/models";
+import { modelProviders } from "../../models/models";
 import type { TtsVoiceValue } from "../../text-to-speech/enum";
 import { DEFAULT_CHARACTERS } from "../characters/config";
 import { ModelSelectionType } from "../characters/enum";
@@ -312,13 +312,11 @@ export class ChatFavoritesRepositoryClient {
             modelInfo: bestModel.name,
             modelProvider:
               modelProviders[bestModel.provider]?.name ?? "Unknown",
-            creditCost: `${getCreditCostFromModel(bestModel)} credits`,
           }
         : {
             modelIcon: "sparkles" as const,
             modelInfo: "No model found",
             modelProvider: "Unknown",
-            creditCost: "0 credits",
           }),
     };
   }

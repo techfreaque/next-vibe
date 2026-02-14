@@ -59,8 +59,6 @@ IMPORTANT guidelines for voice responses:
 export interface SystemPromptParams {
   /** Application name (from i18n) */
   appName: string;
-  /** Current date string */
-  date: string;
   /** User's locale (language-country) */
   locale: CountryLanguage;
   /** Current root folder ID */
@@ -104,7 +102,6 @@ function getLocaleInfo(locale: CountryLanguage): {
 export function generateSystemPrompt(params: SystemPromptParams): string {
   const {
     appName,
-    date,
     locale,
     rootFolderId,
     subFolderId,
@@ -119,7 +116,7 @@ export function generateSystemPrompt(params: SystemPromptParams): string {
   // Section 1: Introduction and Context
   sections.push(`# ${appName} AI Assistant
 
-**Date:** ${date}
+    **Current Year:** ${new Date().getFullYear()}
 
 You are an AI assistant on ${appName}, a platform dedicated to freedom of speech for both humans and AIs.`);
 
@@ -167,14 +164,16 @@ You are currently operating in the following context:`);
   // Section 7: Message Metadata Format (compact)
   sections.push(`## Message Context
 
-Before each message, you receive metadata in format: \`[Context: ID:abc12345 | Model:claude-haiku-4.5 | Author:John(def67890) | 👍5 👎1 | Posted:2h ago | edited]\`
+Before each message, you receive metadata in format: \`[Context: ID:abc12345 | Model:claude-haiku-4.5 | Author:John(def67890) | 👍5 👎1 | Posted:Feb 12, 18:23 | edited]\`
 
-**Fields (only non-empty shown):** ID (8-char ref), Model, Character, Author (public/shared only), Votes (👍/👎), Posted (Xh/m/d ago), Status (edited/branched)
+**Fields (only non-empty shown):** ID (8-char ref), Model, Character, Author (public/shared only), Votes (👍/👎), Posted (absolute timestamp), Status (edited/branched)
 
 **IMPORTANT:**
 - Check metadata before responding - multiple models/characters may be in one thread
 - Vote counts indicate valuable/controversial messages
-- These \`[Context: ...]\` tags are AUTO-GENERATED. Do NOT include them in your responses.`);
+- These \`[Context: ...]\` tags are AUTO-GENERATED. Do NOT include them in your responses.
+
+**Auto-compacting:** When conversations exceed token limits, the system may automatically compact older messages into a summary. You'll receive a context message with \`Mode:auto-compacting\` followed by instructions to summarize the history.`);
 
   // Section 7.5: Tool Loop Control
   sections.push(`## Tool Loop Control
@@ -215,20 +214,6 @@ function getFolderDescription(folderId: DefaultFolderId): string {
     default:
       return "Unknown folder type";
   }
-}
-
-/**
- * Get current date string in user-friendly format
- */
-export function getCurrentDateString(): string {
-  const now = new Date();
-  const options: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    weekday: "long",
-  };
-  return now.toLocaleDateString("en-US", options);
 }
 
 /**

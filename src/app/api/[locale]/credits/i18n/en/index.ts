@@ -170,6 +170,7 @@ export const translations = {
         title: "Credit History",
         description: "View your credit transaction history",
       },
+      emptyState: "No credit transactions yet",
       limit: {
         label: "Limit",
         description: "Maximum number of transactions to return (1-100)",

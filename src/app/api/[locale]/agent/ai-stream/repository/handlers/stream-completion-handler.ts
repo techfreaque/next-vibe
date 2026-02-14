@@ -52,14 +52,6 @@ export class StreamCompletionHandler {
     const usage = await streamResult.usage;
     const finishReason = await streamResult.finishReason;
 
-    logger.info("[AI Stream] Before finalization check", {
-      hasCurrentAssistantMessageId: !!ctx.currentAssistantMessageId,
-      currentAssistantMessageId: ctx.currentAssistantMessageId,
-      hasCurrentAssistantContent: !!ctx.currentAssistantContent,
-      currentAssistantContentLength: ctx.currentAssistantContent.length,
-      currentAssistantContentPreview: ctx.currentAssistantContent.slice(0, 100),
-    });
-
     // Finalize current ASSISTANT message if exists
     if (ctx.currentAssistantMessageId && ctx.currentAssistantContent) {
       logger.info("[AI Stream] Calling finalizeAssistantMessage", {

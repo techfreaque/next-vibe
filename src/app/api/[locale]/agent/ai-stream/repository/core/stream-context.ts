@@ -19,9 +19,17 @@ export interface PendingToolData {
  * MUST call cleanup() when stream ends to prevent memory leaks
  */
 export class StreamContext {
+  // Pre-generated ASSISTANT message ID (for cache stability)
+  // Used only for the FIRST assistant message in a stream
+  private readonly initialAssistantMessageId: string;
+  private hasUsedInitialAssistantId = false;
+
   // Current ASSISTANT message
   currentAssistantMessageId: string | null = null;
   currentAssistantContent = "";
+
+  // Last ASSISTANT message ID (not cleared by finish-step, used for final token reporting)
+  lastAssistantMessageId: string | null = null;
 
   // Reasoning state
   isInReasoningBlock = false;
@@ -49,6 +57,7 @@ export class StreamContext {
     sequenceId: string;
     initialParentId: string | null;
     initialDepth: number;
+    initialAssistantMessageId: string;
   }) {
     this.sequenceId = params.sequenceId;
     this.currentParentId = params.initialParentId;
@@ -56,6 +65,22 @@ export class StreamContext {
     this.lastParentId = params.initialParentId;
     this.lastDepth = params.initialDepth;
     this.lastSequenceId = params.sequenceId;
+    this.initialAssistantMessageId = params.initialAssistantMessageId;
+  }
+
+  /**
+   * Get the next assistant message ID
+   *
+   * For cache stability, the FIRST assistant message uses the pre-generated ID
+   * (which matches the metadata injected in message context).
+   * Subsequent assistant messages (in tool loops) get new UUIDs.
+   */
+  getNextAssistantMessageId(): string {
+    if (!this.hasUsedInitialAssistantId) {
+      this.hasUsedInitialAssistantId = true;
+      return this.initialAssistantMessageId;
+    }
+    return crypto.randomUUID();
   }
 
   /**

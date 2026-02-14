@@ -4,8 +4,11 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-export function LoadingIndicator(): JSX.Element {
-  return (
+import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/hooks/store";
+
+export function LoadingIndicator(): JSX.Element | null {
+  const isStreaming = useAIStreamStore((state) => state.isStreaming);
+  return isStreaming ? (
     <Div className={cn("flex items-start gap-3", "animate-fade-in")}>
       <Div className="flex-1">
         <Div className="flex items-center gap-2">
@@ -24,5 +27,5 @@ export function LoadingIndicator(): JSX.Element {
         <Div className="h-8" />
       </Div>
     </Div>
-  );
+  ) : null;
 }

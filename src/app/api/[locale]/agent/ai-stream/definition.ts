@@ -410,6 +410,16 @@ const { POST } = createEndpoint({
         },
       ),
 
+      // === TIMEZONE (for cache-stable timestamps) ===
+      timezone: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.agent.chat.aiStream.post.timezone.label",
+        description: "app.api.agent.chat.aiStream.post.timezone.description",
+        columns: 6,
+        schema: z.string(),
+      }),
+
       // === RESPONSE FIELDS ===
       success: responseField({
         type: WidgetType.TEXT,
@@ -506,6 +516,7 @@ const { POST } = createEndpoint({
         resumeToken: null,
         voiceMode: null,
         audioInput: { file: null },
+        timezone: "America/New_York",
       },
       withCharacter: {
         operation: "send",
@@ -525,6 +536,7 @@ const { POST } = createEndpoint({
         resumeToken: null,
         voiceMode: null,
         audioInput: { file: null },
+        timezone: "America/New_York",
       },
       retry: {
         operation: "retry",
@@ -544,6 +556,7 @@ const { POST } = createEndpoint({
         resumeToken: null,
         voiceMode: null,
         audioInput: { file: null },
+        timezone: "America/New_York",
       },
     },
     responses: {

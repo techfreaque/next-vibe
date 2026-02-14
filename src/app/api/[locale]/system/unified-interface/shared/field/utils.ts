@@ -1764,6 +1764,12 @@ export function backButton<
     getEndpoint: undefined,
     renderInModal: false,
     popNavigationOnSuccess: undefined,
+  } as TConfig & {
+    schemaType: "widget";
+    type: WidgetType.NAVIGATE_BUTTON;
+    targetEndpoint: undefined;
+    getEndpoint: undefined;
+    prefillFromGet: false;
   };
 }
 

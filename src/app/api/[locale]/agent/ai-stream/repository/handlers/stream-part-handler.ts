@@ -95,6 +95,7 @@ export class StreamPartHandler {
         sequenceId: ctx.sequenceId,
         isIncognito,
         userId,
+        getNextAssistantMessageId: ctx.getNextAssistantMessageId.bind(ctx),
         controller,
         encoder,
         logger,
@@ -102,6 +103,9 @@ export class StreamPartHandler {
       });
       ctx.currentAssistantMessageId = result.currentAssistantMessageId;
       ctx.currentAssistantContent = result.currentAssistantContent;
+      if (result.currentAssistantMessageId) {
+        ctx.lastAssistantMessageId = result.currentAssistantMessageId;
+      }
 
       // If a new ASSISTANT message was created, update currentParentId/currentDepth
       // Note: TTS handler messageId is already set inside processTextDelta
@@ -128,12 +132,16 @@ export class StreamPartHandler {
         sequenceId: ctx.sequenceId,
         isIncognito,
         userId,
+        getNextAssistantMessageId: ctx.getNextAssistantMessageId.bind(ctx),
         controller,
         encoder,
         logger,
       });
       ctx.currentAssistantMessageId = result.currentAssistantMessageId;
       ctx.currentAssistantContent = result.currentAssistantContent;
+      if (result.currentAssistantMessageId) {
+        ctx.lastAssistantMessageId = result.currentAssistantMessageId;
+      }
 
       // If a new ASSISTANT message was created, update currentParentId/currentDepth
       if (result.wasCreated) {
@@ -211,6 +219,9 @@ export class StreamPartHandler {
         ctx.currentAssistantMessageId = result.currentAssistantMessageId;
         ctx.currentAssistantContent = result.currentAssistantContent;
         ctx.isInReasoningBlock = result.isInReasoningBlock;
+        if (result.currentAssistantMessageId) {
+          ctx.lastAssistantMessageId = result.currentAssistantMessageId;
+        }
 
         // Track if this tool requires confirmation
         if (result.requiresConfirmation) {

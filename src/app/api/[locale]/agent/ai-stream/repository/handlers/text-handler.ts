@@ -28,6 +28,7 @@ export class TextHandler {
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
+    getNextAssistantMessageId: () => string;
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
     logger: EndpointLogger;
@@ -49,6 +50,7 @@ export class TextHandler {
       sequenceId,
       isIncognito,
       userId,
+      getNextAssistantMessageId,
       controller,
       encoder,
       logger,
@@ -60,6 +62,7 @@ export class TextHandler {
     if (textDelta !== undefined && textDelta !== null && textDelta !== "") {
       // Add text to current ASSISTANT message (or create if doesn't exist)
       if (!currentAssistantMessageId) {
+        const messageId = getNextAssistantMessageId();
         const result = await this.createAssistantMessage({
           initialContent: textDelta,
           threadId,
@@ -70,6 +73,7 @@ export class TextHandler {
           sequenceId,
           isIncognito,
           userId,
+          messageId,
           controller,
           encoder,
           logger,
@@ -138,6 +142,7 @@ export class TextHandler {
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
+    messageId: string;
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
     logger: EndpointLogger;
@@ -152,14 +157,13 @@ export class TextHandler {
       sequenceId,
       isIncognito,
       userId,
+      messageId,
       controller,
       encoder,
       logger,
     } = params;
 
-    const messageId = crypto.randomUUID();
-
-    logger.info("[AI Stream] Creating ASSISTANT message", {
+    logger.debug("[AI Stream] Creating ASSISTANT message", {
       messageId,
       parentId,
       depth,
@@ -181,7 +185,7 @@ export class TextHandler {
     });
     controller.enqueue(encoder.encode(formatSSEEvent(messageEvent)));
 
-    logger.info("[AI Stream] MESSAGE_CREATED event sent for ASSISTANT", {
+    logger.debug("[AI Stream] MESSAGE_CREATED event sent for ASSISTANT", {
       messageId,
       isIncognito,
       contentLength: initialContent.length,

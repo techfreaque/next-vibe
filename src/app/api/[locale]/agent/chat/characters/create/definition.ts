@@ -6,10 +6,7 @@
 import { z } from "zod";
 
 import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/components/types";
-import {
-  getCreditCostFromModel,
-  ModelId,
-} from "@/app/api/[locale]/agent/models/models";
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -107,7 +104,6 @@ const { POST } = createEndpoint({
               modelIcon: bestModel.icon,
               modelInfo: bestModel.name,
               modelProvider: bestModel.provider,
-              creditCost: `${getCreditCostFromModel(bestModel)} credits`,
             };
 
             // Add to existing section or create new section for this category

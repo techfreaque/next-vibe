@@ -336,13 +336,6 @@ const { GET } = createEndpoint({
                       "app.api.agent.chat.characters.get.response.characters.character.separator.content" as const,
                     usage: { response: true },
                   }),
-                  creditCost: responseField({
-                    type: WidgetType.TEXT,
-                    size: "xs",
-                    variant: "muted",
-                    inline: true,
-                    schema: z.string(),
-                  }),
 
                   favoriteButton: widgetField({
                     type: WidgetType.BUTTON,
@@ -449,7 +442,6 @@ const { GET } = createEndpoint({
                 modelIcon: "sparkles",
                 modelInfo: "Claude Sonnet 4.5",
                 modelProvider: "Anthropic",
-                creditCost: "1.5 credits",
               },
             ],
           },
@@ -470,7 +462,6 @@ const { GET } = createEndpoint({
                 modelIcon: "sparkles",
                 modelInfo: "GPT-5",
                 modelProvider: "OpenAI",
-                creditCost: "3 credits",
               },
             ],
           },

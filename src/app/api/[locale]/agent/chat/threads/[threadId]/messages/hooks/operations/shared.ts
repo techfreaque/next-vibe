@@ -109,12 +109,22 @@ export async function createAndSendUserMessage(
       currentRootFolderId === DefaultFolderId.INCOGNITO &&
       parentMessageId
     ) {
-      const parentIndex = threadMessages.findIndex(
-        (msg) => msg.id === parentMessageId,
-      );
-      if (parentIndex !== -1) {
-        messageHistory = threadMessages.slice(0, parentIndex + 1);
+      // Walk up parent chain to get only messages in this branch
+      messageHistory = [];
+      const messageMap = new Map(threadMessages.map((m) => [m.id, m]));
+      let currentId: string | null = parentMessageId;
+
+      while (currentId) {
+        const msg = messageMap.get(currentId);
+        if (!msg) {
+          break;
+        }
+        messageHistory.push(msg);
+        currentId = msg.parentId;
       }
+
+      // Reverse to get chronological order (oldest first)
+      messageHistory.reverse();
     }
 
     // Skip user message creation for tool confirmations
@@ -216,6 +226,9 @@ export async function createAndSendUserMessage(
         }
       : null;
 
+    // Get user's timezone from browser
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
     // Start AI stream (same for all operations)
     await aiStream.startStream(
       {
@@ -239,6 +252,7 @@ export async function createAndSendUserMessage(
         attachments: attachments && attachments.length > 0 ? attachments : null,
         voiceMode: effectiveVoiceMode,
         audioInput: audioInput ?? { file: null },
+        timezone,
       },
       {
         onCreditsDeducted: (data) => {

@@ -6,6 +6,11 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   ...searchTranslations,
   transcribing: "Audio wird transkribiert...",
+  errorCode: "Fehlercode",
+  compacting: {
+    title: "Verlauf komprimiert",
+    loading: "Verlauf wird komprimiert...",
+  },
   get: {
     title: "List Thread Messages",
     description: "Retrieve all messages in a chat thread",

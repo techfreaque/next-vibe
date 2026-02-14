@@ -274,6 +274,7 @@ export class TextToSpeechRepository {
         user,
         creditsNeeded,
         logger,
+        locale,
       );
 
       if (!deductResult.success) {

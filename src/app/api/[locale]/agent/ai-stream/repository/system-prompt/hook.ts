@@ -11,7 +11,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { generateSystemPrompt, getCurrentDateString } from "./generator";
+import { generateSystemPrompt } from "./generator";
 
 /**
  * Hook for debug view that handles all data fetching and system prompt generation
@@ -77,7 +77,6 @@ export function useDebugSystemPrompt(params: {
     // so we can pass callMode and memorySummary
     return generateSystemPrompt({
       appName,
-      date: getCurrentDateString(),
       locale,
       rootFolderId,
       subFolderId,

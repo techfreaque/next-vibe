@@ -82,7 +82,7 @@ export async function fetchMessageHistory(
 ): Promise<ChatMessage[]> {
   // If no parent message, this is a new root message - return empty history
   if (!parentMessageId) {
-    logger.info("No parent message - returning empty history (new root)", {
+    logger.debug("No parent message - returning empty history (new root)", {
       threadId,
     });
     return [];
@@ -114,14 +114,6 @@ export async function fetchMessageHistory(
 
   // Filter messages to only include ancestors and maintain chronological order
   const branchMessages = allMessages.filter((msg) => ancestorIds.has(msg.id));
-
-  logger.info("Fetched message history (branch filtered)", {
-    threadId,
-    parentMessageId,
-    totalMessages: allMessages.length,
-    branchMessages: branchMessages.length,
-    ancestorCount: ancestorIds.size,
-  });
 
   // Map to role+content format (keep ERROR messages in chain)
   return branchMessages;

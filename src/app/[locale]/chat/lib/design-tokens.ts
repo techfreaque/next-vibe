@@ -32,6 +32,7 @@ export const chatAnimations = {
 
 export const chatTransitions = {
   colors: "transition-colors duration-200",
+  default: "transition-all duration-200",
 } as const;
 
 export const chatProse = {

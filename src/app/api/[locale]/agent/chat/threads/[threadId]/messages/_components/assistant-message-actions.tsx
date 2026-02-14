@@ -3,6 +3,7 @@
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { Bot, Square, Trash2, Volume2, X } from "next-vibe-ui/ui/icons";
+import { Span } from "next-vibe-ui/ui/span";
 import type React from "react";
 
 import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/hooks/store";
@@ -32,6 +33,8 @@ interface AssistantMessageActionsProps {
   onDelete?: (messageId: string) => void;
   className?: string;
   logger: EndpointLogger;
+  tokens: number | null;
+  creditCost: number | null;
 }
 
 export function AssistantMessageActions({
@@ -44,6 +47,8 @@ export function AssistantMessageActions({
   onDelete,
   className,
   logger,
+  tokens,
+  creditCost,
 }: AssistantMessageActionsProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const isTouch = useTouchDevice();
@@ -154,6 +159,32 @@ export function AssistantMessageActions({
           title={t("app.chat.common.assistantMessageActions.deleteMessage")}
           variant="destructive"
         />
+      )}
+
+      {/* Show actual cost/tokens if available - right-aligned */}
+      {((creditCost !== null && creditCost !== undefined) ||
+        (tokens !== null && tokens !== undefined)) && (
+        <Div className="text-xs text-muted-foreground ml-auto flex items-center gap-1.5">
+          {creditCost !== null && creditCost !== undefined && (
+            <Span
+              title={t(
+                "app.chat.common.assistantMessageActions.actualCostUsed",
+              )}
+            >
+              {creditCost.toFixed(2)}{" "}
+              {t("app.chat.common.assistantMessageActions.credits")}
+            </Span>
+          )}
+          {tokens !== null && tokens !== undefined && (
+            <Span
+              title={t("app.chat.common.assistantMessageActions.tokensUsed")}
+              className="text-muted-foreground/70"
+            >
+              • {tokens.toLocaleString()}{" "}
+              {t("app.chat.common.assistantMessageActions.tokens")}
+            </Span>
+          )}
+        </Div>
       )}
     </Div>
   );

@@ -91,7 +91,8 @@ export class ToolCallHandler {
     // Tool call event without preceding text/reasoning - create placeholder ASSISTANT message
     // CRITICAL: Must CREATE the message in DB so TOOL messages can reference it as parent_id
     if (!currentAssistantMessageId) {
-      currentAssistantMessageId = crypto.randomUUID();
+      // Get next assistant message ID (first one uses pre-generated ID for cache stability)
+      currentAssistantMessageId = ctx.getNextAssistantMessageId();
 
       // Update parent chain to point to the placeholder ASSISTANT message
       // This ensures the TOOL message becomes a child of the ASSISTANT message

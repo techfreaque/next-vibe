@@ -86,6 +86,9 @@ export const translations: typeof enTranslations = {
           gpt35: "GPT-3.5",
           llama: "Llama 3",
           cost: "{{count}} Credits",
+          showLegacy: "Legacy-Modelle anzeigen",
+          hideLegacy: "Legacy-Modelle ausblenden",
+          legacyBadge: "Legacy",
         },
         features: {
           title: "Funktionen",

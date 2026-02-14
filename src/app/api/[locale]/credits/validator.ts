@@ -1,8 +1,3 @@
-/**
- * Credit Validator
- * Validates credit availability before AI requests
- */
-
 import {
   ErrorResponseTypes,
   fail,
@@ -14,7 +9,7 @@ import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { getModelCost, type ModelId } from "../agent/models/models";
+import type { ModelId } from "../agent/models/models";
 import { CreditRepository } from "./repository";
 
 /**
@@ -31,24 +26,24 @@ export interface CreditValidationResult {
  * Credit Validator Interface
  */
 export interface CreditValidatorInterface {
-  // Validate user has enough credits for model
   validateUserCredits(
     userId: string,
     modelId: string,
+    modelCost: number,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditValidationResult>>;
 
-  // Validate lead has enough credits for model
   validateLeadCredits(
     leadId: string,
     modelId: string,
+    modelCost: number,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditValidationResult>>;
 
-  // Get or create lead by IP and validate credits
   validateLeadByIp(
     ipAddress: string,
     modelId: string,
+    modelCost: number,
     locale: string,
     logger: EndpointLogger,
   ): Promise<
@@ -63,22 +58,13 @@ export interface CreditValidatorInterface {
  * Credit Validator Implementation
  */
 class CreditValidator implements CreditValidatorInterface {
-  /**
-   * Validate user has enough credits for model
-   * Logic:
-   * - In wallet-based system, each user has ONE wallet
-   * - Get user's balance directly from their wallet
-   */
   async validateUserCredits(
     userId: string,
     modelId: ModelId,
+    modelCost: number,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditValidationResult>> {
     try {
-      const cost = getModelCost(modelId);
-
-      // In wallet-based system, we get the user's wallet balance directly
-      // No need for canonical lead resolution - each user has their own wallet
       const balanceResult = await CreditRepository.getBalance(
         { userId },
         logger,
@@ -93,22 +79,21 @@ class CreditValidator implements CreditValidatorInterface {
       }
 
       const balance = balanceResult.data.total;
-      // Check if we have ENOUGH credits upfront for model cost
-      const hasCredits = balance >= cost;
+      const hasCredits = balance >= modelCost;
 
       logger.debug("Validated user credits", {
         userId,
         modelId,
-        cost,
+        cost: modelCost,
         balance,
         hasCredits,
       });
 
       return success({
         hasCredits,
-        cost,
+        cost: modelCost,
         balance,
-        canUseModel: hasCredits || cost === 0,
+        canUseModel: hasCredits || modelCost === 0,
       });
     } catch (error) {
       logger.error("Failed to validate user credits", parseError(error), {
@@ -122,18 +107,13 @@ class CreditValidator implements CreditValidatorInterface {
     }
   }
 
-  /**
-   * Validate lead has enough credits for model
-   */
   async validateLeadCredits(
     leadId: string,
     modelId: ModelId,
+    modelCost: number,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditValidationResult>> {
     try {
-      const cost = getModelCost(modelId);
-
-      // Get lead's balance (with monthly rotation)
       const balanceResult = await CreditRepository.getLeadBalance(
         leadId,
         logger,
@@ -147,22 +127,21 @@ class CreditValidator implements CreditValidatorInterface {
       }
 
       const balance = balanceResult.data;
-      // Check if we have ENOUGH credits upfront for model cost
-      const hasCredits = balance >= cost;
+      const hasCredits = balance >= modelCost;
 
       logger.debug("Validated lead credits", {
         leadId,
         modelId,
-        cost,
+        cost: modelCost,
         balance,
         hasCredits,
       });
 
       return success({
         hasCredits,
-        cost,
+        cost: modelCost,
         balance,
-        canUseModel: hasCredits || cost === 0, // Free models always allowed
+        canUseModel: hasCredits || modelCost === 0,
       });
     } catch (error) {
       logger.error("Failed to validate lead credits", parseError(error), {
@@ -176,12 +155,10 @@ class CreditValidator implements CreditValidatorInterface {
     }
   }
 
-  /**
-   * Get or create lead by IP and validate credits
-   */
   async validateLeadByIp(
     ipAddress: string,
     modelId: ModelId,
+    modelCost: number,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<
@@ -191,7 +168,6 @@ class CreditValidator implements CreditValidatorInterface {
     }>
   > {
     try {
-      // Get or create lead
       const leadResult = await CreditRepository.getOrCreateLeadByIp(
         ipAddress,
         locale,
@@ -207,17 +183,13 @@ class CreditValidator implements CreditValidatorInterface {
       }
 
       const { leadId, credits } = leadResult.data;
-
-      // Validate credits
-      const cost = getModelCost(modelId);
-      // Check if we have ENOUGH credits upfront for model cost
-      const hasCredits = credits >= cost;
+      const hasCredits = credits >= modelCost;
 
       logger.debug("Validated lead by IP", {
         ipAddress,
         leadId,
         modelId,
-        cost,
+        cost: modelCost,
         balance: credits,
         hasCredits,
       });
@@ -226,9 +198,9 @@ class CreditValidator implements CreditValidatorInterface {
         leadId,
         validation: {
           hasCredits,
-          cost,
+          cost: modelCost,
           balance: credits,
-          canUseModel: hasCredits || cost === 0,
+          canUseModel: hasCredits || modelCost === 0,
         },
       });
     } catch (error) {

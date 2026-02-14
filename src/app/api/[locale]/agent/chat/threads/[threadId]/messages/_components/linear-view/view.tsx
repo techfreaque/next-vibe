@@ -102,6 +102,9 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   const rootBranches = branchInfo[BRANCH_INDEX_KEY];
   const hasRootBranches = rootBranches && rootBranches.siblings.length > 1;
 
+  // Get user's timezone from browser
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   return (
     <>
       {/* Show root-level branch navigator if there are multiple root messages */}
@@ -179,7 +182,11 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                       chatShadows.sm,
                     )}
                   >
-                    {createMetadataSystemMessage(message, rootFolderId)}
+                    {createMetadataSystemMessage(
+                      message,
+                      rootFolderId,
+                      timezone,
+                    )}
                   </Div>
                 </Div>
               )}

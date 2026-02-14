@@ -32,6 +32,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { formatPrice } from "@/app/[locale]/subscription/components/types";
 import { useCreditPurchase } from "@/app/api/[locale]/credits/hooks";
 import purchaseDefinitions from "@/app/api/[locale]/credits/purchase/definition";
 import { useSubscriptionCheckout } from "@/app/api/[locale]/payment/checkout/hooks";
@@ -51,7 +52,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { TOTAL_MODEL_COUNT } from "../../agent/models/models";
 import type { JwtPayloadType } from "../../user/auth/types";
-import { formatPrice } from "./types";
 
 interface BuyCreditsTabProps {
   locale: CountryLanguage;

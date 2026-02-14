@@ -243,7 +243,7 @@ export async function loadTools(params: {
     );
 
     // Filter by requested toolNames (full path with underscores or alias)
-    params.logger.info("[Tools Loader] === FILTERING TOOLS ===", {
+    params.logger.debug("[Tools Loader] === FILTERING TOOLS ===", {
       requestedTools: params.requestedTools,
       allEndpointsCount: allEndpoints.length,
     });
@@ -258,7 +258,7 @@ export async function loadTools(params: {
       return matched;
     });
 
-    params.logger.info("Loaded tools by toolNames", {
+    params.logger.debug("Loaded tools by toolNames", {
       requestedCount: params.requestedTools.length,
       loadedCount: enabledEndpoints.length,
       enabledPaths: enabledEndpoints.map((e) => endpointToToolName(e)),
@@ -325,7 +325,7 @@ export async function loadTools(params: {
 
     const tools = Object.fromEntries(toolsMap.entries());
 
-    params.logger.info("Tools created", {
+    params.logger.debug("Tools created", {
       count: toolsMap.size,
       preferredToolNames: [...toolsMap.keys()],
     });

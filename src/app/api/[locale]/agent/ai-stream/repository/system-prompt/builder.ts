@@ -14,7 +14,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { generateSystemPrompt, getCurrentDateString } from "./generator";
+import { generateSystemPrompt } from "./generator";
 
 /**
  * Build complete system prompt from character ID
@@ -76,7 +76,7 @@ export async function buildSystemPrompt(params: {
       });
 
       if (memorySummary) {
-        logger.info("Loaded user memories into system prompt", {
+        logger.debug("Loaded user memories into system prompt", {
           userId,
           memorySummaryLength: memorySummary.length,
         });
@@ -127,19 +127,11 @@ export async function buildSystemPrompt(params: {
   const appName = t("config.appName");
   const systemPrompt = generateSystemPrompt({
     appName,
-    date: getCurrentDateString(),
     locale,
     rootFolderId,
     subFolderId,
     characterPrompt,
     memorySummary,
-    callMode: callMode ?? false,
-  });
-
-  logger.debug("Built complete system prompt", {
-    systemPromptLength: systemPrompt.length,
-    hasCharacterPrompt: !!characterPrompt,
-    hasMemories: !!memorySummary,
     callMode: callMode ?? false,
   });
 

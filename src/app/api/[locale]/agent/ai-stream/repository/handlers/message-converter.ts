@@ -39,22 +39,26 @@ export class MessageConverter {
   ): Promise<ModelMessage | ModelMessage[] | null> {
     switch (message.role) {
       case ChatMessageRole.USER: {
+        // IMPORTANT: Always use array format for user messages for cache stability
+        // When cache_control is added via providerOptions, AI SDK transforms string content
+        // to array format. Using array format consistently ensures the message structure
+        // is identical between first request and history.
+        const contentParts: Array<
+          | { type: "text"; text: string }
+          | { type: "image"; image: string | URL }
+        > = [];
+
+        // Add text content if present
+        if (message.content) {
+          contentParts.push({ type: "text", text: message.content });
+        }
+
         // Check if message has attachments
         if (
           "metadata" in message &&
           message.metadata?.attachments &&
           message.metadata.attachments.length > 0
         ) {
-          const contentParts: Array<
-            | { type: "text"; text: string }
-            | { type: "image"; image: string | URL }
-          > = [];
-
-          // Add text content if present
-          if (message.content) {
-            contentParts.push({ type: "text", text: message.content });
-          }
-
           // Add attachments
           for (const attachment of message.metadata.attachments) {
             // Get base64 data - either from attachment.data or from URL
@@ -117,11 +121,13 @@ export class MessageConverter {
               }
             }
           }
-
-          return { content: contentParts, role: "user" };
         }
 
-        return { content: message.content ?? "", role: "user" };
+        // Return array format (even for text-only messages for consistency)
+        // NOTE: We return the raw array here. cache_control is added later in toAiSdkMessages
+        // by directly embedding it in the last text part (not via providerOptions) to ensure
+        // consistent format between current messages and history messages.
+        return { content: contentParts, role: "user" };
       }
       case ChatMessageRole.ASSISTANT:
         if (!message.content || !message.content.trim()) {
@@ -134,6 +140,20 @@ export class MessageConverter {
         // Convert TOOL messages to proper AI SDK format
         if ("metadata" in message && message.metadata?.toolCall) {
           const toolCall = message.metadata.toolCall;
+          // Debug: log tool result hash for cache analysis
+          const resultHash = toolCall.result
+            ? Buffer.from(JSON.stringify(toolCall.result))
+                .toString("base64")
+                .slice(0, 20)
+            : "no-result";
+          logger.info("[CACHE DEBUG] Tool message conversion", {
+            toolCallId: toolCall.toolCallId,
+            toolName: toolCall.toolName,
+            resultHash,
+            resultLength: toolCall.result
+              ? JSON.stringify(toolCall.result).length
+              : 0,
+          });
 
           // Check if this TOOL message has a result or error (executed)
           // If yes, we need to return BOTH: ASSISTANT with tool-call AND TOOL with tool-result
@@ -240,10 +260,12 @@ export class MessageConverter {
   /**
    * Convert array of ChatMessages to AI SDK format
    * Properly handles multiple consecutive TOOL messages by combining them into a single assistant message
+   * Adds cache_control to enable Anthropic prompt caching via OpenRouter
    */
   static async toAiSdkMessages(
     messages: ChatMessage[],
     logger: EndpointLogger,
+    timezone: string,
     rootFolderId?: DefaultFolderId,
   ): Promise<ModelMessage[]> {
     const result: ModelMessage[] = [];
@@ -374,7 +396,11 @@ export class MessageConverter {
         (msg.role === ChatMessageRole.USER ||
           msg.role === ChatMessageRole.ASSISTANT)
       ) {
-        const metadataContent = createMetadataSystemMessage(msg, rootFolderId);
+        const metadataContent = createMetadataSystemMessage(
+          msg,
+          rootFolderId,
+          timezone,
+        );
         result.push({
           role: "system",
           content: metadataContent,

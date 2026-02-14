@@ -85,6 +85,9 @@ export async function answerAsAI(
       }
     }
 
+    // Get user's timezone from browser
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
     // Start AI stream
     await aiStream.startStream(
       {
@@ -108,6 +111,7 @@ export async function answerAsAI(
         toolConfirmations: null,
         voiceMode: null,
         audioInput: { file: null },
+        timezone,
       },
       {
         onContentDone: createCreditUpdateCallback(

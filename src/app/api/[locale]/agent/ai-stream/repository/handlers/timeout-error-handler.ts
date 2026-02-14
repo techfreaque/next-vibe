@@ -56,8 +56,8 @@ export class TimeoutErrorHandler {
 
     const timeoutError = fail({
       message: "app.api.agent.chat.aiStream.errors.timeout" as const,
-      errorType: ErrorResponseTypes.UNKNOWN_ERROR,
-      messageParams: { seconds: String(maxDuration) },
+      errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      messageParams: { maxDuration: maxDuration.toString() },
     });
 
     const errorMessageId = crypto.randomUUID();
@@ -92,11 +92,8 @@ export class TimeoutErrorHandler {
       });
     }
 
-    // Emit error event to update UI state
-    const errorEvent = createStreamEvent.error({
-      code: "TIMEOUT_ERROR",
-      message: `Stream timed out after ${maxDuration} seconds. The response may have been too long.`,
-    });
+    // Emit ERROR event to stop the stream
+    const errorEvent = createStreamEvent.error(timeoutError);
     controller.enqueue(encoder.encode(formatSSEEvent(errorEvent)));
   }
 }

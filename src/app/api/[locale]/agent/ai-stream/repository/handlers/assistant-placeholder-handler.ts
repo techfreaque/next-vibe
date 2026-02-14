@@ -25,6 +25,7 @@ export class AssistantPlaceholderHandler {
     character: string;
     isIncognito: boolean;
     userId: string | undefined;
+    initialAssistantMessageId: string;
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
     logger: EndpointLogger;
@@ -42,12 +43,13 @@ export class AssistantPlaceholderHandler {
       character,
       isIncognito,
       userId,
+      initialAssistantMessageId,
       controller,
       encoder,
       logger,
     } = params;
 
-    const messageId = crypto.randomUUID();
+    const messageId = initialAssistantMessageId;
 
     // Update parent chain to point to the placeholder ASSISTANT message
     // This ensures the TOOL message becomes a child of the ASSISTANT message

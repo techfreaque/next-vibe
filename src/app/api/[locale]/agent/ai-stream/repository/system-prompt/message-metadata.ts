@@ -6,36 +6,22 @@
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { defaultLocale } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 /**
- * Get relative time string from date (compact format)
+ * Format absolute timestamp for message metadata
+ * CACHE-STABLE: Returns absolute timestamp that never changes
+ * Format: "Feb 12, 18:23" (localized to user's timezone)
  */
-export function getRelativeTime(date: Date): string {
-  const { t } = simpleT(defaultLocale);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffMins < 1) {
-    return t("app.api.agent.chat.aiStream.post.systemPrompt.now");
-  }
-  if (diffMins < 60) {
-    return t("app.api.agent.chat.aiStream.post.systemPrompt.minutesAgo", {
-      minutes: diffMins,
-    });
-  }
-  if (diffHours < 24) {
-    return t("app.api.agent.chat.aiStream.post.systemPrompt.hoursAgo", {
-      hours: diffHours,
-    });
-  }
-  return t("app.api.agent.chat.aiStream.post.systemPrompt.daysAgo", {
-    days: diffDays,
+export function formatAbsoluteTimestamp(date: Date, timezone: string): string {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: timezone,
   });
+  return formatter.format(date);
 }
 
 /**
@@ -46,6 +32,7 @@ export function getRelativeTime(date: Date): string {
 export function createMessageMetadata(
   message: ChatMessage,
   rootFolderId: DefaultFolderId | undefined,
+  timezone: string,
 ): string {
   const parts: string[] = [];
 
@@ -84,9 +71,9 @@ export function createMessageMetadata(
     parts.push(voteParts.join(" "));
   }
 
-  // Timestamp (relative time)
-  const timeAgo = getRelativeTime(message.createdAt);
-  parts.push(`Posted:${timeAgo}`);
+  // Timestamp (absolute, cache-stable)
+  const timestamp = formatAbsoluteTimestamp(message.createdAt, timezone);
+  parts.push(`Posted:${timestamp}`);
 
   // Status indicators (only if present)
   const statusParts: string[] = [];
@@ -111,7 +98,8 @@ export function createMessageMetadata(
 export function createMetadataSystemMessage(
   message: ChatMessage,
   rootFolderId: DefaultFolderId | undefined,
+  timezone: string,
 ): string {
-  const metadata = createMessageMetadata(message, rootFolderId);
+  const metadata = createMessageMetadata(message, rootFolderId, timezone);
   return `[Context: ${metadata}]`;
 }

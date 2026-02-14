@@ -176,8 +176,7 @@ export class ToolConfirmationHandler {
           toolError = fail({
             message:
               "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
-            errorType: ErrorResponseTypes.UNKNOWN_ERROR,
-            messageParams: { error: "Tool does not have execute method" },
+            errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
       } catch (error) {
@@ -189,10 +188,7 @@ export class ToolConfirmationHandler {
         toolError = fail({
           message:
             "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
-          errorType: ErrorResponseTypes.UNKNOWN_ERROR,
-          messageParams: {
-            error: error instanceof Error ? error.message : String(error),
-          },
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
 
