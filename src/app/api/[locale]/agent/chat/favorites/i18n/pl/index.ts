@@ -78,7 +78,7 @@ export const translations: typeof enTranslations = {
       description: "Zarządzaj ulubionymi konfiguracjami postaci i modeli",
     },
     createButton: {
-      label: "Dodaj ulubione",
+      label: "Odkryj postacie",
     },
     response: {
       favorite: {
@@ -217,11 +217,15 @@ export const translations: typeof enTranslations = {
       description: "Zapisz konfigurację postaci jako ulubioną",
     },
     backButton: {
-      label: "Wróć do ulubionych",
+      label: "Anuluj",
+    },
+    useWithoutSavingButton: {
+      label: "Użyj bez dodawania do ulubionych",
+      loadingText: "Stosowanie...",
     },
     submitButton: {
-      label: "Utwórz ulubiony",
-      loadingText: "Tworzenie...",
+      label: "Dodaj do ulubionych",
+      loadingText: "Dodawanie...",
     },
     characterId: {
       label: "Postać",

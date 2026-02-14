@@ -681,6 +681,10 @@ export const translations: typeof enTranslations = {
         addToCollection: "Dodaj do kolekcji:",
         quick: "Szybko",
         customize: "Dostosuj",
+        useNow: "Użyj teraz",
+        inUse: "W użyciu",
+        chooseFavorite: "Wybierz ulubione",
+        selectFavorite: "Wybierz ulubione do aktywacji:",
       },
     },
     section: {

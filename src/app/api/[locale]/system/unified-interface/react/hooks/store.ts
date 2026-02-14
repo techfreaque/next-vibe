@@ -478,6 +478,8 @@ export const apiClient = {
                 pathParams: context.urlPathParams,
                 responseData: context.responseData,
                 logger: context.logger,
+                user: context.user,
+                locale: context.locale,
               })
           : undefined,
         onError: options.onError

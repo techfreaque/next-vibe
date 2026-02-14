@@ -157,6 +157,15 @@ export const translations = {
     customizeCharacterButton: {
       label: "Customize Character's Personality",
     },
+    useThisCharacterButton: {
+      label: "Use This Character",
+    },
+    useThisModelButton: {
+      label: "Use This Model",
+    },
+    currentlyActiveButton: {
+      label: "Currently Active",
+    },
     signupPrompt: {
       title: "Customize the character's personality",
       description:
@@ -165,9 +174,13 @@ export const translations = {
       signupButton: "Create Account",
       loginButton: "Log In",
     },
-    submitButton: {
-      label: "Save Changes",
+    saveButton: {
+      label: "Save",
       loadingText: "Saving...",
+    },
+    saveAndUseButton: {
+      label: "Save & Use",
+      loadingText: "Saving & Activating...",
     },
     id: {
       label: "Favorite ID",

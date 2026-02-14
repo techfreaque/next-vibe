@@ -13,5 +13,29 @@ export const translations: typeof enTranslations = {
           "Użyj kombinacji liter, cyfr i symboli, aby uzyskać silniejsze hasło",
       },
     },
+    passwordStrength: {
+      requirement: {
+        minLength: {
+          icon: "✗",
+          text: "Co najmniej 8 znaków",
+        },
+        lowercase: {
+          icon: "✗",
+          text: "Zawiera małą literę",
+        },
+        uppercase: {
+          icon: "✗",
+          text: "Zawiera wielką literę",
+        },
+        number: {
+          icon: "✗",
+          text: "Zawiera cyfrę",
+        },
+        special: {
+          icon: "✗",
+          text: "Zawiera znak specjalny",
+        },
+      },
+    },
   },
 };

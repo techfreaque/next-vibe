@@ -168,7 +168,7 @@ export class ChildrenDataRenderer {
    * Extract and filter children, resolving parent value for special fields
    * Accepts both UnifiedField (from endpoints) and AnyChildrenConstrain (from container children)
    */
-  static extractChildren(
+  static extractChildren<TValue extends WidgetData>(
     childrenSchema:
       | Record<
           string,
@@ -182,7 +182,7 @@ export class ChildrenDataRenderer {
           | undefined
         >
       | undefined,
-    value: Record<string, WidgetData> | undefined | null,
+    value: TValue | undefined | null,
     config: ChildrenFilterConfig = {},
   ): ProcessedChild[] {
     if (!childrenSchema) {
@@ -220,7 +220,13 @@ export class ChildrenDataRenderer {
       }
 
       // Extract data
-      const data = value?.[name] ?? null;
+      const data =
+        value &&
+        typeof value === "object" &&
+        !Array.isArray(value) &&
+        !(value instanceof Date)
+          ? value[name]
+          : null;
 
       // Determine if this is a widget-only object or widget field (before we use it)
       const isWidgetOnly = this.isWidgetOnlyObject(field);

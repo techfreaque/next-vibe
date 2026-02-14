@@ -292,7 +292,10 @@ export function EndpointRenderer<
     if (isResponseField(field)) {
       // Only show response fields with data
       const fieldData =
-        data && typeof data === "object" && !Array.isArray(data)
+        data &&
+        typeof data === "object" &&
+        !Array.isArray(data) &&
+        !(data instanceof Date)
           ? data[fieldName]
           : undefined;
       return fieldData !== null && fieldData !== undefined;
@@ -304,7 +307,10 @@ export function EndpointRenderer<
   // Render all widgets in sorted order (respecting order property across request/response)
   const allWidgets = visibleFields.map(([fieldName, field]) => {
     const fieldValue =
-      data && typeof data === "object" && !Array.isArray(data)
+      data &&
+      typeof data === "object" &&
+      !Array.isArray(data) &&
+      !(data instanceof Date)
         ? data[fieldName]
         : undefined;
 

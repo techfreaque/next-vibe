@@ -296,6 +296,7 @@ export const translations = {
     notAvailable: "N/A",
     errors: {
       noEndpoint: "This feature is not available yet. Please try again later",
+      unknown: "An unknown error occurred",
     },
     weekday: {
       monday: "Monday",
@@ -366,9 +367,6 @@ export const translations = {
         errorMessage: "Message:",
         cause: "Cause:",
       },
-    },
-    errors: {
-      unknown: "An unknown error occurred",
     },
     api: {
       notifications: {

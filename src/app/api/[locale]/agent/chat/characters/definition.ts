@@ -54,43 +54,7 @@ const { GET } = createEndpoint({
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.characters" as const],
 
-  options: {
-    queryOptions: {
-      onSuccess: async (data, user, logger) => {
-        // Only compute addedToFav from localStorage for PUBLIC users
-        // Authenticated users get it from the database query
-        if (!user.isPublic) {
-          return;
-        }
-
-        if (!data.responseData.sections) {
-          return;
-        }
-
-        const { ChatFavoritesRepositoryClient } =
-          await import("../favorites/repository-client");
-
-        // Load all favorites from localStorage
-        const favoritesResult =
-          await ChatFavoritesRepositoryClient.getFavorites(logger);
-
-        if (!favoritesResult.success) {
-          return;
-        }
-
-        const favoritedCharacterIds = new Set(
-          favoritesResult.data.favorites.map((fav) => fav.characterId),
-        );
-
-        // Mutate the response data directly (before it's added to cache)
-        for (const section of data.responseData.sections) {
-          for (const character of section.characters) {
-            character.addedToFav = favoritedCharacterIds.has(character.id);
-          }
-        }
-      },
-    },
-  },
+  options: {},
 
   fields: customWidgetObject({
     render: CharactersListContainer,
@@ -261,11 +225,6 @@ const { GET } = createEndpoint({
                     hidden: true,
                     schema: z.enum(ModelId),
                   }),
-                  addedToFav: responseField({
-                    type: WidgetType.TEXT,
-                    hidden: true,
-                    schema: z.boolean(),
-                  }),
                   icon: responseField({
                     type: WidgetType.ICON,
                     containerSize: "lg",
@@ -434,7 +393,6 @@ const { GET } = createEndpoint({
                 modelId: ModelId.CLAUDE_SONNET_4_5,
                 category:
                   "app.api.agent.chat.characters.enums.category.assistant",
-                addedToFav: false,
                 name: "app.api.agent.chat.characters.default.name",
                 tagline: "app.api.agent.chat.characters.default.tagline",
                 description:
@@ -455,7 +413,6 @@ const { GET } = createEndpoint({
                 icon: "direct-hit",
                 modelId: ModelId.GPT_5,
                 category: "app.api.agent.chat.characters.enums.category.coding",
-                addedToFav: true,
                 name: "app.api.agent.chat.characters.custom.name",
                 tagline: "app.api.agent.chat.characters.custom.tagline",
                 description: "app.api.agent.chat.characters.custom.description",

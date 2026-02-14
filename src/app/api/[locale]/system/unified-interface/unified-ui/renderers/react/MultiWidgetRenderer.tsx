@@ -173,7 +173,7 @@ export function ObjectChildrenRenderer<
   const formDataRoot = useWatch({
     control: form?.control,
     disabled: !form || !hasRequestFields,
-  }) as Record<string, WidgetData> | undefined;
+  });
 
   // Merge form data with response data
   const mergedValue = useMemo(() => {
@@ -539,10 +539,11 @@ export function MultiWidgetRenderer<
   const isUnion = isUnionVariants<TKey, TUsage>(childrenSchema);
 
   if (isUnion) {
+    const objectValue = !Array.isArray(value) ? value : null;
     return (
       <UnionObjectRenderer
         variantSchemas={childrenSchema}
-        value={value as Record<string, WidgetData> | null | undefined}
+        value={objectValue}
         fieldName={fieldName}
         discriminator={discriminator}
         watchedDiscriminatorValue={watchedDiscriminatorValue}
@@ -552,10 +553,11 @@ export function MultiWidgetRenderer<
 
   // Check for array child constraint
   if (isArrayChild<TKey, TUsage>(childrenSchema)) {
+    const arrayValue = Array.isArray(value) ? value : null;
     return (
       <ArrayChildRenderer
         childSchema={childrenSchema}
-        value={value as Array<WidgetData> | null | undefined}
+        value={arrayValue}
         fieldName={fieldName}
         renderItem={renderItem}
       />
@@ -564,10 +566,11 @@ export function MultiWidgetRenderer<
 
   // ObjectChildrenConstraint is a Record<string, ...>
   const objectChildren: ObjectChildrenConstraint<TKey, TUsage> = childrenSchema;
+  const objectValue = !Array.isArray(value) ? value : null;
   return (
     <ObjectChildrenRenderer
       childrenSchema={objectChildren}
-      value={value as Record<string, WidgetData> | null | undefined}
+      value={objectValue}
       fieldName={fieldName}
     />
   );

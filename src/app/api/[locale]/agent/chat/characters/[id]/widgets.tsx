@@ -51,13 +51,13 @@ import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import {
   CharacterOwnershipType,
   type CharacterOwnershipTypeValue,
 } from "../../characters/enum";
+import { useChatFavorites } from "../../favorites/hooks";
 import { useAddToFavorites } from "../../favorites/use-add-to-favorites";
 import type definitionGet from "./definition";
 import type definitionPatch from "./definition";
@@ -96,6 +96,7 @@ export function CharacterEditContainer({
   const children = field.children;
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation();
+  const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const form = useWidgetForm<typeof definitionPatch.PATCH>();
@@ -195,6 +196,7 @@ export function CharacterEditContainer({
                 form.setValue("modelSelection", selection)
               }
               t={t}
+              locale={locale}
             />
           )}
         </Div>
@@ -222,12 +224,16 @@ export function CharacterViewContainer({
     | string
     | undefined;
 
-  const { isLoading, isAddedToFav, addToFavorites } = useAddToFavorites({
+  const { addToFavorites } = useAddToFavorites({
     characterId: characterId ?? "",
     logger,
     user,
     locale,
   });
+
+  // Check if character is in favorites by fetching favorites list
+  const { favorites } = useChatFavorites(logger);
+  const isAddedToFav = favorites.some((fav) => fav.characterId === characterId);
 
   const handleDelete = async (): Promise<void> => {
     if (!characterId) {
@@ -239,43 +245,6 @@ export function CharacterViewContainer({
       urlPathParams: { id: characterId },
       renderInModal: true,
       popNavigationOnSuccess: 2,
-    });
-  };
-
-  const handleCustomizeAndAdd = async (): Promise<void> => {
-    if (!characterId) {
-      return;
-    }
-
-    const createFavoriteDefinitions =
-      await import("../../favorites/create/definition");
-    const { DEFAULT_TTS_VOICE } = await import("../../../text-to-speech/enum");
-
-    navigation.push(createFavoriteDefinitions.default.POST, {
-      data: {
-        characterId: characterId,
-        icon: field.value?.icon,
-        name: field.value?.name,
-        tagline: field.value?.tagline,
-        description: field.value?.description,
-        voice: field.value?.voice ?? DEFAULT_TTS_VOICE,
-        modelSelection: null,
-      },
-      popNavigationOnSuccess: 1,
-    });
-  };
-
-  const handleEditCharacter = async (): Promise<void> => {
-    if (!characterId) {
-      return;
-    }
-
-    const patchDefinition = await import("./definition");
-    navigation.push(patchDefinition.default.PATCH, {
-      urlPathParams: { id: characterId },
-      popNavigationOnSuccess: 1,
-      prefillFromGet: true,
-      getEndpoint: patchDefinition.default.GET,
     });
   };
 
@@ -322,7 +291,12 @@ export function CharacterViewContainer({
       )}
 
       {/* Model Selection - View Only */}
-      <ModelSelector modelSelection={modelSelection} readOnly={true} t={t} />
+      <ModelSelector
+        modelSelection={modelSelection}
+        readOnly={true}
+        t={t}
+        locale={locale}
+      />
     </>
   );
 
@@ -348,9 +322,13 @@ export function CharacterViewContainer({
           isLoading={!field.value}
           isAddedToFav={isAddedToFav}
           addToFavorites={addToFavorites}
-          handleCustomizeAndAdd={handleCustomizeAndAdd}
+          characterId={characterId ?? ""}
+          field={field}
+          navigation={navigation}
+          logger={logger}
+          user={user}
+          t={t}
           isOwner={isOwner}
-          handleEditCharacter={handleEditCharacter}
           handleDelete={handleDelete}
         />
         {ContentSection}
@@ -376,9 +354,13 @@ interface CharacterCardProps {
   isLoading?: boolean;
   isAddedToFav?: boolean;
   addToFavorites: (e?: ButtonMouseEvent) => Promise<void>;
-  handleCustomizeAndAdd: (e?: ButtonMouseEvent) => void;
+  characterId: string;
+  field: { value: CharacterGetResponseOutput | null | undefined };
+  navigation: ReturnType<typeof useWidgetNavigation>;
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
+  t: ReturnType<typeof useWidgetTranslation>;
   isOwner: boolean;
-  handleEditCharacter: (e?: ButtonMouseEvent) => void;
   handleDelete: (e?: ButtonMouseEvent) => void;
 }
 
@@ -397,12 +379,15 @@ export function CharacterCard({
   isLoading = false,
   isAddedToFav = false,
   addToFavorites,
-  handleCustomizeAndAdd,
+  characterId,
+  field,
+  navigation,
+  logger,
+  user,
+  t,
   isOwner,
   handleDelete,
-  handleEditCharacter,
 }: CharacterCardProps): React.JSX.Element {
-  const { t } = simpleT(locale);
   const IconComponent =
     ownershipIcon[characterOwnership] ??
     ownershipIcon[CharacterOwnershipType.SYSTEM];
@@ -469,7 +454,7 @@ export function CharacterCard({
           {!isAddedToFav && (
             <Button
               variant="default"
-              size="xs"
+              size="sm"
               className="gap-1"
               onClick={addToFavorites}
               disabled={isLoading}
@@ -482,30 +467,31 @@ export function CharacterCard({
               {t("app.api.agent.chat.characters.id.get.quickAdd")}
             </Button>
           )}
-          <Button
+          <CustomizeAndAddButton
+            characterId={characterId}
+            field={field}
+            navigation={navigation}
+            logger={logger}
+            user={user}
+            locale={locale}
+            t={t}
             variant={isAddedToFav ? "default" : "outline"}
-            size="xs"
-            className="gap-1"
-            onClick={handleCustomizeAndAdd}
-          >
-            <Plus className="h-4 w-4" />
-            {t("app.api.agent.chat.characters.id.get.tweakAndAdd")}
-          </Button>
+            size="sm"
+          />
           {isOwner ? (
             <>
               <Div className="flex-1" />
+              <EditCharacterButton
+                characterId={characterId}
+                navigation={navigation}
+                t={t}
+                isOwner={true}
+                variant="outline"
+                size="sm"
+              />
               <Button
                 variant="outline"
-                size="xs"
-                className="gap-1"
-                onClick={handleEditCharacter}
-              >
-                <Pencil className="h-4 w-4" />
-                {t("app.api.agent.chat.characters.id.get.edit")}
-              </Button>
-              <Button
-                variant="outline"
-                size="xs"
+                size="sm"
                 className="gap-1 text-destructive hover:bg-destructive/10"
                 onClick={handleDelete}
               >
@@ -516,15 +502,14 @@ export function CharacterCard({
           ) : (
             <>
               <Div className="flex-1" />
-              <Button
+              <EditCharacterButton
+                characterId={characterId}
+                navigation={navigation}
+                t={t}
+                isOwner={false}
                 variant="outline"
-                size="xs"
-                className="gap-1"
-                onClick={handleEditCharacter}
-              >
-                <Pencil className="h-4 w-4" />
-                {t("app.api.agent.chat.characters.id.get.copyAndCustomize")}
-              </Button>
+                size="sm"
+              />
             </>
           )}
         </Div>
@@ -575,6 +560,8 @@ function CustomizeAndAddButton({
       const characterSingleDefinitions = await import("./definition");
       const createFavoriteDefinitions =
         await import("../../favorites/create/definition");
+      const editFavoriteDefinitions =
+        await import("../../favorites/[id]/definition");
       const { DEFAULT_TTS_VOICE } =
         await import("../../../text-to-speech/enum");
 
@@ -615,7 +602,12 @@ function CustomizeAndAddButton({
           voice: fullChar.voice ?? DEFAULT_TTS_VOICE,
           modelSelection: null,
         },
-        popNavigationOnSuccess: 1,
+        replaceOnSuccess: {
+          endpoint: editFavoriteDefinitions.default.PATCH,
+          getUrlPathParams: (responseData) => ({ id: responseData.id }),
+          prefillFromGet: true,
+          getEndpoint: editFavoriteDefinitions.default.GET,
+        },
       });
     } finally {
       setIsLoading(false);
@@ -642,8 +634,7 @@ function CustomizeAndAddButton({
       ) : (
         <Plus className={iconSize} />
       )}
-      {!iconOnly &&
-        t("app.api.agent.chat.characters.id.get.customizeButton.label")}
+      {!iconOnly && t("app.api.agent.chat.characters.id.get.tweakAndAdd")}
     </Button>
   );
 }
@@ -655,6 +646,7 @@ function EditCharacterButton({
   characterId,
   navigation,
   t,
+  isOwner = true,
   variant = "outline",
   className = "",
   size = "sm",
@@ -663,6 +655,7 @@ function EditCharacterButton({
   characterId: string;
   navigation: ReturnType<typeof useWidgetNavigation>;
   t: ReturnType<typeof useWidgetTranslation>;
+  isOwner?: boolean;
   variant?: "outline" | "default" | "ghost";
   className?: string;
   size?: "sm" | "lg" | "default" | "icon";
@@ -707,7 +700,12 @@ function EditCharacterButton({
       ) : (
         <Pencil className={iconSize} />
       )}
-      {!iconOnly && t("app.api.agent.chat.characters.id.get.editButton.label")}
+      {!iconOnly &&
+        t(
+          isOwner
+            ? "app.api.agent.chat.characters.id.get.edit"
+            : "app.api.agent.chat.characters.id.get.copyAndCustomize",
+        )}
     </Button>
   );
 }

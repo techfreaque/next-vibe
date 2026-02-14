@@ -475,17 +475,7 @@ export function MultiWidgetRenderer<
   const isUnion = isUnionVariants<TKey, TUsage>(childrenSchema);
 
   if (isUnion) {
-    const objectValue:
-      | InferChildrenOutput<
-          ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
-        >
-      | null
-      | undefined = (!Array.isArray(value) ? value : null) as
-      | InferChildrenOutput<
-          ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
-        >
-      | null
-      | undefined;
+    const objectValue = !Array.isArray(value) ? value : null;
     return (
       <UnionObjectRenderer<TKey, TUsage, typeof childrenSchema>
         variantSchemas={childrenSchema}
@@ -499,12 +489,7 @@ export function MultiWidgetRenderer<
 
   // Check for array child constraint
   if (isArrayChild<TKey, TUsage>(childrenSchema)) {
-    const arrayValue:
-      | InferChildOutput<typeof childrenSchema>[]
-      | null
-      | undefined = Array.isArray(value)
-      ? (value as InferChildOutput<typeof childrenSchema>[])
-      : null;
+    const arrayValue = Array.isArray(value) ? value : null;
     return (
       <ArrayChildRenderer<TKey, TUsage, typeof childrenSchema, TEndpoint>
         childSchema={childrenSchema}
@@ -517,13 +502,7 @@ export function MultiWidgetRenderer<
 
   // ObjectChildrenConstraint is a Record<string, ...>
   const objectChildren: ObjectChildrenConstraint<TKey, TUsage> = childrenSchema;
-  const objectValue:
-    | InferChildrenOutput<typeof objectChildren>
-    | null
-    | undefined = (!Array.isArray(value) ? value : null) as
-    | InferChildrenOutput<typeof objectChildren>
-    | null
-    | undefined;
+  const objectValue = !Array.isArray(value) ? value : null;
   return (
     <ObjectChildrenRenderer<TKey, TUsage, typeof objectChildren, TEndpoint>
       childrenSchema={objectChildren}

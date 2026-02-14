@@ -86,7 +86,7 @@ export type BaseWidgetFieldProps<
     AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>
   >,
 > = TWidgetConfig & {
-  value: InferResponseOutput<TWidgetConfig>;
+  value: InferResponseOutput<TWidgetConfig> | undefined;
   parentValue?: WidgetData;
 };
 

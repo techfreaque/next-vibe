@@ -11,6 +11,7 @@ export type WidgetData =
   | string
   | number
   | boolean
+  | Date
   | null
   | undefined
   | string[]

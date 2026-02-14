@@ -11,6 +11,7 @@ import type { FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
@@ -164,6 +165,8 @@ export interface ApiMutationOptions<TRequest, TResponse, TUrlVariables> {
     pathParams: TUrlVariables;
     responseData: TResponse;
     logger: EndpointLogger;
+    user: JwtPayloadType;
+    locale: CountryLanguage;
   }) => ErrorResponseType | void | Promise<ErrorResponseType | void>;
   onError?: (data: {
     error: ErrorResponseType;

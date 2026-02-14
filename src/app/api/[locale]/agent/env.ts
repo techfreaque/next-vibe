@@ -30,6 +30,11 @@ const baseFields = {
     example: "your-gab-ai-key",
     comment: "Gab AI API key",
   },
+  VENICE_AI_API_KEY: {
+    schema: z.string(),
+    example: "your-venice-ai-key",
+    comment: "Venice AI API key",
+  },
   EDEN_AI_API_KEY: {
     schema: z.string().min(1),
     example: "your-eden-ai-key",

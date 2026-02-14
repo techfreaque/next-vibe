@@ -10,11 +10,19 @@
 import "server-only";
 
 import { OpenAIChatLanguageModel } from "@ai-sdk/openai/internal";
-import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
+import {
+  convertDeveloperToSystemMessages,
+  convertToolMessagesToUserMessages,
+  injectToolInstructions,
+  type OpenAIMessage,
+  type OpenAITool,
+  type OpenAIToolCall,
+  parseToolCalls,
+} from "./shared/tool-calling-prompt-engineering";
 
 /**
  * Create an Uncensored AI provider compatible with AI SDK V2
@@ -48,18 +56,24 @@ export function createUncensoredAI(logger: EndpointLogger): {
 
     // Convert developer messages to system and inject tool instructions
     let modifiedMessages = convertDeveloperToSystemMessages(messages);
+    modifiedMessages = convertToolMessagesToUserMessages(modifiedMessages);
     if (tools && tools.length > 0) {
       modifiedMessages = injectToolInstructions(modifiedMessages, tools);
     }
 
-    // Update request body - remove tools field since model doesn't support it natively
+    // Prepare request body
+    const requestBody = {
+      ...restBody,
+      messages: modifiedMessages,
+      // Remove tools from request
+    };
+
+    const bodyString = JSON.stringify(requestBody);
+
+    // Update request body
     const modifiedInit: RequestInit = {
       ...init,
-      body: JSON.stringify({
-        ...restBody,
-        messages: modifiedMessages,
-        // Remove tools from request
-      }),
+      body: bodyString,
     };
 
     // Make the actual request to uncensored AI API
@@ -85,7 +99,7 @@ export function createUncensoredAI(logger: EndpointLogger): {
       });
     }
 
-    // Convert JSON response to SSE streaming format
+    // For non-streaming, convert JSON response to SSE streaming format
     return createStreamingResponse(jsonResponse, logger);
   };
 
@@ -109,38 +123,6 @@ export function createUncensoredAI(logger: EndpointLogger): {
 /**
  * OpenAI API Types
  */
-
-type JSONValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JSONValue[]
-  | { [key: string]: JSONValue };
-
-interface OpenAIMessage {
-  role: string;
-  content: string | null;
-  tool_calls?: OpenAIToolCall[];
-}
-
-interface OpenAIToolCall {
-  id: string;
-  type: string;
-  function: {
-    name: string;
-    arguments: string;
-  };
-}
-
-interface OpenAITool {
-  type: string;
-  function: {
-    name: string;
-    description?: string;
-    parameters?: Record<string, JSONValue>;
-  };
-}
 
 interface OpenAIRequestBody {
   model: string;
@@ -169,161 +151,6 @@ interface OpenAIResponse {
   choices?: OpenAIChoice[];
 }
 
-interface ParsedToolCall {
-  name: string;
-  arguments: Record<string, JSONValue>;
-}
-
-/**
- * Generate system prompt for tool calling instructions
- */
-function generateToolSystemPrompt(tools: OpenAITool[]): string {
-  const toolDescriptions = tools
-    .map((tool) => {
-      const func = tool.function;
-      return `- ${func.name}: ${func.description || "No description"}
-  Parameters: ${JSON.stringify(func.parameters || {}, null, 2)}`;
-    })
-    .join("\n\n");
-
-  return `You have access to the following tools:
-
-${toolDescriptions}
-
-CRITICAL INSTRUCTIONS FOR TOOL USAGE:
-1. To call tools, you MUST use this EXACT format:
-   <tool_calls>
-   [
-     {"name": "tool_name", "arguments": {"param": "value"}}
-   ]
-   </tool_calls>
-
-2. You can call MULTIPLE tools in a single response by including multiple objects in the array.
-
-3. You can combine tool calls with a text response:
-   - Put your explanation/thinking BEFORE the <tool_calls> block
-   - Example: "I'll search for that information.\n<tool_calls>[{...}]</tool_calls>"
-
-4. IMPORTANT: The <tool_calls> block must contain valid JSON array. Do not add any text inside the tags except the JSON.
-
-5. After tools are executed, you'll receive their results. Use them to provide your final answer IF NEEDED.
-
-6. If you don't need to call any tools, just respond normally without the <tool_calls> block.
-
-7. IMPORTANT: For tools that don't require a follow-up response (like store_memory, update_settings, etc.):
-   - You can include a brief confirmation in your text BEFORE the tool call
-   - Example: "I'll remember that for you.\n<tool_calls>[{"name": "store_memory", ...}]</tool_calls>"
-   - After the tool executes, you DON'T need to respond again unless the user asks something else
-   - To signal no further response needed, add "DONE" after your text
-   - Example: "Got it, I've saved that.\nDONE\n<tool_calls>[{"name": "store_memory", ...}]</tool_calls>"
-
-8. For tools that DO require results (like search, calculator):
-   - Call the tool without DONE
-   - Wait for results
-   - Provide your answer based on the results
-
-Examples:
-- Single tool: <tool_calls>[{"name": "search", "arguments": {"query": "weather in NYC"}}]</tool_calls>
-- Multiple tools: <tool_calls>[{"name": "search", "arguments": {"query": "Paris"}}, {"name": "calculator", "arguments": {"expr": "2+2"}}]</tool_calls>
-- With text: Let me search for that.\n<tool_calls>[{"name": "search", "arguments": {"query": "AI"}}]</tool_calls>
-- Memory (no follow-up): I'll remember that.\nDONE\n<tool_calls>[{"name": "store_memory", "arguments": {"content": "..."}}]</tool_calls>`;
-}
-
-/**
- * Parse tool calls from model response
- * Returns { textContent, toolCalls, isDone }
- */
-function parseToolCalls(
-  content: string,
-  logger: EndpointLogger,
-): {
-  textContent: string;
-  toolCalls: ParsedToolCall[] | null;
-  isDone: boolean;
-} {
-  // Match <tool_calls>[...]</tool_calls>
-  const toolCallsRegex = /<tool_calls>\s*(\[[\s\S]*?\])\s*<\/tool_calls>/;
-  const match = content.match(toolCallsRegex);
-
-  if (!match) {
-    return { textContent: content, toolCalls: null, isDone: false };
-  }
-
-  // Extract text before tool calls
-  let textContent = content.substring(0, match.index).trim();
-
-  // Check for DONE marker (indicates no follow-up response needed)
-  const isDone = /\bDONE\b/.test(textContent);
-  if (isDone) {
-    // Remove DONE marker from text content
-    textContent = textContent.replace(/\s*DONE\s*/g, "").trim();
-  }
-
-  // Parse JSON array of tool calls
-  try {
-    const parsed = JSON.parse(match[1]) as ParsedToolCall[];
-    if (!Array.isArray(parsed)) {
-      logger.error("Tool calls parsed but not an array", {
-        rawMatch: match[1],
-      });
-      return { textContent: content, toolCalls: null, isDone: false };
-    }
-    return { textContent, toolCalls: parsed, isDone };
-  } catch (error) {
-    logger.error("Failed to parse tool calls JSON", parseError(error), {
-      rawMatch: match[1],
-    });
-    return { textContent: content, toolCalls: null, isDone: false };
-  }
-}
-
-/**
- * Convert "developer" role messages to "system" role for API compatibility
- */
-function convertDeveloperToSystemMessages(
-  messages: OpenAIMessage[],
-): OpenAIMessage[] {
-  return messages.map((msg) => {
-    if (msg.role === "developer") {
-      return { ...msg, role: "system" };
-    }
-    return msg;
-  });
-}
-
-/**
- * Inject tool calling instructions into the first system message
- */
-function injectToolInstructions(
-  messages: OpenAIMessage[],
-  tools: OpenAITool[],
-): OpenAIMessage[] {
-  const toolSystemPrompt = generateToolSystemPrompt(tools);
-  const firstSystemIdx = messages.findIndex((msg) => msg.role === "system");
-
-  if (firstSystemIdx !== -1) {
-    // Append to existing system message
-    const existingContent = messages[firstSystemIdx].content;
-    const contentStr =
-      typeof existingContent === "string" ? existingContent : "";
-    const updatedMessages = [...messages];
-    updatedMessages[firstSystemIdx] = {
-      ...messages[firstSystemIdx],
-      content: `${contentStr}\n\n${toolSystemPrompt}`,
-    };
-    return updatedMessages;
-  }
-
-  // No system message found, add one at the beginning
-  return [
-    {
-      role: "system",
-      content: toolSystemPrompt,
-    },
-    ...messages,
-  ];
-}
-
 /**
  * Convert JSON response to Server-Sent Events (SSE) streaming format
  */
@@ -342,10 +169,7 @@ function createStreamingResponse(
 
       for (const choice of jsonResponse.choices || []) {
         const content = choice.message?.content || "";
-        const { textContent, toolCalls, isDone } = parseToolCalls(
-          content,
-          logger,
-        );
+        const { textContent, toolCalls } = parseToolCalls(content, logger);
 
         // Send role chunk
         controller.enqueue(
@@ -417,7 +241,7 @@ function createStreamingResponse(
             ),
           );
 
-          finalFinishReason = isDone ? "stop" : "tool_calls";
+          finalFinishReason = "tool_calls";
         }
       }
 

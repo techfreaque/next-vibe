@@ -47,6 +47,50 @@ import type { StreamingMessage, StreamingThread } from "./store";
 import { useAIStreamStore } from "./store";
 
 /**
+ * Get last message in current branch to use as parent for error messages
+ * This ensures errors are attached to the correct branch
+ */
+function getLastMessageForErrorParent(threadId: string): {
+  parentId: string | null;
+  depth: number;
+} {
+  const chatStore = useChatStore.getState();
+  const threadMessages = Object.values(chatStore.messages).filter(
+    (msg) => msg.threadId === threadId,
+  );
+
+  if (threadMessages.length === 0) {
+    return { parentId: null, depth: 0 };
+  }
+
+  // Get branch indices and find last message in current branch
+  const branchIndices = chatStore.getBranchIndices(threadId);
+
+  // Use the thread-builder utility to find the last message in the branch
+  // This needs to be a synchronous import since we're in a sync function
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const threadBuilder = require("@/app/[locale]/chat/lib/utils/thread-builder");
+  const lastMessage = threadBuilder.getLastMessageInBranch(
+    threadMessages,
+    branchIndices,
+  );
+
+  if (lastMessage) {
+    return {
+      parentId: lastMessage.id,
+      depth: lastMessage.depth + 1,
+    };
+  }
+
+  // Fallback: use the most recent message
+  const fallbackMessage = threadMessages[threadMessages.length - 1];
+  return {
+    parentId: fallbackMessage.id,
+    depth: fallbackMessage.depth + 1,
+  };
+}
+
+/**
  * SSE Stream Options
  */
 export interface StreamOptions {
@@ -433,6 +477,8 @@ export function useAIStream(
             void import("../../chat/hooks/store")
               .then(({ useChatStore }) => {
                 const errorMessageId = crypto.randomUUID();
+                const { parentId, depth } =
+                  getLastMessageForErrorParent(activeThreadId);
 
                 // Add error message to chat store with serialized ErrorResponseType
                 useChatStore.getState().addMessage({
@@ -440,8 +486,8 @@ export function useAIStream(
                   threadId: activeThreadId,
                   role: ChatMessageRole.ERROR,
                   content: serializeError(errorResponse),
-                  parentId: null,
-                  depth: 0,
+                  parentId,
+                  depth,
                   sequenceId: null,
                   authorId: "system",
                   authorName: null,
@@ -507,14 +553,16 @@ export function useAIStream(
             void import("../../chat/hooks/store")
               .then(({ useChatStore }) => {
                 const errorMessageId = crypto.randomUUID();
+                const { parentId, depth } =
+                  getLastMessageForErrorParent(activeThreadId);
 
                 useChatStore.getState().addMessage({
                   id: errorMessageId,
                   threadId: activeThreadId,
                   role: ChatMessageRole.ERROR,
                   content: serializeError(errorResponse),
-                  parentId: null,
-                  depth: 0,
+                  parentId,
+                  depth,
                   sequenceId: null,
                   authorId: "system",
                   authorName: null,
@@ -1347,6 +1395,8 @@ export function useAIStream(
                   void import("../../chat/hooks/store")
                     .then(({ useChatStore }) => {
                       const errorMessageId = crypto.randomUUID();
+                      const { parentId, depth } =
+                        getLastMessageForErrorParent(activeThreadId);
 
                       // ErrorResponseType has a different structure than our chat error messages
                       // Extract the relevant fields
@@ -1369,8 +1419,8 @@ export function useAIStream(
                         threadId: activeThreadId,
                         role: ChatMessageRole.ERROR,
                         content: errorMessage,
-                        parentId: null,
-                        depth: 0,
+                        parentId,
+                        depth,
                         sequenceId: null,
                         authorId: "system",
                         authorName: null,
@@ -1462,14 +1512,16 @@ export function useAIStream(
               void import("../../chat/hooks/store")
                 .then(({ useChatStore }) => {
                   const errorMessageId = crypto.randomUUID();
+                  const { parentId, depth } =
+                    getLastMessageForErrorParent(activeThreadId);
 
                   useChatStore.getState().addMessage({
                     id: errorMessageId,
                     threadId: activeThreadId,
                     role: ChatMessageRole.ERROR,
                     content: serializeError(errorResponse),
-                    parentId: null,
-                    depth: 0,
+                    parentId,
+                    depth,
                     sequenceId: null,
                     authorId: "system",
                     authorName: null,

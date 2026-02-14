@@ -130,6 +130,7 @@ const { POST } = createEndpoint({
         variant: "default",
         size: "default",
         columns: 12,
+        usage: { request: "data" },
       }),
     },
   }),

@@ -4,6 +4,7 @@
  * Currently renders plain text
  */
 import { cn } from "next-vibe/shared/utils/utils";
+import { memo } from "react";
 import { Text as RNText, View } from "react-native";
 
 // Import all public types from web version (web is source of truth)
@@ -11,7 +12,7 @@ import type { MarkdownProps } from "../../web/ui/markdown";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 
-export function Markdown({
+export const Markdown = memo(function Markdown({
   className,
   style,
   content,
@@ -28,4 +29,4 @@ export function Markdown({
       <RNText className="text-sm text-foreground">{content}</RNText>
     </View>
   );
-}
+});

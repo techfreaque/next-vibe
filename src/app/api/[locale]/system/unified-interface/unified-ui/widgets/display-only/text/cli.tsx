@@ -50,8 +50,6 @@ export function TextWidgetInk<
     variant,
     emphasis,
     maxLength,
-    format,
-    href,
   } = field;
   const label = labelKey ? t(labelKey) : undefined;
 
@@ -120,18 +118,6 @@ export function TextWidgetInk<
   }
 
   const displayText = formatText(data.text, maxLength);
-
-  // Handle link format
-  if (format === "link" && href) {
-    return (
-      <Box flexDirection="column">
-        {label && <Text bold>{label}</Text>}
-        <Text color="blue" underline>
-          {displayText}
-        </Text>
-      </Box>
-    );
-  }
 
   // Regular text display
   return (

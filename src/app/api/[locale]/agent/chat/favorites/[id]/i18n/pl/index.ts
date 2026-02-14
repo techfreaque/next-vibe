@@ -159,6 +159,15 @@ export const translations: typeof enTranslations = {
     customizeCharacterButton: {
       label: "Dostosuj osobowość postaci",
     },
+    useThisCharacterButton: {
+      label: "Użyj tej postaci",
+    },
+    useThisModelButton: {
+      label: "Użyj tego modelu",
+    },
+    currentlyActiveButton: {
+      label: "Obecnie aktywne",
+    },
     signupPrompt: {
       title: "Dostosuj osobowość postaci",
       description:
@@ -167,9 +176,13 @@ export const translations: typeof enTranslations = {
       signupButton: "Utwórz konto",
       loginButton: "Zaloguj się",
     },
-    submitButton: {
-      label: "Zapisz zmiany",
+    saveButton: {
+      label: "Zapisz",
       loadingText: "Zapisywanie...",
+    },
+    saveAndUseButton: {
+      label: "Zapisz i Użyj",
+      loadingText: "Zapisywanie i aktywacja...",
     },
     id: {
       label: "ID ulubionego",

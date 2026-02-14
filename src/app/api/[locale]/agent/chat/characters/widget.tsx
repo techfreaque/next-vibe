@@ -5,6 +5,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { Badge } from "next-vibe-ui/ui/badge";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
@@ -18,8 +19,14 @@ import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Star } from "next-vibe-ui/ui/icons/Star";
 import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
 import { useState } from "react";
+import { useMemo } from "react";
 
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/components/model-credit-display";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
@@ -36,7 +43,10 @@ import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interfac
 import { useTouchDevice } from "@/hooks/use-touch-device";
 
 import { cn } from "../../../shared/utils";
+import { Icon } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import { useTourState } from "../_components/welcome-tour/tour-state-context";
+import { useChatFavorites } from "../favorites/hooks";
 import { useAddToFavorites } from "../favorites/use-add-to-favorites";
 import { useSelectorOnboardingContext } from "../threads/_components/chat-input/selector/selector-onboarding/context";
 import characterDetailDefinitions from "./[id]/definition";
@@ -74,6 +84,23 @@ export function CharactersListContainer({
   const setModelSelectorOpen = useTourState(
     (state) => state.setModelSelectorOpen,
   );
+
+  // Fetch favorites to calculate favoriteIds for each character
+  const { favorites, activeFavoriteId } = useChatFavorites(logger);
+
+  // Group favorites by character ID
+  const favoritesByCharacter = useMemo(() => {
+    const map: Record<string, string[]> = {};
+    if (favorites) {
+      for (const fav of favorites) {
+        if (!map[fav.characterId]) {
+          map[fav.characterId] = [];
+        }
+        map[fav.characterId].push(fav.id);
+      }
+    }
+    return map;
+  }, [favorites]);
 
   // Get companion character name for onboarding banner
   const companionCharacter = companionCharacterId
@@ -321,6 +348,8 @@ export function CharactersListContainer({
                     locale={locale}
                     isTouch={isTouch}
                     t={t}
+                    favoritesByCharacter={favoritesByCharacter}
+                    activeFavoriteId={activeFavoriteId}
                   >
                     {children}
                   </CollapsibleCharacterSection>
@@ -383,6 +412,8 @@ function CollapsibleCharacterSection({
   locale,
   isTouch,
   t,
+  favoritesByCharacter,
+  activeFavoriteId,
 }: {
   characters: CharacterListItem[];
   idx: number;
@@ -393,6 +424,8 @@ function CollapsibleCharacterSection({
   locale: ReturnType<typeof useWidgetContext>["locale"];
   isTouch: boolean;
   t: ReturnType<typeof useWidgetTranslation>;
+  favoritesByCharacter: Record<string, string[]>;
+  activeFavoriteId: string | null;
 }): React.JSX.Element {
   const [isExpanded, setIsExpanded] = useState(false);
   const totalCount = characters.length;
@@ -422,6 +455,8 @@ function CollapsibleCharacterSection({
               locale={locale}
               isTouch={isTouch}
               t={t}
+              favoriteIds={favoritesByCharacter[char.id] || []}
+              activeFavoriteId={activeFavoriteId}
             >
               {children}
             </CharacterCard>
@@ -487,6 +522,8 @@ function CharacterCard({
   locale,
   isTouch,
   t,
+  favoriteIds,
+  activeFavoriteId,
 }: {
   char: CharacterListItem;
   idx: number;
@@ -497,8 +534,12 @@ function CharacterCard({
   locale: ReturnType<typeof useWidgetContext>["locale"];
   isTouch: boolean;
   t: ReturnType<typeof useWidgetTranslation>;
+  favoriteIds: string[];
+  activeFavoriteId: string | null;
 }): React.JSX.Element {
-  const isActive = char.addedToFav;
+  const isInCollection = favoriteIds.length > 0;
+  const isActive =
+    activeFavoriteId !== null && favoriteIds.includes(activeFavoriteId);
   const [showActions, setShowActions] = useState(false);
 
   return (
@@ -508,7 +549,9 @@ function CharacterCard({
         "group relative rounded-lg border overflow-hidden transition-all",
         isActive
           ? "border-l-4 border-l-primary border-primary/20 bg-primary/5"
-          : "hover:shadow-sm",
+          : isInCollection
+            ? "border-l-2 border-l-primary/50 hover:shadow-sm"
+            : "hover:shadow-sm",
       )}
       onMouseEnter={() => !isTouch && setShowActions(true)}
       onMouseLeave={() => !isTouch && setShowActions(false)}
@@ -555,9 +598,9 @@ function CharacterCard({
               )}
               fieldName={`sections.${idx}.characters.${char.id}.tagline`}
             />
-            {isActive && (
+            {isInCollection && (
               <Div className="flex items-center gap-1 text-xs text-primary">
-                <Star className="h-3 w-3 fill-primary" />
+                <Star className={cn("h-3 w-3", isActive && "fill-primary")} />
               </Div>
             )}
           </Div>
@@ -656,104 +699,54 @@ function CharacterCard({
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <Div className="flex items-center gap-2 px-3 py-2 bg-muted/50 border-t">
-          {isActive ? (
-            <>
-              <Div className="flex items-center gap-1.5 text-xs text-primary font-medium">
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                <Span>
-                  {t(
-                    "app.api.agent.chat.characters.get.card.actions.inCollection",
-                  )}
-                </Span>
-              </Div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="ml-auto h-7 gap-1.5 text-xs"
-                onClick={async (e) => {
-                  e.stopPropagation();
-                  const { apiClient } =
-                    await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
-                  const characterSingleDefinitions =
-                    await import("./[id]/definition");
-                  const createFavoriteDefinitions =
-                    await import("../favorites/create/definition");
-                  const { DEFAULT_TTS_VOICE } =
-                    await import("../../text-to-speech/enum");
-
-                  const cachedData = apiClient.getEndpointData(
-                    characterSingleDefinitions.default.GET,
-                    logger,
-                    { id: char.id },
-                  );
-                  let fullChar = cachedData?.success
-                    ? cachedData.data
-                    : undefined;
-
-                  if (!fullChar) {
-                    const characterResponse = await apiClient.fetch(
-                      characterSingleDefinitions.default.GET,
-                      logger,
-                      user,
-                      undefined,
-                      { id: char.id },
-                      locale,
-                    );
-                    if (!characterResponse.success) {
-                      return;
-                    }
-                    fullChar = characterResponse.data;
-                  }
-
-                  navigate(createFavoriteDefinitions.default.POST, {
-                    data: {
-                      characterId: char.id,
-                      icon: fullChar.icon,
-                      name: fullChar.name,
-                      tagline: fullChar.tagline,
-                      description: fullChar.description,
-                      voice: fullChar.voice ?? DEFAULT_TTS_VOICE,
-                      modelSelection: null,
-                    },
-                    popNavigationOnSuccess: 1,
-                  });
-                }}
-              >
-                <Plus className="h-3.5 w-3.5" />
-                {t("app.api.agent.chat.characters.get.card.actions.addAnother")}
-              </Button>
-            </>
+        <Div className="flex items-center gap-2 px-3 py-2 bg-muted/50 border-t min-h-[3rem]">
+          {isInCollection ? (
+            <CharacterFavoriteActions
+              char={char}
+              favoriteCount={favoriteIds.length}
+              favoriteIds={favoriteIds}
+              activeFavoriteId={activeFavoriteId}
+              navigate={navigate}
+              logger={logger}
+              user={user}
+              locale={locale}
+              t={t}
+            />
           ) : (
             <>
-              <Div className="text-xs text-muted-foreground">
+              <Div className="text-xs text-muted-foreground flex-shrink-0">
                 {t(
                   "app.api.agent.chat.characters.get.card.actions.addToCollection",
                 )}
               </Div>
-              <AddToFavoritesButton
-                char={char}
-                logger={logger}
-                user={user}
-                locale={locale}
-                variant="default"
-                className="h-7 gap-1.5 text-xs ml-auto"
-              >
-                <Zap className="h-3.5 w-3.5" />
-                {t("app.api.agent.chat.characters.get.card.actions.quick")}
-              </AddToFavoritesButton>
-              <EditFavBeforeAddButton
-                char={char}
-                navigate={navigate}
-                logger={logger}
-                user={user}
-                locale={locale}
-                variant="outline"
-                className="h-7 gap-1.5 text-xs"
-              >
-                <Pencil className="h-3.5 w-3.5" />
-                {t("app.api.agent.chat.characters.get.card.actions.customize")}
-              </EditFavBeforeAddButton>
+              <Div className="flex items-center gap-2 ml-auto flex-shrink-0">
+                <AddToFavoritesButton
+                  char={char}
+                  logger={logger}
+                  user={user}
+                  locale={locale}
+                  variant="default"
+                  className="h-7 gap-1.5 text-xs"
+                  disabled={isInCollection}
+                >
+                  <Zap className="h-3.5 w-3.5" />
+                  {t("app.api.agent.chat.characters.get.card.actions.quick")}
+                </AddToFavoritesButton>
+                <EditFavBeforeAddButton
+                  char={char}
+                  navigate={navigate}
+                  logger={logger}
+                  user={user}
+                  locale={locale}
+                  variant="outline"
+                  className="h-7 gap-1.5 text-xs"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  {t(
+                    "app.api.agent.chat.characters.get.card.actions.customize",
+                  )}
+                </EditFavBeforeAddButton>
+              </Div>
             </>
           )}
         </Div>
@@ -817,6 +810,9 @@ function EditFavBeforeAddButton({
       const fullChar = characterResponse.data;
 
       // Navigate to create favorite with character data
+      const editFavoriteDefinitions =
+        await import("../favorites/[id]/definition");
+
       navigate(createFavoriteDefinitions.default.POST, {
         data: {
           characterId: char.id,
@@ -827,7 +823,12 @@ function EditFavBeforeAddButton({
           voice: fullChar.voice ?? DEFAULT_TTS_VOICE,
           modelSelection: null,
         },
-        popNavigationOnSuccess: 1,
+        replaceOnSuccess: {
+          endpoint: editFavoriteDefinitions.default.PATCH,
+          getUrlPathParams: (responseData) => ({ id: responseData.id }),
+          prefillFromGet: true,
+          getEndpoint: editFavoriteDefinitions.default.GET,
+        },
       });
     } catch (error) {
       logger.error("Failed to edit character", {
@@ -869,6 +870,7 @@ function AddToFavoritesButton({
   variant = "ghost",
   className = "",
   children,
+  disabled = false,
 }: {
   char: CharacterListItem;
   logger: ReturnType<typeof useWidgetContext>["logger"];
@@ -877,6 +879,7 @@ function AddToFavoritesButton({
   variant?: "ghost" | "outline" | "default";
   className?: string;
   children?: React.ReactNode;
+  disabled?: boolean;
 }): React.JSX.Element {
   const { isLoading, addToFavorites } = useAddToFavorites({
     characterId: char.id,
@@ -890,7 +893,7 @@ function AddToFavoritesButton({
       variant={variant}
       size="sm"
       onClick={addToFavorites}
-      disabled={isLoading || char.addedToFav}
+      disabled={isLoading || disabled}
       className={className}
     >
       {isLoading ? (
@@ -901,5 +904,423 @@ function AddToFavoritesButton({
         <Star className="h-4 w-4" />
       )}
     </Button>
+  );
+}
+
+/**
+ * Character Favorite Actions - shows different UI based on how many favorites exist
+ */
+function CharacterFavoriteActions({
+  char,
+  favoriteCount,
+  favoriteIds,
+  activeFavoriteId,
+  navigate,
+  logger,
+  user,
+  locale,
+  t,
+}: {
+  char: CharacterListItem;
+  favoriteCount: number;
+  favoriteIds: string[];
+  activeFavoriteId: string | null;
+  navigate: ReturnType<typeof useWidgetNavigation>["push"];
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
+  locale: ReturnType<typeof useWidgetContext>["locale"];
+  t: ReturnType<typeof useWidgetTranslation>;
+}): React.JSX.Element {
+  const [isActivating, setIsActivating] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const isCurrentlyActive =
+    activeFavoriteId !== null && favoriteIds.includes(activeFavoriteId);
+
+  const handleActivateSingleFavorite = async (
+    e: ButtonMouseEvent,
+  ): Promise<void> => {
+    e.stopPropagation();
+    if (favoriteIds.length !== 1) {
+      return;
+    }
+
+    setIsActivating(true);
+    try {
+      const { ChatSettingsRepositoryClient } =
+        await import("../settings/repository-client");
+      const { apiClient } =
+        await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+      const favoritesDefinition = await import("../favorites/[id]/definition");
+
+      // Fetch the favorite to get its data
+      const favoriteResponse = await apiClient.fetch(
+        favoritesDefinition.default.GET,
+        logger,
+        user,
+        undefined,
+        { id: favoriteIds[0] },
+        locale,
+      );
+
+      if (!favoriteResponse.success) {
+        logger.error("Failed to fetch favorite");
+        return;
+      }
+
+      const favorite = favoriteResponse.data;
+
+      // Determine the model to use
+      let modelId = null;
+      if (favorite.modelSelection) {
+        const { CharactersRepositoryClient } =
+          await import("./repository-client");
+        const bestModel = CharactersRepositoryClient.getBestModelForFavorite(
+          favorite.modelSelection,
+          undefined,
+        );
+        modelId = bestModel?.id || null;
+      }
+
+      // Activate this favorite
+      await ChatSettingsRepositoryClient.selectFavorite({
+        favoriteId: favoriteIds[0],
+        modelId,
+        characterId: char.id,
+        voice: favorite.voice || null,
+        logger,
+        locale,
+        user,
+      });
+    } catch (error) {
+      logger.error("Failed to activate favorite", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setIsActivating(false);
+    }
+  };
+
+  const handleActivateFavorite = async (
+    e: ButtonMouseEvent,
+    favoriteId: string,
+  ): Promise<void> => {
+    e.stopPropagation();
+    setIsActivating(true);
+    setPopoverOpen(false);
+
+    try {
+      const { ChatSettingsRepositoryClient } =
+        await import("../settings/repository-client");
+      const { apiClient } =
+        await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+      const favoritesDefinition = await import("../favorites/[id]/definition");
+
+      // Fetch the favorite to get its data
+      const favoriteResponse = await apiClient.fetch(
+        favoritesDefinition.default.GET,
+        logger,
+        user,
+        undefined,
+        { id: favoriteId },
+        locale,
+      );
+
+      if (!favoriteResponse.success) {
+        logger.error("Failed to fetch favorite");
+        return;
+      }
+
+      const favorite = favoriteResponse.data;
+
+      // Determine the model to use
+      let modelId = null;
+      if (favorite.modelSelection) {
+        const { CharactersRepositoryClient } =
+          await import("./repository-client");
+        const bestModel = CharactersRepositoryClient.getBestModelForFavorite(
+          favorite.modelSelection,
+          undefined,
+        );
+        modelId = bestModel?.id || null;
+      }
+
+      // Activate this favorite
+      await ChatSettingsRepositoryClient.selectFavorite({
+        favoriteId,
+        modelId,
+        characterId: char.id,
+        voice: favorite.voice || null,
+        logger,
+        locale,
+        user,
+      });
+    } catch (error) {
+      logger.error("Failed to activate favorite", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setIsActivating(false);
+    }
+  };
+
+  const handleAddAnother = async (e: ButtonMouseEvent): Promise<void> => {
+    e.stopPropagation();
+    const { apiClient } =
+      await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+    const characterSingleDefinitions = await import("./[id]/definition");
+    const createFavoriteDefinitions =
+      await import("../favorites/create/definition");
+    const { DEFAULT_TTS_VOICE } = await import("../../text-to-speech/enum");
+
+    const cachedData = apiClient.getEndpointData(
+      characterSingleDefinitions.default.GET,
+      logger,
+      { id: char.id },
+    );
+    let fullChar = cachedData?.success ? cachedData.data : undefined;
+
+    if (!fullChar) {
+      const characterResponse = await apiClient.fetch(
+        characterSingleDefinitions.default.GET,
+        logger,
+        user,
+        undefined,
+        { id: char.id },
+        locale,
+      );
+      if (!characterResponse.success) {
+        return;
+      }
+      fullChar = characterResponse.data;
+    }
+
+    const editFavoriteDefinitions =
+      await import("../favorites/[id]/definition");
+
+    navigate(createFavoriteDefinitions.default.POST, {
+      data: {
+        characterId: char.id,
+        icon: fullChar.icon,
+        name: fullChar.name,
+        tagline: fullChar.tagline,
+        description: fullChar.description,
+        voice: fullChar.voice ?? DEFAULT_TTS_VOICE,
+        modelSelection: null,
+      },
+      replaceOnSuccess: {
+        endpoint: editFavoriteDefinitions.default.PATCH,
+        getUrlPathParams: (responseData) => ({
+          id: responseData.id,
+        }),
+        prefillFromGet: true,
+        getEndpoint: editFavoriteDefinitions.default.GET,
+      },
+    });
+  };
+
+  if (favoriteCount === 1) {
+    // Single favorite - show "Use Now" or "In Use" button
+    return (
+      <>
+        <Div className="text-xs text-muted-foreground flex-shrink-0">
+          {t("app.api.agent.chat.characters.get.card.actions.inCollection")}
+        </Div>
+        <Div className="flex items-center gap-2 ml-auto flex-shrink-0">
+          <Button
+            variant={isCurrentlyActive ? "secondary" : "default"}
+            size="sm"
+            className="h-7 gap-1.5 text-xs"
+            onClick={handleActivateSingleFavorite}
+            disabled={isActivating || isCurrentlyActive}
+          >
+            {isActivating ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : isCurrentlyActive ? (
+              <Star className="h-3.5 w-3.5 fill-current" />
+            ) : (
+              <Zap className="h-3.5 w-3.5" />
+            )}
+            {isCurrentlyActive
+              ? t("app.api.agent.chat.characters.get.card.actions.inUse")
+              : t("app.api.agent.chat.characters.get.card.actions.useNow")}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 gap-1.5 text-xs"
+            onClick={handleAddAnother}
+          >
+            <Plus className="h-3.5 w-3.5" />
+            {t("app.api.agent.chat.characters.get.card.actions.addAnother")}
+          </Button>
+        </Div>
+      </>
+    );
+  }
+
+  // Multiple favorites - show popover with list
+  return (
+    <>
+      <Div className="text-xs text-muted-foreground flex-shrink-0">
+        {t("app.api.agent.chat.characters.get.card.actions.inCollection")}
+      </Div>
+      <Div className="flex items-center gap-2 ml-auto flex-shrink-0">
+        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="default"
+              size="sm"
+              className="h-7 gap-1.5 text-xs"
+              onClick={(e) => {
+                e.stopPropagation();
+                setPopoverOpen(!popoverOpen);
+              }}
+            >
+              <Star className="h-3.5 w-3.5" />
+              {t(
+                "app.api.agent.chat.characters.get.card.actions.chooseFavorite",
+              )}{" "}
+              ({favoriteCount})
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 p-2">
+            <Div className="flex flex-col gap-2">
+              <Div className="text-xs font-medium px-2 py-1 text-muted-foreground">
+                {t(
+                  "app.api.agent.chat.characters.get.card.actions.selectFavorite",
+                )}
+              </Div>
+              <FavoritesList
+                favoriteIds={favoriteIds}
+                activeFavoriteId={activeFavoriteId}
+                handleActivateFavorite={handleActivateFavorite}
+                isActivating={isActivating}
+                logger={logger}
+                t={t}
+                locale={locale}
+              />
+            </Div>
+          </PopoverContent>
+        </Popover>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 gap-1.5 text-xs"
+          onClick={handleAddAnother}
+        >
+          <Plus className="h-3.5 w-3.5" />
+          {t("app.api.agent.chat.characters.get.card.actions.addAnother")}
+        </Button>
+      </Div>
+    </>
+  );
+}
+
+/**
+ * Favorites List Component - displays favorite cards in popover
+ */
+function FavoritesList({
+  favoriteIds,
+  activeFavoriteId,
+  handleActivateFavorite,
+  isActivating,
+  logger,
+  t,
+  locale,
+}: {
+  favoriteIds: string[];
+  activeFavoriteId: string | null;
+  handleActivateFavorite: (
+    e: ButtonMouseEvent,
+    favoriteId: string,
+  ) => Promise<void>;
+  isActivating: boolean;
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  t: ReturnType<typeof useWidgetTranslation>;
+  locale: ReturnType<typeof useWidgetContext>["locale"];
+}): React.JSX.Element {
+  const { favorites } = useChatFavorites(logger);
+
+  // Get favorite cards for the IDs we have
+  const favoriteCards = useMemo(() => {
+    if (!favorites) {
+      return [];
+    }
+    return favoriteIds
+      .map((id) => favorites.find((fav) => fav.id === id))
+      .filter((fav): fav is NonNullable<typeof fav> => fav !== undefined);
+  }, [favorites, favoriteIds]);
+
+  if (favoriteCards.length === 0) {
+    return (
+      <Div className="flex items-center justify-center py-4">
+        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+      </Div>
+    );
+  }
+
+  return (
+    <>
+      {favoriteCards.map((fav) => {
+        const isActive = fav.id === activeFavoriteId;
+        return (
+          <Div
+            key={fav.id}
+            className={cn(
+              "flex items-center gap-2 p-2 rounded-md transition-colors",
+              isActive
+                ? "bg-primary/10 text-primary"
+                : "hover:bg-muted cursor-pointer",
+            )}
+            onClick={(e) => {
+              if (!isActive && !isActivating) {
+                void handleActivateFavorite(
+                  e as React.MouseEvent<HTMLButtonElement>,
+                  fav.id,
+                );
+              }
+            }}
+          >
+            <Icon icon={fav.icon} className="h-8 w-8 flex-shrink-0" />
+            <Div className="flex-1 min-w-0 text-sm">
+              <Div className="flex items-center gap-1.5 mb-0.5">
+                <Span
+                  className={cn(
+                    "font-medium truncate",
+                    isActive && "text-primary",
+                  )}
+                >
+                  {t(fav.name)}
+                </Span>
+                <Badge variant="secondary">
+                  {t(fav.voice || DEFAULT_TTS_VOICE)}
+                </Badge>
+              </Div>
+              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Icon icon={fav.modelIcon} className="h-3 w-3 flex-shrink-0" />
+                <Span className="truncate">{t(fav.modelInfo)}</Span>
+                {fav.modelId && (
+                  <>
+                    <Span>•</Span>
+                    <ModelCreditDisplay
+                      modelId={fav.modelId}
+                      variant="text"
+                      className="text-xs flex-shrink-0"
+                      t={t}
+                      locale={locale}
+                    />
+                  </>
+                )}
+              </Div>
+            </Div>
+            {isActivating ? (
+              <Loader2 className="h-4 w-4 animate-spin flex-shrink-0" />
+            ) : isActive ? (
+              <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-primary" />
+            ) : null}
+          </Div>
+        );
+      })}
+    </>
   );
 }

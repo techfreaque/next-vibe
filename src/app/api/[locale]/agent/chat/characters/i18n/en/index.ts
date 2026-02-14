@@ -675,6 +675,10 @@ export const translations = {
         addToCollection: "Add to collection:",
         quick: "Quick",
         customize: "Customize",
+        useNow: "Use Now",
+        inUse: "In Use",
+        chooseFavorite: "Choose Favorite",
+        selectFavorite: "Select a favorite to activate:",
       },
     },
     section: {

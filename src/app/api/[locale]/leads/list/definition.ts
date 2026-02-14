@@ -425,7 +425,11 @@ const { GET } = createEndpoint({
                 viewButton: navigateButtonField({
                   targetEndpoint: leadSingleDefinitions.GET,
                   extractParams: (source) => ({
-                    urlPathParams: { id: String(source.itemData.id) },
+                    urlPathParams: {
+                      id: String(
+                        (source.itemData as { id: string | number })?.id,
+                      ),
+                    },
                   }),
                   prefillFromGet: false,
                   icon: "eye",
@@ -435,7 +439,11 @@ const { GET } = createEndpoint({
                 editButton: navigateButtonField({
                   targetEndpoint: leadSingleDefinitions.PATCH,
                   extractParams: (source) => ({
-                    urlPathParams: { id: String(source.itemData.id) },
+                    urlPathParams: {
+                      id: String(
+                        (source.itemData as { id: string | number })?.id,
+                      ),
+                    },
                   }),
                   prefillFromGet: true,
                   getEndpoint: leadSingleDefinitions.GET,
@@ -446,7 +454,11 @@ const { GET } = createEndpoint({
                 deleteButton: navigateButtonField({
                   targetEndpoint: leadSingleDefinitions.DELETE,
                   extractParams: (source) => ({
-                    urlPathParams: { id: String(source.itemData.id) },
+                    urlPathParams: {
+                      id: String(
+                        (source.itemData as { id: string | number })?.id,
+                      ),
+                    },
                   }),
                   prefillFromGet: false,
                   icon: "trash",

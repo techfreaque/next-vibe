@@ -180,7 +180,7 @@ export interface ModelSelectorProps {
   /**
    * Callback when selection changes (optional for read-only mode)
    */
-  onChange?: (selection: ModelSelectionSimple) => void;
+  onChange?: (selection: ModelSelectionSimple | null) => void;
 
   /**
    * Character's model selection (optional, for CHARACTER_BASED mode)
@@ -291,7 +291,7 @@ export function ModelSelector({
       : undefined;
 
   // Helper to update value
-  const updateValue = (newSelection: ModelSelectionSimple): void => {
+  const updateValue = (newSelection: ModelSelectionSimple | null): void => {
     if (readOnly || !onChange) {
       return;
     }
@@ -306,8 +306,9 @@ export function ModelSelector({
       | typeof ModelSelectionType.MANUAL,
   ): void => {
     if (newMode === ModelSelectionType.CHARACTER_BASED) {
-      // Just toggle the UI state - don't change form value
+      // Toggle UI state and set form value to null
       setUseCharacterBased(true);
+      updateValue(null);
     } else {
       setUseCharacterBased(false);
 
@@ -434,9 +435,9 @@ export function ModelSelector({
           intelligenceIndices,
           INTELLIGENCE_DISPLAY,
         ),
-        priceRange: getRangeFromIndices({ min, max }, PRICE_DISPLAY),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
         contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        speedRange: getRangeFromIndices({ min, max }, SPEED_DISPLAY),
         sortBy,
         sortDirection,
       });
@@ -447,9 +448,9 @@ export function ModelSelector({
           intelligenceIndices,
           INTELLIGENCE_DISPLAY,
         ),
-        priceRange: getRangeFromIndices({ min, max }, PRICE_DISPLAY),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
         contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
-        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        speedRange: getRangeFromIndices({ min, max }, SPEED_DISPLAY),
         sortBy,
         sortDirection,
       });
@@ -1095,6 +1096,7 @@ export function ModelSelector({
                               dimmed={isOutsideFilter}
                               disabled={readOnly}
                               t={t}
+                              locale={locale}
                             />
                           );
                         })}

@@ -316,6 +316,10 @@ export const translations: typeof enTranslations = {
     unexpectedError:
       "Ein unerwarteter Fehler ist aufgetreten: {{error}}. Bitte versuchen Sie es erneut.",
   },
+  info: {
+    streamInterrupted:
+      "Generierung wurde gestoppt. Teilantwort wurde gespeichert.",
+  },
   providers: {
     uncensoredHandler: {
       errors: {

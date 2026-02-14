@@ -210,7 +210,9 @@ const { PATCH } = createEndpoint({
             label: "app.api.leads.lead.id.patch.deleteButton.label",
             targetEndpoint: DELETE,
             extractParams: (source) => ({
-              urlPathParams: { id: source.urlPathParams.id },
+              urlPathParams: {
+                id: (source.urlPathParams as { id: string | number })?.id,
+              },
             }),
             icon: "trash",
             variant: "destructive",
@@ -917,7 +919,11 @@ const { GET } = createEndpoint({
             targetEndpoint: PATCH,
             extractParams: (source) => ({
               urlPathParams: {
-                id: source.responseData.lead.basicInfo.id,
+                id: (
+                  source.responseData as {
+                    lead: { basicInfo: { id: string | number } };
+                  }
+                )?.lead?.basicInfo?.id,
               },
             }),
             prefillFromGet: true,
@@ -933,7 +939,11 @@ const { GET } = createEndpoint({
             targetEndpoint: DELETE,
             extractParams: (source) => ({
               urlPathParams: {
-                id: source.responseData.lead.basicInfo.id,
+                id: (
+                  source.responseData as {
+                    lead: { basicInfo: { id: string | number } };
+                  }
+                )?.lead?.basicInfo?.id,
               },
             }),
             label: "app.api.leads.lead.id.get.deleteButton.label",

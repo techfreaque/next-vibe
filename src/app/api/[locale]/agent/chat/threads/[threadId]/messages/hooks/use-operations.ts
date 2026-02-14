@@ -90,7 +90,6 @@ interface MessageOperationsDeps {
   streamStore: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     streamingMessages: Record<string, any>;
-    error: string | null;
     reset: () => void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     addMessage: (message: any) => void;

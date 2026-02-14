@@ -210,227 +210,233 @@ export const Markdown = memo(function Markdown({
   };
 
   // Memoize the thinking ReactMarkdown components
-  const thinkingComponents: {
-    p: Components["p"];
-  } = useMemo(
-    () => ({
-      p: memo(({ children }: { children: React.ReactNode }) => (
-        <div className="mb-2 last:mb-0">{children}</div>
-      )),
-    }),
+  const thinkingComponents = useMemo(
+    () =>
+      ({
+        p: memo(({ children }: { children: React.ReactNode }) => (
+          <div className="mb-2 last:mb-0">{children}</div>
+        )),
+      }) as Partial<Components>,
     [],
   );
 
   // Memoize the main ReactMarkdown components
-  const mainComponents: Components = useMemo(
-    () => ({
-      h1: memo(({ children }: { children: React.ReactNode }) => (
-        <h1 className="text-3xl font-bold mb-4 mt-8 first:mt-0 leading-tight text-slate-900 dark:text-slate-50 tracking-tight">
-          {children}
-        </h1>
-      )),
-      h2: memo(({ children }: { children: React.ReactNode }) => (
-        <h2 className="text-2xl font-bold mb-3 mt-6 first:mt-0 leading-tight text-slate-900 dark:text-slate-50 tracking-tight border-b border-slate-200 dark:border-slate-800 pb-2">
-          {children}
-        </h2>
-      )),
-      h3: memo(({ children }: { children: React.ReactNode }) => (
-        <h3 className="text-xl font-semibold mb-3 mt-5 first:mt-0 leading-tight text-slate-900 dark:text-slate-100">
-          {children}
-        </h3>
-      )),
-      h4: memo(({ children }: { children: React.ReactNode }) => (
-        <h4 className="text-lg font-semibold mb-2 mt-4 first:mt-0 text-slate-900 dark:text-slate-100">
-          {children}
-        </h4>
-      )),
-      h5: memo(({ children }: { children: React.ReactNode }) => (
-        <h5 className="text-base font-semibold mb-2 mt-3 first:mt-0 tracking-wide text-slate-800 dark:text-slate-200">
-          {children}
-        </h5>
-      )),
-      h6: memo(({ children }: { children: React.ReactNode }) => (
-        <h6 className="text-sm font-semibold mb-1 mt-2 first:mt-0 tracking-wide text-slate-700 dark:text-slate-300 uppercase">
-          {children}
-        </h6>
-      )),
+  const mainComponents = useMemo(
+    () =>
+      ({
+        h1: memo(({ children }: { children: React.ReactNode }) => (
+          <h1 className="text-3xl font-bold mb-4 mt-8 first:mt-0 leading-tight text-slate-900 dark:text-slate-50 tracking-tight">
+            {children}
+          </h1>
+        )),
+        h2: memo(({ children }: { children: React.ReactNode }) => (
+          <h2 className="text-2xl font-bold mb-3 mt-6 first:mt-0 leading-tight text-slate-900 dark:text-slate-50 tracking-tight border-b border-slate-200 dark:border-slate-800 pb-2">
+            {children}
+          </h2>
+        )),
+        h3: memo(({ children }: { children: React.ReactNode }) => (
+          <h3 className="text-xl font-semibold mb-3 mt-5 first:mt-0 leading-tight text-slate-900 dark:text-slate-100">
+            {children}
+          </h3>
+        )),
+        h4: memo(({ children }: { children: React.ReactNode }) => (
+          <h4 className="text-lg font-semibold mb-2 mt-4 first:mt-0 text-slate-900 dark:text-slate-100">
+            {children}
+          </h4>
+        )),
+        h5: memo(({ children }: { children: React.ReactNode }) => (
+          <h5 className="text-base font-semibold mb-2 mt-3 first:mt-0 tracking-wide text-slate-800 dark:text-slate-200">
+            {children}
+          </h5>
+        )),
+        h6: memo(({ children }: { children: React.ReactNode }) => (
+          <h6 className="text-sm font-semibold mb-1 mt-2 first:mt-0 tracking-wide text-slate-700 dark:text-slate-300 uppercase">
+            {children}
+          </h6>
+        )),
 
-      p: memo(({ children }: { children: React.ReactNode }) => (
-        <div className="text-base leading-7 mb-4 last:mb-0 text-slate-700 dark:text-slate-300">
-          {children}
-        </div>
-      )),
+        p: memo(({ children }: { children: React.ReactNode }) => (
+          <div className="text-base leading-7 mb-4 last:mb-0 text-slate-700 dark:text-slate-300">
+            {children}
+          </div>
+        )),
 
-      ul: memo(({ children }: { children: React.ReactNode }) => (
-        <ul className="list-disc list-outside ml-0 pl-6 mb-4 mt-2 space-y-2 text-base marker:text-blue-500 dark:marker:text-blue-400">
-          {children}
-        </ul>
-      )),
-      ol: memo(({ children }: { children: React.ReactNode }) => (
-        <ol className="list-decimal list-outside ml-0 pl-6 mb-4 mt-2 space-y-2 text-base marker:text-blue-500 dark:marker:text-blue-400 marker:font-semibold">
-          {children}
-        </ol>
-      )),
-      li: memo(({ children }: { children: React.ReactNode }) => {
-        // Check if this is a task list item (contains a checkbox)
-        const isTaskListItem = React.Children.toArray(children).some(
-          (child) => {
-            if (React.isValidElement(child) && child.type === "input") {
-              const props = child.props as { type?: string };
-              return props.type === "checkbox";
-            }
-            return false;
-          },
-        );
+        ul: memo(({ children }: { children: React.ReactNode }) => (
+          <ul className="list-disc list-outside ml-0 pl-6 mb-4 mt-2 space-y-2 text-base marker:text-blue-500 dark:marker:text-blue-400">
+            {children}
+          </ul>
+        )),
+        ol: memo(({ children }: { children: React.ReactNode }) => (
+          <ol className="list-decimal list-outside ml-0 pl-6 mb-4 mt-2 space-y-2 text-base marker:text-blue-500 dark:marker:text-blue-400 marker:font-semibold">
+            {children}
+          </ol>
+        )),
+        li: memo(({ children }: { children: React.ReactNode }) => {
+          // Check if this is a task list item (contains a checkbox)
+          const isTaskListItem = React.Children.toArray(children).some(
+            (child) => {
+              if (React.isValidElement(child) && child.type === "input") {
+                const props = child.props as { type?: string };
+                return props.type === "checkbox";
+              }
+              return false;
+            },
+          );
 
-        if (isTaskListItem) {
-          return (
-            <li className="flex items-start gap-2.5 my-1.5 list-none -ml-6">
-              {React.Children.map(children, (child, index) => {
-                if (React.isValidElement(child) && child.type === "input") {
-                  const props = child.props as {
-                    type?: string;
-                    checked?: boolean;
-                    disabled?: boolean;
-                  };
-                  if (props.type === "checkbox") {
-                    return (
-                      <input
-                        key={index}
-                        type="checkbox"
-                        checked={props.checked}
-                        disabled={props.disabled}
-                        className="mt-1 h-4 w-4 rounded border-2 border-slate-300 dark:border-slate-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 focus:ring-2 cursor-pointer disabled:cursor-not-allowed accent-blue-600 dark:accent-blue-500 transition-colors"
-                        readOnly
-                      />
-                    );
+          if (isTaskListItem) {
+            return (
+              <li className="flex items-start gap-2.5 my-1.5 list-none -ml-6">
+                {React.Children.map(children, (child, index) => {
+                  if (React.isValidElement(child) && child.type === "input") {
+                    const props = child.props as {
+                      type?: string;
+                      checked?: boolean;
+                      disabled?: boolean;
+                    };
+                    if (props.type === "checkbox") {
+                      return (
+                        <input
+                          key={index}
+                          type="checkbox"
+                          checked={props.checked}
+                          disabled={props.disabled}
+                          className="mt-1 h-4 w-4 rounded border-2 border-slate-300 dark:border-slate-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 focus:ring-2 cursor-pointer disabled:cursor-not-allowed accent-blue-600 dark:accent-blue-500 transition-colors"
+                          readOnly
+                        />
+                      );
+                    }
                   }
-                }
-                return <span key={index}>{child}</span>;
-              })}
+                  return <span key={index}>{child}</span>;
+                })}
+              </li>
+            );
+          }
+
+          return (
+            <li className="text-base text-slate-700 dark:text-slate-300 leading-7 my-0.5">
+              {children}
             </li>
           );
-        }
+        }),
 
-        return (
-          <li className="text-base text-slate-700 dark:text-slate-300 leading-7 my-0.5">
+        strong: memo(({ children }: { children: React.ReactNode }) => (
+          <strong className="font-bold text-slate-900 dark:text-slate-50">
             {children}
-          </li>
-        );
-      }),
+          </strong>
+        )),
+        em: memo(({ children }: { children: React.ReactNode }) => (
+          <em className="italic text-slate-600 dark:text-slate-400 font-medium">
+            {children}
+          </em>
+        )),
 
-      strong: memo(({ children }: { children: React.ReactNode }) => (
-        <strong className="font-bold text-slate-900 dark:text-slate-50">
-          {children}
-        </strong>
-      )),
-      em: memo(({ children }: { children: React.ReactNode }) => (
-        <em className="italic text-slate-600 dark:text-slate-400 font-medium">
-          {children}
-        </em>
-      )),
+        // Code with copy button and syntax highlighting
+        code: memo(
+          ({
+            children,
+            className,
+            ...props
+          }: {
+            children: React.ReactNode;
+            className?: string;
+          }) => {
+            const match = /language-(\w+)/.exec(className || "");
+            // eslint-disable-next-line @typescript-eslint/no-base-to-string
+            const codeString = String(children).replace(/\n$/, "");
 
-      // Code with copy button and syntax highlighting
-      code: memo(
-        ({
-          children,
-          className,
-          ...props
-        }: {
-          children: React.ReactNode;
-          className?: string;
-        }) => {
-          const match = /language-(\w+)/.exec(className || "");
-          // eslint-disable-next-line @typescript-eslint/no-base-to-string
-          const codeString = String(children).replace(/\n$/, "");
+            // Check if this is a code block (has newlines or is in a pre tag)
+            const isCodeBlock = codeString.includes("\n") || className;
 
-          // Check if this is a code block (has newlines or is in a pre tag)
-          const isCodeBlock = codeString.includes("\n") || className;
+            if (match) {
+              return <CodeBlock code={codeString} language={match[1]} />;
+            }
 
-          if (match) {
-            return <CodeBlock code={codeString} language={match[1]} />;
-          }
+            // If it's a code block without language, use "text" as default
+            if (isCodeBlock) {
+              return <CodeBlock code={codeString} language="text" />;
+            }
 
-          // If it's a code block without language, use "text" as default
-          if (isCodeBlock) {
-            return <CodeBlock code={codeString} language="text" />;
-          }
+            // Inline code
+            return (
+              <code
+                className="bg-slate-100 dark:bg-slate-800/80 text-violet-600 dark:text-violet-400 px-2 py-0.5 rounded-md text-sm font-mono border border-slate-200 dark:border-slate-700/50 font-medium"
+                {...props}
+              >
+                {children}
+              </code>
+            );
+          },
+        ),
 
-          // Inline code
-          return (
-            <code
-              className="bg-slate-100 dark:bg-slate-800/80 text-violet-600 dark:text-violet-400 px-2 py-0.5 rounded-md text-sm font-mono border border-slate-200 dark:border-slate-700/50 font-medium"
-              {...props}
+        pre: memo(({ children }: { children: React.ReactNode }) => {
+          // Let the code component handle the pre wrapper
+          return <>{children}</>;
+        }),
+
+        blockquote: memo(({ children }: { children: React.ReactNode }) => (
+          <blockquote className="relative border-l-4 border-blue-500 dark:border-blue-400 pl-6 pr-4 py-4 my-4 bg-linear-to-r from-blue-50 via-indigo-50/50 to-transparent dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-transparent rounded-r-xl text-base text-slate-700 dark:text-slate-300 shadow-sm">
+            <div
+              className="absolute left-2 top-4 text-blue-500/20 dark:text-blue-400/20 text-6xl leading-none font-serif"
+              aria-hidden="true"
+            >
+              {DECORATIVE_QUOTE}
+            </div>
+            {children}
+          </blockquote>
+        )),
+
+        a: memo(
+          ({
+            href,
+            children,
+          }: {
+            href?: string;
+            children: React.ReactNode;
+          }) => (
+            <Link
+              href={href || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 inline-flex items-center gap-1 underline underline-offset-2 decoration-2 hover:decoration-blue-600 dark:hover:decoration-blue-400 transition-all duration-200 font-medium"
             >
               {children}
-            </code>
-          );
-        },
-      ),
-
-      pre: memo(({ children }: { children: React.ReactNode }) => {
-        // Let the code component handle the pre wrapper
-        return <>{children}</>;
-      }),
-
-      blockquote: memo(({ children }: { children: React.ReactNode }) => (
-        <blockquote className="relative border-l-4 border-blue-500 dark:border-blue-400 pl-6 pr-4 py-4 my-4 bg-linear-to-r from-blue-50 via-indigo-50/50 to-transparent dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-transparent rounded-r-xl text-base text-slate-700 dark:text-slate-300 shadow-sm">
-          <div
-            className="absolute left-2 top-4 text-blue-500/20 dark:text-blue-400/20 text-6xl leading-none font-serif"
-            aria-hidden="true"
-          >
-            {DECORATIVE_QUOTE}
-          </div>
-          {children}
-        </blockquote>
-      )),
-
-      a: memo(
-        ({ href, children }: { href?: string; children: React.ReactNode }) => (
-          <Link
-            href={href || "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 inline-flex items-center gap-1 underline underline-offset-2 decoration-2 hover:decoration-blue-600 dark:hover:decoration-blue-400 transition-all duration-200 font-medium"
-          >
-            {children}
-            <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-70" />
-          </Link>
+              <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-70" />
+            </Link>
+          ),
         ),
-      ),
 
-      img: memo(({ src, alt }: { src?: string; alt?: string }) => (
-        <MarkdownImage
-          src={typeof src === "string" ? src : undefined}
-          alt={alt}
-        />
-      )),
+        img: memo(({ src, alt }: { src?: string; alt?: string }) => (
+          <MarkdownImage
+            src={typeof src === "string" ? src : undefined}
+            alt={alt}
+          />
+        )),
 
-      table: memo(({ children }: { children: React.ReactNode }) => (
-        <div className="overflow-x-auto mb-6 mt-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
-          <table className="min-w-full border-collapse text-sm">
+        table: memo(({ children }: { children: React.ReactNode }) => (
+          <div className="overflow-x-auto mb-6 mt-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+            <table className="min-w-full border-collapse text-sm">
+              {children}
+            </table>
+          </div>
+        )),
+        thead: memo(({ children }: { children: React.ReactNode }) => (
+          <thead className="bg-slate-50 dark:bg-slate-800/50">{children}</thead>
+        )),
+        th: memo(({ children }: { children: React.ReactNode }) => (
+          <th className="border-b-2 border-slate-200 dark:border-slate-700 px-4 py-3 text-left font-semibold text-slate-900 dark:text-slate-100 uppercase text-xs tracking-wider">
             {children}
-          </table>
-        </div>
-      )),
-      thead: memo(({ children }: { children: React.ReactNode }) => (
-        <thead className="bg-slate-50 dark:bg-slate-800/50">{children}</thead>
-      )),
-      th: memo(({ children }: { children: React.ReactNode }) => (
-        <th className="border-b-2 border-slate-200 dark:border-slate-700 px-4 py-3 text-left font-semibold text-slate-900 dark:text-slate-100 uppercase text-xs tracking-wider">
-          {children}
-        </th>
-      )),
-      td: memo(({ children }: { children: React.ReactNode }) => (
-        <td className="border-b border-slate-200 dark:border-slate-800 px-4 py-3 text-slate-700 dark:text-slate-300">
-          {children}
-        </td>
-      )),
+          </th>
+        )),
+        td: memo(({ children }: { children: React.ReactNode }) => (
+          <td className="border-b border-slate-200 dark:border-slate-800 px-4 py-3 text-slate-700 dark:text-slate-300">
+            {children}
+          </td>
+        )),
 
-      hr: memo(() => (
-        <hr className="border-0 border-t-2 border-slate-200 dark:border-slate-800 my-8" />
-      )),
-    }),
+        hr: memo(() => (
+          <hr className="border-0 border-t-2 border-slate-200 dark:border-slate-800 my-8" />
+        )),
+      }) as Partial<Components>,
     [],
   );
 

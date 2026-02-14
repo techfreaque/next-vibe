@@ -79,10 +79,14 @@ export const translations: typeof enTranslations = {
       conversionFailed: "Synteza mowy nie powiodła się: {error}",
       noText: "Nie podano tekstu",
       noAudioUrl: "Nie otrzymano URL audio od dostawcy",
-      audioFetchFailed: "Nie udało się pobrać pliku audio",
       providerError: "Błąd dostawcy: {error}",
       internalError: "Wewnętrzny błąd serwera",
       creditsFailed: "Nie udało się odjąć kredytów: {{error}}",
+      audioFetchFailed: "Nie można utworzyć pliku audio. Spróbuj ponownie",
+      balanceCheckFailed:
+        "Nie można sprawdzić salda kredytów. Spróbuj ponownie",
+      insufficientCredits:
+        "Nie masz wystarczającej liczby kredytów na tę konwersję. Dodaj więcej kredytów, aby kontynuować",
     },
     success: {
       title: "Sukces",

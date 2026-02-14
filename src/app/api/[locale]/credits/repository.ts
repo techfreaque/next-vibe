@@ -2186,20 +2186,23 @@ export class CreditRepository {
       const totalCount = Number(count);
       const { t } = simpleT(locale);
       const result: CreditTransactionOutput[] = transactions.map(
-        (transaction) => ({
-          id: transaction.id,
-          amount: transaction.amount,
-          balanceAfter: transaction.balanceAfter,
-          type: transaction.modelId
-            ? `${t(transaction.type)} (${CreditRepository.getFetaureLabel(
-                transaction.modelId,
-                transaction.feature,
-              )})`
-            : transaction.type,
-          modelId: transaction.modelId,
-          messageId: transaction.messageId,
-          createdAt: transaction.createdAt.toISOString(),
-        }),
+        (transaction) => {
+          const featureLabel = CreditRepository.getFetaureLabel(
+            transaction.modelId,
+            transaction.feature,
+          );
+          return {
+            id: transaction.id,
+            amount: transaction.amount,
+            balanceAfter: transaction.balanceAfter,
+            type: featureLabel
+              ? `${t(transaction.type)} (${featureLabel})`
+              : transaction.type,
+            modelId: transaction.modelId,
+            messageId: transaction.messageId,
+            createdAt: transaction.createdAt.toISOString(),
+          };
+        },
       );
 
       // Add summary entry for other leads' spending if > 0
@@ -2408,16 +2411,22 @@ export class CreditRepository {
       const totalCount = Number(count);
       const { t } = simpleT(locale);
       const result: CreditTransactionOutput[] = transactions.map(
-        (transaction) => ({
-          id: transaction.id,
-          amount: transaction.amount,
-          balanceAfter: transaction.balanceAfter,
-          type: transaction.modelId
-            ? `${t(transaction.type)} (${CreditRepository.getFetaureLabel(transaction.modelId, transaction.feature)})`
-            : transaction.type,
-          messageId: transaction.messageId,
-          createdAt: transaction.createdAt.toISOString(),
-        }),
+        (transaction) => {
+          const featureLabel = CreditRepository.getFetaureLabel(
+            transaction.modelId,
+            transaction.feature,
+          );
+          return {
+            id: transaction.id,
+            amount: transaction.amount,
+            balanceAfter: transaction.balanceAfter,
+            type: featureLabel
+              ? `${t(transaction.type)} (${featureLabel})`
+              : transaction.type,
+            messageId: transaction.messageId,
+            createdAt: transaction.createdAt.toISOString(),
+          };
+        },
       );
 
       // Add summary entry for other devices' spending if > 0

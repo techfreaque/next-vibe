@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq, inArray, isNotNull, ne, or, sql } from "drizzle-orm";
+import { and, eq, ne, or } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
 import type {
@@ -26,7 +26,6 @@ import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { defaultModel, modelProviders } from "../../models/models";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
-import { chatFavorites } from "../favorites/db";
 import type {
   CharacterDeleteResponseOutput,
   CharacterGetResponseOutput,
@@ -73,7 +72,7 @@ export class CharactersRepository {
       if (userId) {
         logger.debug("Getting all characters for user", { userId });
 
-        // Fetch custom characters with addedToFav status via LEFT JOIN
+        // Fetch custom characters
         const customCharactersList = await db
           .select({
             id: customCharacters.id,
@@ -86,16 +85,8 @@ export class CharactersRepository {
             ownershipType: customCharacters.ownershipType,
             modelSelection: customCharacters.modelSelection,
             voice: customCharacters.voice,
-            addedToFav: sql<boolean>`${isNotNull(chatFavorites.id)}`,
           })
           .from(customCharacters)
-          .leftJoin(
-            chatFavorites,
-            and(
-              sql`${chatFavorites.characterId} = ${customCharacters.id}::text`,
-              eq(chatFavorites.userId, userId),
-            ),
-          )
           .where(
             or(
               // User's own characters (any ownershipType)
@@ -124,25 +115,8 @@ export class CharactersRepository {
               modelSelection: char.modelSelection,
             },
             t,
-            char.addedToFav,
           );
         });
-
-        // Fetch favorites for all default characters in one query
-        const defaultCharacterIds = DEFAULT_CHARACTERS.map((c) => c.id);
-        const favoritedDefaultCharacters = await db
-          .select({ characterId: chatFavorites.characterId })
-          .from(chatFavorites)
-          .where(
-            and(
-              inArray(chatFavorites.characterId, defaultCharacterIds),
-              eq(chatFavorites.userId, userId),
-            ),
-          );
-
-        const favoritedDefaultCharacterIds = new Set(
-          favoritedDefaultCharacters.map((f) => f.characterId),
-        );
 
         // Map default characters to card display fields
         const defaultCharactersCards = DEFAULT_CHARACTERS.map((char) => {
@@ -157,7 +131,6 @@ export class CharactersRepository {
               modelSelection: char.modelSelection,
             },
             t,
-            favoritedDefaultCharacterIds.has(char.id),
           );
         });
 
@@ -177,7 +150,6 @@ export class CharactersRepository {
       }
 
       // For public/lead users, return only default characters as card display fields
-      // Public users don't have favorites, so addedToFav is always false
       logger.debug("Getting default characters for public user");
       const defaultCharactersCards = DEFAULT_CHARACTERS.map((char) => {
         return CharactersRepository.mapCharacterToListItem(
@@ -191,7 +163,6 @@ export class CharactersRepository {
             modelSelection: char.modelSelection,
           },
           t,
-          false,
         );
       });
 
@@ -621,7 +592,6 @@ export class CharactersRepository {
       modelSelection: FiltersModelSelection | ManualModelSelection;
     },
     t: TFunction,
-    addedToFav: boolean,
   ): CharacterListItem {
     // Get best model from character's modelSelection
     const bestModel = CharactersRepositoryClient.getBestModelForCharacter(
@@ -650,7 +620,6 @@ export class CharactersRepository {
       category: char.category,
       icon: char.icon ?? "sparkles",
       modelId,
-      addedToFav,
       name:
         char.name ??
         bestModel?.name ??

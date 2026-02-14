@@ -28,6 +28,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { iconSchema } from "../../../shared/types/common.schema";
 import { ModelId } from "../../models/models";
+import { TtsVoiceValue } from "../../text-to-speech/enum";
 import charactersDefinitions from "../characters/definition";
 import { FavoritesListContainer } from "./widget";
 
@@ -96,6 +97,13 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               hidden: true,
               schema: z.enum(ModelId).nullable(),
+            }),
+            voice: responseField({
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.string().nullable() as z.ZodType<
+                typeof TtsVoiceValue | null
+              >,
             }),
             position: responseField({
               type: WidgetType.TEXT,
@@ -241,6 +249,7 @@ const { GET } = createEndpoint({
             id: "550e8400-e29b-41d4-a716-446655440000",
             characterId: "default",
             modelId: ModelId.CLAUDE_SONNET_4_5,
+            voice: TtsVoiceValue,
             position: 0,
             icon: "sparkles",
             name: "Thea",

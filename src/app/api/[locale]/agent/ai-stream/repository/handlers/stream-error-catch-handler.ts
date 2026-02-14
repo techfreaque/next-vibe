@@ -12,7 +12,6 @@ import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { StreamContext } from "../core/stream-context";
-import { AbortErrorHandler } from "./abort-error-handler";
 import { StreamErrorHandler } from "./stream-error-handler";
 import { TimeoutErrorHandler } from "./timeout-error-handler";
 
@@ -45,20 +44,9 @@ export class StreamErrorCatchHandler {
       logger,
     } = params;
 
-    // Check if this is a graceful abort (user stopped generation or tool confirmation required)
-    if (error instanceof Error) {
-      const { wasHandled } = AbortErrorHandler.handleAbortError({
-        error,
-        ctx,
-        controller,
-        encoder,
-        logger,
-      });
-
-      if (wasHandled) {
-        return;
-      }
-    }
+    // Note: Abort errors are now handled inline in stream-execution-handler
+    // This ensures events are emitted before the controller closes
+    // So this handler should only see non-abort errors
 
     // Check if this is a timeout error
     if (error instanceof Error && error.message === "Stream timeout") {

@@ -21,7 +21,10 @@ import type {
   ManualModelSelection,
 } from "../../models/components/types";
 import { modelProviders } from "../../models/models";
-import type { TtsVoiceValue } from "../../text-to-speech/enum";
+import {
+  DEFAULT_TTS_VOICE,
+  type TtsVoiceValue,
+} from "../../text-to-speech/enum";
 import { DEFAULT_CHARACTERS } from "../characters/config";
 import { ModelSelectionType } from "../characters/enum";
 import { CharactersRepositoryClient } from "../characters/repository-client";
@@ -84,6 +87,7 @@ export class ChatFavoritesRepositoryClient {
           character?.tagline ?? null,
           character?.description ?? null,
           activeFavoriteId,
+          character?.voice ?? null,
         );
       });
 
@@ -285,6 +289,7 @@ export class ChatFavoritesRepositoryClient {
     characterTagline: TranslationKey | null,
     characterDescription: TranslationKey | null,
     activeFavoriteId: string | null,
+    characterVoice?: typeof TtsVoiceValue | null,
   ): FavoriteCard {
     const bestModel = CharactersRepositoryClient.getBestModelForFavorite(
       stored.modelSelection,
@@ -297,6 +302,7 @@ export class ChatFavoritesRepositoryClient {
       id: stored.id,
       characterId: stored.characterId,
       modelId: bestModel?.id ?? null,
+      voice: stored.voice ?? characterVoice ?? DEFAULT_TTS_VOICE,
       position: stored.position,
       icon: stored.customIcon ?? characterIcon ?? bestModel?.icon ?? "bot",
       name: characterName ?? bestModel?.name ?? "Unknown",

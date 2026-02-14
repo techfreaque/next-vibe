@@ -79,7 +79,7 @@ export const translations: typeof enTranslations = {
         "Verwalten Sie Ihre bevorzugten Charakter- und Modellkonfigurationen",
     },
     createButton: {
-      label: "Favorit hinzufügen",
+      label: "Charaktere entdecken",
     },
     response: {
       favorite: {
@@ -221,11 +221,15 @@ export const translations: typeof enTranslations = {
       description: "Charakterkonfiguration als Favorit speichern",
     },
     backButton: {
-      label: "Zurück zu Favoriten",
+      label: "Abbrechen",
+    },
+    useWithoutSavingButton: {
+      label: "Ohne zu Favoriten hinzufügen",
+      loadingText: "Wird angewendet...",
     },
     submitButton: {
-      label: "Favorit erstellen",
-      loadingText: "Erstellen...",
+      label: "Zu Favoriten hinzufügen",
+      loadingText: "Hinzufügen...",
     },
     characterId: {
       label: "Charakter",

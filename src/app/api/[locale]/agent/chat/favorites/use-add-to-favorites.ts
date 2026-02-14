@@ -17,7 +17,6 @@ import type { IconKey } from "../../../system/unified-interface/unified-ui/widge
 import type { ModelSelectionSimple } from "../../models/components/types";
 import type { TtsVoiceValue } from "../../text-to-speech/enum";
 import characterSingleDefinitions from "../characters/[id]/definition";
-import charactersDefinition from "../characters/definition";
 import { ChatFavoritesRepositoryClient } from "./repository-client";
 
 export interface CharacterDataForFavorite {
@@ -48,7 +47,6 @@ export interface UseAddToFavoritesOptions {
 
 export interface UseAddToFavoritesReturn {
   isLoading: boolean;
-  isAddedToFav: boolean;
   addToFavorites: (e?: ButtonMouseEvent) => Promise<void>;
 }
 
@@ -65,21 +63,6 @@ export function useAddToFavorites({
   onSuccess,
 }: UseAddToFavoritesOptions): UseAddToFavoritesReturn {
   const [isLoading, setIsLoading] = useState(false);
-
-  // Check if character is already added to favorites from the characters list cache
-  const charactersListData = apiClient.getEndpointData(
-    charactersDefinition.GET,
-    logger,
-    undefined,
-  );
-  const isAddedToFav =
-    charactersListData?.success === true
-      ? charactersListData.data.sections.some((section) =>
-          section.characters.some(
-            (char) => char.id === characterId && char.addedToFav,
-          ),
-        )
-      : false;
 
   const addToFavorites = async (e?: ButtonMouseEvent): Promise<void> => {
     e?.stopPropagation();
@@ -208,33 +191,6 @@ export function useAddToFavorites({
         undefined,
       );
 
-      // Optimistically update characters list
-      apiClient.updateEndpointData(
-        charactersDefinition.GET,
-        logger,
-        (oldData) => {
-          if (!oldData?.success) {
-            return oldData;
-          }
-
-          return {
-            success: true,
-            data: {
-              ...oldData.data,
-              sections: oldData.data.sections.map((section) => ({
-                ...section,
-                characters: section.characters.map((char) =>
-                  char.id === characterId
-                    ? { ...char, addedToFav: true }
-                    : char,
-                ),
-              })),
-            },
-          };
-        },
-        undefined,
-      );
-
       onSuccess?.();
     } catch (error) {
       logger.error("Failed to add to favorites", {
@@ -247,7 +203,6 @@ export function useAddToFavorites({
 
   return {
     isLoading,
-    isAddedToFav,
     addToFavorites,
   };
 }

@@ -1103,7 +1103,7 @@ const { POST } = createEndpoint({
                 title: "app.api.system.builder.post.fields.copyConfig.title",
                 layoutType: LayoutType.GRID,
                 columns: 12,
-                icon: "file-copy",
+                icon: "copy",
               },
               { request: "data" },
               {
@@ -1162,7 +1162,7 @@ const { POST } = createEndpoint({
               layoutType: LayoutType.GRID,
               columns: 12,
               optional: true,
-              icon: "npm",
+              icon: "package",
               defaultExpanded: false,
             },
             { request: "data" },
@@ -1413,7 +1413,7 @@ const { POST } = createEndpoint({
           type: WidgetType.CONTAINER,
           items: [],
           optional: true,
-          icon: "file-check",
+          icon: "check-circle",
         },
         responseField({
           type: WidgetType.TEXT,
@@ -1427,7 +1427,7 @@ const { POST } = createEndpoint({
           type: WidgetType.CONTAINER,
           items: [],
           optional: true,
-          icon: "file-copy",
+          icon: "copy",
         },
         responseField({
           type: WidgetType.TEXT,
@@ -1463,7 +1463,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           optional: true,
-          icon: "list-checks",
+          icon: "list",
         },
         objectField(
           {

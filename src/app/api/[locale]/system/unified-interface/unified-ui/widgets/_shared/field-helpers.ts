@@ -8,18 +8,22 @@
  * - Field extraction from endpoint definitions
  */
 
-import type { ZodTypeAny } from "zod";
+import type { z, ZodTypeAny } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TParams } from "@/i18n/core/static-types";
 
-import type { UnifiedField } from "../../../shared/types/endpoint";
+import type {
+  InferSchemaFromField,
+  UnifiedField,
+} from "../../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
+import type { FieldUsage } from "../../../shared/types/enums";
+import type { WidgetData } from "../../../shared/widgets/widget-data";
 import { hasChildren } from "./type-guards";
 import type {
   AnyChildrenConstrain,
   BaseWidgetConfig,
-  BaseWidgetFieldProps,
   ConstrainedChildUsage,
   FieldUsageConfig,
   SchemaTypes,
@@ -143,45 +147,48 @@ export function getFieldLabel(
 }
 
 /**
- * Augment a field with its runtime value, producing a DispatchField.
- * The cast to DispatchField is safe because:
- * 1. Both UnifiedField and AnyChildrenConstrain extend BaseWidgetConfig
- * 2. DispatchField is UnifiedField & BaseWidgetConfig & { value, parentValue }
- * 3. The spread operator preserves all properties and adds value/parentValue
- * This is the single boundary where type widening is acceptable for the rendering system.
+ * Augment a field with its runtime value - for internal widget rendering.
+ * Used by built-in renderers where fields are passed generically.
+ * The value type is preserved from the caller for type safety at call sites.
  */
-export function withValue<
-  TField extends { usage: FieldUsageConfig },
-  TValue,
-  TParentValue,
->(
+export function withValueNonStrict<TField, TValue>(
   field: TField,
   value: TValue,
-  parentValue: TParentValue,
-): TField extends UnifiedField<
-  string,
-  ZodTypeAny,
-  infer TUsage,
-  // oxlint-disable-next-line no-unused-vars
-  infer TChildren
->
-  ? BaseWidgetFieldProps<TUsage, TField>
-  : TField extends AnyChildrenConstrain<string, infer TUsage>
-    ? TField extends { usage: infer U extends FieldUsageConfig }
-      ? BaseWidgetFieldProps<U, TField>
-      : BaseWidgetFieldProps<TUsage, TField>
-    : never {
-  // Safe cast: spread preserves discriminated union properties (type, schemaType, etc.)
-  // which allows TypeScript to narrow in switch statements
-  return { ...field, value, parentValue } as BaseWidgetFieldProps<
-    FieldUsageConfig,
-    UnifiedField<
-      string,
-      ZodTypeAny,
-      FieldUsageConfig,
-      AnyChildrenConstrain<string, FieldUsageConfig>
-    >
-  >;
+  parentValue: WidgetData | undefined | null,
+): TField & {
+  value: TValue;
+  parentValue: WidgetData | undefined | null;
+} {
+  return { ...field, value, parentValue };
+}
+
+/**
+ * Augment a field with its runtime value - for custom widget.ts files.
+ * Enforces exact type matching: the value parameter must match the field's inferred output type.
+ * Use this when you know the specific field type at compile time.
+ */
+export function withValue<
+  TField extends
+    | UnifiedField<
+        string,
+        z.ZodTypeAny,
+        FieldUsageConfig,
+        AnyChildrenConstrain<string, FieldUsageConfig>
+      >
+    | AnyChildrenConstrain<string, FieldUsageConfig>,
+>(
+  field: TField,
+  value:
+    | z.output<InferSchemaFromField<TField, FieldUsage.ResponseData>>
+    | undefined,
+  parentValue: WidgetData | undefined | null,
+): TField & {
+  value:
+    | z.output<InferSchemaFromField<TField, FieldUsage.ResponseData>>
+    | undefined;
+  parentValue: WidgetData | undefined | null;
+} {
+  return { ...field, value, parentValue };
 }
 
 /**

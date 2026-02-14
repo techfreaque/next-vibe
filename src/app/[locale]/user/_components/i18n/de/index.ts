@@ -13,5 +13,29 @@ export const translations: typeof enTranslations = {
           "Verwenden Sie eine Mischung aus Buchstaben, Zahlen und Symbolen für ein stärkeres Passwort",
       },
     },
+    passwordStrength: {
+      requirement: {
+        minLength: {
+          icon: "✗",
+          text: "Mindestens 8 Zeichen",
+        },
+        lowercase: {
+          icon: "✗",
+          text: "Enthält einen Kleinbuchstaben",
+        },
+        uppercase: {
+          icon: "✗",
+          text: "Enthält einen Großbuchstaben",
+        },
+        number: {
+          icon: "✗",
+          text: "Enthält eine Zahl",
+        },
+        special: {
+          icon: "✗",
+          text: "Enthält ein Sonderzeichen",
+        },
+      },
+    },
   },
 };

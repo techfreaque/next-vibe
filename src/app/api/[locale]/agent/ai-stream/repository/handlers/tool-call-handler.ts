@@ -298,13 +298,6 @@ export class ToolCallHandler {
     });
     controller.enqueue(encoder.encode(formatSSEEvent(toolCallEvent)));
 
-    logger.info("[AI Stream] Tool call started (UI notified)", {
-      messageId: toolMessageId,
-      toolCallId,
-      toolName: part.toolName,
-      requiresConfirmation,
-    });
-
     // CRITICAL: Store tool message to DB immediately (if not incognito)
     // This is required so subsequent tool calls can use this message as parent
     // Without this, parallel tool calls will fail with foreign key constraint errors

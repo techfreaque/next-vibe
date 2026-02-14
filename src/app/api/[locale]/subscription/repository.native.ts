@@ -10,6 +10,7 @@ import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/reac
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { type CountryLanguage } from "@/i18n/core/config";
 
+import type { JwtPayloadType } from "../user/auth/types";
 import type { SubscriptionCancelDeleteRequestOutput } from "./cancel/definition";
 import type {
   SubscriptionCreatePostRequestOutput,
@@ -60,7 +61,7 @@ export class SubscriptionRepository {
     // oxlint-disable-next-line no-unused-vars
     _data: SubscriptionCreatePostRequestOutput,
     // oxlint-disable-next-line no-unused-vars
-    _userId: string,
+    _user: JwtPayloadType,
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
     // oxlint-disable-next-line no-unused-vars

@@ -196,6 +196,10 @@ export const translations: typeof enTranslations = {
       creditsFailed: "Fehler beim Abziehen der Credits: {{error}}",
       providerError:
         "Fehler beim Transkriptionsdienst. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support, wenn das Problem weiterhin besteht.",
+      balanceCheckFailed:
+        "Ihr Guthaben konnte nicht überprüft werden. Bitte versuchen Sie es erneut",
+      insufficientCredits:
+        "Sie haben nicht genügend Guthaben für diese Transkription. Bitte fügen Sie mehr Guthaben hinzu, um fortzufahren",
     },
     success: {
       title: "Erfolg",

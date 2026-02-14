@@ -64,6 +64,7 @@ export class ChatFavoritesRepository {
           let characterName = null;
           let characterTagline = null;
           let characterDescription = null;
+          let characterVoice = null;
 
           if (favorite.characterId && favorite.characterId.trim() !== "") {
             const characterResult = await CharactersRepository.getCharacterById(
@@ -77,6 +78,7 @@ export class ChatFavoritesRepository {
               characterName = characterResult.data.name;
               characterTagline = characterResult.data.tagline;
               characterDescription = characterResult.data.description;
+              characterVoice = characterResult.data.voice;
             }
           }
 
@@ -97,6 +99,7 @@ export class ChatFavoritesRepository {
             characterTagline,
             characterDescription,
             activeFavoriteId,
+            characterVoice,
           );
         }),
       );

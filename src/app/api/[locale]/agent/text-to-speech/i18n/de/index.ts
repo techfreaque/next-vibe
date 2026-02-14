@@ -1,8 +1,10 @@
+import type { translations as enTranslations } from "../en";
+
 /**
  * Text-to-Speech German translations
  */
 
-export const translations = {
+export const translations: typeof enTranslations = {
   post: {
     title: "Text zu Sprache",
     description:
@@ -85,6 +87,10 @@ export const translations = {
       providerError: "Anbieterfehler: {{error}}",
       internalError: "Interner Serverfehler",
       creditsFailed: "Fehler beim Abziehen der Credits: {{error}}",
+      balanceCheckFailed:
+        "Ihr Guthaben konnte nicht überprüft werden. Bitte versuchen Sie es erneut",
+      insufficientCredits:
+        "Sie haben nicht genügend Credits für diese Konvertierung. Bitte fügen Sie weitere Credits hinzu, um fortzufahren",
     },
     success: {
       title: "Erfolg",

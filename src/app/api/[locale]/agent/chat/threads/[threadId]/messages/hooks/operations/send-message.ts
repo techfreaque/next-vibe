@@ -220,17 +220,10 @@ export async function sendMessage(
         currentSubFolderId,
         settings,
         deductCredits,
+        setInput,
+        setAttachments,
       },
     );
-
-    // Clear input on success
-    const { useAIStreamStore } =
-      await import("../../../../../../ai-stream/hooks/store");
-    const streamError = useAIStreamStore.getState().error;
-    if (!streamError) {
-      setInput("");
-      setAttachments([]);
-    }
   } catch (error) {
     logger.error("Failed to send message", parseError(error));
   } finally {

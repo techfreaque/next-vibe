@@ -5,6 +5,28 @@ export const translations = {
     container: {
       title: "Client Routes Index Generator",
     },
+    fields: {
+      outputFile: {
+        label: "Output File",
+        description: "Path to the output file",
+      },
+      dryRun: {
+        label: "Dry Run",
+        description: "Preview changes without writing to file",
+      },
+      success: {
+        title: "Success",
+      },
+      message: {
+        title: "Message",
+      },
+      routesFound: {
+        title: "Routes Found",
+      },
+      duration: {
+        title: "Duration (ms)",
+      },
+    },
     errors: {
       validation: {
         title: "Invalid Input",

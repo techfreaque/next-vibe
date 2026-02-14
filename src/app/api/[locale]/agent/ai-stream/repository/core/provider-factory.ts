@@ -1,5 +1,3 @@
-import { createWriteStream, existsSync, mkdirSync } from "node:fs";
-
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import type { JSONValue } from "ai";
 
@@ -13,15 +11,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { createFreedomGPT } from "../../providers/freedomgpt";
 import { createGabAI } from "../../providers/gab-ai";
 import { createUncensoredAI } from "../../providers/uncensored-ai";
-
-// Request counter for logging
-let requestCounter = 0;
-
-// Ensure log directory exists
-const LOG_DIR = "/tmp/openrouter-requests";
-if (!existsSync(LOG_DIR)) {
-  mkdirSync(LOG_DIR, { recursive: true });
-}
+import { createVeniceAI } from "../../providers/venice-ai";
 
 /**
  * Recursively sort object keys for stable JSON serialization (cache-friendly)
@@ -78,16 +68,20 @@ export class ProviderFactory {
     | typeof createUncensoredAI
     | typeof createFreedomGPT
     | typeof createGabAI
+    | typeof createVeniceAI
   > {
     switch (modelOption.apiProvider) {
       case ApiProvider.UNCENSORED_AI:
         return createUncensoredAI(logger);
 
       case ApiProvider.FREEDOMGPT:
-        return createFreedomGPT();
+        return createFreedomGPT(logger);
 
       case ApiProvider.GAB_AI:
-        return createGabAI();
+        return createGabAI(logger);
+
+      case ApiProvider.VENICE_AI:
+        return createVeniceAI(logger);
 
       default: {
         // Custom fetch wrapper that normalizes request body for stable caching
@@ -95,10 +89,6 @@ export class ProviderFactory {
           url: string | Request | URL,
           options?: RequestInit,
         ): Promise<Response> => {
-          const reqNum = ++requestCounter;
-          const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-          const filename = `${LOG_DIR}/req-${timestamp}-${reqNum}.json`;
-
           // Sort all object keys in request body for stable caching
           let normalizedBody = options?.body;
           if (options?.body && typeof options.body === "string") {
@@ -199,12 +189,6 @@ export class ProviderFactory {
 
             const sorted = sortObjectKeys(parsed);
             normalizedBody = JSON.stringify(sorted);
-
-            // Log the normalized request body
-            const stream = createWriteStream(filename);
-            stream.write(normalizedBody);
-            stream.end();
-            logger.info(`[CACHE DEBUG] Request logged to ${filename}`);
           }
 
           return fetch(url, { ...options, body: normalizedBody });

@@ -8,11 +8,15 @@ import { useRouter } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
 import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Span } from "next-vibe-ui/ui/span";
+import type { JSX } from "react";
 import { useState } from "react";
 
 import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/config";
@@ -20,6 +24,7 @@ import { ModelSelector } from "@/app/api/[locale]/agent/models/components/model-
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
   useWidgetForm,
+  useWidgetIsSubmitting,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
@@ -35,6 +40,8 @@ import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/
 
 import type { ModelSelectionSimple } from "../../../models/components/types";
 import { useCharacter } from "../../characters/[id]/hooks";
+import { useChatSettings } from "../../settings/hooks";
+import { ChatSettingsRepositoryClient } from "../../settings/repository-client";
 import type definitionPatch from "./definition";
 import type { FavoriteUpdateResponseOutput } from "./definition";
 
@@ -62,6 +69,7 @@ export function FavoriteEditContainer({
   const locale = useWidgetLocale();
   const navigation = useWidgetNavigation();
   const router = useRouter();
+  const isSubmitting = useWidgetIsSubmitting();
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const characterId = form?.watch("characterId");
   const isNoCharacter = characterId === NO_CHARACTER_ID;
@@ -72,6 +80,14 @@ export function FavoriteEditContainer({
 
   const characterEndpoint = useCharacter(characterId ?? "", user, logger);
   const characterData = characterEndpoint.read?.data;
+
+  // Get settings to check if this favorite is active
+  const settingsOps = useChatSettings(user, logger);
+
+  // Check if this favorite is currently active
+  const favoriteId = form?.watch("id");
+  const isActiveFavorite =
+    settingsOps.settings?.activeFavoriteId === favoriteId;
 
   const handleCustomizeCharacter = async (): Promise<void> => {
     if (!characterId || isNoCharacter) {
@@ -102,6 +118,47 @@ export function FavoriteEditContainer({
 
   const handleLogin = (): void => {
     router.push(`/${locale}/user/login`);
+  };
+
+  const handleUseThisFavorite = async (): Promise<void> => {
+    const favoriteId = navigation.current?.params?.urlPathParams?.id as
+      | string
+      | undefined;
+
+    if (!favoriteId) {
+      logger.error("Cannot activate favorite - missing favorite ID");
+      return;
+    }
+
+    // Get modelId from the favorites list
+    // We need to fetch it from the favorites list GET endpoint
+    const { apiClient } =
+      await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+    const favoritesDefinition = await import("../definition");
+
+    const favoritesData = apiClient.getEndpointData(
+      favoritesDefinition.default.GET,
+      logger,
+      undefined,
+    );
+
+    const favorite = favoritesData?.success
+      ? favoritesData.data.favorites.find((fav) => fav.id === favoriteId)
+      : undefined;
+
+    const modelId = favorite?.modelId ?? null;
+    const currentCharacterId = favorite?.characterId ?? null;
+    const currentVoice = favorite?.voice ?? null;
+
+    await ChatSettingsRepositoryClient.selectFavorite({
+      favoriteId,
+      modelId,
+      characterId: currentCharacterId,
+      voice: currentVoice,
+      logger,
+      locale,
+      user,
+    });
   };
 
   // Show signup prompt if public user clicked customize character
@@ -177,16 +234,36 @@ export function FavoriteEditContainer({
             variant: "outline",
           }}
         />
-        <NavigateButtonWidget field={children.deleteButton} />
-        <SubmitButtonWidget
+        <NavigateButtonWidget
           field={{
-            text: "app.api.agent.chat.favorites.id.patch.submitButton.label",
-            loadingText:
-              "app.api.agent.chat.favorites.id.patch.submitButton.loadingText",
-            icon: "save",
-            variant: "primary",
+            ...children.deleteButton,
+            label: undefined,
           }}
         />
+        {(form?.formState.isDirty || isSubmitting) && (
+          <>
+            <SubmitButtonWidget
+              field={{
+                text: "app.api.agent.chat.favorites.id.patch.saveButton.label",
+                loadingText:
+                  "app.api.agent.chat.favorites.id.patch.saveButton.loadingText",
+                icon: "save",
+                variant: "outline",
+              }}
+            />
+            {!isActiveFavorite && (
+              <SaveAndUseButton
+                form={form}
+                navigation={navigation}
+                logger={logger}
+                locale={locale}
+                user={user}
+                isSubmitting={isSubmitting}
+                t={t}
+              />
+            )}
+          </>
+        )}
       </Div>
 
       {/* Scrollable Form Container */}
@@ -246,37 +323,176 @@ export function FavoriteEditContainer({
                 </Div>
               </Div>
 
-              {/* Customize Character Button */}
-              <Button
-                type="button"
-                variant="outline"
-                size="default"
-                onClick={handleCustomizeCharacter}
-                className="gap-2"
-              >
-                <Settings className="h-4 w-4" />
-                {t(
-                  "app.api.agent.chat.favorites.id.patch.customizeCharacterButton.label",
-                )}
-              </Button>
+              {/* Action Buttons */}
+              <Div className="flex flex-col gap-2">
+                {/* Customize Character Button */}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="default"
+                  onClick={handleCustomizeCharacter}
+                  className="gap-2"
+                >
+                  <Settings className="h-4 w-4" />
+                  {t(
+                    "app.api.agent.chat.favorites.id.patch.customizeCharacterButton.label",
+                  )}
+                </Button>
+              </Div>
             </Div>
           )}
+
+          {/* Use This Favorite Button - always show */}
+          <Button
+            type="button"
+            variant={isActiveFavorite ? "outline" : "default"}
+            size="default"
+            onClick={handleUseThisFavorite}
+            disabled={isActiveFavorite}
+            className="gap-2"
+          >
+            <CheckCircle className="h-4 w-4" />
+            {isActiveFavorite
+              ? t(
+                  "app.api.agent.chat.favorites.id.patch.currentlyActiveButton.label",
+                )
+              : isNoCharacter
+                ? t(
+                    "app.api.agent.chat.favorites.id.patch.useThisModelButton.label",
+                  )
+                : t(
+                    "app.api.agent.chat.favorites.id.patch.useThisCharacterButton.label",
+                  )}
+          </Button>
 
           <SelectFieldWidget fieldName="voice" field={children.voice} />
           {form && (
             <ModelSelector
               modelSelection={favoriteModelSelection}
               onChange={(selection) =>
-                form.setValue("modelSelection", selection)
+                form.setValue("modelSelection", selection, {
+                  shouldDirty: true,
+                })
               }
               characterModelSelection={
                 isNoCharacter ? undefined : characterData?.modelSelection
               }
               t={t}
+              locale={locale}
             />
           )}
         </Div>
       </Div>
     </Div>
+  );
+}
+
+/**
+ * Save & Use Button Component
+ * Saves the form and then activates the favorite
+ */
+function SaveAndUseButton({
+  form,
+  navigation,
+  logger,
+  locale,
+  user,
+  isSubmitting,
+  t,
+}: {
+  form: ReturnType<typeof useWidgetForm>;
+  navigation: ReturnType<typeof useWidgetNavigation>;
+  logger: ReturnType<typeof useWidgetLogger>;
+  locale: ReturnType<typeof useWidgetLocale>;
+  user: ReturnType<typeof useWidgetUser>;
+  isSubmitting: boolean | undefined;
+  t: ReturnType<typeof useWidgetTranslation>;
+}): JSX.Element {
+  const [isActivating, setIsActivating] = useState(false);
+
+  const handleSaveAndUse = async (): Promise<void> => {
+    if (!form) {
+      return;
+    }
+
+    // Trigger form validation
+    const isValid = await form.trigger();
+    if (!isValid) {
+      return;
+    }
+
+    // Submit the form
+    await form.handleSubmit(async () => {
+      // After successful save, activate the favorite
+      setIsActivating(true);
+      try {
+        const favoriteId = navigation?.current?.params?.urlPathParams?.id as
+          | string
+          | undefined;
+        if (!favoriteId) {
+          return;
+        }
+
+        // Get the saved favorite data
+        const favoriteData = form.getValues();
+        if (!favoriteData) {
+          return;
+        }
+
+        // Determine the model to use
+        let modelId = null;
+        if (favoriteData.modelSelection) {
+          const { CharactersRepositoryClient } =
+            await import("../../characters/repository-client");
+          const bestModel = CharactersRepositoryClient.getBestModelForFavorite(
+            favoriteData.modelSelection,
+            undefined,
+          );
+          modelId = bestModel?.id || null;
+        }
+
+        // Activate this favorite
+        await ChatSettingsRepositoryClient.selectFavorite({
+          favoriteId,
+          modelId,
+          characterId: favoriteData.characterId || null,
+          voice: favoriteData.voice || null,
+          logger,
+          locale,
+          user,
+        });
+      } catch (error) {
+        logger.error("Failed to activate favorite", {
+          error: error instanceof Error ? error.message : String(error),
+        });
+      } finally {
+        setIsActivating(false);
+      }
+    })();
+  };
+
+  return (
+    <Button
+      type="button"
+      variant="default"
+      size="default"
+      className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+      onClick={handleSaveAndUse}
+      disabled={isSubmitting || isActivating}
+    >
+      {isSubmitting || isActivating ? (
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" />
+          {t(
+            "app.api.agent.chat.favorites.id.patch.saveAndUseButton.loadingText",
+          )}
+        </>
+      ) : (
+        <>
+          <Zap className="h-4 w-4" />
+          {t("app.api.agent.chat.favorites.id.patch.saveAndUseButton.label")}
+        </>
+      )}
+    </Button>
   );
 }

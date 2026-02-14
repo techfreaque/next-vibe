@@ -77,7 +77,7 @@ export const translations = {
       description: "Manage your favorite character and model configurations",
     },
     createButton: {
-      label: "Add Favorite",
+      label: "Explore Characters",
     },
     response: {
       favorite: {
@@ -216,11 +216,15 @@ export const translations = {
       description: "Save a character configuration as a favorite",
     },
     backButton: {
-      label: "Back to Favorites",
+      label: "Cancel",
+    },
+    useWithoutSavingButton: {
+      label: "Use Without Adding to Favs",
+      loadingText: "Applying...",
     },
     submitButton: {
-      label: "Create Favorite",
-      loadingText: "Creating...",
+      label: "Add to Favorites",
+      loadingText: "Adding...",
     },
     characterId: {
       label: "Character",

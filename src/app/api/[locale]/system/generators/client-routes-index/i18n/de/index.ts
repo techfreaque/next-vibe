@@ -7,6 +7,28 @@ export const translations: typeof enTranslations = {
     container: {
       title: "Client-Routen-Index-Generator",
     },
+    fields: {
+      outputFile: {
+        label: "Ausgabedatei",
+        description: "Pfad zur Ausgabedatei",
+      },
+      dryRun: {
+        label: "Probelauf",
+        description: "Vorschau der Änderungen ohne Datei zu schreiben",
+      },
+      success: {
+        title: "Erfolg",
+      },
+      message: {
+        title: "Nachricht",
+      },
+      routesFound: {
+        title: "Gefundene Routen",
+      },
+      duration: {
+        title: "Dauer (ms)",
+      },
+    },
     errors: {
       validation: {
         title: "Ungültige Eingabe",

@@ -526,10 +526,10 @@ export const translations: typeof enTranslations = {
     selectCharacter: "Character auswählen",
     modelCreditDisplay: {
       tokenBased: {
-        header: "Kosten variieren je nach Gesprächslänge",
-        costRangeLabel: "Kostenbereich:",
+        header: "Kosten pro Nachricht",
+        costRangeLabel: "Typischer Bereich:",
         costRangeValue: "{{min}} - {{max}} Credits",
-        examplesLabel: "Kostenbeispiele:",
+        examplesLabel: "Beispiele:",
         examples: {
           short: "Kurzes Gespräch",
           medium: "Mittleres Gespräch",
@@ -538,7 +538,7 @@ export const translations: typeof enTranslations = {
         triggersCompacting: "⚡ Aktiviert Komprimierung",
         tokensCount: "{{count}} Tokens",
         explanation:
-          "Die KI verarbeitet bei jeder Nachricht den gesamten Gesprächsverlauf, daher steigen die Kosten mit längeren Gesprächen.",
+          "Die KI verarbeitet bei jeder Nachricht den gesamten Gesprächsverlauf. Längere Gespräche kosten mehr, weil mehr Kontext verarbeitet werden muss.",
         compactingLabel: "✨ Auto-Komprimierung:",
         compactingExplanation:
           " Bei {{threshold}} Tokens werden ältere Nachrichten automatisch zusammengefasst, um Kosten zu reduzieren und gleichzeitig den Kontext zu bewahren.",

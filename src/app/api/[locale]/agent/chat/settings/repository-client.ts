@@ -12,6 +12,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "../../../user/auth/types";
 import { defaultModel, type ModelId } from "../../models/models";
+import type { TtsVoiceValue } from "../../text-to-speech/enum";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import { DEFAULT_TOOL_CONFIRMATION_IDS, DEFAULT_TOOL_IDS } from "../constants";
 import { ViewMode } from "../enum";
@@ -211,11 +212,13 @@ export class ChatSettingsRepositoryClient {
     favoriteId: string;
     modelId: ModelId | null;
     characterId: string | null;
+    voice: typeof TtsVoiceValue | null;
     logger: EndpointLogger;
     locale: CountryLanguage;
     user: JwtPayloadType;
   }): Promise<void> {
-    const { favoriteId, modelId, characterId, logger, locale, user } = params;
+    const { favoriteId, modelId, characterId, voice, logger, locale, user } =
+      params;
 
     const { apiClient } =
       await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
@@ -241,6 +244,9 @@ export class ChatSettingsRepositoryClient {
         }
         if (characterId) {
           updatedData.selectedCharacter = characterId;
+        }
+        if (voice) {
+          updatedData.ttsVoice = voice;
         }
 
         return {
@@ -289,6 +295,7 @@ export class ChatSettingsRepositoryClient {
           activeFavoriteId: favoriteId,
           ...(modelId && { selectedModel: modelId }),
           ...(characterId && { selectedCharacter: characterId }),
+          ...(voice && { ttsVoice: voice }),
         },
         undefined,
         locale,

@@ -335,7 +335,7 @@ export const translations = {
       dolphinLlama3_70B:
         "Dolphin Llama 3 70B - Uncensored large language model based on Llama 3",
       veniceUncensored:
-        "Venice Uncensored - Uncensored AI model for unrestricted conversations",
+        "Venice Uncensored 1.1 - Most uncensored AI model with tool calling support. Designed for maximum creative freedom and authentic interaction. Ideal for open-ended exploration, roleplay, and unfiltered dialogue with minimal content restrictions.",
       claudeOpus45:
         "Claude Opus 4.5 - Most powerful Claude model with exceptional reasoning and creative capabilities",
       claudeOpus46:

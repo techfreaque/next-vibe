@@ -107,32 +107,63 @@ export class StreamExecutionHandler {
         : {}),
     });
 
-    for await (const part of streamResult.fullStream) {
-      const { shouldAbort } = await StreamPartHandler.processPart({
-        part,
-        ctx,
-        streamResult: {
-          usage: streamResult.usage,
-          finishReason: streamResult.finishReason,
-        },
-        threadId,
-        model,
-        character,
-        isIncognito,
-        userId,
-        user,
-        toolsConfig,
-        streamAbortController,
-        emittedToolResultIds,
-        ttsHandler,
-        controller,
-        encoder,
-        logger,
-      });
+    try {
+      for await (const part of streamResult.fullStream) {
+        const { shouldAbort } = await StreamPartHandler.processPart({
+          part,
+          ctx,
+          streamResult: {
+            usage: streamResult.usage,
+            finishReason: streamResult.finishReason,
+          },
+          threadId,
+          model,
+          character,
+          isIncognito,
+          userId,
+          user,
+          toolsConfig,
+          streamAbortController,
+          emittedToolResultIds,
+          ttsHandler,
+          controller,
+          encoder,
+          logger,
+        });
 
-      if (shouldAbort) {
-        return;
+        if (shouldAbort) {
+          return;
+        }
       }
+    } catch (streamError) {
+      // If stream was aborted, handle it inline and emit all events NOW
+      // (before the ReadableStream's cancel() closes the controller)
+      if (streamError instanceof Error) {
+        const { AbortErrorHandler } = await import("./abort-error-handler");
+        const { wasHandled } = await AbortErrorHandler.handleAbortError({
+          error: streamError,
+          ctx,
+          controller,
+          encoder,
+          logger,
+          threadId,
+          isIncognito,
+          userId,
+          model,
+          systemPrompt,
+          messages,
+          tools,
+          user,
+        });
+
+        if (wasHandled) {
+          // Abort was handled, return cleanly
+          return;
+        }
+      }
+
+      // Not an abort error, re-throw
+      throw streamError;
     }
 
     const usageData = await streamResult.usage;

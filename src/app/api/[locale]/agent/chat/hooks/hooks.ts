@@ -307,7 +307,6 @@ export function useChat(
   );
   const streamThreads = useAIStreamStore((state) => state.threads);
   const isStreaming = useAIStreamStore((state) => state.isStreaming);
-  const streamError = useAIStreamStore((state) => state.error);
   const streamReset = useAIStreamStore((state) => state.reset);
   const streamAddThread = useAIStreamStore((state) => state.addThread);
   const streamAddMessage = useAIStreamStore((state) => state.addMessage);
@@ -472,7 +471,6 @@ export function useChat(
     },
     streamStore: {
       streamingMessages,
-      error: streamError,
       reset: streamReset,
       addMessage: streamAddMessage,
     },

@@ -27,10 +27,10 @@ import type { SpacingSize } from "../../display-only/title/types";
 import type { CustomWidgetObjectConfig } from "../custom/types";
 
 /**
- * Base container properties shared between regular and union variants
+ * Container layout and styling properties (without type discriminant)
+ * Used for custom widgets that need container-like layout but have their own type
  */
-interface BaseContainerProps<TKey extends string> {
-  type: WidgetType.CONTAINER;
+export interface BaseContainerLayoutProps<TKey extends string> {
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
   layoutType?: LayoutType;
@@ -126,6 +126,15 @@ interface BaseContainerProps<TKey extends string> {
    * Returns additional className to merge with static className
    */
   getClassName?: (value: WidgetData, parentValue?: WidgetData) => string;
+}
+
+/**
+ * Base container properties shared between regular and union variants
+ */
+interface BaseContainerProps<
+  TKey extends string,
+> extends BaseContainerLayoutProps<TKey> {
+  type: WidgetType.CONTAINER;
 }
 
 /**

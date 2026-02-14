@@ -66,7 +66,7 @@ export enum ModelId {
   GLM_4_6 = "glm-4.6",
   GLM_4_5_AIR = "glm-4.5-air",
   GLM_4_5V = "glm-4.5v",
-  VENICE_UNCENSORED = "venice-uncensored-free",
+  VENICE_UNCENSORED = "venice-uncensored",
   // DOLPHIN_3_0_MISTRAL_24B = "dolphin-3.0-mistral-24b",
   // DOLPHIN_LLAMA_3_70B = "dolphin-llama-3.70b",
   // DOLPHIN_3_0_R1_MISTRAL_24B = "dolphin-3.0-r1-mistral-24b",
@@ -82,6 +82,7 @@ export enum ApiProvider {
   GAB_AI = "gab-ai",
   FREEDOMGPT = "freedomgpt",
   UNCENSORED_AI = "uncensored-ai",
+  VENICE_AI = "venice-ai",
 }
 
 /**
@@ -197,9 +198,9 @@ export const modelProviders: Record<string, ModelProvider> = {
     name: "Z.AI",
     icon: "si-zendesk",
   },
-  cognitiveComputations: {
+  veniceAI: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
-    name: "Cognitive Computations",
+    name: "Venice.ai",
     icon: "venice-ai-logo",
   },
   freedomGPT: {
@@ -260,8 +261,8 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     parameterCount: undefined,
     contextWindow: 32768,
     icon: "freedom-gpt-logo",
-    openRouterModel: "freedomgpt-liberty",
-    creditCost: 3,
+    openRouterModel: "liberty",
+    creditCost: 7, // costs 5 credits but we add 2 credits for markup
 
     utilities: [
       ModelUtility.UNCENSORED,
@@ -273,7 +274,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     intelligence: IntelligenceLevel.QUICK,
     speed: SpeedLevel.FAST,
     content: ContentLevel.UNCENSORED,
-    features: { ...defaultFeatures },
+    features: { ...defaultFeatures, toolCalling: false },
     weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
   },
   [ModelId.GAB_AI_ARYA]: {
@@ -298,36 +299,37 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.CONTROVERSIAL,
       ModelUtility.POLITICAL_RIGHT,
     ],
-    supportsTools: false,
+    supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.BALANCED,
     content: ContentLevel.UNCENSORED,
-    features: { ...defaultFeatures },
+    features: { ...defaultFeatures, toolCalling: true },
     weaknesses: [ModelUtility.CODING],
   },
   [ModelId.VENICE_UNCENSORED]: {
     id: ModelId.VENICE_UNCENSORED,
-    name: "Venice Uncensored",
-    provider: "cognitiveComputations",
-    apiProvider: ApiProvider.OPENROUTER,
+    name: "Venice Uncensored 1.1",
+    provider: "veniceAI",
+    apiProvider: ApiProvider.VENICE_AI,
     description: "app.chat.models.descriptions.veniceUncensored",
     parameterCount: 24,
-    contextWindow: 32768,
+    contextWindow: 32000,
     icon: "venice-ai-logo",
-    openRouterModel:
-      "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
-    creditCost: 1,
+    openRouterModel: "venice-uncensored",
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.2,
+    outputTokenCost: 0.9,
 
     utilities: [
       ModelUtility.UNCENSORED,
       ModelUtility.CREATIVE,
       ModelUtility.ROLEPLAY,
     ],
-    supportsTools: false,
+    supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
     speed: SpeedLevel.FAST,
     content: ContentLevel.UNCENSORED,
-    features: { ...defaultFeatures },
+    features: { ...defaultFeatures, toolCalling: true },
     weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
   },
   // [ModelId.DOLPHIN_LLAMA_3_70B]: {

@@ -679,6 +679,10 @@ export const translations: typeof enTranslations = {
         addToCollection: "Zur Sammlung hinzufügen:",
         quick: "Schnell",
         customize: "Anpassen",
+        useNow: "Jetzt verwenden",
+        inUse: "In Verwendung",
+        chooseFavorite: "Favorit wählen",
+        selectFavorite: "Wähle einen Favoriten zum Aktivieren:",
       },
     },
     section: {

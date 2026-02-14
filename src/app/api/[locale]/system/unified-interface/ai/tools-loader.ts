@@ -60,10 +60,21 @@ function createToolFromEndpoint(
   // This creates a FlexibleSchema that the AI SDK can use
   const inputSchema = jsonSchema(jsonSchemaObject as JSONSchema7, {
     validate: (value) => {
+      // Extract noLoop parameter before validation (it's not part of endpoint schema)
+      const noLoop =
+        typeof value === "object" &&
+        value !== null &&
+        "noLoop" in value &&
+        value.noLoop === true;
+
       // Use the original Zod schema (with transforms) for validation
       const result = zodSchemaWithTransforms.safeParse(value);
       if (result.success) {
-        return { success: true, value: result.data };
+        // Add noLoop back to the validated data so it reaches tool-call-handler
+        return {
+          success: true,
+          value: noLoop ? { ...result.data, noLoop: true } : result.data,
+        };
       }
       return {
         success: false,

@@ -44,6 +44,8 @@ export interface MessageOperationDeps {
     ttsVoice: typeof TtsVoiceValue;
   };
   deductCredits: (creditCost: number, feature: string) => void;
+  setInput?: (input: string) => void;
+  setAttachments?: (attachments: File[] | ((prev: File[]) => File[])) => void;
 }
 
 /**
@@ -61,6 +63,8 @@ export async function createAndSendUserMessage(
     currentSubFolderId,
     settings,
     deductCredits,
+    setInput,
+    setAttachments,
   } = deps;
 
   const {
@@ -184,6 +188,16 @@ export async function createAndSendUserMessage(
 
       chatStore.addMessage(createdUserMessage);
 
+      // For incognito mode, clear input immediately since messages are stored locally
+      // No need to wait for server confirmation
+      if (
+        currentRootFolderId === DefaultFolderId.INCOGNITO &&
+        operation === "send"
+      ) {
+        setInput?.("");
+        setAttachments?.([]);
+      }
+
       // Save to localStorage (incognito only - server saves via API)
       if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
         // If there are attachments, use saveMessageWithAttachments to convert files to base64
@@ -255,6 +269,21 @@ export async function createAndSendUserMessage(
         timezone,
       },
       {
+        onMessageCreated: (data) => {
+          // Clear input when USER message is confirmed by server (for server threads only)
+          // This means the message was successfully stored in the database
+          if (
+            data.role === ChatMessageRole.USER &&
+            operation === "send" &&
+            currentRootFolderId !== DefaultFolderId.INCOGNITO
+          ) {
+            logger.debug("[Message] User message created, clearing input", {
+              messageId: data.messageId,
+            });
+            setInput?.("");
+            setAttachments?.([]);
+          }
+        },
         onCreditsDeducted: (data) => {
           // Optimistically deduct credits when server emits CREDITS_DEDUCTED event
           logger.debug("[Credits] Deducting credits from SSE event", {

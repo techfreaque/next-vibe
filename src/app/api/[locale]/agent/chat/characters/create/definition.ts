@@ -100,7 +100,6 @@ const { POST } = createEndpoint({
               name: data.requestData.name,
               tagline: data.requestData.tagline,
               description: data.requestData.description,
-              addedToFav: false,
               modelIcon: bestModel.icon,
               modelInfo: bestModel.name,
               modelProvider: bestModel.provider,

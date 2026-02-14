@@ -322,7 +322,9 @@ export const translations: typeof enTranslations = {
       gabAiArya:
         "Gab AI Arya - Niecenzurowany model konwersacyjny AI z wolnością wypowiedzi i kreatywnymi możliwościami",
       gemini3Pro:
-        "Google Gemini 3 Pro - Zaawansowany multimodalny model AI z dużym oknem kontekstowym",
+        "Google Gemini 3 Pro - Zaawansowany multimodalny model AI z dużym oknem kontekstowym i potężnymi możliwościami rozumowania",
+      gemini3Flash:
+        "Google Gemini 3 Flash - Szybki, wydajny multimodalny model AI zoptymalizowany dla szybkich odpowiedzi",
       deepseekV32:
         "DeepSeek V3.2 - Wysokowydajny model rozumowania z zaawansowanymi możliwościami kodowania",
       gpt52Pro:
@@ -336,13 +338,23 @@ export const translations: typeof enTranslations = {
       dolphinLlama3_70B:
         "Dolphin Llama 3 70B - Niecenzurowany duży model językowy oparty na Llama 3",
       veniceUncensored:
-        "Venice Uncensored - Niecenzurowany model AI dla nieograniczonych rozmów",
+        "Venice Uncensored 1.1 - Najbardziej niecenzurowany model AI z obsługą wywoływania narzędzi. Zaprojektowany dla maksymalnej kreatywnej wolności i autentycznej interakcji. Idealny do otwartej eksploracji, gier fabularnych i niefiltrowanego dialogu z minimalnymi ograniczeniami treści.",
       claudeOpus45:
         "Claude Opus 4.5 - Najpotężniejszy model Claude z wyjątkowymi możliwościami rozumowania i kreatywnymi",
       claudeOpus46:
         "Claude Opus 4.6 - Najnowszy i najpotężniejszy model Claude z wyjątkowymi możliwościami rozumowania i kreatywnymi",
       claudeHaiku45:
         "Claude Haiku 4.5 - Szybki i wydajny model Claude zoptymalizowany pod kątem szybkości i opłacalności",
+      glm46:
+        "GLM-4 6B - Wydajny dwujęzyczny model AI chińsko-angielski z silnymi ogólnymi możliwościami",
+      glm47:
+        "GLM-4 7B - Zaawansowany dwujęzyczny model chińsko-angielski z ulepszonymi możliwościami rozumowania i kodowania",
+      glm47Flash:
+        "GLM-4 7B Flash - Ultraszybki model chińsko-angielski zoptymalizowany dla szybkich odpowiedzi",
+      kimiK2:
+        "Kimi K2 - Potężny chiński model AI z doskonałym zrozumieniem kontekstu",
+      kimiK2_5:
+        "Kimi K2.5 - Rozszerzony chiński model AI z ulepszonymi możliwościami rozumowania i kreatywnymi",
     },
   },
   modelUtilities: {

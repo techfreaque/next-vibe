@@ -29,6 +29,8 @@ export interface MutationExecutorOptions<TRequest, TResponse, TUrlVariables> {
     urlPathParams: TUrlVariables;
     responseData: TResponse;
     logger: EndpointLogger;
+    user: JwtPayloadType;
+    locale: CountryLanguage;
   }) => void | ErrorResponseType | Promise<void | ErrorResponseType>;
 
   /** Callback when mutation fails */
@@ -191,6 +193,8 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
         urlPathParams: pathParams,
         responseData: response.data,
         logger,
+        user,
+        locale,
       });
 
       // If callback returns an error, return it

@@ -11,6 +11,7 @@ import { ModelSelector } from "@/app/api/[locale]/agent/models/components/model-
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
   useWidgetForm,
+  useWidgetLocale,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react";
@@ -22,6 +23,7 @@ import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { TParams } from "@/i18n/core/static-types";
 
 import type { ModelSelectionSimple } from "../../../models/components/types";
@@ -48,6 +50,7 @@ export function CharacterCreateContainer({
   const children = field.children;
   const form = useWidgetForm<typeof defintion.POST>();
   const t = useWidgetTranslation();
+  const locale = useWidgetLocale();
 
   return (
     <Div className="flex flex-col gap-0">
@@ -101,7 +104,7 @@ export function CharacterCreateContainer({
             fieldName="systemPrompt"
             field={children.systemPrompt}
           />
-          <ModelSelectorWrapper form={form} t={t} />
+          <ModelSelectorWrapper form={form} t={t} locale={locale} />
         </Div>
       </Div>
     </Div>
@@ -111,14 +114,16 @@ export function CharacterCreateContainer({
 function ModelSelectorWrapper({
   form,
   t,
+  locale,
 }: {
   form: ReturnType<typeof useWidgetForm<typeof defintion.POST>>;
   t: (key: string, params?: TParams) => string;
+  locale: CountryLanguage;
 }): JSX.Element {
   const modelSelection = form.watch("modelSelection");
   const error = form.formState.errors.modelSelection;
   const onChange = useCallback(
-    (selection: ModelSelectionSimple) =>
+    (selection: ModelSelectionSimple | null) =>
       form.setValue("modelSelection", selection),
     [form],
   );
@@ -131,6 +136,7 @@ function ModelSelectorWrapper({
         modelSelection={modelSelection}
         onChange={onChange}
         t={t}
+        locale={locale}
       />
     </>
   );

@@ -370,6 +370,8 @@ export const translations: typeof enTranslations = {
       },
     },
     errors: {
+      noEndpoint:
+        "Ta funkcja nie jest jeszcze dostępna. Spróbuj ponownie później",
       unknown: "Wystąpił nieznany błąd",
     },
     api: {

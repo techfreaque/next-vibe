@@ -227,7 +227,10 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
         return false;
       }
       const fieldData =
-        data && typeof data === "object" && !Array.isArray(data)
+        data &&
+        typeof data === "object" &&
+        !Array.isArray(data) &&
+        !(data instanceof Date)
           ? data[fieldName]
           : undefined;
       const hasData = fieldData !== null && fieldData !== undefined;
@@ -243,7 +246,10 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     // For response fields, only show if they have data
     if (isResponseField(field)) {
       const fieldData =
-        data && typeof data === "object" && !Array.isArray(data)
+        data &&
+        typeof data === "object" &&
+        !Array.isArray(data) &&
+        !(data instanceof Date)
           ? data[fieldName]
           : undefined;
       return fieldData !== null && fieldData !== undefined;

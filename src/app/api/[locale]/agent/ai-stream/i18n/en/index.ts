@@ -276,6 +276,10 @@ export const translations = {
   error: {
     title: "Stream Error",
   },
+  info: {
+    streamInterrupted:
+      "Generation was stopped. Partial response has been saved.",
+  },
   errors: {
     toolExecutionError: "A tool failed to execute properly. Please try again.",
     toolExecutionFailed: "Tool execution failed. Please try again.",

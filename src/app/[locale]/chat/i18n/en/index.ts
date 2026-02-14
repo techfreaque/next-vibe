@@ -521,10 +521,10 @@ export const translations = {
     selectCharacter: "Select Character",
     modelCreditDisplay: {
       tokenBased: {
-        header: "Cost varies based on conversation length",
-        costRangeLabel: "Cost range:",
+        header: "Cost per message",
+        costRangeLabel: "Typical range:",
         costRangeValue: "{{min}} - {{max}} credits",
-        examplesLabel: "Cost examples:",
+        examplesLabel: "Examples:",
         examples: {
           short: "Short conversation",
           medium: "Medium conversation",
@@ -533,7 +533,7 @@ export const translations = {
         triggersCompacting: "⚡ Triggers compacting",
         tokensCount: "{{count}} tokens",
         explanation:
-          "The AI processes your entire conversation history with each message, so costs increase as conversations grow longer.",
+          "The AI processes your entire conversation history with each message. Longer conversations cost more because there's more context to process.",
         compactingLabel: "✨ Auto-compacting:",
         compactingExplanation:
           " At {{threshold}} tokens, older messages are automatically summarized to reduce costs while preserving context.",

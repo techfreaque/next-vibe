@@ -323,7 +323,9 @@ export const translations: typeof enTranslations = {
       gabAiArya:
         "Gab AI Arya - Unzensiertes Konversations-KI-Modell mit freier Meinungsäußerung und kreativen Fähigkeiten",
       gemini3Pro:
-        "Google Gemini 3 Pro - Fortgeschrittenes multimodales KI-Modell mit großem Kontextfenster",
+        "Google Gemini 3 Pro - Fortgeschrittenes multimodales KI-Modell mit großem Kontextfenster und leistungsstarken Reasoning-Fähigkeiten",
+      gemini3Flash:
+        "Google Gemini 3 Flash - Schnelles, effizientes multimodales KI-Modell optimiert für schnelle Antworten",
       deepseekV32:
         "DeepSeek V3.2 - Hochleistungs-Reasoning-Modell mit erweiterten Coding-Fähigkeiten",
       gpt52Pro:
@@ -337,13 +339,23 @@ export const translations: typeof enTranslations = {
       dolphinLlama3_70B:
         "Dolphin Llama 3 70B - Unzensiertes großes Sprachmodell basierend auf Llama 3",
       veniceUncensored:
-        "Venice Uncensored - Unzensiertes KI-Modell für uneingeschränkte Konversationen",
+        "Venice Uncensored 1.1 - Das unzensierteste KI-Modell mit Tool-Calling-Unterstützung. Entwickelt für maximale kreative Freiheit und authentische Interaktion. Ideal für offene Erkundung, Rollenspiele und ungefilterten Dialog mit minimalen Inhaltsbeschränkungen.",
       claudeOpus45:
         "Claude Opus 4.5 - Leistungsstärkstes Claude-Modell mit außergewöhnlichen Reasoning- und kreativen Fähigkeiten",
       claudeOpus46:
         "Claude Opus 4.6 - Neuestes und leistungsstärkstes Claude-Modell mit außergewöhnlichen Reasoning- und kreativen Fähigkeiten",
       claudeHaiku45:
         "Claude Haiku 4.5 - Schnelles und effizientes Claude-Modell optimiert für Geschwindigkeit und Kosteneffizienz",
+      glm46:
+        "GLM-4 6B - Effizientes chinesisch-englisches bilinguales KI-Modell mit starken allgemeinen Fähigkeiten",
+      glm47:
+        "GLM-4 7B - Fortgeschrittenes chinesisch-englisches bilinguales Modell mit verbesserten Reasoning- und Coding-Fähigkeiten",
+      glm47Flash:
+        "GLM-4 7B Flash - Ultraschnelles chinesisch-englisches Modell optimiert für schnelle Antworten",
+      kimiK2:
+        "Kimi K2 - Leistungsstarkes chinesisches KI-Modell mit ausgezeichnetem Kontextverständnis",
+      kimiK2_5:
+        "Kimi K2.5 - Erweitertes chinesisches KI-Modell mit verbesserten Reasoning- und kreativen Fähigkeiten",
     },
   },
   modelUtilities: {

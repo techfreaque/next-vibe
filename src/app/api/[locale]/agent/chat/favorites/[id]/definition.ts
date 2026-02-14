@@ -294,13 +294,86 @@ const { PATCH } = createEndpoint({
 
   options: {
     mutationOptions: {
-      onSuccess: async ({ logger, pathParams, requestData }) => {
+      onSuccess: async (data) => {
+        const { logger, pathParams, requestData, user, locale } = data;
+
         // Import dependencies
         const { apiClient } =
           await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
         const favoritesDefinition = await import("../definition");
         const { ChatFavoritesRepositoryClient } =
           await import("../repository-client");
+
+        // Check if this is the currently active favorite and update settings if needed
+        const settingsDefinition = await import("../../settings/definition");
+        const settingsData = apiClient.getEndpointData(
+          settingsDefinition.default.GET,
+          logger,
+          undefined,
+        );
+        const isActiveFavorite =
+          settingsData?.success &&
+          settingsData.data.activeFavoriteId === pathParams.id;
+
+        // If this is the active favorite, update settings with new model/voice
+        if (isActiveFavorite && settingsData?.success) {
+          let modelId = settingsData.data.selectedModel;
+          if (requestData.modelSelection) {
+            const { CharactersRepositoryClient } =
+              await import("../../characters/repository-client");
+            const bestModel =
+              CharactersRepositoryClient.getBestModelForFavorite(
+                requestData.modelSelection,
+                undefined,
+              );
+            modelId = bestModel?.id || settingsData.data.selectedModel;
+          }
+
+          // Optimistically update settings cache with new model and voice
+          apiClient.updateEndpointData(
+            settingsDefinition.default.GET,
+            logger,
+            (prevData) => {
+              if (!prevData?.success) {
+                return prevData;
+              }
+              return {
+                success: true,
+                data: {
+                  ...prevData.data,
+                  selectedModel: modelId,
+                  ttsVoice: requestData.voice ?? prevData.data.ttsVoice,
+                },
+              };
+            },
+            undefined,
+          );
+
+          // Persist the settings update to the database
+          try {
+            await apiClient.mutate(
+              settingsDefinition.default.POST,
+              logger,
+              user,
+              {
+                selectedModel: modelId,
+                ttsVoice: requestData.voice ?? settingsData.data.ttsVoice,
+              },
+              undefined,
+              locale,
+            );
+          } catch (error) {
+            logger.error("Failed to update settings for active favorite", {
+              errorMessage:
+                error instanceof Error ? error.message : String(error),
+            });
+            // Revert optimistic update on error
+            await apiClient.refetchEndpoint(
+              settingsDefinition.default.GET,
+              logger,
+            );
+          }
+        }
 
         // Optimistically update the favorite in the list with proper recomputation
         apiClient.updateEndpointData(

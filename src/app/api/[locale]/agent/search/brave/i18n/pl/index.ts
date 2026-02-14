@@ -92,6 +92,14 @@ export const translations: typeof enTranslations = {
         title: "Wyszukiwanie nie powiodło się",
         description: "Wystąpił błąd podczas wyszukiwania",
       },
+      validation: {
+        title: "Nieprawidłowe wyszukiwanie",
+        description: "Sprawdź parametry wyszukiwania i spróbuj ponownie",
+      },
+      internal: {
+        title: "Coś poszło nie tak",
+        description: "Nie mogliśmy ukończyć wyszukiwania. Spróbuj ponownie",
+      },
     },
     success: {
       title: "Wyszukiwanie zakończone sukcesem",

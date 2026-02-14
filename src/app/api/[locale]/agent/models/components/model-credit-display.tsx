@@ -134,6 +134,7 @@ export function ModelCreditDisplay({
 }: ModelCreditDisplayProps): JSX.Element {
   const model = getModelById(modelId);
   const [isOpen, setIsOpen] = useState(false);
+  const openTimeoutRef = useRef<number | null>(null);
   const closeTimeoutRef = useRef<number | null>(null);
 
   // Determine currency based on country
@@ -188,15 +189,27 @@ export function ModelCreditDisplay({
     );
 
   const handleMouseEnter = (): void => {
+    // Clear any pending close timeout
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
     }
-    setIsOpen(true);
+
+    // Open with a 500ms delay
+    openTimeoutRef.current = window.setTimeout(() => {
+      setIsOpen(true);
+    }, 500);
   };
 
   const handleMouseLeave = (): void => {
-    closeTimeoutRef.current = setTimeout(() => {
+    // Clear any pending open timeout
+    if (openTimeoutRef.current) {
+      clearTimeout(openTimeoutRef.current);
+      openTimeoutRef.current = null;
+    }
+
+    // Close with a short delay
+    closeTimeoutRef.current = window.setTimeout(() => {
       setIsOpen(false);
     }, 150);
   };
@@ -207,6 +220,7 @@ export function ModelCreditDisplay({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className="inline-block"
+      onClick={(e) => e.stopPropagation()}
     >
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
@@ -214,7 +228,10 @@ export function ModelCreditDisplay({
             variant="ghost"
             size="sm"
             className="h-auto p-0 hover:bg-transparent cursor-help"
-            onTouchStart={() => setIsOpen(!isOpen)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpen(!isOpen);
+            }}
           >
             {baseContent}
           </Button>

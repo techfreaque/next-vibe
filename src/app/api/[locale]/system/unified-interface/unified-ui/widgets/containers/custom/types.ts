@@ -8,6 +8,7 @@ import type {
   FieldUsageConfig,
   ObjectChildrenConstraint,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import type { BaseContainerLayoutProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/container/types";
 
 /**
  * Custom widget config - allows custom React component renderer
@@ -20,7 +21,10 @@ export interface CustomWidgetObjectConfig<
     TKey,
     ConstrainedChildUsage<TUsage>
   >,
-> extends BaseObjectWidgetConfig<TKey, TUsage, TSchemaType, TChildren> {
+>
+  extends
+    BaseObjectWidgetConfig<TKey, TUsage, TSchemaType, TChildren>,
+    BaseContainerLayoutProps<TKey> {
   type: WidgetType.CUSTOM_WIDGET;
   // oxlint-disable-next-line typescript/no-explicit-any
   render?: React.ComponentType<any>;

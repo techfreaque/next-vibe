@@ -3,15 +3,10 @@ import * as React from "react";
 import type { ViewStyle } from "react-native";
 import { Animated, StyleSheet, View } from "react-native";
 
-import type { AudioWaveformProps as WebAudioWaveformProps } from "@/packages/next-vibe-ui/web/ui/audio-waveform";
+import type { AudioWaveformProps } from "@/packages/next-vibe-ui/web/ui/audio-waveform";
 import { applyStyleType } from "@/packages/next-vibe-ui/web/utils/style-type";
 
-// Native adapts to web's props - stream is MediaStream | null from web
-export type AudioWaveformProps = WebAudioWaveformProps & {
-  /** Color for the waveform bars (native-only prop) */
-  color?: string;
-};
-
+const color = "ef4444";
 /**
  * Historical time-series audio waveform visualization for React Native
  * Simulates entire recording history compressed into fixed bars
@@ -23,9 +18,7 @@ export function AudioWaveform({
   className,
   nativeStyle,
   barCount = 96,
-  height = 32,
   maxBarHeight = 32,
-  color = "#ef4444", // destructive/red color
 }: AudioWaveformProps & { nativeStyle?: ViewStyle }): JSX.Element {
   const animatedValues = React.useRef(
     Array.from({ length: barCount }, () => new Animated.Value(0)),
@@ -123,7 +116,7 @@ export function AudioWaveform({
   return (
     <View
       {...styleProps}
-      style={[styles.container, styleProps.style, { height }]}
+      style={[styles.container, styleProps.style, { height: maxBarHeight }]}
     >
       {animatedValues.map((animatedValue, i) => (
         <Animated.View

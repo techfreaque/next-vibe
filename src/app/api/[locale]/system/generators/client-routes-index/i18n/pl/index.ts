@@ -7,6 +7,28 @@ export const translations: typeof enTranslations = {
     container: {
       title: "Generator indeksu tras klienta",
     },
+    fields: {
+      outputFile: {
+        label: "Plik wyjściowy",
+        description: "Ścieżka do pliku wyjściowego",
+      },
+      dryRun: {
+        label: "Uruchomienie próbne",
+        description: "Podgląd zmian bez zapisu do pliku",
+      },
+      success: {
+        title: "Sukces",
+      },
+      message: {
+        title: "Wiadomość",
+      },
+      routesFound: {
+        title: "Znalezione trasy",
+      },
+      duration: {
+        title: "Czas trwania (ms)",
+      },
+    },
     errors: {
       validation: {
         title: "Nieprawidłowe dane",

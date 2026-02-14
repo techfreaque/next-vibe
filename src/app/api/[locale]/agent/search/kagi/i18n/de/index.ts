@@ -84,6 +84,16 @@ export const translations: typeof enTranslations = {
         title: "Suche fehlgeschlagen",
         description: "Bei der Suche ist ein Fehler aufgetreten",
       },
+      validation: {
+        title: "Ungültige Suche",
+        description:
+          "Bitte überprüfen Sie Ihre Suchparameter und versuchen Sie es erneut",
+      },
+      internal: {
+        title: "Etwas ist schief gelaufen",
+        description:
+          "Wir konnten Ihre Suche nicht abschließen. Bitte versuchen Sie es erneut",
+      },
     },
     success: {
       title: "Suche erfolgreich",

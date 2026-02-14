@@ -1,3 +1,4 @@
+import { translations as clientRoutesIndexTranslations } from "../../client-routes-index/i18n/de";
 import { translations as emailTemplatesTranslations } from "../../email-templates/i18n/de";
 import { translations as endpointTranslations } from "../../endpoint/i18n/de";
 import { translations as endpointsTranslations } from "../../endpoints/i18n/de";
@@ -12,6 +13,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Generatoren",
+  clientRoutesIndex: clientRoutesIndexTranslations,
   emailTemplates: emailTemplatesTranslations,
   endpoint: endpointTranslations,
   endpoints: endpointsTranslations,

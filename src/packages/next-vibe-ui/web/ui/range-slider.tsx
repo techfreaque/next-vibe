@@ -338,8 +338,9 @@ export function RangeSlider<TTranslationKey extends string = TranslationKey>({
               };
 
               return (
-                <div
+                <button
                   key={`option-${option.value}`}
+                  type="button"
                   className={cn(
                     "absolute flex flex-col items-center gap-0 transition-all duration-300 -translate-x-1/2",
                     isInRange
@@ -351,6 +352,14 @@ export function RangeSlider<TTranslationKey extends string = TranslationKey>({
                   )}
                   style={{ left: `${position}%` }}
                   onClick={handleClick}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleClick();
+                    }
+                  }}
+                  tabIndex={isMiddle || disabled ? -1 : 0}
+                  disabled={disabled}
                 >
                   {option.icon && (
                     <Icon
@@ -366,7 +375,7 @@ export function RangeSlider<TTranslationKey extends string = TranslationKey>({
                       {t(option.description)}
                     </Span>
                   )}
-                </div>
+                </button>
               );
             })}
           </div>

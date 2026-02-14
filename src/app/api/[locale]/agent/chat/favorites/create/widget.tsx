@@ -4,15 +4,21 @@
 
 "use client";
 
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { useState } from "react";
 
 import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/config";
+import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
 import { ModelSelector } from "@/app/api/[locale]/agent/models/components/model-selector";
 import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/components/types";
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
   useWidgetForm,
+  useWidgetLocale,
   useWidgetLogger,
+  useWidgetNavigation,
   useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -25,6 +31,7 @@ import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interfac
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import { useCharacter } from "../../characters/[id]/hooks";
+import { useChatSettings } from "../../settings/hooks";
 import type definition from "./definition";
 import type { FavoriteCreateResponseOutput } from "./definition";
 
@@ -47,9 +54,14 @@ export function FavoriteCreateContainer({
   const children = field.children;
   const form = useWidgetForm();
   const t = useWidgetTranslation();
+  const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const navigate = useWidgetNavigation();
+  const [isApplying, setIsApplying] = useState(false);
+
   const characterId = form?.watch("characterId");
+  const voice = form.watch("voice");
   const isNoCharacter = characterId === NO_CHARACTER_ID;
 
   const favoriteModelSelection: ModelSelectionSimple | undefined =
@@ -58,9 +70,50 @@ export function FavoriteCreateContainer({
   const characterEndpoint = useCharacter(characterId ?? "", user, logger);
   const characterData = characterEndpoint.read?.data;
 
+  const { updateSettings } = useChatSettings(user, logger);
+
+  const handleUseWithoutSaving = async (): Promise<void> => {
+    if (!form || !characterId) {
+      return;
+    }
+
+    setIsApplying(true);
+    try {
+      // Resolve the model to use
+      const modelSelection =
+        favoriteModelSelection ?? characterData?.modelSelection ?? null;
+
+      let selectedModel: ModelId | undefined = undefined;
+
+      if (modelSelection) {
+        // Resolve model selection to actual ModelId
+        const bestModel =
+          CharactersRepositoryClient.getBestModelForCharacter(modelSelection);
+        selectedModel = bestModel?.id;
+      }
+
+      // Apply settings without creating a favorite (activeFavoriteId = null)
+      await updateSettings({
+        activeFavoriteId: null,
+        selectedCharacter: characterId,
+        selectedModel,
+        ttsVoice: voice ?? characterData?.voice ?? null,
+      });
+
+      // Navigate back
+      navigate.pop(1);
+    } catch (error) {
+      logger.error("Failed to apply settings without saving", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setIsApplying(false);
+    }
+  };
+
   return (
     <Div className="flex flex-col gap-0">
-      {/* Top Actions: Back + Submit */}
+      {/* Top Actions: Back + Use Without Saving + Save */}
       <Div className="flex flex-row gap-2 px-4 pt-4 pb-4">
         <NavigateButtonWidget
           field={{
@@ -68,6 +121,21 @@ export function FavoriteCreateContainer({
             variant: "outline",
           }}
         />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleUseWithoutSaving}
+          disabled={isApplying || !characterId}
+          className="ml-auto h-8 text-xs"
+        >
+          {isApplying
+            ? t(
+                "app.api.agent.chat.favorites.post.useWithoutSavingButton.loadingText",
+              )
+            : t(
+                "app.api.agent.chat.favorites.post.useWithoutSavingButton.label",
+              )}
+        </Button>
         <SubmitButtonWidget
           field={{
             text: "app.api.agent.chat.favorites.post.submitButton.label",
@@ -75,7 +143,8 @@ export function FavoriteCreateContainer({
               "app.api.agent.chat.favorites.post.submitButton.loadingText",
             icon: "plus",
             variant: "primary",
-            className: "ml-auto",
+            size: "sm",
+            className: "h-8 text-xs",
           }}
         />
       </Div>
@@ -123,6 +192,7 @@ export function FavoriteCreateContainer({
                 isNoCharacter ? undefined : characterData?.modelSelection
               }
               t={t}
+              locale={locale}
             />
           )}
         </Div>

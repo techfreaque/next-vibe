@@ -195,6 +195,10 @@ export const translations: typeof enTranslations = {
       creditsFailed: "Nie udało się potrącić kredytów: {{error}}",
       providerError:
         "Błąd usługi transkrypcji. Spróbuj ponownie lub skontaktuj się z pomocą techniczną, jeśli problem będzie się powtarzał.",
+      balanceCheckFailed:
+        "Nie można sprawdzić salda kredytów. Spróbuj ponownie",
+      insufficientCredits:
+        "Nie masz wystarczającej liczby kredytów na tę transkrypcję. Dodaj więcej kredytów, aby kontynuować",
     },
     success: {
       title: "Sukces",
