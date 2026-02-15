@@ -332,18 +332,18 @@ export class FileGenerator {
           const childKey = childKeys[0];
           const childValue = value[childKey];
 
-          // If the single child is also an object, flatten it
+          // If the single child is also an object, skip this level (flatten it out)
+          // and continue processing from the child
           if (
             typeof childValue === "object" &&
             childValue !== null &&
             !Array.isArray(childValue)
           ) {
-            // Recursively flatten the child
-            const flattenedChild = this.flattenSingleChildObjects({
-              [childKey]: childValue,
-            });
-            // Merge the flattened child directly into result (skip the parent key)
-            Object.assign(result, flattenedChild);
+            // Skip the current key and process the child's content directly
+            // Recursively flatten the child value
+            result[childKey] = this.flattenSingleChildObjects(
+              childValue as TranslationObject,
+            );
           } else {
             // Single child is a primitive value - keep the structure
             result[key] = value;
@@ -623,10 +623,7 @@ export class FileGenerator {
    * @param locationPrefix - The location prefix to strip
    * @returns The key after stripping and flattening
    */
-  public simulateFlattenedKey(
-    fullKey: string,
-    locationPrefix: string,
-  ): string {
+  public simulateFlattenedKey(fullKey: string, locationPrefix: string): string {
     // Strip location prefix
     let strippedKey = fullKey;
     if (locationPrefix && fullKey.startsWith(`${locationPrefix}.`)) {
@@ -647,9 +644,7 @@ export class FileGenerator {
     const flattened = this.flattenSingleChildObjects(tempObj);
 
     // Convert back to dot notation to get the final key
-    const flattenedKeys = Object.keys(
-      this.flattenTranslationObject(flattened),
-    );
+    const flattenedKeys = Object.keys(this.flattenTranslationObject(flattened));
     return flattenedKeys[0] || strippedKey;
   }
 
