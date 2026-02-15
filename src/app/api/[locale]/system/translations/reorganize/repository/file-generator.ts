@@ -714,11 +714,24 @@ export class FileGenerator {
       if (child === "[locale]") {
         exports.push(`  ...${importName}`);
       } else {
-        // Quote keys that contain special characters
-        const exportKey = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(child)
-          ? child
-          : // eslint-disable-next-line i18next/no-literal-string
-            `"${child}"`;
+        // Convert kebab-case folder names to camelCase for export keys
+        // e.g., speech-to-text -> speechToText
+        let exportKey = child;
+
+        // Convert kebab-case to camelCase
+        exportKey = exportKey.replaceAll(
+          /-([a-z0-9])/g,
+          (hyphenAndChar: string, letter: string) =>
+            hyphenAndChar.length > 1 ? letter.toUpperCase() : hyphenAndChar,
+        );
+
+        // Quote keys that still contain special characters after camelCase conversion
+        // (e.g., keys with other special chars besides hyphens)
+        if (!/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(exportKey)) {
+          // eslint-disable-next-line i18next/no-literal-string
+          exportKey = `"${exportKey}"`;
+        }
+
         exports.push(`  ${exportKey}: ${importName}`);
       }
     }
