@@ -114,7 +114,7 @@ export class TranslationReorganizeRepositoryImpl {
 
         output.push(
           t(
-            "app.api.system.translations.reorganize.post.messages.backupCreated",
+            "app.api.system.translations.reorganize.common.messages.backupCreated",
             {
               path: backupPath,
             },
@@ -164,7 +164,7 @@ export class TranslationReorganizeRepositoryImpl {
       );
 
       output.push(
-        t("app.api.system.translations.reorganize.post.messages.foundKeys", {
+        t("app.api.system.translations.reorganize.common.messages.foundKeys", {
           used: usedKeys,
           total: allKeys.size,
         }),
@@ -177,7 +177,7 @@ export class TranslationReorganizeRepositoryImpl {
       if (removeUnused && unusedKeys > 0) {
         output.push(
           t(
-            "app.api.system.translations.reorganize.post.messages.removingKeys",
+            "app.api.system.translations.reorganize.common.messages.removingKeys",
             {
               count: unusedKeys,
             },
@@ -331,7 +331,7 @@ export class TranslationReorganizeRepositoryImpl {
                 type: "updated",
                 path: `i18n/${language}/**/*.ts`,
                 description:
-                  "app.api.system.translations.reorganize.post.messages.removingKeys",
+                  "app.api.system.translations.reorganize.common.messages.removingKeys",
                 descriptionParams: {
                   language,
                   count: keysRemoved,
@@ -492,7 +492,7 @@ export class TranslationReorganizeRepositoryImpl {
                   type: "updated",
                   path: path.join(TRANSLATIONS_DIR, language, "index.ts"),
                   description:
-                    "app.api.system.translations.reorganize.post.messages.regeneratedStructure",
+                    "app.api.system.translations.reorganize.common.messages.regeneratedStructure",
                   descriptionParams: { language },
                 });
               }
@@ -1277,7 +1277,8 @@ export class TranslationReorganizeRepositoryImpl {
     // For each location, simulate the complete flattening and update mappings
     for (const [location, translations] of groups.entries()) {
       // Get location prefix
-      const locationPrefix = this.fileGenerator!.locationToFlatKeyPublic(location);
+      const locationPrefix =
+        this.fileGenerator!.locationToFlatKeyPublic(location);
 
       // Strip location prefix from all keys
       const strippedTranslations: TranslationObject = {};
@@ -1290,13 +1291,18 @@ export class TranslationReorganizeRepositoryImpl {
       }
 
       // Unflatten to nested structure
-      const nested = this.fileGenerator!.unflattenTranslationObjectPublic(strippedTranslations);
+      const nested =
+        this.fileGenerator!.unflattenTranslationObjectPublic(
+          strippedTranslations,
+        );
 
       // Flatten single-child objects
-      const flattened = this.fileGenerator!.flattenSingleChildObjectsPublic(nested);
+      const flattened =
+        this.fileGenerator!.flattenSingleChildObjectsPublic(nested);
 
       // Flatten back to dot notation
-      const flattenedKeys = this.fileGenerator!.flattenTranslationObjectPublic(flattened);
+      const flattenedKeys =
+        this.fileGenerator!.flattenTranslationObjectPublic(flattened);
 
       // Now compare original keys to flattened keys and update mappings
       for (const [originalKey, value] of Object.entries(translations)) {
@@ -1317,7 +1323,9 @@ export class TranslationReorganizeRepositoryImpl {
         for (const [flatKey, flatValue] of Object.entries(flattenedKeys)) {
           if (flatValue === value) {
             // Found the flattened version
-            const correctKey = locationPrefix ? `${locationPrefix}.${flatKey}` : flatKey;
+            const correctKey = locationPrefix
+              ? `${locationPrefix}.${flatKey}`
+              : flatKey;
 
             if (originalKey !== correctKey) {
               // Update mapping
@@ -1332,7 +1340,9 @@ export class TranslationReorganizeRepositoryImpl {
 
               // Update or create mapping
               keyMappings.set(sourceKey, correctKey);
-              logger.info(`[FLATTEN-FIX] ${sourceKey} -> ${correctKey} (was: ${originalKey})`);
+              logger.info(
+                `[FLATTEN-FIX] ${sourceKey} -> ${correctKey} (was: ${originalKey})`,
+              );
             }
             break;
           }
@@ -1485,17 +1495,19 @@ export class TranslationReorganizeRepositoryImpl {
 
         // For shared keys, if the key doesn't start with the location prefix + ".common",
         // we need to insert "common" after the location prefix
-        // Example: key "app.api.leads.import.post.title" shared at location "app"
+        // Example: key "app.common.api.import.post.title" shared at location "app"
         // should become "app.common.api.leads.import.post.title"
         let adjustedKey = fullPath;
         if (isShared && actualLocationPrefix) {
           const locationDotCommon = `${actualLocationPrefix}.common`;
           if (!adjustedKey.startsWith(`${locationDotCommon}.`)) {
             // Insert "common" after the location prefix
-            // adjustedKey: "app.api.leads.import.post.title"
+            // adjustedKey: "app.common.api.import.post.title"
             // actualLocationPrefix: "app"
             // Result: "app.common.api.leads.import.post.title"
-            const afterPrefix = adjustedKey.startsWith(`${actualLocationPrefix}.`)
+            const afterPrefix = adjustedKey.startsWith(
+              `${actualLocationPrefix}.`,
+            )
               ? adjustedKey.slice(actualLocationPrefix.length + 1)
               : adjustedKey;
             adjustedKey = `${locationDotCommon}.${afterPrefix}`;
@@ -1539,9 +1551,14 @@ export class TranslationReorganizeRepositoryImpl {
           // Key already matches the location - it's correct!
           keySuffix = fullPathCamelCase.slice(actualLocationPrefix.length + 1);
           // Convert hyphenated/snake_case segments to camelCase
-          keySuffix = keySuffix.split('.').map(part =>
-            part.replace(/[-_]([a-z0-9])/g, (_, letter) => letter.toUpperCase())
-          ).join('.');
+          keySuffix = keySuffix
+            .split(".")
+            .map((part) =>
+              part.replace(/[-_]([a-z0-9])/g, (_, letter) =>
+                letter.toUpperCase(),
+              ),
+            )
+            .join(".");
           correctKey = `${actualLocationPrefix}.${keySuffix}`;
 
           // For shared keys, ensure they're under "common" in the file structure
@@ -1576,7 +1593,7 @@ export class TranslationReorganizeRepositoryImpl {
 
           // Find where key and location paths diverge
           // This handles cases where the key has a different structure than the location
-          // Example: key "app.api.agent.chat.tags.threads" vs location "app.api.agent.chat.threads"
+          // Example: key "app.api.common.agent.chat.tags.threads" vs location "app.api.agent.chat.threads"
           // Common prefix: ["app", "api", "agent", "chat"]
           // Key continues with: ["tags", "threads"]
           // Location continues with: ["threads"]
@@ -1871,6 +1888,9 @@ export class TranslationReorganizeRepositoryImpl {
       const locationTranslations: TranslationObject = {};
 
       // Extract translation values for each key in this location
+      const locationPrefix = this.fileGenerator
+        ? this.fileGenerator.locationToFlatKeyPublic(location)
+        : "";
       this.extractTranslationValuesForLocation(
         englishTranslations,
         languageTranslations,
@@ -1879,6 +1899,7 @@ export class TranslationReorganizeRepositoryImpl {
         keyUsageMap,
         logger,
         reverseKeyMappings,
+        locationPrefix,
       );
 
       if (Object.keys(locationTranslations).length > 0) {
@@ -1911,6 +1932,7 @@ export class TranslationReorganizeRepositoryImpl {
     keyUsageMap: Map<string, string[]>,
     logger: EndpointLogger,
     keyMappings?: Map<string, string>,
+    locationPrefix?: string,
   ): void {
     for (const [key, englishValue] of Object.entries(englishTranslations)) {
       const fullKey = currentPath ? `${currentPath}.${key}` : key;
@@ -1929,13 +1951,19 @@ export class TranslationReorganizeRepositoryImpl {
           keyUsageMap,
           logger,
           keyMappings,
+          locationPrefix,
         );
       } else {
         // This is a leaf translation value - find the corresponding value in source language
-        // If the key was remapped, use the original key to look up the translation
-        const lookupKey = keyMappings?.has(fullKey)
-          ? keyMappings.get(fullKey)!
+        // Build the complete key path including location prefix for reverse mapping lookup
+        const completeKey = locationPrefix
+          ? `${locationPrefix}.${fullKey}`
           : fullKey;
+
+        // If the key was remapped (NEW key in reverseKeyMappings), use the original key to look up the translation
+        const lookupKey = keyMappings?.has(completeKey)
+          ? keyMappings.get(completeKey)!
+          : completeKey;
 
         const sourceValue = this.findTranslationValue(
           lookupKey,
@@ -1945,12 +1973,12 @@ export class TranslationReorganizeRepositoryImpl {
         if (sourceValue !== undefined) {
           targetLocationTranslations[key] = sourceValue;
           logger.debug(
-            `Extracted translation: ${fullKey} (lookup: ${lookupKey}) = ${sourceValue}`,
+            `Extracted translation: ${completeKey} (lookup: ${lookupKey}) = ${sourceValue}`,
           );
         } else {
           // Only log at debug level - these are expected when keys are defined but not yet translated
           logger.debug(
-            `Could not find translation for key: ${fullKey} (lookup: ${lookupKey})`,
+            `Could not find translation for key: ${completeKey} (lookup: ${lookupKey})`,
           );
         }
       }
