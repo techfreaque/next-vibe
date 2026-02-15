@@ -991,34 +991,38 @@ export class FileGenerator {
 
             if (hasGeneratedFile || hasChildrenWithFiles) {
               // Child exists with files - check if ALL keys under this top-level key
-              // actually belong to the child's location prefix
-              const childLocationPrefix = this.locationToFlatKey(childLocation);
+              // are ACTUALLY IN the child's location group (not just matching the prefix)
+              const childTranslations = groups.get(childLocation);
 
-              // Flatten this key's value to check all nested keys
-              const flattenedValue =
-                typeof value === "object" && value !== null
-                  ? this.flattenTranslationObject(
-                      value as TranslationObject,
-                      key,
-                    )
-                  : { [key]: value };
+              if (childTranslations) {
+                // Flatten this key's value to check all nested keys
+                const flattenedValue =
+                  typeof value === "object" && value !== null
+                    ? this.flattenTranslationObject(
+                        value as TranslationObject,
+                        key,
+                      )
+                    : { [key]: value };
 
-              // Check if ALL keys belong to child's location prefix
-              const allKeysMatchChild = Object.keys(flattenedValue).every(
-                (fullKey) => {
-                  const reconstitutedKey = locationPrefix
-                    ? `${locationPrefix}.${fullKey}`
-                    : fullKey;
-                  return (
-                    childLocationPrefix &&
-                    reconstitutedKey.startsWith(`${childLocationPrefix}.`)
-                  );
-                },
-              );
+                // Flatten child translations to check against
+                const flattenedChildTranslations =
+                  this.flattenTranslationObject(childTranslations, "");
 
-              if (allKeysMatchChild) {
-                // All keys belong to child - skip to avoid duplicate
-                continue;
+                // Check if ALL keys exist in child's translations
+                const allKeysInChild = Object.keys(flattenedValue).every(
+                  (fullKey) => {
+                    const reconstitutedKey = locationPrefix
+                      ? `${locationPrefix}.${fullKey}`
+                      : fullKey;
+                    // Check if this exact key exists in the child's translations
+                    return reconstitutedKey in flattenedChildTranslations;
+                  },
+                );
+
+                if (allKeysInChild) {
+                  // All keys are in child's translations - skip to avoid duplicate
+                  continue;
+                }
               }
 
               // Some keys don't belong to child - include them inline
