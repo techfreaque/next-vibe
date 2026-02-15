@@ -764,10 +764,17 @@ export class FileGenerator {
 
         for (const [key, value] of Object.entries(nestedTranslations)) {
           // Check if this key matches a child directory name
-          if (directChildren.has(key)) {
-            // This key matches a child directory name
+          // Keys are camelCase but directChildren has kebab-case folder names
+          // Convert key back to kebab-case for comparison
+          const kebabKey = key.replaceAll(
+            /[A-Z]/g,
+            (letter: string) => `-${letter.toLowerCase()}`,
+          );
+
+          if (directChildren.has(key) || directChildren.has(kebabKey)) {
+            // This key matches a child directory name (either exact match or kebab-case match)
             // Check if we're importing from this child
-            const childLocation = `${sourcePath}/${key}`;
+            const childLocation = `${sourcePath}/${directChildren.has(key) ? key : kebabKey}`;
 
             // Skip if child has generated file OR will generate one (has children with files)
             const hasGeneratedFile = generatedFiles.has(childLocation);
