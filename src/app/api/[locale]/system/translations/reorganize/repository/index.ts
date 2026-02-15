@@ -1340,78 +1340,9 @@ export class TranslationReorganizeRepositoryImpl {
           // Single usage - place at the directory of that file
           location = path.dirname(usageFiles[0]);
         } else {
-          // Multiple usages - find the file whose location matches the key structure
-          // For example: key app.api.user.userRoles.* should be at app/api/[locale]/user/user-roles/
-          const keyParts = fullPath.split(".");
-          let primaryLocationFile: string | null = null;
-
-          // Try to find a file whose path matches the key structure
-          for (const file of usageFiles) {
-            const relPath = file.replace(/^.*\/src\//, "");
-            const fileLocationKey = this.fileGenerator
-              ? this.fileGenerator.locationToFlatKeyPublic(
-                  path.dirname(relPath),
-                )
-              : "";
-
-            // Check if the file's location matches the key prefix
-            if (fileLocationKey && fullPath.startsWith(fileLocationKey + ".")) {
-              primaryLocationFile = file;
-              break;
-            }
-          }
-
-          if (primaryLocationFile) {
-            // Found a file whose location matches the key structure - use that as primary location
-            location = path.dirname(primaryLocationFile);
-            isShared = false;
-            logger.debug(
-              `Key ${fullPath} matches location structure of ${primaryLocationFile}`,
-            );
-          } else {
-            // No matching location - check if key is in shared/common location
-            const keyLowerCase = fullPath.toLowerCase();
-            const hasSharedInKey =
-              keyLowerCase.includes(".shared.") ||
-              keyLowerCase.includes(".common.");
-
-            if (hasSharedInKey) {
-            // Key is meant to be shared - find the actual shared directory from usage files
-            // We look for directories containing "shared" or "common" in the actual filesystem paths
-            const sharedDirs = usageFiles
-              .map((file) => {
-                const dir = path.dirname(file);
-                // Find the first parent directory that contains "shared" or "common"
-                const parts = dir.split(path.sep);
-                const sharedIndex = parts.findIndex(
-                  (p) => p === "shared" || p === "common",
-                );
-                if (sharedIndex >= 0) {
-                  // Return path up to and including the shared/common directory
-                  return parts.slice(0, sharedIndex + 1).join(path.sep);
-                }
-                return null;
-              })
-              .filter((dir): dir is string => dir !== null);
-
-              if (sharedDirs.length > 0) {
-                // Use the first shared directory found
-                location = sharedDirs[0];
-                isShared = true;
-                logger.debug(
-                  `Keeping shared key ${fullPath} in shared location: ${location}`,
-                );
-              } else {
-                // Fallback to common ancestor
-                location = this.getCommonAncestorLocation(usageFiles);
-                isShared = true;
-              }
-            } else {
-              // Multiple usages - find common ancestor
-              location = this.getCommonAncestorLocation(usageFiles);
-              isShared = true;
-            }
-          }
+          // Multiple usages - find common ancestor
+          location = this.getCommonAncestorLocation(usageFiles);
+          isShared = true;
         }
 
         // Convert absolute path to relative path from project root
