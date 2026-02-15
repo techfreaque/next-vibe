@@ -110,28 +110,26 @@ export class KeyUsageAnalyzer {
   }
 
   /**
-   * Scan source files for ALL known translation keys using exact string matching
-   * Same as scanCodebaseForKeyUsage but scans ALL known keys at once
-   * @param allKeys - Set of all translation keys to search for
+   * Scan source files and find ALL translation key patterns using exact double-quote matching
+   * Finds any string in double quotes that looks like a translation key (has dots)
    * @param logger - Logger instance for debugging
    * @returns Map of translation keys to arrays of file paths where they are used
    */
-  scanAllKeysInSourceFiles(
-    allKeys: Set<string>,
-    logger: EndpointLogger,
-  ): Map<string, string[]> {
+  scanAllKeysInSourceFiles(logger: EndpointLogger): Map<string, string[]> {
     const keyUsageMap = new Map<string, string[]>();
 
-    logger.info(
-      `Scanning source files for ${allKeys.size} translation keys using exact matching`,
-    );
+    logger.info("Scanning source files for all translation key patterns");
 
     // Get all source files to scan
     const sourceFiles = this.findFiles(SRC_DIR, FILE_EXTENSIONS);
 
     logger.debug(`Found ${sourceFiles.length} source files to scan`);
 
-    // Scan each file for key usage
+    // Pattern: any double-quoted string with at least one dot
+    // Matches: "app.api.shared.errorTypes.validation_error"
+    const keyPattern = /"([a-z][a-z0-9._-]*\.[a-z0-9._-]+)"/gi;
+
+    // Scan each file for translation key patterns
     for (const filePath of sourceFiles) {
       // Skip translation files themselves, test files, and backup files
       if (
@@ -146,12 +144,14 @@ export class KeyUsageAnalyzer {
       try {
         const content = fs.readFileSync(filePath, "utf8");
 
-        // Check each key for exact match with double quotes
-        for (const key of allKeys) {
-          if (content.includes(`"${key}"`)) {
-            if (!keyUsageMap.has(key)) {
-              keyUsageMap.set(key, []);
-            }
+        // Find all translation key patterns in this file
+        let match;
+        while ((match = keyPattern.exec(content)) !== null) {
+          const key = match[1];
+          if (!keyUsageMap.has(key)) {
+            keyUsageMap.set(key, []);
+          }
+          if (!keyUsageMap.get(key)?.includes(filePath)) {
             keyUsageMap.get(key)?.push(filePath);
           }
         }
@@ -162,7 +162,7 @@ export class KeyUsageAnalyzer {
 
     const keysFound = keyUsageMap.size;
     logger.info(
-      `Found ${keysFound} keys used in source files (${allKeys.size - keysFound} unused)`,
+      `Found ${keysFound} unique translation keys in source files`,
     );
 
     return keyUsageMap;

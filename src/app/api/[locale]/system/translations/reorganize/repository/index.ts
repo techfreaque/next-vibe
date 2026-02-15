@@ -131,15 +131,23 @@ export class TranslationReorganizeRepositoryImpl {
       );
       const currentTranslations = await this.loadCurrentTranslations(logger);
 
-      // Extract all keys from current translation files
+      // Scan source files for ALL translation key patterns (double-quoted strings with dots)
+      const sourceFileKeys = this.keyUsageAnalyzer.scanAllKeysInSourceFiles(logger);
+
+      // Also extract keys from current translation files
       const allKeys =
         this.keyUsageAnalyzer.extractAllTranslationKeys(currentTranslations);
 
-      // Scan source files for these keys using exact double-quote matching
-      const keyUsageMap = this.keyUsageAnalyzer.scanAllKeysInSourceFiles(
-        allKeys,
-        logger,
-      );
+      // Merge both: use source file keys as primary, supplement with translation file keys
+      const keyUsageMap = new Map(sourceFileKeys);
+
+      // Add any keys from translations that weren't found in source files
+      for (const key of allKeys) {
+        if (!keyUsageMap.has(key)) {
+          // Key exists in translations but not in source files - might be unused
+          keyUsageMap.set(key, []);
+        }
+      }
 
       const usedKeys = [...keyUsageMap.keys()].length;
       const unusedKeys = allKeys.size - usedKeys;
