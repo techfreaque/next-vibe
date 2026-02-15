@@ -1483,8 +1483,30 @@ export class TranslationReorganizeRepositoryImpl {
           ? this.fileGenerator.locationToFlatKeyPublic(location)
           : "";
 
+        // For shared keys, if the key doesn't start with the location prefix + ".common",
+        // we need to insert "common" after the location prefix
+        // Example: key "app.api.leads.import.post.title" shared at location "app"
+        // should become "app.common.api.leads.import.post.title"
+        let adjustedKey = fullPath;
+        if (isShared && actualLocationPrefix) {
+          const locationDotCommon = `${actualLocationPrefix}.common`;
+          if (!adjustedKey.startsWith(`${locationDotCommon}.`)) {
+            // Insert "common" after the location prefix
+            // adjustedKey: "app.api.leads.import.post.title"
+            // actualLocationPrefix: "app"
+            // Result: "app.common.api.leads.import.post.title"
+            const afterPrefix = adjustedKey.startsWith(`${actualLocationPrefix}.`)
+              ? adjustedKey.slice(actualLocationPrefix.length + 1)
+              : adjustedKey;
+            adjustedKey = `${locationDotCommon}.${afterPrefix}`;
+            logger.info(
+              `Inserted "common" for shared key at ${location}: ${adjustedKey}`,
+            );
+          }
+        }
+
         logger.info(
-          `Co-locating key: ${fullPath} at location: ${location} (actual location prefix: ${actualLocationPrefix}, isShared: ${isShared})`,
+          `Co-locating key: ${adjustedKey} at location: ${location} (actual location prefix: ${actualLocationPrefix}, isShared: ${isShared})`,
         );
 
         // Determine the correct key structure based on actual location
@@ -1496,11 +1518,11 @@ export class TranslationReorganizeRepositoryImpl {
 
         // For shared keys at common ancestors, ensure "common" is preserved in the structure
         // This prevents flattening from breaking the key lookup
-        const hasCommonInKey = fullPath.includes(".common.");
+        const hasCommonInKey = adjustedKey.includes(".common.");
         const shouldPreserveCommon = isShared && hasCommonInKey;
 
-        // Convert fullPath to camelCase for comparison with actualLocationPrefix
-        const fullPathCamelCase = fullPath
+        // Convert adjustedKey to camelCase for comparison with actualLocationPrefix
+        const fullPathCamelCase = adjustedKey
           .split(".")
           .map((part) =>
             part.replace(/[-_]([a-z0-9])/g, (_, letter) =>
@@ -1525,7 +1547,7 @@ export class TranslationReorganizeRepositoryImpl {
           // For shared keys, ensure they're under "common" in the file structure
           if (shouldPreserveCommon && !keySuffix.startsWith("common.")) {
             // Extract the common part and reconstruct
-            const keyAfterPrefix = fullPath.slice(
+            const keyAfterPrefix = adjustedKey.slice(
               actualLocationPrefix.length + 1,
             );
             const parts = keyAfterPrefix.split(".");
@@ -1547,7 +1569,7 @@ export class TranslationReorganizeRepositoryImpl {
           // - Suffix: navigation.dashboard
           // - Correct key: app.admin._components.navigation.dashboard
 
-          const keyParts = fullPath.split(".");
+          const keyParts = adjustedKey.split(".");
           const locationParts = actualLocationPrefix
             ? actualLocationPrefix.split(".")
             : [];
@@ -1635,14 +1657,14 @@ export class TranslationReorganizeRepositoryImpl {
           if (actualLocationPrefix && keySuffix) {
             correctKey = `${actualLocationPrefix}.${keySuffix}`;
           } else if (actualLocationPrefix && !keySuffix) {
-            // No suffix - key matches location exactly, keep original
-            correctKey = fullPath;
+            // No suffix - key matches location exactly, keep adjusted key
+            correctKey = adjustedKey;
             keySuffix = keyParts[keyParts.length - 1];
           } else {
-            // No location prefix (root level) - keep original key unchanged
+            // No location prefix (root level) - keep adjusted key unchanged
             // This happens when common ancestor is at src/ root, which means
             // the key is used across multiple top-level directories
-            correctKey = fullPath;
+            correctKey = adjustedKey;
             keySuffix = keyParts[keyParts.length - 1];
           }
 
