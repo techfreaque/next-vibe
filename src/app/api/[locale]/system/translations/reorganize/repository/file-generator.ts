@@ -763,32 +763,46 @@ export class FileGenerator {
         const locationPrefix = this.locationToFlatKey(sourcePath);
 
         for (const [key, value] of Object.entries(nestedTranslations)) {
-          // Check if this key matches a child directory name
-          // Keys are camelCase but directChildren has kebab-case folder names
-          // Convert key back to kebab-case for comparison
+          // ONLY skip this key if it matches a child directory AND all translations
+          // under this key belong to that child's location
+          // Don't skip if this is just a shared prefix with different structure
           const kebabKey = key.replaceAll(
             /[A-Z]/g,
             (letter: string) => `-${letter.toLowerCase()}`,
           );
 
-          if (directChildren.has(key) || directChildren.has(kebabKey)) {
-            // This key matches a child directory name (either exact match or kebab-case match)
-            // Check if we're importing from this child
-            const childLocation = `${sourcePath}/${directChildren.has(key) ? key : kebabKey}`;
+          const matchingChild = directChildren.has(key) ? key : directChildren.has(kebabKey) ? kebabKey : null;
 
-            // Skip if child has generated file OR will generate one (has children with files)
+          if (matchingChild) {
+            const childLocation = `${sourcePath}/${matchingChild}`;
             const hasGeneratedFile = generatedFiles.has(childLocation);
             const hasChildrenWithFiles = [...generatedFiles].some((loc) =>
               loc.startsWith(`${childLocation}/`),
             );
 
             if (hasGeneratedFile || hasChildrenWithFiles) {
-              // We're importing from this child - skip to avoid duplicate key
-              // The import statement already handles this (e.g., api: apiTranslations)
-              continue;
-            }
+              // Child exists with files - check if ALL keys under this top-level key
+              // actually belong to the child's location prefix
+              const childLocationPrefix = this.locationToFlatKey(childLocation);
 
-            // Child directory exists but has no translations - include at parent level
+              // Flatten this key's value to check all nested keys
+              const flattenedValue = typeof value === "object" && value !== null
+                ? this.flattenTranslationObject(value as TranslationObject, key)
+                : { [key]: value };
+
+              // Check if ALL keys belong to child's location prefix
+              const allKeysMatchChild = Object.keys(flattenedValue).every(fullKey => {
+                const reconstitutedKey = locationPrefix ? `${locationPrefix}.${fullKey}` : fullKey;
+                return childLocationPrefix && reconstitutedKey.startsWith(`${childLocationPrefix}.`);
+              });
+
+              if (allKeysMatchChild) {
+                // All keys belong to child - skip to avoid duplicate
+                continue;
+              }
+
+              // Some keys don't belong to child - include them inline
+            }
           }
 
           const valueStr =
