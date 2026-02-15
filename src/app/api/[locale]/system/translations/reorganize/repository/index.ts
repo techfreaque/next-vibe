@@ -1356,25 +1356,34 @@ export class TranslationReorganizeRepositoryImpl {
           }
         }
 
-        // Skip scoped translation locations - check if this location has a scoped i18n index
-        const scopedCheckPath = path.join(
-          process.cwd(),
-          "src",
-          location,
-          "i18n",
-          "index.ts",
-        );
-        if (fs.existsSync(scopedCheckPath)) {
-          try {
-            const scopedContent = fs.readFileSync(scopedCheckPath, "utf-8");
-            if (scopedContent.includes("createScopedTranslation")) {
-              // This is a scoped translation - skip it entirely
-              logger.info(`[SCOPED-SKIP] Skipping scoped location: ${location} for key: ${fullPath}`);
-              continue;
+        // Skip scoped translation locations - check if this location or any parent has a scoped i18n index
+        let isScoped = false;
+        const locationParts = location.split("/");
+        for (let i = locationParts.length; i > 0; i--) {
+          const parentLocation = locationParts.slice(0, i).join("/");
+          const scopedCheckPath = path.join(
+            process.cwd(),
+            "src",
+            parentLocation,
+            "i18n",
+            "index.ts",
+          );
+          if (fs.existsSync(scopedCheckPath)) {
+            try {
+              const scopedContent = fs.readFileSync(scopedCheckPath, "utf-8");
+              if (scopedContent.includes("createScopedTranslation")) {
+                // This location or a parent is scoped - skip it entirely
+                logger.info(`[SCOPED-SKIP] Skipping scoped location: ${location} (parent: ${parentLocation}) for key: ${fullPath}`);
+                isScoped = true;
+                break;
+              }
+            } catch {
+              // If we can't read it, continue checking parents
             }
-          } catch {
-            // If we can't read it, proceed normally
           }
+        }
+        if (isScoped) {
+          continue;
         }
 
         // Add the key to this location group with the CORRECT FULL key
