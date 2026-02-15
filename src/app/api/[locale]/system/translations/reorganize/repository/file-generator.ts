@@ -765,43 +765,23 @@ export class FileGenerator {
         for (const [key, value] of Object.entries(nestedTranslations)) {
           // Check if this key matches a child directory name
           if (directChildren.has(key)) {
-            // This key MIGHT belong to a child directory
-            // Check if the child actually has these specific translations
+            // This key matches a child directory name
+            // Check if we're importing from this child
             const childLocation = `${sourcePath}/${key}`;
-            const childGroup = groups.get(childLocation);
 
-            if (childGroup && Object.keys(childGroup).length > 0) {
-              // Child has translations - check if they overlap with parent's nested keys
-              // Flatten parent's nested keys under this top-level key
-              const parentFlatKeys = new Set<string>();
-              const flattenNested = (obj: any, prefix: string) => {
-                for (const [k, v] of Object.entries(obj)) {
-                  const fullKey = prefix ? `${prefix}.${k}` : k;
-                  if (typeof v === "object" && v !== null && !Array.isArray(v)) {
-                    flattenNested(v, fullKey);
-                  } else {
-                    parentFlatKeys.add(
-                      locationPrefix ? `${locationPrefix}.${fullKey}` : fullKey,
-                    );
-                  }
-                }
-              };
-              flattenNested(value, key);
+            // Skip if child has generated file OR will generate one (has children with files)
+            const hasGeneratedFile = generatedFiles.has(childLocation);
+            const hasChildrenWithFiles = [...generatedFiles].some((loc) =>
+              loc.startsWith(`${childLocation}/`),
+            );
 
-              // Check if any of parent's keys exist in child's group
-              const childHasAnyKey = Array.from(parentFlatKeys).some((flatKey) =>
-                Object.prototype.hasOwnProperty.call(childGroup, flatKey),
-              );
-
-              if (childHasAnyKey) {
-                // Child has at least one of these keys - skip entire nested object
-                continue;
-              }
-
-              // Child exists but doesn't have these specific keys - include at parent
+            if (hasGeneratedFile || hasChildrenWithFiles) {
+              // We're importing from this child - skip to avoid duplicate key
+              // The import statement already handles this (e.g., api: apiTranslations)
+              continue;
             }
 
-            // Child doesn't exist or doesn't have these keys - include at parent level
+            // Child directory exists but has no translations - include at parent level
           }
 
           const valueStr =
