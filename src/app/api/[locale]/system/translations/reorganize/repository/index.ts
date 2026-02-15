@@ -239,6 +239,9 @@ export class TranslationReorganizeRepositoryImpl {
           keyUsageFrequency.set(key, files.length);
         }
 
+        // Ensure fileGenerator is initialized before grouping (needed for locationToFlatKey)
+        await this.getFileGenerator();
+
         // Group translations by usage location
         const { groups, keyMappings } = this.groupTranslationsByUsage(
           filteredTranslations,
@@ -376,6 +379,10 @@ export class TranslationReorganizeRepositoryImpl {
             "app.api.system.translations.reorganize.post.messages.groupingByLocation",
           ),
         );
+
+        // Ensure fileGenerator is initialized before grouping (needed for locationToFlatKey)
+        await this.getFileGenerator();
+
         const { groups, keyMappings } = this.groupTranslationsByUsage(
           filteredTranslations, // Use filtered translations (with unused keys removed if requested)
           keyUsageMap,
@@ -1389,7 +1396,7 @@ export class TranslationReorganizeRepositoryImpl {
           ? this.fileGenerator.locationToFlatKeyPublic(location)
           : "";
 
-        logger.debug(
+        logger.info(
           `Co-locating key: ${fullPath} at location: ${location} (actual location prefix: ${actualLocationPrefix}, isShared: ${isShared})`,
         );
 
