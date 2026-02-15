@@ -1461,7 +1461,11 @@ export class TranslationReorganizeRepositoryImpl {
           // The suffix should be the key parts after common prefix, minus any redundant overlap
 
           let commonPrefixLength = 0;
-          for (let i = 0; i < Math.min(keyParts.length, locationParts.length); i++) {
+          for (
+            let i = 0;
+            i < Math.min(keyParts.length, locationParts.length);
+            i++
+          ) {
             if (keyParts[i] === locationParts[i]) {
               commonPrefixLength = i + 1;
             } else {
@@ -1478,15 +1482,29 @@ export class TranslationReorganizeRepositoryImpl {
           // Remove any key parts that redundantly duplicate the location remainder
           // Example: if keyRemainder = ["tags", "threads"] and locationRemainder = ["threads"]
           // We should remove "threads" from keyRemainder if it appears at the end
+          // Also handles: keyRemainder = ["tags", "files"] and locationRemainder = ["files", "[threadId]", "[filename]"]
+          // Should remove "files" even though it's not at the end of locationRemainder
           let suffixParts = keyRemainder;
 
           if (locationRemainder.length > 0) {
-            // Check if the key remainder ends with the same segments as location remainder
-            // This handles the duplicate segments issue
-            const overlap = this.findTrailingOverlap(keyRemainder, locationRemainder);
-            if (overlap > 0) {
+            // First check for trailing overlap (most common case)
+            const trailingOverlap = this.findTrailingOverlap(
+              keyRemainder,
+              locationRemainder,
+            );
+            if (trailingOverlap > 0) {
               // Remove the overlapping parts from the suffix
-              suffixParts = keyRemainder.slice(0, -overlap);
+              suffixParts = keyRemainder.slice(0, -trailingOverlap);
+            } else {
+              // Check if any segments in keyRemainder also appear in locationRemainder
+              // This handles cases where dynamic parameters like [threadId] appear in the middle
+              suffixParts = keyRemainder.filter((keyPart) => {
+                // Keep the part if it's NOT in the location remainder
+                // But ignore parameter placeholders like [threadId] when checking
+                return !locationRemainder.some(
+                  (locPart) => !locPart.startsWith("[") && locPart === keyPart
+                );
+              });
             }
           }
 
