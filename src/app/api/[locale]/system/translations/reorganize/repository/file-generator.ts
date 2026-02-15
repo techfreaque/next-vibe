@@ -974,35 +974,13 @@ export class FileGenerator {
             }
           }
 
-          // CRITICAL: If we're spreading [locale], don't include inline keys that would
-          // overwrite what's in the spread. Check if this key matches a child being spread.
+          // CRITICAL: If we're spreading [locale], DON'T write ANY inline keys except 'api'
+          // Everything else should come from the spread or from child imports
           if (hasSpreadChild && directChildren.has("[locale]")) {
-            // This key might conflict with spread from [locale]
-            // We should skip it to avoid overwriting the spread
-            // The [locale] spread already includes everything from app/[locale]/i18n
-            const localeLocation = `${sourcePath}/[locale]`;
-            const localeLocationPrefix = this.locationToFlatKey(localeLocation);
-
-            // Check if this key would belong to the locale child
-            const flattenedValue =
-              typeof value === "object" && value !== null
-                ? this.flattenTranslationObject(value as TranslationObject, key)
-                : { [key]: value };
-
-            const anyKeyMatchesLocale = Object.keys(flattenedValue).some(
-              (fullKey) => {
-                const reconstitutedKey = locationPrefix
-                  ? `${locationPrefix}.${fullKey}`
-                  : fullKey;
-                return (
-                  localeLocationPrefix &&
-                  reconstitutedKey.startsWith(`${localeLocationPrefix}.`)
-                );
-              },
-            );
-
-            if (anyKeyMatchesLocale) {
-              // Skip - this would overwrite spread content
+            // Only allow 'api' as inline key since it's explicitly imported separately
+            // All other keys would overwrite or duplicate what's in the [locale] spread
+            if (key !== "api") {
+              // Skip - would conflict with spread from [locale]
               continue;
             }
           }
