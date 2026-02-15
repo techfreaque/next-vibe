@@ -132,7 +132,8 @@ export class TranslationReorganizeRepositoryImpl {
       const currentTranslations = await this.loadCurrentTranslations(logger);
 
       // Scan source files for ALL translation key patterns (double-quoted strings with dots)
-      const sourceFileKeys = this.keyUsageAnalyzer.scanAllKeysInSourceFiles(logger);
+      const sourceFileKeys =
+        this.keyUsageAnalyzer.scanAllKeysInSourceFiles(logger);
 
       // Also extract keys from current translation files
       const allKeys =
@@ -151,6 +152,15 @@ export class TranslationReorganizeRepositoryImpl {
 
       const usedKeys = [...keyUsageMap.keys()].length;
       const unusedKeys = allKeys.size - usedKeys;
+
+      // Debug: check for specific problematic keys
+      const testKey = "app.api.shared.errorTypes.validation_error";
+      if (keyUsageMap.has(testKey)) {
+        const files = keyUsageMap.get(testKey)!;
+        logger.info(`TEST: ${testKey} found in keyUsageMap with ${files.length} files`);
+      } else {
+        logger.info(`TEST: ${testKey} NOT in keyUsageMap`);
+      }
 
       logger.info(
         `Key usage analysis: ${usedKeys} used / ${allKeys.size} total (${unusedKeys} unused)`,
@@ -1256,6 +1266,10 @@ export class TranslationReorganizeRepositoryImpl {
         // This is a leaf translation value
         const usageFiles = keyUsageMap.get(fullPath) || [];
 
+        if (fullPath.includes("validation_error")) {
+          logger.info(`PROCESSING: ${fullPath}, usageFiles.length = ${usageFiles.length}`);
+        }
+
         // Only process keys that are actually used in the codebase
         if (usageFiles.length === 0) {
           logger.debug(`Skipping unused translation key: ${fullPath}`);
@@ -1270,9 +1284,39 @@ export class TranslationReorganizeRepositoryImpl {
           // Single usage - place at the directory of that file
           location = path.dirname(usageFiles[0]);
         } else {
-          // Multiple usages - find common ancestor
-          location = this.getCommonAncestorLocation(usageFiles);
-          isShared = true;
+          // Multiple usages - check if key is in shared/common location
+          // If so, keep it there instead of moving to common ancestor
+          const keyLowerCase = fullPath.toLowerCase();
+          const hasSharedInKey = keyLowerCase.includes(".shared.") || keyLowerCase.includes(".common.");
+
+          if (hasSharedInKey) {
+            // Key is meant to be shared - keep it in shared location
+            // Find the shared directory from the key path
+            const keyParts = fullPath.split(".");
+            const sharedIndex = keyParts.findIndex(p => p === "shared" || p === "common");
+
+            if (sharedIndex >= 0) {
+              // Construct the shared location path from the key
+              const locationParts = keyParts.slice(0, sharedIndex + 1);
+              location = locationParts.join("/").replace(/\./g, "/");
+
+              // For api keys, add [locale] if not present
+              if (location.includes("api") && !location.includes("[locale]")) {
+                location = location.replace("api", "api/[locale]");
+              }
+
+              isShared = true;
+              logger.debug(`Keeping shared key ${fullPath} in shared location: ${location}`);
+            } else {
+              // Fallback to common ancestor
+              location = this.getCommonAncestorLocation(usageFiles);
+              isShared = true;
+            }
+          } else {
+            // Multiple usages - find common ancestor
+            location = this.getCommonAncestorLocation(usageFiles);
+            isShared = true;
+          }
         }
 
         // Convert absolute path to relative path from project root
@@ -1398,9 +1442,14 @@ export class TranslationReorganizeRepositoryImpl {
         }
         groups.get(location)![correctKey] = value;
 
+        if (fullPath.includes("validation_error")) {
+          logger.info(`ADDED: ${fullPath} → ${correctKey} at location: ${location}`);
+        }
+
         // Track key mapping for updating source files
         if (fullPath !== correctKey) {
           keyMappings.set(fullPath, correctKey);
+          logger.debug(`Key mapping: ${fullPath} → ${correctKey}`);
         }
 
         // Track the original key for this location
