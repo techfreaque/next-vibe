@@ -98,8 +98,8 @@ export class TranslationReorganizeRepositoryImpl {
     }> = [];
 
     try {
-      // DISABLE removeUnused until key scanner bug is fixed
-      const removeUnused = false; // request.regenerateStructure;
+      // Auto-enable removeUnused when regenerating structure
+      const removeUnused = request.regenerateStructure;
 
       output.push(
         t("app.api.system.translations.reorganize.post.messages.starting"),
@@ -133,7 +133,8 @@ export class TranslationReorganizeRepositoryImpl {
 
       // Scan source files for ALL translation keys actually used in code
       // This is critical for detecting keys that may have been reorganized/moved
-      const sourceFileKeyUsageMap = this.keyUsageAnalyzer.scanAllKeysInSourceFiles(logger);
+      const sourceFileKeyUsageMap =
+        this.keyUsageAnalyzer.scanAllKeysInSourceFiles(logger);
 
       // Also extract keys from current translation files
       const allKeys =
@@ -226,11 +227,7 @@ export class TranslationReorganizeRepositoryImpl {
       }
 
       // If removeUnused is enabled but regenerateStructure is not, we need to regenerate files based on usage
-      if (
-        removeUnused &&
-        !request.regenerateStructure &&
-        keysRemoved > 0
-      ) {
+      if (removeUnused && !request.regenerateStructure && keysRemoved > 0) {
         output.push(
           t(
             "app.api.system.translations.reorganize.post.messages.writingFilteredTranslations",
@@ -1094,12 +1091,18 @@ export class TranslationReorganizeRepositoryImpl {
 
       // After building new structure, scan source files for keys that need mapping
       // This catches keys that were in old structure but moved to new locations
-      logger.info("Generating key mappings from source file keys to new structure");
+      logger.info(
+        "Generating key mappings from source file keys to new structure",
+      );
 
       // Build a flat map of all keys in the new structure
       const newStructureKeys = new Set<string>();
       for (const groupTranslations of groups.values()) {
-        this.extractAllTranslationKeysHelper(groupTranslations, "", newStructureKeys);
+        this.extractAllTranslationKeysHelper(
+          groupTranslations,
+          "",
+          newStructureKeys,
+        );
       }
 
       // For each key found in source files, check if it needs mapping
@@ -1156,7 +1159,9 @@ export class TranslationReorganizeRepositoryImpl {
         }
       }
 
-      logger.info(`Generated ${keyMappings.size} key mappings for source file updates`);
+      logger.info(
+        `Generated ${keyMappings.size} key mappings for source file updates`,
+      );
 
       return { groups, originalKeys, keyMappings };
     } catch (error) {

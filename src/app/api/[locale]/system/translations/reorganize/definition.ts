@@ -101,17 +101,6 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      regenerateKeys: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.translations.reorganize.post.fields.regenerateKeys.title" as const,
-        description:
-          "app.api.system.translations.reorganize.post.fields.regenerateKeys.description" as const,
-        columns: 6,
-        schema: z.boolean().default(false),
-      }),
-
       // === RESPONSE FIELDS ===
       response: objectField(
         {
@@ -330,7 +319,6 @@ const { POST } = createEndpoint({
         dryRun: true,
         backup: true,
         regenerateStructure: false,
-        regenerateKeys: false,
       },
     },
     responses: {
