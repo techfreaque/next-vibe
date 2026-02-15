@@ -127,8 +127,14 @@ export class KeyUsageAnalyzer {
 
     logger.debug(`Found ${sourceFiles.length} source files to scan`);
 
-    // Pattern to match translation keys: t("key.path.here") or t('key.path.here')
-    const keyPattern = /t\(["']([a-zA-Z0-9._-]+)["']\)/g;
+    // Patterns to match translation keys in various contexts:
+    // 1. t("key") or t('key')
+    // 2. message: "key" or message: 'key'
+    // 3. title: "key" or title: 'key'
+    // 4. description: "key" or description: 'key'
+    // 5. label: "key" or label: 'key'
+    // Pattern matches: [word characters or specific keywords]:["']([dotted.key.path])["']
+    const keyPattern = /(?:t\(|message:|title:|description:|label:|text:)\s*["']([a-zA-Z0-9._-]+)["']/g;
 
     // Scan each file for translation key patterns
     for (const filePath of sourceFiles) {
