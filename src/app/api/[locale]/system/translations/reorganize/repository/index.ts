@@ -1457,21 +1457,16 @@ export class TranslationReorganizeRepositoryImpl {
           const suffixStartIndex = locationParts.length;
           keySuffix = keyParts.slice(suffixStartIndex).join(".");
 
-          // The correct key should be: actualLocationPrefix + keySuffix
-          if (actualLocationPrefix && keySuffix) {
-            correctKey = `${actualLocationPrefix}.${keySuffix}`;
-          } else if (actualLocationPrefix && !keySuffix) {
-            // No suffix - this means the key structure doesn't match the location structure
-            // This typically happens when a shared key (like app.admin.users.table.name)
-            // is used in a deeply nested component (like app/[locale]/admin/users/list/components)
-            // In this case, keep the original key structure and don't create a mapping
-            logger.debug(
-              `Key structure doesn't match location - keeping original: ${fullPath} (location: ${location})`,
-            );
-            correctKey = fullPath;
-            keySuffix = fullPath.split(".").pop() || fullPath;
+          // Simple deterministic rule: new key = locationPrefix + leafKeyName
+          // Extract the leaf key name (last part of the old key)
+          const leafKeyName = keyParts[keyParts.length - 1];
+          keySuffix = leafKeyName;
+
+          // The correct key is: location prefix + leaf key name
+          if (actualLocationPrefix) {
+            correctKey = `${actualLocationPrefix}.${leafKeyName}`;
           } else {
-            correctKey = keySuffix || actualLocationPrefix || fullPath;
+            correctKey = leafKeyName;
           }
         }
 
