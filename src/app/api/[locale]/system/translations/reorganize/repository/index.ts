@@ -153,15 +153,6 @@ export class TranslationReorganizeRepositoryImpl {
       const usedKeys = [...keyUsageMap.keys()].length;
       const unusedKeys = allKeys.size - usedKeys;
 
-      // Debug: check for specific problematic keys
-      const testKey = "app.api.shared.errorTypes.validation_error";
-      if (keyUsageMap.has(testKey)) {
-        const files = keyUsageMap.get(testKey)!;
-        logger.info(`TEST: ${testKey} found in keyUsageMap with ${files.length} files`);
-      } else {
-        logger.info(`TEST: ${testKey} NOT in keyUsageMap`);
-      }
-
       logger.info(
         `Key usage analysis: ${usedKeys} used / ${allKeys.size} total (${unusedKeys} unused)`,
       );
@@ -1266,10 +1257,6 @@ export class TranslationReorganizeRepositoryImpl {
         // This is a leaf translation value
         const usageFiles = keyUsageMap.get(fullPath) || [];
 
-        if (fullPath.includes("validation_error")) {
-          logger.info(`PROCESSING: ${fullPath}, usageFiles.length = ${usageFiles.length}`);
-        }
-
         // Only process keys that are actually used in the codebase
         if (usageFiles.length === 0) {
           logger.debug(`Skipping unused translation key: ${fullPath}`);
@@ -1442,14 +1429,9 @@ export class TranslationReorganizeRepositoryImpl {
         }
         groups.get(location)![correctKey] = value;
 
-        if (fullPath.includes("validation_error")) {
-          logger.info(`ADDED: ${fullPath} → ${correctKey} at location: ${location}`);
-        }
-
         // Track key mapping for updating source files
         if (fullPath !== correctKey) {
           keyMappings.set(fullPath, correctKey);
-          logger.debug(`Key mapping: ${fullPath} → ${correctKey}`);
         }
 
         // Track the original key for this location
