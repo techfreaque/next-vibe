@@ -1504,6 +1504,7 @@ export class TranslationReorganizeRepositoryImpl {
           // Simulate flattening to get the actual key that will be in the file
           // The file generator will flatten single-child objects, so we need to predict that
           if (this.fileGenerator && actualLocationPrefix) {
+            const beforeSimulation = correctKey;
             const simulatedKey = this.fileGenerator.simulateFlattenedKey(
               correctKey,
               actualLocationPrefix,
@@ -1512,6 +1513,11 @@ export class TranslationReorganizeRepositoryImpl {
             if (simulatedKey) {
               correctKey = `${actualLocationPrefix}.${simulatedKey}`;
               keySuffix = simulatedKey;
+              if (beforeSimulation !== correctKey) {
+                logger.info(
+                  `[FLATTEN-SIM] ${fullPath}: ${beforeSimulation} -> ${correctKey}`,
+                );
+              }
             }
           }
         }
