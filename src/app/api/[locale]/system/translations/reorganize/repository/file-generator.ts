@@ -309,6 +309,35 @@ export class FileGenerator {
   }
 
   /**
+   * Flatten a nested translation object into dot-notation keys
+   * @param obj - The nested translation object to flatten
+   * @param prefix - Optional prefix for the keys
+   * @returns Flattened object with dot-notation keys
+   */
+  private flattenTranslationObject(
+    obj: TranslationObject,
+    prefix = "",
+  ): Record<string, string | number | boolean> {
+    const result: Record<string, string | number | boolean> = {};
+
+    for (const [key, value] of Object.entries(obj)) {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
+
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        !Array.isArray(value)
+      ) {
+        Object.assign(result, this.flattenTranslationObject(value, fullKey));
+      } else {
+        result[fullKey] = value;
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Convert object to formatted string with proper indentation
    * @param obj - The object to convert to string
    * @param indent - Current indentation level
@@ -771,7 +800,11 @@ export class FileGenerator {
             (letter: string) => `-${letter.toLowerCase()}`,
           );
 
-          const matchingChild = directChildren.has(key) ? key : directChildren.has(kebabKey) ? kebabKey : null;
+          const matchingChild = directChildren.has(key)
+            ? key
+            : directChildren.has(kebabKey)
+              ? kebabKey
+              : null;
 
           if (matchingChild) {
             const childLocation = `${sourcePath}/${matchingChild}`;
@@ -786,15 +819,26 @@ export class FileGenerator {
               const childLocationPrefix = this.locationToFlatKey(childLocation);
 
               // Flatten this key's value to check all nested keys
-              const flattenedValue = typeof value === "object" && value !== null
-                ? this.flattenTranslationObject(value as TranslationObject, key)
-                : { [key]: value };
+              const flattenedValue =
+                typeof value === "object" && value !== null
+                  ? this.flattenTranslationObject(
+                      value as TranslationObject,
+                      key,
+                    )
+                  : { [key]: value };
 
               // Check if ALL keys belong to child's location prefix
-              const allKeysMatchChild = Object.keys(flattenedValue).every(fullKey => {
-                const reconstitutedKey = locationPrefix ? `${locationPrefix}.${fullKey}` : fullKey;
-                return childLocationPrefix && reconstitutedKey.startsWith(`${childLocationPrefix}.`);
-              });
+              const allKeysMatchChild = Object.keys(flattenedValue).every(
+                (fullKey) => {
+                  const reconstitutedKey = locationPrefix
+                    ? `${locationPrefix}.${fullKey}`
+                    : fullKey;
+                  return (
+                    childLocationPrefix &&
+                    reconstitutedKey.startsWith(`${childLocationPrefix}.`)
+                  );
+                },
+              );
 
               if (allKeysMatchChild) {
                 // All keys belong to child - skip to avoid duplicate
