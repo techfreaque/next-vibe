@@ -1402,6 +1402,11 @@ export class TranslationReorganizeRepositoryImpl {
         // Extract the suffix after the location prefix
         let keySuffix: string;
 
+        // For shared keys at common ancestors, ensure "common" is preserved in the structure
+        // This prevents flattening from breaking the key lookup
+        const hasCommonInKey = fullPath.includes(".common.");
+        const shouldPreserveCommon = isShared && hasCommonInKey;
+
         // Try to find where the key diverges from the actual location
         if (
           actualLocationPrefix &&
@@ -1410,7 +1415,19 @@ export class TranslationReorganizeRepositoryImpl {
           // Key already matches the location - it's correct!
           keySuffix = fullPath.slice(actualLocationPrefix.length + 1);
           correctKey = fullPath;
-        } else {
+
+          // For shared keys, ensure they're under "common" in the file structure
+          if (shouldPreserveCommon && !keySuffix.startsWith("common.")) {
+            // Extract the common part and reconstruct
+            const keyAfterPrefix = fullPath.slice(actualLocationPrefix.length + 1);
+            const parts = keyAfterPrefix.split(".");
+            const commonIndex = parts.indexOf("common");
+            if (commonIndex >= 0) {
+              // Rebuild with common at the start
+              keySuffix = ["common", ...parts.slice(commonIndex + 1)].join(".");
+            }
+          }
+        } else{
           // Key doesn't match the actual location
           // We need to reconstruct the correct key
           // Strategy: Replace the location-related parts of the key with the actual location prefix
@@ -1484,6 +1501,17 @@ export class TranslationReorganizeRepositoryImpl {
           }
 
           keySuffix = suffixParts.join(".");
+
+          // For shared keys with "common" in them, ensure "common" is at the start of the suffix
+          if (shouldPreserveCommon) {
+            // Check if "common" is in the key remainder
+            const commonIndex = keyRemainder.indexOf("common");
+            if (commonIndex >= 0) {
+              // Reconstruct suffix with "common" at the beginning
+              const partsAfterCommon = keyRemainder.slice(commonIndex + 1);
+              keySuffix = ["common", ...partsAfterCommon].join(".");
+            }
+          }
 
           // The correct key is: location prefix + suffix
           // This preserves the full key structure after the location prefix

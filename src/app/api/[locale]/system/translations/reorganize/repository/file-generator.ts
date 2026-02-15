@@ -314,9 +314,13 @@ export class FileGenerator {
    * flatten them together. This prevents duplication like:
    * { components: { navigation: { ... } } } -> { navigation: { ... } }
    * @param obj - The nested object to flatten
+   * @param preserveKeys - Keys that should never be flattened (e.g., "common" for shared translations)
    * @returns The flattened object with single-child paths collapsed
    */
-  private flattenSingleChildObjects(obj: TranslationObject): TranslationObject {
+  private flattenSingleChildObjects(
+    obj: TranslationObject,
+    preserveKeys: Set<string> = new Set(["common"]),
+  ): TranslationObject {
     const result: TranslationObject = {};
 
     for (const [key, value] of Object.entries(obj)) {
@@ -332,9 +336,16 @@ export class FileGenerator {
           const childKey = childKeys[0];
           const childValue = value[childKey];
 
-          // If the single child is also an object, skip this level (flatten it out)
-          // and continue processing from the child
-          if (
+          // Never flatten if this key should be preserved
+          if (preserveKeys.has(key)) {
+            // Keep this level and recursively flatten the child
+            result[key] = this.flattenSingleChildObjects(
+              value as TranslationObject,
+              preserveKeys,
+            );
+          } else if (
+            // If the single child is also an object, skip this level (flatten it out)
+            // and continue processing from the child
             typeof childValue === "object" &&
             childValue !== null &&
             !Array.isArray(childValue)
@@ -343,6 +354,7 @@ export class FileGenerator {
             // Recursively flatten the child value
             result[childKey] = this.flattenSingleChildObjects(
               childValue as TranslationObject,
+              preserveKeys,
             );
           } else {
             // Single child is a primitive value - keep the structure
@@ -359,6 +371,7 @@ export class FileGenerator {
             ) {
               flattenedValue[childKey] = this.flattenSingleChildObjects(
                 childValue as TranslationObject,
+                preserveKeys,
               );
             } else {
               flattenedValue[childKey] = childValue;
