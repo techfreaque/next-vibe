@@ -759,23 +759,49 @@ export class FileGenerator {
 
         // Add own translations as spread entries in the exports
         // BUT exclude translations that belong to child directories
+        // Strategy: Flatten both parent and child translations to check for overlaps
+        const locationPrefix = this.locationToFlatKey(sourcePath);
+
         for (const [key, value] of Object.entries(nestedTranslations)) {
           // Check if this key matches a child directory name
           if (directChildren.has(key)) {
             // This key MIGHT belong to a child directory
-            // But we need to verify that the child actually has these translations
-            // If the child doesn't have them, they belong at this parent level
+            // Check if the child actually has these specific translations
             const childLocation = `${sourcePath}/${key}`;
             const childGroup = groups.get(childLocation);
 
-            // If child has a group with translations, skip this key (will be imported from child)
-            // If child has no group or empty group, include it here (belongs to parent)
             if (childGroup && Object.keys(childGroup).length > 0) {
-              continue;
+              // Child has translations - check if they overlap with parent's nested keys
+              // Flatten parent's nested keys under this top-level key
+              const parentFlatKeys = new Set<string>();
+              const flattenNested = (obj: any, prefix: string) => {
+                for (const [k, v] of Object.entries(obj)) {
+                  const fullKey = prefix ? `${prefix}.${k}` : k;
+                  if (typeof v === "object" && v !== null && !Array.isArray(v)) {
+                    flattenNested(v, fullKey);
+                  } else {
+                    parentFlatKeys.add(
+                      locationPrefix ? `${locationPrefix}.${fullKey}` : fullKey,
+                    );
+                  }
+                }
+              };
+              flattenNested(value, key);
+
+              // Check if any of parent's keys exist in child's group
+              const childHasAnyKey = Array.from(parentFlatKeys).some((flatKey) =>
+                Object.prototype.hasOwnProperty.call(childGroup, flatKey),
+              );
+
+              if (childHasAnyKey) {
+                // Child has at least one of these keys - skip entire nested object
+                continue;
+              }
+
+              // Child exists but doesn't have these specific keys - include at parent
             }
 
-            // Child doesn't have translations - this key belongs at parent level
-            // Fall through to include it
+            // Child doesn't exist or doesn't have these keys - include at parent level
           }
 
           const valueStr =
