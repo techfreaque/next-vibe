@@ -8,6 +8,32 @@ export const translations = {
   components: componentsTranslations,
   other: otherTranslations,
   signup: signupTranslations,
+  auth: {
+    passwordStrength: {
+      requirement: {
+        minLength: {
+          icon: "check",
+          text: "At least 8 characters",
+        },
+        lowercase: {
+          icon: "check",
+          text: "Contains a lowercase letter",
+        },
+        uppercase: {
+          icon: "check",
+          text: "Contains an uppercase letter",
+        },
+        number: {
+          icon: "check",
+          text: "Contains a number",
+        },
+        special: {
+          icon: "check",
+          text: "Contains a special character",
+        },
+      },
+    },
+  },
   common: {
     appName: "{{appName}}",
     backToHome: "Back to Home",

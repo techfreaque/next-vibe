@@ -58,6 +58,48 @@ export const translations: typeof enTranslations = {
       title: "Tworzenie subskrypcji",
       description: "Utwórz nową subskrypcję z wybranym planem",
     },
+    errors: {
+      validation: {
+        title: "Nieprawidłowe dane",
+        description: "Sprawdź dane subskrypcji i spróbuj ponownie",
+      },
+      network: {
+        title: "Błąd połączenia",
+        description: "Sprawdź połączenie internetowe",
+      },
+      unauthorized: {
+        title: "Wymagane logowanie",
+        description: "Zaloguj się, aby utworzyć subskrypcję",
+      },
+      forbidden: {
+        title: "Brak dostępu",
+        description: "Nie masz uprawnień do tworzenia subskrypcji",
+      },
+      notFound: {
+        title: "Nie znaleziono planu",
+        description: "Wybrany plan subskrypcji nie został znaleziony",
+      },
+      server: {
+        title: "Coś poszło nie tak",
+        description: "Nie udało się utworzyć subskrypcji. Spróbuj ponownie",
+      },
+      unknown: {
+        title: "Nieoczekiwany błąd",
+        description: "Coś nieoczekiwanego się wydarzyło. Spróbuj ponownie",
+      },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Masz zmiany, które nie zostały zapisane",
+      },
+      conflict: {
+        title: "Subskrypcja istnieje",
+        description: "Masz już aktywną subskrypcję",
+      },
+    },
+    success: {
+      title: "Subskrypcja utworzona",
+      description: "Twoja subskrypcja została pomyślnie aktywowana",
+    },
   },
 
   // PUT endpoint
@@ -68,6 +110,49 @@ export const translations: typeof enTranslations = {
       title: "Aktualizacja subskrypcji",
       description: "Zaktualizuj swój plan subskrypcji lub okres rozliczeniowy",
     },
+    errors: {
+      validation: {
+        title: "Nieprawidłowa aktualizacja",
+        description: "Sprawdź zmiany i spróbuj ponownie",
+      },
+      network: {
+        title: "Błąd połączenia",
+        description: "Nie udało się zapisać zmian. Spróbuj ponownie",
+      },
+      unauthorized: {
+        title: "Wymagane logowanie",
+        description: "Zaloguj się, aby zaktualizować subskrypcję",
+      },
+      forbidden: {
+        title: "Brak dostępu",
+        description: "Nie masz uprawnień do aktualizacji tej subskrypcji",
+      },
+      notFound: {
+        title: "Nie znaleziono subskrypcji",
+        description: "Nie mogliśmy znaleźć Twojej subskrypcji",
+      },
+      server: {
+        title: "Aktualizacja nie powiodła się",
+        description: "Nie udało się zapisać zmian. Spróbuj ponownie",
+      },
+      unknown: {
+        title: "Nieoczekiwany błąd",
+        description: "Coś nieoczekiwanego się wydarzyło. Spróbuj ponownie",
+      },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Masz zmiany, które nie zostały zapisane",
+      },
+      conflict: {
+        title: "Konflikt aktualizacji",
+        description:
+          "Twoja subskrypcja się zmieniła. Odśwież stronę i spróbuj ponownie",
+      },
+    },
+    success: {
+      title: "Subskrypcja zaktualizowana",
+      description: "Twoja subskrypcja została pomyślnie zaktualizowana",
+    },
   },
 
   // DELETE endpoint
@@ -77,6 +162,49 @@ export const translations: typeof enTranslations = {
     form: {
       title: "Anulowanie subskrypcji",
       description: "Anuluj swoją subskrypcję z opcjonalnymi ustawieniami",
+    },
+    errors: {
+      validation: {
+        title: "Nieprawidłowe żądanie",
+        description: "Sprawdź dane anulowania i spróbuj ponownie",
+      },
+      network: {
+        title: "Błąd połączenia",
+        description: "Nie udało się przetworzyć anulowania. Spróbuj ponownie",
+      },
+      unauthorized: {
+        title: "Wymagane logowanie",
+        description: "Zaloguj się, aby anulować subskrypcję",
+      },
+      forbidden: {
+        title: "Brak dostępu",
+        description: "Nie masz uprawnień do anulowania tej subskrypcji",
+      },
+      notFound: {
+        title: "Nie znaleziono subskrypcji",
+        description: "Nie mogliśmy znaleźć Twojej subskrypcji",
+      },
+      server: {
+        title: "Anulowanie nie powiodło się",
+        description: "Nie udało się anulować subskrypcji. Spróbuj ponownie",
+      },
+      unknown: {
+        title: "Nieoczekiwany błąd",
+        description: "Coś nieoczekiwanego się wydarzyło. Spróbuj ponownie",
+      },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Masz zmiany, które nie zostały zapisane",
+      },
+      conflict: {
+        title: "Konflikt anulowania",
+        description:
+          "Status subskrypcji się zmienił. Odśwież stronę i spróbuj ponownie",
+      },
+    },
+    success: {
+      title: "Subskrypcja anulowana",
+      description: "Twoja subskrypcja została pomyślnie anulowana",
     },
   },
 

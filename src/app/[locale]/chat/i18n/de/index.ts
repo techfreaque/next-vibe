@@ -1158,10 +1158,16 @@ export const translations: typeof enTranslations = {
         "Grok 4 Fast ist xAIs neuestes multimodales Modell mit SOTA-Kosteneffizienz und einem 2M-Token-Kontextfenster. Es gibt zwei Varianten: ohne und mit Reasoning.",
       glm46:
         "GLM 4.6 - effizientes 7B-Parameter-Modell mit großem Kontextfenster",
+      glm47:
+        "GLM 4.7 - verbessertes 7B-Modell mit erweiterten Reasoning- und Coding-Fähigkeiten",
+      glm47Flash:
+        "GLM 4.7 Flash - ultraschnelle Variante optimiert für schnelle Antworten",
       glm45Air:
         "GLM 4.5 AIR - ultraschnelles leichtgewichtiges Modell mit großem Kontextfenster",
       glm45v:
         "GLM 4.5v - visionsfähiges multimodales Modell mit großem Kontextfenster",
+      kimiK2_5:
+        "Kimi K2.5 - Erweiterte Version mit verbessertem Reasoning und kreativen Schreibfähigkeiten",
       uncensoredLmV11:
         "Unzensiertes Sprachmodell ohne Inhaltsfilterung - Premium-Modell",
       freedomgptLiberty:

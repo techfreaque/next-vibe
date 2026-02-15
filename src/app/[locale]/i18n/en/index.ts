@@ -294,6 +294,9 @@ export const translations = {
     filter: "Filter",
     refresh: "Refresh",
     notAvailable: "N/A",
+    errors: {
+      noEndpoint: "This feature is not available yet. Please try again later",
+    },
     weekday: {
       monday: "Monday",
       tuesday: "Tuesday",

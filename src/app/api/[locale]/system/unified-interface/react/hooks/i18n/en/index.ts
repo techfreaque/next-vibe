@@ -1,4 +1,7 @@
 export const translations = {
+  localstorage: {
+    noCallback: "No callback provided for localStorage operation",
+  },
   apiUtils: {
     errors: {
       http_error: "HTTP Error",

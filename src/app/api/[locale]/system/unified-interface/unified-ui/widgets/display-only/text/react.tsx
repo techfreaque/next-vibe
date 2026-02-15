@@ -1,7 +1,5 @@
 "use client";
 
-import type { Route } from "next";
-import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { Label } from "next-vibe-ui/ui/label";
@@ -137,12 +135,9 @@ export function TextWidget<
     multiline,
     emphasis,
     maxLength,
-    format,
-    href,
     textAlign,
     size = "base",
     gap,
-    padding,
     className: fieldClassName,
   } = field;
   const usage = "usage" in field ? field.usage : undefined;
@@ -172,7 +167,6 @@ export function TextWidget<
 
   // Spacing classes from config
   const gapClass = getSpacingClassName("gap", gap);
-  const paddingClass = getSpacingClassName("padding", padding);
 
   // Variant and emphasis styling classes
   const variantClass = variant ? getTextVariantClassName(variant) : "";
@@ -200,27 +194,6 @@ export function TextWidget<
       <Div className={alignmentClass}>
         {label && <Label className=" font-medium">{label}</Label>}
         <Span className={cn("font-mono ", styleClasses)}>{displayText}</Span>
-      </Div>
-    );
-  }
-
-  // Handle format="link" with href from field.ui config
-  if (format === "link" && href && content) {
-    const linkText = t(content, contentParams);
-    const displayText = formatText(linkText, maxLength);
-    // Prepend locale to href if it doesn't start with http
-    const localizedHref = href.startsWith("http")
-      ? href
-      : `/${locale}${href.startsWith("/") ? "" : "/"}${href}`;
-
-    return (
-      <Div className={cn("flex", paddingClass || "py-2", alignmentClass)}>
-        <Link
-          href={localizedHref as Route}
-          className=" text-muted-foreground hover:text-primary underline-offset-4 hover:underline transition-colors"
-        >
-          {displayText}
-        </Link>
       </Div>
     );
   }

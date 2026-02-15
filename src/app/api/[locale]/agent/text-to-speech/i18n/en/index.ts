@@ -77,10 +77,14 @@ export const translations = {
       conversionFailed: "Speech synthesis failed: {{error}}",
       noText: "No text provided",
       noAudioUrl: "No audio URL received from provider",
-      audioFetchFailed: "Failed to fetch audio file",
+      audioFetchFailed: "Unable to create the audio file. Please try again",
       providerError: "Provider error: {{error}}",
       internalError: "Internal server error",
       creditsFailed: "Failed to deduct credits: {{error}}",
+      balanceCheckFailed:
+        "Unable to check your credit balance. Please try again",
+      insufficientCredits:
+        "You don't have enough credits for this conversion. Please add more credits to continue",
     },
     success: {
       title: "Success",

@@ -25,6 +25,8 @@ export const translations: typeof enTranslations = {
     addUser: "Dodaj użytkownika",
     edit: "Edytuj",
     editUser: "Edytuj użytkownika",
+    viewDetails: "Zobacz szczegóły",
+    backToList: "Wróć do listy",
   },
   form: {
     buttons: {

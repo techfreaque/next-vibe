@@ -1143,9 +1143,15 @@ export const translations: typeof enTranslations = {
       grok4Fast:
         "Grok 4 Fast to najnowszy multimodalny model xAI z najlepszą efektywnością kosztową i oknem kontekstu 2M tokenów. Dostępny w dwóch wariantach: bez rozumowania i z rozumowaniem.",
       glm46: "GLM 4.6 - wydajny model z 7B parametrami i dużym oknem kontekstu",
+      glm47:
+        "GLM 4.7 - ulepszony model 7B z rozszerzonymi możliwościami rozumowania i kodowania",
+      glm47Flash:
+        "GLM 4.7 Flash - ultraszybki wariant zoptymalizowany pod kątem szybkich odpowiedzi",
       glm45Air: "GLM 4.5 AIR - ultraszybki lekki model z dużym oknem kontekstu",
       glm45v:
         "GLM 4.5v - multimodalny model z obsługą wizji i dużym oknem kontekstu",
+      kimiK2_5:
+        "Kimi K2.5 - Rozszerzona wersja z ulepszonymi możliwościami rozumowania i pisania kreatywnego",
       uncensoredLmV11:
         "Niecenzurowany model językowy bez filtrowania treści - model premium",
       freedomgptLiberty:

@@ -24,8 +24,8 @@ import { Strong } from "next-vibe-ui/ui/strong";
 import type { JSX } from "react";
 import { useRef, useState } from "react";
 
-import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { getCountryFromLocale } from "@/i18n/core/language-utils";
 
 import {
   COMPACT_TRIGGER,
@@ -244,29 +244,32 @@ export function ModelCreditDisplay({
               {/* Cost range highlight */}
               <Div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                 <Span className="text-xs font-medium text-muted-foreground">
-                  {t("app.chat.selector.modelCreditDisplay.tokenBased.costRangeLabel")}
+                  {t(
+                    "app.chat.selector.modelCreditDisplay.tokenBased.costRangeLabel",
+                  )}
                 </Span>
                 <Span className="text-sm font-bold">
-                  {t("app.chat.selector.modelCreditDisplay.tokenBased.costRangeValue", {
-                    min: minCost,
-                    max: maxCost,
-                  })}
+                  {t(
+                    "app.chat.selector.modelCreditDisplay.tokenBased.costRangeValue",
+                    {
+                      min: minCost,
+                      max: maxCost,
+                    },
+                  )}
                 </Span>
               </Div>
 
               {/* Example scenarios */}
               <Div className="space-y-2.5">
                 <Span className="text-xs font-medium text-muted-foreground block">
-                  {t("app.chat.selector.modelCreditDisplay.tokenBased.examplesLabel")}
+                  {t(
+                    "app.chat.selector.modelCreditDisplay.tokenBased.examplesLabel",
+                  )}
                 </Span>
                 <Div className="space-y-2">
                   {costRanges.map((scenario, idx) => {
                     const descriptionKey =
-                      idx === 0
-                        ? "short"
-                        : idx === 1
-                          ? "medium"
-                          : "long";
+                      idx === 0 ? "short" : idx === 1 ? "medium" : "long";
 
                     return (
                       <Div
@@ -292,9 +295,14 @@ export function ModelCreditDisplay({
                             )}
                           </Div>
                           <Span className="text-muted-foreground block text-[10px] leading-tight">
-                            {t("app.chat.selector.modelCreditDisplay.tokenBased.tokensCount", {
-                              count: formatNumber(scenario.input + scenario.output),
-                            })}
+                            {t(
+                              "app.chat.selector.modelCreditDisplay.tokenBased.tokensCount",
+                              {
+                                count: formatNumber(
+                                  scenario.input + scenario.output,
+                                ),
+                              },
+                            )}
                           </Span>
                         </Div>
                         <Span className="font-mono font-semibold text-sm">
@@ -309,15 +317,22 @@ export function ModelCreditDisplay({
               {/* Footer explanation */}
               <Div className="pt-3 border-t space-y-2.5">
                 <Span className="text-[10px] text-muted-foreground block leading-relaxed">
-                  {t("app.chat.selector.modelCreditDisplay.tokenBased.explanation")}
+                  {t(
+                    "app.chat.selector.modelCreditDisplay.tokenBased.explanation",
+                  )}
                 </Span>
                 <Span className="text-[10px] text-muted-foreground block leading-relaxed">
                   <Strong>
-                    {t("app.chat.selector.modelCreditDisplay.tokenBased.compactingLabel")}
+                    {t(
+                      "app.chat.selector.modelCreditDisplay.tokenBased.compactingLabel",
+                    )}
                   </Strong>
-                  {t("app.chat.selector.modelCreditDisplay.tokenBased.compactingExplanation", {
-                    threshold: formatTokenThreshold(effectiveTrigger),
-                  })}
+                  {t(
+                    "app.chat.selector.modelCreditDisplay.tokenBased.compactingExplanation",
+                    {
+                      threshold: formatTokenThreshold(effectiveTrigger),
+                    },
+                  )}
                 </Span>
                 <Span className="text-[10px] text-muted-foreground block">
                   {t("app.chat.selector.modelCreditDisplay.creditValue", {
@@ -338,8 +353,12 @@ export function ModelCreditDisplay({
                 </Span>
                 <Span className="text-xs text-muted-foreground block leading-relaxed">
                   {isTrulyFree
-                    ? t("app.chat.selector.modelCreditDisplay.fixed.freeDescription")
-                    : t("app.chat.selector.modelCreditDisplay.fixed.fixedDescription")}
+                    ? t(
+                        "app.chat.selector.modelCreditDisplay.fixed.freeDescription",
+                      )
+                    : t(
+                        "app.chat.selector.modelCreditDisplay.fixed.fixedDescription",
+                      )}
                 </Span>
               </Div>
 
@@ -347,7 +366,9 @@ export function ModelCreditDisplay({
               {!isTrulyFree && (
                 <Div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                   <Span className="text-xs font-medium text-muted-foreground">
-                    {t("app.chat.selector.modelCreditDisplay.fixed.costPerMessage")}
+                    {t(
+                      "app.chat.selector.modelCreditDisplay.fixed.costPerMessage",
+                    )}
                   </Span>
                   <Span className="text-sm font-bold">{costText}</Span>
                 </Div>
@@ -358,17 +379,25 @@ export function ModelCreditDisplay({
                 <Span className="text-xs text-muted-foreground block leading-relaxed">
                   {isTrulyFree ? (
                     <>
-                      {t("app.chat.selector.modelCreditDisplay.fixed.freeExplanation")}{" "}
+                      {t(
+                        "app.chat.selector.modelCreditDisplay.fixed.freeExplanation",
+                      )}{" "}
                       <Strong>
-                        {t("app.chat.selector.modelCreditDisplay.fixed.freeHighlight")}
+                        {t(
+                          "app.chat.selector.modelCreditDisplay.fixed.freeHighlight",
+                        )}
                       </Strong>
                     </>
                   ) : (
                     <>
                       <Strong>
-                        {t("app.chat.selector.modelCreditDisplay.fixed.simpleLabel")}
+                        {t(
+                          "app.chat.selector.modelCreditDisplay.fixed.simpleLabel",
+                        )}
                       </Strong>
-                      {t("app.chat.selector.modelCreditDisplay.fixed.simpleExplanation")}
+                      {t(
+                        "app.chat.selector.modelCreditDisplay.fixed.simpleExplanation",
+                      )}
                     </>
                   )}
                 </Span>

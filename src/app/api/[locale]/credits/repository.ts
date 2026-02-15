@@ -1685,6 +1685,7 @@ export class CreditRepository {
             requestedAmount: amount,
           });
 
+          // STEP 1: Deduct from free credits FIRST
           let freeCreditsToDeduct = Math.min(
             remaining,
             freeCreditsAvailableInPool,
@@ -1746,6 +1747,7 @@ export class CreditRepository {
           }
         }
 
+        // STEP 2: Deduct from expiring subscription credits
         if (remaining > 0 && pool.userWallet) {
           const walletIds = [pool.userWallet.id];
           const expiringPacks = await tx
@@ -1754,6 +1756,7 @@ export class CreditRepository {
             .where(
               and(
                 inArray(creditPacks.walletId, walletIds),
+                eq(creditPacks.type, CreditPackType.SUBSCRIPTION),
                 not(isNull(creditPacks.expiresAt)),
                 gte(creditPacks.expiresAt, new Date()),
               ),
@@ -1824,21 +1827,22 @@ export class CreditRepository {
           }
         }
 
+        // STEP 3: Deduct from earned credits (referral rewards)
         if (remaining > 0 && pool.userWallet) {
           const walletIds = [pool.userWallet.id];
-          const permanentPacks = await tx
+          const earnedPacks = await tx
             .select()
             .from(creditPacks)
             .where(
               and(
                 inArray(creditPacks.walletId, walletIds),
-                isNull(creditPacks.expiresAt),
+                eq(creditPacks.type, CreditPackType.EARNED),
               ),
             )
-            .orderBy(desc(creditPacks.createdAt))
+            .orderBy(creditPacks.createdAt) // FIFO for earned credits
             .for("update"); // Lock packs to prevent race conditions
 
-          for (const pack of permanentPacks) {
+          for (const pack of earnedPacks) {
             if (remaining <= 0) {
               break;
             }
@@ -1901,22 +1905,26 @@ export class CreditRepository {
           }
         }
 
-        // Step 4: Deduct from earned credit packs (LOWEST PRIORITY - for referral earnings)
+        // STEP 4: Deduct from permanent purchased credits (LAST - never expire)
         if (remaining > 0 && pool.userWallet) {
           const walletIds = [pool.userWallet.id];
-          const earnedPacks = await tx
+          const permanentPacks = await tx
             .select()
             .from(creditPacks)
             .where(
               and(
                 inArray(creditPacks.walletId, walletIds),
-                eq(creditPacks.type, CreditPackType.EARNED),
+                or(
+                  eq(creditPacks.type, CreditPackType.PERMANENT),
+                  eq(creditPacks.type, CreditPackType.BONUS),
+                ),
+                isNull(creditPacks.expiresAt),
               ),
             )
-            .orderBy(creditPacks.createdAt) // FIFO for earned credits
+            .orderBy(desc(creditPacks.createdAt))
             .for("update"); // Lock packs to prevent race conditions
 
-          for (const pack of earnedPacks) {
+          for (const pack of permanentPacks) {
             if (remaining <= 0) {
               break;
             }

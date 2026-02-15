@@ -24,6 +24,8 @@ export const translations = {
     addUser: "Add User",
     edit: "Edit",
     editUser: "Edit User",
+    viewDetails: "View Details",
+    backToList: "Back to List",
   },
   form: {
     buttons: {

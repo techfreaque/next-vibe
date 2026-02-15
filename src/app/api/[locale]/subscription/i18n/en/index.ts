@@ -57,6 +57,48 @@ export const translations = {
       title: "Subscription Creation",
       description: "Create a new subscription with the selected plan",
     },
+    errors: {
+      validation: {
+        title: "Invalid Input",
+        description: "Please check your subscription details and try again",
+      },
+      network: {
+        title: "Connection Error",
+        description: "Unable to connect. Please check your internet connection",
+      },
+      unauthorized: {
+        title: "Sign In Required",
+        description: "Please sign in to create a subscription",
+      },
+      forbidden: {
+        title: "Access Denied",
+        description: "You don't have permission to create a subscription",
+      },
+      notFound: {
+        title: "Plan Not Found",
+        description: "The subscription plan you selected couldn't be found",
+      },
+      server: {
+        title: "Something Went Wrong",
+        description: "We couldn't create your subscription. Please try again",
+      },
+      unknown: {
+        title: "Unexpected Error",
+        description: "Something unexpected happened. Please try again",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have changes that haven't been saved",
+      },
+      conflict: {
+        title: "Subscription Exists",
+        description: "You already have an active subscription",
+      },
+    },
+    success: {
+      title: "Subscription Created",
+      description: "Your subscription has been activated successfully",
+    },
   },
 
   // PUT endpoint
@@ -67,6 +109,49 @@ export const translations = {
       title: "Subscription Update",
       description: "Update your subscription plan or billing interval",
     },
+    errors: {
+      validation: {
+        title: "Invalid Update",
+        description: "Please check your changes and try again",
+      },
+      network: {
+        title: "Connection Error",
+        description: "Unable to save your changes. Please try again",
+      },
+      unauthorized: {
+        title: "Sign In Required",
+        description: "Please sign in to update your subscription",
+      },
+      forbidden: {
+        title: "Access Denied",
+        description: "You don't have permission to update this subscription",
+      },
+      notFound: {
+        title: "Subscription Not Found",
+        description: "We couldn't find your subscription to update",
+      },
+      server: {
+        title: "Update Failed",
+        description: "We couldn't save your changes. Please try again",
+      },
+      unknown: {
+        title: "Unexpected Error",
+        description: "Something unexpected happened. Please try again",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have changes that haven't been saved",
+      },
+      conflict: {
+        title: "Update Conflict",
+        description:
+          "Your subscription has changed. Please refresh and try again",
+      },
+    },
+    success: {
+      title: "Subscription Updated",
+      description: "Your subscription has been updated successfully",
+    },
   },
 
   // DELETE endpoint
@@ -76,6 +161,49 @@ export const translations = {
     form: {
       title: "Subscription Cancellation",
       description: "Cancel your subscription with optional settings",
+    },
+    errors: {
+      validation: {
+        title: "Invalid Request",
+        description: "Please check your cancellation details and try again",
+      },
+      network: {
+        title: "Connection Error",
+        description: "Unable to process cancellation. Please try again",
+      },
+      unauthorized: {
+        title: "Sign In Required",
+        description: "Please sign in to cancel your subscription",
+      },
+      forbidden: {
+        title: "Access Denied",
+        description: "You don't have permission to cancel this subscription",
+      },
+      notFound: {
+        title: "Subscription Not Found",
+        description: "We couldn't find your subscription to cancel",
+      },
+      server: {
+        title: "Cancellation Failed",
+        description: "We couldn't cancel your subscription. Please try again",
+      },
+      unknown: {
+        title: "Unexpected Error",
+        description: "Something unexpected happened. Please try again",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have changes that haven't been saved",
+      },
+      conflict: {
+        title: "Cancellation Conflict",
+        description:
+          "Your subscription status has changed. Please refresh and try again",
+      },
+    },
+    success: {
+      title: "Subscription Canceled",
+      description: "Your subscription has been canceled successfully",
     },
   },
 

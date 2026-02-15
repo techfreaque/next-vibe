@@ -58,6 +58,54 @@ export const translations: typeof enTranslations = {
       title: "Abonnement-Erstellung",
       description: "Ein neues Abonnement mit dem gewählten Plan erstellen",
     },
+    errors: {
+      validation: {
+        title: "Ungültige Eingabe",
+        description:
+          "Bitte überprüfen Sie Ihre Abonnementdetails und versuchen Sie es erneut",
+      },
+      network: {
+        title: "Verbindungsfehler",
+        description:
+          "Keine Verbindung möglich. Bitte überprüfen Sie Ihre Internetverbindung",
+      },
+      unauthorized: {
+        title: "Anmeldung erforderlich",
+        description: "Bitte melden Sie sich an, um ein Abonnement zu erstellen",
+      },
+      forbidden: {
+        title: "Zugriff verweigert",
+        description:
+          "Sie haben keine Berechtigung, ein Abonnement zu erstellen",
+      },
+      notFound: {
+        title: "Plan nicht gefunden",
+        description:
+          "Der ausgewählte Abonnement-Plan konnte nicht gefunden werden",
+      },
+      server: {
+        title: "Ein Fehler ist aufgetreten",
+        description:
+          "Ihr Abonnement konnte nicht erstellt werden. Bitte versuchen Sie es erneut",
+      },
+      unknown: {
+        title: "Unerwarteter Fehler",
+        description:
+          "Etwas Unerwartetes ist passiert. Bitte versuchen Sie es erneut",
+      },
+      unsavedChanges: {
+        title: "Nicht gespeicherte Änderungen",
+        description: "Sie haben Änderungen, die noch nicht gespeichert wurden",
+      },
+      conflict: {
+        title: "Abonnement existiert bereits",
+        description: "Sie haben bereits ein aktives Abonnement",
+      },
+    },
+    success: {
+      title: "Abonnement erstellt",
+      description: "Ihr Abonnement wurde erfolgreich aktiviert",
+    },
   },
 
   // PUT endpoint
@@ -69,6 +117,55 @@ export const translations: typeof enTranslations = {
       description:
         "Ihren Abonnement-Plan oder das Abrechnungsintervall aktualisieren",
     },
+    errors: {
+      validation: {
+        title: "Ungültige Aktualisierung",
+        description:
+          "Bitte überprüfen Sie Ihre Änderungen und versuchen Sie es erneut",
+      },
+      network: {
+        title: "Verbindungsfehler",
+        description:
+          "Ihre Änderungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut",
+      },
+      unauthorized: {
+        title: "Anmeldung erforderlich",
+        description:
+          "Bitte melden Sie sich an, um Ihr Abonnement zu aktualisieren",
+      },
+      forbidden: {
+        title: "Zugriff verweigert",
+        description:
+          "Sie haben keine Berechtigung, dieses Abonnement zu aktualisieren",
+      },
+      notFound: {
+        title: "Abonnement nicht gefunden",
+        description: "Wir konnten Ihr Abonnement nicht finden",
+      },
+      server: {
+        title: "Aktualisierung fehlgeschlagen",
+        description:
+          "Ihre Änderungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut",
+      },
+      unknown: {
+        title: "Unerwarteter Fehler",
+        description:
+          "Etwas Unerwartetes ist passiert. Bitte versuchen Sie es erneut",
+      },
+      unsavedChanges: {
+        title: "Nicht gespeicherte Änderungen",
+        description: "Sie haben Änderungen, die noch nicht gespeichert wurden",
+      },
+      conflict: {
+        title: "Aktualisierungskonflikt",
+        description:
+          "Ihr Abonnement hat sich geändert. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut",
+      },
+    },
+    success: {
+      title: "Abonnement aktualisiert",
+      description: "Ihr Abonnement wurde erfolgreich aktualisiert",
+    },
   },
 
   // DELETE endpoint
@@ -78,6 +175,54 @@ export const translations: typeof enTranslations = {
     form: {
       title: "Abonnement-Kündigung",
       description: "Ihr Abonnement mit optionalen Einstellungen kündigen",
+    },
+    errors: {
+      validation: {
+        title: "Ungültige Anfrage",
+        description:
+          "Bitte überprüfen Sie Ihre Kündigungsdetails und versuchen Sie es erneut",
+      },
+      network: {
+        title: "Verbindungsfehler",
+        description:
+          "Die Kündigung konnte nicht verarbeitet werden. Bitte versuchen Sie es erneut",
+      },
+      unauthorized: {
+        title: "Anmeldung erforderlich",
+        description: "Bitte melden Sie sich an, um Ihr Abonnement zu kündigen",
+      },
+      forbidden: {
+        title: "Zugriff verweigert",
+        description:
+          "Sie haben keine Berechtigung, dieses Abonnement zu kündigen",
+      },
+      notFound: {
+        title: "Abonnement nicht gefunden",
+        description: "Wir konnten Ihr Abonnement nicht finden",
+      },
+      server: {
+        title: "Kündigung fehlgeschlagen",
+        description:
+          "Ihr Abonnement konnte nicht gekündigt werden. Bitte versuchen Sie es erneut",
+      },
+      unknown: {
+        title: "Unerwarteter Fehler",
+        description:
+          "Etwas Unerwartetes ist passiert. Bitte versuchen Sie es erneut",
+      },
+      unsavedChanges: {
+        title: "Nicht gespeicherte Änderungen",
+        description: "Sie haben Änderungen, die noch nicht gespeichert wurden",
+      },
+      conflict: {
+        title: "Kündigungskonflikt",
+        description:
+          "Ihr Abonnementstatus hat sich geändert. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut",
+      },
+    },
+    success: {
+      title: "Abonnement gekündigt",
+      description: "Ihr Abonnement wurde erfolgreich gekündigt",
     },
   },
 

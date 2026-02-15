@@ -192,6 +192,10 @@ export const translations = {
       creditsFailed: "Failed to deduct credits: {{error}}",
       providerError:
         "Transcription service error. Please try again or contact support if the issue persists.",
+      balanceCheckFailed:
+        "Unable to check your credit balance. Please try again",
+      insufficientCredits:
+        "You don't have enough credits for this transcription. Please add more credits to continue",
     },
     success: {
       title: "Success",

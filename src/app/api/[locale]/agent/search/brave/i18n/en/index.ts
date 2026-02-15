@@ -90,6 +90,14 @@ export const translations = {
         title: "Search failed",
         description: "An error occurred while searching",
       },
+      validation: {
+        title: "Invalid Search",
+        description: "Please check your search parameters and try again",
+      },
+      internal: {
+        title: "Something Went Wrong",
+        description: "We couldn't complete your search. Please try again",
+      },
     },
     success: {
       title: "Search Successful",

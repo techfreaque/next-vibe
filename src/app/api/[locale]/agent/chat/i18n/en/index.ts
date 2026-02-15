@@ -319,7 +319,9 @@ export const translations = {
       gabAiArya:
         "Gab AI Arya - Uncensored conversational AI model with free expression and creative capabilities",
       gemini3Pro:
-        "Google Gemini 3 Pro - Advanced multimodal AI model with large context window",
+        "Google Gemini 3 Pro - Advanced multimodal AI model with large context window and powerful reasoning capabilities",
+      gemini3Flash:
+        "Google Gemini 3 Flash - Fast, efficient multimodal AI model optimized for quick responses",
       deepseekV32:
         "DeepSeek V3.2 - High-performance reasoning model with advanced coding capabilities",
       gpt52Pro:
@@ -340,6 +342,16 @@ export const translations = {
         "Claude Opus 4.6 - Latest and most powerful Claude model with exceptional reasoning and creative capabilities",
       claudeHaiku45:
         "Claude Haiku 4.5 - Fast and efficient Claude model optimized for speed and cost-effectiveness",
+      glm46:
+        "GLM-4 6B - Efficient Chinese-English bilingual AI model with strong general capabilities",
+      glm47:
+        "GLM-4 7B - Advanced Chinese-English bilingual model with improved reasoning and coding abilities",
+      glm47Flash:
+        "GLM-4 7B Flash - Ultra-fast Chinese-English model optimized for quick responses",
+      kimiK2:
+        "Kimi K2 - Powerful Chinese AI model with excellent context understanding",
+      kimiK2_5:
+        "Kimi K2.5 - Enhanced Chinese AI model with improved reasoning and creative capabilities",
     },
   },
   modelUtilities: {

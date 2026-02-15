@@ -1,6 +1,9 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  localstorage: {
+    noCallback: "Kein Callback für localStorage-Operation bereitgestellt",
+  },
   apiUtils: {
     errors: {
       http_error: "HTTP-Fehler",

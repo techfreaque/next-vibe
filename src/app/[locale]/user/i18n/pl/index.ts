@@ -9,6 +9,32 @@ export const translations: typeof enTranslations = {
   components: componentsTranslations,
   other: otherTranslations,
   signup: signupTranslations,
+  auth: {
+    passwordStrength: {
+      requirement: {
+        minLength: {
+          icon: "check",
+          text: "Co najmniej 8 znaków",
+        },
+        lowercase: {
+          icon: "check",
+          text: "Zawiera małą literę",
+        },
+        uppercase: {
+          icon: "check",
+          text: "Zawiera wielką literę",
+        },
+        number: {
+          icon: "check",
+          text: "Zawiera cyfrę",
+        },
+        special: {
+          icon: "check",
+          text: "Zawiera znak specjalny",
+        },
+      },
+    },
+  },
   common: {
     appName: "Next Vibe",
     backToHome: "Powrót do strony głównej",

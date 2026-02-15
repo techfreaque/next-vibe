@@ -123,12 +123,6 @@ export interface TextWidgetConfig<
   /** Maximum text length before truncation */
   maxLength?: number;
 
-  /** Display format (link requires href) */
-  format?: "link" | "plain";
-
-  /** Link destination when format="link" */
-  href?: string;
-
   /** Text alignment */
   textAlign?: "left" | "center" | "right";
 
@@ -137,9 +131,6 @@ export interface TextWidgetConfig<
 
   /** Gap between label and text */
   gap?: SpacingSize;
-
-  /** Padding around text */
-  padding?: SpacingSize;
 
   /**
    * Dynamic className callback - receives field value and parent value
