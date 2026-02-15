@@ -34,11 +34,7 @@ import { UserRole } from "../../../user/user-roles/enum";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "translations", "reorganize"],
-  allowedRoles: [
-    // still a bit buggy - disabled to prevent AI from calling it
-    UserRole.ADMIN,
-    UserRole.PUBLIC, // TEMPORARY for debugging
-  ],
+  allowedRoles: [UserRole.CLI_AUTH_BYPASS],
 
   title: "app.api.system.translations.reorganize.post.title",
   description: "app.api.system.translations.reorganize.post.description",
