@@ -974,12 +974,12 @@ export class FileGenerator {
             }
           }
 
-          // CRITICAL: If we're spreading [locale], DON'T write ANY inline keys except 'api'
-          // Everything else should come from the spread or from child imports
+          // CRITICAL: If we're spreading [locale], only allow specific inline keys
+          // - 'api': explicitly imported child
+          // - 'common': shared translations at common ancestor
+          // Everything else would overwrite what's in the [locale] spread
           if (hasSpreadChild && directChildren.has("[locale]")) {
-            // Only allow 'api' as inline key since it's explicitly imported separately
-            // All other keys would overwrite or duplicate what's in the [locale] spread
-            if (key !== "api") {
+            if (key !== "api" && key !== "common") {
               // Skip - would conflict with spread from [locale]
               continue;
             }
