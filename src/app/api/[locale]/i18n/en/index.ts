@@ -1,6 +1,5 @@
 import { translations as agentTranslations } from "../../agent/i18n/en";
 import { translations as browserTranslations } from "../../browser/i18n/en";
-import { translations as contactTranslations } from "../../contact/i18n/en";
 import { translations as creditsTranslations } from "../../credits/i18n/en";
 import { translations as emailsTranslations } from "../../emails/i18n/en";
 import { translations as importTranslations } from "../../import/i18n/en";
@@ -13,7 +12,6 @@ import { translations as productsTranslations } from "../../products/i18n/en";
 import { translations as referralTranslations } from "../../referral/i18n/en";
 import { translations as sharedTranslations } from "../../shared/i18n/en";
 import { translations as sharedUtilsTranslations } from "../../shared/utils/i18n/en";
-import { translations as smsTranslations } from "../../sms/i18n/en";
 import { translations as subscriptionTranslations } from "../../subscription/i18n/en";
 import { translations as systemTranslations } from "../../system/i18n/en";
 import { translations as userTranslations } from "../../user/i18n/en";
@@ -22,7 +20,6 @@ import { translations as usersTranslations } from "../../users/i18n/en";
 export const translations = {
   agent: agentTranslations,
   browser: browserTranslations,
-  contact: contactTranslations,
   credits: creditsTranslations,
   emails: emailsTranslations,
   import: importTranslations,
@@ -36,7 +33,6 @@ export const translations = {
     ...sharedTranslations,
     utils: sharedUtilsTranslations,
   },
-  sms: smsTranslations,
   stripe: stripeTranslations,
   subscription: subscriptionTranslations,
   system: systemTranslations,
