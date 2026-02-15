@@ -1461,10 +1461,15 @@ export class TranslationReorganizeRepositoryImpl {
           if (actualLocationPrefix && keySuffix) {
             correctKey = `${actualLocationPrefix}.${keySuffix}`;
           } else if (actualLocationPrefix && !keySuffix) {
-            // No suffix - this means the key is shorter than or equal to the location
-            // Use a default suffix like "page" or "title"
-            correctKey = `${actualLocationPrefix}.page`;
-            keySuffix = "page";
+            // No suffix - this means the key structure doesn't match the location structure
+            // This typically happens when a shared key (like app.admin.users.table.name)
+            // is used in a deeply nested component (like app/[locale]/admin/users/list/components)
+            // In this case, keep the original key structure and don't create a mapping
+            logger.debug(
+              `Key structure doesn't match location - keeping original: ${fullPath} (location: ${location})`,
+            );
+            correctKey = fullPath;
+            keySuffix = fullPath.split(".").pop() || fullPath;
           } else {
             correctKey = keySuffix || actualLocationPrefix || fullPath;
           }
