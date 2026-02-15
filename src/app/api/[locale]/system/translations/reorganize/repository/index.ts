@@ -1087,80 +1087,6 @@ export class TranslationReorganizeRepositoryImpl {
         logger,
       );
 
-      // After building new structure, scan source files for keys that need mapping
-      // This catches keys that were in old structure but moved to new locations
-      logger.info(
-        "Generating key mappings from source file keys to new structure",
-      );
-
-      // Build a flat map of all keys in the new structure
-      const newStructureKeys = new Set<string>();
-      for (const groupTranslations of groups.values()) {
-        this.extractAllTranslationKeysHelper(
-          groupTranslations,
-          "",
-          newStructureKeys,
-        );
-      }
-
-      // For each key found in source files, check if it needs mapping
-      for (const [sourceKey, files] of keyUsageMap) {
-        // If the key exists in new structure with same name, no mapping needed
-        if (newStructureKeys.has(sourceKey)) {
-          continue;
-        }
-
-        // Key doesn't exist in new structure - need to find where it should be
-        // Based on where it's used, determine the correct new key
-        const usageLocation = files[0] ? path.dirname(files[0]) : "";
-        const projectRoot = process.cwd();
-        let relativeLocation = usageLocation;
-
-        if (usageLocation.startsWith(projectRoot)) {
-          relativeLocation = usageLocation.slice(projectRoot.length + 1);
-        }
-
-        if (relativeLocation.startsWith("src/")) {
-          relativeLocation = relativeLocation.slice(4);
-        }
-
-        // Calculate what the key SHOULD be based on the new location
-        const actualLocationPrefix = this.fileGenerator
-          ? this.fileGenerator.locationToFlatKeyPublic(relativeLocation)
-          : "";
-
-        // Try to determine the suffix from the old key
-        // For example: app.api.shared.errorTypes.validation_error
-        //   might map to app.api.shared.utils.errorTypes.validation_error
-        const oldKeyParts = sourceKey.split(".");
-        let newKey = sourceKey;
-
-        if (actualLocationPrefix) {
-          // Try to find a matching key in the new structure with different prefix
-          for (const candidateKey of newStructureKeys) {
-            const candidateParts = candidateKey.split(".");
-            // If the suffix matches, this might be the mapping
-            const oldSuffix = oldKeyParts.slice(-3).join(".");
-            const candidateSuffix = candidateParts.slice(-3).join(".");
-
-            if (oldSuffix === candidateSuffix) {
-              newKey = candidateKey;
-              break;
-            }
-          }
-        }
-
-        // Only create mapping if we found a different key
-        if (newKey !== sourceKey && newStructureKeys.has(newKey)) {
-          keyMappings.set(sourceKey, newKey);
-          logger.debug(`Mapping source key: ${sourceKey} → ${newKey}`);
-        }
-      }
-
-      logger.info(
-        `Generated ${keyMappings.size} key mappings for source file updates`,
-      );
-
       return { groups, originalKeys, keyMappings };
     } catch (error) {
       logger.error("Error in groupTranslationsByUsage", {
@@ -1275,29 +1201,6 @@ export class TranslationReorganizeRepositoryImpl {
     }
 
     return filesUpdated;
-  }
-
-  /**
-   * Helper to extract all translation keys from an object into a set
-   */
-  private extractAllTranslationKeysHelper(
-    obj: TranslationObject,
-    prefix: string,
-    keys: Set<string>,
-  ): void {
-    for (const [key, value] of Object.entries(obj)) {
-      const fullKey = prefix ? `${prefix}.${key}` : key;
-
-      if (
-        typeof value === "object" &&
-        value !== null &&
-        !Array.isArray(value)
-      ) {
-        this.extractAllTranslationKeysHelper(value, fullKey, keys);
-      } else {
-        keys.add(fullKey);
-      }
-    }
   }
 
   /**
