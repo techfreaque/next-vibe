@@ -1500,6 +1500,20 @@ export class TranslationReorganizeRepositoryImpl {
             correctKey = fullPath;
             keySuffix = keyParts[keyParts.length - 1];
           }
+
+          // Simulate flattening to get the actual key that will be in the file
+          // The file generator will flatten single-child objects, so we need to predict that
+          if (this.fileGenerator && actualLocationPrefix) {
+            const simulatedKey = this.fileGenerator.simulateFlattenedKey(
+              correctKey,
+              actualLocationPrefix,
+            );
+            // Reconstruct the full key with location prefix + flattened suffix
+            if (simulatedKey) {
+              correctKey = `${actualLocationPrefix}.${simulatedKey}`;
+              keySuffix = simulatedKey;
+            }
+          }
         }
 
         // Skip scoped translation locations - check if this location or any parent has a scoped i18n index

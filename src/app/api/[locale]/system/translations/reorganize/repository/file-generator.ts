@@ -309,6 +309,73 @@ export class FileGenerator {
   }
 
   /**
+   * Flatten single-child objects to avoid redundant nesting
+   * If an object has only one child and that child is also an object,
+   * flatten them together. This prevents duplication like:
+   * { components: { navigation: { ... } } } -> { navigation: { ... } }
+   * @param obj - The nested object to flatten
+   * @returns The flattened object with single-child paths collapsed
+   */
+  private flattenSingleChildObjects(obj: TranslationObject): TranslationObject {
+    const result: TranslationObject = {};
+
+    for (const [key, value] of Object.entries(obj)) {
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        !Array.isArray(value)
+      ) {
+        // Check if this object has only one child
+        const childKeys = Object.keys(value);
+
+        if (childKeys.length === 1) {
+          const childKey = childKeys[0];
+          const childValue = value[childKey];
+
+          // If the single child is also an object, flatten it
+          if (
+            typeof childValue === "object" &&
+            childValue !== null &&
+            !Array.isArray(childValue)
+          ) {
+            // Recursively flatten the child
+            const flattenedChild = this.flattenSingleChildObjects({
+              [childKey]: childValue,
+            });
+            // Merge the flattened child directly into result (skip the parent key)
+            Object.assign(result, flattenedChild);
+          } else {
+            // Single child is a primitive value - keep the structure
+            result[key] = value;
+          }
+        } else {
+          // Multiple children - recursively flatten each child but keep this level
+          const flattenedValue: TranslationObject = {};
+          for (const [childKey, childValue] of Object.entries(value)) {
+            if (
+              typeof childValue === "object" &&
+              childValue !== null &&
+              !Array.isArray(childValue)
+            ) {
+              flattenedValue[childKey] = this.flattenSingleChildObjects(
+                childValue as TranslationObject,
+              );
+            } else {
+              flattenedValue[childKey] = childValue;
+            }
+          }
+          result[key] = flattenedValue;
+        }
+      } else {
+        // Primitive value - keep as is
+        result[key] = value;
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Flatten a nested translation object into dot-notation keys
    * @param obj - The nested translation object to flatten
    * @param prefix - Optional prefix for the keys
@@ -484,7 +551,12 @@ export class FileGenerator {
     // Convert to nested structure
     const nestedTranslations =
       this.unflattenTranslationObject(strippedTranslations);
-    const translationsObject = this.objectToString(nestedTranslations, 0);
+
+    // Flatten single-child objects to avoid redundant nesting
+    const flattenedTranslations =
+      this.flattenSingleChildObjects(nestedTranslations);
+
+    const translationsObject = this.objectToString(flattenedTranslations, 0);
     // eslint-disable-next-line i18next/no-literal-string
     const typeAnnotation = isMainLanguage ? "" : ": typeof enTranslations";
 
@@ -542,6 +614,43 @@ export class FileGenerator {
    */
   public locationToFlatKeyPublic(location: string): string {
     return this.locationToFlatKey(location);
+  }
+
+  /**
+   * Simulate what a key will look like after location prefix stripping and flattening
+   * This helps the reorganizer predict the final key structure
+   * @param fullKey - The full key path
+   * @param locationPrefix - The location prefix to strip
+   * @returns The key after stripping and flattening
+   */
+  public simulateFlattenedKey(
+    fullKey: string,
+    locationPrefix: string,
+  ): string {
+    // Strip location prefix
+    let strippedKey = fullKey;
+    if (locationPrefix && fullKey.startsWith(`${locationPrefix}.`)) {
+      strippedKey = fullKey.slice(locationPrefix.length + 1);
+    }
+
+    // Simulate unflatten + flatten by building temp object
+    const tempObj: TranslationObject = {};
+    const parts = strippedKey.split(".");
+    let current = tempObj;
+    for (let i = 0; i < parts.length - 1; i++) {
+      current[parts[i]] = {};
+      current = current[parts[i]] as TranslationObject;
+    }
+    current[parts[parts.length - 1]] = "value";
+
+    // Flatten single-child objects
+    const flattened = this.flattenSingleChildObjects(tempObj);
+
+    // Convert back to dot notation to get the final key
+    const flattenedKeys = Object.keys(
+      this.flattenTranslationObject(flattened),
+    );
+    return flattenedKeys[0] || strippedKey;
   }
 
   /**
@@ -786,12 +895,16 @@ export class FileGenerator {
         const nestedTranslations =
           this.unflattenTranslationObject(strippedTranslations);
 
+        // Flatten single-child objects to avoid redundant nesting
+        const flattenedTranslations =
+          this.flattenSingleChildObjects(nestedTranslations);
+
         // Add own translations as spread entries in the exports
         // BUT exclude translations that belong to child directories
         // Strategy: Flatten both parent and child translations to check for overlaps
         const locationPrefix = this.locationToFlatKey(sourcePath);
 
-        for (const [key, value] of Object.entries(nestedTranslations)) {
+        for (const [key, value] of Object.entries(flattenedTranslations)) {
           // ONLY skip this key if it matches a child directory AND all translations
           // under this key belong to that child's location
           // Don't skip if this is just a shared prefix with different structure
