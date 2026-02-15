@@ -98,8 +98,8 @@ export class TranslationReorganizeRepositoryImpl {
     }> = [];
 
     try {
-      // Always enable removeUnused when regenerateStructure is enabled
-      const removeUnused = request.regenerateStructure;
+      // DISABLE removeUnused until key scanner bug is fixed
+      const removeUnused = false; // request.regenerateStructure;
 
       output.push(
         t("app.api.system.translations.reorganize.post.messages.starting"),
