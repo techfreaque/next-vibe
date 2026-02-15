@@ -1414,12 +1414,18 @@ export class TranslationReorganizeRepositoryImpl {
         ) {
           // Key already matches the location - it's correct!
           keySuffix = fullPath.slice(actualLocationPrefix.length + 1);
-          correctKey = fullPath;
+          // Convert hyphenated/snake_case segments to camelCase
+          keySuffix = keySuffix.split('.').map(part =>
+            part.replace(/[-_]([a-z0-9])/g, (_, letter) => letter.toUpperCase())
+          ).join('.');
+          correctKey = `${actualLocationPrefix}.${keySuffix}`;
 
           // For shared keys, ensure they're under "common" in the file structure
           if (shouldPreserveCommon && !keySuffix.startsWith("common.")) {
             // Extract the common part and reconstruct
-            const keyAfterPrefix = fullPath.slice(actualLocationPrefix.length + 1);
+            const keyAfterPrefix = fullPath.slice(
+              actualLocationPrefix.length + 1,
+            );
             const parts = keyAfterPrefix.split(".");
             const commonIndex = parts.indexOf("common");
             if (commonIndex >= 0) {
@@ -1427,7 +1433,7 @@ export class TranslationReorganizeRepositoryImpl {
               keySuffix = ["common", ...parts.slice(commonIndex + 1)].join(".");
             }
           }
-        } else{
+        } else {
           // Key doesn't match the actual location
           // We need to reconstruct the correct key
           // Strategy: Replace the location-related parts of the key with the actual location prefix
@@ -1494,13 +1500,22 @@ export class TranslationReorganizeRepositoryImpl {
                 // Keep the part if it's NOT in the location remainder
                 // But ignore parameter placeholders like [threadId] when checking
                 return !locationRemainder.some(
-                  (locPart) => !locPart.startsWith("[") && locPart === keyPart
+                  (locPart) => !locPart.startsWith("[") && locPart === keyPart,
                 );
               });
             }
           }
 
           keySuffix = suffixParts.join(".");
+          // Convert to camelCase
+          keySuffix = keySuffix
+            .split(".")
+            .map((part) =>
+              part.replace(/[-_]([a-z0-9])/g, (_, letter) =>
+                letter.toUpperCase(),
+              ),
+            )
+            .join(".");
 
           // For shared keys with "common" in them, ensure "common" is at the start of the suffix
           if (shouldPreserveCommon) {
