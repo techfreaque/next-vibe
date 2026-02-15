@@ -1088,6 +1088,48 @@ export class TranslationReorganizeRepositoryImpl {
         logger,
       );
 
+      // After reorganization, check for keys in source files that don't match new structure
+      // Build flat map of all keys in new structure
+      const newStructureKeys = new Map<string, string>(); // newKey -> location
+      for (const [location, groupTrans] of groups) {
+        this.extractKeysFromObject(groupTrans, "", newStructureKeys, location);
+      }
+
+      logger.info(`New structure has ${newStructureKeys.size} keys`);
+
+      // Check all source file keys against new structure
+      for (const [sourceKey] of keyUsageMap) {
+        // If source key exists in new structure with same name, no mapping needed
+        if (newStructureKeys.has(sourceKey)) {
+          continue;
+        }
+
+        // Source key doesn't exist - try to find it with different path
+        // Strategy: match by longer suffix for more accuracy
+        const sourceParts = sourceKey.split(".");
+
+        // Try matching with increasingly longer suffixes (5, 4, 3 parts)
+        let found = false;
+        for (let suffixLen = 5; suffixLen >= 3 && !found; suffixLen--) {
+          const sourceSuffix = sourceParts.slice(-suffixLen).join(".");
+
+          for (const [newKey] of newStructureKeys) {
+            const newParts = newKey.split(".");
+            const newSuffix = newParts.slice(-suffixLen).join(".");
+
+            if (sourceSuffix === newSuffix && sourceKey !== newKey) {
+              // Found a match! Create mapping
+              keyMappings.set(sourceKey, newKey);
+              logger.debug(`MAPPING SOURCE (${suffixLen} parts): "${sourceKey}" -> "${newKey}"`);
+              found = true;
+              break;
+            }
+          }
+        }
+      }
+
+      logger.info(`Generated ${keyMappings.size} source file mappings`);
+
       return { groups, originalKeys, keyMappings };
     } catch (error) {
       logger.error("Error in groupTranslationsByUsage", {
@@ -1205,6 +1247,30 @@ export class TranslationReorganizeRepositoryImpl {
   }
 
   /**
+   * Extract all keys from a translation object
+   */
+  private extractKeysFromObject(
+    obj: TranslationObject,
+    prefix: string,
+    keys: Map<string, string>,
+    location: string,
+  ): void {
+    for (const [key, value] of Object.entries(obj)) {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
+
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        !Array.isArray(value)
+      ) {
+        this.extractKeysFromObject(value, fullKey, keys, location);
+      } else {
+        keys.set(fullKey, location);
+      }
+    }
+  }
+
+  /**
    * Process translation keys for location-based co-location
    * Co-locates each translation at ALL of its specific usage locations
    * @param obj - The translation object to process
@@ -1274,13 +1340,17 @@ export class TranslationReorganizeRepositoryImpl {
           // Multiple usages - check if key is in shared/common location
           // If so, keep it there instead of moving to common ancestor
           const keyLowerCase = fullPath.toLowerCase();
-          const hasSharedInKey = keyLowerCase.includes(".shared.") || keyLowerCase.includes(".common.");
+          const hasSharedInKey =
+            keyLowerCase.includes(".shared.") ||
+            keyLowerCase.includes(".common.");
 
           if (hasSharedInKey) {
             // Key is meant to be shared - keep it in shared location
             // Find the shared directory from the key path
             const keyParts = fullPath.split(".");
-            const sharedIndex = keyParts.findIndex(p => p === "shared" || p === "common");
+            const sharedIndex = keyParts.findIndex(
+              (p) => p === "shared" || p === "common",
+            );
 
             if (sharedIndex >= 0) {
               // Construct the shared location path from the key
@@ -1293,7 +1363,9 @@ export class TranslationReorganizeRepositoryImpl {
               }
 
               isShared = true;
-              logger.debug(`Keeping shared key ${fullPath} in shared location: ${location}`);
+              logger.debug(
+                `Keeping shared key ${fullPath} in shared location: ${location}`,
+              );
             } else {
               // Fallback to common ancestor
               location = this.getCommonAncestorLocation(usageFiles);
@@ -1432,6 +1504,7 @@ export class TranslationReorganizeRepositoryImpl {
         // Track key mapping for updating source files
         if (fullPath !== correctKey) {
           keyMappings.set(fullPath, correctKey);
+          logger.info(`MAPPING: "${fullPath}" -> "${correctKey}"`);
         }
 
         // Track the original key for this location
