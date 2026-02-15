@@ -411,6 +411,14 @@ export class TranslationReorganizeRepositoryImpl {
           `Key mappings: ${keyMappings.size} keys need to be updated`,
         );
 
+        // Fix key mappings based on actual flattening that will happen during file generation
+        if (this.fileGenerator) {
+          this.fixKeyMappingsWithFlattening(groups, keyMappings, logger);
+          logger.info(
+            `After flattening correction: ${keyMappings.size} keys need to be updated`,
+          );
+        }
+
         // Update code files with new keys
         if (keyMappings.size > 0) {
           const codeFilesUpdated = this.updateCodeFilesWithNewKeys(
