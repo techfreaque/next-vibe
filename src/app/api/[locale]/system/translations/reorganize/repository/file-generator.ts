@@ -255,6 +255,15 @@ export class FileGenerator {
   }
 
   /**
+   * Public wrapper for unflattenTranslationObject
+   */
+  public unflattenTranslationObjectPublic(
+    translations: TranslationObject,
+  ): TranslationObject {
+    return this.unflattenTranslationObject(translations);
+  }
+
+  /**
    * Convert flat dot-notation keys back to nested object structure
    * @param translations - The translation object with flat keys
    * @returns The nested translation object
@@ -306,6 +315,16 @@ export class FileGenerator {
     }
 
     return nested;
+  }
+
+  /**
+   * Public wrapper for flattenSingleChildObjects
+   */
+  public flattenSingleChildObjectsPublic(
+    obj: TranslationObject,
+    preserveKeys: Set<string> = new Set(["common"]),
+  ): TranslationObject {
+    return this.flattenSingleChildObjects(obj, preserveKeys);
   }
 
   /**
@@ -399,6 +418,16 @@ export class FileGenerator {
     }
 
     return result;
+  }
+
+  /**
+   * Public wrapper for flattenTranslationObject
+   */
+  public flattenTranslationObjectPublic(
+    obj: TranslationObject,
+    prefix = "",
+  ): Record<string, string | number | boolean> {
+    return this.flattenTranslationObject(obj, prefix);
   }
 
   /**

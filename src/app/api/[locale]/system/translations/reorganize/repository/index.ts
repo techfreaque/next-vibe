@@ -261,6 +261,14 @@ export class TranslationReorganizeRepositoryImpl {
           `Key mappings: ${keyMappings.size} keys need to be updated`,
         );
 
+        // Fix key mappings based on actual flattening that will happen during file generation
+        if (this.fileGenerator) {
+          this.fixKeyMappingsWithFlattening(groups, keyMappings, logger);
+          logger.info(
+            `After flattening correction: ${keyMappings.size} keys need to be updated`,
+          );
+        }
+
         // Update code files with new keys
         if (keyMappings.size > 0) {
           const filesUpdated = this.updateCodeFilesWithNewKeys(
@@ -1247,6 +1255,82 @@ export class TranslationReorganizeRepositoryImpl {
     }
 
     return filesUpdated;
+  }
+
+  /**
+   * Fix key mappings based on actual flattening that will occur during file generation
+   * This ensures that single-child intermediate levels are properly removed from keys
+   */
+  private fixKeyMappingsWithFlattening(
+    groups: Map<string, TranslationObject>,
+    keyMappings: Map<string, string>,
+    logger: EndpointLogger,
+  ): void {
+    // For each location, simulate the complete flattening and update mappings
+    for (const [location, translations] of groups.entries()) {
+      // Get location prefix
+      const locationPrefix = this.fileGenerator!.locationToFlatKeyPublic(location);
+
+      // Strip location prefix from all keys
+      const strippedTranslations: TranslationObject = {};
+      for (const [key, value] of Object.entries(translations)) {
+        let strippedKey = key;
+        if (locationPrefix && key.startsWith(`${locationPrefix}.`)) {
+          strippedKey = key.slice(locationPrefix.length + 1);
+        }
+        strippedTranslations[strippedKey] = value;
+      }
+
+      // Unflatten to nested structure
+      const nested = this.fileGenerator!.unflattenTranslationObjectPublic(strippedTranslations);
+
+      // Flatten single-child objects
+      const flattened = this.fileGenerator!.flattenSingleChildObjectsPublic(nested);
+
+      // Flatten back to dot notation
+      const flattenedKeys = this.fileGenerator!.flattenTranslationObjectPublic(flattened);
+
+      // Now compare original keys to flattened keys and update mappings
+      for (const [originalKey, value] of Object.entries(translations)) {
+        // Find this key in the flattened structure
+        let strippedOriginal = originalKey;
+        if (locationPrefix && originalKey.startsWith(`${locationPrefix}.`)) {
+          strippedOriginal = originalKey.slice(locationPrefix.length + 1);
+        }
+
+        // The flattened key should exist in flattenedKeys
+        if (flattenedKeys[strippedOriginal] !== undefined) {
+          // Key wasn't changed by flattening - it's already correct
+          continue;
+        }
+
+        // Find the flattened version by comparing values
+        // (This is safe because we're within the same location)
+        for (const [flatKey, flatValue] of Object.entries(flattenedKeys)) {
+          if (flatValue === value) {
+            // Found the flattened version
+            const correctKey = locationPrefix ? `${locationPrefix}.${flatKey}` : flatKey;
+
+            if (originalKey !== correctKey) {
+              // Update mapping
+              // First, find any existing mapping for this original key
+              let sourceKey = originalKey;
+              for (const [oldKey, newKey] of keyMappings.entries()) {
+                if (newKey === originalKey) {
+                  sourceKey = oldKey;
+                  break;
+                }
+              }
+
+              // Update or create mapping
+              keyMappings.set(sourceKey, correctKey);
+              logger.info(`[FLATTEN-FIX] ${sourceKey} -> ${correctKey} (was: ${originalKey})`);
+            }
+            break;
+          }
+        }
+      }
+    }
   }
 
   /**
