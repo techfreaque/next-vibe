@@ -1105,28 +1105,10 @@ export class TranslationReorganizeRepositoryImpl {
           continue;
         }
 
-        // Source key doesn't exist - try to find it with different path
-        // Strategy: match by longer suffix for more accuracy
-        const sourceParts = sourceKey.split(".");
-
-        // Try matching with increasingly longer suffixes (5, 4, 3 parts)
-        let found = false;
-        for (let suffixLen = 5; suffixLen >= 3 && !found; suffixLen--) {
-          const sourceSuffix = sourceParts.slice(-suffixLen).join(".");
-
-          for (const [newKey] of newStructureKeys) {
-            const newParts = newKey.split(".");
-            const newSuffix = newParts.slice(-suffixLen).join(".");
-
-            if (sourceSuffix === newSuffix && sourceKey !== newKey) {
-              // Found a match! Create mapping
-              keyMappings.set(sourceKey, newKey);
-              logger.debug(`MAPPING SOURCE (${suffixLen} parts): "${sourceKey}" -> "${newKey}"`);
-              found = true;
-              break;
-            }
-          }
-        }
+        // Source key doesn't exist in new structure - skip it
+        // DO NOT create mappings for different keys that happen to have similar suffixes
+        // This would incorrectly map keys from different scoped locations
+        logger.debug(`Source key not found in new structure: "${sourceKey}"`);
       }
 
       logger.info(`Generated ${keyMappings.size} source file mappings`);
