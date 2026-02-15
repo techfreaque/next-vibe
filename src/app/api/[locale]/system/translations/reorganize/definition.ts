@@ -53,7 +53,7 @@ const { POST } = createEndpoint({
   // CLI configuration
   aliases: ["translations:reorganize"],
   cli: {
-    firstCliArgKey: "removeUnused",
+    firstCliArgKey: "regenerateStructure",
   },
 
   fields: objectField(
@@ -68,17 +68,6 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      removeUnused: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.translations.reorganize.post.fields.removeUnused.title" as const,
-        description:
-          "app.api.system.translations.reorganize.post.fields.removeUnused.description" as const,
-        columns: 6,
-        schema: z.boolean().default(false),
-      }),
-
       dryRun: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
@@ -338,7 +327,6 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        removeUnused: false,
         dryRun: true,
         backup: true,
         regenerateStructure: false,

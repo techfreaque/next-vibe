@@ -98,14 +98,8 @@ export class TranslationReorganizeRepositoryImpl {
     }> = [];
 
     try {
-      // Validate: removeUnused requires regenerateStructure
-      if (request.removeUnused && !request.regenerateStructure) {
-        return fail({
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          message:
-            "app.api.system.translations.reorganize.post.messages.removeUnusedRequiresRegenerate",
-        });
-      }
+      // Always enable removeUnused when regenerateStructure is enabled
+      const removeUnused = request.regenerateStructure;
 
       output.push(
         t("app.api.system.translations.reorganize.post.messages.starting"),
@@ -163,7 +157,7 @@ export class TranslationReorganizeRepositoryImpl {
       let keysRemoved = 0;
       let filteredTranslations = currentTranslations;
 
-      if (request.removeUnused && unusedKeys > 0) {
+      if (removeUnused && unusedKeys > 0) {
         output.push(
           t(
             "app.api.system.translations.reorganize.post.messages.removingKeys",
@@ -186,7 +180,7 @@ export class TranslationReorganizeRepositoryImpl {
             "app.api.system.translations.reorganize.post.messages.dryRunCompleted",
           ),
         );
-        if (request.removeUnused && unusedKeys > 0) {
+        if (removeUnused && unusedKeys > 0) {
           output.push(
             t(
               "app.api.system.translations.reorganize.post.messages.removedKeysFromLanguage",
@@ -206,7 +200,7 @@ export class TranslationReorganizeRepositoryImpl {
             summary: {
               totalKeys: allKeys.size,
               usedKeys,
-              unusedKeys: request.removeUnused ? 0 : unusedKeys,
+              unusedKeys: removeUnused ? 0 : unusedKeys,
               keysRemoved: 0, // Dry run, so no actual removal
               filesUpdated: 0,
               filesCreated: 0,
@@ -222,7 +216,7 @@ export class TranslationReorganizeRepositoryImpl {
 
       // If removeUnused is enabled but regenerateStructure is not, we need to regenerate files based on usage
       if (
-        request.removeUnused &&
+        removeUnused &&
         !request.regenerateStructure &&
         keysRemoved > 0
       ) {
@@ -483,7 +477,7 @@ export class TranslationReorganizeRepositoryImpl {
               summary: {
                 totalKeys: allKeys.size,
                 usedKeys,
-                unusedKeys: request.removeUnused ? 0 : unusedKeys,
+                unusedKeys: removeUnused ? 0 : unusedKeys,
                 keysRemoved,
                 filesUpdated,
                 filesCreated,
