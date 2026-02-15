@@ -553,7 +553,7 @@ export class TranslationReorganizeRepositoryImpl {
 
       return fail({
         message:
-          "app.api.system.translations.reorganize.repository.error.internal_error",
+          "app.api.system.translations.reorganize.repository.error.internalError",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -797,7 +797,7 @@ export class TranslationReorganizeRepositoryImpl {
 
       return fail({
         message:
-          "app.api.system.translations.reorganize.repository.error.internal_error",
+          "app.api.system.translations.reorganize.repository.error.internalError",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1407,13 +1407,23 @@ export class TranslationReorganizeRepositoryImpl {
         const hasCommonInKey = fullPath.includes(".common.");
         const shouldPreserveCommon = isShared && hasCommonInKey;
 
+        // Convert fullPath to camelCase for comparison with actualLocationPrefix
+        const fullPathCamelCase = fullPath
+          .split(".")
+          .map((part) =>
+            part.replace(/[-_]([a-z0-9])/g, (_, letter) =>
+              letter.toUpperCase(),
+            ),
+          )
+          .join(".");
+
         // Try to find where the key diverges from the actual location
         if (
           actualLocationPrefix &&
-          fullPath.startsWith(`${actualLocationPrefix}.`)
+          fullPathCamelCase.startsWith(`${actualLocationPrefix}.`)
         ) {
           // Key already matches the location - it's correct!
-          keySuffix = fullPath.slice(actualLocationPrefix.length + 1);
+          keySuffix = fullPathCamelCase.slice(actualLocationPrefix.length + 1);
           // Convert hyphenated/snake_case segments to camelCase
           keySuffix = keySuffix.split('.').map(part =>
             part.replace(/[-_]([a-z0-9])/g, (_, letter) => letter.toUpperCase())
@@ -2077,7 +2087,7 @@ export class TranslationReorganizeRepositoryImpl {
       });
       return fail({
         message:
-          "app.api.system.translations.reorganize.repository.error.internal_error",
+          "app.api.system.translations.reorganize.repository.error.internalError",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
