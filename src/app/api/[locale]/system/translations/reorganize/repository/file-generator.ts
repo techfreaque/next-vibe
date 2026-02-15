@@ -813,6 +813,7 @@ export class FileGenerator {
     const imports: string[] = [];
     const exports: string[] = [];
     const usedImportNames = new Set<string>();
+    const hasSpreadChild = directChildren.has("[locale]");
 
     // Import from direct children - but only if they have generated files
     for (const child of directChildren) {
@@ -856,8 +857,11 @@ export class FileGenerator {
         `import { translations as ${importName} } from "${importPath}";`,
       );
 
+      // Track which children are spread vs keyed
+      const isSpread = child === "[locale]";
+
       // Only spread [locale] folders, use keyed exports for everything else
-      if (child === "[locale]") {
+      if (isSpread) {
         exports.push(`  ...${importName}`);
       } else {
         // Convert kebab-case folder names to camelCase for export keys
@@ -967,6 +971,39 @@ export class FileGenerator {
               }
 
               // Some keys don't belong to child - include them inline
+            }
+          }
+
+          // CRITICAL: If we're spreading [locale], don't include inline keys that would
+          // overwrite what's in the spread. Check if this key matches a child being spread.
+          if (hasSpreadChild && directChildren.has("[locale]")) {
+            // This key might conflict with spread from [locale]
+            // We should skip it to avoid overwriting the spread
+            // The [locale] spread already includes everything from app/[locale]/i18n
+            const localeLocation = `${sourcePath}/[locale]`;
+            const localeLocationPrefix = this.locationToFlatKey(localeLocation);
+
+            // Check if this key would belong to the locale child
+            const flattenedValue =
+              typeof value === "object" && value !== null
+                ? this.flattenTranslationObject(value as TranslationObject, key)
+                : { [key]: value };
+
+            const anyKeyMatchesLocale = Object.keys(flattenedValue).some(
+              (fullKey) => {
+                const reconstitutedKey = locationPrefix
+                  ? `${locationPrefix}.${fullKey}`
+                  : fullKey;
+                return (
+                  localeLocationPrefix &&
+                  reconstitutedKey.startsWith(`${localeLocationPrefix}.`)
+                );
+              },
+            );
+
+            if (anyKeyMatchesLocale) {
+              // Skip - this would overwrite spread content
+              continue;
             }
           }
 
