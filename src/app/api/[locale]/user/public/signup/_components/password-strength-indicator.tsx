@@ -48,15 +48,37 @@ export function PasswordStrengthIndicator(): React.JSX.Element | null {
           ? "text-yellow-500"
           : "text-green-500";
 
-  const labelText = globalT(
-    `app.user.components.auth.common.passwordStrength.${level}`,
-  );
+  let labelText: string;
+  switch (level) {
+    case "weak":
+      labelText = globalT(
+        "app.user.components.auth.common.passwordStrength.weak",
+      );
+      break;
+    case "fair":
+      labelText = globalT(
+        "app.user.components.auth.common.passwordStrength.fair",
+      );
+      break;
+    case "good":
+      labelText = globalT(
+        "app.user.components.auth.common.passwordStrength.good",
+      );
+      break;
+    case "strong":
+      labelText = globalT(
+        "app.user.components.auth.common.passwordStrength.strong",
+      );
+      break;
+  }
 
   return (
     <Div className="flex flex-col gap-2">
       <Div className="flex justify-between items-center text-sm">
         <Span className="font-medium">
-          {globalT("app.user.components.auth.common.passwordStrength.label")}
+          {globalT(
+            "app.api.user.public.signup._components.components.auth.common.passwordStrength.label",
+          )}
         </Span>
         <Span className={cn("font-semibold", textColorClass)}>{labelText}</Span>
       </Div>
