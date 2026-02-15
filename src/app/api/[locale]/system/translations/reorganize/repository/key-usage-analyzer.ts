@@ -110,33 +110,28 @@ export class KeyUsageAnalyzer {
   }
 
   /**
-   * Scan source files and extract ALL translation keys found in the code
-   * This is different from scanCodebaseForKeyUsage which only looks for known keys
+   * Scan source files for ALL known translation keys using exact string matching
+   * Same as scanCodebaseForKeyUsage but scans ALL known keys at once
+   * @param allKeys - Set of all translation keys to search for
    * @param logger - Logger instance for debugging
    * @returns Map of translation keys to arrays of file paths where they are used
    */
   scanAllKeysInSourceFiles(
+    allKeys: Set<string>,
     logger: EndpointLogger,
   ): Map<string, string[]> {
     const keyUsageMap = new Map<string, string[]>();
 
-    logger.info("Scanning source files for all translation key patterns");
+    logger.info(
+      `Scanning source files for ${allKeys.size} translation keys using exact matching`,
+    );
 
     // Get all source files to scan
     const sourceFiles = this.findFiles(SRC_DIR, FILE_EXTENSIONS);
 
     logger.debug(`Found ${sourceFiles.length} source files to scan`);
 
-    // Patterns to match translation keys in various contexts:
-    // 1. t("key") or t('key')
-    // 2. message: "key" or message: 'key'
-    // 3. title: "key" or title: 'key'
-    // 4. description: "key" or description: 'key'
-    // 5. label: "key" or label: 'key'
-    // Pattern matches: [word characters or specific keywords]:["']([dotted.key.path])["']
-    const keyPattern = /(?:t\(|message:|title:|description:|label:|text:)\s*["']([a-zA-Z0-9._-]+)["']/g;
-
-    // Scan each file for translation key patterns
+    // Scan each file for key usage
     for (const filePath of sourceFiles) {
       // Skip translation files themselves, test files, and backup files
       if (
@@ -151,14 +146,12 @@ export class KeyUsageAnalyzer {
       try {
         const content = fs.readFileSync(filePath, "utf8");
 
-        // Find all translation key patterns in this file
-        let match;
-        while ((match = keyPattern.exec(content)) !== null) {
-          const key = match[1];
-          if (!keyUsageMap.has(key)) {
-            keyUsageMap.set(key, []);
-          }
-          if (!keyUsageMap.get(key)?.includes(filePath)) {
+        // Check each key for exact match with double quotes
+        for (const key of allKeys) {
+          if (content.includes(`"${key}"`)) {
+            if (!keyUsageMap.has(key)) {
+              keyUsageMap.set(key, []);
+            }
             keyUsageMap.get(key)?.push(filePath);
           }
         }
@@ -169,7 +162,7 @@ export class KeyUsageAnalyzer {
 
     const keysFound = keyUsageMap.size;
     logger.info(
-      `Found ${keysFound} unique translation keys used in source files`,
+      `Found ${keysFound} keys used in source files (${allKeys.size - keysFound} unused)`,
     );
 
     return keyUsageMap;
