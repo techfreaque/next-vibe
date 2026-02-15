@@ -283,9 +283,8 @@ export class CliInputParser {
     if (interactive) {
       optionsData.interactive = true;
     }
-    if (dryRun) {
-      optionsData.dryRun = true;
-    }
+    // Always set dryRun to allow false values to override schema defaults
+    optionsData.dryRun = dryRun;
     return optionsData;
   }
 

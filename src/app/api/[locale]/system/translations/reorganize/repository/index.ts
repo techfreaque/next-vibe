@@ -1096,6 +1096,7 @@ export class TranslationReorganizeRepositoryImpl {
       }
 
       logger.info(`New structure has ${newStructureKeys.size} keys`);
+      logger.info(`Source files have ${keyUsageMap.size} keys`);
 
       // Check all source file keys against new structure
       for (const [sourceKey] of keyUsageMap) {
