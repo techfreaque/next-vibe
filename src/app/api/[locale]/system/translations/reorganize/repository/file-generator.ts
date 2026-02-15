@@ -359,7 +359,10 @@ export class FileGenerator {
 
             // If flattened child also has only one key, continue flattening recursively
             const flattenedChildKeys = Object.keys(flattenedChild);
-            if (flattenedChildKeys.length === 1 && flattenedChildKeys[0] !== childKey) {
+            if (
+              flattenedChildKeys.length === 1 &&
+              flattenedChildKeys[0] !== childKey
+            ) {
               // The child was flattened - merge its contents directly into result
               Object.assign(result, flattenedChild);
             } else {
@@ -433,6 +436,13 @@ export class FileGenerator {
    * @param indent - Current indentation level
    * @returns The formatted object string
    */
+  /**
+   * Convert kebab-case or snake_case keys to camelCase
+   */
+  private toCamelCase(str: string): string {
+    return str.replace(/[-_]([a-z0-9])/g, (_, letter) => letter.toUpperCase());
+  }
+
   private objectToString(obj: TranslationObject, indent: number): string {
     const indentStr = "  ".repeat(indent);
     const nextIndentStr = "  ".repeat(indent + 1);
@@ -448,10 +458,12 @@ export class FileGenerator {
     }
 
     const lines = entries.map(([key, value]) => {
+      // Convert to camelCase
+      const camelKey = this.toCamelCase(key);
       // Use unquoted key if it's a valid JavaScript identifier
-      const keyStr = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
-        ? key
-        : JSON.stringify(key);
+      const keyStr = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(camelKey)
+        ? camelKey
+        : JSON.stringify(camelKey);
 
       if (
         typeof value === "object" &&
@@ -999,9 +1011,11 @@ export class FileGenerator {
             typeof value === "string"
               ? JSON.stringify(value)
               : this.objectToString(value as TranslationObject, 1);
-          const exportKey = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
-            ? key
-            : `"${key}"`;
+          // Convert to camelCase
+          const camelKey = this.toCamelCase(key);
+          const exportKey = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(camelKey)
+            ? camelKey
+            : `"${camelKey}"`;
           exports.push(`  ${exportKey}: ${valueStr}`);
         }
       } catch (error) {
