@@ -5,6 +5,16 @@
  * Command line interface that can execute any route.ts from generated index files
  */
 
+// Load environment FIRST before any other imports
+// This ensures .env is loaded before any modules try to access process.env
+import { type EnvironmentResult, loadEnvironment } from "./runtime/environment";
+
+export const binaryStartTime = Date.now();
+
+// Load environment first and capture platform
+const environmentResult: EnvironmentResult = loadEnvironment();
+
+// Now import everything else after env is loaded
 import { Command } from "commander";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
@@ -13,17 +23,11 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { createEndpointLogger } from "../shared/logger/endpoint";
-import { type EnvironmentResult, loadEnvironment } from "./runtime/environment";
 import {
   ErrorHandler,
   setupGlobalErrorHandlers,
 } from "./runtime/execution-errors";
 import { CliInputParser, type ParsedCliData } from "./runtime/parsing";
-
-export const binaryStartTime = Date.now();
-
-// Load environment first and capture platform
-const environmentResult: EnvironmentResult = loadEnvironment();
 
 /** The detected CLI platform (CLI for local dev, CLI_PACKAGE for npm package) */
 export const cliPlatform = environmentResult.platform;
