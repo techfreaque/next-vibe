@@ -1216,19 +1216,16 @@ export class TranslationReorganizeRepositoryImpl {
         let content = fs.readFileSync(filePath, "utf8");
         let modified = false;
 
-        // Replace each old key with the new key
+        // Replace each old key with the new key - exact double-quote matching
         for (const [oldKey, newKey] of keyMappings) {
-          // Match t("oldKey") or t('oldKey')
-          const patterns = [
-            new RegExp(`t\\("${oldKey.replaceAll(".", "\\.")}"\\)`, "g"),
-            new RegExp(`t\\('${oldKey.replaceAll(".", "\\.")}'\\)`, "g"),
-          ];
+          // Match exact double-quoted strings: "oldKey"
+          const escapedOldKey = oldKey.replaceAll(".", "\\.");
+          const pattern = new RegExp(`"${escapedOldKey}"`, "g");
 
-          for (const pattern of patterns) {
-            if (pattern.test(content)) {
-              content = content.replace(pattern, `t("${newKey}")`);
-              modified = true;
-            }
+          if (pattern.test(content)) {
+            content = content.replace(pattern, `"${newKey}"`);
+            modified = true;
+            logger.debug(`Replacing "${oldKey}" with "${newKey}" in ${filePath}`);
           }
         }
 
