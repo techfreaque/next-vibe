@@ -1466,7 +1466,11 @@ export class TranslationReorganizeRepositoryImpl {
           if (actualLocationPrefix) {
             correctKey = `${actualLocationPrefix}.${leafKeyName}`;
           } else {
-            correctKey = leafKeyName;
+            // No location prefix (root level) - keep original key unchanged
+            // This happens when common ancestor is at src/ root, which means
+            // the key is used across multiple top-level directories
+            correctKey = fullPath;
+            keySuffix = leafKeyName;
           }
         }
 
