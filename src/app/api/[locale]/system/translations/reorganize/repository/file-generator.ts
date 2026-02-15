@@ -97,8 +97,24 @@ export class FileGenerator {
   }
 
   /**
+   * Check if an i18n directory has a scoped index file
+   */
+  private hasScopedIndexFile(i18nDir: string): boolean {
+    const indexPath = path.join(i18nDir, INDEX_FILE);
+    if (!fs.existsSync(indexPath)) {
+      return false;
+    }
+    try {
+      const content = fs.readFileSync(indexPath, "utf-8");
+      return content.includes("createScopedTranslation");
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * Recursively remove old i18n files for a specific language
-   * Removes all generated i18n directories except the root src/i18n
+   * Removes all generated i18n directories except root src/i18n and scoped directories
    * @param dir - The directory to search for i18n files
    * @param language - The language code to remove files for
    * @param logger - Logger instance for debugging
@@ -125,18 +141,29 @@ export class FileGenerator {
           // Found an i18n directory
           const absoluteI18nPath = path.resolve(fullPath);
 
-          // Only remove if this is NOT the root src/i18n directory
-          if (absoluteI18nPath !== rootSrcI18nDir) {
-            const languageDir = path.join(fullPath, language);
-            if (fs.existsSync(languageDir)) {
-              fs.rmSync(languageDir, { recursive: true, force: true });
-            }
+          // Skip root src/i18n
+          if (absoluteI18nPath === rootSrcI18nDir) {
+            continue;
+          }
 
-            // If the i18n directory is now empty, remove it entirely
-            const remainingEntries = fs.readdirSync(fullPath);
-            if (remainingEntries.length === 0) {
-              fs.rmSync(fullPath, { recursive: true, force: true });
-            }
+          // Skip scoped translation directories
+          if (this.hasScopedIndexFile(fullPath)) {
+            logger.info(
+              `Preserving scoped i18n directory: ${path.relative(process.cwd(), fullPath)}`,
+            );
+            continue;
+          }
+
+          // Remove language-specific files
+          const languageDir = path.join(fullPath, language);
+          if (fs.existsSync(languageDir)) {
+            fs.rmSync(languageDir, { recursive: true, force: true });
+          }
+
+          // If the i18n directory is now empty, remove it entirely
+          const remainingEntries = fs.readdirSync(fullPath);
+          if (remainingEntries.length === 0) {
+            fs.rmSync(fullPath, { recursive: true, force: true });
           }
         } else {
           // Recursively search subdirectories
@@ -418,83 +445,59 @@ export class FileGenerator {
       },
     );
 
-    // Convert to dot notation
+    // Replace / with . to create dot notation
     key = key.replaceAll("/", ".");
 
+    // Special handling: app-native stays as app-native (not appNative)
+    // because it's a top-level folder that might be needed for routing purposes
     return key;
   }
 
   /**
-   * Public wrapper for locationToFlatKey
+   * Public version of locationToFlatKey for external use
    */
-  locationToFlatKeyPublic(location: string): string {
+  public locationToFlatKeyPublic(location: string): string {
     return this.locationToFlatKey(location);
   }
 
   /**
-   * Convert folder name to valid JavaScript identifier in camelCase
+   * Sanitize identifier to be valid JavaScript identifier
+   * Replaces non-alphanumeric characters with underscores and ensures it doesn't start with a number
+   * @param name - The identifier to sanitize
+   * @returns A valid JavaScript identifier
    */
   private sanitizeIdentifier(name: string): string {
-    // Remove parentheses: (site) -> site
-    let sanitized = name.replaceAll(/[()]/g, "");
+    // Replace non-alphanumeric characters with nothing (remove them)
+    let sanitized = name.replaceAll(/[^a-zA-Z0-9]/g, "");
 
-    // Remove brackets and dots: [...notFound] -> notFound, [locale] -> locale
-    sanitized = sanitized.replaceAll(/[[\].]/g, "");
-
-    // Remove leading underscore: _components -> components
-    sanitized = sanitized.replace(/^_/, "");
-
-    // Convert kebab-case to camelCase: unified-interface -> unifiedUi
-    // oxlint-disable-next-line no-unused-vars
-    sanitized = sanitized.replaceAll(/-([a-z])/g, (_, letter: string) =>
-      letter.toUpperCase(),
-    );
-
-    // Replace remaining invalid characters with empty string (remove them)
-    sanitized = sanitized.replaceAll(/[^a-zA-Z0-9]/g, "");
-
-    // Ensure it starts with a letter or underscore
-    if (!/^[a-zA-Z_]/.test(sanitized)) {
+    // If starts with number, prepend underscore
+    if (/^[0-9]/.test(sanitized)) {
       sanitized = `_${sanitized}`;
+    }
+
+    // If empty after sanitization, return a default
+    if (sanitized === "") {
+      // eslint-disable-next-line i18next/no-literal-string
+      sanitized = "default";
     }
 
     return sanitized;
   }
 
   /**
-   * Clean up existing language directory except core utilities
+   * Clean up existing language directory in src/i18n
+   * @param language - The language code to clean up
    */
   private cleanupLanguageDirectory(language: string): void {
-    const languageDir = buildPath("src", I18N_PATH, language);
-
-    if (!fs.existsSync(languageDir)) {
-      return;
-    }
-
-    // Get all items in the language directory
-    const items = fs.readdirSync(languageDir);
-
-    for (const item of items) {
-      const itemPath = path.join(languageDir, item);
-      const stat = fs.statSync(itemPath);
-
-      // Keep core directory and index.ts, remove everything else
-      if (item !== "core" && item !== INDEX_FILE) {
-        if (stat.isDirectory()) {
-          fs.rmSync(itemPath, { recursive: true, force: true });
-        } else {
-          fs.unlinkSync(itemPath);
-        }
-      }
+    const langDir = buildPath("src", I18N_PATH, language);
+    if (fs.existsSync(langDir)) {
+      fs.rmSync(langDir, { recursive: true, force: true });
     }
   }
 
   /**
-   * Generate hierarchical index files in source folders (next to the code)
-   * Creates parent index files that import their direct children
-   * Uses two-pass approach:
-   * 1. First pass: Generate all leaf files and track which were created
-   * 2. Second pass: Generate parent aggregators that only import existing children
+   * Generate hierarchical index files in source folders
+   * Creates parent aggregators that import their children
    */
   private generateSourceHierarchy(
     groups: Map<string, TranslationObject>,

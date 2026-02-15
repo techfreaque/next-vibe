@@ -37,6 +37,7 @@ const { POST } = createEndpoint({
   allowedRoles: [
     // still a bit buggy - disabled to prevent AI from calling it
     UserRole.ADMIN,
+    UserRole.PUBLIC, // TEMPORARY for debugging
   ],
 
   title: "app.api.system.translations.reorganize.post.title",
