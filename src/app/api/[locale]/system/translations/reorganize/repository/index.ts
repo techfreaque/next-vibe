@@ -1452,10 +1452,45 @@ export class TranslationReorganizeRepositoryImpl {
             ? actualLocationPrefix.split(".")
             : [];
 
-          // The suffix starts after the location depth
-          // If location has 3 parts (app.admin._components), the suffix is everything after part 3
-          const suffixStartIndex = locationParts.length;
-          keySuffix = keyParts.slice(suffixStartIndex).join(".");
+          // Find where key and location paths diverge
+          // This handles cases where the key has a different structure than the location
+          // Example: key "app.api.agent.chat.tags.threads" vs location "app.api.agent.chat.threads"
+          // Common prefix: ["app", "api", "agent", "chat"]
+          // Key continues with: ["tags", "threads"]
+          // Location continues with: ["threads"]
+          // The suffix should be the key parts after common prefix, minus any redundant overlap
+
+          let commonPrefixLength = 0;
+          for (let i = 0; i < Math.min(keyParts.length, locationParts.length); i++) {
+            if (keyParts[i] === locationParts[i]) {
+              commonPrefixLength = i + 1;
+            } else {
+              break;
+            }
+          }
+
+          // Get the key parts after the common prefix
+          const keyRemainder = keyParts.slice(commonPrefixLength);
+
+          // Get the location parts after the common prefix
+          const locationRemainder = locationParts.slice(commonPrefixLength);
+
+          // Remove any key parts that redundantly duplicate the location remainder
+          // Example: if keyRemainder = ["tags", "threads"] and locationRemainder = ["threads"]
+          // We should remove "threads" from keyRemainder if it appears at the end
+          let suffixParts = keyRemainder;
+
+          if (locationRemainder.length > 0) {
+            // Check if the key remainder ends with the same segments as location remainder
+            // This handles the duplicate segments issue
+            const overlap = this.findTrailingOverlap(keyRemainder, locationRemainder);
+            if (overlap > 0) {
+              // Remove the overlapping parts from the suffix
+              suffixParts = keyRemainder.slice(0, -overlap);
+            }
+          }
+
+          keySuffix = suffixParts.join(".");
 
           // The correct key is: location prefix + suffix
           // This preserves the full key structure after the location prefix
@@ -1990,6 +2025,35 @@ export class TranslationReorganizeRepositoryImpl {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
+  }
+
+  /**
+   * Find the length of trailing overlap between two arrays
+   * Example: findTrailingOverlap(["tags", "threads"], ["threads"]) returns 1
+   * Example: findTrailingOverlap(["a", "b", "c"], ["b", "c"]) returns 2
+   * Example: findTrailingOverlap(["a", "b"], ["c", "d"]) returns 0
+   */
+  private findTrailingOverlap(arr1: string[], arr2: string[]): number {
+    let overlap = 0;
+    const minLength = Math.min(arr1.length, arr2.length);
+
+    for (let i = 1; i <= minLength; i++) {
+      // Check if the last i elements of arr1 match the last i elements of arr2
+      let matches = true;
+      for (let j = 0; j < i; j++) {
+        if (arr1[arr1.length - i + j] !== arr2[arr2.length - i + j]) {
+          matches = false;
+          break;
+        }
+      }
+      if (matches) {
+        overlap = i;
+      } else {
+        break;
+      }
+    }
+
+    return overlap;
   }
 
   /**
