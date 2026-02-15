@@ -102,7 +102,9 @@ export class TranslationReorganizeRepositoryImpl {
       const removeUnused = request.regenerateStructure;
 
       output.push(
-        t("app.api.system.translations.reorganize.post.messages.starting"),
+        t(
+          "app.api.system.translations.reorganize.repository.messages.starting",
+        ),
       );
 
       // Create backup if requested
@@ -121,13 +123,17 @@ export class TranslationReorganizeRepositoryImpl {
       }
 
       output.push(
-        t("app.api.system.translations.reorganize.post.messages.scanningUsage"),
+        t(
+          "app.api.system.translations.reorganize.repository.messages.scanningUsage",
+        ),
       );
 
       // Load current translations
 
       output.push(
-        t("app.api.system.translations.reorganize.post.messages.loadingFiles"),
+        t(
+          "app.api.system.translations.reorganize.repository.messages.loadingFiles",
+        ),
       );
       const currentTranslations = await this.loadCurrentTranslations(logger);
 
@@ -188,17 +194,17 @@ export class TranslationReorganizeRepositoryImpl {
       if (request.dryRun) {
         output.push(
           t(
-            "app.api.system.translations.reorganize.post.messages.dryRunCompleted",
+            "app.api.system.translations.reorganize.repository.messages.dryRunCompleted",
           ),
         );
         if (removeUnused && unusedKeys > 0) {
           output.push(
             t(
-              "app.api.system.translations.reorganize.post.messages.removedKeysFromLanguage",
+              "app.api.system.translations.reorganize.repository.messages.removedKeysFromLanguage",
               {
                 count: unusedKeys,
                 language: t(
-                  "app.api.system.translations.reorganize.post.messages.unusedKeysLabel",
+                  "app.api.system.translations.reorganize.repository.messages.unusedKeysLabel",
                 ),
               },
             ),
@@ -229,7 +235,7 @@ export class TranslationReorganizeRepositoryImpl {
       if (removeUnused && !request.regenerateStructure && keysRemoved > 0) {
         output.push(
           t(
-            "app.api.system.translations.reorganize.post.messages.writingFilteredTranslations",
+            "app.api.system.translations.reorganize.repository.messages.writingFilteredTranslations",
           ),
         );
 
@@ -332,7 +338,9 @@ export class TranslationReorganizeRepositoryImpl {
         }
 
         output.push(
-          t("app.api.system.translations.reorganize.post.messages.completed"),
+          t(
+            "app.api.system.translations.reorganize.repository.messages.completed",
+          ),
         );
 
         return success({
@@ -359,7 +367,7 @@ export class TranslationReorganizeRepositoryImpl {
       if (request.regenerateStructure) {
         output.push(
           t(
-            "app.api.system.translations.reorganize.post.messages.regeneratingStructure",
+            "app.api.system.translations.reorganize.repository.messages.regeneratingStructure",
           ),
         );
 
@@ -367,7 +375,7 @@ export class TranslationReorganizeRepositoryImpl {
 
         output.push(
           t(
-            "app.api.system.translations.reorganize.post.messages.analyzingFrequency",
+            "app.api.system.translations.reorganize.repository.messages.analyzingFrequency",
           ),
         );
         const keyUsageFrequency =
@@ -376,7 +384,7 @@ export class TranslationReorganizeRepositoryImpl {
         // Group translations by usage location
         output.push(
           t(
-            "app.api.system.translations.reorganize.post.messages.groupingByLocation",
+            "app.api.system.translations.reorganize.repository.messages.groupingByLocation",
           ),
         );
 
@@ -409,7 +417,7 @@ export class TranslationReorganizeRepositoryImpl {
         // Generate files for each language
         output.push(
           t(
-            "app.api.system.translations.reorganize.post.messages.generatingFiles",
+            "app.api.system.translations.reorganize.repository.messages.generatingFiles",
           ),
         );
 
@@ -482,7 +490,9 @@ export class TranslationReorganizeRepositoryImpl {
           // Main index structure is now handled by the hierarchical file generation
           // The new system generates proper hierarchical imports instead of flat location-based imports
           output.push(
-            t("app.api.system.translations.reorganize.post.messages.completed"),
+            t(
+              "app.api.system.translations.reorganize.repository.messages.completed",
+            ),
           );
 
           return success({
@@ -505,12 +515,16 @@ export class TranslationReorganizeRepositoryImpl {
           });
         }
         output.push(
-          t("app.api.system.translations.reorganize.post.messages.noKeysInUse"),
+          t(
+            "app.api.system.translations.reorganize.repository.messages.noKeysInUse",
+          ),
         );
       }
 
       output.push(
-        t("app.api.system.translations.reorganize.post.messages.completed"),
+        t(
+          "app.api.system.translations.reorganize.repository.messages.completed",
+        ),
       );
 
       return success({
@@ -725,7 +739,7 @@ export class TranslationReorganizeRepositoryImpl {
       if (!fs.existsSync(request.backupPath)) {
         return fail({
           message:
-            "app.api.system.translations.restoreBackup.post.messages.backupNotFound",
+            "app.api.system.translations.reorganize.repository.messages.backupNotFound",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -741,7 +755,7 @@ export class TranslationReorganizeRepositoryImpl {
         return success({
           success: true,
           message: t(
-            "app.api.system.translations.restoreBackup.post.messages.validationSuccessful",
+            "app.api.system.translations.reorganize.repository.messages.validationSuccessful",
           ),
           backupInfo: {
             backupPath: request.backupPath,
@@ -764,7 +778,7 @@ export class TranslationReorganizeRepositoryImpl {
       return success({
         success: true,
         message: t(
-          "app.api.system.translations.restoreBackup.post.messages.restoreSuccessful",
+          "app.api.system.translations.reorganize.repository.messages.restoreSuccessful",
         ),
         backupInfo: {
           backupPath: request.backupPath,
@@ -1215,7 +1229,9 @@ export class TranslationReorganizeRepositoryImpl {
           if (pattern.test(content)) {
             content = content.replace(pattern, `"${newKey}"`);
             modified = true;
-            logger.debug(`Replacing "${oldKey}" with "${newKey}" in ${filePath}`);
+            logger.debug(
+              `Replacing "${oldKey}" with "${newKey}" in ${filePath}`,
+            );
           }
         }
 
@@ -1332,23 +1348,27 @@ export class TranslationReorganizeRepositoryImpl {
             keyLowerCase.includes(".common.");
 
           if (hasSharedInKey) {
-            // Key is meant to be shared - keep it in shared location
-            // Find the shared directory from the key path
-            const keyParts = fullPath.split(".");
-            const sharedIndex = keyParts.findIndex(
-              (p) => p === "shared" || p === "common",
-            );
+            // Key is meant to be shared - find the actual shared directory from usage files
+            // We look for directories containing "shared" or "common" in the actual filesystem paths
+            const sharedDirs = usageFiles
+              .map((file) => {
+                const dir = path.dirname(file);
+                // Find the first parent directory that contains "shared" or "common"
+                const parts = dir.split(path.sep);
+                const sharedIndex = parts.findIndex(
+                  (p) => p === "shared" || p === "common",
+                );
+                if (sharedIndex >= 0) {
+                  // Return path up to and including the shared/common directory
+                  return parts.slice(0, sharedIndex + 1).join(path.sep);
+                }
+                return null;
+              })
+              .filter((dir): dir is string => dir !== null);
 
-            if (sharedIndex >= 0) {
-              // Construct the shared location path from the key
-              const locationParts = keyParts.slice(0, sharedIndex + 1);
-              location = locationParts.join("/").replace(/\./g, "/");
-
-              // For api keys, add [locale] if not present
-              if (location.includes("api") && !location.includes("[locale]")) {
-                location = location.replace("api", "api/[locale]");
-              }
-
+            if (sharedDirs.length > 0) {
+              // Use the first shared directory found
+              location = sharedDirs[0];
               isShared = true;
               logger.debug(
                 `Keeping shared key ${fullPath} in shared location: ${location}`,
