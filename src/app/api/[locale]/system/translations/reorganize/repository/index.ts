@@ -1356,6 +1356,27 @@ export class TranslationReorganizeRepositoryImpl {
           }
         }
 
+        // Skip scoped translation locations - check if this location has a scoped i18n index
+        const scopedCheckPath = path.join(
+          process.cwd(),
+          "src",
+          location,
+          "i18n",
+          "index.ts",
+        );
+        if (fs.existsSync(scopedCheckPath)) {
+          try {
+            const scopedContent = fs.readFileSync(scopedCheckPath, "utf-8");
+            if (scopedContent.includes("createScopedTranslation")) {
+              // This is a scoped translation - skip it entirely
+              logger.info(`[SCOPED-SKIP] Skipping scoped location: ${location} for key: ${fullPath}`);
+              continue;
+            }
+          } catch {
+            // If we can't read it, proceed normally
+          }
+        }
+
         // Add the key to this location group with the CORRECT FULL key
         if (!groups.has(location)) {
           groups.set(location, {});

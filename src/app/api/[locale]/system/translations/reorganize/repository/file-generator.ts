@@ -580,6 +580,15 @@ export class FileGenerator {
     logger: EndpointLogger,
     generatedFiles: Set<string>,
   ): void {
+    // Skip generating index files for scoped translation directories
+    const i18nPath = buildPath("src", sourcePath, I18N_PATH);
+    if (this.hasScopedIndexFile(i18nPath)) {
+      logger.info(
+        `Skipping scoped translation import: ${path.relative(process.cwd(), i18nPath)}`,
+      );
+      return;
+    }
+
     const indexPath = buildPath(
       "src",
       sourcePath,
