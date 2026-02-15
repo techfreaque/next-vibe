@@ -102,18 +102,60 @@ export class FileGenerator {
 
   /**
    * Check if an i18n directory has a scoped index file
+   * Also checks parent directories to handle scoped modules with subdirectories
    */
   private hasScopedIndexFile(i18nDir: string): boolean {
+    // First check the directory itself
     const indexPath = path.join(i18nDir, INDEX_FILE);
-    if (!fs.existsSync(indexPath)) {
+    if (fs.existsSync(indexPath)) {
+      try {
+        const content = fs.readFileSync(indexPath, "utf-8");
+        if (content.includes("createScopedTranslation")) {
+          return true;
+        }
+      } catch {
+        // Continue to check parents
+      }
+    }
+
+    // Check parent directories
+    // Convert to relative path from cwd to extract location
+    const relativePath = path.relative(process.cwd(), i18nDir);
+    if (!relativePath.startsWith("src/")) {
       return false;
     }
-    try {
-      const content = fs.readFileSync(indexPath, "utf-8");
-      return content.includes("createScopedTranslation");
-    } catch {
-      return false;
+
+    // Remove "src/" and "/i18n" to get the location path
+    let locationPath = relativePath.slice(4); // Remove "src/"
+    if (locationPath.endsWith("/i18n")) {
+      locationPath = locationPath.slice(0, -5); // Remove "/i18n"
     }
+
+    // Check each parent directory for scoped i18n
+    const locationParts = locationPath.split("/");
+    for (let i = locationParts.length - 1; i > 0; i--) {
+      const parentLocation = locationParts.slice(0, i).join("/");
+      const parentI18nPath = path.join(
+        process.cwd(),
+        "src",
+        parentLocation,
+        I18N_PATH,
+        INDEX_FILE,
+      );
+
+      if (fs.existsSync(parentI18nPath)) {
+        try {
+          const content = fs.readFileSync(parentI18nPath, "utf-8");
+          if (content.includes("createScopedTranslation")) {
+            return true;
+          }
+        } catch {
+          // Continue checking other parents
+        }
+      }
+    }
+
+    return false;
   }
 
   /**
