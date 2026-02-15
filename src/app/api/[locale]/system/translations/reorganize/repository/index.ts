@@ -131,13 +131,24 @@ export class TranslationReorganizeRepositoryImpl {
       );
       const currentTranslations = await this.loadCurrentTranslations(logger);
 
-      // Analyze key usage
+      // Scan source files for ALL translation keys actually used in code
+      // This is critical for detecting keys that may have been reorganized/moved
+      const sourceFileKeyUsageMap = this.keyUsageAnalyzer.scanAllKeysInSourceFiles(logger);
+
+      // Also extract keys from current translation files
       const allKeys =
         this.keyUsageAnalyzer.extractAllTranslationKeys(currentTranslations);
       const keyUsageMap = this.keyUsageAnalyzer.scanCodebaseForKeyUsage(
         allKeys,
         logger,
       );
+
+      // Merge both maps to ensure we catch all keys
+      for (const [key, files] of sourceFileKeyUsageMap) {
+        if (!keyUsageMap.has(key)) {
+          keyUsageMap.set(key, files);
+        }
+      }
 
       const usedKeys = [...keyUsageMap.keys()].length;
       const unusedKeys = allKeys.size - usedKeys;
