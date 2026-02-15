@@ -148,6 +148,10 @@ export class TranslationReorganizeRepositoryImpl {
       const usedKeys = [...keyUsageMap.keys()].length;
       const unusedKeys = allKeys.size - usedKeys;
 
+      logger.info(
+        `Key usage analysis: ${usedKeys} used / ${allKeys.size} total (${unusedKeys} unused)`,
+      );
+
       output.push(
         t("app.api.system.translations.reorganize.post.messages.foundKeys", {
           used: usedKeys,
@@ -1373,7 +1377,9 @@ export class TranslationReorganizeRepositoryImpl {
               const scopedContent = fs.readFileSync(scopedCheckPath, "utf-8");
               if (scopedContent.includes("createScopedTranslation")) {
                 // This location or a parent is scoped - skip it entirely
-                logger.info(`[SCOPED-SKIP] Skipping scoped location: ${location} (parent: ${parentLocation}) for key: ${fullPath}`);
+                logger.info(
+                  `[SCOPED-SKIP] Skipping scoped location: ${location} (parent: ${parentLocation}) for key: ${fullPath}`,
+                );
                 isScoped = true;
                 break;
               }
