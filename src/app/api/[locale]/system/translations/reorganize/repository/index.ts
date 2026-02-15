@@ -1340,9 +1340,24 @@ export class TranslationReorganizeRepositoryImpl {
           // Single usage - place at the directory of that file
           location = path.dirname(usageFiles[0]);
         } else {
-          // Multiple usages - find common ancestor
-          location = this.getCommonAncestorLocation(usageFiles);
-          isShared = true;
+          // Multiple usages - check if one file is an enum definition
+          // Enum definitions (enum.ts files) are the PRIMARY location
+          const enumFile = usageFiles.find(
+            (f) =>
+              f.endsWith("/enum.ts") ||
+              f.endsWith("/enums.ts") ||
+              f.includes("/enum/"),
+          );
+
+          if (enumFile) {
+            // Use enum definition location as primary
+            location = path.dirname(enumFile);
+            isShared = false;
+          } else {
+            // Find common ancestor
+            location = this.getCommonAncestorLocation(usageFiles);
+            isShared = true;
+          }
         }
 
         // Convert absolute path to relative path from project root
