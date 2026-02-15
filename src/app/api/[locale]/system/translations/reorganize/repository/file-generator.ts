@@ -1025,16 +1025,11 @@ export class FileGenerator {
             }
           }
 
-          // CRITICAL: If we're spreading [locale], only allow specific inline keys
-          // - 'api': explicitly imported child
-          // - 'common': shared translations at common ancestor
-          // Everything else would overwrite what's in the [locale] spread
-          if (hasSpreadChild && directChildren.has("[locale]")) {
-            if (key !== "api" && key !== "common") {
-              // Skip - would conflict with spread from [locale]
-              continue;
-            }
-          }
+          // The check above already determined if keys belong to a child directory
+          // If we reach here, either:
+          // 1. No matching child directory exists, OR
+          // 2. A child exists but NOT all keys belong to it (shared keys at common ancestor)
+          // In both cases, include the keys inline to avoid losing them
 
           const valueStr =
             typeof value === "string"
