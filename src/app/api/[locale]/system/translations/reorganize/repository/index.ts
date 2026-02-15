@@ -1340,14 +1340,42 @@ export class TranslationReorganizeRepositoryImpl {
           // Single usage - place at the directory of that file
           location = path.dirname(usageFiles[0]);
         } else {
-          // Multiple usages - check if key is in shared/common location
-          // If so, keep it there instead of moving to common ancestor
-          const keyLowerCase = fullPath.toLowerCase();
-          const hasSharedInKey =
-            keyLowerCase.includes(".shared.") ||
-            keyLowerCase.includes(".common.");
+          // Multiple usages - find the file whose location matches the key structure
+          // For example: key app.api.user.userRoles.* should be at app/api/[locale]/user/user-roles/
+          const keyParts = fullPath.split(".");
+          let primaryLocationFile: string | null = null;
 
-          if (hasSharedInKey) {
+          // Try to find a file whose path matches the key structure
+          for (const file of usageFiles) {
+            const relPath = file.replace(/^.*\/src\//, "");
+            const fileLocationKey = this.fileGenerator
+              ? this.fileGenerator.locationToFlatKeyPublic(
+                  path.dirname(relPath),
+                )
+              : "";
+
+            // Check if the file's location matches the key prefix
+            if (fileLocationKey && fullPath.startsWith(fileLocationKey + ".")) {
+              primaryLocationFile = file;
+              break;
+            }
+          }
+
+          if (primaryLocationFile) {
+            // Found a file whose location matches the key structure - use that as primary location
+            location = path.dirname(primaryLocationFile);
+            isShared = false;
+            logger.debug(
+              `Key ${fullPath} matches location structure of ${primaryLocationFile}`,
+            );
+          } else {
+            // No matching location - check if key is in shared/common location
+            const keyLowerCase = fullPath.toLowerCase();
+            const hasSharedInKey =
+              keyLowerCase.includes(".shared.") ||
+              keyLowerCase.includes(".common.");
+
+            if (hasSharedInKey) {
             // Key is meant to be shared - find the actual shared directory from usage files
             // We look for directories containing "shared" or "common" in the actual filesystem paths
             const sharedDirs = usageFiles
@@ -1366,22 +1394,23 @@ export class TranslationReorganizeRepositoryImpl {
               })
               .filter((dir): dir is string => dir !== null);
 
-            if (sharedDirs.length > 0) {
-              // Use the first shared directory found
-              location = sharedDirs[0];
-              isShared = true;
-              logger.debug(
-                `Keeping shared key ${fullPath} in shared location: ${location}`,
-              );
+              if (sharedDirs.length > 0) {
+                // Use the first shared directory found
+                location = sharedDirs[0];
+                isShared = true;
+                logger.debug(
+                  `Keeping shared key ${fullPath} in shared location: ${location}`,
+                );
+              } else {
+                // Fallback to common ancestor
+                location = this.getCommonAncestorLocation(usageFiles);
+                isShared = true;
+              }
             } else {
-              // Fallback to common ancestor
+              // Multiple usages - find common ancestor
               location = this.getCommonAncestorLocation(usageFiles);
               isShared = true;
             }
-          } else {
-            // Multiple usages - find common ancestor
-            location = this.getCommonAncestorLocation(usageFiles);
-            isShared = true;
           }
         }
 
