@@ -14,6 +14,14 @@ export const binaryStartTime = Date.now();
 // Load environment first and capture platform
 const environmentResult: EnvironmentResult = loadEnvironment();
 
+// Force env initialization BEFORE any other imports that might use it
+// This prevents circular dependency errors when db/index.ts tries to access env.DATABASE_URL
+import { env } from "@/config/env";
+
+// Ensure env is actually initialized by accessing a property
+// This forces the defineEnv() call to complete before any other modules are loaded
+const _envCheck = env.NODE_ENV;
+
 // Now import everything else after env is loaded
 import { Command } from "commander";
 import { parseError } from "next-vibe/shared/utils/parse-error";
