@@ -762,8 +762,20 @@ export class FileGenerator {
         for (const [key, value] of Object.entries(nestedTranslations)) {
           // Check if this key matches a child directory name
           if (directChildren.has(key)) {
-            // This is a child directory import, skip it (will be imported separately)
-            continue;
+            // This key MIGHT belong to a child directory
+            // But we need to verify that the child actually has these translations
+            // If the child doesn't have them, they belong at this parent level
+            const childLocation = `${sourcePath}/${key}`;
+            const childGroup = groups.get(childLocation);
+
+            // If child has a group with translations, skip this key (will be imported from child)
+            // If child has no group or empty group, include it here (belongs to parent)
+            if (childGroup && Object.keys(childGroup).length > 0) {
+              continue;
+            }
+
+            // Child doesn't have translations - this key belongs at parent level
+            // Fall through to include it
           }
 
           const valueStr =
