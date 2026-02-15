@@ -352,10 +352,20 @@ export class FileGenerator {
           ) {
             // Skip the current key and process the child's content directly
             // Recursively flatten the child value
-            result[childKey] = this.flattenSingleChildObjects(
+            const flattenedChild = this.flattenSingleChildObjects(
               childValue as TranslationObject,
               preserveKeys,
             );
+
+            // If flattened child also has only one key, continue flattening recursively
+            const flattenedChildKeys = Object.keys(flattenedChild);
+            if (flattenedChildKeys.length === 1 && flattenedChildKeys[0] !== childKey) {
+              // The child was flattened - merge its contents directly into result
+              Object.assign(result, flattenedChild);
+            } else {
+              // Keep the child key
+              result[childKey] = flattenedChild;
+            }
           } else {
             // Single child is a primitive value - keep the structure
             result[key] = value;
