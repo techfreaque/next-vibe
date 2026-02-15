@@ -1457,20 +1457,20 @@ export class TranslationReorganizeRepositoryImpl {
           const suffixStartIndex = locationParts.length;
           keySuffix = keyParts.slice(suffixStartIndex).join(".");
 
-          // Simple deterministic rule: new key = locationPrefix + leafKeyName
-          // Extract the leaf key name (last part of the old key)
-          const leafKeyName = keyParts[keyParts.length - 1];
-          keySuffix = leafKeyName;
-
-          // The correct key is: location prefix + leaf key name
-          if (actualLocationPrefix) {
-            correctKey = `${actualLocationPrefix}.${leafKeyName}`;
+          // The correct key is: location prefix + suffix
+          // This preserves the full key structure after the location prefix
+          if (actualLocationPrefix && keySuffix) {
+            correctKey = `${actualLocationPrefix}.${keySuffix}`;
+          } else if (actualLocationPrefix && !keySuffix) {
+            // No suffix - key matches location exactly, keep original
+            correctKey = fullPath;
+            keySuffix = keyParts[keyParts.length - 1];
           } else {
             // No location prefix (root level) - keep original key unchanged
             // This happens when common ancestor is at src/ root, which means
             // the key is used across multiple top-level directories
             correctKey = fullPath;
-            keySuffix = leafKeyName;
+            keySuffix = keyParts[keyParts.length - 1];
           }
         }
 
