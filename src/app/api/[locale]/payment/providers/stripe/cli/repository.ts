@@ -115,8 +115,8 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
           break;
         }
         case "login": {
-          logger.debug(t("app.api.payment.providers.stripe.login.instructions"));
-          response.instructions = t("app.api.payment.providers.stripe.login.instructions");
+          logger.debug(t("app.api.stripe.login.instructions"));
+          response.instructions = t("app.api.stripe.login.instructions");
           break;
         }
         case "status": {
@@ -125,16 +125,16 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
             response.version = this.getStripeVersion();
             const authenticated = this.checkStripeAuth(logger);
             response.status = authenticated
-              ? t("app.api.payment.providers.stripe.status.authenticated")
-              : t("app.api.payment.providers.stripe.status.not_authenticated");
+              ? t("app.api.stripe.status.authenticated")
+              : t("app.api.stripe.status.not_authenticated");
           } else {
-            response.status = t("app.api.payment.providers.stripe.status.not_installed");
+            response.status = t("app.api.stripe.status.not_installed");
           }
           break;
         }
         default: {
           return fail({
-            message: "app.api.payment.providers.stripe.errors.validation.title",
+            message: "app.api.stripe.errors.validation.title",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: { operation: data.operation },
           });
@@ -154,12 +154,12 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       logger.error("Error processing Stripe CLI operation:", parseError(error));
       const parsedError = parseError(error);
       return fail({
-        message: "app.api.payment.providers.stripe.errors.serverError.title",
+        message: "app.api.stripe.errors.serverError.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           operation: data.operation,
           error: parsedError.message,
-          details: t("app.api.payment.providers.stripe.errors.execution_failed"),
+          details: t("app.api.stripe.errors.execution_failed"),
         },
       });
     }
@@ -180,7 +180,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
         parseError(error),
       );
       return fail({
-        message: "app.api.payment.providers.stripe.errors.serverError.title",
+        message: "app.api.stripe.errors.serverError.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -204,13 +204,13 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
         return success(url);
       }
       return fail({
-        message: "app.api.payment.providers.stripe.errors.serverError.title",
+        message: "app.api.stripe.errors.serverError.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: "stripe.errors.listener_failed" },
       });
     } catch (error) {
       return fail({
-        message: "app.api.payment.providers.stripe.errors.serverError.title",
+        message: "app.api.stripe.errors.serverError.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -226,7 +226,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       return success(authenticated);
     } catch (error) {
       return fail({
-        message: "app.api.payment.providers.stripe.errors.serverError.title",
+        message: "app.api.stripe.errors.serverError.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

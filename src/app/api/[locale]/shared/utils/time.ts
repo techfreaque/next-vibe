@@ -16,7 +16,7 @@ export function timeToSeconds(
   const [hours, minutes] = timeStr.split(":").map(Number);
   if (hours === undefined || minutes === undefined) {
     return fail({
-      message: "app.api.shared.time.errors.invalid_time_format.title",
+      message: "app.api.shared.utils.time.errors.invalid_time_format.title",
       errorType: ErrorResponseTypes.VALIDATION_ERROR,
       messageParams: {
         inputValue: timeStr,
@@ -36,7 +36,7 @@ export type SimpleTimeFormat = `${number}:${number}`;
 export function secondsToTime(seconds: number): ResponseType<string> {
   if (seconds < 0 || seconds >= 86_400) {
     return fail({
-      message: "app.api.shared.time.errors.invalid_time_range.title",
+      message: "app.api.shared.utils.time.errors.invalid_time_range.title",
       errorType: ErrorResponseTypes.VALIDATION_ERROR,
       messageParams: {
         inputValue: seconds,

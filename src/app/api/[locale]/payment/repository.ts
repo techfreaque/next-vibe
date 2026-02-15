@@ -371,7 +371,7 @@ export class PaymentRepository {
           error: verificationResult.message,
         });
         return fail({
-          message: "app.api.payment.providers.stripe.errors.webhookVerificationFailed.title",
+          message: "app.api.stripe.errors.webhookVerificationFailed.title",
           errorType: ErrorResponseTypes.BAD_REQUEST,
           messageParams: { error: verificationResult.message },
         });

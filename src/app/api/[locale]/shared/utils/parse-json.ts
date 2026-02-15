@@ -36,7 +36,7 @@ export function parseJsonWithComments(
     if (typeof result !== "object" || result === null) {
       return fail({
         message:
-          "app.api.shared.parseJsonWithComments.errors.invalid_json",
+          "app.api.shared.utils.parseJsonWithComments.errors.invalid_json",
         errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
       });
     }
@@ -47,7 +47,7 @@ export function parseJsonWithComments(
     };
   } catch (error) {
     return fail({
-      message: "app.api.shared.parseJsonWithComments.errors.invalid_json",
+      message: "app.api.shared.utils.parseJsonWithComments.errors.invalid_json",
       errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
       messageParams: {
         error: error instanceof Error ? error.message : String(error),

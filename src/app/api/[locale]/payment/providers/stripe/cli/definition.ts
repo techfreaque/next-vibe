@@ -26,14 +26,14 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["payment", "providers", "stripe", "cli"],
-  title: "app.api.payment.providers.stripe.title" as const,
-  description: "app.api.payment.providers.stripe.description" as const,
-  category: "app.api.payment.providers.stripe.category" as const,
+  title: "app.api.stripe.title" as const,
+  description: "app.api.stripe.description" as const,
+  category: "app.api.stripe.category" as const,
   icon: "credit-card" as const,
   tags: [
-    "app.api.payment.providers.stripe.tags.stripe" as const,
-    "app.api.payment.providers.stripe.tags.cli" as const,
-    "app.api.payment.providers.stripe.tags.webhook" as const,
+    "app.api.stripe.tags.stripe" as const,
+    "app.api.stripe.tags.cli" as const,
+    "app.api.stripe.tags.webhook" as const,
   ],
   allowedRoles: [
     UserRole.ADMIN,
@@ -50,8 +50,8 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.payment.providers.stripe.form.title" as const,
-      description: "app.api.payment.providers.stripe.form.description" as const,
+      title: "app.api.stripe.form.title" as const,
+      description: "app.api.stripe.form.description" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -61,32 +61,32 @@ const { POST } = createEndpoint({
       operation: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.payment.providers.stripe.form.fields.operation.label" as const,
+        label: "app.api.stripe.form.fields.operation.label" as const,
         description:
-          "app.api.payment.providers.stripe.form.fields.operation.description" as const,
+          "app.api.stripe.form.fields.operation.description" as const,
         placeholder:
-          "app.api.payment.providers.stripe.form.fields.operation.placeholder" as const,
+          "app.api.stripe.form.fields.operation.placeholder" as const,
         columns: 6,
         options: [
           {
             value: "check",
-            label: "app.api.payment.providers.stripe.operations.check" as const,
+            label: "app.api.stripe.operations.check" as const,
           },
           {
             value: "install",
-            label: "app.api.payment.providers.stripe.operations.install" as const,
+            label: "app.api.stripe.operations.install" as const,
           },
           {
             value: "listen",
-            label: "app.api.payment.providers.stripe.operations.listen" as const,
+            label: "app.api.stripe.operations.listen" as const,
           },
           {
             value: "login",
-            label: "app.api.payment.providers.stripe.operations.login" as const,
+            label: "app.api.stripe.operations.login" as const,
           },
           {
             value: "status",
-            label: "app.api.payment.providers.stripe.operations.status" as const,
+            label: "app.api.stripe.operations.status" as const,
           },
         ],
         schema: z.enum(["check", "install", "listen", "login", "status"]),
@@ -95,9 +95,9 @@ const { POST } = createEndpoint({
       port: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.payment.providers.stripe.form.fields.port.label" as const,
-        description: "app.api.payment.providers.stripe.form.fields.port.description" as const,
-        placeholder: "app.api.payment.providers.stripe.form.fields.port.placeholder" as const,
+        label: "app.api.stripe.form.fields.port.label" as const,
+        description: "app.api.stripe.form.fields.port.description" as const,
+        placeholder: "app.api.stripe.form.fields.port.placeholder" as const,
         columns: 6,
         schema: z.coerce.number().optional(),
       }),
@@ -105,40 +105,40 @@ const { POST } = createEndpoint({
       events: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label: "app.api.payment.providers.stripe.form.fields.events.label" as const,
-        description: "app.api.payment.providers.stripe.form.fields.events.description" as const,
-        placeholder: "app.api.payment.providers.stripe.form.fields.events.placeholder" as const,
+        label: "app.api.stripe.form.fields.events.label" as const,
+        description: "app.api.stripe.form.fields.events.description" as const,
+        placeholder: "app.api.stripe.form.fields.events.placeholder" as const,
         columns: 12,
         options: [
           {
             value: "payment_intent.succeeded",
             label:
-              "app.api.payment.providers.stripe.form.fields.events.paymentIntentSucceeded" as const,
+              "app.api.stripe.form.fields.events.paymentIntentSucceeded" as const,
           },
           {
             value: "payment_intent.payment_failed",
             label:
-              "app.api.payment.providers.stripe.form.fields.events.paymentIntentFailed" as const,
+              "app.api.stripe.form.fields.events.paymentIntentFailed" as const,
           },
           {
             value: "customer.subscription.created",
             label:
-              "app.api.payment.providers.stripe.form.fields.events.subscriptionCreated" as const,
+              "app.api.stripe.form.fields.events.subscriptionCreated" as const,
           },
           {
             value: "customer.subscription.updated",
             label:
-              "app.api.payment.providers.stripe.form.fields.events.subscriptionUpdated" as const,
+              "app.api.stripe.form.fields.events.subscriptionUpdated" as const,
           },
           {
             value: "invoice.payment_succeeded",
             label:
-              "app.api.payment.providers.stripe.form.fields.events.invoicePaymentSucceeded" as const,
+              "app.api.stripe.form.fields.events.invoicePaymentSucceeded" as const,
           },
           {
             value: "invoice.payment_failed",
             label:
-              "app.api.payment.providers.stripe.form.fields.events.invoicePaymentFailed" as const,
+              "app.api.stripe.form.fields.events.invoicePaymentFailed" as const,
           },
         ],
         schema: z.array(z.string()).optional(),
@@ -147,11 +147,11 @@ const { POST } = createEndpoint({
       forwardTo: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.payment.providers.stripe.form.fields.forwardTo.label" as const,
+        label: "app.api.stripe.form.fields.forwardTo.label" as const,
         description:
-          "app.api.payment.providers.stripe.form.fields.forwardTo.description" as const,
+          "app.api.stripe.form.fields.forwardTo.description" as const,
         placeholder:
-          "app.api.payment.providers.stripe.form.fields.forwardTo.placeholder" as const,
+          "app.api.stripe.form.fields.forwardTo.placeholder" as const,
         columns: 6,
         schema: z.string().optional(),
       }),
@@ -159,9 +159,9 @@ const { POST } = createEndpoint({
       skipSslVerify: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.payment.providers.stripe.form.fields.skipSslVerify.label" as const,
+        label: "app.api.stripe.form.fields.skipSslVerify.label" as const,
         description:
-          "app.api.payment.providers.stripe.form.fields.skipSslVerify.description" as const,
+          "app.api.stripe.form.fields.skipSslVerify.description" as const,
         columns: 6,
         schema: z.boolean().default(false),
       }),
@@ -169,43 +169,43 @@ const { POST } = createEndpoint({
       // RESPONSE FIELDS
       success: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.payment.providers.stripe.response.success" as const,
+        content: "app.api.stripe.response.success" as const,
         schema: z.boolean(),
       }),
 
       installed: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.payment.providers.stripe.response.installed" as const,
+        content: "app.api.stripe.response.installed" as const,
         schema: z.boolean().optional(),
       }),
 
       version: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.payment.providers.stripe.response.version" as const,
+        content: "app.api.stripe.response.version" as const,
         schema: z.string().optional(),
       }),
 
       status: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.payment.providers.stripe.response.status" as const,
+        content: "app.api.stripe.response.status" as const,
         schema: z.string().optional(),
       }),
 
       output: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.payment.providers.stripe.response.output" as const,
+        content: "app.api.stripe.response.output" as const,
         schema: z.string().optional(),
       }),
 
       instructions: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.payment.providers.stripe.response.instructions" as const,
+        content: "app.api.stripe.response.instructions" as const,
         schema: z.string().optional(),
       }),
 
       webhookEndpoint: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.payment.providers.stripe.response.webhookEndpoint" as const,
+        content: "app.api.stripe.response.webhookEndpoint" as const,
         schema: z.string().optional(),
       }),
     },
@@ -254,46 +254,46 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.payment.providers.stripe.errors.validation.title" as const,
-      description: "app.api.payment.providers.stripe.errors.validation.description" as const,
+      title: "app.api.stripe.errors.validation.title" as const,
+      description: "app.api.stripe.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.payment.providers.stripe.errors.network.title" as const,
-      description: "app.api.payment.providers.stripe.errors.network.description" as const,
+      title: "app.api.stripe.errors.network.title" as const,
+      description: "app.api.stripe.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.payment.providers.stripe.errors.unauthorized.title" as const,
-      description: "app.api.payment.providers.stripe.errors.unauthorized.description" as const,
+      title: "app.api.stripe.errors.unauthorized.title" as const,
+      description: "app.api.stripe.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.payment.providers.stripe.errors.forbidden.title" as const,
-      description: "app.api.payment.providers.stripe.errors.forbidden.description" as const,
+      title: "app.api.stripe.errors.forbidden.title" as const,
+      description: "app.api.stripe.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.payment.providers.stripe.errors.notFound.title" as const,
-      description: "app.api.payment.providers.stripe.errors.notFound.description" as const,
+      title: "app.api.stripe.errors.notFound.title" as const,
+      description: "app.api.stripe.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.payment.providers.stripe.errors.serverError.title" as const,
-      description: "app.api.payment.providers.stripe.errors.serverError.description" as const,
+      title: "app.api.stripe.errors.serverError.title" as const,
+      description: "app.api.stripe.errors.serverError.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.payment.providers.stripe.errors.unknown.title" as const,
-      description: "app.api.payment.providers.stripe.errors.unknown.description" as const,
+      title: "app.api.stripe.errors.unknown.title" as const,
+      description: "app.api.stripe.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.payment.providers.stripe.errors.unsavedChanges.title" as const,
-      description: "app.api.payment.providers.stripe.errors.unsavedChanges.description" as const,
+      title: "app.api.stripe.errors.unsavedChanges.title" as const,
+      description: "app.api.stripe.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.payment.providers.stripe.errors.conflict.title" as const,
-      description: "app.api.payment.providers.stripe.errors.conflict.description" as const,
+      title: "app.api.stripe.errors.conflict.title" as const,
+      description: "app.api.stripe.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.payment.providers.stripe.success.title" as const,
-    description: "app.api.payment.providers.stripe.success.description" as const,
+    title: "app.api.stripe.success.title" as const,
+    description: "app.api.stripe.success.description" as const,
   },
 });
 
