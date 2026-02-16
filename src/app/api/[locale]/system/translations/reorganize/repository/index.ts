@@ -1673,6 +1673,8 @@ export class TranslationReorganizeRepositoryImpl {
               // Check if any segments in keyRemainder also appear in locationRemainder
               // This handles cases where dynamic parameters like [threadId] appear in the middle
               // CRITICAL: Convert to camelCase for comparison since folders use kebab-case
+              // ALSO: Check if key part is a "composite" that starts with a location part
+              // (e.g., "cronSystem" starts with "cron" from folder) - these are old namespaces to remove
               const toCamelCase = (str: string) =>
                 str.replace(/[-_]([a-z0-9])/g, (_, letter) => letter.toUpperCase());
               const locationRemainderCamel = locationRemainder.map(toCamelCase);
@@ -1681,9 +1683,30 @@ export class TranslationReorganizeRepositoryImpl {
                 // Keep the part if it's NOT in the location remainder
                 // But ignore parameter placeholders like [threadId] when checking
                 const keyPartCamel = toCamelCase(keyPart);
-                return !locationRemainderCamel.some(
+
+                // Check for exact match
+                const hasExactMatch = locationRemainderCamel.some(
                   (locPart) => !locPart.startsWith("[") && locPart === keyPartCamel,
                 );
+                if (hasExactMatch) {
+                  return false; // Remove exact matches
+                }
+
+                // Check if keyPart is a composite that starts with any location part
+                // e.g., "cronSystem" starts with "cron" -> remove it
+                const isComposite = locationRemainderCamel.some((locPart) => {
+                  if (locPart.startsWith("[")) return false; // Skip dynamic segments
+                  // Check if keyPart starts with locPart and has more characters after
+                  // This catches "cronSystem" starting with "cron"
+                  return (
+                    keyPartCamel.length > locPart.length &&
+                    keyPartCamel.startsWith(locPart) &&
+                    // Ensure the next character is uppercase (camelCase boundary)
+                    keyPartCamel[locPart.length] === keyPartCamel[locPart.length].toUpperCase()
+                  );
+                });
+
+                return !isComposite; // Keep only non-composite parts
               });
             }
           }
