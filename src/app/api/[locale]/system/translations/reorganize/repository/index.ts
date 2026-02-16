@@ -1168,7 +1168,7 @@ export class TranslationReorganizeRepositoryImpl {
             if (entry.isDirectory()) {
               // Check if this is an i18n/${language} directory
               if (entry.name === "i18n") {
-                const langFile = path.join(fullPath, language, "index.ts");
+                const langFile = path.join(fullPath, language, "app.api.system.index.ts");
                 if (fs.existsSync(langFile)) {
                   files.push(langFile);
                 }
@@ -1356,8 +1356,8 @@ export class TranslationReorganizeRepositoryImpl {
 
           // Strip duplicate path segments from keyRemainder that appear in location
           // This handles cases where old keys have folder names that are now in the path
-          // Example: location "app/[locale]/admin/_components" has prefix "app.admin._components"
-          // Old key "app.admin.components.navigation.dashboard" has remainder "components.navigation.dashboard"
+          // Example: location "app/[locale]/admin/_components" has prefix "app.api.system.translations.reorganize.repository.admin.Components"
+          // Old key "app.common.admin.dashboard" has remainder "app.api.system.translations.reorganize.repository.dashboard"
           // We need to filter out "components" since "_components" is in the location
           const locationRemainder = locationParts.slice(commonPrefixLength);
           const toCamelCase = (str: string) =>
@@ -1724,7 +1724,20 @@ export class TranslationReorganizeRepositoryImpl {
         typeof value === "boolean"
       ) {
         // This is a leaf translation value
-        const usageFiles = keyUsageMap.get(fullPath) || [];
+        let usageFiles = keyUsageMap.get(fullPath) || [];
+
+        // If not found, try checking for old key variants where _folder -> folder
+        // This handles loaded translations with new structure (app.admin._components.navigation)
+        // when source code still uses old structure (app.admin.components.navigation)
+        if (usageFiles.length === 0) {
+          const oldKeyVariant = fullPath.replace(/\._([a-z])/g, ".$1");
+          if (oldKeyVariant !== fullPath) {
+            usageFiles = keyUsageMap.get(oldKeyVariant) || [];
+            if (usageFiles.length > 0) {
+              logger.debug(`Found usage for old key variant: ${oldKeyVariant} (new key: ${fullPath})`);
+            }
+          }
+        }
 
         // Only process keys that are actually used in the codebase
         if (usageFiles.length === 0) {
