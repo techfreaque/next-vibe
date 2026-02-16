@@ -680,6 +680,9 @@ export class FileGenerator {
     // Remove [locale] segments
     key = key.replaceAll("/[locale]", "");
 
+    // Remove _components folders from the path
+    key = key.replaceAll("/_components", "");
+
     // Convert kebab-case folder names to camelCase
     // e.g., unified-interface -> unifiedInterface, react-native -> reactNative
     key = key.replaceAll(
