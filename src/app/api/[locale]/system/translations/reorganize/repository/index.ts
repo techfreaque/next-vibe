@@ -1168,7 +1168,9 @@ export class TranslationReorganizeRepositoryImpl {
             if (entry.isDirectory()) {
               // Check if this is an i18n/${language} directory
               if (entry.name === "i18n") {
-                const langFile = path.join(fullPath, language, "app.api.system.index.ts");
+                // NOTE: Must use template literal to prevent linter from auto-replacing with full path
+                const indexFileName = `${"index"}.ts`;
+                const langFile = path.join(fullPath, language, indexFileName);
                 if (fs.existsSync(langFile)) {
                   files.push(langFile);
                 }
@@ -2389,18 +2391,31 @@ export class TranslationReorganizeRepositoryImpl {
           ? keyMappings.get(completeKey)!
           : completeKey;
 
-        let sourceValue = this.findTranslationValue(
-          lookupKey,
-          sourceLanguageTranslations,
-        );
+        // Try direct lookup first (for flat translation objects)
+        let sourceValue = sourceLanguageTranslations[lookupKey] as string | number | boolean | undefined;
 
-        // If not found with lookup key (old key), try with complete key (new key)
-        // This handles loaded translations that already have the new key structure
-        if (sourceValue === undefined && lookupKey !== completeKey) {
+        // If not found, try nested lookup (for nested translation objects)
+        if (sourceValue === undefined) {
           sourceValue = this.findTranslationValue(
-            completeKey,
+            lookupKey,
             sourceLanguageTranslations,
           );
+        }
+
+        // If still not found with lookup key (old key), try with complete key (new key)
+        // This handles loaded translations that already have the new key structure
+        if (sourceValue === undefined && lookupKey !== completeKey) {
+          // Try direct lookup with new key
+          sourceValue = sourceLanguageTranslations[completeKey] as string | number | boolean | undefined;
+
+          // If still not found, try nested lookup
+          if (sourceValue === undefined) {
+            sourceValue = this.findTranslationValue(
+              completeKey,
+              sourceLanguageTranslations,
+            );
+          }
+
           if (sourceValue !== undefined) {
             logger.debug(
               `Found translation with new key: ${completeKey} (old key ${lookupKey} not found)`,
