@@ -1341,14 +1341,14 @@ export class TranslationReorganizeRepositoryImpl {
             groups.set(location, {});
           }
           const groupTranslations = groups.get(location)!;
-          groupTranslations[sourceKey] = `TODO: ${keySuffix}`;
+          groupTranslations[correctKey] = `TODO: ${keySuffix}`;
 
           // Add to originalKeys so it gets processed in conflict resolution and regrouping
           if (!originalKeys.has(location)) {
             originalKeys.set(location, []);
           }
           originalKeys.get(location)!.push({
-            key: sourceKey,
+            key: correctKey,
             value: `TODO: ${keySuffix}`,
           });
 
@@ -1361,6 +1361,12 @@ export class TranslationReorganizeRepositoryImpl {
           logger.info(
             `Created placeholder for missing key: ${sourceKey} at ${location}`,
           );
+
+          // Track key mapping for updating source files if source key differs from correct key
+          if (sourceKey !== correctKey) {
+            keyMappings.set(sourceKey, correctKey);
+            logger.info(`MAPPING: "${sourceKey}" -> "${correctKey}"`);
+          }
         }
       }
 
