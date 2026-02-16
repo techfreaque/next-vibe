@@ -1125,8 +1125,8 @@ export class TranslationReorganizeRepositoryImpl {
         logger,
       );
 
-      // CRITICAL: Detect and resolve key conflicts caused by flattening
-      this.resolveKeyConflicts(groups, originalKeys, keyMappings, logger);
+      // CRITICAL: Apply flattening while resolving conflicts
+      this.applyFlatteningWithConflictResolution(groups, originalKeys, keyMappings, logger);
 
       // After reorganization, check for keys in source files that don't match new structure
       // Build flat map of all keys in new structure
@@ -1714,25 +1714,7 @@ export class TranslationReorganizeRepositoryImpl {
             keySuffix = keyParts[keyParts.length - 1];
           }
 
-          // Simulate flattening to get the actual key that will be in the file
-          // The file generator will flatten single-child objects, so we need to predict that
-          if (this.fileGenerator && actualLocationPrefix) {
-            const beforeSimulation = correctKey;
-            const simulatedKey = this.fileGenerator.simulateFlattenedKey(
-              correctKey,
-              actualLocationPrefix,
-            );
-            // Reconstruct the full key with location prefix + flattened suffix
-            if (simulatedKey) {
-              correctKey = `${actualLocationPrefix}.${simulatedKey}`;
-              keySuffix = simulatedKey;
-              if (beforeSimulation !== correctKey) {
-                logger.info(
-                  `[FLATTEN-SIM] ${fullPath}: ${beforeSimulation} -> ${correctKey}`,
-                );
-              }
-            }
-          }
+          // NOTE: Flattening simulation removed - will be done after all keys collected
         }
 
         // Skip scoped translation locations - check if this location or any parent has a scoped i18n index
@@ -1792,11 +1774,9 @@ export class TranslationReorganizeRepositoryImpl {
   }
 
   /**
-   * Resolve key conflicts caused by aggressive flattening
-   * Detects when flattened keys create conflicts where a key path needs to be
-   * both a primitive value and an object with children
+   * Apply flattening while resolving conflicts
    */
-  private resolveKeyConflicts(
+  private applyFlatteningWithConflictResolution(
     groups: Map<string, TranslationObject>,
     originalKeys: Map<
       string,
@@ -1805,45 +1785,40 @@ export class TranslationReorganizeRepositoryImpl {
     keyMappings: Map<string, string>,
     logger: EndpointLogger,
   ): void {
-    // For each location, check if any keys create conflicts
     for (const [location, originalKeysList] of originalKeys) {
-      // Build a map of all keys at this location
-      const keyPaths = new Map<string, "primitive" | "object">();
+      const locationPrefix = this.fileGenerator
+        ? this.fileGenerator.locationToFlatKeyPublic(location)
+        : "";
 
-      for (const { key } of originalKeysList) {
-        // Mark this exact path as having a primitive value
-        keyPaths.set(key, "primitive");
+      const allKeys = originalKeysList.map(({ key }) => key);
+      const conflicts = new Set<string>();
 
-        // Mark all parent paths as needing to be objects
-        const parts = key.split(".");
-        for (let i = 1; i < parts.length; i++) {
-          const parentPath = parts.slice(0, i).join(".");
-          if (!keyPaths.has(parentPath)) {
-            keyPaths.set(parentPath, "object");
+      for (const key of allKeys) {
+        const hasChildren = allKeys.some(
+          (otherKey) => otherKey !== key && otherKey.startsWith(`${key}.`)
+        );
+
+        if (hasChildren) {
+          conflicts.add(key);
+          logger.warn(`CONFLICT at ${location}: "${key}" has both value and children`);
+
+          const conflictIndex = originalKeysList.findIndex(({ key: k }) => k === key);
+          if (conflictIndex !== -1) {
+            const { value } = originalKeysList[conflictIndex];
+            const newKey = `${key}._conflict_0`;
+            originalKeysList[conflictIndex] = { key: newKey, value };
+
+            const fullOldKey = locationPrefix ? `${locationPrefix}.${key}` : key;
+            const fullNewKey = locationPrefix ? `${locationPrefix}.${newKey}` : newKey;
+            const groupTranslations = groups.get(location);
+            if (groupTranslations && groupTranslations[fullOldKey] !== undefined) {
+              groupTranslations[fullNewKey] = groupTranslations[fullOldKey];
+              delete groupTranslations[fullOldKey];
+            }
+
+            logger.info(`CONFLICT-FIX: Renamed "${fullOldKey}" -> "${fullNewKey}"`);
           }
         }
-      }
-
-      // Detect conflicts: paths that are marked as both primitive and object
-      const conflicts: string[] = [];
-      for (const [keyPath, type] of keyPaths) {
-        if (type === "primitive") {
-          // Check if this path is also needed as an object (has children)
-          const hasChildren = Array.from(keyPaths.keys()).some(
-            (otherPath) => otherPath !== keyPath && otherPath.startsWith(`${keyPath}.`)
-          );
-          if (hasChildren) {
-            conflicts.push(keyPath);
-            logger.warn(
-              `CONFLICT at ${location}: "${keyPath}" is both a primitive value and has children`
-            );
-          }
-        }
-      }
-
-      // Log conflicts for now
-      if (conflicts.length > 0) {
-        logger.warn(`Location ${location} has ${conflicts.length} key conflicts`);
       }
     }
   }
