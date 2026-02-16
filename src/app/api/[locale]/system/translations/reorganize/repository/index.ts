@@ -1364,12 +1364,19 @@ export class TranslationReorganizeRepositoryImpl {
             ? `${locationPrefix}.${keySuffix}`
             : keySuffix;
 
-          // Add to groups with placeholder value
+          // Check if the correct key exists in loaded translations
+          // This handles the case where source code has old key but translations have new key
+          const existingValue = translations[correctPlaceholderKey];
+          const placeholderValue = existingValue !== undefined
+            ? existingValue
+            : `TODO: ${keySuffix}`;
+
+          // Add to groups with value (existing or placeholder)
           if (!groups.has(location)) {
             groups.set(location, {});
           }
           const groupTranslations = groups.get(location)!;
-          groupTranslations[correctPlaceholderKey] = `TODO: ${keySuffix}`;
+          groupTranslations[correctPlaceholderKey] = placeholderValue;
 
           // Add to originalKeys so it gets processed in conflict resolution and regrouping
           if (!originalKeys.has(location)) {
@@ -1377,7 +1384,7 @@ export class TranslationReorganizeRepositoryImpl {
           }
           originalKeys.get(location)!.push({
             key: correctPlaceholderKey,
-            value: `TODO: ${keySuffix}`,
+            value: placeholderValue,
           });
 
           // Track missing keys for reporting
