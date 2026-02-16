@@ -110,64 +110,6 @@ export class KeyUsageAnalyzer {
   }
 
   /**
-   * Scan source files and find ALL translation key patterns using exact double-quote matching
-   * Finds any string in double quotes that looks like a translation key (has dots)
-   * @param logger - Logger instance for debugging
-   * @returns Map of translation keys to arrays of file paths where they are used
-   */
-  scanAllKeysInSourceFiles(logger: EndpointLogger): Map<string, string[]> {
-    const keyUsageMap = new Map<string, string[]>();
-
-    logger.info("Scanning source files for all translation key patterns");
-
-    // Get all source files to scan
-    const sourceFiles = this.findFiles(SRC_DIR, FILE_EXTENSIONS);
-
-    logger.debug(`Found ${sourceFiles.length} source files to scan`);
-
-    // Pattern: any double-quoted string with at least one dot
-    // Matches translation keys like "app.api.shared.errorTypes.validationError"
-    // Includes square brackets for dynamic route segments like [id], [slug], etc.
-    const keyPattern = /"([a-z][a-z0-9._[\]-]*\.[a-z0-9._[\]-]+)"/gi;
-
-    // Scan each file for translation key patterns
-    for (const filePath of sourceFiles) {
-      // Skip translation files themselves, test files, and backup files
-      if (
-        filePath.includes("/i18n/") ||
-        filePath.includes("/__tests__/") ||
-        filePath.includes(TEST_FILE_PATTERN) ||
-        filePath.includes("/.tmp/")
-      ) {
-        continue;
-      }
-
-      try {
-        const content = fs.readFileSync(filePath, "utf8");
-
-        // Find all translation key patterns in this file
-        let match;
-        while ((match = keyPattern.exec(content)) !== null) {
-          const key = match[1];
-          if (!keyUsageMap.has(key)) {
-            keyUsageMap.set(key, []);
-          }
-          if (!keyUsageMap.get(key)?.includes(filePath)) {
-            keyUsageMap.get(key)?.push(filePath);
-          }
-        }
-      } catch (error) {
-        logger.debug(`Could not read file ${filePath}: ${parseError(error)}`);
-      }
-    }
-
-    const keysFound = keyUsageMap.size;
-    logger.info(`Found ${keysFound} unique translation keys in source files`);
-
-    return keyUsageMap;
-  }
-
-  /**
    * Check if a translation key is used in a file by searching for the key as a string literal
    * @param key - The translation key to search for
    * @param content - The file content to search in

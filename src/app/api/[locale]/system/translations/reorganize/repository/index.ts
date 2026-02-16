@@ -137,27 +137,26 @@ export class TranslationReorganizeRepositoryImpl {
       );
       const currentTranslations = await this.loadCurrentTranslations(logger);
 
-      // Scan source files for ALL translation key patterns (double-quoted strings with dots)
-      const sourceFileKeys =
-        this.keyUsageAnalyzer.scanAllKeysInSourceFiles(logger);
-
-      // Also extract keys from current translation files
+      // Extract all known keys from current translation files
       const allKeys =
         this.keyUsageAnalyzer.extractAllTranslationKeys(currentTranslations);
 
-      // Merge both: use source file keys as primary, supplement with translation file keys
-      const keyUsageMap = new Map(sourceFileKeys);
+      // Scan source files to check where each known key is actually used
+      const keyUsageMap = this.keyUsageAnalyzer.scanCodebaseForKeyUsage(
+        allKeys,
+        logger,
+      );
 
-      // Add any keys from translations that weren't found in source files
+      // Keys in keyUsageMap have usage, keys not in map are unused
+      const usedKeys = keyUsageMap.size;
+      const unusedKeys = allKeys.size - usedKeys;
+
+      // Add unused keys to map with empty usage arrays for downstream processing
       for (const key of allKeys) {
         if (!keyUsageMap.has(key)) {
-          // Key exists in translations but not in source files - might be unused
           keyUsageMap.set(key, []);
         }
       }
-
-      const usedKeys = [...keyUsageMap.keys()].length;
-      const unusedKeys = allKeys.size - usedKeys;
 
       logger.info(
         `Key usage analysis: ${usedKeys} used / ${allKeys.size} total (${unusedKeys} unused)`,
