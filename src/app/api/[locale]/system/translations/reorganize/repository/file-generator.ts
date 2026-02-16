@@ -1140,15 +1140,7 @@ export class FileGenerator {
           }
           usedExportKeys.add(plainKey);
 
-          // Special handling for "common" key when we have a spread child
-          // Both the spread child and parent location may have "common" keys
-          // We need to merge them, not let one overwrite the other
-          if (plainKey === "common" && hasSpreadChild) {
-            // Add as spread to merge with existing common from spread child
-            exports.push(`  ...${valueStr}`);
-          } else {
-            exports.push(`  ${exportKey}: ${valueStr}`);
-          }
+          exports.push(`  ${exportKey}: ${valueStr}`);
         }
       } catch (error) {
         logger.error(
