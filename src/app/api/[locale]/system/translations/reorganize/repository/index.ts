@@ -1429,11 +1429,19 @@ export class TranslationReorganizeRepositoryImpl {
 
     if (usageFiles.length === 1) {
       // Single usage - use the directory containing the file
-      return path.dirname(usageFiles[0]);
+      let dir = path.dirname(usageFiles[0]);
+      // Strip _components from the path
+      dir = dir.replace(/\/_components$/, "").replace(/\/_components\//g, "/");
+      return dir;
     }
 
     // Find common ancestor
-    const dirs = usageFiles.map((f) => path.dirname(f));
+    const dirs = usageFiles.map((f) => {
+      let dir = path.dirname(f);
+      // Strip _components from the path
+      dir = dir.replace(/\/_components$/, "").replace(/\/_components\//g, "/");
+      return dir;
+    });
     let commonPath = dirs[0];
 
     for (const dir of dirs.slice(1)) {
@@ -2163,6 +2171,11 @@ export class TranslationReorganizeRepositoryImpl {
           return path.relative(projectRoot, dir);
         }
         return dir;
+      })
+      .map((dir) => {
+        // Strip _components directories from location paths
+        // e.g., "app/[locale]/admin/_components" -> "app/[locale]/admin"
+        return dir.replace(/\/_components$/, "").replace(/\/_components\//g, "/");
       })
       .filter((dir, index, array) => array.indexOf(dir) === index); // Remove duplicates
 
