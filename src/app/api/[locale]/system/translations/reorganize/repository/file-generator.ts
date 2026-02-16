@@ -390,8 +390,18 @@ export class FileGenerator {
               flattenedChildKeys.length === 1 &&
               flattenedChildKeys[0] !== childKey
             ) {
-              // The child was flattened - merge its contents directly into result
-              Object.assign(result, flattenedChild);
+              // Check if merging would create a conflict
+              const hasConflict = flattenedChildKeys.some(k => k in result);
+              if (hasConflict) {
+                // Key conflict - don't flatten, keep the full parent.child path
+                result[key] = this.flattenSingleChildObjects(
+                  value as TranslationObject,
+                  preserveKeys,
+                );
+              } else {
+                // The child was flattened - merge its contents directly into result
+                Object.assign(result, flattenedChild);
+              }
             } else {
               // Check if childKey already exists in result to avoid conflicts
               if (childKey in result) {
