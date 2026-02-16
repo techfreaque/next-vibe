@@ -1493,26 +1493,37 @@ export class TranslationReorganizeRepositoryImpl {
           ? this.fileGenerator.locationToFlatKeyPublic(location)
           : "";
 
-        // For shared keys, if the key doesn't start with the location prefix + ".common",
-        // we need to insert "common" after the location prefix
-        // Example: key "app.common.api.import.post.title" shared at location "app"
-        // should become "app.common.api.leads.import.post.title"
+        // For shared keys, we need to insert "common" after the common ancestor location prefix
+        // Example: key "app.api.agent.chat.tags.threads" shared at location "app/api/[locale]/agent/chat/threads"
+        // The common ancestor part is what's shared: find the longest common prefix
+        // Then insert "common" after that prefix
         let adjustedKey = fullPath;
         if (isShared && actualLocationPrefix) {
           const locationDotCommon = `${actualLocationPrefix}.common`;
           if (!adjustedKey.startsWith(`${locationDotCommon}.`)) {
-            // Insert "common" after the location prefix
-            // adjustedKey: "app.common.api.import.post.title"
-            // actualLocationPrefix: "app"
-            // Result: "app.common.api.leads.import.post.title"
-            const afterPrefix = adjustedKey.startsWith(
-              `${actualLocationPrefix}.`,
-            )
-              ? adjustedKey.slice(actualLocationPrefix.length + 1)
-              : adjustedKey;
-            adjustedKey = `${locationDotCommon}.${afterPrefix}`;
+            // Find the longest common prefix between the key and location prefix
+            const keyParts = fullPath.split(".");
+            const locationParts = actualLocationPrefix.split(".");
+
+            let commonPrefixLength = 0;
+            for (let i = 0; i < Math.min(keyParts.length, locationParts.length); i++) {
+              if (keyParts[i] === locationParts[i]) {
+                commonPrefixLength = i + 1;
+              } else {
+                break;
+              }
+            }
+
+            // Build the adjusted key with "common" inserted after the common prefix
+            const commonPrefix = keyParts.slice(0, commonPrefixLength).join(".");
+            const remaining = keyParts.slice(commonPrefixLength).join(".");
+
+            adjustedKey = commonPrefix
+              ? `${commonPrefix}.common.${remaining}`
+              : `common.${fullPath}`;
+
             logger.info(
-              `Inserted "common" for shared key at ${location}: ${adjustedKey}`,
+              `Inserted "common" for shared key at ${location}: ${fullPath} -> ${adjustedKey} (common prefix: ${commonPrefix})`,
             );
           }
         }
