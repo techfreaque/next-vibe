@@ -908,25 +908,33 @@ export class FileGenerator {
         `import { translations as ${importName} } from "${importPath}";`,
       );
 
-      // Convert folder names to export keys
-      // Do NOT spread anything - all children should be keyed
-      let exportKey = child;
+      // Track which children are spread vs keyed
+      const isSpread = child === "[locale]";
 
-      // Convert kebab-case to camelCase
-      exportKey = exportKey.replaceAll(
-        /-([a-z0-9])/g,
-        (hyphenAndChar: string, letter: string) =>
-          hyphenAndChar.length > 1 ? letter.toUpperCase() : hyphenAndChar,
-      );
+      // Only spread [locale] folders, use keyed exports for everything else
+      if (isSpread) {
+        exports.push(`  ...${importName}`);
+      } else {
+        // Convert kebab-case folder names to camelCase for export keys
+        // e.g., speech-to-text -> speechToText
+        let exportKey = child;
 
-      // Quote keys that still contain special characters after camelCase conversion
-      // (e.g., keys with other special chars besides hyphens)
-      if (!/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(exportKey)) {
-        // eslint-disable-next-line i18next/no-literal-string
-        exportKey = `"${exportKey}"`;
+        // Convert kebab-case to camelCase
+        exportKey = exportKey.replaceAll(
+          /-([a-z0-9])/g,
+          (hyphenAndChar: string, letter: string) =>
+            hyphenAndChar.length > 1 ? letter.toUpperCase() : hyphenAndChar,
+        );
+
+        // Quote keys that still contain special characters after camelCase conversion
+        // (e.g., keys with other special chars besides hyphens)
+        if (!/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(exportKey)) {
+          // eslint-disable-next-line i18next/no-literal-string
+          exportKey = `"${exportKey}"`;
+        }
+
+        exports.push(`  ${exportKey}: ${importName}`);
       }
-
-      exports.push(`  ${exportKey}: ${importName}`);
     }
 
     // Check if this location has its own translations
