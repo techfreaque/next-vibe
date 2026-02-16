@@ -912,6 +912,14 @@ export class FileGenerator {
     for (const child of directChildren) {
       const childLocation = `${sourcePath}/${child}`;
 
+      // Skip _components directories - they should not be exported as separate keys
+      if (child === "_components") {
+        logger.debug(
+          `Skipping _components directory at ${sourcePath} (should be merged into parent)`,
+        );
+        continue;
+      }
+
       // Skip "src" ONLY at root level - would create circular imports
       // But allow "src" as subdirectory name (e.g., launchpad/src)
       if (childLocation === "src") {
