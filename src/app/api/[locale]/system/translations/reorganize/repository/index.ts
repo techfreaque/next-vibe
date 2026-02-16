@@ -1353,7 +1353,11 @@ export class TranslationReorganizeRepositoryImpl {
 
           // Get key remainder after common prefix
           const keyRemainder = keyParts.slice(commonPrefixLength);
-          let keySuffix = keyRemainder.join(".");
+          // Normalize snake_case to camelCase for each part
+          const normalizedRemainder = keyRemainder.map((part) =>
+            part.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()),
+          );
+          let keySuffix = normalizedRemainder.join(".");
 
           // Build correct key with location prefix
           const correctPlaceholderKey = locationPrefix
@@ -1994,7 +1998,13 @@ export class TranslationReorganizeRepositoryImpl {
             if (commonIndex >= 0) {
               // Reconstruct suffix with "common" at the beginning
               const partsAfterCommon = keyRemainder.slice(commonIndex + 1);
-              keySuffix = ["common", ...partsAfterCommon].join(".");
+              // Apply camelCase normalization to the parts after "common"
+              const normalizedParts = partsAfterCommon.map((part) =>
+                part.replace(/[-_]([a-z0-9])/g, (_, letter) =>
+                  letter.toUpperCase(),
+                ),
+              );
+              keySuffix = ["common", ...normalizedParts].join(".");
             }
           }
 
