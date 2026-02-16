@@ -52,7 +52,9 @@
 
 **Example:**
 - `src/app/i18n/en/index.ts` imports from `../../[locale]/i18n/en` and `../../api/i18n/en`
-- Special case: `[locale]` folders are SPREAD (using `...`) to avoid `[locale]` in key paths
+- **EXCEPTION:** `[locale]` folders are SPREAD (using `...`) to avoid `[locale]` in key paths
+  - This is the ONLY exception to including folder names in the path
+  - `[locale]` is a Next.js dynamic route parameter, not a translation scope
 - Regular folders are exported as named keys (e.g., `api: apiTranslations`)
 
 ## Regeneration Workflow
