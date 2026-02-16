@@ -1340,6 +1340,15 @@ export class TranslationReorganizeRepositoryImpl {
 
               // Update or create mapping
               keyMappings.set(sourceKey, correctKey);
+
+              // CRITICAL: Also update the groups Map to use the flattened key
+              // Otherwise regrouping will fail because it looks for the old intermediate key
+              const locationTranslations = groups.get(location)!;
+              if (locationTranslations[originalKey] !== undefined) {
+                locationTranslations[correctKey] = locationTranslations[originalKey];
+                delete locationTranslations[originalKey];
+              }
+
               logger.info(
                 `[FLATTEN-FIX] ${sourceKey} -> ${correctKey} (was: ${originalKey})`,
               );
