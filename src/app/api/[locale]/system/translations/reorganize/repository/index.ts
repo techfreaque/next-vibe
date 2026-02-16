@@ -1168,7 +1168,7 @@ export class TranslationReorganizeRepositoryImpl {
             if (entry.isDirectory()) {
               // Check if this is an i18n/${language} directory
               if (entry.name === "i18n") {
-                const langFile = path.join(fullPath, language, "index.ts");
+                const langFile = path.join(fullPath, language, "app.api.system.index.ts");
                 if (fs.existsSync(langFile)) {
                   files.push(langFile);
                 }
@@ -2389,10 +2389,24 @@ export class TranslationReorganizeRepositoryImpl {
           ? keyMappings.get(completeKey)!
           : completeKey;
 
-        const sourceValue = this.findTranslationValue(
+        let sourceValue = this.findTranslationValue(
           lookupKey,
           sourceLanguageTranslations,
         );
+
+        // If not found with lookup key (old key), try with complete key (new key)
+        // This handles loaded translations that already have the new key structure
+        if (sourceValue === undefined && lookupKey !== completeKey) {
+          sourceValue = this.findTranslationValue(
+            completeKey,
+            sourceLanguageTranslations,
+          );
+          if (sourceValue !== undefined) {
+            logger.debug(
+              `Found translation with new key: ${completeKey} (old key ${lookupKey} not found)`,
+            );
+          }
+        }
 
         if (sourceValue !== undefined) {
           targetLocationTranslations[key] = sourceValue;
