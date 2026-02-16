@@ -114,7 +114,7 @@ export class TranslationReorganizeRepositoryImpl {
 
         output.push(
           t(
-            "app.api.system.translations.reorganize.common.messages.backupCreated",
+            "app.api.system.translations.reorganize.repository.app.api.messages.backupCreated",
             {
               path: backupPath,
             },
@@ -164,7 +164,7 @@ export class TranslationReorganizeRepositoryImpl {
       );
 
       output.push(
-        t("app.api.system.translations.reorganize.common.messages.foundKeys", {
+        t("app.api.system.translations.reorganize.repository.app.api.messages.foundKeys", {
           used: usedKeys,
           total: allKeys.size,
         }),
@@ -177,7 +177,7 @@ export class TranslationReorganizeRepositoryImpl {
       if (removeUnused && unusedKeys > 0) {
         output.push(
           t(
-            "app.api.system.translations.reorganize.common.messages.removingKeys",
+            "app.api.system.translations.reorganize.repository.app.api.messages.removingKeys",
             {
               count: unusedKeys,
             },
@@ -331,7 +331,7 @@ export class TranslationReorganizeRepositoryImpl {
                 type: "updated",
                 path: `i18n/${language}/**/*.ts`,
                 description:
-                  "app.api.system.translations.reorganize.common.messages.removingKeys",
+                  "app.api.system.translations.reorganize.repository.app.api.messages.removingKeys",
                 descriptionParams: {
                   language,
                   count: keysRemoved,
@@ -492,7 +492,7 @@ export class TranslationReorganizeRepositoryImpl {
                   type: "updated",
                   path: path.join(TRANSLATIONS_DIR, language, "index.ts"),
                   description:
-                    "app.api.system.translations.reorganize.common.messages.regeneratedStructure",
+                    "app.api.system.translations.reorganize.repository.app.api.messages.regeneratedStructure",
                   descriptionParams: { language },
                 });
               }
@@ -1181,6 +1181,15 @@ export class TranslationReorganizeRepositoryImpl {
           const groupTranslations = groups.get(location)!;
           groupTranslations[sourceKey] = `TODO: ${keySuffix}`;
 
+          // Add to originalKeys so it gets processed in conflict resolution and regrouping
+          if (!originalKeys.has(location)) {
+            originalKeys.set(location, []);
+          }
+          originalKeys.get(location)!.push({
+            key: sourceKey,
+            value: `TODO: ${keySuffix}`,
+          });
+
           // Track missing keys for reporting
           if (!missingKeys.has(location)) {
             missingKeys.set(location, []);
@@ -1552,7 +1561,7 @@ export class TranslationReorganizeRepositoryImpl {
           : "";
 
         // For shared keys, we need to insert "common" after the common ancestor location prefix
-        // Example: key "app.api.common.agent.chat.tags.threads" shared at location "app/api/[locale]/agent/chat/threads"
+        // Example: key "app.api.system.translations.reorganize.repository.app.api.common.tags.threads" shared at location "app/api/[locale]/agent/chat/threads"
         // The common ancestor part is what's shared: find the longest common prefix
         // Then insert "common" after that prefix
         let adjustedKey = fullPath;
@@ -1668,7 +1677,7 @@ export class TranslationReorganizeRepositoryImpl {
 
           // Find where key and location paths diverge
           // This handles cases where the key has a different structure than the location
-          // Example: key "app.api.common.agent.chat.tags.threads" vs location "app.api.agent.chat.threads"
+          // Example: key "app.api.system.translations.reorganize.repository.app.api.common.tags.threads" vs location "app.api.system.translations.reorganize.repository.app.api.threads"
           // Common prefix: ["app", "api", "agent", "chat"]
           // Key continues with: ["tags", "threads"]
           // Location continues with: ["threads"]
