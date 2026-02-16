@@ -4,45 +4,47 @@
 
 ### Single-Use Keys (Used Once)
 
-**Rule:** Keys used in only ONE location co-locate to the nearest ancestor i18n directory.
+**Rule:** Keys used in only ONE location co-locate to the DEEPEST folder where they are used. The i18n directory is created at that exact location.
 
 **Example:**
 - Usage file: `src/app/[locale]/chat/lib/utils/navigation.ts`
-- Translation file: `src/app/[locale]/chat/i18n/en/index.ts`
-- Location prefix: `app.chat`
-- Key in translation file: Content from the source, NOT including file path
-- Full key: `app.chat.{whatever}.{the}.{source}.{had}`
+- Translation i18n directory: `src/app/[locale]/chat/lib/utils/i18n/en/index.ts` (at the DEEPEST folder)
+- Location prefix: `app.chat.lib.utils`
+- Key in translation file: Content from the source with the location prefix stripped
+- Full key: `app.chat.lib.utils.{whatever}.{the}.{source}.{had}`
 
 **Important:**
-- We do NOT include `lib`, `utils`, `navigation.ts` or any file path in the key structure
-- The key structure comes from the ORIGINAL flat translation content
-- File organization (`lib/`, `utils/`, `components/`, etc.) is irrelevant to translation keys
-- After flattening single-child objects recursively, old path names get removed naturally
+- The complete folder structure IS included in both the i18n directory path AND the key prefix
+- `lib/`, `utils/`, `components/`, etc. ARE part of the location and key structure
+- The i18n directory is created at the deepest folder level where the key is used
+- After flattening single-child objects recursively in the leaf file, old redundant path names get removed
 
 ### Shared Keys (Used Multiple Times)
 
-**Rule:** Keys used in MULTIPLE locations go to the nearest common ancestor's i18n directory under a `common` object.
+**Rule:** Keys used in MULTIPLE locations go to the nearest common ancestor's i18n directory under a `common` object. The i18n directory is created at the common ancestor folder.
 
 **Example:**
 - Used in: `src/app/[locale]/chat/lib/utils/navigation.ts` AND `src/app/[locale]/chat/components/sidebar.tsx`
 - Common ancestor: `src/app/[locale]/chat`
-- Translation file: `src/app/[locale]/chat/i18n/en/index.ts`
+- Translation i18n directory: `src/app/[locale]/chat/i18n/en/index.ts` (at the common ancestor)
+- Location prefix: `app.chat`
 - Key in file: `common.newPrivateChat`
 - Full key: `app.chat.common.newPrivateChat`
 
 **Important:**
 - `common` namespace indicates the key is shared across multiple files
-- Shared keys live at the nearest common ancestor i18n directory
+- Shared keys live at the nearest common ancestor i18n directory (NOT the deepest folder)
 - The `common.` prefix is added during reorganization
+- The complete folder structure up to the common ancestor IS included in the location prefix
 
 ### Key Flattening
 
 **Process:**
-1. Keys are moved to co-located i18n files based on usage location
-2. Location prefix (e.g., `app.chat`) is stripped from keys in the file
+1. Keys are moved to co-located i18n files based on usage location (deepest folder for single-use, common ancestor for shared)
+2. Location prefix (e.g., `app.chat.lib.utils` for single-use or `app.chat` for shared) is stripped from keys in the file
 3. File contains just the suffix (e.g., `common.newPrivateChat` → becomes `common: { newPrivateChat: "..." }`)
 4. Single-child objects are flattened recursively (e.g., `{ oldPath: { oldName: { actual: "value" } } }` → `{ actual: "value" }`)
-5. This flattening removes weird old path names automatically
+5. This flattening removes weird old redundant path names automatically from the leaf file content
 
 ### Parent Aggregator Files
 
@@ -159,11 +161,11 @@ git commit -m "fix: <description of what you fixed>"
 
 ## Common Issues and Fixes
 
-### Issue: Keys include file paths like `lib.utils.navigation`
+### Issue: Keys missing folder structure like `lib.utils`
 
-**Problem:** Generator is including directory structure in key names.
+**Problem:** Generator is NOT including the complete directory structure in key names.
 
-**Fix:** Keys should only reflect the original translation structure, not file paths. Flattening should remove these.
+**Fix:** Keys MUST include the full folder path from app root to the deepest usage location. For single-use keys, this includes `lib/`, `utils/`, `components/`, etc. all the way to the deepest folder.
 
 ### Issue: Keys have double segments like `app.chat.lib.utils.chat.common.newPrivateChat`
 
