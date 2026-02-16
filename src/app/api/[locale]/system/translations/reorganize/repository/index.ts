@@ -1494,7 +1494,7 @@ export class TranslationReorganizeRepositoryImpl {
           : "";
 
         // For shared keys, we need to insert "common" after the common ancestor location prefix
-        // Example: key "app.api.agent.chat.tags.threads" shared at location "app/api/[locale]/agent/chat/threads"
+        // Example: key "app.api.common.agent.chat.tags.threads" shared at location "app/api/[locale]/agent/chat/threads"
         // The common ancestor part is what's shared: find the longest common prefix
         // Then insert "common" after that prefix
         let adjustedKey = fullPath;
@@ -1506,7 +1506,11 @@ export class TranslationReorganizeRepositoryImpl {
             const locationParts = actualLocationPrefix.split(".");
 
             let commonPrefixLength = 0;
-            for (let i = 0; i < Math.min(keyParts.length, locationParts.length); i++) {
+            for (
+              let i = 0;
+              i < Math.min(keyParts.length, locationParts.length);
+              i++
+            ) {
               if (keyParts[i] === locationParts[i]) {
                 commonPrefixLength = i + 1;
               } else {
@@ -1515,7 +1519,9 @@ export class TranslationReorganizeRepositoryImpl {
             }
 
             // Build the adjusted key with "common" inserted after the common prefix
-            const commonPrefix = keyParts.slice(0, commonPrefixLength).join(".");
+            const commonPrefix = keyParts
+              .slice(0, commonPrefixLength)
+              .join(".");
             const remaining = keyParts.slice(commonPrefixLength).join(".");
 
             adjustedKey = commonPrefix
@@ -1899,9 +1905,6 @@ export class TranslationReorganizeRepositoryImpl {
       const locationTranslations: TranslationObject = {};
 
       // Extract translation values for each key in this location
-      const locationPrefix = this.fileGenerator
-        ? this.fileGenerator.locationToFlatKeyPublic(location)
-        : "";
       this.extractTranslationValuesForLocation(
         englishTranslations,
         languageTranslations,
@@ -1910,7 +1913,6 @@ export class TranslationReorganizeRepositoryImpl {
         keyUsageMap,
         logger,
         reverseKeyMappings,
-        locationPrefix,
       );
 
       if (Object.keys(locationTranslations).length > 0) {
@@ -1943,7 +1945,6 @@ export class TranslationReorganizeRepositoryImpl {
     keyUsageMap: Map<string, string[]>,
     logger: EndpointLogger,
     keyMappings?: Map<string, string>,
-    locationPrefix?: string,
   ): void {
     for (const [key, englishValue] of Object.entries(englishTranslations)) {
       const fullKey = currentPath ? `${currentPath}.${key}` : key;
@@ -1962,14 +1963,12 @@ export class TranslationReorganizeRepositoryImpl {
           keyUsageMap,
           logger,
           keyMappings,
-          locationPrefix,
         );
       } else {
         // This is a leaf translation value - find the corresponding value in source language
-        // Build the complete key path including location prefix for reverse mapping lookup
-        const completeKey = locationPrefix
-          ? `${locationPrefix}.${fullKey}`
-          : fullKey;
+        // fullKey already contains the complete path from the nested English translations structure
+        // which was built using correctKey (includes location prefix + .common. for shared keys)
+        const completeKey = fullKey;
 
         // If the key was remapped (NEW key in reverseKeyMappings), use the original key to look up the translation
         const lookupKey = keyMappings?.has(completeKey)
