@@ -945,42 +945,62 @@ export class TranslationReorganizeRepositoryImpl {
     logger: EndpointLogger,
   ): Promise<TranslationObject> {
     try {
+      // STEP 1: Load from flat structure
       const mainLanguagePath = path.join(
         TRANSLATIONS_DIR,
         languageDefaults.language,
         "index.ts",
       );
 
+      let flatTranslations: TranslationObject = {};
+
       if (!fs.existsSync(mainLanguagePath)) {
-        return {};
+        logger.debug(`Main language file not found: ${mainLanguagePath}`);
+      } else {
+        // Use dynamic import for proper ES module support
+        let translationModule: TranslationModule;
+        try {
+          // Convert to file URL for dynamic import
+          const fileUrl = FILE_PROTOCOL + mainLanguagePath;
+          translationModule = (await import(fileUrl)) as TranslationModule;
+        } catch (importError) {
+          logger.error("Failed to import translation module", {
+            path: mainLanguagePath,
+            error: parseError(importError).message,
+          });
+          return {};
+        }
+
+        const translations =
+          translationModule.default || translationModule.translations;
+
+        if (!translations) {
+          logger.error("No translations found in module", {
+            path: mainLanguagePath,
+            availableExports: Object.keys(translationModule),
+          });
+        } else {
+          flatTranslations = translations;
+        }
       }
 
-      // Use dynamic import for proper ES module support
-      let translationModule: TranslationModule;
-      try {
-        // Convert to file URL for dynamic import
-        const fileUrl = FILE_PROTOCOL + mainLanguagePath;
-        translationModule = (await import(fileUrl)) as TranslationModule;
-      } catch (importError) {
-        logger.error("Failed to import translation module", {
-          path: mainLanguagePath,
-          error: parseError(importError).message,
-        });
-        return {};
-      }
+      // STEP 2: Load from existing co-located i18n files and merge
+      logger.info(`Loading existing co-located i18n files for ${languageDefaults.language}...`);
+      const colocatedTranslations = await this.loadColocatedTranslations(
+        languageDefaults.language,
+        logger,
+      );
 
-      const translations =
-        translationModule.default || translationModule.translations;
+      // STEP 3: Merge flat and co-located translations (co-located takes precedence)
+      const mergedTranslations = { ...flatTranslations, ...colocatedTranslations };
 
-      if (!translations) {
-        logger.error("No translations found in module", {
-          path: mainLanguagePath,
-          availableExports: Object.keys(translationModule),
-        });
-        return {};
-      }
+      logger.info(
+        `Loaded ${Object.keys(flatTranslations).length} keys from flat structure, ` +
+        `${Object.keys(colocatedTranslations).length} keys from co-located files, ` +
+        `${Object.keys(mergedTranslations).length} total keys for current translations`,
+      );
 
-      return translations;
+      return mergedTranslations;
     } catch (error) {
       logger.debug(
         `Failed to load current translations: ${parseError(error).message}`,
