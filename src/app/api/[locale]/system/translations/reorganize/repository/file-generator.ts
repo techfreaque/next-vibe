@@ -905,19 +905,21 @@ export class FileGenerator {
         continue;
       }
 
-      // Check if this child has a generated file OR will generate one (has children with files)
+      // Check if this child has translations at its location
       const hasGeneratedFile = generatedFiles.has(childLocation);
-      const hasChildrenWithFiles = [...generatedFiles].some((loc) =>
-        loc.startsWith(`${childLocation}/`),
-      );
 
-      // Also check if the child i18n directory actually exists
+      // Check if the child i18n directory actually exists
       const childI18nDir = buildPath("src", childLocation, I18N_PATH, language);
       const childIndexExists = fs.existsSync(
         buildPath(childI18nDir, INDEX_FILE),
       );
 
-      if (!hasGeneratedFile && !hasChildrenWithFiles && !childIndexExists) {
+      // Only import if child has its own translations OR its i18n dir exists
+      // Don't import just because it has descendants - those have their own aggregators
+      if (!hasGeneratedFile && !childIndexExists) {
+        logger.debug(
+          `Skipping child "${child}" - no file and i18n doesn't exist`,
+        );
         continue;
       }
 
