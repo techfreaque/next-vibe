@@ -1941,10 +1941,10 @@ export class TranslationReorganizeRepositoryImpl {
                 // But ignore parameter placeholders like [threadId] when checking
                 const keyPartCamel = toCamelCase(keyPart);
 
-                // Check for exact match
+                // Check for exact match (case-insensitive)
                 const hasExactMatch = locationRemainderCamel.some(
                   (locPart) =>
-                    !locPart.startsWith("[") && locPart === keyPartCamel,
+                    !locPart.startsWith("[") && locPart.toLowerCase() === keyPartCamel.toLowerCase(),
                 );
                 if (hasExactMatch) {
                   return false; // Remove exact matches
