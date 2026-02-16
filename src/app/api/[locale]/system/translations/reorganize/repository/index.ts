@@ -1962,15 +1962,17 @@ export class TranslationReorganizeRepositoryImpl {
           if (actualLocationPrefix && keySuffix) {
             correctKey = `${actualLocationPrefix}.${keySuffix}`;
           } else if (actualLocationPrefix && !keySuffix) {
-            // No suffix - key matches location exactly, keep adjusted key
-            correctKey = adjustedKey;
+            // No suffix - the key's non-location parts were all filtered out
+            // This shouldn't happen in normal cases, but if it does,
+            // use the last part of the original key as suffix
             keySuffix = keyParts[keyParts.length - 1];
+            correctKey = `${actualLocationPrefix}.${keySuffix}`;
           } else {
             // No location prefix (root level) - keep adjusted key unchanged
             // This happens when common ancestor is at src/ root, which means
             // the key is used across multiple top-level directories
-            correctKey = adjustedKey;
             keySuffix = keyParts[keyParts.length - 1];
+            correctKey = adjustedKey;
           }
 
           // NOTE: Flattening simulation removed - will be done after all keys collected
