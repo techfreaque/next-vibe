@@ -1703,7 +1703,13 @@ export class TranslationReorganizeRepositoryImpl {
         if (location === "") {
           const keyPrefix = fullPath.split(".")[0];
           // Map keys like config.* to config folder, app-native.* to app-native folder, etc.
-          if (keyPrefix && keyPrefix !== "app" && keyPrefix !== "packages") {
+          // Exclude "src" because it's the base directory and would create src/src/
+          if (
+            keyPrefix &&
+            keyPrefix !== "app" &&
+            keyPrefix !== "packages" &&
+            keyPrefix !== "src"
+          ) {
             location = keyPrefix;
             logger.debug(
               `Mapped root-level key ${fullPath} to folder: ${location}`,
