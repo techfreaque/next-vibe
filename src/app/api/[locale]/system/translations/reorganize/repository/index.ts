@@ -1126,7 +1126,12 @@ export class TranslationReorganizeRepositoryImpl {
       );
 
       // CRITICAL: Apply flattening while resolving conflicts
-      this.applyFlatteningWithConflictResolution(groups, originalKeys, keyMappings, logger);
+      this.applyFlatteningWithConflictResolution(
+        groups,
+        originalKeys,
+        keyMappings,
+        logger,
+      );
 
       // After reorganization, check for keys in source files that don't match new structure
       // Build flat map of all keys in new structure
@@ -1348,7 +1353,8 @@ export class TranslationReorganizeRepositoryImpl {
               // Otherwise regrouping will fail because it looks for the old intermediate key
               const locationTranslations = groups.get(location)!;
               if (locationTranslations[originalKey] !== undefined) {
-                locationTranslations[correctKey] = locationTranslations[originalKey];
+                locationTranslations[correctKey] =
+                  locationTranslations[originalKey];
                 delete locationTranslations[originalKey];
               }
 
@@ -1666,11 +1672,17 @@ export class TranslationReorganizeRepositoryImpl {
             } else {
               // Check if any segments in keyRemainder also appear in locationRemainder
               // This handles cases where dynamic parameters like [threadId] appear in the middle
+              // CRITICAL: Convert to camelCase for comparison since folders use kebab-case
+              const toCamelCase = (str: string) =>
+                str.replace(/[-_]([a-z0-9])/g, (_, letter) => letter.toUpperCase());
+              const locationRemainderCamel = locationRemainder.map(toCamelCase);
+
               suffixParts = keyRemainder.filter((keyPart) => {
                 // Keep the part if it's NOT in the location remainder
                 // But ignore parameter placeholders like [threadId] when checking
-                return !locationRemainder.some(
-                  (locPart) => !locPart.startsWith("[") && locPart === keyPart,
+                const keyPartCamel = toCamelCase(keyPart);
+                return !locationRemainderCamel.some(
+                  (locPart) => !locPart.startsWith("[") && locPart === keyPartCamel,
                 );
               });
             }
@@ -1795,28 +1807,41 @@ export class TranslationReorganizeRepositoryImpl {
 
       for (const key of allKeys) {
         const hasChildren = allKeys.some(
-          (otherKey) => otherKey !== key && otherKey.startsWith(`${key}.`)
+          (otherKey) => otherKey !== key && otherKey.startsWith(`${key}.`),
         );
 
         if (hasChildren) {
           conflicts.add(key);
-          logger.warn(`CONFLICT at ${location}: "${key}" has both value and children`);
+          logger.warn(
+            `CONFLICT at ${location}: "${key}" has both value and children`,
+          );
 
-          const conflictIndex = originalKeysList.findIndex(({ key: k }) => k === key);
+          const conflictIndex = originalKeysList.findIndex(
+            ({ key: k }) => k === key,
+          );
           if (conflictIndex !== -1) {
             const { value } = originalKeysList[conflictIndex];
             const newKey = `${key}._conflict_0`;
             originalKeysList[conflictIndex] = { key: newKey, value };
 
-            const fullOldKey = locationPrefix ? `${locationPrefix}.${key}` : key;
-            const fullNewKey = locationPrefix ? `${locationPrefix}.${newKey}` : newKey;
+            const fullOldKey = locationPrefix
+              ? `${locationPrefix}.${key}`
+              : key;
+            const fullNewKey = locationPrefix
+              ? `${locationPrefix}.${newKey}`
+              : newKey;
             const groupTranslations = groups.get(location);
-            if (groupTranslations && groupTranslations[fullOldKey] !== undefined) {
+            if (
+              groupTranslations &&
+              groupTranslations[fullOldKey] !== undefined
+            ) {
               groupTranslations[fullNewKey] = groupTranslations[fullOldKey];
               delete groupTranslations[fullOldKey];
             }
 
-            logger.info(`CONFLICT-FIX: Renamed "${fullOldKey}" -> "${fullNewKey}"`);
+            logger.info(
+              `CONFLICT-FIX: Renamed "${fullOldKey}" -> "${fullNewKey}"`,
+            );
           }
         }
       }
