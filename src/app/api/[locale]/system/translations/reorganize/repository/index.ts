@@ -1330,25 +1330,47 @@ export class TranslationReorganizeRepositoryImpl {
           const locationPrefix =
             this.fileGenerator!.locationToFlatKeyPublic(location);
 
-          // Create the key path relative to location
-          let keySuffix = sourceKey;
-          if (locationPrefix && sourceKey.startsWith(`${locationPrefix}.`)) {
-            keySuffix = sourceKey.slice(locationPrefix.length + 1);
+          // Calculate the correct key for this location
+          // Similar logic to lines 1860-1979, but simplified for missing keys
+          const keyParts = sourceKey.split(".");
+          const locationParts = location.split("/");
+
+          // Find common prefix
+          let commonPrefixLength = 0;
+          for (
+            let i = 0;
+            i < Math.min(keyParts.length, locationParts.length);
+            i++
+          ) {
+            if (keyParts[i] === locationParts[i]) {
+              commonPrefixLength = i + 1;
+            } else {
+              break;
+            }
           }
+
+          // Get key remainder after common prefix
+          const keyRemainder = keyParts.slice(commonPrefixLength);
+          let keySuffix = keyRemainder.join(".");
+
+          // Build correct key with location prefix
+          const correctPlaceholderKey = locationPrefix
+            ? `${locationPrefix}.${keySuffix}`
+            : keySuffix;
 
           // Add to groups with placeholder value
           if (!groups.has(location)) {
             groups.set(location, {});
           }
           const groupTranslations = groups.get(location)!;
-          groupTranslations[correctKey] = `TODO: ${keySuffix}`;
+          groupTranslations[correctPlaceholderKey] = `TODO: ${keySuffix}`;
 
           // Add to originalKeys so it gets processed in conflict resolution and regrouping
           if (!originalKeys.has(location)) {
             originalKeys.set(location, []);
           }
           originalKeys.get(location)!.push({
-            key: correctKey,
+            key: correctPlaceholderKey,
             value: `TODO: ${keySuffix}`,
           });
 
@@ -1363,9 +1385,9 @@ export class TranslationReorganizeRepositoryImpl {
           );
 
           // Track key mapping for updating source files if source key differs from correct key
-          if (sourceKey !== correctKey) {
-            keyMappings.set(sourceKey, correctKey);
-            logger.info(`MAPPING: "${sourceKey}" -> "${correctKey}"`);
+          if (sourceKey !== correctPlaceholderKey) {
+            keyMappings.set(sourceKey, correctPlaceholderKey);
+            logger.info(`MAPPING: "${sourceKey}" -> "${correctPlaceholderKey}"`);
           }
         }
       }
