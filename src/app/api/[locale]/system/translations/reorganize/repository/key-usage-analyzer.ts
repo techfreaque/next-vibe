@@ -162,9 +162,7 @@ export class KeyUsageAnalyzer {
     }
 
     const keysFound = keyUsageMap.size;
-    logger.info(
-      `Found ${keysFound} unique translation keys in source files`,
-    );
+    logger.info(`Found ${keysFound} unique translation keys in source files`);
 
     return keyUsageMap;
   }
