@@ -82,7 +82,7 @@ vibe translations:reorganize --regenerateStructure=true --dryRun=false -v > /tmp
 ### Step 3: Start Type Check in Background (DO NOT WAIT)
 
 ```bash
-nohup bun x tsgo > ./.tmp/tsgo-errors.txt
+bunx tsgo --noEmit --incremental --tsBuildInfoFile tsconfig.tsbuildinfo --skipLibCheck --project tsconfig.json > ./.tmp/tsgo-errors.txt
 ```
 
 **Important:**
