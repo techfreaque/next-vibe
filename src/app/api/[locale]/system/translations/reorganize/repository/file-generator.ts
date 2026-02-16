@@ -1040,6 +1040,36 @@ export class FileGenerator {
               ? kebabKey
               : null;
 
+          // If this key matches a SPREAD child's exported key, skip it to avoid overwriting
+          // When [locale] is spread, its children (admin, story, etc.) become direct properties
+          // We should never add inline content that conflicts with spread child exports
+          if (hasSpreadChild) {
+            const spreadChildLocation = `${sourcePath}/[locale]`;
+            const spreadChildTranslations = groups.get(spreadChildLocation);
+
+            if (spreadChildTranslations) {
+              // Check if this key exists in the spread child's translations
+              // The spread child has keys like "app.[locale].admin.xxx" and exports them as "admin: xxx"
+              // So we need to check if the flattened child translations contain any key starting with this key
+              const flattenedSpreadChild = this.flattenTranslationObject(spreadChildTranslations, "");
+              const locationPrefix = this.locationToFlatKey(sourcePath);
+              const spreadChildPrefix = locationPrefix ? `${locationPrefix}.[locale].${key}` : `[locale].${key}`;
+
+              // Check if any key in spread child starts with this prefix
+              const existsInSpreadChild = Object.keys(flattenedSpreadChild).some((childKey) =>
+                childKey === spreadChildPrefix || childKey.startsWith(`${spreadChildPrefix}.`)
+              );
+
+              if (existsInSpreadChild) {
+                // This key will be provided by the spread child - skip inline to avoid overwrite
+                logger.debug(
+                  `Skipping inline key "${key}" at ${sourcePath} - conflicts with spread [locale] child`
+                );
+                continue;
+              }
+            }
+          }
+
           if (matchingChild) {
             const childLocation = `${sourcePath}/${matchingChild}`;
             const hasGeneratedFile = generatedFiles.has(childLocation);
@@ -1110,7 +1140,15 @@ export class FileGenerator {
           }
           usedExportKeys.add(plainKey);
 
-          exports.push(`  ${exportKey}: ${valueStr}`);
+          // Special handling for "common" key when we have a spread child
+          // Both the spread child and parent location may have "common" keys
+          // We need to merge them, not let one overwrite the other
+          if (plainKey === "common" && hasSpreadChild) {
+            // Add as spread to merge with existing common from spread child
+            exports.push(`  ...${valueStr}`);
+          } else {
+            exports.push(`  ${exportKey}: ${valueStr}`);
+          }
         }
       } catch (error) {
         logger.error(
