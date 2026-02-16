@@ -67,10 +67,14 @@
 
 ```bash
 # Reset to clean state - removes all regeneration files from previous attempts
-git reset --hard HEAD && git clean -fd
+# IMPORTANT: Use -fdx to also remove untracked i18n directories from failed regenerations
+git reset --hard HEAD && git clean -fdx
+# After clean, restore .env and reinstall deps
+cp .env.example .env 2>/dev/null || true
+bun install
 ```
 
-**Why:** Ensures you're regenerating from a clean, known state, not from broken/partial regenerations.
+**Why:** Ensures you're regenerating from a clean, known state, not from broken/partial regenerations. The -fdx flag removes untracked i18n directories created by failed regenerations.
 
 ### Step 2: Run Regeneration
 
