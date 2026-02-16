@@ -1316,12 +1316,11 @@ export class TranslationReorganizeRepositoryImpl {
               ? locations[0]
               : this.getCommonAncestorLocation(locations);
 
-          // Safeguard: Never use "src" as a location since it's the base directory
-          if (location === "src") {
-            location = "";
-            logger.debug(
-              `Converted placeholder location "src" to root level for key: ${sourceKey}`,
-            );
+          // Strip src/ prefix if present (locations from getSpecificUsageLocations might include it)
+          if (location.startsWith("src/")) {
+            location = location.slice(4); // Remove "src/"
+          } else if (location === "src") {
+            location = ""; // Root level
           }
 
           // Add placeholder entry to groups
