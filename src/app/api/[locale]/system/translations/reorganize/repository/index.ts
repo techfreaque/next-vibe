@@ -2133,10 +2133,19 @@ export class TranslationReorganizeRepositoryImpl {
             `Extracted translation: ${completeKey} (lookup: ${lookupKey}) = ${sourceValue}`,
           );
         } else {
-          // Only log at debug level - these are expected when keys are defined but not yet translated
-          logger.debug(
-            `Could not find translation for key: ${completeKey} (lookup: ${lookupKey})`,
-          );
+          // Key doesn't exist in old translations
+          // If the English value is a TODO placeholder, use it (for new keys)
+          if (typeof englishValue === "string" && englishValue.startsWith("TODO: ")) {
+            targetLocationTranslations[key] = englishValue;
+            logger.info(
+              `Using placeholder for new key: ${completeKey} = ${englishValue}`,
+            );
+          } else {
+            // Only log at debug level - these are expected when keys are defined but not yet translated
+            logger.debug(
+              `Could not find translation for key: ${completeKey} (lookup: ${lookupKey})`,
+            );
+          }
         }
       }
     }
