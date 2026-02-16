@@ -827,6 +827,14 @@ export class FileGenerator {
     logger: EndpointLogger,
     generatedFiles: Set<string>,
   ): void {
+    // Skip sourcePath="src" to prevent creating src/src/ directory
+    if (sourcePath === "src") {
+      logger.info(
+        `Skipping sourcePath "src" (would create src/src/ directory)`,
+      );
+      return;
+    }
+
     // Skip generating index files for scoped translation directories
     const i18nPath = buildPath("src", sourcePath, I18N_PATH);
     if (this.hasScopedIndexFile(i18nPath)) {
