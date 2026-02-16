@@ -1168,7 +1168,7 @@ export class TranslationReorganizeRepositoryImpl {
             if (entry.isDirectory()) {
               // Check if this is an i18n/${language} directory
               if (entry.name === "i18n") {
-                const langFile = path.join(fullPath, language, "app.api.system.translations.reorganize.repository.index.ts");
+                const langFile = path.join(fullPath, language, "index.ts");
                 if (fs.existsSync(langFile)) {
                   files.push(langFile);
                 }
@@ -1872,7 +1872,7 @@ export class TranslationReorganizeRepositoryImpl {
           // For example:
           // - Key: app.admin.components.navigation.dashboard
           // - Location: app/[locale]/admin/_components → prefix: app.admin._components
-          // - We replace "app.api.system.translations.reorganize.repository.admin.components" with "app.api.system.translations.reorganize.repository.admin._components"
+          // - We replace "app.api.system.translations.reorganize.repository.admin.components" with "app.api.system.translations.reorganize.repository.admin.Components"
           // - Suffix: navigation.dashboard
           // - Correct key: app.admin._components.navigation.dashboard
 
