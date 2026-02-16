@@ -1590,20 +1590,15 @@ export class TranslationReorganizeRepositoryImpl {
       // These are segments that represent actual folder names, not just nested objects in a file
       const folderSegments = new Set<string>(["common"]); // Always preserve "common"
 
-      // Extract folder segments from all keys at this location
-      // For example, if we have keys like "[...slug].notFound", "[id].details", etc.
-      // we need to preserve "[...slug]" and "[id]" as they are folder names
+      // Extract ALL intermediate path segments from all keys at this location
+      // For example, if we have keys like "[...slug].notFound", "[id].details.name", etc.
+      // we need to preserve ALL segments except the last: "[...slug]", "[id]", "details"
+      // because they ALL represent folder/file structure, not redundant nesting
       for (const key of Object.keys(strippedTranslations)) {
         const segments = key.split(".");
-        // First segment after location prefix is often a folder name if it matches certain patterns
-        if (segments.length > 1) {
-          const firstSegment = segments[0];
-          // Preserve segments that look like folder names:
-          // - Start with [ (dynamic routes like [id], [...slug])
-          // - Common folder patterns
-          if (firstSegment.startsWith("[") || firstSegment === "common" || firstSegment === "_components") {
-            folderSegments.add(firstSegment);
-          }
+        // Add ALL segments except the last one (which is the actual leaf translation key)
+        for (let i = 0; i < segments.length - 1; i++) {
+          folderSegments.add(segments[i]);
         }
       }
 
