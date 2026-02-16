@@ -680,9 +680,6 @@ export class FileGenerator {
     // Remove [locale] segments
     key = key.replaceAll("/[locale]", "");
 
-    // Remove _components folders from the path
-    key = key.replaceAll("/_components", "");
-
     // Convert kebab-case folder names to camelCase
     // e.g., unified-interface -> unifiedInterface, react-native -> reactNative
     key = key.replaceAll(
@@ -911,14 +908,6 @@ export class FileGenerator {
     // Import from direct children - but only if they have generated files
     for (const child of directChildren) {
       const childLocation = `${sourcePath}/${child}`;
-
-      // Skip _components directories - they should not be exported as separate keys
-      if (child === "_components") {
-        logger.debug(
-          `Skipping _components directory at ${sourcePath} (should be merged into parent)`,
-        );
-        continue;
-      }
 
       // Skip "src" ONLY at root level - would create circular imports
       // But allow "src" as subdirectory name (e.g., launchpad/src)
