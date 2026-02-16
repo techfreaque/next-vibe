@@ -1353,8 +1353,32 @@ export class TranslationReorganizeRepositoryImpl {
 
           // Get key remainder after common prefix
           const keyRemainder = keyParts.slice(commonPrefixLength);
+
+          // Strip duplicate path segments from keyRemainder that appear in location
+          // This handles cases where old keys have folder names that are now in the path
+          // Example: location "app/[locale]/admin/_components" has prefix "app.admin._components"
+          // Old key "app.admin.components.navigation.dashboard" has remainder "components.navigation.dashboard"
+          // We need to filter out "components" since "_components" is in the location
+          const locationRemainder = locationParts.slice(commonPrefixLength);
+          const toCamelCase = (str: string) =>
+            str.replace(/[-_]([a-z0-9])/g, (_, letter) => letter.toUpperCase());
+          const locationRemainderCamel = locationRemainder.map(toCamelCase);
+
+          const filteredRemainder = keyRemainder.filter((keyPart) => {
+            const keyPartCamel = toCamelCase(keyPart);
+            // Remove parts that match location segments (case-insensitive)
+            const hasExactMatch = locationRemainderCamel.some(
+              (locPart) =>
+                !locPart.startsWith("[") && locPart.toLowerCase() === keyPartCamel.toLowerCase()
+            );
+            if (hasExactMatch) {
+              return false; // Remove exact matches
+            }
+            return true; // Keep other parts
+          });
+
           // Normalize snake_case to camelCase for each part
-          const normalizedRemainder = keyRemainder.map((part) =>
+          const normalizedRemainder = filteredRemainder.map((part) =>
             part.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()),
           );
           let keySuffix = normalizedRemainder.join(".");
