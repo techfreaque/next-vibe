@@ -1142,6 +1142,9 @@ export class TranslationReorganizeRepositoryImpl {
     const result: TranslationObject = {};
     const projectRoot = process.cwd();
 
+    // Ensure fileGenerator is loaded
+    await this.getFileGenerator();
+
     // Scan for i18n files in src/app and src/app/api
     const searchPaths = [
       path.join(projectRoot, "src/app"),
