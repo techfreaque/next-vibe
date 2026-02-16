@@ -233,6 +233,14 @@ export class FileGenerator {
   ): void {
     // Step 1: Generate leaf files (actual translation files)
     for (const [location, translations] of groups) {
+      // Skip location="src" to prevent creating src/src/ directory
+      if (location === "src") {
+        logger.info(
+          `Skipping location "src" (would create src/src/ directory)`,
+        );
+        continue;
+      }
+
       // Skip generating files for scoped translation directories
       const i18nPath = buildPath("src", location, I18N_PATH);
       if (this.hasScopedIndexFile(i18nPath)) {
