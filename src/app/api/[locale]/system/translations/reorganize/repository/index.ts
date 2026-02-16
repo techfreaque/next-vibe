@@ -2549,6 +2549,7 @@ export class TranslationReorganizeRepositoryImpl {
       .replace(/^src\//, "")
       .replaceAll("/", ".")
       .replace(/\[locale\]\.?/, "")
+      .replace(/\._components\.?/g, ".")
       .replace(/\.i18n.*$/, "");
   }
 
