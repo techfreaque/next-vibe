@@ -164,10 +164,13 @@ export class TranslationReorganizeRepositoryImpl {
       );
 
       output.push(
-        t("app.api.system.translations.reorganize.repository.app.api.messages.foundKeys", {
-          used: usedKeys,
-          total: allKeys.size,
-        }),
+        t(
+          "app.api.system.translations.reorganize.repository.app.api.messages.foundKeys",
+          {
+            used: usedKeys,
+            total: allKeys.size,
+          },
+        ),
       );
 
       // Handle unused key removal if requested
@@ -985,19 +988,24 @@ export class TranslationReorganizeRepositoryImpl {
       }
 
       // STEP 2: Load from existing co-located i18n files and merge
-      logger.info(`Loading existing co-located i18n files for ${languageDefaults.language}...`);
+      logger.info(
+        `Loading existing co-located i18n files for ${languageDefaults.language}...`,
+      );
       const colocatedTranslations = await this.loadColocatedTranslations(
         languageDefaults.language,
         logger,
       );
 
       // STEP 3: Merge flat and co-located translations (co-located takes precedence)
-      const mergedTranslations = { ...flatTranslations, ...colocatedTranslations };
+      const mergedTranslations = {
+        ...flatTranslations,
+        ...colocatedTranslations,
+      };
 
       logger.info(
         `Loaded ${Object.keys(flatTranslations).length} keys from flat structure, ` +
-        `${Object.keys(colocatedTranslations).length} keys from co-located files, ` +
-        `${Object.keys(mergedTranslations).length} total keys for current translations`,
+          `${Object.keys(colocatedTranslations).length} keys from co-located files, ` +
+          `${Object.keys(mergedTranslations).length} total keys for current translations`,
       );
 
       return mergedTranslations;
@@ -1023,7 +1031,8 @@ export class TranslationReorganizeRepositoryImpl {
       return entries
         .filter((entry) => entry.isDirectory())
         .map((entry) => entry.name)
-        .filter((name) => !name.startsWith("."));
+        .filter((name) => !name.startsWith("."))
+        .filter((name) => name !== "core"); // Exclude infrastructure directories
     } catch {
       return [languageDefaults.language];
     }
@@ -1047,64 +1056,71 @@ export class TranslationReorganizeRepositoryImpl {
       if (!fs.existsSync(languagePath)) {
         logger.debug(`Language file not found: ${languagePath}`);
       } else {
-
-      // Try to use dynamic import first (proper ES module support)
-      try {
-        const fileUrl = FILE_PROTOCOL + languagePath;
-        const translationModule = (await import(fileUrl)) as TranslationModule;
-        const translations =
-          translationModule.default || translationModule.translations;
-
-        if (translations && typeof translations === "object") {
-          logger.debug(
-            `Successfully loaded translations for ${language} via import`,
-          );
-          flatTranslations = translations;
-        }
-      } catch (importError) {
-        logger.debug(
-          `Import failed for ${language}, trying file parsing: ${parseError(importError).message}`,
-        );
-      }
-
-      // Fallback to file parsing
-      const content = fs.readFileSync(languagePath, "utf8");
-
-      // Extract the translation object (improved parsing)
-      const match = content.match(
-        /export\s+const\s+\w+\s*(?::\s*[^=]+)?\s*=\s*({[\s\S]*?})\s*as\s+const/,
-      );
-      if (match) {
-        const translationString = match[1];
+        // Try to use dynamic import first (proper ES module support)
         try {
-          // Attempt to parse as JSON (works for simple structures)
-          const translations = JSON.parse(
-            translationString,
-          ) as TranslationObject;
+          const fileUrl = FILE_PROTOCOL + languagePath;
+          const translationModule = (await import(
+            fileUrl
+          )) as TranslationModule;
+          const translations =
+            translationModule.default || translationModule.translations;
+
+          if (translations && typeof translations === "object") {
+            logger.debug(
+              `Successfully loaded translations for ${language} via import`,
+            );
+            flatTranslations = translations;
+          }
+        } catch (importError) {
           logger.debug(
-            `Successfully parsed translations for ${language} via JSON`,
+            `Import failed for ${language}, trying file parsing: ${parseError(importError).message}`,
           );
-          flatTranslations = translations;
-        } catch (jsonError) {
-          logger.debug(
-            `JSON parsing failed for ${language}: ${parseError(jsonError).message}`,
-          );
-          // Could add more sophisticated parsing here if needed
         }
-      }
+
+        // Fallback to file parsing
+        const content = fs.readFileSync(languagePath, "utf8");
+
+        // Extract the translation object (improved parsing)
+        const match = content.match(
+          /export\s+const\s+\w+\s*(?::\s*[^=]+)?\s*=\s*({[\s\S]*?})\s*as\s+const/,
+        );
+        if (match) {
+          const translationString = match[1];
+          try {
+            // Attempt to parse as JSON (works for simple structures)
+            const translations = JSON.parse(
+              translationString,
+            ) as TranslationObject;
+            logger.debug(
+              `Successfully parsed translations for ${language} via JSON`,
+            );
+            flatTranslations = translations;
+          } catch (jsonError) {
+            logger.debug(
+              `JSON parsing failed for ${language}: ${parseError(jsonError).message}`,
+            );
+            // Could add more sophisticated parsing here if needed
+          }
+        }
       }
 
       // STEP 2: Load from existing co-located i18n files and merge
       logger.info(`Loading existing co-located i18n files for ${language}...`);
-      const colocatedTranslations = await this.loadColocatedTranslations(language, logger);
+      const colocatedTranslations = await this.loadColocatedTranslations(
+        language,
+        logger,
+      );
 
       // STEP 3: Merge flat and co-located translations (co-located takes precedence)
-      const mergedTranslations = { ...flatTranslations, ...colocatedTranslations };
+      const mergedTranslations = {
+        ...flatTranslations,
+        ...colocatedTranslations,
+      };
 
       logger.info(
         `Loaded ${Object.keys(flatTranslations).length} keys from flat structure, ` +
-        `${Object.keys(colocatedTranslations).length} keys from co-located files, ` +
-        `${Object.keys(mergedTranslations).length} total keys for ${language}`,
+          `${Object.keys(colocatedTranslations).length} keys from co-located files, ` +
+          `${Object.keys(mergedTranslations).length} total keys for ${language}`,
       );
 
       return mergedTranslations;
@@ -1133,7 +1149,9 @@ export class TranslationReorganizeRepositoryImpl {
     ];
 
     for (const searchPath of searchPaths) {
-      if (!fs.existsSync(searchPath)) continue;
+      if (!fs.existsSync(searchPath)) {
+        continue;
+      }
 
       // Find all i18n/${language}/index.ts files
       const findI18nFiles = (dir: string): string[] => {
@@ -1163,7 +1181,9 @@ export class TranslationReorganizeRepositoryImpl {
       };
 
       const i18nFiles = findI18nFiles(searchPath);
-      logger.info(`Found ${i18nFiles.length} co-located i18n files for ${language} in ${searchPath}`);
+      logger.info(
+        `Found ${i18nFiles.length} co-located i18n files for ${language} in ${searchPath}`,
+      );
 
       // Load each file and merge into result
       for (const filePath of i18nFiles) {
@@ -1172,7 +1192,9 @@ export class TranslationReorganizeRepositoryImpl {
           // e.g., src/app/api/[locale]/agent/models/openrouter/i18n/en/index.ts
           //    -> app.api.agent.models.openrouter
           const relativePath = path.relative(projectRoot, filePath);
-          const locationPath = path.dirname(path.dirname(path.dirname(relativePath))); // Remove /i18n/en/index.ts
+          const locationPath = path.dirname(
+            path.dirname(path.dirname(relativePath)),
+          ); // Remove /i18n/en/index.ts
           const locationPrefix = locationPath
             .replace(/^src\//, "")
             .replace(/\/\[locale\]/g, "") // Remove [locale] segment
@@ -1180,22 +1202,30 @@ export class TranslationReorganizeRepositoryImpl {
 
           // Load the file
           const fileUrl = FILE_PROTOCOL + filePath;
-          const translationModule = (await import(fileUrl)) as TranslationModule;
-          const translations = translationModule.default || translationModule.translations;
+          const translationModule = (await import(
+            fileUrl
+          )) as TranslationModule;
+          const translations =
+            translationModule.default || translationModule.translations;
 
           if (translations && typeof translations === "object") {
             // Flatten and prefix all keys with the location prefix
-            const flattenedKeys = this.fileGenerator!.flattenTranslationObjectPublic(translations);
+            const flattenedKeys =
+              this.fileGenerator!.flattenTranslationObjectPublic(translations);
 
             for (const [key, value] of Object.entries(flattenedKeys)) {
               const fullKey = locationPrefix ? `${locationPrefix}.${key}` : key;
               result[fullKey] = value;
             }
 
-            logger.debug(`Loaded ${Object.keys(flattenedKeys).length} keys from ${relativePath}`);
+            logger.debug(
+              `Loaded ${Object.keys(flattenedKeys).length} keys from ${relativePath}`,
+            );
           }
         } catch (err) {
-          logger.debug(`Failed to load co-located file ${filePath}: ${parseError(err).message}`);
+          logger.debug(
+            `Failed to load co-located file ${filePath}: ${parseError(err).message}`,
+          );
         }
       }
     }
@@ -1281,12 +1311,14 @@ export class TranslationReorganizeRepositoryImpl {
 
         if (locations.length > 0) {
           // Use first location (or common ancestor if multiple)
-          const location = locations.length === 1
-            ? locations[0]
-            : this.getCommonAncestorLocation(locations);
+          const location =
+            locations.length === 1
+              ? locations[0]
+              : this.getCommonAncestorLocation(locations);
 
           // Add placeholder entry to groups
-          const locationPrefix = this.fileGenerator!.locationToFlatKeyPublic(location);
+          const locationPrefix =
+            this.fileGenerator!.locationToFlatKeyPublic(location);
 
           // Create the key path relative to location
           let keySuffix = sourceKey;
@@ -1316,13 +1348,17 @@ export class TranslationReorganizeRepositoryImpl {
           }
           missingKeys.get(location)!.push(sourceKey);
 
-          logger.info(`Created placeholder for missing key: ${sourceKey} at ${location}`);
+          logger.info(
+            `Created placeholder for missing key: ${sourceKey} at ${location}`,
+          );
         }
       }
 
       // Report missing keys summary
       if (missingKeys.size > 0) {
-        logger.warn(`Created placeholders for ${Array.from(missingKeys.values()).flat().length} missing keys across ${missingKeys.size} locations`);
+        logger.warn(
+          `Created placeholders for ${[...missingKeys.values()].flat().length} missing keys across ${missingKeys.size} locations`,
+        );
       }
 
       logger.info(`Generated ${keyMappings.size} source file mappings`);
@@ -2255,7 +2291,10 @@ export class TranslationReorganizeRepositoryImpl {
         } else {
           // Key doesn't exist in old translations
           // If the English value is a TODO placeholder, use it (for new keys)
-          if (typeof englishValue === "string" && englishValue.startsWith("TODO: ")) {
+          if (
+            typeof englishValue === "string" &&
+            englishValue.startsWith("TODO: ")
+          ) {
             targetLocationTranslations[key] = englishValue;
             logger.info(
               `Using placeholder for new key: ${completeKey} = ${englishValue}`,
