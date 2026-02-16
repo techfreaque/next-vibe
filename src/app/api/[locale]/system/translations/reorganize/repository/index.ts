@@ -1311,10 +1311,18 @@ export class TranslationReorganizeRepositoryImpl {
 
         if (locations.length > 0) {
           // Use first location (or common ancestor if multiple)
-          const location =
+          let location =
             locations.length === 1
               ? locations[0]
               : this.getCommonAncestorLocation(locations);
+
+          // Safeguard: Never use "src" as a location since it's the base directory
+          if (location === "src") {
+            location = "";
+            logger.debug(
+              `Converted placeholder location "src" to root level for key: ${sourceKey}`,
+            );
+          }
 
           // Add placeholder entry to groups
           const locationPrefix =
