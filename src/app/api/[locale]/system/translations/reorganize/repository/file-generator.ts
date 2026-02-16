@@ -864,6 +864,7 @@ export class FileGenerator {
     const imports: string[] = [];
     const exports: string[] = [];
     const usedImportNames = new Set<string>();
+    const usedExportKeys = new Set<string>(); // Track export keys to prevent duplicates
     const hasSpreadChild = directChildren.has("[locale]");
 
     // Import from direct children - but only if they have generated files
@@ -933,6 +934,8 @@ export class FileGenerator {
           exportKey = `"${exportKey}"`;
         }
 
+        // Track this export key
+        usedExportKeys.add(exportKey.replaceAll('"', ''));
         exports.push(`  ${exportKey}: ${importName}`);
       }
     }
@@ -1044,6 +1047,14 @@ export class FileGenerator {
           const exportKey = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(camelKey)
             ? camelKey
             : `"${camelKey}"`;
+
+          // Skip if this key was already exported (prevents duplicates)
+          const plainKey = exportKey.replaceAll('"', '');
+          if (usedExportKeys.has(plainKey)) {
+            continue;
+          }
+          usedExportKeys.add(plainKey);
+
           exports.push(`  ${exportKey}: ${valueStr}`);
         }
       } catch (error) {
