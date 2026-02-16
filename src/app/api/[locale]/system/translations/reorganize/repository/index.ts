@@ -135,10 +135,7 @@ export class TranslationReorganizeRepositoryImpl {
           "app.api.system.translations.reorganize.repository.messages.loadingFiles",
         ),
       );
-      const currentTranslations = await this.loadCurrentTranslations(
-        logger,
-        request.regenerateStructure,
-      );
+      const currentTranslations = await this.loadCurrentTranslations(logger);
 
       // Scan source files for ALL translation key patterns (double-quoted strings with dots)
       const sourceFileKeys =
@@ -949,7 +946,6 @@ export class TranslationReorganizeRepositoryImpl {
    */
   private async loadCurrentTranslations(
     logger: EndpointLogger,
-    regenerateStructure = false,
   ): Promise<TranslationObject> {
     try {
       // STEP 1: Load from flat structure
@@ -992,15 +988,6 @@ export class TranslationReorganizeRepositoryImpl {
       }
 
       // STEP 2: Load from existing co-located i18n files and merge
-      // IMPORTANT: When regenerating structure, ONLY use flat source translations
-      // to avoid loading broken structure from previous failed regenerations
-      if (regenerateStructure) {
-        logger.info(
-          `Regenerating structure - using ONLY flat source translations (${Object.keys(flatTranslations).length} keys)`,
-        );
-        return flatTranslations;
-      }
-
       logger.info(
         `Loading existing co-located i18n files for ${languageDefaults.language}...`,
       );
