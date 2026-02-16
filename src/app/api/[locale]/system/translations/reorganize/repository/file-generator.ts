@@ -885,15 +885,16 @@ export class FileGenerator {
 
     // Import from direct children - but only if they have generated files
     for (const child of directChildren) {
-      // Skip "src" as a child - it's the base directory and would create circular imports
-      if (child === "src") {
+      const childLocation = `${sourcePath}/${child}`;
+
+      // Skip "src" ONLY at root level - would create circular imports
+      // But allow "src" as subdirectory name (e.g., launchpad/src)
+      if (childLocation === "src") {
         logger.debug(
-          `Skipping "src" as a child directory (would create circular import)`,
+          `Skipping root "src" as child (would create circular import)`,
         );
         continue;
       }
-
-      const childLocation = `${sourcePath}/${child}`;
 
       // Skip scoped translation directories - they should not be imported into global schema
       const childI18nPath = buildPath("src", childLocation, I18N_PATH);
