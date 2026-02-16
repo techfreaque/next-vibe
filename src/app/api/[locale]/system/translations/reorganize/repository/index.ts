@@ -1020,12 +1020,13 @@ export class TranslationReorganizeRepositoryImpl {
     logger: EndpointLogger,
   ): Promise<TranslationObject> {
     try {
+      // STEP 1: Load from old flat structure
       const languagePath = path.join(TRANSLATIONS_DIR, language, "index.ts");
+      let flatTranslations: TranslationObject = {};
 
       if (!fs.existsSync(languagePath)) {
         logger.debug(`Language file not found: ${languagePath}`);
-        return {};
-      }
+      } else {
 
       // Try to use dynamic import first (proper ES module support)
       try {
@@ -1038,7 +1039,7 @@ export class TranslationReorganizeRepositoryImpl {
           logger.debug(
             `Successfully loaded translations for ${language} via import`,
           );
-          return translations;
+          flatTranslations = translations;
         }
       } catch (importError) {
         logger.debug(
@@ -1063,24 +1064,120 @@ export class TranslationReorganizeRepositoryImpl {
           logger.debug(
             `Successfully parsed translations for ${language} via JSON`,
           );
-          return translations;
+          flatTranslations = translations;
         } catch (jsonError) {
           logger.debug(
             `JSON parsing failed for ${language}: ${parseError(jsonError).message}`,
           );
           // Could add more sophisticated parsing here if needed
-          return {};
         }
       }
+      }
 
-      logger.debug(`No translation object found in ${languagePath}`);
-      return {};
+      // STEP 2: Load from existing co-located i18n files and merge
+      logger.info(`Loading existing co-located i18n files for ${language}...`);
+      const colocatedTranslations = await this.loadColocatedTranslations(language, logger);
+
+      // STEP 3: Merge flat and co-located translations (co-located takes precedence)
+      const mergedTranslations = { ...flatTranslations, ...colocatedTranslations };
+
+      logger.info(
+        `Loaded ${Object.keys(flatTranslations).length} keys from flat structure, ` +
+        `${Object.keys(colocatedTranslations).length} keys from co-located files, ` +
+        `${Object.keys(mergedTranslations).length} total keys for ${language}`,
+      );
+
+      return mergedTranslations;
     } catch (error) {
       logger.error(
         `Failed to load translations for ${language}: ${parseError(error).message}`,
       );
       return {};
     }
+  }
+
+  /**
+   * Load all existing co-located i18n files and flatten them into a single object
+   */
+  private async loadColocatedTranslations(
+    language: string,
+    logger: EndpointLogger,
+  ): Promise<TranslationObject> {
+    const result: TranslationObject = {};
+    const projectRoot = process.cwd();
+
+    // Scan for i18n files in src/app and src/app/api
+    const searchPaths = [
+      path.join(projectRoot, "src/app"),
+      path.join(projectRoot, "src/app/api"),
+    ];
+
+    for (const searchPath of searchPaths) {
+      if (!fs.existsSync(searchPath)) continue;
+
+      // Find all i18n/${language}/index.ts files
+      const findI18nFiles = (dir: string): string[] => {
+        const files: string[] = [];
+        try {
+          const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+          for (const entry of entries) {
+            const fullPath = path.join(dir, entry.name);
+
+            if (entry.isDirectory()) {
+              // Check if this is an i18n/${language} directory
+              if (entry.name === "i18n") {
+                const langFile = path.join(fullPath, language, "index.ts");
+                if (fs.existsSync(langFile)) {
+                  files.push(langFile);
+                }
+              }
+              // Recurse into subdirectories
+              files.push(...findI18nFiles(fullPath));
+            }
+          }
+        } catch (err) {
+          // Skip directories we can't read
+        }
+        return files;
+      };
+
+      const i18nFiles = findI18nFiles(searchPath);
+      logger.info(`Found ${i18nFiles.length} co-located i18n files for ${language} in ${searchPath}`);
+
+      // Load each file and merge into result
+      for (const filePath of i18nFiles) {
+        try {
+          // Extract location prefix from file path
+          // e.g., src/app/api/[locale]/agent/models/openrouter/i18n/en/index.ts
+          //    -> app.api.agent.models.openrouter
+          const relativePath = path.relative(projectRoot, filePath);
+          const locationPath = path.dirname(path.dirname(path.dirname(relativePath))); // Remove /i18n/en/index.ts
+          const locationPrefix = locationPath.replace(/^src\//, "").replace(/\//g, ".");
+
+          // Load the file
+          const fileUrl = FILE_PROTOCOL + filePath;
+          const translationModule = (await import(fileUrl)) as TranslationModule;
+          const translations = translationModule.default || translationModule.translations;
+
+          if (translations && typeof translations === "object") {
+            // Flatten and prefix all keys with the location prefix
+            const flattenedKeys = this.fileGenerator!.flattenTranslationObjectPublic(translations);
+
+            for (const [key, value] of Object.entries(flattenedKeys)) {
+              const fullKey = locationPrefix ? `${locationPrefix}.${key}` : key;
+              result[fullKey] = value;
+            }
+
+            logger.debug(`Loaded ${Object.keys(flattenedKeys).length} keys from ${relativePath}`);
+          }
+        } catch (err) {
+          logger.debug(`Failed to load co-located file ${filePath}: ${parseError(err).message}`);
+        }
+      }
+    }
+
+    return result;
   }
 
   /**
