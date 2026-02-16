@@ -910,7 +910,13 @@ export class FileGenerator {
         loc.startsWith(`${childLocation}/`),
       );
 
-      if (!hasGeneratedFile && !hasChildrenWithFiles) {
+      // Also check if the child i18n directory actually exists
+      const childI18nDir = buildPath("src", childLocation, I18N_PATH, language);
+      const childIndexExists = fs.existsSync(
+        buildPath(childI18nDir, INDEX_FILE),
+      );
+
+      if (!hasGeneratedFile && !hasChildrenWithFiles && !childIndexExists) {
         continue;
       }
 
