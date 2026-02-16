@@ -1144,16 +1144,56 @@ export class TranslationReorganizeRepositoryImpl {
       logger.info(`Source files have ${keyUsageMap.size} keys`);
 
       // Check all source file keys against new structure
-      for (const [sourceKey] of keyUsageMap) {
+      const missingKeys = new Map<string, string[]>(); // location -> missing keys
+
+      for (const [sourceKey, usageFiles] of keyUsageMap) {
         // If source key exists in new structure with same name, no mapping needed
         if (newStructureKeys.has(sourceKey)) {
           continue;
         }
 
-        // Source key doesn't exist in new structure - skip it
-        // DO NOT create mappings for different keys that happen to have similar suffixes
-        // This would incorrectly map keys from different scoped locations
-        logger.debug(`Source key not found in new structure: "${sourceKey}"`);
+        // Source key doesn't exist in old translations
+        // Create placeholder in the new structure based on usage location
+        logger.warn(`Source key not found in old translations: "${sourceKey}"`);
+
+        // Get usage location(s)
+        const locations = this.getSpecificUsageLocations(usageFiles, logger);
+
+        if (locations.length > 0) {
+          // Use first location (or common ancestor if multiple)
+          const location = locations.length === 1
+            ? locations[0]
+            : this.getCommonAncestorLocation(locations);
+
+          // Add placeholder entry to groups
+          const locationPrefix = this.fileGenerator!.locationToFlatKeyPublic(location);
+
+          // Create the key path relative to location
+          let keySuffix = sourceKey;
+          if (locationPrefix && sourceKey.startsWith(`${locationPrefix}.`)) {
+            keySuffix = sourceKey.slice(locationPrefix.length + 1);
+          }
+
+          // Add to groups with placeholder value
+          if (!groups.has(location)) {
+            groups.set(location, {});
+          }
+          const groupTranslations = groups.get(location)!;
+          groupTranslations[sourceKey] = `TODO: ${keySuffix}`;
+
+          // Track missing keys for reporting
+          if (!missingKeys.has(location)) {
+            missingKeys.set(location, []);
+          }
+          missingKeys.get(location)!.push(sourceKey);
+
+          logger.info(`Created placeholder for missing key: ${sourceKey} at ${location}`);
+        }
+      }
+
+      // Report missing keys summary
+      if (missingKeys.size > 0) {
+        logger.warn(`Created placeholders for ${Array.from(missingKeys.values()).flat().length} missing keys across ${missingKeys.size} locations`);
       }
 
       logger.info(`Generated ${keyMappings.size} source file mappings`);
@@ -1676,7 +1716,9 @@ export class TranslationReorganizeRepositoryImpl {
               // ALSO: Check if key part is a "composite" that starts with a location part
               // (e.g., "cronSystem" starts with "cron" from folder) - these are old namespaces to remove
               const toCamelCase = (str: string) =>
-                str.replace(/[-_]([a-z0-9])/g, (_, letter) => letter.toUpperCase());
+                str.replace(/[-_]([a-z0-9])/g, (_, letter) =>
+                  letter.toUpperCase(),
+                );
               const locationRemainderCamel = locationRemainder.map(toCamelCase);
 
               suffixParts = keyRemainder.filter((keyPart) => {
@@ -1686,7 +1728,8 @@ export class TranslationReorganizeRepositoryImpl {
 
                 // Check for exact match
                 const hasExactMatch = locationRemainderCamel.some(
-                  (locPart) => !locPart.startsWith("[") && locPart === keyPartCamel,
+                  (locPart) =>
+                    !locPart.startsWith("[") && locPart === keyPartCamel,
                 );
                 if (hasExactMatch) {
                   return false; // Remove exact matches
@@ -1695,14 +1738,17 @@ export class TranslationReorganizeRepositoryImpl {
                 // Check if keyPart is a composite that starts with any location part
                 // e.g., "cronSystem" starts with "cron" -> remove it
                 const isComposite = locationRemainderCamel.some((locPart) => {
-                  if (locPart.startsWith("[")) return false; // Skip dynamic segments
+                  if (locPart.startsWith("[")) {
+                    return false;
+                  } // Skip dynamic segments
                   // Check if keyPart starts with locPart and has more characters after
                   // This catches "cronSystem" starting with "cron"
                   return (
                     keyPartCamel.length > locPart.length &&
                     keyPartCamel.startsWith(locPart) &&
                     // Ensure the next character is uppercase (camelCase boundary)
-                    keyPartCamel[locPart.length] === keyPartCamel[locPart.length].toUpperCase()
+                    keyPartCamel[locPart.length] ===
+                      keyPartCamel[locPart.length].toUpperCase()
                   );
                 });
 
