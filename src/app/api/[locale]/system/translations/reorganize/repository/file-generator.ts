@@ -288,7 +288,7 @@ export class FileGenerator {
           // Skip this entire key to avoid errors
           if (typeof existing !== "object" || existing === null) {
             // Key conflict detected - this is expected when a parent key exists as both
-            // a primitive value and an object path (e.g., "health" string vs "health.get.title")
+            // a primitive value and an object path (e.g., "health" string vs "app.api.system.translations.reorganize.repository.title")
             // The child directory import will override the primitive value, so we skip it here
             // Only log at debug level to reduce noise
             // Skip this entire key
@@ -869,6 +869,14 @@ export class FileGenerator {
 
     // Import from direct children - but only if they have generated files
     for (const child of directChildren) {
+      // Skip "src" as a child - it's the base directory and would create circular imports
+      if (child === "src") {
+        logger.debug(
+          `Skipping "src" as a child directory (would create circular import)`,
+        );
+        continue;
+      }
+
       const childLocation = `${sourcePath}/${child}`;
 
       // Skip scoped translation directories - they should not be imported into global schema

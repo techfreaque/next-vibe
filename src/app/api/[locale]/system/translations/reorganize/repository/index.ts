@@ -2001,6 +2001,15 @@ export class TranslationReorganizeRepositoryImpl {
           continue;
         }
 
+        // Safeguard: Never use "src" as a location since it's the base directory
+        // Keys at root level should have empty string location
+        if (location === "src") {
+          location = "";
+          logger.debug(
+            `Converted location "src" to root level for key: ${fullPath}`,
+          );
+        }
+
         // Add the key to this location group with the CORRECT FULL key
         if (!groups.has(location)) {
           groups.set(location, {});
