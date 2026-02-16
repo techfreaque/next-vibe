@@ -393,8 +393,17 @@ export class FileGenerator {
               // The child was flattened - merge its contents directly into result
               Object.assign(result, flattenedChild);
             } else {
-              // Keep the child key
-              result[childKey] = flattenedChild;
+              // Check if childKey already exists in result to avoid conflicts
+              if (childKey in result) {
+                // Key conflict - don't flatten, keep the full parent.child path
+                result[key] = this.flattenSingleChildObjects(
+                  value as TranslationObject,
+                  preserveKeys,
+                );
+              } else {
+                // Keep the child key
+                result[childKey] = flattenedChild;
+              }
             }
           } else {
             // Single child is a primitive value - keep the structure
@@ -607,7 +616,7 @@ export class FileGenerator {
     }
 
     // Strip the location prefix from keys for the leaf file
-    // E.g., location="app/[locale]/admin", key="app.admin.nav.dashboard" -> "nav.dashboard"
+    // E.g., location="app/[locale]/admin", key="app.api.system.translations.reorganize.repository.admin.nav.dashboard" -> "app.api.system.translations.reorganize.repository.nav.dashboard"
     const locationPrefix = this.locationToFlatKey(location);
     const strippedTranslations: TranslationObject = {};
 
