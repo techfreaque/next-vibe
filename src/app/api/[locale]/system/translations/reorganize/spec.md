@@ -67,11 +67,6 @@
 
 ```bash
 # Reset to clean state - removes all regeneration files from previous attempts
-# IMPORTANT: Use -fdx to also remove untracked i18n directories from failed regenerations
-git reset --hard HEAD && git clean -fdx
-# After clean, restore .env and reinstall deps
-cp .env.example .env 2>/dev/null || true
-bun install
 ```
 
 **Why:** Ensures you're regenerating from a clean, known state, not from broken/partial regenerations. The -fdx flag removes untracked i18n directories created by failed regenerations.
@@ -87,13 +82,13 @@ vibe translations:reorganize --regenerateStructure=true --dryRun=false -v > /tmp
 ### Step 3: Start Type Check in Background (DO NOT WAIT)
 
 ```bash
-nohup bun x tsgo > /tmp/tsgo-errors.txt 2>&1 &
+nohup bun x tsgo > ./.tmp/tsgo-errors.txt
 ```
 
 **Important:**
 - Start this IMMEDIATELY after regeneration completes
 - Do NOT wait for it (takes 15+ minutes)
-- It will notify when done
+- It should notify when done
 - Use `tsgo` NOT `tsc` (tsc is too slow)
 - You can kill it early with `pkill -9 tsgo` if you find issues and need to regenerate sooner
 
