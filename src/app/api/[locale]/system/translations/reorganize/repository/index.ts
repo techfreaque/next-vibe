@@ -1153,7 +1153,10 @@ export class TranslationReorganizeRepositoryImpl {
           //    -> app.api.agent.models.openrouter
           const relativePath = path.relative(projectRoot, filePath);
           const locationPath = path.dirname(path.dirname(path.dirname(relativePath))); // Remove /i18n/en/index.ts
-          const locationPrefix = locationPath.replace(/^src\//, "").replace(/\//g, ".");
+          const locationPrefix = locationPath
+            .replace(/^src\//, "")
+            .replace(/\/\[locale\]/g, "") // Remove [locale] segment
+            .replace(/\//g, ".");
 
           // Load the file
           const fileUrl = FILE_PROTOCOL + filePath;
