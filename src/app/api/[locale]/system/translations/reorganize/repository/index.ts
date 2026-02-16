@@ -103,7 +103,7 @@ export class TranslationReorganizeRepositoryImpl {
 
       output.push(
         t(
-          "app.api.system.translations.reorganize.repository.messages.starting",
+          "app.api.system.translations.reorganize.repository.repository.messages.starting",
         ),
       );
 
@@ -114,7 +114,7 @@ export class TranslationReorganizeRepositoryImpl {
 
         output.push(
           t(
-            "app.api.system.translations.reorganize.repository.app.api.messages.backupCreated",
+            "app.api.system.translations.reorganize.repository.repository.api.messages.backupCreated",
             {
               path: backupPath,
             },
@@ -124,7 +124,7 @@ export class TranslationReorganizeRepositoryImpl {
 
       output.push(
         t(
-          "app.api.system.translations.reorganize.repository.messages.scanningUsage",
+          "app.api.system.translations.reorganize.repository.repository.messages.scanningUsage",
         ),
       );
 
@@ -132,7 +132,7 @@ export class TranslationReorganizeRepositoryImpl {
 
       output.push(
         t(
-          "app.api.system.translations.reorganize.repository.messages.loadingFiles",
+          "app.api.system.translations.reorganize.repository.repository.messages.loadingFiles",
         ),
       );
       const currentTranslations = await this.loadCurrentTranslations(logger);
@@ -165,7 +165,7 @@ export class TranslationReorganizeRepositoryImpl {
 
       output.push(
         t(
-          "app.api.system.translations.reorganize.repository.app.api.messages.foundKeys",
+          "app.api.system.translations.reorganize.repository.repository.api.messages.foundKeys",
           {
             used: usedKeys,
             total: allKeys.size,
@@ -180,7 +180,7 @@ export class TranslationReorganizeRepositoryImpl {
       if (removeUnused && unusedKeys > 0) {
         output.push(
           t(
-            "app.api.system.translations.reorganize.repository.app.api.messages.removingKeys",
+            "app.api.system.translations.reorganize.repository.repository.api.messages.removingKeys",
             {
               count: unusedKeys,
             },
@@ -197,17 +197,17 @@ export class TranslationReorganizeRepositoryImpl {
       if (request.dryRun) {
         output.push(
           t(
-            "app.api.system.translations.reorganize.repository.messages.dryRunCompleted",
+            "app.api.system.translations.reorganize.repository.repository.messages.dryRunCompleted",
           ),
         );
         if (removeUnused && unusedKeys > 0) {
           output.push(
             t(
-              "app.api.system.translations.reorganize.repository.messages.removedKeysFromLanguage",
+              "app.api.system.translations.reorganize.repository.repository.messages.removedKeysFromLanguage",
               {
                 count: unusedKeys,
                 language: t(
-                  "app.api.system.translations.reorganize.repository.messages.unusedKeysLabel",
+                  "app.api.system.translations.reorganize.repository.repository.messages.unusedKeysLabel",
                 ),
               },
             ),
@@ -238,7 +238,7 @@ export class TranslationReorganizeRepositoryImpl {
       if (removeUnused && !request.regenerateStructure && keysRemoved > 0) {
         output.push(
           t(
-            "app.api.system.translations.reorganize.repository.messages.writingFilteredTranslations",
+            "app.api.system.translations.reorganize.repository.repository.messages.writingFilteredTranslations",
           ),
         );
 
@@ -334,7 +334,7 @@ export class TranslationReorganizeRepositoryImpl {
                 type: "updated",
                 path: `i18n/${language}/**/*.ts`,
                 description:
-                  "app.api.system.translations.reorganize.repository.app.api.messages.removingKeys",
+                  "app.api.system.translations.reorganize.repository.repository.api.messages.removingKeys",
                 descriptionParams: {
                   language,
                   count: keysRemoved,
@@ -350,7 +350,7 @@ export class TranslationReorganizeRepositoryImpl {
 
         output.push(
           t(
-            "app.api.system.translations.reorganize.repository.messages.completed",
+            "app.api.system.translations.reorganize.repository.repository.messages.completed",
           ),
         );
 
@@ -378,7 +378,7 @@ export class TranslationReorganizeRepositoryImpl {
       if (request.regenerateStructure) {
         output.push(
           t(
-            "app.api.system.translations.reorganize.repository.messages.regeneratingStructure",
+            "app.api.system.translations.reorganize.repository.repository.messages.regeneratingStructure",
           ),
         );
 
@@ -386,7 +386,7 @@ export class TranslationReorganizeRepositoryImpl {
 
         output.push(
           t(
-            "app.api.system.translations.reorganize.repository.messages.analyzingFrequency",
+            "app.api.system.translations.reorganize.repository.repository.messages.analyzingFrequency",
           ),
         );
         const keyUsageFrequency =
@@ -395,7 +395,7 @@ export class TranslationReorganizeRepositoryImpl {
         // Group translations by usage location
         output.push(
           t(
-            "app.api.system.translations.reorganize.repository.messages.groupingByLocation",
+            "app.api.system.translations.reorganize.repository.repository.messages.groupingByLocation",
           ),
         );
 
@@ -436,7 +436,7 @@ export class TranslationReorganizeRepositoryImpl {
         // Generate files for each language
         output.push(
           t(
-            "app.api.system.translations.reorganize.repository.messages.generatingFiles",
+            "app.api.system.translations.reorganize.repository.repository.messages.generatingFiles",
           ),
         );
 
@@ -493,9 +493,9 @@ export class TranslationReorganizeRepositoryImpl {
                 filesUpdated++;
                 changes.push({
                   type: "updated",
-                  path: path.join(TRANSLATIONS_DIR, language, "index.ts"),
+                  path: path.join(TRANSLATIONS_DIR, language, "app.api.system.index.ts"),
                   description:
-                    "app.api.system.translations.reorganize.repository.app.api.messages.regeneratedStructure",
+                    "app.api.system.translations.reorganize.repository.repository.api.messages.regeneratedStructure",
                   descriptionParams: { language },
                 });
               }
@@ -510,7 +510,7 @@ export class TranslationReorganizeRepositoryImpl {
           // The new system generates proper hierarchical imports instead of flat location-based imports
           output.push(
             t(
-              "app.api.system.translations.reorganize.repository.messages.completed",
+              "app.api.system.translations.reorganize.repository.repository.messages.completed",
             ),
           );
 
@@ -535,14 +535,14 @@ export class TranslationReorganizeRepositoryImpl {
         }
         output.push(
           t(
-            "app.api.system.translations.reorganize.repository.messages.noKeysInUse",
+            "app.api.system.translations.reorganize.repository.repository.messages.noKeysInUse",
           ),
         );
       }
 
       output.push(
         t(
-          "app.api.system.translations.reorganize.repository.messages.completed",
+          "app.api.system.translations.reorganize.repository.repository.messages.completed",
         ),
       );
 
@@ -572,7 +572,7 @@ export class TranslationReorganizeRepositoryImpl {
 
       return fail({
         message:
-          "app.api.system.translations.reorganize.repository.error.internalError",
+          "app.api.system.translations.reorganize.repository.repository.error.internalError",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -758,7 +758,7 @@ export class TranslationReorganizeRepositoryImpl {
       if (!fs.existsSync(request.backupPath)) {
         return fail({
           message:
-            "app.api.system.translations.reorganize.repository.messages.backupNotFound",
+            "app.api.system.translations.reorganize.repository.repository.messages.backupNotFound",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -774,7 +774,7 @@ export class TranslationReorganizeRepositoryImpl {
         return success({
           success: true,
           message: t(
-            "app.api.system.translations.reorganize.repository.messages.validationSuccessful",
+            "app.api.system.translations.reorganize.repository.repository.messages.validationSuccessful",
           ),
           backupInfo: {
             backupPath: request.backupPath,
@@ -797,7 +797,7 @@ export class TranslationReorganizeRepositoryImpl {
       return success({
         success: true,
         message: t(
-          "app.api.system.translations.reorganize.repository.messages.restoreSuccessful",
+          "app.api.system.translations.reorganize.repository.repository.messages.restoreSuccessful",
         ),
         backupInfo: {
           backupPath: request.backupPath,
@@ -816,7 +816,7 @@ export class TranslationReorganizeRepositoryImpl {
 
       return fail({
         message:
-          "app.api.system.translations.reorganize.repository.error.internalError",
+          "app.api.system.translations.reorganize.repository.repository.error.internalError",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -952,7 +952,7 @@ export class TranslationReorganizeRepositoryImpl {
       const mainLanguagePath = path.join(
         TRANSLATIONS_DIR,
         languageDefaults.language,
-        "index.ts",
+        "app.api.system.index.ts",
       );
 
       let flatTranslations: TranslationObject = {};
@@ -1050,7 +1050,7 @@ export class TranslationReorganizeRepositoryImpl {
   ): Promise<TranslationObject> {
     try {
       // STEP 1: Load from old flat structure
-      const languagePath = path.join(TRANSLATIONS_DIR, language, "index.ts");
+      const languagePath = path.join(TRANSLATIONS_DIR, language, "app.api.system.index.ts");
       let flatTranslations: TranslationObject = {};
 
       if (!fs.existsSync(languagePath)) {
@@ -1168,7 +1168,7 @@ export class TranslationReorganizeRepositoryImpl {
             if (entry.isDirectory()) {
               // Check if this is an i18n/${language} directory
               if (entry.name === "i18n") {
-                const langFile = path.join(fullPath, language, "index.ts");
+                const langFile = path.join(fullPath, language, "app.api.system.index.ts");
                 if (fs.existsSync(langFile)) {
                   files.push(langFile);
                 }
@@ -1331,11 +1331,12 @@ export class TranslationReorganizeRepositoryImpl {
             this.fileGenerator!.locationToFlatKeyPublic(location);
 
           // Calculate the correct key for this location
-          // Similar logic to lines 1860-1979, but simplified for missing keys
+          // The key should be: locationPrefix + suffix (where suffix is the part after locationPrefix)
+          // If sourceKey doesn't start with locationPrefix, extract the non-location parts as suffix
           const keyParts = sourceKey.split(".");
-          const locationParts = location.split("/");
+          const locationParts = locationPrefix ? locationPrefix.split(".") : [];
 
-          // Find common prefix
+          // Find common prefix between key and location prefix (not location path!)
           let commonPrefixLength = 0;
           for (
             let i = 0;
@@ -1761,7 +1762,7 @@ export class TranslationReorganizeRepositoryImpl {
           : "";
 
         // For shared keys, we need to insert "common" after the common ancestor location prefix
-        // Example: key "app.api.system.translations.reorganize.repository.app.api.common.tags.threads" shared at location "app/api/[locale]/agent/chat/threads"
+        // Example: key "app.api.system.translations.reorganize.repository.repository.api.common.tags.threads" shared at location "app/api/[locale]/agent/chat/threads"
         // The common ancestor part is what's shared: find the longest common prefix
         // Then insert "common" after that prefix
         let adjustedKey = fullPath;
@@ -1866,7 +1867,7 @@ export class TranslationReorganizeRepositoryImpl {
           // For example:
           // - Key: app.admin.components.navigation.dashboard
           // - Location: app/[locale]/admin/_components → prefix: app.admin._components
-          // - We replace "app.admin.components" with "app.admin._components"
+          // - We replace "app.api.system.translations.reorganize.repository.admin.components" with "app.api.system.translations.reorganize.repository.admin._components"
           // - Suffix: navigation.dashboard
           // - Correct key: app.admin._components.navigation.dashboard
 
@@ -1877,7 +1878,7 @@ export class TranslationReorganizeRepositoryImpl {
 
           // Find where key and location paths diverge
           // This handles cases where the key has a different structure than the location
-          // Example: key "app.api.system.translations.reorganize.repository.app.api.common.tags.threads" vs location "app.api.system.translations.reorganize.repository.app.api.threads"
+          // Example: key "app.api.system.translations.reorganize.repository.repository.api.common.tags.threads" vs location "app.api.system.translations.reorganize.repository.repository.api.threads"
           // Common prefix: ["app", "api", "agent", "chat"]
           // Key continues with: ["tags", "threads"]
           // Location continues with: ["threads"]
@@ -2019,7 +2020,7 @@ export class TranslationReorganizeRepositoryImpl {
             "src",
             parentLocation,
             "i18n",
-            "index.ts",
+            "app.api.system.index.ts",
           );
           if (fs.existsSync(scopedCheckPath)) {
             try {
@@ -2410,7 +2411,7 @@ export class TranslationReorganizeRepositoryImpl {
       const mainIndexPath = path.join(
         TRANSLATIONS_DIR,
         languageDefaults.language,
-        "index.ts",
+        "app.api.system.index.ts",
       );
 
       if (!fs.existsSync(mainIndexPath)) {
@@ -2609,7 +2610,7 @@ export class TranslationReorganizeRepositoryImpl {
       });
       return fail({
         message:
-          "app.api.system.translations.reorganize.repository.error.internalError",
+          "app.api.system.translations.reorganize.repository.repository.error.internalError",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
