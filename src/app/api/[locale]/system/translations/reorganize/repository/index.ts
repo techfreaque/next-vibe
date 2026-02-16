@@ -1168,7 +1168,7 @@ export class TranslationReorganizeRepositoryImpl {
             if (entry.isDirectory()) {
               // Check if this is an i18n/${language} directory
               if (entry.name === "i18n") {
-                const langFile = path.join(fullPath, language, "app.api.system.index.ts");
+                const langFile = path.join(fullPath, language, "index.ts");
                 if (fs.existsSync(langFile)) {
                   files.push(langFile);
                 }
@@ -1357,7 +1357,7 @@ export class TranslationReorganizeRepositoryImpl {
           // Strip duplicate path segments from keyRemainder that appear in location
           // This handles cases where old keys have folder names that are now in the path
           // Example: location "app/[locale]/admin/_components" has prefix "app.api.system.translations.reorganize.repository.admin.Components"
-          // Old key "app.common.admin.dashboard" has remainder "app.api.system.translations.reorganize.repository.dashboard"
+          // Old key "app.api.system.translations.reorganize.repository.common.admin.dashboard" has remainder "app.api.system.translations.reorganize.repository.dashboard"
           // We need to filter out "components" since "_components" is in the location
           const locationRemainder = locationParts.slice(commonPrefixLength);
           const toCamelCase = (str: string) =>
