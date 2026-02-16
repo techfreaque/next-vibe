@@ -350,6 +350,9 @@ export class FileGenerator {
   ): TranslationObject {
     const result: TranslationObject = {};
 
+    // Pre-check: identify all top-level keys to avoid flattening conflicts
+    const topLevelKeys = new Set(Object.keys(obj));
+
     for (const [key, value] of Object.entries(obj)) {
       if (
         typeof value === "object" &&
@@ -390,8 +393,8 @@ export class FileGenerator {
               flattenedChildKeys.length === 1 &&
               flattenedChildKeys[0] !== childKey
             ) {
-              // Check if merging would create a conflict
-              const hasConflict = flattenedChildKeys.some(k => k in result);
+              // Check if merging would create a conflict with existing or future keys
+              const hasConflict = flattenedChildKeys.some(k => k in result || topLevelKeys.has(k));
               if (hasConflict) {
                 // Key conflict - don't flatten, keep the full parent.child path
                 result[key] = this.flattenSingleChildObjects(
@@ -403,8 +406,8 @@ export class FileGenerator {
                 Object.assign(result, flattenedChild);
               }
             } else {
-              // Check if childKey already exists in result to avoid conflicts
-              if (childKey in result) {
+              // Check if childKey already exists or will exist to avoid conflicts
+              if (childKey in result || topLevelKeys.has(childKey)) {
                 // Key conflict - don't flatten, keep the full parent.child path
                 result[key] = this.flattenSingleChildObjects(
                   value as TranslationObject,
