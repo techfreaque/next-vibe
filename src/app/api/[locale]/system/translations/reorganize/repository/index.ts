@@ -493,7 +493,7 @@ export class TranslationReorganizeRepositoryImpl {
                 filesUpdated++;
                 changes.push({
                   type: "updated",
-                  path: path.join(TRANSLATIONS_DIR, language, "app.api.system.index.ts"),
+                  path: path.join(TRANSLATIONS_DIR, language, "app.api.system.translations.reorganize.repository.index.ts"),
                   description:
                     "app.api.system.translations.reorganize.repository.repository.api.messages.regeneratedStructure",
                   descriptionParams: { language },
@@ -952,7 +952,7 @@ export class TranslationReorganizeRepositoryImpl {
       const mainLanguagePath = path.join(
         TRANSLATIONS_DIR,
         languageDefaults.language,
-        "app.api.system.index.ts",
+        "app.api.system.translations.reorganize.repository.index.ts",
       );
 
       let flatTranslations: TranslationObject = {};
@@ -1050,7 +1050,7 @@ export class TranslationReorganizeRepositoryImpl {
   ): Promise<TranslationObject> {
     try {
       // STEP 1: Load from old flat structure
-      const languagePath = path.join(TRANSLATIONS_DIR, language, "app.api.system.index.ts");
+      const languagePath = path.join(TRANSLATIONS_DIR, language, "app.api.system.translations.reorganize.repository.index.ts");
       let flatTranslations: TranslationObject = {};
 
       if (!fs.existsSync(languagePath)) {
@@ -1168,7 +1168,7 @@ export class TranslationReorganizeRepositoryImpl {
             if (entry.isDirectory()) {
               // Check if this is an i18n/${language} directory
               if (entry.name === "i18n") {
-                const langFile = path.join(fullPath, language, "app.api.system.index.ts");
+                const langFile = path.join(fullPath, language, "app.api.system.translations.reorganize.repository.index.ts");
                 if (fs.existsSync(langFile)) {
                   files.push(langFile);
                 }
@@ -1322,8 +1322,9 @@ export class TranslationReorganizeRepositoryImpl {
           // Strip src/ prefix if present (locations from getSpecificUsageLocations might include it)
           if (location.startsWith("src/")) {
             location = location.slice(4); // Remove "src/"
-          } else if (location === "src") {
-            location = ""; // Root level
+          } else if (location === "src" || location === "") {
+            // Root level or no common ancestor - default to app for shared global keys
+            location = "app";
           }
 
           // Add placeholder entry to groups
@@ -2020,7 +2021,7 @@ export class TranslationReorganizeRepositoryImpl {
             "src",
             parentLocation,
             "i18n",
-            "app.api.system.index.ts",
+            "app.api.system.translations.reorganize.repository.index.ts",
           );
           if (fs.existsSync(scopedCheckPath)) {
             try {
@@ -2411,7 +2412,7 @@ export class TranslationReorganizeRepositoryImpl {
       const mainIndexPath = path.join(
         TRANSLATIONS_DIR,
         languageDefaults.language,
-        "app.api.system.index.ts",
+        "app.api.system.translations.reorganize.repository.index.ts",
       );
 
       if (!fs.existsSync(mainIndexPath)) {
