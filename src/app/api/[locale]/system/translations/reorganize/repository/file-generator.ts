@@ -1077,7 +1077,7 @@ export class FileGenerator {
             if (spreadChildTranslations) {
               // Check if this key exists in the spread child's translations
               // Keys at app/[locale] have prefix "app" (not "app.[locale]") because [locale] is stripped
-              // So check for "app.admin.xxx", "app.common.xxx", etc.
+              // So check for "app.api.system.translations.reorganize.repository.admin.xxx", "app.api.system.translations.reorganize.repository.common.xxx", etc.
               const flattenedSpreadChild = this.flattenTranslationObject(spreadChildTranslations, "");
               const locationPrefix = this.locationToFlatKey(sourcePath);
               const spreadChildPrefix = locationPrefix ? `${locationPrefix}.${key}` : key;

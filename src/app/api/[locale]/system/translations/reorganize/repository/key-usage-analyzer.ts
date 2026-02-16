@@ -126,8 +126,8 @@ export class KeyUsageAnalyzer {
     logger.debug(`Found ${sourceFiles.length} source files to scan`);
 
     // Pattern: any double-quoted string with at least one dot
-    // Matches: "app.api.shared.errorTypes.validation_error" and "app.api.[...slug].not_found"
-    // Includes square brackets for dynamic route segments like [id], [...slug], etc.
+    // Matches translation keys like "app.api.shared.errorTypes.validationError"
+    // Includes square brackets for dynamic route segments like [id], [slug], etc.
     const keyPattern = /"([a-z][a-z0-9._[\]-]*\.[a-z0-9._[\]-]+)"/gi;
 
     // Scan each file for translation key patterns
