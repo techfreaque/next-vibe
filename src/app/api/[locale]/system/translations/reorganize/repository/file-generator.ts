@@ -1045,8 +1045,35 @@ export class FileGenerator {
           // We should never add inline content that conflicts with spread child exports
           if (hasSpreadChild) {
             const spreadChildLocation = `${sourcePath}/[locale]`;
-            const spreadChildTranslations = groups.get(spreadChildLocation);
 
+            // Get direct children of the spread child location
+            const spreadChildDirectChildren = new Set<string>();
+            for (const location of locationsToCheck) {
+              if (location.startsWith(`${spreadChildLocation}/`)) {
+                const relativePath = location.slice(spreadChildLocation.length + 1);
+                if (relativePath.includes("/")) {
+                  const firstSegment = relativePath.split("/")[0];
+                  spreadChildDirectChildren.add(firstSegment);
+                } else {
+                  spreadChildDirectChildren.add(relativePath);
+                }
+              }
+            }
+
+            // Check if this key matches a child directory name of the spread child
+            // Those directories will be imported and exported by the spread child, so we must skip them
+            const kebabKey = key.replaceAll(/([A-Z])/g, "-$1").toLowerCase().replaceAll(/^-/, "");
+            const matchesChildDir = spreadChildDirectChildren.has(key) || spreadChildDirectChildren.has(kebabKey);
+
+            if (matchesChildDir) {
+              logger.debug(
+                `Skipping inline key "${key}" at ${sourcePath} - matches child directory of spread [locale]`
+              );
+              continue;
+            }
+
+            // Also check if key exists in co-located translations at spread child location
+            const spreadChildTranslations = groups.get(spreadChildLocation);
             if (spreadChildTranslations) {
               // Check if this key exists in the spread child's translations
               // Keys at app/[locale] have prefix "app" (not "app.[locale]") because [locale] is stripped
@@ -1063,7 +1090,7 @@ export class FileGenerator {
               if (existsInSpreadChild) {
                 // This key will be provided by the spread child - skip inline to avoid overwrite
                 logger.debug(
-                  `Skipping inline key "${key}" at ${sourcePath} - conflicts with spread [locale] child`
+                  `Skipping inline key "${key}" at ${sourcePath} - exists in co-located translations at spread [locale]`
                 );
                 continue;
               }
