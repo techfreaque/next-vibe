@@ -507,6 +507,16 @@ export class TranslationReorganizeRepositoryImpl {
             }
           }
 
+          // Fix 19: Post-generation reconciliation pass.
+          // Now that all i18n files are generated we know the EXACT key structure.
+          // Correct any source file references that fixKeyMappingsWithFlattening got wrong.
+          if (this.fileGenerator) {
+            const enGroups = languageTranslationsMap.get("en");
+            if (enGroups) {
+              this.reconcileSourceKeysWithGeneratedFiles(enGroups, keyMappings, logger);
+            }
+          }
+
           // Main index structure is now handled by the hierarchical file generation
           // The new system generates proper hierarchical imports instead of flat location-based imports
           output.push(
@@ -1735,6 +1745,156 @@ export class TranslationReorganizeRepositoryImpl {
             break;
           }
         }
+      }
+    }
+  }
+
+  /**
+   * Fix 19: Post-generation key reconciliation pass.
+   *
+   * After all i18n files have been generated we know the EXACT key structure in each
+   * leaf file (the file generator ran strip-prefix → unflatten → flatten-until-stable).
+   * `fixKeyMappingsWithFlattening` attempts to predict that structure BEFORE generation,
+   * but the two algorithms can diverge (value collisions, "common" insertion, etc.).
+   *
+   * This pass re-computes the actual flat keys for every location, then scans source
+   * files for any translation key reference that currently points to a non-existent key.
+   * When a mismatch is found, we identify the correct key by matching the original
+   * (pre-FLATTEN-FIX) key path suffix and apply the correction directly to source files.
+   */
+  private reconcileSourceKeysWithGeneratedFiles(
+    groups: Map<string, TranslationObject>,
+    keyMappings: Map<string, string>,
+    logger: EndpointLogger,
+  ): void {
+    // Build per-location actual flat key maps.
+    // Maps locationPrefix -> { flatKey -> value }  (the actual keys in the generated file)
+    const locationActualKeys = new Map<string, Map<string, string>>();
+
+    for (const [location, translations] of groups.entries()) {
+      const locationPrefix = this.fileGenerator!.locationToFlatKeyPublic(location);
+
+      // Strip location prefix
+      const strippedTranslations: TranslationObject = {};
+      for (const [key, value] of Object.entries(translations)) {
+        let strippedKey = key;
+        if (locationPrefix && key.startsWith(`${locationPrefix}.`)) {
+          strippedKey = key.slice(locationPrefix.length + 1);
+        }
+        strippedTranslations[strippedKey] = value;
+      }
+
+      // Apply the EXACT same pipeline as generateLeafFileContent
+      const nested = this.fileGenerator!.unflattenTranslationObjectPublic(strippedTranslations);
+      let flattened = this.fileGenerator!.flattenSingleChildObjectsPublic(nested, new Set(["common"]));
+      for (let _pass = 0; _pass < 8; _pass++) {
+        const next = this.fileGenerator!.flattenSingleChildObjectsPublic(flattened, new Set(["common"]));
+        const prevKeys = JSON.stringify(Object.keys(this.fileGenerator!.flattenTranslationObjectPublic(flattened)).sort());
+        const nextKeys = JSON.stringify(Object.keys(this.fileGenerator!.flattenTranslationObjectPublic(next)).sort());
+        flattened = next;
+        if (prevKeys === nextKeys) break;
+      }
+      const actualFlatKeys = this.fileGenerator!.flattenTranslationObjectPublic(flattened);
+      locationActualKeys.set(locationPrefix, new Map(Object.entries(actualFlatKeys)));
+    }
+
+    // Build a reverse map: currentMappedKey -> sourceKey (what keyMappings currently says)
+    // keyMappings: sourceKey -> currentMappedKey
+    const reverseMappings = new Map<string, string>(); // currentMappedKey -> sourceKey
+    for (const [sourceKey, currentKey] of keyMappings.entries()) {
+      reverseMappings.set(currentKey, sourceKey);
+    }
+
+    // For each location, check whether any currently-mapped key is WRONG
+    // (i.e., doesn't appear in the actual generated keys for that location)
+    const corrections = new Map<string, string>(); // wrongKey -> correctKey
+
+    for (const [locationPrefix, actualKeys] of locationActualKeys.entries()) {
+      // Collect all keyMappings that point to this location
+      for (const [sourceKey, currentMappedKey] of keyMappings.entries()) {
+        // Check if this mapped key belongs to this location
+        if (!currentMappedKey.startsWith(`${locationPrefix}.`)) continue;
+
+        // Strip location prefix to get the local key
+        const localKey = currentMappedKey.slice(locationPrefix.length + 1);
+
+        // If the local key already exists in the actual keys → correct, nothing to do
+        if (actualKeys.has(localKey)) continue;
+
+        // The key is WRONG. Find the correct actual key.
+        // Find the value this source key should map to by checking groups
+        let targetValue: string | undefined;
+        for (const [loc, trans] of groups.entries()) {
+          const locPrefix = this.fileGenerator!.locationToFlatKeyPublic(loc);
+          if (locPrefix !== locationPrefix) continue;
+          // Check current mapped key (the regroupedTranslations uses the new mapped keys)
+          if (trans[currentMappedKey] !== undefined) {
+            targetValue = trans[currentMappedKey] as string;
+            break;
+          }
+          // Also check the source key directly (in case it wasn't remapped)
+          if (trans[sourceKey] !== undefined) {
+            targetValue = trans[sourceKey] as string;
+            break;
+          }
+        }
+
+        if (targetValue === undefined) continue;
+
+        // Find actual key(s) with this value in this location
+        const candidates: string[] = [];
+        for (const [flatKey, flatValue] of actualKeys.entries()) {
+          if (flatValue === targetValue) {
+            candidates.push(flatKey);
+          }
+        }
+
+        if (candidates.length === 0) continue;
+
+        // If only one candidate, use it
+        // If multiple (duplicate values), pick the one whose suffix best matches sourceKey
+        let bestCandidate = candidates[0];
+        if (candidates.length > 1) {
+          // Score each candidate by longest common suffix with sourceKey
+          const sourceParts = sourceKey.split(".");
+          let bestScore = -1;
+          for (const candidate of candidates) {
+            const candParts = candidate.split(".");
+            let matchLen = 0;
+            for (let i = 1; i <= Math.min(sourceParts.length, candParts.length); i++) {
+              if (sourceParts[sourceParts.length - i] === candParts[candParts.length - i]) {
+                matchLen++;
+              } else {
+                break;
+              }
+            }
+            if (matchLen > bestScore) {
+              bestScore = matchLen;
+              bestCandidate = candidate;
+            }
+          }
+        }
+
+        const correctFullKey = `${locationPrefix}.${bestCandidate}`;
+        if (correctFullKey !== currentMappedKey) {
+          corrections.set(currentMappedKey, correctFullKey);
+          logger.info(`[RECONCILE] ${sourceKey}: ${currentMappedKey} -> ${correctFullKey}`);
+        }
+      }
+    }
+
+    if (corrections.size === 0) {
+      logger.info("[RECONCILE] No key corrections needed");
+      return;
+    }
+
+    logger.info(`[RECONCILE] Correcting ${corrections.size} key references in source files`);
+    this.updateCodeFilesWithNewKeys(corrections, logger);
+
+    // Also update keyMappings for consistency
+    for (const [sourceKey, currentMappedKey] of keyMappings.entries()) {
+      if (corrections.has(currentMappedKey)) {
+        keyMappings.set(sourceKey, corrections.get(currentMappedKey)!);
       }
     }
   }
