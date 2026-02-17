@@ -692,6 +692,9 @@ export class FileGenerator {
     // Remove [locale] segments
     key = key.replaceAll("/[locale]", "");
 
+    // Strip parentheses from Next.js route group folders: /(other) -> /other
+    key = key.replaceAll(/\/\(([a-z0-9-]+)\)/g, "/$1");
+
     // Convert kebab-case folder names to camelCase
     // e.g., unified-interface -> unifiedInterface, react-native -> reactNative
     // Note: underscore-prefixed folders (_components) are kept as-is
