@@ -47,7 +47,6 @@ export const IGNORED_DIRS = [
   "node_modules",
   ".next",
   "dist",
-  "build",
   ".tmp",
   I18N_PATH,
 ];

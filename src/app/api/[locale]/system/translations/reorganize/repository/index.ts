@@ -1992,13 +1992,10 @@ export class TranslationReorganizeRepositoryImpl {
       }
     }
 
-    // Third pass: Direct source file scan.
-    // Previous passes only fix keys that appear in keyMappings. But source files may contain
-    // wrong keys from previous generator runs that were never tracked in keyMappings (e.g.,
-    // a key was partially fixed in one run, leaving a new bad key not in the current keyMappings).
-    // This pass scans ALL source files, extracts any quoted "app.XXX" key strings, and fixes
-    // any that don't exist in the valid key set.
-    this.fixSourceFileKeysDirectly(locationActualKeys, logger);
+    // Third pass: Direct source file scan (DISABLED - causes incorrect corrections due to
+    // loose suffix-matching heuristic that can map unrelated keys to each other).
+    // this.fixSourceFileKeysDirectly(locationActualKeys, logger);
+    logger.info("[RECONCILE] Third pass (direct scan) disabled");
   }
 
   /**
