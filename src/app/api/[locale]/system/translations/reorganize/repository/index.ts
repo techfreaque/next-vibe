@@ -1636,12 +1636,20 @@ export class TranslationReorganizeRepositoryImpl {
       const folderSegments = new Set<string>(["common"]);
 
       // Flatten single-child objects, preserving only "common".
-      // Run twice: first pass may leave some single-child nodes un-collapsed due to topLevelKeys
-      // conflicts that get resolved after the first pass (e.g., A.B.* where A collapses to B,
-      // freeing up the slot for C.B.* to collapse to B.* on the second pass).
+      // Run until stable: each pass may reveal new single-child nodes that were hidden by
+      // conflicts that were resolved in the prior pass. This ensures the key mapping computed
+      // here matches the key structure that the file generator will produce (which also applies
+      // flattening to the post-mapping content, potentially collapsing further).
       let flattened =
         this.fileGenerator!.flattenSingleChildObjectsPublic(nested, folderSegments);
-      flattened = this.fileGenerator!.flattenSingleChildObjectsPublic(flattened, folderSegments);
+      for (let pass = 0; pass < 8; pass++) {
+        const next =
+          this.fileGenerator!.flattenSingleChildObjectsPublic(flattened, folderSegments);
+        const prevKeys = JSON.stringify(Object.keys(this.fileGenerator!.flattenTranslationObjectPublic(flattened)).sort());
+        const nextKeys = JSON.stringify(Object.keys(this.fileGenerator!.flattenTranslationObjectPublic(next)).sort());
+        flattened = next;
+        if (prevKeys === nextKeys) break;
+      }
 
       // Flatten back to dot notation
       const flattenedKeys =

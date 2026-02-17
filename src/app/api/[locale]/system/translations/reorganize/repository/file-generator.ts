@@ -664,9 +664,15 @@ export class FileGenerator {
       this.unflattenTranslationObject(strippedTranslations);
 
     // Flatten single-child objects to avoid redundant nesting.
-    // Run twice to handle cases where the first pass resolves conflicts enabling more collapses.
-    const flattenedTranslations =
-      this.flattenSingleChildObjects(this.flattenSingleChildObjects(nestedTranslations));
+    // Run until stable so the result matches what fixKeyMappingsWithFlattening computes.
+    let flattenedTranslations = this.flattenSingleChildObjects(nestedTranslations);
+    for (let _pass = 0; _pass < 8; _pass++) {
+      const next = this.flattenSingleChildObjects(flattenedTranslations);
+      const prevKeys = JSON.stringify(Object.keys(this.flattenTranslationObject(flattenedTranslations)).sort());
+      const nextKeys = JSON.stringify(Object.keys(this.flattenTranslationObject(next)).sort());
+      flattenedTranslations = next;
+      if (prevKeys === nextKeys) break;
+    }
 
     const translationsObject = this.objectToString(flattenedTranslations, 0);
     // eslint-disable-next-line i18next/no-literal-string
