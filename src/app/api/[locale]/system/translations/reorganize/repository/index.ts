@@ -1528,7 +1528,8 @@ export class TranslationReorganizeRepositoryImpl {
         // Replace each old key with the new key - exact double-quote matching
         for (const [oldKey, newKey] of keyMappings) {
           // Match exact double-quoted strings: "oldKey"
-          const escapedOldKey = oldKey.replaceAll(".", "\\.");
+          // Escape ALL regex special chars (not just dots) to handle keys with [...slug], (other), etc.
+          const escapedOldKey = oldKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
           const pattern = new RegExp(`"${escapedOldKey}"`, "g");
 
           if (pattern.test(content)) {
