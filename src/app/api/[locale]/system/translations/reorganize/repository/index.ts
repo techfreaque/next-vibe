@@ -1567,23 +1567,11 @@ export class TranslationReorganizeRepositoryImpl {
           strippedTranslations,
         );
 
-      // Identify folder segments in the stripped keys that should NEVER be flattened
-      // These are segments that represent actual folder names, not just nested objects in a file
-      const folderSegments = new Set<string>(["common"]); // Always preserve "common"
+      // Only preserve "common" — it's the namespace for shared keys and must never be flattened away.
+      // All other intermediate segments (old namespace junk) get flattened by the single-child rule.
+      const folderSegments = new Set<string>(["common"]);
 
-      // Extract ALL intermediate path segments from all keys at this location
-      // For example, if we have keys like "[...slug].notFound", "[id].details.name", etc.
-      // we need to preserve ALL segments except the last: "[...slug]", "[id]", "details"
-      // because they ALL represent folder/file structure, not redundant nesting
-      for (const key of Object.keys(strippedTranslations)) {
-        const segments = key.split(".");
-        // Add ALL segments except the last one (which is the actual leaf translation key)
-        for (let i = 0; i < segments.length - 1; i++) {
-          folderSegments.add(segments[i]);
-        }
-      }
-
-      // Flatten single-child objects, but preserve folder segments
+      // Flatten single-child objects, preserving only "common"
       const flattened =
         this.fileGenerator!.flattenSingleChildObjectsPublic(nested, folderSegments);
 
