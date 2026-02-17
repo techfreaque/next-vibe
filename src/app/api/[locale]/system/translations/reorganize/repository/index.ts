@@ -1144,10 +1144,12 @@ export class TranslationReorganizeRepositoryImpl {
     // Ensure fileGenerator is loaded
     await this.getFileGenerator();
 
-    // Scan for i18n files in src/app and src/app/api
+    // Scan for i18n files in src/app, src/app/api, src/packages, and src/app-native
     const searchPaths = [
       path.join(projectRoot, "src/app"),
       path.join(projectRoot, "src/app/api"),
+      path.join(projectRoot, "src/packages"),
+      path.join(projectRoot, "src/app-native"),
     ];
 
     for (const searchPath of searchPaths) {
@@ -1199,10 +1201,13 @@ export class TranslationReorganizeRepositoryImpl {
           const locationPath = path.dirname(
             path.dirname(path.dirname(relativePath)),
           ); // Remove /i18n/en/index.ts
-          const locationPrefix = locationPath
-            .replace(/^src\//, "")
-            .replace(/\/\[locale\]/g, "") // Remove [locale] segment
-            .replace(/\//g, ".");
+          // Use locationToFlatKeyPublic for consistent camelCase/kebab conversion
+          const locationPrefix = this.fileGenerator
+            ? this.fileGenerator.locationToFlatKeyPublic(locationPath)
+            : locationPath
+                .replace(/^src\//, "")
+                .replace(/\/\[locale\]/g, "")
+                .replace(/\//g, ".");
 
           // Load the file
           const fileUrl = FILE_PROTOCOL + filePath;
