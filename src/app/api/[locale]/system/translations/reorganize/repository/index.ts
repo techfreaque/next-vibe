@@ -1641,13 +1641,18 @@ export class TranslationReorganizeRepositoryImpl {
           strippedTranslations,
         );
 
-      // Preserve "common" and all direct child subdirectory key names.
+      // Preserve "common" and direct child subdirectory key names that actually have
+      // translations in the parent group under that child prefix.
       // Child directories produce explicit named imports like `shared: sharedTranslations` in the
       // generated file, so those keys must never be flattened away by the single-child rule.
-      // e.g., if _components/shared/ is a sub-location, "shared" must be preserved in the
-      // _components location's flattening so that app.api.leads._components.shared.* stays correct.
+      // e.g., if _components/shared/ is a sub-location AND the _components group has keys
+      // starting with `app.api.leads._components.shared.*`, then "shared" must be preserved.
+      // NOTE: Only protect child names that are actually referenced in the parent's group,
+      // to avoid protecting "old namespace" segments like `list` in `users.list.enums.*`
+      // where `users/list` is a child directory but `list.enums.*` are NOT from the list group.
       const folderSegments = new Set<string>(["common"]);
-      // Find direct child locations and add their camelCase segment names to folderSegments
+      // Find direct child locations whose camelCase name appears as the first segment in the
+      // parent group's stripped translations. This indicates the child IS being imported here.
       for (const childLocation of groups.keys()) {
         if (childLocation === location) continue;
         // Check if childLocation is a direct child (one extra segment) of location
@@ -1660,7 +1665,34 @@ export class TranslationReorganizeRepositoryImpl {
               /-([a-z0-9])/g,
               (_: string, letter: string) => letter.toUpperCase(),
             );
-            folderSegments.add(camelCased);
+            // Only protect this child's key name if the PARENT group has keys starting
+            // with `{camelCased}.` AND those SAME full keys also exist in the CHILD group.
+            // This means the child is truly referenced in the parent's i18n file as
+            // `{camelCased}: childTranslations` (a named import).
+            //
+            // Example: `_components` has `shared.admin.batch.previewDescription` in its
+            // strippedTranslations, and `_components/shared` group ALSO contains
+            // `app.api.leads._components.shared.admin.batch.previewDescription`.
+            // → `shared` is protected.
+            //
+            // Counter-example: `users` has `list.enums.userSortField.firstName` in its
+            // strippedTranslations, but `users/list` group contains `app.api.users.list.users.*`
+            // (its own endpoint keys) — NOT `app.api.users.list.enums.*`.
+            // → `list` is NOT protected.
+            const childGroup = groups.get(childLocation);
+            if (childGroup) {
+              const parentChildKeys = Object.keys(strippedTranslations)
+                .filter((k) => k.startsWith(`${camelCased}.`));
+              const childGroupHasSameKeys = parentChildKeys.some((k) => {
+                const fullKey = locationPrefix
+                  ? `${locationPrefix}.${k}`
+                  : k;
+                return fullKey in childGroup;
+              });
+              if (childGroupHasSameKeys) {
+                folderSegments.add(camelCased);
+              }
+            }
           }
         }
       }
