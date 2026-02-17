@@ -496,10 +496,10 @@ export class FileGenerator {
    * @returns The formatted object string
    */
   /**
-   * Convert kebab-case keys to camelCase (hyphens only, never underscores)
+   * Convert kebab-case or snake_case keys to camelCase
    */
   private toCamelCase(str: string): string {
-    return str.replace(/[-]([a-z0-9])/g, (_, letter) => letter.toUpperCase());
+    return str.replace(/[-_]([a-z0-9])/g, (_, letter) => letter.toUpperCase());
   }
 
   private objectToString(obj: TranslationObject, indent: number): string {
