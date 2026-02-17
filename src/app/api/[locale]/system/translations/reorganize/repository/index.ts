@@ -1357,7 +1357,7 @@ export class TranslationReorganizeRepositoryImpl {
 
           // Strip consecutive duplicate: if keyRemainder starts with the same segment
           // that ends the common prefix, it's a redundant old-namespace repetition.
-          // e.g., key "app.admin.leads.leads.admin.stats.title" at location "app.admin.leads.stats"
+          // e.g., key "app.common.admin.leads.leads.admin.stats.title" at location "app.admin.leads.stats"
           // common prefix ends with "leads", keyRemainder starts with "leads" -> remove it
           if (
             commonPrefixLength > 0 &&
@@ -1372,11 +1372,17 @@ export class TranslationReorganizeRepositoryImpl {
           const toCamelCase = (str: string) =>
             str.replace(/[-]([a-z0-9])/g, (_, letter) => letter.toUpperCase());
           const locationRemainderCamel = locationRemainder.map(toCamelCase);
+          // For matching purposes only: strip leading _ and surrounding () from location parts
+          // e.g. old key "components" should match location "_components", "other" should match "(other)"
+          // The output key still uses actualLocationPrefix which preserves _components and (other) correctly
+          const locationRemainderForMatch = locationRemainder.map((p) =>
+            toCamelCase(p.replace(/^\((.+)\)$/, "$1").replace(/^_/, ""))
+          );
 
           const filteredRemainder = keyRemainder.filter((keyPart) => {
             const keyPartCamel = toCamelCase(keyPart);
             // Remove parts that match location remainder segments (case-insensitive)
-            const hasExactMatch = locationRemainderCamel.some(
+            const hasExactMatch = locationRemainderForMatch.some(
               (locPart) =>
                 !locPart.startsWith("[") && locPart.toLowerCase() === keyPartCamel.toLowerCase()
             );
@@ -1385,7 +1391,7 @@ export class TranslationReorganizeRepositoryImpl {
             }
             // Remove parts that are camelCase prefixes of location parts
             // e.g., "app" is a prefix of "appNative" -> remove it
-            const isKeyPrefixOfLocPart = locationRemainderCamel.some((locPart) => {
+            const isKeyPrefixOfLocPart = locationRemainderForMatch.some((locPart) => {
               if (locPart.startsWith("[")) return false;
               return (
                 locPart.length > keyPartCamel.length &&
@@ -1994,7 +2000,7 @@ export class TranslationReorganizeRepositoryImpl {
 
           // Strip consecutive duplicate: if keyRemainder starts with the same segment
           // that ends the common prefix, it's a redundant old-namespace repetition.
-          // e.g., key "app.admin.leads.leads.admin.stats.title" at location "app.admin.leads.stats"
+          // e.g., key "app.common.admin.leads.leads.admin.stats.title" at location "app.admin.leads.stats"
           // common prefix ends with "leads", keyRemainder starts with "leads" -> remove it
           if (
             commonPrefixLength > 0 &&
@@ -2034,6 +2040,11 @@ export class TranslationReorganizeRepositoryImpl {
                   letter.toUpperCase(),
                 );
               const locationRemainderCamel = locationRemainder.map(toCamelCase);
+              // For matching purposes only: strip leading _ and surrounding () from location parts
+              // e.g. old key "components" should match location "_components", "other" should match "(other)"
+              const locationRemainderForMatch = locationRemainder.map((p) =>
+                toCamelCase(p.replace(/^\((.+)\)$/, "$1").replace(/^_/, ""))
+              );
 
               suffixParts = keyRemainder.filter((keyPart) => {
                 // Keep the part if it's NOT in the location remainder
@@ -2041,7 +2052,7 @@ export class TranslationReorganizeRepositoryImpl {
                 const keyPartCamel = toCamelCase(keyPart);
 
                 // Check for exact match (case-insensitive)
-                const hasExactMatch = locationRemainderCamel.some(
+                const hasExactMatch = locationRemainderForMatch.some(
                   (locPart) =>
                     !locPart.startsWith("[") && locPart.toLowerCase() === keyPartCamel.toLowerCase(),
                 );
@@ -2051,7 +2062,7 @@ export class TranslationReorganizeRepositoryImpl {
 
                 // Check if keyPart is a composite that starts with any location part
                 // e.g., "cronSystem" starts with "cron" -> remove it
-                const isComposite = locationRemainderCamel.some((locPart) => {
+                const isComposite = locationRemainderForMatch.some((locPart) => {
                   if (locPart.startsWith("[")) {
                     return false;
                   } // Skip dynamic segments
@@ -2070,7 +2081,7 @@ export class TranslationReorganizeRepositoryImpl {
                 // Check if keyPart is a camelCase prefix of any location part
                 // e.g., "app" is a prefix of "appNative" -> remove it
                 // This handles cases where old namespace parts like "app.native" map to "appNative"
-                const isKeyPrefixOfLocPart = locationRemainderCamel.some((locPart) => {
+                const isKeyPrefixOfLocPart = locationRemainderForMatch.some((locPart) => {
                   if (locPart.startsWith("[")) return false;
                   return (
                     locPart.length > keyPartCamel.length &&
