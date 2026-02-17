@@ -419,8 +419,14 @@ export class FileGenerator {
               }
             }
           } else {
-            // Single child is a primitive value - keep the structure
-            result[key] = value;
+            // Single child is a primitive value - flatten it out too
+            // e.g. { campaignStarter: { description: "..." } } → { description: "..." }
+            if (childKey in result || topLevelKeys.has(childKey)) {
+              // Key conflict - keep the structure
+              result[key] = value;
+            } else {
+              result[childKey] = childValue;
+            }
           }
         } else {
           // Multiple children - recursively flatten each child but keep this level
