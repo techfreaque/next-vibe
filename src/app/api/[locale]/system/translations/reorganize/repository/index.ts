@@ -1883,6 +1883,101 @@ export class TranslationReorganizeRepositoryImpl {
       }
     }
 
+    // Second pass: find source keys whose currentMappedKey doesn't match ANY location prefix.
+    // These are completely misassigned keys (FLATTEN-FIX overwrote a correct mapping with
+    // a wrong one from a different location that happened to share the same value).
+    // Strategy: look up the original value from the regroupedTranslations by scanning all
+    // location groups for ANY key containing the source key's suffix, then find the correct
+    // actual key across all locations.
+    const allLocationPrefixes = [...locationActualKeys.keys()];
+
+    // Build a reverse lookup: value → [(locationPrefix, actualKey)] across all locations
+    // For disambiguation we use suffix matching against the sourceKey
+    const valueToActualLocKeys = new Map<string, Array<{prefix: string; key: string}>>();
+    for (const [locPrefix, actualKeys] of locationActualKeys.entries()) {
+      for (const [flatKey, flatValue] of actualKeys.entries()) {
+        if (typeof flatValue !== "string") continue;
+        if (!valueToActualLocKeys.has(flatValue)) {
+          valueToActualLocKeys.set(flatValue, []);
+        }
+        valueToActualLocKeys.get(flatValue)!.push({ prefix: locPrefix, key: flatKey });
+      }
+    }
+
+    for (const [sourceKey, currentMappedKey] of keyMappings.entries()) {
+      // Skip keys already being corrected
+      if (corrections.has(currentMappedKey)) continue;
+
+      // Check if currentMappedKey matches any known location prefix
+      const matchesAnyLocation = allLocationPrefixes.some(
+        prefix => currentMappedKey.startsWith(`${prefix}.`)
+      );
+
+      if (matchesAnyLocation) continue; // Handled in first pass or correct
+
+      // This key doesn't match any location prefix - it's orphaned/wrong.
+      // Find the value by scanning all location groups for any entry matching the source key
+      let targetValue: string | undefined;
+      for (const [, trans] of groups.entries()) {
+        // Try current mapped key
+        if (trans[currentMappedKey] !== undefined) {
+          targetValue = trans[currentMappedKey] as string;
+          break;
+        }
+        // Try source key
+        if (trans[sourceKey] !== undefined) {
+          targetValue = trans[sourceKey] as string;
+          break;
+        }
+        // Try any key that ends with sourceKey's last 3 segments
+        const sourceSuffix = sourceKey.split(".").slice(-3).join(".");
+        for (const [groupKey, groupValue] of Object.entries(trans)) {
+          if (groupKey.endsWith(`.${sourceSuffix}`) || groupKey === sourceSuffix) {
+            targetValue = groupValue as string;
+            break;
+          }
+        }
+        if (targetValue !== undefined) break;
+      }
+
+      if (targetValue === undefined) continue;
+
+      // Find all actual location keys with this value
+      const candidates = valueToActualLocKeys.get(targetValue) ?? [];
+      if (candidates.length === 0) continue;
+
+      // Pick best candidate by longest common suffix with sourceKey
+      const sourceParts = sourceKey.split(".");
+      let bestScore = -1;
+      let bestPrefix = "";
+      let bestFlatKey = "";
+
+      for (const { prefix, key } of candidates) {
+        const candParts = key.split(".");
+        let matchLen = 0;
+        for (let i = 1; i <= Math.min(sourceParts.length, candParts.length); i++) {
+          if (sourceParts[sourceParts.length - i] === candParts[candParts.length - i]) {
+            matchLen++;
+          } else {
+            break;
+          }
+        }
+        if (matchLen > bestScore) {
+          bestScore = matchLen;
+          bestPrefix = prefix;
+          bestFlatKey = key;
+        }
+      }
+
+      if (!bestFlatKey || bestScore === 0) continue; // No suffix match at all - skip (too risky)
+
+      const correctFullKey = `${bestPrefix}.${bestFlatKey}`;
+      if (correctFullKey !== currentMappedKey) {
+        corrections.set(currentMappedKey, correctFullKey);
+        logger.info(`[RECONCILE-ORPHAN] ${sourceKey}: ${currentMappedKey} -> ${correctFullKey}`);
+      }
+    }
+
     if (corrections.size === 0) {
       logger.info("[RECONCILE] No key corrections needed");
       return;
