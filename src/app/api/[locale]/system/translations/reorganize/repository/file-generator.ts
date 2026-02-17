@@ -509,9 +509,14 @@ export class FileGenerator {
    */
   /**
    * Convert kebab-case or snake_case keys to camelCase
+   * Note: leading underscores are preserved (e.g., _components stays _components)
    */
   private toCamelCase(str: string): string {
-    return str.replace(/[-_]([a-z0-9])/g, (_, letter) => letter.toUpperCase());
+    // Preserve leading underscores (e.g., _components should not become Components)
+    const leadingUnderscores = str.match(/^_+/)?.[0] ?? "";
+    const rest = str.slice(leadingUnderscores.length);
+    const camelRest = rest.replace(/[-_]([a-z0-9])/g, (_, letter) => letter.toUpperCase());
+    return leadingUnderscores + camelRest;
   }
 
   private objectToString(obj: TranslationObject, indent: number): string {
@@ -658,9 +663,10 @@ export class FileGenerator {
     const nestedTranslations =
       this.unflattenTranslationObject(strippedTranslations);
 
-    // Flatten single-child objects to avoid redundant nesting
+    // Flatten single-child objects to avoid redundant nesting.
+    // Run twice to handle cases where the first pass resolves conflicts enabling more collapses.
     const flattenedTranslations =
-      this.flattenSingleChildObjects(nestedTranslations);
+      this.flattenSingleChildObjects(this.flattenSingleChildObjects(nestedTranslations));
 
     const translationsObject = this.objectToString(flattenedTranslations, 0);
     // eslint-disable-next-line i18next/no-literal-string
@@ -919,6 +925,8 @@ export class FileGenerator {
     const usedExportKeys = new Set<string>(); // Track export keys to prevent duplicates
     const hasSpreadChild = directChildren.has("[locale]");
     let spreadChildImportName: string | null = null; // Track the import name of the [locale] spread child
+    // Fix 15: Track child key -> import name for merge detection
+    const childKeyToImportName = new Map<string, string>();
 
     // Import from direct children - but only if they have generated files
     for (const child of directChildren) {
@@ -1010,7 +1018,9 @@ export class FileGenerator {
         }
 
         // Track this export key
-        usedExportKeys.add(exportKey.replaceAll('"', ''));
+        const plainExportKey = exportKey.replaceAll('"', '');
+        usedExportKeys.add(plainExportKey);
+        childKeyToImportName.set(plainExportKey, importName); // Fix 15: track for merge
         exports.push(`  ${exportKey}: ${importName}`);
       }
     }
@@ -1217,6 +1227,21 @@ export class FileGenerator {
           // Skip if this key was already exported (prevents duplicates)
           const plainKey = exportKey.replaceAll('"', '');
           if (usedExportKeys.has(plainKey)) {
+            // Fix 15: If this key matches a child import, generate a merged export
+            // instead of silently dropping the inline content.
+            // e.g., cron: { ...cronTranslations, frequency: {...}, patterns: {...} }
+            const childImportName = childKeyToImportName.get(plainKey);
+            if (childImportName && typeof value === "object" && value !== null) {
+              const mergedValueStr = `{\n    ...${childImportName},\n${valueStr.slice(1)}`;
+              // Replace the existing export entry for this key
+              const existingIdx = exports.findIndex((e) => e.trimStart().startsWith(`${exportKey}:`));
+              if (existingIdx >= 0) {
+                exports[existingIdx] = `  ${exportKey}: ${mergedValueStr}`;
+                logger.info(
+                  `[FIX-15] Merging inline key "${key}" at ${sourcePath} with child import "${childImportName}"`,
+                );
+              }
+            }
             continue;
           }
           usedExportKeys.add(plainKey);

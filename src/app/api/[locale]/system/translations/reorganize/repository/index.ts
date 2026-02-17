@@ -1611,9 +1611,13 @@ export class TranslationReorganizeRepositoryImpl {
       // All other intermediate segments (old namespace junk) get flattened by the single-child rule.
       const folderSegments = new Set<string>(["common"]);
 
-      // Flatten single-child objects, preserving only "common"
-      const flattened =
+      // Flatten single-child objects, preserving only "common".
+      // Run twice: first pass may leave some single-child nodes un-collapsed due to topLevelKeys
+      // conflicts that get resolved after the first pass (e.g., A.B.* where A collapses to B,
+      // freeing up the slot for C.B.* to collapse to B.* on the second pass).
+      let flattened =
         this.fileGenerator!.flattenSingleChildObjectsPublic(nested, folderSegments);
+      flattened = this.fileGenerator!.flattenSingleChildObjectsPublic(flattened, folderSegments);
 
       // Flatten back to dot notation
       const flattenedKeys =
@@ -1642,19 +1646,25 @@ export class TranslationReorganizeRepositoryImpl {
 
             // Fix 14: Detect and remove duplicate folder-name segment.
             // After FLATTEN-FIX collapses _components.home.FOLDERNAME.* into FOLDERNAME.*,
-            // the resulting key has the folder name duplicated (e.g., careers.careers.*).
-            // If flatKey starts with the same segment as the location prefix's last segment,
-            // strip that leading segment to avoid the duplicate.
+            // the resulting key may duplicate a folder name already in the location prefix.
+            // Example: careers.[jobId].careers.* → careers.[jobId].* (strip leading "careers.")
+            // Check ALL ancestor segments of the location prefix (not just the last one).
             if (locationPrefix) {
-              const locationLastSegment = locationPrefix.split(".").pop()!;
-              if (effectiveFlatKey.startsWith(`${locationLastSegment}.`)) {
-                const deduplicated = effectiveFlatKey.slice(locationLastSegment.length + 1);
-                // Only strip if the result still has content and isn't just the last segment itself
-                if (deduplicated.length > 0) {
-                  logger.debug(
-                    `[FIX-14] Stripping duplicate folder segment "${locationLastSegment}" from flatKey "${effectiveFlatKey}" -> "${deduplicated}"`,
-                  );
-                  effectiveFlatKey = deduplicated;
+              const locationSegments = locationPrefix.split(".");
+              // Skip very short prefixes (app.*, etc.) to avoid false positives
+              if (locationSegments.length >= 3) {
+                // Try each location segment (skip the first generic one like "app")
+                for (const seg of locationSegments.slice(1)) {
+                  if (effectiveFlatKey.startsWith(`${seg}.`) && !seg.startsWith("[")) {
+                    const deduplicated = effectiveFlatKey.slice(seg.length + 1);
+                    if (deduplicated.length > 0) {
+                      logger.debug(
+                        `[FIX-14] Stripping duplicate folder segment "${seg}" from flatKey "${effectiveFlatKey}" -> "${deduplicated}"`,
+                      );
+                      effectiveFlatKey = deduplicated;
+                      break; // Only strip one level
+                    }
+                  }
                 }
               }
             }
