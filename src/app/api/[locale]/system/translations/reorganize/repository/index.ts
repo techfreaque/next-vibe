@@ -1312,6 +1312,16 @@ export class TranslationReorganizeRepositoryImpl {
           continue;
         }
 
+        // If source key already has a mapping (was renamed), skip – it's not truly missing.
+        // Adding it again would re-introduce the old key into groups and break FLATTEN-FIX
+        // (e.g. emailJourneys.components.* remapped to common.emailJourneys.components.*).
+        if (keyMappings.has(sourceKey)) {
+          logger.debug(
+            `Source key "${sourceKey}" not in new structure but has mapping to "${keyMappings.get(sourceKey)}" – skipping missing-key handler`,
+          );
+          continue;
+        }
+
         // Source key doesn't exist in old translations
         // Create placeholder in the new structure based on usage location
         logger.warn(`Source key not found in old translations: "${sourceKey}"`);
