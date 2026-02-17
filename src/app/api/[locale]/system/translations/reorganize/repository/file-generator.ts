@@ -918,6 +918,7 @@ export class FileGenerator {
     const usedImportNames = new Set<string>();
     const usedExportKeys = new Set<string>(); // Track export keys to prevent duplicates
     const hasSpreadChild = directChildren.has("[locale]");
+    let spreadChildImportName: string | null = null; // Track the import name of the [locale] spread child
 
     // Import from direct children - but only if they have generated files
     for (const child of directChildren) {
@@ -983,6 +984,7 @@ export class FileGenerator {
 
       // Only spread [locale] folders, use keyed exports for everything else
       if (isSpread) {
+        spreadChildImportName = importName; // Remember for later conflict detection
         exports.push(`  ...${importName}`);
       } else {
         // Convert kebab-case folder names to camelCase for export keys
@@ -1115,6 +1117,36 @@ export class FileGenerator {
                   `Skipping inline key "${key}" at ${sourcePath} - all keys exist in co-located translations at spread [locale]`
                 );
                 continue;
+              }
+
+              // Check if the spread child has SOME keys under this same top-level key.
+              // If so, the inline value would OVERRIDE the spread child's contribution for that key.
+              // We need to detect this conflict and emit a merged object instead.
+              const spreadChildHasKeyContent = Object.keys(flattenedSpreadChild).some(
+                (fullKey) => fullKey.startsWith(`${spreadChildPrefix}.`) || fullKey === spreadChildPrefix,
+              );
+
+              if (spreadChildHasKeyContent && spreadChildImportName) {
+                // Conflict: both the parent (inline) and the spread child contribute to the same top-level key.
+                // Generate a merged value: { ...spreadChildImportName.key, ...ourOwnKeys }
+                const camelKey = this.toCamelCase(key);
+                const exportKey = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(camelKey)
+                  ? camelKey
+                  : `"${camelKey}"`;
+                const plainKey = exportKey.replaceAll('"', '');
+                if (!usedExportKeys.has(plainKey)) {
+                  usedExportKeys.add(plainKey);
+                  const valueStr = this.objectToString(value as TranslationObject, 1);
+                  // Access the spread child's key using dot notation (camelCase key)
+                  const spreadChildKeyAccess = `${spreadChildImportName}.${camelKey}`;
+                  // Build a merged object that first spreads from the spread child, then overlays our own keys
+                  const mergedValueStr = `{\n    ...${spreadChildKeyAccess},\n${valueStr.slice(1)}`;
+                  logger.info(
+                    `Merging inline key "${key}" at ${sourcePath} with spread child "${spreadChildLocation}" to avoid override`,
+                  );
+                  exports.push(`  ${exportKey}: ${mergedValueStr}`);
+                }
+                continue; // Skip the normal inline export below since we handled it here
               }
             }
           }

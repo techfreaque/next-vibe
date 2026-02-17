@@ -256,6 +256,7 @@ export class TranslationReorganizeRepositoryImpl {
           keyUsageMap,
           keyUsageFrequency,
           logger,
+          currentTranslations, // Pass original translations to recover test-only keys
         );
 
         logger.info(`Created ${groups.size} location-based translation groups`);
@@ -406,6 +407,7 @@ export class TranslationReorganizeRepositoryImpl {
           keyUsageMap,
           keyUsageFrequency,
           logger,
+          currentTranslations, // Pass original translations to recover test-only keys
         );
 
         logger.info(`Created ${groups.size} translation groups`);
@@ -1257,6 +1259,7 @@ export class TranslationReorganizeRepositoryImpl {
     keyUsageMap: Map<string, string[]>,
     keyUsageFrequency: Map<string, number>,
     logger: EndpointLogger,
+    originalTranslations?: TranslationObject,
   ): {
     groups: Map<string, TranslationObject>;
     originalKeys: Map<
@@ -1322,9 +1325,30 @@ export class TranslationReorganizeRepositoryImpl {
           continue;
         }
 
-        // Source key doesn't exist in old translations
+        // Source key doesn't exist in old translations (or was removed as unused)
         // Create placeholder in the new structure based on usage location
         logger.warn(`Source key not found in old translations: "${sourceKey}"`);
+
+        // Special case: keys with no usages (only referenced in test files or truly unused)
+        // that DO exist in original translations — preserve them at root namespace level.
+        // This ensures test-only keys remain valid _TranslationKey types after reorganization.
+        if (usageFiles.length === 0 && originalTranslations && this.fileGenerator) {
+          const originalValue = originalTranslations[sourceKey];
+          if (originalValue !== undefined && typeof originalValue !== "object") {
+            // Key exists in original translations — preserve at root namespace location
+            const rootNamespace = sourceKey.split(".")[0]; // e.g., "app", "packages"
+            const naturalLocation = rootNamespace;
+            if (!groups.has(naturalLocation)) {
+              groups.set(naturalLocation, {});
+            }
+            const locationGroup = groups.get(naturalLocation)!;
+            locationGroup[sourceKey] = originalValue;
+            logger.debug(
+              `Preserved test-only/unused key "${sourceKey}" at root location "${naturalLocation}" with value "${originalValue}"`,
+            );
+          }
+          continue;
+        }
 
         // Get usage location(s)
         const locations = this.getSpecificUsageLocations(usageFiles, logger);
@@ -1744,7 +1768,27 @@ export class TranslationReorganizeRepositoryImpl {
 
         // Only process keys that are actually used in the codebase
         if (usageFiles.length === 0) {
-          logger.debug(`Skipping unused translation key: ${fullPath}`);
+          // Key exists in old translations but was not found in non-test source files.
+          // This can happen when a key is only referenced in test files (which are excluded
+          // from the scanner to avoid driving co-location to test directories).
+          // Preserve these keys at their root-namespace location so they remain valid
+          // _TranslationKey types in the TypeScript system (test files will still pass tsgo).
+          if (this.fileGenerator) {
+            const rootNamespace = fullPath.split(".")[0]; // e.g., "app", "packages", "config"
+            // Use the root namespace as the location (e.g., "app" for all "app.*" keys)
+            const naturalLocation = rootNamespace;
+            if (!groups.has(naturalLocation)) {
+              groups.set(naturalLocation, {});
+            }
+            const locationGroup = groups.get(naturalLocation)!;
+            // Use the full key as-is (already starts with the location prefix)
+            locationGroup[fullPath] = value;
+            logger.debug(
+              `Preserving test-only/unused key "${fullPath}" at root location "${naturalLocation}"`,
+            );
+          } else {
+            logger.debug(`Skipping unused translation key: ${fullPath}`);
+          }
           continue;
         }
 
