@@ -1353,21 +1353,29 @@ export class TranslationReorganizeRepositoryImpl {
           }
 
           // Get key remainder after common prefix
-          const keyRemainder = keyParts.slice(commonPrefixLength);
+          let keyRemainder = keyParts.slice(commonPrefixLength);
 
-          // Strip duplicate path segments from keyRemainder that appear in location
-          // This handles cases where old keys have folder names that are now in the path
-          // Example: location "app/[locale]/admin/_components" has prefix "app.api.system.translations.reorganize.repository.admin.Components"
-          // Old key "app.api.system.translations.reorganize.repository.common.admin.dashboard" has remainder "app.api.system.translations.reorganize.repository.dashboard"
-          // We need to filter out "components" since "_components" is in the location
+          // Strip consecutive duplicate: if keyRemainder starts with the same segment
+          // that ends the common prefix, it's a redundant old-namespace repetition.
+          // e.g., key "app.admin.leads.leads.admin.stats.title" at location "app.admin.leads.stats"
+          // common prefix ends with "leads", keyRemainder starts with "leads" -> remove it
+          if (
+            commonPrefixLength > 0 &&
+            keyRemainder.length > 0 &&
+            keyRemainder[0] === keyParts[commonPrefixLength - 1]
+          ) {
+            keyRemainder = keyRemainder.slice(1);
+          }
+
+          // Strip duplicate path segments from keyRemainder that appear in location remainder
           const locationRemainder = locationParts.slice(commonPrefixLength);
           const toCamelCase = (str: string) =>
-            str.replace(/[-_]([a-z0-9])/g, (_, letter) => letter.toUpperCase());
+            str.replace(/[-]([a-z0-9])/g, (_, letter) => letter.toUpperCase());
           const locationRemainderCamel = locationRemainder.map(toCamelCase);
 
           const filteredRemainder = keyRemainder.filter((keyPart) => {
             const keyPartCamel = toCamelCase(keyPart);
-            // Remove parts that match location segments (case-insensitive)
+            // Remove parts that match location remainder segments (case-insensitive)
             const hasExactMatch = locationRemainderCamel.some(
               (locPart) =>
                 !locPart.startsWith("[") && locPart.toLowerCase() === keyPartCamel.toLowerCase()
@@ -1375,12 +1383,28 @@ export class TranslationReorganizeRepositoryImpl {
             if (hasExactMatch) {
               return false; // Remove exact matches
             }
+            // Remove parts that are camelCase prefixes of location parts
+            // e.g., "app" is a prefix of "appNative" -> remove it
+            const isKeyPrefixOfLocPart = locationRemainderCamel.some((locPart) => {
+              if (locPart.startsWith("[")) return false;
+              return (
+                locPart.length > keyPartCamel.length &&
+                locPart.toLowerCase().startsWith(keyPartCamel.toLowerCase()) &&
+                locPart[keyPartCamel.length] === locPart[keyPartCamel.length].toUpperCase()
+              );
+            });
+            if (isKeyPrefixOfLocPart) {
+              return false;
+            }
             return true; // Keep other parts
           });
 
-          // Normalize snake_case to camelCase for each part
+          // Normalize to camelCase: convert hyphens always, convert internal (non-leading) underscores
+          // but preserve leading underscores like _components
           const normalizedRemainder = filteredRemainder.map((part) =>
-            part.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()),
+            part
+              .replace(/[-]([a-z0-9])/g, (_, letter) => letter.toUpperCase())
+              .replace(/(?<=[a-z0-9])_([a-z0-9])/g, (_, letter) => letter.toUpperCase()),
           );
           let keySuffix = normalizedRemainder.join(".");
 
@@ -1886,10 +1910,11 @@ export class TranslationReorganizeRepositoryImpl {
         const shouldPreserveCommon = isShared && hasCommonInKey;
 
         // Convert adjustedKey to camelCase for comparison with actualLocationPrefix
+        // Only convert hyphens (not leading underscores like _components which are folder prefixes)
         const fullPathCamelCase = adjustedKey
           .split(".")
           .map((part) =>
-            part.replace(/[-_]([a-z0-9])/g, (_, letter) =>
+            part.replace(/[-]([a-z0-9])/g, (_, letter) =>
               letter.toUpperCase(),
             ),
           )
@@ -1902,11 +1927,11 @@ export class TranslationReorganizeRepositoryImpl {
         ) {
           // Key already matches the location - it's correct!
           keySuffix = fullPathCamelCase.slice(actualLocationPrefix.length + 1);
-          // Convert hyphenated/snake_case segments to camelCase
+          // Convert hyphenated segments to camelCase (not leading underscores like _components)
           keySuffix = keySuffix
             .split(".")
             .map((part) =>
-              part.replace(/[-_]([a-z0-9])/g, (_, letter) =>
+              part.replace(/[-]([a-z0-9])/g, (_, letter) =>
                 letter.toUpperCase(),
               ),
             )
@@ -1965,7 +1990,19 @@ export class TranslationReorganizeRepositoryImpl {
           }
 
           // Get the key parts after the common prefix
-          const keyRemainder = keyParts.slice(commonPrefixLength);
+          let keyRemainder = keyParts.slice(commonPrefixLength);
+
+          // Strip consecutive duplicate: if keyRemainder starts with the same segment
+          // that ends the common prefix, it's a redundant old-namespace repetition.
+          // e.g., key "app.admin.leads.leads.admin.stats.title" at location "app.admin.leads.stats"
+          // common prefix ends with "leads", keyRemainder starts with "leads" -> remove it
+          if (
+            commonPrefixLength > 0 &&
+            keyRemainder.length > 0 &&
+            keyRemainder[0] === keyParts[commonPrefixLength - 1]
+          ) {
+            keyRemainder = keyRemainder.slice(1);
+          }
 
           // Get the location parts after the common prefix
           const locationRemainder = locationParts.slice(commonPrefixLength);
@@ -1993,7 +2030,7 @@ export class TranslationReorganizeRepositoryImpl {
               // ALSO: Check if key part is a "composite" that starts with a location part
               // (e.g., "cronSystem" starts with "cron" from folder) - these are old namespaces to remove
               const toCamelCase = (str: string) =>
-                str.replace(/[-_]([a-z0-9])/g, (_, letter) =>
+                str.replace(/[-]([a-z0-9])/g, (_, letter) =>
                   letter.toUpperCase(),
                 );
               const locationRemainderCamel = locationRemainder.map(toCamelCase);
@@ -2028,18 +2065,31 @@ export class TranslationReorganizeRepositoryImpl {
                       keyPartCamel[locPart.length].toUpperCase()
                   );
                 });
+                if (isComposite) return false;
 
-                return !isComposite; // Keep only non-composite parts
+                // Check if keyPart is a camelCase prefix of any location part
+                // e.g., "app" is a prefix of "appNative" -> remove it
+                // This handles cases where old namespace parts like "app.native" map to "appNative"
+                const isKeyPrefixOfLocPart = locationRemainderCamel.some((locPart) => {
+                  if (locPart.startsWith("[")) return false;
+                  return (
+                    locPart.length > keyPartCamel.length &&
+                    locPart.toLowerCase().startsWith(keyPartCamel.toLowerCase()) &&
+                    locPart[keyPartCamel.length] === locPart[keyPartCamel.length].toUpperCase()
+                  );
+                });
+
+                return !isKeyPrefixOfLocPart; // Keep only non-prefix parts
               });
             }
           }
 
           keySuffix = suffixParts.join(".");
-          // Convert to camelCase
+          // Convert hyphenated segments to camelCase (not leading underscores like _components)
           keySuffix = keySuffix
             .split(".")
             .map((part) =>
-              part.replace(/[-_]([a-z0-9])/g, (_, letter) =>
+              part.replace(/[-]([a-z0-9])/g, (_, letter) =>
                 letter.toUpperCase(),
               ),
             )

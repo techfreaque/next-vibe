@@ -682,6 +682,7 @@ export class FileGenerator {
 
     // Convert kebab-case folder names to camelCase
     // e.g., unified-interface -> unifiedInterface, react-native -> reactNative
+    // Note: underscore-prefixed folders (_components) are kept as-is
     key = key.replaceAll(
       /\/([a-z0-9-]+)/g,
       (fullMatch: string, segment: string) => {
@@ -698,8 +699,6 @@ export class FileGenerator {
     // Replace / with . to create dot notation
     key = key.replaceAll("/", ".");
 
-    // Special handling: app-native stays as app-native (not appNative)
-    // because it's a top-level folder that might be needed for routing purposes
     return key;
   }
 
@@ -973,6 +972,7 @@ export class FileGenerator {
       } else {
         // Convert kebab-case folder names to camelCase for export keys
         // e.g., speech-to-text -> speechToText
+        // Note: underscore-prefixed folders (_components) are kept as-is
         let exportKey = child;
 
         // Convert kebab-case to camelCase
