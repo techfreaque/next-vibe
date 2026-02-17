@@ -1979,19 +1979,149 @@ export class TranslationReorganizeRepositoryImpl {
     }
 
     if (corrections.size === 0) {
-      logger.info("[RECONCILE] No key corrections needed");
+      logger.info("[RECONCILE] No key corrections from passes 1 & 2");
+    } else {
+      logger.info(`[RECONCILE] Correcting ${corrections.size} key references in source files`);
+      this.updateCodeFilesWithNewKeys(corrections, logger);
+
+      // Also update keyMappings for consistency
+      for (const [sourceKey, currentMappedKey] of keyMappings.entries()) {
+        if (corrections.has(currentMappedKey)) {
+          keyMappings.set(sourceKey, corrections.get(currentMappedKey)!);
+        }
+      }
+    }
+
+    // Third pass: Direct source file scan.
+    // Previous passes only fix keys that appear in keyMappings. But source files may contain
+    // wrong keys from previous generator runs that were never tracked in keyMappings (e.g.,
+    // a key was partially fixed in one run, leaving a new bad key not in the current keyMappings).
+    // This pass scans ALL source files, extracts any quoted "app.XXX" key strings, and fixes
+    // any that don't exist in the valid key set.
+    this.fixSourceFileKeysDirectly(locationActualKeys, logger);
+  }
+
+  /**
+   * Fix 20: Direct source file scan for invalid translation keys.
+   * Reads all non-test, non-i18n source files, extracts quoted "app.XXX" key strings,
+   * and corrects any that don't exist in the valid key set by value+suffix matching.
+   */
+  private fixSourceFileKeysDirectly(
+    locationActualKeys: Map<string, Map<string, string>>,
+    logger: EndpointLogger,
+  ): void {
+    // Build complete set of valid keys: locationPrefix.flatKey
+    const validKeys = new Set<string>();
+    for (const [locPrefix, actualKeys] of locationActualKeys.entries()) {
+      for (const [flatKey] of actualKeys.entries()) {
+        validKeys.add(locPrefix ? `${locPrefix}.${flatKey}` : flatKey);
+      }
+    }
+
+    const sourceFiles = this.keyUsageAnalyzer.findFiles(SRC_DIR, FILE_EXTENSIONS);
+    const directCorrections = new Map<string, string>();
+
+    // Pattern: "app." followed by key characters (including brackets, dots, underscores, hyphens, camelCase)
+    const keyPattern = /"(app\.[a-zA-Z0-9_.[\]()-]+)"/g;
+
+    for (const filePath of sourceFiles) {
+      if (
+        filePath.includes("/i18n/") ||
+        filePath.includes("/.tmp/")
+      ) {
+        continue;
+      }
+      // Note: unlike updateCodeFilesWithNewKeys, this pass ALSO scans test files
+      // because test files may reference translation keys that changed paths.
+
+      let content: string;
+      try {
+        content = fs.readFileSync(filePath, "utf8");
+      } catch {
+        continue;
+      }
+
+      // Find all "app.XXX" strings in this file
+      const matches = new Set<string>();
+      let match: RegExpExecArray | null;
+      keyPattern.lastIndex = 0;
+      while ((match = keyPattern.exec(content)) !== null) {
+        matches.add(match[1]);
+      }
+
+      for (const foundKey of matches) {
+        // Skip if already known to be valid
+        if (validKeys.has(foundKey)) continue;
+        // Skip if already being corrected
+        if (directCorrections.has(foundKey)) continue;
+
+        // Find the best correction for this invalid key
+        // Strategy: find the location prefix it was MEANT to be in (longest prefix match),
+        // then use value+suffix matching to find the correct flat key
+        let bestPrefix = "";
+        let bestPrefixLen = 0;
+        for (const locPrefix of locationActualKeys.keys()) {
+          if (!locPrefix) continue;
+          // Normalize for comparison (strip brackets)
+          const normFoundKey = foundKey.replace(/\[([^\]]+)\]/g, "$1");
+          const normLocPrefix = locPrefix.replace(/\[([^\]]+)\]/g, "$1");
+          if (
+            normFoundKey.startsWith(`${normLocPrefix}.`) &&
+            normLocPrefix.length > bestPrefixLen
+          ) {
+            bestPrefix = locPrefix;
+            bestPrefixLen = normLocPrefix.length;
+          }
+        }
+
+        if (!bestPrefix) continue;
+
+        // Extract the local key (suffix after the normalized location prefix)
+        const normFoundKey = foundKey.replace(/\[([^\]]+)\]/g, "$1");
+        const normBestPrefix = bestPrefix.replace(/\[([^\]]+)\]/g, "$1");
+        const localSuffix = normFoundKey.slice(normBestPrefix.length + 1);
+
+        // Find all actual keys in this location
+        const actualKeys = locationActualKeys.get(bestPrefix);
+        if (!actualKeys || actualKeys.size === 0) continue;
+
+        // Score each actual key by suffix similarity to localSuffix
+        const suffixParts = localSuffix.split(".");
+        let bestScore = -1;
+        let bestFlatKey = "";
+        for (const [flatKey] of actualKeys.entries()) {
+          const flatParts = flatKey.split(".");
+          let matchLen = 0;
+          for (let i = 1; i <= Math.min(suffixParts.length, flatParts.length); i++) {
+            if (suffixParts[suffixParts.length - i] === flatParts[flatParts.length - i]) {
+              matchLen++;
+            } else {
+              break;
+            }
+          }
+          if (matchLen > bestScore) {
+            bestScore = matchLen;
+            bestFlatKey = flatKey;
+          }
+        }
+
+        if (bestScore <= 0 || !bestFlatKey) continue;
+
+        const correctKey = `${bestPrefix}.${bestFlatKey}`;
+        if (correctKey !== foundKey && !validKeys.has(foundKey)) {
+          directCorrections.set(foundKey, correctKey);
+          logger.info(`[RECONCILE-DIRECT] ${foundKey} -> ${correctKey}`);
+        }
+      }
+    }
+
+    if (directCorrections.size === 0) {
+      logger.info("[RECONCILE-DIRECT] No additional key corrections needed");
       return;
     }
 
-    logger.info(`[RECONCILE] Correcting ${corrections.size} key references in source files`);
-    this.updateCodeFilesWithNewKeys(corrections, logger);
-
-    // Also update keyMappings for consistency
-    for (const [sourceKey, currentMappedKey] of keyMappings.entries()) {
-      if (corrections.has(currentMappedKey)) {
-        keyMappings.set(sourceKey, corrections.get(currentMappedKey)!);
-      }
-    }
+    logger.info(`[RECONCILE-DIRECT] Correcting ${directCorrections.size} additional key references`);
+    this.updateCodeFilesWithNewKeys(directCorrections, logger);
   }
 
   /**
@@ -2358,13 +2488,38 @@ export class TranslationReorganizeRepositoryImpl {
           )
           .join(".");
 
-        // Try to find where the key diverges from the actual location
-        if (
+        // Normalize a key prefix by stripping bracket notation (e.g. [threadId] -> threadId)
+        // so we can compare source keys (no brackets) with location prefixes (have brackets)
+        const normalizeForMatch = (s: string): string =>
+          s.replace(/\[([^\]]+)\]/g, "$1");
+
+        const normalizedLocationPrefix = actualLocationPrefix
+          ? normalizeForMatch(actualLocationPrefix)
+          : "";
+
+        // Try to find where the key diverges from the actual location.
+        // Also handle the case where the key has no brackets but the locationPrefix does
+        // (e.g., key has "threadId" but location has "[threadId]").
+        const keyMatchesLocation =
           actualLocationPrefix &&
-          fullPathCamelCase.startsWith(`${actualLocationPrefix}.`)
-        ) {
+          (fullPathCamelCase.startsWith(`${actualLocationPrefix}.`) ||
+            (normalizedLocationPrefix &&
+              normalizeForMatch(fullPathCamelCase).startsWith(
+                `${normalizedLocationPrefix}.`,
+              )));
+
+        if (keyMatchesLocation && actualLocationPrefix) {
           // Key already matches the location - it's correct!
-          keySuffix = fullPathCamelCase.slice(actualLocationPrefix.length + 1);
+          // Use normalized match to extract the suffix
+          let keySuffixRaw: string;
+          if (fullPathCamelCase.startsWith(`${actualLocationPrefix}.`)) {
+            keySuffixRaw = fullPathCamelCase.slice(actualLocationPrefix.length + 1);
+          } else {
+            // Normalized match: strip the normalizedLocationPrefix from normalizeForMatch(fullPathCamelCase)
+            const normalizedKey = normalizeForMatch(fullPathCamelCase);
+            keySuffixRaw = normalizedKey.slice(normalizedLocationPrefix.length + 1);
+          }
+          keySuffix = keySuffixRaw;
           // Convert hyphenated and internal underscore segments to camelCase
           // but preserve leading underscores like _components
           keySuffix = keySuffix
@@ -2398,19 +2553,24 @@ export class TranslationReorganizeRepositoryImpl {
           // then take everything after as the raw suffix.
           // Do NOT strip any segments — the leaf file flattening algorithm
           // (single-child object collapsing, recursive) removes all old redundant namespace names.
+          //
+          // Use bracket-normalized comparison so that "threadId" matches "[threadId]".
 
           const keyParts = adjustedKey.split(".");
           const locationParts = actualLocationPrefix
             ? actualLocationPrefix.split(".")
             : [];
+          // Normalized parts for comparison (strip brackets)
+          const normKeyParts = keyParts.map(normalizeForMatch);
+          const normLocParts = locationParts.map(normalizeForMatch);
 
           let commonPrefixLength = 0;
           for (
             let i = 0;
-            i < Math.min(keyParts.length, locationParts.length);
+            i < Math.min(normKeyParts.length, normLocParts.length);
             i++
           ) {
-            if (keyParts[i] === locationParts[i]) {
+            if (normKeyParts[i] === normLocParts[i]) {
               commonPrefixLength = i + 1;
             } else {
               break;
