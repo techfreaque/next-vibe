@@ -1,9 +1,6 @@
 
 
 export const translations = {
-  tags: {
-    maintenance: "Maintenance",
-  },
   post: {
     title: "Reorganize Translations",
     description: "Reorganize translation files and remove unused keys",
@@ -24,9 +21,6 @@ export const translations = {
         title: "Regenerate Structure",
         description: "Regenerate translation file structure based on usage",
       },
-      success: {
-        title: "Operation Successful",
-      },
       summary: {
         title: "Summary",
       },
@@ -42,6 +36,7 @@ export const translations = {
       changes: {
         title: "Changes",
       },
+      title: "Operation Successful",
     },
     messages: {
       foundKeys: "Found Keys",
@@ -68,4 +63,5 @@ export const translations = {
       description: "Translation reorganization completed successfully",
     },
   },
+  maintenance: "Maintenance",
 };

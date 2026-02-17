@@ -1,9 +1,6 @@
 
 
 export const translations = {
-  tags: {
-    maintenance: "Wartung",
-  },
   post: {
     title: "Übersetzungen reorganisieren",
     description: "Übersetzungsdateien reorganisieren und ungenutzte Schlüssel entfernen",
@@ -24,9 +21,6 @@ export const translations = {
         title: "Struktur regenerieren",
         description: "Übersetzungsdateistruktur basierend auf Verwendung regenerieren",
       },
-      success: {
-        title: "Operation erfolgreich",
-      },
       summary: {
         title: "Zusammenfassung",
       },
@@ -42,6 +36,7 @@ export const translations = {
       changes: {
         title: "Änderungen",
       },
+      title: "Operation erfolgreich",
     },
     messages: {
       foundKeys: "Gefundene Schlüssel",
@@ -68,4 +63,5 @@ export const translations = {
       description: "Übersetzungsreorganisation erfolgreich abgeschlossen",
     },
   },
+  maintenance: "Wartung",
 };

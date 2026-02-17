@@ -41,7 +41,7 @@ const { POST } = createEndpoint({
   category: "app.api.system.translations.common.category",
   tags: [
     "app.api.system.translations.reorganize.tags",
-    "app.api.system.translations.reorganize.tags.maintenance",
+    "app.api.system.translations.reorganize.maintenance",
     "app.api.system.translations.common.tags.i18n",
   ],
   icon: "languages",
@@ -113,7 +113,7 @@ const { POST } = createEndpoint({
           success: responseField({
             type: WidgetType.TEXT,
             content:
-              "app.api.system.translations.reorganize.post.fields.success.title",
+              "app.api.system.translations.reorganize.post.fields.title",
             schema: z.boolean(),
           }),
 

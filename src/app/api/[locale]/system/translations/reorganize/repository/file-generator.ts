@@ -192,6 +192,12 @@ export class FileGenerator {
             continue;
           }
 
+          // Skip src/config/i18n - manually maintained, not generated
+          const configI18nDir = buildPath("src", "config", I18N_PATH);
+          if (absoluteI18nPath === path.resolve(configI18nDir)) {
+            continue;
+          }
+
           // Skip scoped translation directories
           if (this.hasScopedIndexFile(fullPath)) {
             logger.info(
@@ -1078,25 +1084,29 @@ export class FileGenerator {
               continue;
             }
 
-            // Also check if key exists in co-located translations at spread child location
+            // Also check if ALL keys under this top-level key exist in the spread child's translations.
+            // Only skip if ALL leaf keys are provided by the spread child (to avoid partial overwrite).
             const spreadChildTranslations = groups.get(spreadChildLocation);
             if (spreadChildTranslations) {
-              // Check if this key exists in the spread child's translations
-              // Keys at app/[locale] have prefix "app" (not "app.[locale]") because [locale] is stripped
-              // So check for "app.api.system.translations.reorganize.repository.admin.xxx", "app.api.system.translations.reorganize.repository.common.xxx", etc.
               const flattenedSpreadChild = this.flattenTranslationObject(spreadChildTranslations, "");
               const locationPrefix = this.locationToFlatKey(sourcePath);
               const spreadChildPrefix = locationPrefix ? `${locationPrefix}.${key}` : key;
 
-              // Check if any key in spread child starts with this prefix
-              const existsInSpreadChild = Object.keys(flattenedSpreadChild).some((childKey) =>
-                childKey === spreadChildPrefix || childKey.startsWith(`${spreadChildPrefix}.`)
+              // Flatten this key's value to check all leaf keys
+              const flattenedValue =
+                typeof value === "object" && value !== null
+                  ? this.flattenTranslationObject(value as TranslationObject, spreadChildPrefix)
+                  : { [spreadChildPrefix]: value };
+
+              // Only skip if ALL leaf keys are present in the spread child
+              const allKeysInSpreadChild = Object.keys(flattenedValue).every(
+                (fullKey) => fullKey in flattenedSpreadChild,
               );
 
-              if (existsInSpreadChild) {
-                // This key will be provided by the spread child - skip inline to avoid overwrite
+              if (allKeysInSpreadChild) {
+                // All keys are provided by the spread child - skip inline to avoid overwrite
                 logger.debug(
-                  `Skipping inline key "${key}" at ${sourcePath} - exists in co-located translations at spread [locale]`
+                  `Skipping inline key "${key}" at ${sourcePath} - all keys exist in co-located translations at spread [locale]`
                 );
                 continue;
               }

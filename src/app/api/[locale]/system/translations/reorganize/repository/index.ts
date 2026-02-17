@@ -1872,13 +1872,16 @@ export class TranslationReorganizeRepositoryImpl {
         ) {
           // Key already matches the location - it's correct!
           keySuffix = fullPathCamelCase.slice(actualLocationPrefix.length + 1);
-          // Convert hyphenated segments to camelCase (not leading underscores like _components)
+          // Convert hyphenated and internal underscore segments to camelCase
+          // but preserve leading underscores like _components
           keySuffix = keySuffix
             .split(".")
             .map((part) =>
-              part.replace(/[-]([a-z0-9])/g, (_, letter) =>
-                letter.toUpperCase(),
-              ),
+              part
+                .replace(/[-]([a-z0-9])/g, (_, letter) => letter.toUpperCase())
+                .replace(/(?<=[a-z0-9])_([a-z0-9])/g, (_, letter) =>
+                  letter.toUpperCase(),
+                ),
             )
             .join(".");
           correctKey = `${actualLocationPrefix}.${keySuffix}`;
