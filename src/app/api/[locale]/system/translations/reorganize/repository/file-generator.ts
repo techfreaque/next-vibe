@@ -990,6 +990,9 @@ export class FileGenerator {
         // Note: underscore-prefixed folders (_components) are kept as-is
         let exportKey = child;
 
+        // Strip parentheses from Next.js route group folders: (other) -> other
+        exportKey = exportKey.replace(/^\(([a-z0-9-]+)\)$/, "$1");
+
         // Convert kebab-case to camelCase
         exportKey = exportKey.replaceAll(
           /-([a-z0-9])/g,
