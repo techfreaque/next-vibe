@@ -1258,6 +1258,16 @@ export class FileGenerator {
       }
     }
 
+    // Always include preserved top-level sections whose i18n directories exist
+    // These sections (like "config") are maintained manually and must appear in the root aggregator
+    const preservedSections = ["config"];
+    for (const section of preservedSections) {
+      const sectionI18nPath = buildPath("src", section, I18N_PATH, language);
+      if (fs.existsSync(buildPath(sectionI18nPath, INDEX_FILE))) {
+        topLevelSections.add(section);
+      }
+    }
+
     // Skip if no top-level sections found
     if (topLevelSections.size === 0) {
       return;

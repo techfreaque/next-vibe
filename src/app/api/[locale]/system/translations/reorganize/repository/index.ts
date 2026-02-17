@@ -1144,12 +1144,13 @@ export class TranslationReorganizeRepositoryImpl {
     // Ensure fileGenerator is loaded
     await this.getFileGenerator();
 
-    // Scan for i18n files in src/app, src/app/api, src/packages, and src/app-native
+    // Scan for i18n files in src/app, src/app/api, src/packages, src/app-native, and src/config
     const searchPaths = [
       path.join(projectRoot, "src/app"),
       path.join(projectRoot, "src/app/api"),
       path.join(projectRoot, "src/packages"),
       path.join(projectRoot, "src/app-native"),
+      path.join(projectRoot, "src/config"),
     ];
 
     for (const searchPath of searchPaths) {
@@ -1737,6 +1738,17 @@ export class TranslationReorganizeRepositoryImpl {
           continue;
         }
 
+        // Preserved namespaces: keys whose root namespace has its own i18n directory
+        // (e.g., "config.*" lives in src/config/i18n/ and must NOT be relocated).
+        // These keys are kept at their original location and not re-generated.
+        // The root aggregator (src/i18n/en/index.ts) includes them via generateCleanMainIndex.
+        const preservedNamespaces = ["config"];
+        const keyRootNamespace = fullPath.split(".")[0];
+        if (preservedNamespaces.includes(keyRootNamespace)) {
+          logger.debug(`Skipping preserved namespace key "${fullPath}" - kept at "${keyRootNamespace}"`);
+          continue;
+        }
+
         // Place translation at the FOLDER where the key is used
         let location: string;
         let isShared = false;
@@ -2075,12 +2087,18 @@ export class TranslationReorganizeRepositoryImpl {
         if (!groups.has(location)) {
           groups.set(location, {});
         }
-        groups.get(location)![correctKey] = value;
+        const locationGroup = groups.get(location)!;
+        locationGroup[correctKey] = value;
 
         // Track key mapping for updating source files
         if (fullPath !== correctKey) {
           keyMappings.set(fullPath, correctKey);
           logger.info(`MAPPING: "${fullPath}" -> "${correctKey}"`);
+          // Remove the old key from groups so FLATTEN-FIX sees a clean structure
+          // without duplicate entries that would block single-child flattening
+          if (locationGroup[fullPath] !== undefined) {
+            delete locationGroup[fullPath];
+          }
         }
 
         // Track the original key for this location
