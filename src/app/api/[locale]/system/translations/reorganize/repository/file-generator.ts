@@ -1074,7 +1074,7 @@ export class FileGenerator {
 
             // Check if this key matches a child directory name of the spread child
             // Those directories will be imported and exported by the spread child, so we must skip them
-            const kebabKey = key.replaceAll(/([A-Z])/g, "-$1").toLowerCase().replaceAll(/^-/, "");
+            const kebabKey = key.replaceAll(/([A-Z])/g, "-$1").toLowerCase().replace(/^-/, "");
             const matchesChildDir = spreadChildDirectChildren.has(key) || spreadChildDirectChildren.has(kebabKey);
 
             if (matchesChildDir) {
