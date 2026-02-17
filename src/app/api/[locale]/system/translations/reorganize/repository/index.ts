@@ -1378,9 +1378,9 @@ export class TranslationReorganizeRepositoryImpl {
             return true; // Keep other parts
           });
 
-          // Normalize snake_case to camelCase for each part
+          // Convert kebab-case to camelCase (hyphens only, never underscores)
           const normalizedRemainder = filteredRemainder.map((part) =>
-            part.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()),
+            part.replace(/-([a-z0-9])/g, (_, letter) => letter.toUpperCase()),
           );
           let keySuffix = normalizedRemainder.join(".");
 
@@ -1884,11 +1884,11 @@ export class TranslationReorganizeRepositoryImpl {
         const hasCommonInKey = adjustedKey.includes(".common.");
         const shouldPreserveCommon = isShared && hasCommonInKey;
 
-        // Convert adjustedKey to camelCase for comparison with actualLocationPrefix
+        // Convert adjustedKey to camelCase (hyphens only) for comparison with actualLocationPrefix
         const fullPathCamelCase = adjustedKey
           .split(".")
           .map((part) =>
-            part.replace(/[-_]([a-z0-9])/g, (_, letter) =>
+            part.replace(/[-]([a-z0-9])/g, (_, letter) =>
               letter.toUpperCase(),
             ),
           )
@@ -1901,11 +1901,11 @@ export class TranslationReorganizeRepositoryImpl {
         ) {
           // Key already matches the location - it's correct!
           keySuffix = fullPathCamelCase.slice(actualLocationPrefix.length + 1);
-          // Convert hyphenated/snake_case segments to camelCase
+          // Convert hyphenated segments to camelCase (hyphens only, never underscores)
           keySuffix = keySuffix
             .split(".")
             .map((part) =>
-              part.replace(/[-_]([a-z0-9])/g, (_, letter) =>
+              part.replace(/[-]([a-z0-9])/g, (_, letter) =>
                 letter.toUpperCase(),
               ),
             )
@@ -2034,11 +2034,11 @@ export class TranslationReorganizeRepositoryImpl {
           }
 
           keySuffix = suffixParts.join(".");
-          // Convert to camelCase
+          // Convert kebab-case to camelCase (hyphens only, never underscores)
           keySuffix = keySuffix
             .split(".")
             .map((part) =>
-              part.replace(/[-_]([a-z0-9])/g, (_, letter) =>
+              part.replace(/[-]([a-z0-9])/g, (_, letter) =>
                 letter.toUpperCase(),
               ),
             )
@@ -2051,9 +2051,9 @@ export class TranslationReorganizeRepositoryImpl {
             if (commonIndex >= 0) {
               // Reconstruct suffix with "common" at the beginning
               const partsAfterCommon = keyRemainder.slice(commonIndex + 1);
-              // Apply camelCase normalization to the parts after "common"
+              // Convert kebab-case to camelCase (hyphens only, never underscores)
               const normalizedParts = partsAfterCommon.map((part) =>
-                part.replace(/[-_]([a-z0-9])/g, (_, letter) =>
+                part.replace(/[-]([a-z0-9])/g, (_, letter) =>
                   letter.toUpperCase(),
                 ),
               );
