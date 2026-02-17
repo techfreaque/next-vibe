@@ -1638,9 +1638,30 @@ export class TranslationReorganizeRepositoryImpl {
         for (const [flatKey, flatValue] of Object.entries(flattenedKeys)) {
           if (flatValue === value) {
             // Found the flattened version
+            let effectiveFlatKey = flatKey;
+
+            // Fix 14: Detect and remove duplicate folder-name segment.
+            // After FLATTEN-FIX collapses _components.home.FOLDERNAME.* into FOLDERNAME.*,
+            // the resulting key has the folder name duplicated (e.g., careers.careers.*).
+            // If flatKey starts with the same segment as the location prefix's last segment,
+            // strip that leading segment to avoid the duplicate.
+            if (locationPrefix) {
+              const locationLastSegment = locationPrefix.split(".").pop()!;
+              if (effectiveFlatKey.startsWith(`${locationLastSegment}.`)) {
+                const deduplicated = effectiveFlatKey.slice(locationLastSegment.length + 1);
+                // Only strip if the result still has content and isn't just the last segment itself
+                if (deduplicated.length > 0) {
+                  logger.debug(
+                    `[FIX-14] Stripping duplicate folder segment "${locationLastSegment}" from flatKey "${effectiveFlatKey}" -> "${deduplicated}"`,
+                  );
+                  effectiveFlatKey = deduplicated;
+                }
+              }
+            }
+
             const correctKey = locationPrefix
-              ? `${locationPrefix}.${flatKey}`
-              : flatKey;
+              ? `${locationPrefix}.${effectiveFlatKey}`
+              : effectiveFlatKey;
 
             if (originalKey !== correctKey) {
               // Update mapping
