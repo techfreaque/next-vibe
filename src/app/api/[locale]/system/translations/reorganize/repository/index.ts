@@ -1641,61 +1641,11 @@ export class TranslationReorganizeRepositoryImpl {
           strippedTranslations,
         );
 
-      // Preserve "common" and direct child subdirectory key names that actually have
-      // translations in the parent group under that child prefix.
-      // Child directories produce explicit named imports like `shared: sharedTranslations` in the
-      // generated file, so those keys must never be flattened away by the single-child rule.
-      // e.g., if _components/shared/ is a sub-location AND the _components group has keys
-      // starting with `app.api.leads._components.shared.*`, then "shared" must be preserved.
-      // NOTE: Only protect child names that are actually referenced in the parent's group,
-      // to avoid protecting "old namespace" segments like `list` in `users.list.enums.*`
-      // where `users/list` is a child directory but `list.enums.*` are NOT from the list group.
-      const folderSegments = new Set<string>(["common"]);
-      // Find direct child locations whose camelCase name appears as the first segment in the
-      // parent group's stripped translations. This indicates the child IS being imported here.
-      for (const childLocation of groups.keys()) {
-        if (childLocation === location) continue;
-        // Check if childLocation is a direct child (one extra segment) of location
-        if (childLocation.startsWith(`${location}/`)) {
-          const remainder = childLocation.slice(location.length + 1);
-          // Only direct children (no further slashes)
-          if (!remainder.includes("/")) {
-            // Convert the directory segment to camelCase (same logic as locationToFlatKey)
-            const camelCased = remainder.replaceAll(
-              /-([a-z0-9])/g,
-              (_: string, letter: string) => letter.toUpperCase(),
-            );
-            // Only protect this child's key name if the PARENT group has keys starting
-            // with `{camelCased}.` AND those SAME full keys also exist in the CHILD group.
-            // This means the child is truly referenced in the parent's i18n file as
-            // `{camelCased}: childTranslations` (a named import).
-            //
-            // Example: `_components` has `shared.admin.batch.previewDescription` in its
-            // strippedTranslations, and `_components/shared` group ALSO contains
-            // `app.api.leads._components.shared.admin.batch.previewDescription`.
-            // → `shared` is protected.
-            //
-            // Counter-example: `users` has `list.enums.userSortField.firstName` in its
-            // strippedTranslations, but `users/list` group contains `app.api.users.list.users.*`
-            // (its own endpoint keys) — NOT `app.api.users.list.enums.*`.
-            // → `list` is NOT protected.
-            const childGroup = groups.get(childLocation);
-            if (childGroup) {
-              const parentChildKeys = Object.keys(strippedTranslations)
-                .filter((k) => k.startsWith(`${camelCased}.`));
-              const childGroupHasSameKeys = parentChildKeys.some((k) => {
-                const fullKey = locationPrefix
-                  ? `${locationPrefix}.${k}`
-                  : k;
-                return fullKey in childGroup;
-              });
-              if (childGroupHasSameKeys) {
-                folderSegments.add(camelCased);
-              }
-            }
-          }
-        }
-      }
+      // Compute folderSegments: keys that should never be flattened away.
+      // Uses the shared helper to ensure consistency with reconcileSourceKeysWithGeneratedFiles.
+      const folderSegments = this.computeFolderSegments(
+        location, locationPrefix, strippedTranslations, groups,
+      );
 
       // Flatten single-child objects, preserving "common" and child directory names.
       // Run until stable: each pass may reveal new single-child nodes that were hidden by
@@ -1802,6 +1752,53 @@ export class TranslationReorganizeRepositoryImpl {
   }
 
   /**
+   * Compute the folderSegments set for a given location in the groups map.
+   * This set contains key names that should never be flattened away, including:
+   *   - "common" (always preserved for shared translations)
+   *   - direct child directory names that have the same keys in the parent group
+   *
+   * Both `fixKeyMappingsWithFlattening` and `reconcileSourceKeysWithGeneratedFiles`
+   * use this to ensure consistent flattening simulation.
+   */
+  private computeFolderSegments(
+    location: string,
+    locationPrefix: string,
+    strippedTranslations: TranslationObject,
+    groups: Map<string, TranslationObject>,
+  ): Set<string> {
+    const folderSegments = new Set<string>(["common"]);
+    for (const childLocation of groups.keys()) {
+      if (childLocation === location) continue;
+      if (childLocation.startsWith(`${location}/`)) {
+        const remainder = childLocation.slice(location.length + 1);
+        if (!remainder.includes("/")) {
+          const camelCased = remainder.replaceAll(
+            /-([a-z0-9])/g,
+            (_: string, letter: string) => letter.toUpperCase(),
+          );
+          // Protect this child's key name if the parent's strippedTranslations has keys
+          // starting with `{camelCased}.` AND those same full keys exist in the child group.
+          // This distinguishes real child imports (same keys in both) from old namespace
+          // segments co-located to the parent (different keys in child).
+          const childGroup = groups.get(childLocation);
+          if (childGroup) {
+            const parentChildKeys = Object.keys(strippedTranslations)
+              .filter((k) => k.startsWith(`${camelCased}.`));
+            const childGroupHasSameKeys = parentChildKeys.some((k) => {
+              const fullKey = locationPrefix ? `${locationPrefix}.${k}` : k;
+              return fullKey in childGroup;
+            });
+            if (childGroupHasSameKeys) {
+              folderSegments.add(camelCased);
+            }
+          }
+        }
+      }
+    }
+    return folderSegments;
+  }
+
+  /**
    * Fix 19: Post-generation key reconciliation pass.
    *
    * After all i18n files have been generated we know the EXACT key structure in each
@@ -1836,11 +1833,17 @@ export class TranslationReorganizeRepositoryImpl {
         strippedTranslations[strippedKey] = value;
       }
 
+      // Compute the same folderSegments as fixKeyMappingsWithFlattening to ensure
+      // consistent flattening simulation (protecting child directory names).
+      const folderSegments = this.computeFolderSegments(
+        location, locationPrefix, strippedTranslations, groups,
+      );
+
       // Apply the EXACT same pipeline as generateLeafFileContent
       const nested = this.fileGenerator!.unflattenTranslationObjectPublic(strippedTranslations);
-      let flattened = this.fileGenerator!.flattenSingleChildObjectsPublic(nested, new Set(["common"]));
+      let flattened = this.fileGenerator!.flattenSingleChildObjectsPublic(nested, folderSegments);
       for (let _pass = 0; _pass < 8; _pass++) {
-        const next = this.fileGenerator!.flattenSingleChildObjectsPublic(flattened, new Set(["common"]));
+        const next = this.fileGenerator!.flattenSingleChildObjectsPublic(flattened, folderSegments);
         const prevKeys = JSON.stringify(Object.keys(this.fileGenerator!.flattenTranslationObjectPublic(flattened)).sort());
         const nextKeys = JSON.stringify(Object.keys(this.fileGenerator!.flattenTranslationObjectPublic(next)).sort());
         flattened = next;
