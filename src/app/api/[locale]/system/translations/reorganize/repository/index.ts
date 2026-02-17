@@ -1793,9 +1793,49 @@ export class TranslationReorganizeRepositoryImpl {
         }
 
         // Calculate what the key SHOULD be based on the actual location
-        const actualLocationPrefix = this.fileGenerator
+        let actualLocationPrefix = this.fileGenerator
           ? this.fileGenerator.locationToFlatKeyPublic(location)
           : "";
+
+        // If the key's path encodes a more specific location than the common ancestor,
+        // refine the location to match the key's own path prefix.
+        // Example: key "packages.nextVibeUi.web.common.searchCountries" placed at
+        // "packages/next-vibe-ui" (common ancestor of web/ui and native/ui) but the
+        // key's "web" segment points to "packages/next-vibe-ui/web" which has its own i18n dir.
+        if (
+          isShared &&
+          actualLocationPrefix &&
+          fullPath.startsWith(`${actualLocationPrefix}.`)
+        ) {
+          const afterPrefix = fullPath.slice(actualLocationPrefix.length + 1);
+          const nextSegment = afterPrefix.split(".")[0];
+          if (nextSegment && nextSegment !== "common") {
+            // Convert camelCase segment back to potential kebab-case folder name
+            const kebabSegment = nextSegment.replace(
+              /([A-Z])/g,
+              (c) => `-${c.toLowerCase()}`,
+            );
+            for (const candidateSegment of [nextSegment, kebabSegment]) {
+              const candidateLocation = `${location}/${candidateSegment}`;
+              const candidateI18nPath = path.join(
+                process.cwd(),
+                "src",
+                candidateLocation,
+                "i18n",
+              );
+              if (fs.existsSync(candidateI18nPath)) {
+                logger.debug(
+                  `Refining location for key "${fullPath}" from "${location}" to "${candidateLocation}" based on key path prefix`,
+                );
+                location = candidateLocation;
+                actualLocationPrefix = this.fileGenerator
+                  ? this.fileGenerator.locationToFlatKeyPublic(location)
+                  : actualLocationPrefix;
+                break;
+              }
+            }
+          }
+        }
 
         // For shared keys, we need to insert "common" after the common ancestor location prefix
         // Example: key "app.api.system.translations.reorganize.repository.repository.api.common.tags.threads" shared at location "app/api/[locale]/agent/chat/threads"
