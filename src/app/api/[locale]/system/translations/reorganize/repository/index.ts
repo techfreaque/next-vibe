@@ -1806,8 +1806,40 @@ export class TranslationReorganizeRepositoryImpl {
           // _TranslationKey types in the TypeScript system (test files will still pass tsgo).
           if (this.fileGenerator) {
             const rootNamespace = fullPath.split(".")[0]; // e.g., "app", "packages", "config"
-            // Use the root namespace as the location (e.g., "app" for all "app.*" keys)
-            const naturalLocation = rootNamespace;
+            // Fix 17: Find the DEEPEST matching i18n location for the unused key
+            // instead of always placing at root namespace (which causes inline override conflicts).
+            // Walk the key's path segments and find the deepest folder with an i18n directory
+            // whose locationToFlatKey prefix matches the key path.
+            let naturalLocation = rootNamespace;
+            {
+              const keySegments = fullPath.split(".");
+              let candidatePath = rootNamespace;
+              // Convert rootNamespace to actual folder (e.g., "app" -> look in "app/")
+              for (let si = 1; si < keySegments.length; si++) {
+                const seg = keySegments[si];
+                const kebabSeg = seg.replace(/([A-Z])/g, (c) => `-${c.toLowerCase()}`);
+                // Also try bracket-wrapped segment for Next.js dynamic routes
+                const candidates = [seg, kebabSeg];
+                if (seg.startsWith("[") || seg.endsWith("]")) {
+                  candidates.push(seg);
+                }
+                let found = false;
+                for (const candidateSeg of candidates) {
+                  const candidate = `${candidatePath}/${candidateSeg}`;
+                  const candidateI18nPath = path.join(process.cwd(), "src", candidate, "i18n");
+                  if (fs.existsSync(candidateI18nPath)) {
+                    const candidatePrefix = this.fileGenerator.locationToFlatKeyPublic(candidate);
+                    if (fullPath.startsWith(`${candidatePrefix}.`) || fullPath === candidatePrefix) {
+                      naturalLocation = candidate;
+                      candidatePath = candidate;
+                      found = true;
+                      break;
+                    }
+                  }
+                }
+                if (!found) break;
+              }
+            }
             if (!groups.has(naturalLocation)) {
               groups.set(naturalLocation, {});
             }
@@ -1815,7 +1847,7 @@ export class TranslationReorganizeRepositoryImpl {
             // Use the full key as-is (already starts with the location prefix)
             locationGroup[fullPath] = value;
             logger.debug(
-              `Preserving test-only/unused key "${fullPath}" at root location "${naturalLocation}"`,
+              `Preserving test-only/unused key "${fullPath}" at location "${naturalLocation}"`,
             );
           } else {
             logger.debug(`Skipping unused translation key: ${fullPath}`);
