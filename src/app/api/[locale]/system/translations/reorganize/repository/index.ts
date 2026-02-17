@@ -1330,21 +1330,45 @@ export class TranslationReorganizeRepositoryImpl {
         logger.warn(`Source key not found in old translations: "${sourceKey}"`);
 
         // Special case: keys with no usages (only referenced in test files or truly unused)
-        // that DO exist in original translations — preserve them at root namespace level.
+        // that DO exist in original translations — preserve them at deepest matching i18n location.
         // This ensures test-only keys remain valid _TranslationKey types after reorganization.
         if (usageFiles.length === 0 && originalTranslations && this.fileGenerator) {
           const originalValue = originalTranslations[sourceKey];
           if (originalValue !== undefined && typeof originalValue !== "object") {
-            // Key exists in original translations — preserve at root namespace location
+            // Fix 17: Find the DEEPEST matching i18n location for the unused key
+            // instead of always placing at root namespace (which causes inline override conflicts).
             const rootNamespace = sourceKey.split(".")[0]; // e.g., "app", "packages"
-            const naturalLocation = rootNamespace;
+            let naturalLocation = rootNamespace;
+            {
+              const keySegments = sourceKey.split(".");
+              let candidatePath = rootNamespace;
+              for (let si = 1; si < keySegments.length; si++) {
+                const seg = keySegments[si];
+                const kebabSeg = seg.replace(/([A-Z])/g, (c) => `-${c.toLowerCase()}`);
+                let found = false;
+                for (const candidateSeg of [seg, kebabSeg]) {
+                  const candidate = `${candidatePath}/${candidateSeg}`;
+                  const candidateI18nPath = path.join(process.cwd(), "src", candidate, "i18n");
+                  if (fs.existsSync(candidateI18nPath)) {
+                    const candidatePrefix = this.fileGenerator.locationToFlatKeyPublic(candidate);
+                    if (sourceKey.startsWith(`${candidatePrefix}.`) || sourceKey === candidatePrefix) {
+                      naturalLocation = candidate;
+                      candidatePath = candidate;
+                      found = true;
+                      break;
+                    }
+                  }
+                }
+                if (!found) break;
+              }
+            }
             if (!groups.has(naturalLocation)) {
               groups.set(naturalLocation, {});
             }
             const locationGroup = groups.get(naturalLocation)!;
             locationGroup[sourceKey] = originalValue;
             logger.debug(
-              `Preserved test-only/unused key "${sourceKey}" at root location "${naturalLocation}" with value "${originalValue}"`,
+              `Preserved test-only/unused key "${sourceKey}" at location "${naturalLocation}" with value "${originalValue}"`,
             );
           }
           continue;
