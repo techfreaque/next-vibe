@@ -1641,11 +1641,31 @@ export class TranslationReorganizeRepositoryImpl {
           strippedTranslations,
         );
 
-      // Only preserve "common" — it's the namespace for shared keys and must never be flattened away.
-      // All other intermediate segments (old namespace junk) get flattened by the single-child rule.
+      // Preserve "common" and all direct child subdirectory key names.
+      // Child directories produce explicit named imports like `shared: sharedTranslations` in the
+      // generated file, so those keys must never be flattened away by the single-child rule.
+      // e.g., if _components/shared/ is a sub-location, "shared" must be preserved in the
+      // _components location's flattening so that app.api.leads._components.shared.* stays correct.
       const folderSegments = new Set<string>(["common"]);
+      // Find direct child locations and add their camelCase segment names to folderSegments
+      for (const childLocation of groups.keys()) {
+        if (childLocation === location) continue;
+        // Check if childLocation is a direct child (one extra segment) of location
+        if (childLocation.startsWith(`${location}/`)) {
+          const remainder = childLocation.slice(location.length + 1);
+          // Only direct children (no further slashes)
+          if (!remainder.includes("/")) {
+            // Convert the directory segment to camelCase (same logic as locationToFlatKey)
+            const camelCased = remainder.replaceAll(
+              /-([a-z0-9])/g,
+              (_: string, letter: string) => letter.toUpperCase(),
+            );
+            folderSegments.add(camelCased);
+          }
+        }
+      }
 
-      // Flatten single-child objects, preserving only "common".
+      // Flatten single-child objects, preserving "common" and child directory names.
       // Run until stable: each pass may reveal new single-child nodes that were hidden by
       // conflicts that were resolved in the prior pass. This ensures the key mapping computed
       // here matches the key structure that the file generator will produce (which also applies
