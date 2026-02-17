@@ -1352,62 +1352,13 @@ export class TranslationReorganizeRepositoryImpl {
             }
           }
 
-          // Get key remainder after common prefix
-          let keyRemainder = keyParts.slice(commonPrefixLength);
-
-          // Strip consecutive duplicate: if keyRemainder starts with the same segment
-          // that ends the common prefix, it's a redundant old-namespace repetition.
-          // e.g., key "app.common.admin.leads.leads.admin.stats.title" at location "app.admin.leads.stats"
-          // common prefix ends with "leads", keyRemainder starts with "leads" -> remove it
-          if (
-            commonPrefixLength > 0 &&
-            keyRemainder.length > 0 &&
-            keyRemainder[0] === keyParts[commonPrefixLength - 1]
-          ) {
-            keyRemainder = keyRemainder.slice(1);
-          }
-
-          // Strip duplicate path segments from keyRemainder that appear in location remainder
-          const locationRemainder = locationParts.slice(commonPrefixLength);
-          const toCamelCase = (str: string) =>
-            str.replace(/[-]([a-z0-9])/g, (_, letter) => letter.toUpperCase());
-          const locationRemainderCamel = locationRemainder.map(toCamelCase);
-          // For matching purposes only: strip leading _ and surrounding () from location parts
-          // e.g. old key "components" should match location "_components", "other" should match "(other)"
-          // The output key still uses actualLocationPrefix which preserves _components and (other) correctly
-          const locationRemainderForMatch = locationRemainder.map((p) =>
-            toCamelCase(p.replace(/^\((.+)\)$/, "$1").replace(/^_/, ""))
-          );
-
-          const filteredRemainder = keyRemainder.filter((keyPart) => {
-            const keyPartCamel = toCamelCase(keyPart);
-            // Remove parts that match location remainder segments (case-insensitive)
-            const hasExactMatch = locationRemainderForMatch.some(
-              (locPart) =>
-                !locPart.startsWith("[") && locPart.toLowerCase() === keyPartCamel.toLowerCase()
-            );
-            if (hasExactMatch) {
-              return false; // Remove exact matches
-            }
-            // Remove parts that are camelCase prefixes of location parts
-            // e.g., "app" is a prefix of "appNative" -> remove it
-            const isKeyPrefixOfLocPart = locationRemainderForMatch.some((locPart) => {
-              if (locPart.startsWith("[")) return false;
-              return (
-                locPart.length > keyPartCamel.length &&
-                locPart.toLowerCase().startsWith(keyPartCamel.toLowerCase()) &&
-                locPart[keyPartCamel.length] === locPart[keyPartCamel.length].toUpperCase()
-              );
-            });
-            if (isKeyPrefixOfLocPart) {
-              return false;
-            }
-            return true; // Keep other parts
-          });
+          // Raw suffix: everything after the common prefix, as-is.
+          // Do NOT filter or strip segments — flattening handles all old redundant namespace names.
+          const rawSuffix = keyParts.slice(commonPrefixLength);
 
           // Normalize to camelCase: convert hyphens always, convert internal (non-leading) underscores
           // but preserve leading underscores like _components
-          const normalizedRemainder = filteredRemainder.map((part) =>
+          const normalizedRemainder = rawSuffix.map((part) =>
             part
               .replace(/[-]([a-z0-9])/g, (_, letter) => letter.toUpperCase())
               .replace(/(?<=[a-z0-9])_([a-z0-9])/g, (_, letter) => letter.toUpperCase()),
@@ -1958,29 +1909,16 @@ export class TranslationReorganizeRepositoryImpl {
             }
           }
         } else {
-          // Key doesn't match the actual location
-          // We need to reconstruct the correct key
-          // Strategy: Replace the location-related parts of the key with the actual location prefix
-          // Then keep the rest as the suffix
-          // For example:
-          // - Key: app.admin.components.navigation.dashboard
-          // - Location: app/[locale]/admin/_components → prefix: app.admin._components
-          // - We replace "app.api.system.translations.reorganize.repository.admin.components" with "app.api.system.translations.reorganize.repository.admin.Components"
-          // - Suffix: navigation.dashboard
-          // - Correct key: app.admin._components.navigation.dashboard
+          // Key doesn't start with the actual location prefix.
+          // Find the longest common prefix between key parts and location parts,
+          // then take everything after as the raw suffix.
+          // Do NOT strip any segments — the leaf file flattening algorithm
+          // (single-child object collapsing, recursive) removes all old redundant namespace names.
 
           const keyParts = adjustedKey.split(".");
           const locationParts = actualLocationPrefix
             ? actualLocationPrefix.split(".")
             : [];
-
-          // Find where key and location paths diverge
-          // This handles cases where the key has a different structure than the location
-          // Example: key "app.api.system.translations.reorganize.repository.repository.api.common.tags.threads" vs location "app.api.system.translations.reorganize.repository.repository.api.threads"
-          // Common prefix: ["app", "api", "agent", "chat"]
-          // Key continues with: ["tags", "threads"]
-          // Location continues with: ["threads"]
-          // The suffix should be the key parts after common prefix, minus any redundant overlap
 
           let commonPrefixLength = 0;
           for (
@@ -1995,153 +1933,33 @@ export class TranslationReorganizeRepositoryImpl {
             }
           }
 
-          // Get the key parts after the common prefix
-          let keyRemainder = keyParts.slice(commonPrefixLength);
+          // Raw suffix: everything after the common prefix, as-is
+          const rawSuffix = keyParts.slice(commonPrefixLength);
 
-          // Strip consecutive duplicate: if keyRemainder starts with the same segment
-          // that ends the common prefix, it's a redundant old-namespace repetition.
-          // e.g., key "app.common.admin.leads.leads.admin.stats.title" at location "app.admin.leads.stats"
-          // common prefix ends with "leads", keyRemainder starts with "leads" -> remove it
-          if (
-            commonPrefixLength > 0 &&
-            keyRemainder.length > 0 &&
-            keyRemainder[0] === keyParts[commonPrefixLength - 1]
-          ) {
-            keyRemainder = keyRemainder.slice(1);
-          }
-
-          // Get the location parts after the common prefix
-          const locationRemainder = locationParts.slice(commonPrefixLength);
-
-          // Remove any key parts that redundantly duplicate the location remainder
-          // Example: if keyRemainder = ["tags", "threads"] and locationRemainder = ["threads"]
-          // We should remove "threads" from keyRemainder if it appears at the end
-          // Also handles: keyRemainder = ["tags", "files"] and locationRemainder = ["files", "[threadId]", "[filename]"]
-          // Should remove "files" even though it's not at the end of locationRemainder
-          let suffixParts = keyRemainder;
-
-          if (locationRemainder.length > 0) {
-            // First check for trailing overlap (most common case)
-            const trailingOverlap = this.findTrailingOverlap(
-              keyRemainder,
-              locationRemainder,
-            );
-            if (trailingOverlap > 0) {
-              // Remove the overlapping parts from the suffix
-              suffixParts = keyRemainder.slice(0, -trailingOverlap);
-            } else {
-              // Check if any segments in keyRemainder also appear in locationRemainder
-              // This handles cases where dynamic parameters like [threadId] appear in the middle
-              // CRITICAL: Convert to camelCase for comparison since folders use kebab-case
-              // ALSO: Check if key part is a "composite" that starts with a location part
-              // (e.g., "cronSystem" starts with "cron" from folder) - these are old namespaces to remove
-              const toCamelCase = (str: string) =>
-                str.replace(/[-]([a-z0-9])/g, (_, letter) =>
-                  letter.toUpperCase(),
-                );
-              const locationRemainderCamel = locationRemainder.map(toCamelCase);
-              // For matching purposes only: strip leading _ and surrounding () from location parts
-              // e.g. old key "components" should match location "_components", "other" should match "(other)"
-              const locationRemainderForMatch = locationRemainder.map((p) =>
-                toCamelCase(p.replace(/^\((.+)\)$/, "$1").replace(/^_/, ""))
-              );
-
-              suffixParts = keyRemainder.filter((keyPart) => {
-                // Keep the part if it's NOT in the location remainder
-                // But ignore parameter placeholders like [threadId] when checking
-                const keyPartCamel = toCamelCase(keyPart);
-
-                // Check for exact match (case-insensitive)
-                const hasExactMatch = locationRemainderForMatch.some(
-                  (locPart) =>
-                    !locPart.startsWith("[") && locPart.toLowerCase() === keyPartCamel.toLowerCase(),
-                );
-                if (hasExactMatch) {
-                  return false; // Remove exact matches
-                }
-
-                // Check if keyPart is a composite that starts with any location part
-                // e.g., "cronSystem" starts with "cron" -> remove it
-                const isComposite = locationRemainderForMatch.some((locPart) => {
-                  if (locPart.startsWith("[")) {
-                    return false;
-                  } // Skip dynamic segments
-                  // Check if keyPart starts with locPart and has more characters after
-                  // This catches "cronSystem" starting with "cron"
-                  return (
-                    keyPartCamel.length > locPart.length &&
-                    keyPartCamel.startsWith(locPart) &&
-                    // Ensure the next character is uppercase (camelCase boundary)
-                    keyPartCamel[locPart.length] ===
-                      keyPartCamel[locPart.length].toUpperCase()
-                  );
-                });
-                if (isComposite) return false;
-
-                // Check if keyPart is a camelCase prefix of any location part
-                // e.g., "app" is a prefix of "appNative" -> remove it
-                // This handles cases where old namespace parts like "app.native" map to "appNative"
-                const isKeyPrefixOfLocPart = locationRemainderForMatch.some((locPart) => {
-                  if (locPart.startsWith("[")) return false;
-                  return (
-                    locPart.length > keyPartCamel.length &&
-                    locPart.toLowerCase().startsWith(keyPartCamel.toLowerCase()) &&
-                    locPart[keyPartCamel.length] === locPart[keyPartCamel.length].toUpperCase()
-                  );
-                });
-
-                return !isKeyPrefixOfLocPart; // Keep only non-prefix parts
-              });
-            }
-          }
-
-          keySuffix = suffixParts.join(".");
-          // Convert hyphenated segments to camelCase (not leading underscores like _components)
-          keySuffix = keySuffix
-            .split(".")
+          // Apply camelCase to each part: convert hyphens and internal underscores,
+          // but NEVER strip leading underscores (e.g. _components stays _components)
+          keySuffix = rawSuffix
             .map((part) =>
-              part.replace(/[-]([a-z0-9])/g, (_, letter) =>
-                letter.toUpperCase(),
-              ),
+              part
+                .replace(/[-]([a-z0-9])/g, (_, letter) => letter.toUpperCase())
+                .replace(/(?<=[a-z0-9])_([a-z0-9])/g, (_, letter) =>
+                  letter.toUpperCase(),
+                ),
             )
             .join(".");
 
-          // For shared keys with "common" in them, ensure "common" is at the start of the suffix
-          if (shouldPreserveCommon) {
-            // Check if "common" is in the key remainder
-            const commonIndex = keyRemainder.indexOf("common");
-            if (commonIndex >= 0) {
-              // Reconstruct suffix with "common" at the beginning
-              const partsAfterCommon = keyRemainder.slice(commonIndex + 1);
-              // Apply camelCase normalization to the parts after "common"
-              const normalizedParts = partsAfterCommon.map((part) =>
-                part.replace(/[-_]([a-z0-9])/g, (_, letter) =>
-                  letter.toUpperCase(),
-                ),
-              );
-              keySuffix = ["common", ...normalizedParts].join(".");
-            }
-          }
-
-          // The correct key is: location prefix + suffix
-          // This preserves the full key structure after the location prefix
           if (actualLocationPrefix && keySuffix) {
             correctKey = `${actualLocationPrefix}.${keySuffix}`;
-          } else if (actualLocationPrefix && !keySuffix) {
-            // No suffix - the key's non-location parts were all filtered out
-            // This shouldn't happen in normal cases, but if it does,
-            // use the last part of the original key as suffix
+          } else if (actualLocationPrefix) {
+            // rawSuffix was empty - key parts were fully covered by common prefix
+            // Use the last part of the original key as a fallback
             keySuffix = keyParts[keyParts.length - 1];
             correctKey = `${actualLocationPrefix}.${keySuffix}`;
           } else {
-            // No location prefix (root level) - keep adjusted key unchanged
-            // This happens when common ancestor is at src/ root, which means
-            // the key is used across multiple top-level directories
+            // No location prefix - keep adjusted key unchanged
             keySuffix = keyParts[keyParts.length - 1];
             correctKey = adjustedKey;
           }
-
-          // NOTE: Flattening simulation removed - will be done after all keys collected
         }
 
         // Skip scoped translation locations - check if this location or any parent has a scoped i18n index

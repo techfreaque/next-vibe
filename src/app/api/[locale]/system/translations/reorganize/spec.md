@@ -20,8 +20,34 @@ Go to the **nearest common ancestor** under a `common` object (NOT the deepest f
 - Full key: `app.chat.common.newPrivateChat`
 
 ### Key Flattening
-1. Location prefix is stripped from keys in the leaf file
-2. Single-child objects are flattened recursively, e.g. `{ oldPath: { oldName: { actual: "value" } } }` → `{ actual: "value" }` — removes old redundant path names automatically
+
+**Rule:** In leaf i18n files only, after writing all keys, recursively flatten any object that has exactly one child. Repeat until no more single-child objects remain.
+
+**This is the ONLY mechanism for removing old redundant namespace names.** The generator must NOT try to strip or deduplicate path segments during key calculation. Just:
+1. Strip the location prefix from the full key to get the suffix
+2. For shared keys, prepend `common.` to the suffix
+3. Write the suffix as-is into the leaf file
+4. After writing, flatten all single-child objects recursively
+
+**Example:**
+```
+Old key:      app.admin.common.loading
+Location:     app/[locale]/admin   →  prefix: app.admin
+Suffix:       common.loading        (after stripping app.admin.)
+In file:      { common: { loading: "Loading..." } }   ← no flattening needed here (2 children possible)
+Full key:     app.admin.common.loading  ✓
+```
+
+```
+Old key:      app.story.nav.user.login
+Location:     app/[locale]/story/_components/nav  →  prefix: app.story._components.nav
+Suffix after strip:     story.nav.user.login  (old namespace junk)
+In file:      { story: { nav: { user: { login: "..." } } } }
+After flatten (story→nav→user are single-child): { login: "..." }
+Full key:     app.story._components.nav.login  ✓
+```
+
+**Source file keys must use the POST-flatten key path**, not the pre-flatten suffix. The generator updates source files AFTER flattening.
 
 ### Parent Aggregator Files
 Parent directories re-export child translations to build the full tree. `[locale]` is the **only** folder that gets spread (`...`); all other folders export as named keys.

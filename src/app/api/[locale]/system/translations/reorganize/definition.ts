@@ -38,11 +38,11 @@ const { POST } = createEndpoint({
 
   title: "app.api.system.translations.reorganize.post.title",
   description: "app.api.system.translations.reorganize.post.description",
-  category: "app.api.system.translations.category",
+  category: "app.api.system.translations.common.category",
   tags: [
-    "app.api.system.translations.tags.reorganize",
-    "app.api.system.translations.tags.maintenance",
-    "app.api.system.translations.tags.i18n",
+    "app.api.system.translations.reorganize.tags",
+    "app.api.system.translations.reorganize.tags.maintenance",
+    "app.api.system.translations.common.tags.i18n",
   ],
   icon: "languages",
 
