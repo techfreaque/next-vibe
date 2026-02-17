@@ -1794,6 +1794,38 @@ export class TranslationReorganizeRepositoryImpl {
             logger.debug(
               `Mapped root-level key ${fullPath} to folder: ${location}`,
             );
+          } else if (keyPrefix === "packages" && this.fileGenerator) {
+            // For packages.* keys at root level, walk into packages/ to find the best matching i18n dir
+            // e.g. packages.nextVibeUi.web.common.required -> packages/next-vibe-ui/web
+            const segments = fullPath.split(".");
+            let bestLocation = "";
+            let candidatePath = "packages";
+            for (let si = 1; si < segments.length; si++) {
+              // Try both the segment as-is and as kebab-case
+              const seg = segments[si];
+              const kebabSeg = seg.replace(/([A-Z])/g, (c) => `-${c.toLowerCase()}`);
+              let found = false;
+              for (const candidateSeg of [seg, kebabSeg]) {
+                const candidate = `${candidatePath}/${candidateSeg}`;
+                const candidateI18nPath = path.join(process.cwd(), "src", candidate, "i18n");
+                if (fs.existsSync(candidateI18nPath)) {
+                  const candidatePrefix = this.fileGenerator.locationToFlatKeyPublic(candidate);
+                  if (fullPath.startsWith(`${candidatePrefix}.`) || fullPath === candidatePrefix) {
+                    bestLocation = candidate;
+                    candidatePath = candidate;
+                    found = true;
+                    break;
+                  }
+                }
+              }
+              if (!found) break;
+            }
+            if (bestLocation) {
+              location = bestLocation;
+              logger.debug(
+                `Mapped root-level packages key ${fullPath} to folder: ${location}`,
+              );
+            }
           }
         }
 
@@ -1804,7 +1836,7 @@ export class TranslationReorganizeRepositoryImpl {
 
         // If the key's path encodes a more specific location than the common ancestor,
         // refine the location to match the key's own path prefix.
-        // Example: key "packages.nextVibeUi.web.common.searchCountries" placed at
+        // Example: key "common.searchCountries" placed at
         // "packages/next-vibe-ui" (common ancestor of web/ui and native/ui) but the
         // key's "web" segment points to "packages/next-vibe-ui/web" which has its own i18n dir.
         if (
