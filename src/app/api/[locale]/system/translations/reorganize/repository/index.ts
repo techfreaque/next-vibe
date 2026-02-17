@@ -1837,69 +1837,6 @@ export class TranslationReorganizeRepositoryImpl {
           }
         }
 
-        // If the key's path does NOT start with the computed location prefix,
-        // walk up the location tree to find a parent location whose prefix IS a
-        // prefix of the key. This handles cross-boundary key usage, e.g. a native
-        // file using "packages.nextVibeUi.web.common.*" keys — the correct location
-        // is "packages/next-vibe-ui/web" (the key's path prefix), not "web/ui".
-        if (actualLocationPrefix && !fullPath.startsWith(`${actualLocationPrefix}.`)) {
-          const locationSegments = location.split("/");
-          for (let i = locationSegments.length - 1; i > 0; i--) {
-            const parentLocation = locationSegments.slice(0, i).join("/");
-            const parentPrefix = this.fileGenerator
-              ? this.fileGenerator.locationToFlatKeyPublic(parentLocation)
-              : "";
-            if (parentPrefix && fullPath.startsWith(`${parentPrefix}.`)) {
-              // Found a parent whose prefix matches — now check if we can refine further
-              const afterParentPrefix = fullPath.slice(parentPrefix.length + 1);
-              const nextSeg = afterParentPrefix.split(".")[0];
-              if (nextSeg && nextSeg !== "common") {
-                const kebabSeg = nextSeg.replace(
-                  /([A-Z])/g,
-                  (c) => `-${c.toLowerCase()}`,
-                );
-                let refined = false;
-                for (const candidateSegment of [nextSeg, kebabSeg]) {
-                  const candidateLocation = `${parentLocation}/${candidateSegment}`;
-                  const candidateI18nPath = path.join(
-                    process.cwd(),
-                    "src",
-                    candidateLocation,
-                    "i18n",
-                  );
-                  if (fs.existsSync(candidateI18nPath)) {
-                    logger.debug(
-                      `Refining location for key "${fullPath}" from "${location}" to "${candidateLocation}" based on key path prefix (cross-boundary)`,
-                    );
-                    location = candidateLocation;
-                    actualLocationPrefix = this.fileGenerator
-                      ? this.fileGenerator.locationToFlatKeyPublic(location)
-                      : actualLocationPrefix;
-                    refined = true;
-                    break;
-                  }
-                }
-                if (!refined) {
-                  // Use the parent location itself
-                  logger.debug(
-                    `Refining location for key "${fullPath}" from "${location}" to "${parentLocation}" based on key path prefix (cross-boundary, no child match)`,
-                  );
-                  location = parentLocation;
-                  actualLocationPrefix = parentPrefix;
-                }
-              } else {
-                // Key segment after parent is "common" or ends - use parent directly
-                logger.debug(
-                  `Refining location for key "${fullPath}" from "${location}" to "${parentLocation}" based on key path prefix (cross-boundary)`,
-                );
-                location = parentLocation;
-                actualLocationPrefix = parentPrefix;
-              }
-              break;
-            }
-          }
-        }
-
         // For shared keys, we need to insert "common" after the common ancestor location prefix
         // Example: key "app.api.system.translations.reorganize.repository.repository.api.common.tags.threads" shared at location "app/api/[locale]/agent/chat/threads"
         // The common ancestor part is what's shared: find the longest common prefix
