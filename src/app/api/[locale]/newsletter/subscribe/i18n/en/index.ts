@@ -142,7 +142,7 @@ export const translations = {
       benefit_3: "Exclusive offers and early access to new features",
       benefit_4: "Community highlights and success stories",
       frequency:
-        "We'll send you updates every few weeks—never spam, always valuable content.",
+        "We'll send you updates every few weeks - never spam, always valuable content.",
       unsubscribe_text: "Don't want to receive these emails?",
       unsubscribe_link: "Unsubscribe",
     },

@@ -13,6 +13,8 @@ import {
   requestField,
   requestUrlPathParamsField,
   responseField,
+  submitButton,
+  widgetObjectField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -220,7 +222,30 @@ const { PUT } = createEndpoint({
     },
     { request: "data&urlPathParams", response: true },
     {
-      backButton: backButton({ usage: { request: "data", response: true } }),
+      actions: widgetObjectField(
+        {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.INLINE,
+          gap: "2",
+          noCard: true,
+        },
+        { request: "data&urlPathParams", response: true },
+        {
+          backButton: backButton({
+            inline: true,
+            usage: { response: true, request: "data&urlPathParams" },
+          }),
+          submitButton: submitButton({
+            inline: true,
+            className: "ml-auto",
+            label:
+              "app.api.system.unifiedInterface.tasks.cronSystem.task.put.submitButton.label" as const,
+            loadingText:
+              "app.api.system.unifiedInterface.tasks.cronSystem.task.put.submitButton.loadingText" as const,
+            usage: { response: true, request: "data&urlPathParams" },
+          }),
+        },
+      ),
 
       // URL parameter
       id: requestUrlPathParamsField({
@@ -231,6 +256,7 @@ const { PUT } = createEndpoint({
         description:
           "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.id.description",
         schema: z.string(),
+        hidden: true,
       }),
 
       // Request data fields

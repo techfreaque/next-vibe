@@ -1,13 +1,13 @@
 export const translations = {
   title: "Zarabiaj z {{appName}}",
   description:
-    "Zamień swoją sieć kontaktów w pasywny dochód. Udostępnij swój link polecający i zarabiaj 20% prowizji, gdy ludzie subskrybują — plus mniejsze zarobki od ich poleceń dzięki naszemu systemowi wielopoziomowemu.",
+    "Zamień swoją sieć kontaktów w pasywny dochód. Udostępnij swój link polecający i zarabiaj 20% prowizji, gdy ludzie subskrybują - plus mniejsze zarobki od ich poleceń dzięki naszemu systemowi wielopoziomowemu.",
   tagline: "Program Poleceń",
   howItWorks: {
     title: "Jak to działa",
     step1Title: "Twórz kody polecające",
     step1Body:
-      "Generuj unikalne kody dla różnych odbiorców — znajomych, social media czy kampanii.",
+      "Generuj unikalne kody dla różnych odbiorców - znajomych, social media czy kampanii.",
     step2Title: "Udostępnij link",
     step2Body:
       "Gdy ktoś zarejestruje się przez Twój link i subskrybuje, zarabiasz prowizję.",

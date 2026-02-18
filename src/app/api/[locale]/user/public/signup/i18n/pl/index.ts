@@ -311,26 +311,35 @@ export const translations: typeof enTranslations = {
     footer: "To jest automatyczne powiadomienie z {{appName}}",
   },
   email: {
-    title: "Witamy w {{appName}}, {{privateName}}!",
-    subject: "Witamy w {{appName}} - Twoja niecenzurowana AI czeka",
+    subject: "Jesteś z nami - {{appName}} jest gotowe na Ciebie",
     previewText:
-      "Dostęp do 38 modeli AI bez filtrów i ograniczeń. Zacznij już teraz z 20 darmowymi creditami!",
-    welcomeMessage: "Jesteś w środku! Witamy w niecenzurowanych rozmowach z AI",
-    description:
-      "Twoje konto jest gotowe. Masz 20 darmowych creditów, aby zacząć rozmawiać z dowolnym z naszych 38 modeli AI – w tym Claude Sonnet 4.5, GPT-5.2 Pro, Gemini 3 Pro, Kimi K2, DeepSeek R1 oraz ekskluzywne niecenzurowane modele jak UncensoredLM v1.2, FreedomGPT Liberty i Grok 4. Bez filtrów. Bez ograniczeń. Tylko szczere rozmowy z AI.",
-    ctaTitle: "Zacznij rozmawiać już teraz",
-    ctaButton: "Uruchom Chat AI",
-    whatYouGet: "Co otrzymujesz (100% za darmo)",
-    feature1: "20 creditów miesięcznie – na zawsze",
-    feature2: "Dostęp do wszystkich 38 modeli AI",
-    feature3: "Niecenzurowane modele, które nie odmawiają odpowiedzi",
-    feature4: "Tryby czatu: Prywatny, Incognito, Współdzielony i Publiczny",
-    feature5: "Forum społeczności z innymi entuzjastami AI",
-    needMore: "Gotowy na nieograniczone rozmowy?",
-    needMoreDesc:
-      "Zdobądź 40× więcej creditów – 800/miesiąc za jedyne 8 €! To nieograniczony dostęp do wszystkich 38 modeli bez dziennych limitów. Idealne dla poważnych użytkowników AI. Plus: zasubskrybuj i odblokuj możliwość zakupu pakietów creditów, które nigdy nie wygasają – idealne dla power userów potrzebujących dodatkowych creditów na żądanie.",
-    viewPlans: "Przejdź na Unlimited teraz",
-    signoff: "Witamy w przyszłości rozmów z AI,\nZespół {{appName}}",
-    ps: "P.S. Twoja prywatność jest dla nas ważna. Wybierz tryb Incognito, aby przechowywać rozmowy tylko na Twoim urządzeniu – nigdy nie są wysyłane na nasze serwery.",
+      "Hej {{privateName}}, Twoje konto jest gotowe. Rozmawiaj z Claude, GPT, Gemini, DeepSeek i {{modelCount}} innymi - za darmo, bez karty.",
+    headline: "Twoja AI czeka.",
+    greeting: "Hej {{privateName}},",
+    intro:
+      "Witamy w {{appName}}. Właśnie odblokowałeś dostęp do najbardziej kompletnej platformy do rozmów z AI - wszystko, co lubisz w ChatGPT, plus modele open-source i modele bez filtrów treści.",
+    models: {
+      title: "{{modelCount}} modeli w 3 kategoriach",
+      mainstream: "Główny nurt",
+      open: "Open Source",
+      uncensored: "Niecenzurowane",
+    },
+    free: {
+      title: "Co dostajesz za darmo, na zawsze:",
+      credits: "20 creditów miesięcznie - bez karty, bez daty wygaśnięcia",
+      allModels: "Dostęp do wszystkich {{modelCount}} modeli AI",
+      uncensored:
+        "4 niecenzurowane modele, które naprawdę odpowiadają na pytania",
+      chatModes: "Tryby czatu: Prywatny, Incognito, Współdzielony i Publiczny",
+      noCard: "Karta kredytowa nie jest wymagana - nigdy",
+    },
+    ctaButton: "Zacznij rozmawiać",
+    upgrade: {
+      title: "Chcesz więcej?",
+      desc: "8 €/miesiąc daje Ci 800 creditów - to 40× więcej. Możesz też kupować dodatkowe pakiety creditów, które nigdy nie wygasają. Idealne do codziennego użytku AI.",
+      cta: "Zobacz plan Unlimited",
+    },
+    signoff: "Miłych rozmów,\nZespół {{appName}}",
+    ps: "P.S. Użyj trybu Incognito, aby zachować rozmowy tylko na swoim urządzeniu – nigdy nie przechowujemy ich na naszych serwerach.",
   },
 };

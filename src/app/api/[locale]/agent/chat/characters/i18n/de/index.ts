@@ -686,7 +686,7 @@ export const translations: typeof enTranslations = {
       },
     },
     section: {
-      showMore: "{count} weitere anzeigen",
+      showMore: "{{count}} weitere anzeigen",
       showLess: "Weniger anzeigen",
     },
     response: {

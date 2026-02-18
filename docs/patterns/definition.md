@@ -455,7 +455,7 @@ responseField(
 // ✅ CORRECT - Response array with DATA_CARDS widget
 responseArrayField(
   {
-    type: WidgetType.DATA_CARDS,
+    type: WidgetType.CONTAINER,
   },
   objectField(
     {

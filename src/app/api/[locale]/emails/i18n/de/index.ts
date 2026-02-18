@@ -488,7 +488,7 @@ export const translations: typeof enTranslations = {
     default: "Ein Fehler ist aufgetreten",
   },
   template: {
-    tagline: "Ihre KI-gestützte Chat-Plattform",
+    tagline: "KI ohne Einschränkungen",
   },
   footer: {
     visitWebsite: "Website besuchen",
@@ -668,14 +668,72 @@ export const translations: typeof enTranslations = {
           description: "Bestätigungs-E-Mail für erfolgreiches Abonnement",
         },
         preview: {
-          firstName: "Vorname",
-          firstName_description: "Vorname des Benutzers",
+          privateName: "Privatname",
+          privateName_description: "Privatname des Benutzers",
           userId: "Benutzer-ID",
           userId_description: "Eindeutige ID des Benutzers",
           leadId: "Lead-ID",
           leadId_description: "ID des zugeordneten Leads",
           planName: "Plan-Name",
           planName_description: "Name des Abonnement-Plans",
+        },
+      },
+    },
+    admin: {
+      signup: {
+        meta: {
+          name: "Admin: Neue Benutzerregistrierung",
+          description: "Admin-Benachrichtigung bei neuer Benutzerregistrierung",
+        },
+        preview: {
+          privateName: "Privatname",
+          publicName: "Öffentlicher Name",
+          email: "E-Mail",
+          userId: "Benutzer-ID",
+          subscribeToNewsletter: "Newsletter-Abonnement",
+        },
+      },
+      subscription: {
+        meta: {
+          name: "Admin: Neues Abonnement",
+          description: "Admin-Benachrichtigung bei neuem Abonnement",
+        },
+        preview: {
+          privateName: "Privatname",
+          publicName: "Öffentlicher Name",
+          email: "E-Mail",
+          planName: "Plan-Name",
+          statusName: "Status",
+        },
+      },
+      user_create: {
+        meta: {
+          name: "Admin: Neuer Benutzer erstellt",
+          description:
+            "Admin-Benachrichtigung bei Erstellung eines Benutzerkontos",
+        },
+        preview: {
+          privateName: "Privatname",
+          publicName: "Öffentlicher Name",
+          email: "E-Mail",
+          userId: "Benutzer-ID",
+          leadId: "Lead-ID",
+        },
+      },
+      contact: {
+        meta: {
+          name: "Admin: Kontaktformular-Einsendung",
+          description:
+            "Admin-Benachrichtigung bei Einreichung eines Kontaktformulars",
+        },
+        preview: {
+          name: "Name des Absenders",
+          email: "E-Mail des Absenders",
+          subject: "Betreff",
+          message: "Nachricht",
+          company: "Unternehmen",
+          userId: "Benutzer-ID",
+          leadId: "Lead-ID",
         },
       },
     },

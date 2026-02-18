@@ -1,13 +1,13 @@
 export const translations = {
   title: "Earn with {{appName}}",
   description:
-    "Turn your network into passive income. Share your referral link and earn 20% commission when people subscribe — plus smaller earnings from their referrals through our multi-level system.",
+    "Turn your network into passive income. Share your referral link and earn 20% commission when people subscribe - plus smaller earnings from their referrals through our multi-level system.",
   tagline: "Referral Program",
   howItWorks: {
     title: "How It Works",
     step1Title: "Create referral codes",
     step1Body:
-      "Generate unique codes for different audiences — friends, social media, or campaigns.",
+      "Generate unique codes for different audiences - friends, social media, or campaigns.",
     step2Title: "Share your link",
     step2Body:
       "When someone signs up using your link and subscribes, you earn commission.",

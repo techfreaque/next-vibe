@@ -8,7 +8,12 @@
 import { render } from "@react-email/render";
 import { parseError } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "next-vibe-ui/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import { Mail, Send } from "next-vibe-ui/ui/icons";
 import { Iframe } from "next-vibe-ui/ui/iframe";
@@ -93,12 +98,15 @@ export function EmailPreviewClient({
                   </Span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
+                <DialogTitle className="sr-only">
+                  {t("app.admin.leads.leads.admin.emails.testEmail.button")}
+                </DialogTitle>
                 <TestEmailForm
                   user={user}
+                  locale={locale}
                   emailJourneyVariant={journeyVariant}
                   emailCampaignStage={stage}
-                  onClose={() => setIsTestEmailOpen(false)}
                 />
               </DialogContent>
             </Dialog>

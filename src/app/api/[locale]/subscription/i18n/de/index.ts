@@ -371,35 +371,45 @@ export const translations: typeof enTranslations = {
   // Email translations
   email: {
     success: {
-      title: "Willkommen bei {{planName}}, {{firstName}}!",
-      subject: "Dein {{appName}} Abo ist aktiv - Unbegrenzte KI wartet",
+      headline: "Du bist dabei. Keine Filter, keine Belehrungen.",
+      subject: "Dein {{appName}} Abo ist aktiv",
       previewText:
-        "Dein {{planName}} Abo ist jetzt aktiv! Genieße unbegrenzten Zugriff auf 38 KI-Modelle.",
-      welcomeMessage: "Dein {{planName}} Abo ist jetzt aktiv!",
-      description:
-        "Danke fürs Upgrade auf {{appName}}! Du hast jetzt vollen Zugriff auf alle 38 KI-Modelle ohne tägliche Limits. Starte jetzt Gespräche mit Claude Sonnet 4.5, GPT-5.2 Pro, Gemini 3 Pro und allen unseren unzensierten Modellen ohne Einschränkungen.",
-      nextSteps: {
-        title: "Alles bereit!",
+        "{{privateName}}, du bist live. 800 Credits/Monat, {{modelCount}} Modelle, null Einschränkungen.",
+      activeBadge: "Aktiv",
+      greeting: "Hey {{privateName}},",
+      intro:
+        "Dein {{appName}} Abo ist bestätigt und bereit. Du hast jeden Monat 800 Credits für alle Modelle — keine Tageslimits, keine Inhaltsfilter, keine Erklärungen nötig.",
+      models: {
+        title: "{{modelCount}} Modelle, 3 Kategorien",
+        mainstream: "Mainstream",
+        open: "Open Source",
+        uncensored: "Unzensiert",
+      },
+      included: {
+        title: "Was du jeden Monat bekommst:",
+        credits: "800 Credits pro Monat (automatisch erneuert)",
+        models: "Zugriff auf alle {{modelCount}} KI-Modelle",
+        nolimits: "Keine Tageslimits - nutz alle Credits wann du willst",
+        uncensored: "Unzensierte Modelle ohne Inhaltsfilter",
+        packs:
+          "Extra Credit-Pakete kaufen, die niemals ablaufen (nur für Abonnenten)",
+        cancel: "Jederzeit kündbar, keine Fragen gestellt",
+      },
+      cta: "Jetzt Chatten",
+      packs: {
+        title: "Mehr Credits benötigt?",
         description:
-          "Dein Abo ist aktiv und einsatzbereit. Spring direkt rein und entdecke unbegrenzte KI-Gespräche.",
-        cta: "Jetzt mit dem Chatten beginnen",
+          "Kaufe Credit-Pakete jederzeit - 5 € für 500 Credits. Sie verfallen nie und stapeln sich auf dein monatliches Kontingent. Nur für Abonnenten verfügbar.",
+        cta: "Credit-Paket kaufen",
       },
-      support: {
-        title: "Brauchst du Hilfe?",
-        description:
-          "Unser Support-Team steht dir bei allen Fragen zu deinem Abo zur Verfügung.",
-        cta: "Hilfe erhalten",
-      },
-      footer: {
-        message: "Danke, dass du unzensierte KI unterstützt!",
-        signoff:
-          "Willkommen bei unbegrenzten Gesprächen,\nDas {{appName}} Team",
-      },
+      manage: "Abo jederzeit verwalten oder kündigen in",
+      manageLink: "deinen Kontoeinstellungen",
+      signoff: "Viel Spaß beim Chatten,\nDas {{appName}} Team",
     },
     admin_notification: {
       title: "Neues Abonnement",
       subject: "Neues Abonnement - {{planName}}",
-      preview: "Neues Abo: {{firstName}} hat {{planName}} abonniert",
+      preview: "Neues Abo: {{userName}} hat {{planName}} abonniert",
       message: "Ein neuer Nutzer hat {{appName}} abonniert.",
       details: "Abonnement-Details",
       user_name: "Benutzername",

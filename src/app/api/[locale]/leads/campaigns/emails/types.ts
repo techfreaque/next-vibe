@@ -112,20 +112,15 @@ export interface ABTestConfig {
   isActive: boolean;
   startDate: Date;
   endDate?: Date;
-  variants: {
-    // [EmailJourneyVariant.PERSONAL_APPROACH]: {
-    //   weight: number;
-    //   description: string;
-    // };
-    [EmailJourneyVariant.RESULTS_FOCUSED]: {
-      weight: number;
-      description: string;
-    };
-    [EmailJourneyVariant.PERSONAL_RESULTS]: {
-      weight: number;
-      description: string;
-    };
-  };
+  variants: Partial<
+    Record<
+      (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
+      {
+        weight: number;
+        description: string;
+      }
+    >
+  >;
   targetAudience?: {
     countries?: string[];
   };

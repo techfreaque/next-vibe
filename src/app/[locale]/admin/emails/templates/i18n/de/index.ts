@@ -216,5 +216,129 @@ export const translations: typeof enTranslations = {
         },
       },
     },
+    admin: {
+      signup: {
+        meta: {
+          name: "Admin: Neue Benutzerregistrierung",
+          description: "Admin-Benachrichtigung bei neuer Benutzerregistrierung",
+        },
+        preview: {
+          privateName: {
+            label: "Privatname",
+            description: "Privatname des Benutzers",
+          },
+          publicName: {
+            label: "Öffentlicher Name",
+            description: "Öffentlicher Anzeigename des Benutzers",
+          },
+          email: {
+            label: "E-Mail",
+            description: "E-Mail-Adresse des Benutzers",
+          },
+          userId: {
+            label: "Benutzer-ID",
+            description: "Eindeutige Benutzer-ID",
+          },
+          subscribeToNewsletter: {
+            label: "Newsletter-Abonnement",
+            description: "Ob der Benutzer den Newsletter abonniert hat",
+          },
+        },
+      },
+      subscription: {
+        meta: {
+          name: "Admin: Neues Abonnement",
+          description: "Admin-Benachrichtigung bei neuem Abonnement",
+        },
+        preview: {
+          privateName: {
+            label: "Privatname",
+            description: "Privatname des Benutzers",
+          },
+          publicName: {
+            label: "Öffentlicher Name",
+            description: "Öffentlicher Anzeigename des Benutzers",
+          },
+          email: {
+            label: "E-Mail",
+            description: "E-Mail-Adresse des Benutzers",
+          },
+          planName: {
+            label: "Plan-Name",
+            description: "Name des Abonnement-Plans",
+          },
+          statusName: {
+            label: "Status",
+            description: "Aktueller Abonnement-Status",
+          },
+        },
+      },
+      user_create: {
+        meta: {
+          name: "Admin: Neuer Benutzer erstellt",
+          description:
+            "Admin-Benachrichtigung bei Erstellung eines Benutzerkontos",
+        },
+        preview: {
+          privateName: {
+            label: "Privatname",
+            description: "Privatname des Benutzers",
+          },
+          publicName: {
+            label: "Öffentlicher Name",
+            description: "Öffentlicher Anzeigename des Benutzers",
+          },
+          email: {
+            label: "E-Mail",
+            description: "E-Mail-Adresse des Benutzers",
+          },
+          userId: {
+            label: "Benutzer-ID",
+            description: "Eindeutige Benutzer-ID",
+          },
+          leadId: {
+            label: "Lead-ID",
+            description: "Lead-Tracking-Identifikator (optional)",
+          },
+        },
+      },
+      contact: {
+        meta: {
+          name: "Admin: Kontaktformular-Einsendung",
+          description:
+            "Admin-Benachrichtigung bei Einreichung eines Kontaktformulars",
+        },
+        preview: {
+          name: {
+            label: "Name des Absenders",
+            description: "Name der Person, die das Formular eingereicht hat",
+          },
+          email: {
+            label: "E-Mail des Absenders",
+            description: "E-Mail-Adresse des Absenders",
+          },
+          subject: {
+            label: "Betreff",
+            description: "Betreff des Kontaktformulars",
+          },
+          message: {
+            label: "Nachricht",
+            description: "Nachrichteninhalt des Kontaktformulars",
+          },
+          company: {
+            label: "Unternehmen",
+            description: "Unternehmensname (optional)",
+          },
+          userId: {
+            label: "Benutzer-ID",
+            description: "Benutzerkontoidentifikator (optional)",
+          },
+          leadId: {
+            label: "Lead-ID",
+            description: "Lead-Tracking-Identifikator",
+          },
+        },
+      },
+    },
   },
 };

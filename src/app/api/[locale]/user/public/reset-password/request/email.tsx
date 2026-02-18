@@ -18,6 +18,8 @@ import { z } from "zod";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { env } from "@/config/env";
+import { RESET_TOKEN_EXPIRY } from "@/config/constants";
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -74,6 +76,7 @@ function PasswordResetRequestEmail({
         "app.api.user.public.resetPassword.request.email.previewText",
         {
           appName: translatedAppName,
+          modelCount: TOTAL_MODEL_COUNT,
         },
       )}
       recipientEmail={recipientEmail}
@@ -113,7 +116,9 @@ function PasswordResetRequestEmail({
           marginBottom: "16px",
         }}
       >
-        {t("app.api.user.public.resetPassword.request.email.instructions")}
+        {t("app.api.user.public.resetPassword.request.email.instructions", {
+          hours: RESET_TOKEN_EXPIRY,
+        })}
       </Text>
 
       <Section style={{ textAlign: "center", marginTop: "32px" }}>
@@ -140,7 +145,9 @@ function PasswordResetRequestEmail({
           marginTop: "24px",
         }}
       >
-        {t("app.api.user.public.resetPassword.request.email.expirationInfo")}
+        {t("app.api.user.public.resetPassword.request.email.expirationInfo", {
+          hours: RESET_TOKEN_EXPIRY,
+        })}
       </Text>
     </EmailTemplate>
   );

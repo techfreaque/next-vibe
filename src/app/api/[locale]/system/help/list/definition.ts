@@ -100,8 +100,11 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      // Note: success and totalCommands are hidden internal fields
-      // They're used for response tracking but not rendered in CLI output
+      // Pre-formatted CLI output (used by pretty renderer, ignored by JSON)
+      formatted: responseField({
+        type: WidgetType.MARKDOWN,
+        schema: z.string().optional(),
+      }),
 
       commands: responseArrayField(
         {

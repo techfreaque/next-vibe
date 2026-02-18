@@ -558,7 +558,7 @@ const { PUT } = createEndpoint({
         fromEmail: "campaigns@example.com",
         priority: 15,
         campaignTypes: [CampaignType.LEAD_CAMPAIGN],
-        emailJourneyVariants: [EmailJourneyVariant.PERSONAL_APPROACH],
+        emailJourneyVariants: [EmailJourneyVariant.UNCENSORED_CONVERT],
         emailCampaignStages: [EmailCampaignStage.INITIAL],
         countries: ["GLOBAL"],
         languages: ["de", "en"],

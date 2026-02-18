@@ -126,9 +126,9 @@ export const translations: typeof enTranslations = {
     },
     // Email journey variant options
     emailJourneyVariants: {
-      personalApproach: "Podejście osobiste",
-      resultsFocused: "Skoncentrowane na wynikach",
-      personalResults: "Osobiste wyniki",
+      uncensoredConvert: "Niecenzurowana konwersja",
+      sideHustle: "Dodatkowy zarobek",
+      quietRecommendation: "Cicha rekomendacja",
     },
     // Email campaign stage options
     emailCampaignStages: {

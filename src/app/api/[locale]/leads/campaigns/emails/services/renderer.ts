@@ -20,9 +20,9 @@ import {
   LeadStatus,
 } from "../../../enum";
 import type { LeadWithEmailType } from "../../../types";
-import { personalJourneyTemplates } from "../journeys/personal.email";
-import { personalPracticalJourneyTemplates } from "../journeys/personal-results.email";
-import { resultsJourneyTemplates } from "../journeys/results/results";
+import { quietRecommendationJourneyTemplates } from "../journeys/quiet-recommendation.email";
+import { sideHustleJourneyTemplates } from "../journeys/side-hustle.email";
+import { uncensoredConvertJourneyTemplates } from "../journeys/uncensored-convert.email";
 import type {
   EmailTemplateData,
   EmailTemplateFunction,
@@ -126,24 +126,31 @@ class EmailPreviewCache {
 const previewCache = new EmailPreviewCache();
 
 // Cleanup expired cache entries every 10 minutes
-setInterval(
+// Allow Node.js to exit even if interval is active by calling unref()
+const _cacheCleanupInterval = setInterval(
   () => {
     previewCache.cleanup();
   },
   10 * 60 * 1000,
 );
+// Node.js Timeout objects have .unref() to prevent keeping the process alive
+type NodeTimeout = ReturnType<typeof setInterval> & { unref?: () => void };
+(_cacheCleanupInterval as NodeTimeout).unref?.();
 
 /**
  * Journey Template Registry
  * Maps journey variants to their template functions
  */
-const JOURNEY_TEMPLATES: Record<
-  (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
-  JourneyTemplateMap
+const JOURNEY_TEMPLATES: Partial<
+  Record<
+    (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
+    JourneyTemplateMap
+  >
 > = {
-  [EmailJourneyVariant.PERSONAL_APPROACH]: personalJourneyTemplates,
-  [EmailJourneyVariant.RESULTS_FOCUSED]: resultsJourneyTemplates,
-  [EmailJourneyVariant.PERSONAL_RESULTS]: personalPracticalJourneyTemplates,
+  [EmailJourneyVariant.UNCENSORED_CONVERT]: uncensoredConvertJourneyTemplates,
+  [EmailJourneyVariant.SIDE_HUSTLE]: sideHustleJourneyTemplates,
+  [EmailJourneyVariant.QUIET_RECOMMENDATION]:
+    quietRecommendationJourneyTemplates,
 };
 
 /**
@@ -324,35 +331,45 @@ export class EmailRendererService {
       (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]
     >;
   } {
-    const journeyInfo = {
-      [EmailJourneyVariant.PERSONAL_APPROACH]: {
+    const journeyInfo: Partial<
+      Record<
+        (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
+        { name: string; description: string }
+      >
+    > = {
+      [EmailJourneyVariant.UNCENSORED_CONVERT]: {
         name: t(
-          "app.api.leads.campaigns.emails.journeys.components.journeyInfo.personalApproach.name",
+          "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.uncensoredConvert.name",
         ),
         description: t(
-          "app.api.leads.campaigns.emails.journeys.components.journeyInfo.personalApproach.description",
+          "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.uncensoredConvert.description",
         ),
       },
-      [EmailJourneyVariant.RESULTS_FOCUSED]: {
+      [EmailJourneyVariant.SIDE_HUSTLE]: {
         name: t(
-          "app.api.leads.campaigns.emails.journeys.components.journeyInfo.resultsFocused.name",
+          "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.sideHustle.name",
         ),
         description: t(
-          "app.api.leads.campaigns.emails.journeys.components.journeyInfo.resultsFocused.description",
+          "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.sideHustle.description",
         ),
       },
-      [EmailJourneyVariant.PERSONAL_RESULTS]: {
+      [EmailJourneyVariant.QUIET_RECOMMENDATION]: {
         name: t(
-          "app.api.leads.campaigns.emails.journeys.components.journeyInfo.personalResults.name",
+          "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.quietRecommendation.name",
         ),
         description: t(
-          "app.api.leads.campaigns.emails.journeys.components.journeyInfo.personalResults.description",
+          "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.quietRecommendation.description",
         ),
       },
     };
 
+    const info = journeyInfo[journeyVariant] ?? {
+      name: journeyVariant,
+      description: "",
+    };
+
     return {
-      ...journeyInfo[journeyVariant],
+      ...info,
       availableStages: this.getAvailableStages(journeyVariant),
     };
   }

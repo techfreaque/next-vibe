@@ -1,13 +1,13 @@
 export const translations = {
   title: "Verdienen mit {{appName}}",
   description:
-    "Verwandeln Sie Ihr Netzwerk in passives Einkommen. Teilen Sie Ihren Empfehlungslink und verdienen Sie 20% Provision, wenn Leute abonnieren — plus kleinere Einnahmen von deren Empfehlungen durch unser Multi-Level-System.",
+    "Verwandeln Sie Ihr Netzwerk in passives Einkommen. Teilen Sie Ihren Empfehlungslink und verdienen Sie 20% Provision, wenn Leute abonnieren - plus kleinere Einnahmen von deren Empfehlungen durch unser Multi-Level-System.",
   tagline: "Empfehlungsprogramm",
   howItWorks: {
     title: "So funktioniert's",
     step1Title: "Empfehlungscodes erstellen",
     step1Body:
-      "Generieren Sie einzigartige Codes für verschiedene Zielgruppen — Freunde, Social Media oder Kampagnen.",
+      "Generieren Sie einzigartige Codes für verschiedene Zielgruppen - Freunde, Social Media oder Kampagnen.",
     step2Title: "Link teilen",
     step2Body:
       "Wenn sich jemand über Ihren Link anmeldet und abonniert, verdienen Sie Provision.",

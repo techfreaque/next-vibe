@@ -217,5 +217,128 @@ export const translations: typeof enTranslations = {
         },
       },
     },
+    admin: {
+      signup: {
+        meta: {
+          name: "Admin: Nowa rejestracja użytkownika",
+          description: "Powiadomienie admina o nowej rejestracji użytkownika",
+        },
+        preview: {
+          privateName: {
+            label: "Imię prywatne",
+            description: "Prywatne imię użytkownika",
+          },
+          publicName: {
+            label: "Nazwa publiczna",
+            description: "Publiczna nazwa wyświetlana użytkownika",
+          },
+          email: {
+            label: "E-mail",
+            description: "Adres e-mail użytkownika",
+          },
+          userId: {
+            label: "ID użytkownika",
+            description: "Unikalny identyfikator użytkownika",
+          },
+          subscribeToNewsletter: {
+            label: "Subskrypcja newslettera",
+            description: "Czy użytkownik zasubskrybował newsletter",
+          },
+        },
+      },
+      subscription: {
+        meta: {
+          name: "Admin: Nowa subskrypcja",
+          description: "Powiadomienie admina o nowej subskrypcji",
+        },
+        preview: {
+          privateName: {
+            label: "Imię prywatne",
+            description: "Prywatne imię użytkownika",
+          },
+          publicName: {
+            label: "Nazwa publiczna",
+            description: "Publiczna nazwa wyświetlana użytkownika",
+          },
+          email: {
+            label: "E-mail",
+            description: "Adres e-mail użytkownika",
+          },
+          planName: {
+            label: "Nazwa planu",
+            description: "Nazwa planu subskrypcji",
+          },
+          statusName: {
+            label: "Status",
+            description: "Aktualny status subskrypcji",
+          },
+        },
+      },
+      user_create: {
+        meta: {
+          name: "Admin: Nowy użytkownik utworzony",
+          description: "Powiadomienie admina o utworzeniu konta użytkownika",
+        },
+        preview: {
+          privateName: {
+            label: "Imię prywatne",
+            description: "Prywatne imię użytkownika",
+          },
+          publicName: {
+            label: "Nazwa publiczna",
+            description: "Publiczna nazwa wyświetlana użytkownika",
+          },
+          email: {
+            label: "E-mail",
+            description: "Adres e-mail użytkownika",
+          },
+          userId: {
+            label: "ID użytkownika",
+            description: "Unikalny identyfikator użytkownika",
+          },
+          leadId: {
+            label: "ID leada",
+            description: "Identyfikator śledzenia leada (opcjonalnie)",
+          },
+        },
+      },
+      contact: {
+        meta: {
+          name: "Admin: Zgłoszenie formularza kontaktowego",
+          description:
+            "Powiadomienie admina o przesłaniu formularza kontaktowego",
+        },
+        preview: {
+          name: {
+            label: "Nazwa nadawcy",
+            description: "Nazwa osoby, która przesłała formularz",
+          },
+          email: {
+            label: "E-mail nadawcy",
+            description: "Adres e-mail nadawcy",
+          },
+          subject: {
+            label: "Temat",
+            description: "Temat formularza kontaktowego",
+          },
+          message: {
+            label: "Wiadomość",
+            description: "Zawartość wiadomości formularza kontaktowego",
+          },
+          company: {
+            label: "Firma",
+            description: "Nazwa firmy (opcjonalnie)",
+          },
+          userId: {
+            label: "ID użytkownika",
+            description: "Identyfikator konta użytkownika (opcjonalnie)",
+          },
+          leadId: {
+            label: "ID leada",
+            description: "Identyfikator śledzenia leada",
+          },
+        },
+      },
+    },
   },
 };

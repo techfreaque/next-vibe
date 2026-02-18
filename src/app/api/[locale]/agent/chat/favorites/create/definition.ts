@@ -173,7 +173,7 @@ const { POST } = createEndpoint({
       icon: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ICON,
-        schema: iconSchema.nullable().optional(),
+        schema: iconSchema.optional(),
         theme: {
           style: "none",
         } as const,

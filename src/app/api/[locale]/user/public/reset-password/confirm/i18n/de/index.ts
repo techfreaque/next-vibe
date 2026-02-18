@@ -8,14 +8,14 @@ export const translations: typeof enTranslations = {
     title: "Ihr {{appName}}-Passwort wurde zurückgesetzt",
     subject: "Passwort erfolgreich zurückgesetzt - {{appName}}",
     previewText:
-      "Ihr Passwort wurde erfolgreich zurückgesetzt. Sie können sich jetzt anmelden und mit 38 KI-Modellen chatten.",
+      "Ihr Passwort wurde erfolgreich zurückgesetzt. Sie können sich jetzt anmelden und mit {{modelCount}} KI-Modellen chatten.",
     greeting: "Hallo,",
     confirmationMessage:
       "Ihr {{appName}}-Passwort wurde erfolgreich zurückgesetzt.",
     successMessage:
       "Ihr Passwort-Reset ist abgeschlossen! Sie können sich jetzt mit Ihrem neuen Passwort in Ihr Konto einloggen und weiter unzensierte KI-Gespräche führen.",
     loginInstructions:
-      "Sie können sich jetzt mit Ihrem neuen Passwort anmelden und auf alle 38 KI-Modelle zugreifen.",
+      "Sie können sich jetzt mit Ihrem neuen Passwort anmelden und auf alle {{modelCount}} KI-Modelle zugreifen.",
     loginButton: "Bei {{appName}} anmelden",
     securityInfo:
       "Diese Passwortänderung wurde von {{ipAddress}} am {{resetTime}} abgeschlossen.",

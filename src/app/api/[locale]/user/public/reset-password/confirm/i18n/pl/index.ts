@@ -8,14 +8,14 @@ export const translations: typeof enTranslations = {
     title: "Twoje hasło {{appName}} zostało zresetowane",
     subject: "Hasło pomyślnie zresetowane - {{appName}}",
     previewText:
-      "Twoje hasło zostało pomyślnie zresetowane. Możesz się teraz zalogować i kontynuować rozmowy z 38 modelami AI.",
+      "Twoje hasło zostało pomyślnie zresetowane. Możesz się teraz zalogować i kontynuować rozmowy z {{modelCount}} modelami AI.",
     greeting: "Witaj,",
     confirmationMessage:
       "Twoje hasło {{appName}} zostało pomyślnie zresetowane.",
     successMessage:
       "Resetowanie hasła zakończone! Możesz teraz zalogować się do swojego konta przy użyciu nowego hasła i kontynuować odkrywanie niecenzurowanych rozmów z AI.",
     loginInstructions:
-      "Możesz się teraz zalogować przy użyciu nowego hasła i uzyskać dostęp do wszystkich 38 modeli AI.",
+      "Możesz się teraz zalogować przy użyciu nowego hasła i uzyskać dostęp do wszystkich {{modelCount}} modeli AI.",
     loginButton: "Zaloguj się do {{appName}}",
     securityInfo:
       "Ta zmiana hasła została dokonana z {{ipAddress}} dnia {{resetTime}}.",

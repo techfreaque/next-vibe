@@ -37,6 +37,12 @@ export const translations: typeof enTranslations = {
       public: "Öffentlich",
       incognito: "Inkognito",
     },
+    foldersShort: {
+      private: "Privat",
+      shared: "Geteilt",
+      public: "Öffentlich",
+      incognito: "Inkognito",
+    },
   },
   enums: {
     role: {
@@ -344,8 +350,11 @@ export const translations: typeof enTranslations = {
         "Claude Opus 4.5 - Leistungsstärkstes Claude-Modell mit außergewöhnlichen Reasoning- und kreativen Fähigkeiten",
       claudeOpus46:
         "Claude Opus 4.6 - Neuestes und leistungsstärkstes Claude-Modell mit außergewöhnlichen Reasoning- und kreativen Fähigkeiten",
+      claudeSonnet46:
+        "Claude Sonnet 4.6 - Anthropics leistungsfähigstes Sonnet-Modell mit frontier-Leistung in Coding, Agenten und professioneller Arbeit",
       claudeHaiku45:
         "Claude Haiku 4.5 - Schnelles und effizientes Claude-Modell optimiert für Geschwindigkeit und Kosteneffizienz",
+      glm5: "GLM-5 - Z.AIs Flaggschiff-Open-Source-Basismodell für komplexes Systemdesign und langfristige Agenten-Workflows, vergleichbar mit führenden Closed-Source-Modellen",
       glm46:
         "GLM-4 6B - Effizientes chinesisch-englisches bilinguales KI-Modell mit starken allgemeinen Fähigkeiten",
       glm47:

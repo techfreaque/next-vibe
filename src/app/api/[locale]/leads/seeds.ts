@@ -201,9 +201,9 @@ const SAMPLE_CAMPAIGN_STAGES = [
 ] as const;
 
 const SAMPLE_JOURNEY_VARIANTS = [
-  EmailJourneyVariant.PERSONAL_APPROACH,
-  EmailJourneyVariant.RESULTS_FOCUSED,
-  EmailJourneyVariant.PERSONAL_RESULTS,
+  EmailJourneyVariant.UNCENSORED_CONVERT,
+  EmailJourneyVariant.SIDE_HUSTLE,
+  EmailJourneyVariant.QUIET_RECOMMENDATION,
 ] as const;
 
 const SAMPLE_WEBSITE_DOMAINS = ["nopepepepepepepepe.com"];
@@ -663,7 +663,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
       source: LeadSource.WEBSITE,
       notes: "Test lead for automated testing",
       currentCampaignStage: EmailCampaignStage.INITIAL,
-      emailJourneyVariant: EmailJourneyVariant.PERSONAL_APPROACH,
+      emailJourneyVariant: EmailJourneyVariant.UNCENSORED_CONVERT,
       emailsSent: 1,
       emailsOpened: 0,
       emailsClicked: 0,
@@ -689,7 +689,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
       source: LeadSource.REFERRAL,
       notes: "Test lead with high engagement",
       currentCampaignStage: EmailCampaignStage.FOLLOWUP_2,
-      emailJourneyVariant: EmailJourneyVariant.RESULTS_FOCUSED,
+      emailJourneyVariant: EmailJourneyVariant.SIDE_HUSTLE,
       emailsSent: 3,
       emailsOpened: 2,
       emailsClicked: 1,
@@ -716,7 +716,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
       source: LeadSource.SOCIAL_MEDIA,
       notes: "Test lead that completed the conversion funnel",
       currentCampaignStage: EmailCampaignStage.NURTURE,
-      emailJourneyVariant: EmailJourneyVariant.PERSONAL_RESULTS,
+      emailJourneyVariant: EmailJourneyVariant.QUIET_RECOMMENDATION,
       emailsSent: 8,
       emailsOpened: 7,
       emailsClicked: 5,
@@ -791,7 +791,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
     {
       leadId: testLeadIds[0],
       stage: EmailCampaignStage.INITIAL,
-      journeyVariant: EmailJourneyVariant.PERSONAL_APPROACH,
+      journeyVariant: EmailJourneyVariant.UNCENSORED_CONVERT,
       subject: "Welcome to our platform!",
       templateName: "welcome-email",
       scheduledAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
@@ -807,7 +807,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
     {
       leadId: testLeadIds[1],
       stage: EmailCampaignStage.FOLLOWUP_2,
-      journeyVariant: EmailJourneyVariant.RESULTS_FOCUSED,
+      journeyVariant: EmailJourneyVariant.SIDE_HUSTLE,
       subject: "Your business success starts here",
       templateName: "followup-general",
       scheduledAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),

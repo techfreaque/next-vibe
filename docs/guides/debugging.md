@@ -1,258 +1,184 @@
 # Debugging Guide
 
-> **Part of NextVibe Framework** (GPL-3.0) - Debugging techniques and troubleshooting
-
-**Fix issues faster with the right tools.**
+> **Part of NextVibe Framework** (GPL-3.0)
 
 ---
 
-## Overview
+## Type & Lint Errors
 
-**Primary debugging tools:**
-
-- `vibe check` - Type and lint errors
-- EndpointLogger - logging across server/client enable debug via src/config/debug.ts
-- Chrome DevTools MCP - Client-side debugging
-- CLI testing - Endpoint verification
-
----
-
-## 1. Type Errors
-
-**Always run `vibe check` first:**
+Run `vibe check`. Fix everything it reports - no workarounds, no type assertions.
 
 ```bash
-vibe check                    # Entire codebase
-vibe check src/path/to/file   # Specific file/folder
+vibe check                    # entire codebase
+vibe check src/path/to/file   # specific file or folder
 ```
 
-**Common Issues:**
+`check` and `c` are aliases - `vibe check src/` is equivalent to `vibe c src/`.
+
+For MCP usage, the same endpoint is available as the `check` tool. See [vibe check docs](../patterns/definition.md) and the MCP server setup.
+
+---
+
+## i18n Errors
+
+See [i18n Patterns](../patterns/i18n.md) for the complete system.
+
+The short version: translation keys map exactly to folder paths. `vibe check` catches missing or wrong keys - **but only if `translationsKeyTypesafety` is enabled**.
+
+In `src/config/debug.ts`:
 
 ```typescript
-// "Property doesn't exist"
-const name = user.firstName; // ❌ Error
-const name = user.publicName; // ✅ Check actual schema in db.ts
-
-// "Type 'X' is not assignable to type 'Y'"
-const role = "ADMIN"; // ❌ Error
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-const role = UserRole.ADMIN; // ✅ Use proper enum
-
-// "Possibly undefined"
-const userId = response.data.userId; // ❌ Error
-if (response.success) {
-  const userId = response.data.userId; // ✅ Type-safe
-}
+// Speeds up the typecheck by 100x but disables translation typesafety
+export const translationsKeyTypesafety = false;
 ```
 
----
-
-## 2. Translation Errors
-
-**Error:** `Argument of type '"app.user.login.title"' is not assignable to type 'TranslationKey'`
-
-**Debug Steps:**
-
-1. Find i18n file location: `src/app/api/[locale]/user/public/login/i18n/en/index.ts`
-2. Build correct key from path:
-   - Path: `app/api/[locale]/user/public/login`
-   - Remove `[locale]`: `app/api/user/public/login`
-   - Replace `/` with `.`: `app.api.user.public.login.title`
-3. Verify key exists in all language files
-4. Run `vibe check` - error disappears if fixed
-
-See [I18n Structure Rules](i18n-structure-rules.md) for complete guide.
+When this is `false` (the default), `vibe check` runs fast but won't catch invalid translation keys. Set it to `true` before checking i18n, then set it back - leaving it on makes typecheck extremely slow.
 
 ---
 
-## 3. Endpoint Errors
+## Debug Logging
 
-**Test endpoints via CLI:**
+By default only `info`, `warn`, and `error` are logged. `debug()` calls are silent unless you enable debug mode.
+
+**Enable for a single CLI run:**
 
 ```bash
-vibe --help                                        # List all endpoints
-vibe user:public:login --email="test@test.com" --password="pass123"
-vibe user:create --name="Test" --verbose          # Detailed errors
+vibe <command> -v
+vibe <command> --verbose
 ```
 
-**Common Issues:**
+**Enable permanently in development** - edit `src/config/debug.ts`:
 
-**"Endpoint not found" (404)**
+```typescript
+export let enableDebugLogger = false;  // change to true
+export let debugMiddleware = false;    // change to true for middleware logs
+```
 
-1. Check folder structure: `/api/en-GLOBAL/user/create` → `src/app/api/[locale]/user/create/route.ts`
-2. Verify exports: `export const { POST } = endpointsHandler({ ... });`
-3. Check path array: `path: ["user", "create"]` matches folders
+Set these back to `false` before committing. The `-v` flag sets them at runtime via `enableDebug()`.
 
-**"Validation failed" (Zod errors)**
-
-1. Check schema in `definition.ts`: `email: requestField({}, z.string().email())`
-2. Test with CLI: `vibe user:create --email="invalid" --name="Test"`
-3. Fix request data to match schema
-
-**"Unauthorized" (401/403)**
-
-1. Check `allowedRoles` in definition: `allowedRoles: [UserRole.ADMIN]`
-2. Verify JWT: `logger.debug("User role", { role: user.role });`
-3. Test with correct user role
+There is also `translationsKeyMode` in that file - set it to `true` to show raw translation keys in the UI instead of translated strings, useful when tracking down which key is used where.
 
 ---
 
-## 4. Database Errors
+## Endpoint Debugging
 
-**Connection:**
+### Finding the CLI command for a route
+
+Every `route.ts` maps to a CLI command. The command key is the `path` array from `definition.ts` joined with underscores, plus the HTTP method:
+
+```
+path: ["user", "public", "login"]  +  method: POST
+→  vibe user_public_login_POST
+```
+
+To see all available commands:
 
 ```bash
-vibe db:status              # Check database
-docker ps | grep postgres   # If using Docker
+vibe list           # all commands
+vibe list --format=tree
+vibe help <command> # details for one command
 ```
 
-**Migrations:**
+If the endpoint has `aliases` defined in its `definition.ts`, use those instead - they're shorter:
+
+```typescript
+// definition.ts
+aliases: ["check", "c"],
+```
 
 ```bash
-vibe migrate:status         # Check pending
-vibe migrate                # Run migrations
-vibe migrate:generate       # Regenerate after schema changes
+vibe check          # alias
+vibe c              # shorter alias
+vibe system_check_vibe-check_POST  # full key, same endpoint
 ```
 
-**Query Debugging:**
+### Passing data to a command
 
-```typescript
-logger.debug("Query params", { userId: user.id });
-const result = await db.query.users.findFirst({ where: eq(users.id, user.id) });
-logger.debug("Query result", { found: !!result });
-```
+**Three ways to pass request data:**
 
----
-
-## 5. Logger Debugging
-
-**Server-Side:**
-
-```typescript
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-
-async function processData(data, user, locale, logger: EndpointLogger) {
-  logger.info("Processing started", { userId: user.id });
-  try {
-    const result = await doSomething(data);
-    logger.info("Processing complete", { resultId: result.id });
-    return success(result);
-  } catch (error) {
-    logger.error("Processing failed", error, { data });
-    return fail({
-      message: "error.translation.key",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
-  }
-}
-```
-
-**Client-Side:**
-
-```typescript
-const logger = useMemo(
-  () => createEndpointLogger(false, Date.now(), locale),
-  [locale],
-);
-const handleClick = () =>
-  logger.debug("Button clicked", { timestamp: Date.now() });
-```
-
-**Log Levels:** `debug()` (dev only), `info()` (important events), `warn()` (warnings), `error()` (failures), `vibe()` (CLI/framework)
-
----
-
-## 6. React Errors
-
-**Hook Errors:**
-
-```typescript
-// "Rendered more hooks than previous render" - DON'T use hooks conditionally
-// ❌
-if (condition) { const { data } = useQuery(); }
-
-// ✅
-const { data } = useQuery();
-if (condition && data) { /* Use data */ }
-
-// "Cannot update component while rendering" - DON'T setState during render
-// ❌
-function Component() { setState(newValue); return <div>...</div>; }
-
-// ✅
-function Component() {
-  useEffect(() => { setState(newValue); }, []);
-  return <div>...</div>;
-}
-```
-
-**Form Debugging:**
-
-```typescript
-const { form } = useApiForm(definition, logger);
-console.log("Values:", form.watch());
-console.log("Errors:", form.formState.errors);
-```
-
----
-
-## 7. Build Errors
+**1. Named flags with dot-notation for nested fields:**
 
 ```bash
-vibe check # Fix all type/lint errors
-rm -rf .next node_modules/.cache && vibe build  # Clean rebuild
+vibe user_public_login_POST --email="test@example.com" --password="secret"
+vibe agent_chat_settings_POST --"config.theme"=dark --"config.language"=en
 ```
 
-**Import Paths:**
+Kebab-case flags are automatically converted to camelCase: `--user-name` → `userName`.
 
-```typescript
-import { Button } from "../../components/ui/button"; // ❌ Relative
-import { Button } from "@/path/to/button"; // ✅ Use alias
+**2. Raw JSON via `-d`:**
+
+```bash
+vibe user_public_login_POST -d '{"email":"test@example.com","password":"secret"}'
 ```
 
----
+**3. First positional argument** (when the endpoint defines `firstCliArgKey`):
 
-## 8. Common Issues
+Some endpoints define a shorthand for the most common parameter. For example `vibe check` has `firstCliArgKey: "paths"`, so:
 
-- **"Module not found"** → Check file exists, verify import path, check tsconfig.json paths, restart dev server
-- **"Infinite loop/re-renders"** → Check useEffect dependencies: `useEffect(() => setState(value), [dependency])` not `useEffect(() => setState(value))`
-- **"CORS errors"** → Verify API route in `/api` folder, check headers, check environment config
-- **"Hydration mismatch"** → Ensure server/client render same HTML, avoid `Date.now()` during render, use `useEffect` for client-only code
-
-```typescript
-// Hydration fix example
-// ❌ Different on server/client
-const time = Date.now();
-
-// ✅ Client-only
-const [time, setTime] = useState<number>();
-useEffect(() => {
-  setTime(Date.now());
-}, []);
+```bash
+vibe check src/components       # equivalent to --paths="src/components"
+vibe check src/ src/components  # passes array
 ```
 
+Check the endpoint's `definition.ts` `cli.firstCliArgKey` field to know if this applies.
+
+### Verbose output
+
+Every command supports `-v` / `--verbose`:
+
+```bash
+vibe user_public_login_POST --email="test@example.com" --password="secret" -v
+```
+
+This enables debug logging and prints full request/response details.
+
+### Authentication
+
+The CLI user is determined in this order:
+
+1. **Saved session** - from a previous `vibe user_public_login_POST` call (stored in `.vibe.session`)
+2. **`VIBE_CLI_USER_EMAIL` env variable** - set in `.env`, authenticated from the DB automatically
+3. **Public/anonymous user** - if neither is set
+
+To log in and save a session:
+
+```bash
+vibe user_public_login_POST --email="you@example.com" --password="yourpassword"
+```
+
+### Verifying an endpoint works end-to-end
+
+1. Find the command key from `definition.ts` path array or `vibe list`
+2. Run with `-v` to see full debug output
+3. Check server terminal for `logger.debug()` output (needs debug mode enabled)
+4. If getting 401/403: check `allowedRoles` in `definition.ts` and your user's role
+5. If getting validation errors: check the Zod schemas in `definition.ts` fields
+
 ---
 
-## 9. Debug Workflow
+## Database
 
-1. Run `vibe check` and fix all type/lint errors (no workarounds, no type assertions)
-2. Test via CLI: `vibe endpoint:name --param=value`
-3. Add logging: `logger.debug("Step 1", { data })`
-4. Check logs: server (terminal), client (browser console), database (Drizzle Studio)
-5. Verify fix: `vibe check && vibe test`
+### Migrations
 
----
+Schema changes in `src/app/api/[locale]/system/db/db.ts` require generating and running a migration:
 
-## 10. Tools Reference
+```bash
+npx drizzle-kit generate   # generate migration files from schema changes
+npx drizzle-kit migrate    # apply pending migrations
+```
 
-**Development:** `vibe check` (type/lint), `vibe test` (tests), `vibe studio` (DB GUI), `vibe --help` (commands)
-**Browser DevTools:** Console (logs), Network (API), React DevTools (state), Sources (breakpoints)
-**VS Code:** oxlint, TypeScript, Drizzle extensions
+`vibe dev` and `vibe start` run migrations automatically on startup, so in normal development you don't need to run and generate them manually.
 
----
+### SQL access
 
-## Next Steps
+Use `vibe sql` (alias for `system_db_sql_POST`) to run SQL directly:
 
-- [Testing Guide](testing-guide.md) - Write tests
-- [Error Handling Patterns](error-handling.md) - Handle errors properly
-- [Logger Patterns](logger-patterns.md) - Logging best practices
+```bash
+vibe sql "SELECT * FROM users LIMIT 10"
+vibe sql --queryFile="./queries/report.sql"
+vibe sql "UPDATE users SET name='test' WHERE id=1" --dryRun=true
+```
+
+The `sql` and `db:sql` aliases both work. The first positional argument maps to `query`. Use `--queryFile` to pass a path to a `.sql` file instead. Add `--dryRun=true` to preview without applying changes.
+
+Requires an authenticated admin user (session or `VIBE_CLI_USER_EMAIL`).

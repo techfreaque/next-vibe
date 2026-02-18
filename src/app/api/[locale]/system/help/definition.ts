@@ -60,6 +60,12 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
+      // Pre-formatted CLI output (used by pretty renderer, ignored by JSON)
+      formatted: responseField({
+        type: WidgetType.MARKDOWN,
+        schema: z.string().optional(),
+      }),
+
       // Header section
       header: objectField(
         {

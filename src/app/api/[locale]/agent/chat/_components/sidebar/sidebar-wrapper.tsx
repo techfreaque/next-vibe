@@ -7,21 +7,79 @@ import { ResizableContainer } from "next-vibe-ui/ui/resizable";
 import type { JSX, ReactNode } from "react";
 import { useEffect, useState } from "react";
 
+import { SidebarFooter } from "@/app/api/[locale]/agent/chat/_components/sidebar/footer/sidebar-footer";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import foldersDefinition from "@/app/api/[locale]/agent/chat/folders/definition";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatSidebar } from "@/app/api/[locale]/agent/chat/threads/_components/sidebar";
+import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+/**
+ * Feature flag: set to true to use the new widget-based sidebar (no useChatContext).
+ * Set to false to fall back to the legacy ChatSidebar.
+ */
+const USE_WIDGET_SIDEBAR = false;
+
 const SIDEBAR_WIDTH = "w-65";
-const SIDEBAR_MIN_WIDTH_PX = 235; // Minimum 235px
+const SIDEBAR_MIN_WIDTH_PX = 245; // Minimum 235px
 const SIDEBAR_MAX_WIDTH_VW = 90; // Maximum 90vw
 
 interface SidebarWrapperProps {
   locale: CountryLanguage;
   logger: EndpointLogger;
   children?: ReactNode;
+}
+
+/**
+ * New widget-based sidebar — no useChatContext inside the sidebar itself.
+ * Footer is owned here so it stays outside the scrollable widget area.
+ */
+function WidgetSidebar({
+  locale,
+  logger,
+}: {
+  locale: CountryLanguage;
+  logger: EndpointLogger;
+}): JSX.Element {
+  const { user, initialCredits } = useChatContext();
+  const creditsEndpoint = useCredits(user, logger, initialCredits);
+  const credits = creditsEndpoint?.read?.response?.success
+    ? creditsEndpoint.read.response.data
+    : initialCredits;
+
+  return (
+    <Div className="flex flex-col h-full bg-background overflow-hidden">
+      <EndpointsPage
+        endpoint={foldersDefinition}
+        locale={locale}
+        user={user}
+        forceMethod="GET"
+        className="flex-1 h-full overflow-hidden"
+        endpointOptions={{
+          read: {
+            initialState: {
+              rootFolderId: DefaultFolderId.PRIVATE,
+            },
+            queryOptions: {
+              refetchOnWindowFocus: false,
+              staleTime: 30 * 1000,
+            },
+          },
+        }}
+      />
+      <SidebarFooter
+        locale={locale}
+        credits={credits}
+        user={user}
+        logger={logger}
+      />
+    </Div>
+  );
 }
 
 export function SidebarWrapper({
@@ -53,6 +111,8 @@ export function SidebarWrapper({
     };
   }, []);
 
+  const SidebarContent = USE_WIDGET_SIDEBAR ? WidgetSidebar : ChatSidebar;
+
   // Mobile: use overlay (NO RESIZE - fixed width)
   if (isMobile) {
     return (
@@ -67,7 +127,7 @@ export function SidebarWrapper({
             )}
           >
             <Div className="h-full w-full bg-background">
-              <ChatSidebar locale={locale} logger={logger} />
+              <SidebarContent locale={locale} logger={logger} />
             </Div>
           </Div>
         )}
@@ -86,6 +146,7 @@ export function SidebarWrapper({
       </Div>
     );
   }
+
   // Desktop: Resizable sidebar with custom ResizableContainer
   return (
     <Div className="flex flex-row h-full w-full">
@@ -106,7 +167,7 @@ export function SidebarWrapper({
               transition={{ duration: 0.4, ease: "easeInOut" }}
               className="h-full"
             >
-              <ChatSidebar locale={locale} logger={logger} />
+              <SidebarContent locale={locale} logger={logger} />
             </MotionDiv>
           )}
         </AnimatePresence>

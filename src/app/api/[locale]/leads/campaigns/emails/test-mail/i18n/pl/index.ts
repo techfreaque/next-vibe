@@ -143,6 +143,8 @@ export const translations: typeof enTranslations = {
     },
     widget: {
       title: "Wyślij testowy e-mail",
+      send: "Wyślij testowy e-mail",
+      sending: "Wysyłanie...",
       successMessage: "Testowy e-mail wysłany pomyślnie",
       sentTo: "Wysłano do: ",
       subject: "Temat: ",

@@ -349,35 +349,45 @@ export const translations: typeof enTranslations = {
   // Email translations
   email: {
     success: {
-      title: "Witamy w {{planName}}, {{firstName}}!",
-      subject:
-        "Twoja subskrypcja {{appName}} jest aktywna - Nieograniczona AI czeka",
+      headline: "Jesteś w środku. Bez filtrów, bez wykładów.",
+      subject: "Twoja subskrypcja {{appName}} jest aktywna",
       previewText:
-        "Twoja subskrypcja {{planName}} jest teraz aktywna! Ciesz się nieograniczonym dostępem do 38 modeli AI.",
-      welcomeMessage: "Twoja subskrypcja {{planName}} jest teraz aktywna!",
-      description:
-        "Dziękujemy za upgrade do {{appName}}! Masz teraz pełny dostęp do wszystkich 38 modeli AI bez dziennych limitów. Zacznij rozmawiać z Claude Sonnet 4.5, GPT-5.2 Pro, Gemini 3 Pro i wszystkimi naszymi niecenzurowanymi modelami bez ograniczeń.",
-      nextSteps: {
-        title: "Wszystko gotowe!",
+        "{{privateName}}, jesteś live. 800 creditów/miesiąc, {{modelCount}} modeli, zero ograniczeń.",
+      activeBadge: "Aktywna",
+      greeting: "Hej {{privateName}},",
+      intro:
+        "Twoja subskrypcja {{appName}} jest potwierdzona i gotowa. Masz 800 creditów każdego miesiąca na wszystkie modele — bez dziennych limitów, bez filtrów treści, bez tłumaczenia się.",
+      models: {
+        title: "{{modelCount}} modeli, 3 kategorie",
+        mainstream: "Główny nurt",
+        open: "Open Source",
+        uncensored: "Niecenzurowane",
+      },
+      included: {
+        title: "Co dostajesz każdego miesiąca:",
+        credits: "800 creditów miesięcznie (automatyczne odnowienie)",
+        models: "Dostęp do wszystkich {{modelCount}} modeli AI",
+        nolimits: "Brak dziennych limitów - używaj creditów kiedy chcesz",
+        uncensored: "Niecenzurowane modele bez filtrów treści",
+        packs:
+          "Kupuj dodatkowe pakiety creditów, które nigdy nie wygasają (tylko dla subskrybentów)",
+        cancel: "Anuluj w dowolnym momencie, bez pytań",
+      },
+      cta: "Zacznij rozmawiać",
+      packs: {
+        title: "Potrzebujesz więcej creditów?",
         description:
-          "Twoja subskrypcja jest aktywna i gotowa do użycia. Wskocz od razu i odkryj nieograniczone rozmowy z AI.",
-        cta: "Zacznij rozmawiać już teraz",
+          "Kupuj pakiety creditów w dowolnym momencie - 5 € za 500 creditów. Nigdy nie wygasają i sumują się z miesięcznym przydziałem. Dostępne tylko dla subskrybentów.",
+        cta: "Kup pakiet creditów",
       },
-      support: {
-        title: "Potrzebujesz pomocy?",
-        description:
-          "Nasz zespół wsparcia jest tutaj, aby pomóc Ci z wszelkimi pytaniami dotyczącymi subskrypcji.",
-        cta: "Uzyskaj pomoc",
-      },
-      footer: {
-        message: "Dziękujemy za wspieranie niecenzurowanej AI!",
-        signoff: "Witamy w nieograniczonych rozmowach,\nZespół {{appName}}",
-      },
+      manage: "Zarządzaj lub anuluj subskrypcję w dowolnym momencie w",
+      manageLink: "ustawieniach konta",
+      signoff: "Miłych rozmów,\nZespół {{appName}}",
     },
     admin_notification: {
       title: "Nowa subskrypcja",
       subject: "Nowa subskrypcja - {{planName}}",
-      preview: "Nowa subskrypcja: {{firstName}} zasubskrybował {{planName}}",
+      preview: "Nowa subskrypcja: {{userName}} zasubskrybował {{planName}}",
       message: "Nowy użytkownik zasubskrybował {{appName}}.",
       details: "Szczegóły subskrypcji",
       user_name: "Nazwa użytkownika",

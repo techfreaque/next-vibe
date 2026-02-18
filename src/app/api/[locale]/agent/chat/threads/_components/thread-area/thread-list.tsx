@@ -2,66 +2,45 @@
 
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
-import React from "react";
 
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import type { ChatThread } from "@/app/api/[locale]/agent/chat/hooks/store";
+import type { ChatFolder, ChatThread } from "@/app/api/[locale]/agent/chat/db";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { ThreadItem } from "./thread-item";
 
 interface ThreadListProps {
   threads: ChatThread[];
+  activeThreadId: string | null;
   compact?: boolean;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  user: JwtPayloadType;
+  folders?: Record<string, ChatFolder>;
+  onSelect: (threadId: string) => void;
+  onDelete: (threadId: string) => void;
+  onUpdateTitle: (threadId: string, title: string) => void;
+  onMoveThread?: (threadId: string, folderId: string | null) => void;
+  onPinThread?: (threadId: string, pinned: boolean) => void;
+  onArchiveThread?: (threadId: string, archived: boolean) => void;
 }
 
 export function ThreadList({
   threads,
+  activeThreadId,
   compact = false,
   locale,
   logger,
+  user,
+  folders,
+  onSelect,
+  onDelete,
+  onUpdateTitle,
+  onMoveThread,
+  onPinThread,
+  onArchiveThread,
 }: ThreadListProps): JSX.Element {
-  // Get callbacks and state from context
-  const chat = useChatContext();
-  const {
-    activeThreadId,
-    handleSelectThread: onSelectThread,
-    handleDeleteThread: onDeleteThread,
-    updateThread,
-    user,
-  } = chat;
-
-  // Create wrapper callbacks for thread operations
-  const onUpdateTitle = React.useCallback(
-    (threadId: string, title: string) => {
-      void updateThread(threadId, { title });
-    },
-    [updateThread],
-  );
-
-  const onMoveThread = React.useCallback(
-    (threadId: string, folderId: string | null) => {
-      void updateThread(threadId, { folderId });
-    },
-    [updateThread],
-  );
-
-  const onPinThread = React.useCallback(
-    (threadId: string, pinned: boolean) => {
-      void updateThread(threadId, { pinned });
-    },
-    [updateThread],
-  );
-
-  const onArchiveThread = React.useCallback(
-    (threadId: string, archived: boolean) => {
-      void updateThread(threadId, { archived });
-    },
-    [updateThread],
-  );
   return (
     <Div className="flex flex-col gap-0.5">
       {threads.map((thread) => (
@@ -69,13 +48,13 @@ export function ThreadList({
           key={thread.id}
           thread={thread}
           isActive={thread.id === activeThreadId}
-          onSelect={onSelectThread}
-          onDelete={onDeleteThread}
+          onSelect={onSelect}
+          onDelete={onDelete}
           onUpdateTitle={onUpdateTitle}
           onMoveThread={onMoveThread}
           onPinThread={onPinThread}
           onArchiveThread={onArchiveThread}
-          chat={chat}
+          folders={folders}
           compact={compact}
           locale={locale}
           logger={logger}

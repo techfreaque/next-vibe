@@ -322,6 +322,93 @@ const contactFormTemplate: EmailTemplateDefinition<ContactFormProps> = {
 
 export default contactFormTemplate;
 
+// Admin contact notification template — same component, isForCompany forced true
+const adminContactPropsSchema = z.object({
+  name: z.string(),
+  email: z.string().email(),
+  company: z.string().optional(),
+  subject: z.string(),
+  message: z.string(),
+  userId: z.string().optional(),
+  leadId: z.string().optional(),
+});
+
+type AdminContactProps = z.infer<typeof adminContactPropsSchema>;
+
+export const adminContactFormTemplate: EmailTemplateDefinition<AdminContactProps> =
+  {
+    meta: {
+      id: "admin-contact-form-notification",
+      version: "1.0.0",
+      name: "app.api.emails.templates.admin.contact.meta.name",
+      description: "app.api.emails.templates.admin.contact.meta.description",
+      category: "admin",
+      path: "/contact/email.tsx",
+      defaultSubject: (t) =>
+        t("app.api.contact.email.partner.subject", { subject: "…" }),
+      previewFields: {
+        name: {
+          type: "text",
+          label: "app.api.emails.templates.admin.contact.preview.name",
+          defaultValue: "Max Mustermann",
+          required: true,
+        },
+        email: {
+          type: "email",
+          label: "app.api.emails.templates.admin.contact.preview.email",
+          defaultValue: "max@example.com",
+          required: true,
+        },
+        subject: {
+          type: "text",
+          label: "app.api.emails.templates.admin.contact.preview.subject",
+          defaultValue: "Question about pricing",
+          required: true,
+        },
+        message: {
+          type: "textarea",
+          label: "app.api.emails.templates.admin.contact.preview.message",
+          defaultValue:
+            "I would like to know more about your subscription plans.",
+          required: true,
+        },
+        company: {
+          type: "text",
+          label: "app.api.emails.templates.admin.contact.preview.company",
+          defaultValue: "Acme Corp",
+        },
+        userId: {
+          type: "text",
+          label: "app.api.emails.templates.admin.contact.preview.userId",
+          defaultValue: "example-user-id-123",
+        },
+        leadId: {
+          type: "text",
+          label: "app.api.emails.templates.admin.contact.preview.leadId",
+          defaultValue: "example-lead-id-456",
+        },
+      },
+    },
+    schema: adminContactPropsSchema,
+    component: ({ props, t, locale, recipientEmail, tracking }) =>
+      ContactFormEmail({
+        props: { ...props, isForCompany: true },
+        t,
+        locale,
+        recipientEmail,
+        tracking,
+      }),
+    exampleProps: {
+      name: "Max Mustermann",
+      email: "max@example.com",
+      subject: "Question about pricing",
+      message: "I would like to know more about your subscription plans.",
+      company: "Acme Corp",
+      userId: "example-user-id-123",
+      leadId: "example-lead-id-456",
+    },
+  };
+
 // ============================================================================
 // ADAPTERS (Business Logic - Maps endpoint data to template props)
 // ============================================================================

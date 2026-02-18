@@ -725,7 +725,7 @@ export const translations = {
     // Screen 1: Story
     story: {
       title: "Think of us as your team.",
-      line1: "Most people start with a companion — someone to chat with daily.",
+      line1: "Most people start with a companion - someone to chat with daily.",
       line2: "When you need specific help, switch to a specialist.",
       line3: "It's like having experts on speed dial.",
       continue: "Meet the Team",
@@ -1173,6 +1173,7 @@ export const translations = {
       grok4: "X-AI Grok 4 - premium model",
       grok4Fast:
         "Grok 4 Fast is xAI's latest multimodal model with SOTA cost-efficiency and a 2M token context window. It comes in two flavors: non-reasoning and reasoning.",
+      glm5: "GLM-5 - Z.AI's flagship open-source model for complex systems design and long-horizon agent workflows, rivaling leading closed-source models",
       glm46: "GLM 4.6 - efficient 7B parameter model with large context window",
       glm47:
         "GLM 4.7 - improved 7B model with enhanced reasoning and coding abilities",

@@ -132,15 +132,15 @@ export const translations = {
       unsubscribed: "Unsubscribed",
     },
     emailJourneyVariant: {
-      personalApproach: "Personal Approach",
-      resultsFocused: "Results Focused",
-      personalResults: "Personal Results",
+      uncensoredConvert: "Uncensored Convert",
+      sideHustle: "Side Hustle",
+      quietRecommendation: "Quiet Recommendation",
     },
     emailJourneyVariantFilter: {
       all: "All",
-      personalApproach: "Personal Approach",
-      resultsFocused: "Results Focused",
-      personalResults: "Personal Results",
+      uncensoredConvert: "Uncensored Convert",
+      sideHustle: "Side Hustle",
+      quietRecommendation: "Quiet Recommendation",
     },
     sortOrder: {
       asc: "Ascending",

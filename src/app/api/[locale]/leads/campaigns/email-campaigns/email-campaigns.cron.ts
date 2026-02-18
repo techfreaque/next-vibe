@@ -66,9 +66,9 @@ function sortStagesByPriority(
  * Check if a stage should be processed based on configuration
  */
 function shouldProcessStage(config: EmailCampaignConfigType): boolean {
-  // Check if current time is within enabled hours
+  // Check if current time is within enabled hours (UTC)
   const now = new Date();
-  const currentHour = now.getHours();
+  const currentHour = now.getUTCHours();
 
   if (
     currentHour < config.enabledHours.start ||
@@ -77,8 +77,8 @@ function shouldProcessStage(config: EmailCampaignConfigType): boolean {
     return false;
   }
 
-  // Check if current day is enabled (0 = Sunday, 1 = Monday, etc.)
-  const currentDay = now.getDay();
+  // Check if current day is enabled (UTC, 0 = Sunday, 1 = Monday, etc.)
+  const currentDay = now.getUTCDay();
   if (!config.enabledDays.includes(currentDay)) {
     return false;
   }
@@ -183,10 +183,10 @@ function validateEmailCampaignTask(
       return success(false);
     }
 
-    // Check if we're within enabled time window
+    // Check if we're within enabled time window (UTC)
     const now = new Date();
-    const currentHour = now.getHours();
-    const currentDay = now.getDay();
+    const currentHour = now.getUTCHours();
+    const currentDay = now.getUTCDay();
 
     if (
       currentHour < config.enabledHours.start ||
@@ -247,10 +247,27 @@ export async function execute(
 
     const result = createEmptyEmailCampaignResult();
 
+    // Only process stages if current time is within the enabled window
+    if (!shouldProcessStage(config)) {
+      logger.debug("Outside enabled time window, skipping all stages");
+      return success(result);
+    }
+
+    // Bootstrap PENDING leads into active campaigns before sending
+    // This transitions PENDING → CAMPAIGN_RUNNING and creates emailCampaigns entries
+    const bootstrapResult =
+      await emailCampaignsRepository.bootstrapPendingLeads(
+        config.batchSize,
+        logger,
+      );
+    if (bootstrapResult.success) {
+      logger.info("Bootstrapped pending leads", {
+        count: bootstrapResult.data,
+      });
+    }
+
     // Get enabled stages sorted by priority
-    const stagesToProcess = sortStagesByPriority(
-      config.enabledStages.filter(() => shouldProcessStage(config)),
-    );
+    const stagesToProcess = sortStagesByPriority(config.enabledStages);
 
     logger.debug("Processing stages in order", {
       stages: stagesToProcess,

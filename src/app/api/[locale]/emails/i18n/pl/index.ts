@@ -488,7 +488,7 @@ export const translations: typeof enTranslations = {
     default: "Wystąpił błąd",
   },
   template: {
-    tagline: "Twoja platforma czatu zasilana AI",
+    tagline: "AI bez ograniczeń",
   },
   footer: {
     visitWebsite: "Odwiedź stronę",
@@ -667,14 +667,71 @@ export const translations: typeof enTranslations = {
           description: "E-mail potwierdzający udaną subskrypcję",
         },
         preview: {
-          firstName: "Imię",
-          firstName_description: "Imię użytkownika",
+          privateName: "Imię prywatne",
+          privateName_description: "Prywatne imię użytkownika",
           userId: "ID użytkownika",
           userId_description: "Unikalny identyfikator użytkownika",
           leadId: "ID leada",
           leadId_description: "ID powiązanego leada",
           planName: "Nazwa planu",
           planName_description: "Nazwa planu subskrypcji",
+        },
+      },
+    },
+    admin: {
+      signup: {
+        meta: {
+          name: "Admin: Nowa rejestracja użytkownika",
+          description: "Powiadomienie admina o nowej rejestracji użytkownika",
+        },
+        preview: {
+          privateName: "Imię prywatne",
+          publicName: "Nazwa publiczna",
+          email: "E-mail",
+          userId: "ID użytkownika",
+          subscribeToNewsletter: "Subskrypcja newslettera",
+        },
+      },
+      subscription: {
+        meta: {
+          name: "Admin: Nowa subskrypcja",
+          description: "Powiadomienie admina o nowej subskrypcji",
+        },
+        preview: {
+          privateName: "Imię prywatne",
+          publicName: "Nazwa publiczna",
+          email: "E-mail",
+          planName: "Nazwa planu",
+          statusName: "Status",
+        },
+      },
+      user_create: {
+        meta: {
+          name: "Admin: Nowy użytkownik utworzony",
+          description: "Powiadomienie admina o utworzeniu konta użytkownika",
+        },
+        preview: {
+          privateName: "Imię prywatne",
+          publicName: "Nazwa publiczna",
+          email: "E-mail",
+          userId: "ID użytkownika",
+          leadId: "ID leada",
+        },
+      },
+      contact: {
+        meta: {
+          name: "Admin: Zgłoszenie formularza kontaktowego",
+          description:
+            "Powiadomienie admina o przesłaniu formularza kontaktowego",
+        },
+        preview: {
+          name: "Nazwa nadawcy",
+          email: "E-mail nadawcy",
+          subject: "Temat",
+          message: "Wiadomość",
+          company: "Firma",
+          userId: "ID użytkownika",
+          leadId: "ID leada",
         },
       },
     },

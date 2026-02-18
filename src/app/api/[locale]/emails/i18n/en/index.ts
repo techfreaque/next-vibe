@@ -487,7 +487,7 @@ export const translations = {
     default: "An error occurred",
   },
   template: {
-    tagline: "Your AI-powered chat platform",
+    tagline: "AI without the guardrails",
   },
   footer: {
     visitWebsite: "Visit Website",
@@ -664,14 +664,70 @@ export const translations = {
           description: "Confirmation email for successful subscription",
         },
         preview: {
-          firstName: "First Name",
-          firstName_description: "First name of the user",
+          privateName: "Private Name",
+          privateName_description: "Private name of the user",
           userId: "User ID",
           userId_description: "Unique identifier for the user",
           leadId: "Lead ID",
           leadId_description: "ID of the associated lead",
           planName: "Plan Name",
           planName_description: "Name of the subscription plan",
+        },
+      },
+    },
+    admin: {
+      signup: {
+        meta: {
+          name: "Admin: New User Signup",
+          description: "Admin notification when a new user registers",
+        },
+        preview: {
+          privateName: "Private Name",
+          publicName: "Public Name",
+          email: "Email",
+          userId: "User ID",
+          subscribeToNewsletter: "Newsletter Subscription",
+        },
+      },
+      subscription: {
+        meta: {
+          name: "Admin: New Subscription",
+          description: "Admin notification when a user subscribes",
+        },
+        preview: {
+          privateName: "Private Name",
+          publicName: "Public Name",
+          email: "Email",
+          planName: "Plan Name",
+          statusName: "Status",
+        },
+      },
+      user_create: {
+        meta: {
+          name: "Admin: New User Created",
+          description: "Admin notification when a user account is created",
+        },
+        preview: {
+          privateName: "Private Name",
+          publicName: "Public Name",
+          email: "Email",
+          userId: "User ID",
+          leadId: "Lead ID",
+        },
+      },
+      contact: {
+        meta: {
+          name: "Admin: Contact Form Submission",
+          description: "Admin notification when a contact form is submitted",
+        },
+        preview: {
+          name: "Sender Name",
+          email: "Sender Email",
+          subject: "Subject",
+          message: "Message",
+          company: "Company",
+          userId: "User ID",
+          leadId: "Lead ID",
         },
       },
     },

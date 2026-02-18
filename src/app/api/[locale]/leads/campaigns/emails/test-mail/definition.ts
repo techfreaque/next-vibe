@@ -367,7 +367,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         campaignType: CampaignType.LEAD_CAMPAIGN,
-        emailJourneyVariant: EmailJourneyVariant.PERSONAL_APPROACH,
+        emailJourneyVariant: EmailJourneyVariant.UNCENSORED_CONVERT,
         emailCampaignStage: EmailCampaignStage.INITIAL,
         testEmail: "test@example.com",
         leadData: {

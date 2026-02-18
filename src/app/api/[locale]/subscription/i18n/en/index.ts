@@ -348,34 +348,44 @@ export const translations = {
   // Email translations
   email: {
     success: {
-      title: "Welcome to {{planName}}, {{firstName}}!",
-      subject: "Your {{appName}} Subscription is Active - Unlimited AI Awaits",
+      headline: "You're in. No filters, no lectures.",
+      subject: "Your {{appName}} subscription is active",
       previewText:
-        "Your {{planName}} subscription is now active! Enjoy unlimited access to 38 AI models.",
-      welcomeMessage: "Your {{planName}} subscription is now active!",
-      description:
-        "Thank you for upgrading to {{appName}}! You now have full access to all 38 AI models with no daily limits. Start chatting with Claude Sonnet 4.5, GPT-5.2 Pro, Gemini 3 Pro, and all our uncensored models without restrictions.",
-      nextSteps: {
-        title: "You're All Set!",
+        "{{privateName}}, you're live. 800 credits/month, {{modelCount}} models, zero restrictions.",
+      activeBadge: "Active",
+      greeting: "Hey {{privateName}},",
+      intro:
+        "Your {{appName}} subscription is confirmed and ready. You have 800 credits every month across all models — no daily caps, no content filters, no explanations required.",
+      models: {
+        title: "{{modelCount}} models, 3 categories",
+        mainstream: "Mainstream",
+        open: "Open Source",
+        uncensored: "Uncensored",
+      },
+      included: {
+        title: "What you get every month:",
+        credits: "800 credits per month (auto-renewed)",
+        models: "Access to all {{modelCount}} AI models",
+        nolimits: "No daily limits - use all credits whenever you want",
+        uncensored: "Uncensored models with no content filters",
+        packs: "Buy extra credit packs that never expire (subscribers only)",
+        cancel: "Cancel anytime, no questions asked",
+      },
+      cta: "Start Chatting Now",
+      packs: {
+        title: "Need more credits?",
         description:
-          "Your subscription is active and ready to use. Jump right in and start exploring unlimited AI conversations.",
-        cta: "Start Chatting Now",
+          "Buy credit packs anytime - €5 for 500 credits. They never expire and stack on top of your monthly allowance. Only available to subscribers.",
+        cta: "Buy Credit Pack",
       },
-      support: {
-        title: "Need Help?",
-        description:
-          "Our support team is here to assist you with any questions about your subscription.",
-        cta: "Get Help",
-      },
-      footer: {
-        message: "Thank you for supporting uncensored AI!",
-        signoff: "Welcome to unlimited conversations,\nThe {{appName}} Team",
-      },
+      manage: "Manage or cancel your subscription anytime in",
+      manageLink: "your account settings",
+      signoff: "Happy chatting,\nThe {{appName}} Team",
     },
     admin_notification: {
       title: "New Subscription",
       subject: "New Subscription - {{planName}}",
-      preview: "New subscription: {{firstName}} subscribed to {{planName}}",
+      preview: "New subscription: {{userName}} subscribed to {{planName}}",
       message: "A new user has subscribed to {{appName}}.",
       details: "Subscription Details",
       user_name: "User Name",

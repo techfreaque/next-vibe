@@ -37,7 +37,9 @@ function flattenMessage(msg: ModelMessage): string {
   if (typeof content === "string") {
     parts.push(content);
   } else if (Array.isArray(content)) {
-    for (const part of content as Array<Record<string, string | number | boolean | null | undefined>>) {
+    for (const part of content as Array<
+      Record<string, string | number | boolean | null | undefined>
+    >) {
       if (part.type === "text" && typeof part.text === "string") {
         parts.push(part.text);
       } else if (part.type === "tool-call") {

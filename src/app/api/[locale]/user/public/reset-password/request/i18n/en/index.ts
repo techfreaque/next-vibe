@@ -9,14 +9,15 @@ export const translations = {
     title: "Reset Your {{appName}} Password",
     subject: "Password Reset Request - {{appName}}",
     previewText:
-      "Reset your password to regain access to your {{appName}} account and continue chatting with 38 AI models.",
+      "Reset your password to regain access to your {{appName}} account and continue chatting with {{modelCount}} AI models.",
     greeting: "Hello,",
     requestInfo:
       "We received a request to reset the password for your {{appName}} account.",
     instructions:
-      "Click the button below to create a new password. This link is valid for 24 hours and can only be used once.",
+      "Click the button below to create a new password. This link is valid for {{hours}} hours and can only be used once.",
     buttonText: "Reset My Password",
-    expirationInfo: "This secure link expires in 24 hours for your protection.",
+    expirationInfo:
+      "This secure link expires in {{hours}} hours for your protection.",
     securityInfo:
       "For your security, this password reset was requested from {{ipAddress}} on {{requestTime}}.",
     didntRequest: "Didn't Request This?",
@@ -54,7 +55,7 @@ export const translations = {
     },
     deliveryInfo: {
       estimatedTime: "within 5 minutes",
-      expiresAt: "24 hours from now",
+      expiresAt: "4 hours from now",
     },
     nextSteps: {
       checkEmail: "Check your email inbox and spam folder",

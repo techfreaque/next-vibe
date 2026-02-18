@@ -133,15 +133,15 @@ export const translations: typeof enTranslations = {
       unsubscribed: "Wypisany",
     },
     emailJourneyVariant: {
-      personalApproach: "Podejście personalne",
-      resultsFocused: "Skupiony na wynikach",
-      personalResults: "Wyniki personalne",
+      uncensoredConvert: "Niecenzurowana konwersja",
+      sideHustle: "Dodatkowy zarobek",
+      quietRecommendation: "Cicha rekomendacja",
     },
     emailJourneyVariantFilter: {
       all: "Wszystkie",
-      personalApproach: "Podejście personalne",
-      resultsFocused: "Skupiony na wynikach",
-      personalResults: "Wyniki personalne",
+      uncensoredConvert: "Niecenzurowana konwersja",
+      sideHustle: "Dodatkowy zarobek",
+      quietRecommendation: "Cicha rekomendacja",
     },
     sortOrder: {
       asc: "Rosnąco",

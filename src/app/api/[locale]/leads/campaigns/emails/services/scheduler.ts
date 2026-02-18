@@ -80,7 +80,6 @@ export class CampaignSchedulerService {
       LeadStatus.SUBSCRIPTION_CONFIRMED,
       LeadStatus.BOUNCED,
       LeadStatus.INVALID,
-      LeadStatus.PENDING,
     ];
 
     return (

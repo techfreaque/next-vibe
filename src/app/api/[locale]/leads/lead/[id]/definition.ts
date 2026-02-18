@@ -782,7 +782,7 @@ const { PATCH } = createEndpoint({
           campaignTracking: {
             source: LeadSource.REFERRAL,
             currentCampaignStage: EmailCampaignStage.FOLLOWUP_1,
-            emailJourneyVariant: EmailJourneyVariant.RESULTS_FOCUSED,
+            emailJourneyVariant: EmailJourneyVariant.SIDE_HUSTLE,
             emailsSent: 7,
             lastEmailSentAt: new Date("2024-01-20T10:00:00Z"),
           },
@@ -1170,7 +1170,7 @@ const { GET } = createEndpoint({
           campaignTracking: {
             source: LeadSource.WEBSITE,
             currentCampaignStage: EmailCampaignStage.INITIAL,
-            emailJourneyVariant: EmailJourneyVariant.PERSONAL_APPROACH,
+            emailJourneyVariant: EmailJourneyVariant.UNCENSORED_CONVERT,
             emailsSent: 5,
             lastEmailSentAt: new Date("2024-01-15T10:00:00Z"),
           },

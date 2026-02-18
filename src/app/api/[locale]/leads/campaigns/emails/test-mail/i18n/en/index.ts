@@ -141,6 +141,8 @@ export const translations = {
     },
     widget: {
       title: "Send Test Email",
+      send: "Send Test Email",
+      sending: "Sending...",
       successMessage: "Test email sent successfully",
       sentTo: "Sent to: ",
       subject: "Subject: ",

@@ -13,6 +13,7 @@ import {
 import type { ReactElement } from "react";
 import { z } from "zod";
 
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -69,6 +70,7 @@ function PasswordResetConfirmEmail({
         "app.api.user.public.resetPassword.confirm.email.previewText",
         {
           appName,
+          modelCount: TOTAL_MODEL_COUNT,
         },
       )}
       recipientEmail={recipientEmail}
@@ -108,7 +110,12 @@ function PasswordResetConfirmEmail({
           marginBottom: "16px",
         }}
       >
-        {t("app.api.user.public.resetPassword.confirm.email.loginInstructions")}
+        {t(
+          "app.api.user.public.resetPassword.confirm.email.loginInstructions",
+          {
+            modelCount: TOTAL_MODEL_COUNT,
+          },
+        )}
       </Text>
 
       <Section style={{ marginTop: "32px" }}>

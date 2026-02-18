@@ -269,7 +269,7 @@ export const translations = {
       mission: {
         title: "Our Mission",
         description:
-          "To provide a unified platform for both private AI conversations and public community discussions. We believe you should control your privacy level—from local-only chats to public forum threads—while accessing the best AI models without censorship.",
+          "To provide a unified platform for both private AI conversations and public community discussions. We believe you should control your privacy level - from local-only chats to public forum threads - while accessing the best AI models without censorship.",
       },
       story: {
         title: "Our Story",

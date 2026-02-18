@@ -120,9 +120,9 @@ export const translations = {
     },
     // Email journey variant options
     emailJourneyVariants: {
-      personalApproach: "Personal Approach",
-      resultsFocused: "Results Focused",
-      personalResults: "Personal Results",
+      uncensoredConvert: "Uncensored Convert",
+      sideHustle: "Side Hustle",
+      quietRecommendation: "Quiet Recommendation",
     },
     // Email campaign stage options
     emailCampaignStages: {

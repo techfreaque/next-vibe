@@ -35,9 +35,9 @@ export const PRODUCTION_CONFIG: CampaignStarterConfigType = {
     end: 15, // 3 PM UTC
   },
   leadsPerWeek: {
-    "en-GLOBAL": 0, // 100 leads per week for English (Global)
-    "de-DE": 0, // 50 leads per week for German (Germany)
-    "pl-PL": 0, // 30 leads per week for Polish (Poland)
+    "en-GLOBAL": 100, // 100 leads per week for English (Global)
+    "de-DE": 50, // 50 leads per week for German (Germany)
+    "pl-PL": 30, // 30 leads per week for Polish (Poland)
   },
   // Cron settings
   schedule: "*/3 * * * *",
@@ -95,7 +95,7 @@ export function getDefaultCronSettings(): CronSettings {
   const isProduction = env.NODE_ENV === Environment.PRODUCTION;
   return {
     // eslint-disable-next-line i18next/no-literal-string
-    schedule: isProduction ? "*/3 * * * *" : "*/1 * * * *", // Every 3 min (prod) or 1 min (dev)
+    schedule: isProduction ? "*/5 * * * *" : "*/1 * * * *", // Every 5 min (prod) or 1 min (dev)
 
     enabled: true,
     priority: isProduction ? CronTaskPriority.MEDIUM : CronTaskPriority.LOW,

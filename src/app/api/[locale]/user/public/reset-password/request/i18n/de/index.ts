@@ -10,15 +10,15 @@ export const translations: typeof enTranslations = {
     title: "Setzen Sie Ihr {{appName}}-Passwort zurück",
     subject: "Anfrage zur Passwortzurücksetzung - {{appName}}",
     previewText:
-      "Setzen Sie Ihr Passwort zurück, um wieder Zugriff auf Ihr {{appName}}-Konto zu erhalten und mit 38 KI-Modellen zu chatten.",
+      "Setzen Sie Ihr Passwort zurück, um wieder Zugriff auf Ihr {{appName}}-Konto zu erhalten und mit {{modelCount}} KI-Modellen zu chatten.",
     greeting: "Hallo,",
     requestInfo:
       "Wir haben eine Anfrage zur Zurücksetzung des Passworts für Ihr {{appName}}-Konto erhalten.",
     instructions:
-      "Klicken Sie auf die Schaltfläche unten, um ein neues Passwort zu erstellen. Dieser Link ist 24 Stunden gültig und kann nur einmal verwendet werden.",
+      "Klicken Sie auf die Schaltfläche unten, um ein neues Passwort zu erstellen. Dieser Link ist {{hours}} Stunden gültig und kann nur einmal verwendet werden.",
     buttonText: "Mein Passwort zurücksetzen",
     expirationInfo:
-      "Dieser sichere Link läuft in 24 Stunden zu Ihrem Schutz ab.",
+      "Dieser sichere Link läuft in {{hours}} Stunden zu Ihrem Schutz ab.",
     securityInfo:
       "Zu Ihrer Sicherheit wurde diese Passwortzurücksetzung von {{ipAddress}} am {{requestTime}} angefordert.",
     didntRequest: "Nicht angefordert?",
@@ -58,7 +58,7 @@ export const translations: typeof enTranslations = {
     },
     deliveryInfo: {
       estimatedTime: "innerhalb von 5 Minuten",
-      expiresAt: "24 Stunden ab jetzt",
+      expiresAt: "4 Stunden ab jetzt",
     },
     nextSteps: {
       checkEmail: "Überprüfen Sie Ihren E-Mail-Eingang und Spam-Ordner",

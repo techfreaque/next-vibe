@@ -3,7 +3,7 @@
  * Refactored to separate template from business logic
  */
 
-import { Button, Section, Text } from "@react-email/components";
+import { Button, Column, Row, Section, Text } from "@react-email/components";
 import {
   fail,
   success,
@@ -16,6 +16,10 @@ import { z } from "zod";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { env } from "@/config/env";
+import {
+  FEATURED_MODELS,
+  TOTAL_MODEL_COUNT,
+} from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -57,136 +61,74 @@ function SignupWelcomeEmail({
   recipientEmail: string;
   tracking: TrackingContext;
 }): ReactElement {
+  const appName = t("config.appName");
+
+  const modelCategories = [
+    {
+      label: t("app.api.user.public.signup.email.models.mainstream"),
+      models: FEATURED_MODELS.mainstream,
+      color: "#1e40af",
+      bg: "#dbeafe",
+    },
+    {
+      label: t("app.api.user.public.signup.email.models.open"),
+      models: FEATURED_MODELS.open,
+      color: "#166534",
+      bg: "#dcfce7",
+    },
+    {
+      label: t("app.api.user.public.signup.email.models.uncensored"),
+      models: FEATURED_MODELS.uncensored,
+      color: "#7c2d12",
+      bg: "#fed7aa",
+    },
+  ];
+
   return (
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("app.api.user.public.signup.email.welcomeMessage")}
-      previewText={t("app.api.user.public.signup.email.previewText")}
+      title={t("app.api.user.public.signup.email.headline")}
+      previewText={t("app.api.user.public.signup.email.previewText", {
+        privateName: props.privateName,
+        modelCount: TOTAL_MODEL_COUNT,
+      })}
       recipientEmail={recipientEmail}
       tracking={tracking}
     >
-      {/* Description */}
+      {/* Personal greeting */}
       <Text
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
           color: "#374151",
-          marginBottom: "8px",
-          textAlign: "center",
-          fontWeight: "500",
+          marginBottom: "6px",
         }}
       >
-        {t("app.api.user.public.signup.email.title", {
-          appName: t("config.appName"),
+        {t("app.api.user.public.signup.email.greeting", {
           privateName: props.privateName,
         })}
       </Text>
 
-      {/* Description */}
       <Text
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
           color: "#374151",
-          marginBottom: "32px",
-          textAlign: "left",
+          marginBottom: "28px",
         }}
       >
-        {t("app.api.user.public.signup.email.description")}
+        {t("app.api.user.public.signup.email.intro", { appName })}
       </Text>
 
-      {/* What You Get Section */}
+      {/* Model showcase */}
       <Section
         style={{
-          backgroundColor: "#f0f9ff",
+          backgroundColor: "#f8fafc",
           borderRadius: "12px",
           padding: "24px",
-          marginBottom: "32px",
-          border: "2px solid #3b82f6",
-        }}
-      >
-        <Text
-          style={{
-            fontSize: "18px",
-            lineHeight: "1.4",
-            color: "#111827",
-            fontWeight: "700",
-            marginBottom: "20px",
-            textAlign: "center",
-          }}
-        >
-          {t("app.api.user.public.signup.email.whatYouGet")}
-        </Text>
-
-        {/* Features List */}
-        {[
-          t("app.api.user.public.signup.email.feature1"),
-          t("app.api.user.public.signup.email.feature2"),
-          t("app.api.user.public.signup.email.feature3"),
-          t("app.api.user.public.signup.email.feature4"),
-          t("app.api.user.public.signup.email.feature5"),
-        ].map((feature, index) => (
-          <div
-            key={index}
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              marginBottom: "12px",
-            }}
-          >
-            <span
-              style={{
-                color: "#3b82f6",
-                fontSize: "20px",
-                marginRight: "12px",
-                lineHeight: "1",
-              }}
-            >
-              ✓
-            </span>
-            <Text
-              style={{
-                fontSize: "15px",
-                lineHeight: "1.5",
-                color: "#374151",
-                margin: "0",
-              }}
-            >
-              {feature}
-            </Text>
-          </div>
-        ))}
-      </Section>
-
-      {/* CTA Button */}
-      <Section style={{ textAlign: "center", marginBottom: "32px" }}>
-        <Button
-          href={`${tracking.baseUrl}/${locale}`}
-          style={{
-            backgroundColor: "#3b82f6",
-            borderRadius: "8px",
-            color: "#ffffff",
-            fontSize: "18px",
-            padding: "16px 40px",
-            textDecoration: "none",
-            fontWeight: "700",
-            display: "inline-block",
-            boxShadow: "0 4px 6px rgba(59, 130, 246, 0.4)",
-          }}
-        >
-          {t("app.api.user.public.signup.email.ctaButton")}
-        </Button>
-      </Section>
-
-      {/* Need More Section */}
-      <Section
-        style={{
-          backgroundColor: "#fafafa",
-          borderRadius: "8px",
-          padding: "20px",
-          marginBottom: "32px",
-          textAlign: "center",
+          marginBottom: "24px",
+          border: "1px solid #e2e8f0",
         }}
       >
         <Text
@@ -194,35 +136,182 @@ function SignupWelcomeEmail({
             fontSize: "16px",
             fontWeight: "700",
             color: "#111827",
-            marginBottom: "8px",
+            marginBottom: "16px",
+            textAlign: "center",
           }}
         >
-          {t("app.api.user.public.signup.email.needMore")}
+          {t("app.api.user.public.signup.email.models.title", {
+            modelCount: TOTAL_MODEL_COUNT,
+          })}
+        </Text>
+
+        {modelCategories.map((cat, ci) => (
+          <div key={ci} style={{ marginBottom: ci < 2 ? "16px" : "0" }}>
+            <Text
+              style={{
+                fontSize: "12px",
+                fontWeight: "700",
+                color: "#6b7280",
+                letterSpacing: "0.07em",
+                textTransform: "uppercase",
+                marginBottom: "8px",
+              }}
+            >
+              {cat.label}
+            </Text>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+              {cat.models.map((m, i) => (
+                <span
+                  key={i}
+                  style={{
+                    display: "inline-block",
+                    backgroundColor: cat.bg,
+                    color: cat.color,
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    padding: "4px 10px",
+                    borderRadius: "6px",
+                    marginRight: "6px",
+                    marginBottom: "4px",
+                  }}
+                >
+                  {m}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </Section>
+
+      {/* What you get */}
+      <Section
+        style={{
+          backgroundColor: "#eff6ff",
+          borderRadius: "12px",
+          padding: "24px",
+          marginBottom: "28px",
+          border: "2px solid #bfdbfe",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: "16px",
+            fontWeight: "700",
+            color: "#1e40af",
+            marginBottom: "14px",
+          }}
+        >
+          {t("app.api.user.public.signup.email.free.title")}
+        </Text>
+
+        {[
+          t("app.api.user.public.signup.email.free.credits"),
+          t("app.api.user.public.signup.email.free.allModels", {
+            modelCount: TOTAL_MODEL_COUNT,
+          }),
+          t("app.api.user.public.signup.email.free.uncensored"),
+          t("app.api.user.public.signup.email.free.chatModes"),
+          t("app.api.user.public.signup.email.free.noCard"),
+        ].map((item, i) => (
+          <Row key={i} style={{ marginBottom: "10px" }}>
+            <Column
+              style={{
+                width: "24px",
+                verticalAlign: "top",
+                paddingTop: "1px",
+              }}
+            >
+              <Text
+                style={{
+                  color: "#2563eb",
+                  fontWeight: "700",
+                  fontSize: "15px",
+                  lineHeight: "1.5",
+                  margin: "0",
+                }}
+              >
+                ✓
+              </Text>
+            </Column>
+            <Column style={{ verticalAlign: "top" }}>
+              <Text
+                style={{
+                  fontSize: "15px",
+                  lineHeight: "1.5",
+                  color: "#1e3a8a",
+                  margin: "0",
+                }}
+              >
+                {item}
+              </Text>
+            </Column>
+          </Row>
+        ))}
+      </Section>
+
+      {/* Primary CTA */}
+      <Section style={{ textAlign: "center", marginBottom: "28px" }}>
+        <Button
+          href={`${tracking.baseUrl}/${locale}`}
+          style={{
+            backgroundColor: "#2563eb",
+            borderRadius: "8px",
+            color: "#ffffff",
+            fontSize: "17px",
+            padding: "16px 44px",
+            textDecoration: "none",
+            fontWeight: "700",
+            boxShadow: "0 4px 12px rgba(37, 99, 235, 0.35)",
+          }}
+        >
+          {t("app.api.user.public.signup.email.ctaButton")}
+        </Button>
+      </Section>
+
+      {/* Upgrade nudge */}
+      <Section
+        style={{
+          backgroundColor: "#fafafa",
+          borderRadius: "10px",
+          padding: "20px 24px",
+          marginBottom: "28px",
+          border: "1px solid #e5e7eb",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: "15px",
+            fontWeight: "700",
+            color: "#111827",
+            marginBottom: "6px",
+          }}
+        >
+          {t("app.api.user.public.signup.email.upgrade.title")}
         </Text>
         <Text
           style={{
             fontSize: "14px",
             color: "#6b7280",
-            marginBottom: "16px",
+            lineHeight: "1.6",
+            marginBottom: "14px",
           }}
         >
-          {t("app.api.user.public.signup.email.needMoreDesc")}
+          {t("app.api.user.public.signup.email.upgrade.desc")}
         </Text>
         <Button
           href={`${tracking.baseUrl}/${locale}/subscription`}
           style={{
             backgroundColor: "#ffffff",
-            border: "2px solid #3b82f6",
+            border: "1.5px solid #2563eb",
             borderRadius: "6px",
-            color: "#3b82f6",
+            color: "#2563eb",
             fontSize: "14px",
-            padding: "10px 24px",
+            padding: "10px 20px",
             textDecoration: "none",
             fontWeight: "600",
-            display: "inline-block",
           }}
         >
-          {t("app.api.user.public.signup.email.viewPlans")}
+          {t("app.api.user.public.signup.email.upgrade.cta")}
         </Button>
       </Section>
 
@@ -236,17 +325,15 @@ function SignupWelcomeEmail({
           whiteSpace: "pre-line",
         }}
       >
-        {t("app.api.user.public.signup.email.signoff", {
-          appName: t("config.appName"),
-        })}
+        {t("app.api.user.public.signup.email.signoff", { appName })}
       </Text>
 
-      {/* P.S. */}
+      {/* Privacy PS */}
       <Text
         style={{
           fontSize: "13px",
           lineHeight: "1.6",
-          color: "#6b7280",
+          color: "#9ca3af",
           fontStyle: "italic",
           borderTop: "1px solid #e5e7eb",
           paddingTop: "16px",
@@ -671,6 +758,87 @@ function renderAdminNotificationEmailContent(
     </EmailTemplate>
   );
 }
+
+// Admin signup notification schema and template definition
+const adminSignupPropsSchema = z.object({
+  privateName: z.string(),
+  publicName: z.string(),
+  email: z.string().email(),
+  userId: z.string(),
+  subscribeToNewsletter: z.boolean().optional(),
+});
+
+type AdminSignupProps = z.infer<typeof adminSignupPropsSchema>;
+
+export const adminSignupNotificationTemplate: EmailTemplateDefinition<AdminSignupProps> =
+  {
+    meta: {
+      id: "admin-signup-notification",
+      version: "1.0.0",
+      name: "app.api.emails.templates.admin.signup.meta.name",
+      description: "app.api.emails.templates.admin.signup.meta.description",
+      category: "admin",
+      path: "/user/public/signup/email.tsx",
+      defaultSubject: (t) =>
+        t("app.api.user.public.signup.admin_notification.subject", {
+          userName: "User",
+        }),
+      previewFields: {
+        privateName: {
+          type: "text",
+          label: "app.api.emails.templates.admin.signup.preview.privateName",
+          defaultValue: "Max",
+          required: true,
+        },
+        publicName: {
+          type: "text",
+          label: "app.api.emails.templates.admin.signup.preview.publicName",
+          defaultValue: "Max Mustermann",
+          required: true,
+        },
+        email: {
+          type: "email",
+          label: "app.api.emails.templates.admin.signup.preview.email",
+          defaultValue: "max@example.com",
+          required: true,
+        },
+        userId: {
+          type: "text",
+          label: "app.api.emails.templates.admin.signup.preview.userId",
+          defaultValue: "example-user-id-123",
+          required: true,
+        },
+        subscribeToNewsletter: {
+          type: "boolean",
+          label:
+            "app.api.emails.templates.admin.signup.preview.subscribeToNewsletter",
+          defaultValue: false,
+        },
+      },
+    },
+    schema: adminSignupPropsSchema,
+    component: ({ props, t, locale, recipientEmail }) =>
+      renderAdminNotificationEmailContent(
+        t,
+        locale,
+        recipientEmail,
+        {
+          privateName: props.privateName,
+          publicName: props.publicName,
+          email: props.email,
+          id: props.userId,
+          createdAt: new Date(),
+        },
+        { subscribeToNewsletter: props.subscribeToNewsletter },
+      ),
+    exampleProps: {
+      privateName: "Max",
+      publicName: "Max Mustermann",
+      email: "max@example.com",
+      userId: "example-user-id-123",
+      subscribeToNewsletter: false,
+    },
+  };
 
 /**
  * Admin Notification Email Function

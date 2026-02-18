@@ -191,7 +191,7 @@ export function CharacterEditContainer({
           />
           {form && (
             <ModelSelector
-              modelSelection={form.watch("modelSelection")}
+              modelSelection={form.watch("modelSelection") ?? undefined}
               onChange={(selection) =>
                 form.setValue("modelSelection", selection)
               }
@@ -595,7 +595,7 @@ function CustomizeAndAddButton({
       navigation.push(createFavoriteDefinitions.default.POST, {
         data: {
           characterId: characterId,
-          icon: fullChar.icon,
+          icon: fullChar.icon ?? undefined,
           name: fullChar.name,
           tagline: fullChar.tagline,
           description: fullChar.description,

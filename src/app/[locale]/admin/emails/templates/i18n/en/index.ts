@@ -209,5 +209,127 @@ export const translations = {
         },
       },
     },
+    admin: {
+      signup: {
+        meta: {
+          name: "Admin: New User Signup",
+          description: "Admin notification when a new user registers",
+        },
+        preview: {
+          privateName: {
+            label: "Private Name",
+            description: "User's private name",
+          },
+          publicName: {
+            label: "Public Name",
+            description: "User's public display name",
+          },
+          email: {
+            label: "Email",
+            description: "User's email address",
+          },
+          userId: {
+            label: "User ID",
+            description: "Unique identifier for the user",
+          },
+          subscribeToNewsletter: {
+            label: "Newsletter Subscription",
+            description: "Whether the user subscribed to the newsletter",
+          },
+        },
+      },
+      subscription: {
+        meta: {
+          name: "Admin: New Subscription",
+          description: "Admin notification when a user subscribes",
+        },
+        preview: {
+          privateName: {
+            label: "Private Name",
+            description: "User's private name",
+          },
+          publicName: {
+            label: "Public Name",
+            description: "User's public display name",
+          },
+          email: {
+            label: "Email",
+            description: "User's email address",
+          },
+          planName: {
+            label: "Plan Name",
+            description: "Name of the subscription plan",
+          },
+          statusName: {
+            label: "Status",
+            description: "Current subscription status",
+          },
+        },
+      },
+      user_create: {
+        meta: {
+          name: "Admin: New User Created",
+          description: "Admin notification when a user account is created",
+        },
+        preview: {
+          privateName: {
+            label: "Private Name",
+            description: "User's private name",
+          },
+          publicName: {
+            label: "Public Name",
+            description: "User's public display name",
+          },
+          email: {
+            label: "Email",
+            description: "User's email address",
+          },
+          userId: {
+            label: "User ID",
+            description: "Unique identifier for the user",
+          },
+          leadId: {
+            label: "Lead ID",
+            description: "Lead tracking identifier (optional)",
+          },
+        },
+      },
+      contact: {
+        meta: {
+          name: "Admin: Contact Form Submission",
+          description: "Admin notification when a contact form is submitted",
+        },
+        preview: {
+          name: {
+            label: "Sender Name",
+            description: "Name of person who submitted the form",
+          },
+          email: {
+            label: "Sender Email",
+            description: "Email address of the sender",
+          },
+          subject: {
+            label: "Subject",
+            description: "Contact form subject",
+          },
+          message: {
+            label: "Message",
+            description: "Contact form message content",
+          },
+          company: {
+            label: "Company",
+            description: "Company name (optional)",
+          },
+          userId: {
+            label: "User ID",
+            description: "User account identifier (optional)",
+          },
+          leadId: {
+            label: "Lead ID",
+            description: "Lead tracking identifier",
+          },
+        },
+      },
+    },
   },
 };

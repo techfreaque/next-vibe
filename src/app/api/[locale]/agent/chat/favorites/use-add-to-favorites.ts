@@ -135,7 +135,7 @@ export function useAddToFavorites({
         user,
         {
           characterId: characterId,
-          icon: charData.icon,
+          icon: charData.icon ?? undefined,
           name: charData.name,
           tagline: charData.tagline,
           description: charData.description,

@@ -69,9 +69,11 @@ export const {
   options: EmailJourneyVariantOptions,
   Value: EmailJourneyVariantValues,
 } = createEnumOptions({
-  PERSONAL_APPROACH: "app.api.leads.enums.emailJourneyVariant.personalApproach",
-  RESULTS_FOCUSED: "app.api.leads.enums.emailJourneyVariant.resultsFocused",
-  PERSONAL_RESULTS: "app.api.leads.enums.emailJourneyVariant.personalResults",
+  UNCENSORED_CONVERT:
+    "app.api.leads.enums.emailJourneyVariant.uncensoredConvert",
+  SIDE_HUSTLE: "app.api.leads.enums.emailJourneyVariant.sideHustle",
+  QUIET_RECOMMENDATION:
+    "app.api.leads.enums.emailJourneyVariant.quietRecommendation",
 });
 
 export const {
@@ -80,12 +82,11 @@ export const {
   Value: EmailJourneyVariantFilterValues,
 } = createEnumOptions({
   ALL: "app.api.leads.enums.emailJourneyVariantFilter.all",
-  PERSONAL_APPROACH:
-    "app.api.leads.enums.emailJourneyVariantFilter.personalApproach",
-  RESULTS_FOCUSED:
-    "app.api.leads.enums.emailJourneyVariantFilter.resultsFocused",
-  PERSONAL_RESULTS:
-    "app.api.leads.enums.emailJourneyVariantFilter.personalResults",
+  UNCENSORED_CONVERT:
+    "app.api.leads.enums.emailJourneyVariantFilter.uncensoredConvert",
+  SIDE_HUSTLE: "app.api.leads.enums.emailJourneyVariantFilter.sideHustle",
+  QUIET_RECOMMENDATION:
+    "app.api.leads.enums.emailJourneyVariantFilter.quietRecommendation",
 });
 
 /**
@@ -595,9 +596,9 @@ export const EmailCampaignStageDB = [
 ] as const;
 
 export const EmailJourneyVariantDB = [
-  EmailJourneyVariant.PERSONAL_APPROACH,
-  EmailJourneyVariant.RESULTS_FOCUSED,
-  EmailJourneyVariant.PERSONAL_RESULTS,
+  EmailJourneyVariant.UNCENSORED_CONVERT,
+  EmailJourneyVariant.SIDE_HUSTLE,
+  EmailJourneyVariant.QUIET_RECOMMENDATION,
 ] as const;
 
 export const EmailProviderDB = [

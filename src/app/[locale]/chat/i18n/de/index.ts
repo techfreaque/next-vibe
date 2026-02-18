@@ -733,7 +733,7 @@ export const translations: typeof enTranslations = {
     story: {
       title: "Sieh uns als dein Team.",
       line1:
-        "Die meisten beginnen mit einem Begleiter — jemand für den täglichen Chat.",
+        "Die meisten beginnen mit einem Begleiter - jemand für den täglichen Chat.",
       line2: "Wenn du spezielle Hilfe brauchst, wechsle zu einem Spezialisten.",
       line3: "Es ist wie Experten auf Kurzwahl zu haben.",
       continue: "Team kennenlernen",
@@ -1156,6 +1156,7 @@ export const translations: typeof enTranslations = {
       grok4: "X-AI Grok 4 - Premium-Modell",
       grok4Fast:
         "Grok 4 Fast ist xAIs neuestes multimodales Modell mit SOTA-Kosteneffizienz und einem 2M-Token-Kontextfenster. Es gibt zwei Varianten: ohne und mit Reasoning.",
+      glm5: "GLM-5 - Z.AIs Flaggschiff-Open-Source-Modell für komplexes Systemdesign und langfristige Agenten-Workflows, vergleichbar mit führenden Closed-Source-Modellen",
       glm46:
         "GLM 4.6 - effizientes 7B-Parameter-Modell mit großem Kontextfenster",
       glm47:

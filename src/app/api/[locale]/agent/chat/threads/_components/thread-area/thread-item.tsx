@@ -44,8 +44,7 @@ import {
   chatColors,
   chatTransitions,
 } from "@/app/[locale]/chat/lib/design-tokens";
-import type { UseChatReturn } from "@/app/api/[locale]/agent/chat/hooks/hooks";
-import type { ChatThread } from "@/app/api/[locale]/agent/chat/hooks/store";
+import type { ChatFolder, ChatThread } from "@/app/api/[locale]/agent/chat/db";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -67,7 +66,7 @@ export interface ThreadItemProps {
   onMoveThread?: (threadId: string, folderId: string | null) => void;
   onPinThread?: (threadId: string, pinned: boolean) => void;
   onArchiveThread?: (threadId: string, archived: boolean) => void;
-  chat?: UseChatReturn;
+  folders?: Record<string, ChatFolder>;
   compact?: boolean;
   locale: CountryLanguage;
   logger: EndpointLogger;
@@ -82,7 +81,7 @@ export function ThreadItem({
   onMoveThread,
   onPinThread,
   onArchiveThread,
-  chat,
+  folders,
   compact = false,
   locale,
   logger,
@@ -170,8 +169,8 @@ export function ThreadItem({
   };
 
   // Get all folders for the move menu - only folders from the same root folder
-  const allFolders = chat
-    ? Object.values(chat.folders).filter(
+  const allFolders = folders
+    ? Object.values(folders).filter(
         (folder) => folder.rootFolderId === thread.rootFolderId,
       )
     : [];
@@ -382,7 +381,7 @@ export function ThreadItem({
                   )}
 
                   {/* Only show Move to Folder if user has permission (computed server-side) */}
-                  {onMoveThread && chat && thread.canEdit && (
+                  {onMoveThread && folders && thread.canEdit && (
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuSub>

@@ -36,6 +36,12 @@ export const translations = {
       public: "Public",
       incognito: "Incognito",
     },
+    foldersShort: {
+      private: "Private",
+      shared: "Shared",
+      public: "Public",
+      incognito: "Incognito",
+    },
   },
   enums: {
     role: {
@@ -340,8 +346,11 @@ export const translations = {
         "Claude Opus 4.5 - Most powerful Claude model with exceptional reasoning and creative capabilities",
       claudeOpus46:
         "Claude Opus 4.6 - Latest and most powerful Claude model with exceptional reasoning and creative capabilities",
+      claudeSonnet46:
+        "Claude Sonnet 4.6 - Anthropic's most capable Sonnet-class model with frontier performance across coding, agents, and professional work",
       claudeHaiku45:
         "Claude Haiku 4.5 - Fast and efficient Claude model optimized for speed and cost-effectiveness",
+      glm5: "GLM-5 - Z.AI's flagship open-source foundation model engineered for complex systems design and long-horizon agent workflows, rivaling leading closed-source models",
       glm46:
         "GLM-4 6B - Efficient Chinese-English bilingual AI model with strong general capabilities",
       glm47:

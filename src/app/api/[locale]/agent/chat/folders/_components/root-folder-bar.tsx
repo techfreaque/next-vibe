@@ -2,6 +2,7 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useCallback, useState } from "react";
 
@@ -16,6 +17,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/config";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import { FolderAccessModal } from "./folder-access-modal";
 
@@ -30,45 +32,41 @@ interface RootFolderBarProps {
  * Get color classes for a folder based on its color
  */
 /* eslint-disable i18next/no-literal-string */
+const COLOR_MAP: Record<string, { active: string; hover: string }> = {
+  sky: {
+    active: "bg-sky-500/15 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20",
+    hover: "hover:bg-sky-500/10 hover:text-sky-600",
+  },
+  teal: {
+    active:
+      "bg-teal-500/15 text-teal-700 dark:text-teal-300 hover:bg-teal-500/20",
+    hover: "hover:bg-teal-500/10 hover:text-teal-600",
+  },
+  amber: {
+    active:
+      "bg-amber-500/15 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20",
+    hover: "hover:bg-amber-500/10 hover:text-amber-600",
+  },
+  purple: {
+    active:
+      "bg-purple-500/15 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20",
+    hover: "hover:bg-purple-500/10 hover:text-purple-600",
+  },
+  zinc: {
+    active:
+      "bg-zinc-500/15 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-500/20",
+    hover: "hover:bg-zinc-500/10 hover:text-zinc-600",
+  },
+};
+
 function getColorClasses(color: string | null, isActive: boolean): string {
   if (!color) {
     return isActive ? "bg-primary text-primary-foreground" : "hover:bg-accent";
   }
-
-  // Map color names to Tailwind classes (softer colors)
-  const colorMap: Record<string, { active: string; hover: string }> = {
-    sky: {
-      active:
-        "bg-sky-500/15 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20",
-      hover: "hover:bg-sky-500/10 hover:text-sky-600",
-    },
-    teal: {
-      active:
-        "bg-teal-500/15 text-teal-700 dark:text-teal-300 hover:bg-teal-500/20",
-      hover: "hover:bg-teal-500/10 hover:text-teal-600",
-    },
-    amber: {
-      active:
-        "bg-amber-500/15 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20",
-      hover: "hover:bg-amber-500/10 hover:text-amber-600",
-    },
-    purple: {
-      active:
-        "bg-purple-500/15 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20",
-      hover: "hover:bg-purple-500/10 hover:text-purple-600",
-    },
-    zinc: {
-      active:
-        "bg-zinc-500/15 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-500/20",
-      hover: "hover:bg-zinc-500/10 hover:text-zinc-600",
-    },
-  };
-
-  const classes = colorMap[color];
+  const classes = COLOR_MAP[color];
   if (!classes) {
     return isActive ? "bg-primary text-primary-foreground" : "hover:bg-accent";
   }
-
   return isActive ? classes.active : classes.hover;
 }
 
@@ -80,6 +78,8 @@ export function RootFolderBar({
   isAuthenticated,
   locale,
 }: RootFolderBarProps): JSX.Element {
+  const { t } = simpleT(locale);
+
   // Get root folders from DEFAULT_FOLDER_CONFIGS (convert object to array, sorted by order)
   // Show all folders to all users, but disable PRIVATE and SHARED for public users
   const rootFolders = Object.values(DEFAULT_FOLDER_CONFIGS).toSorted(
@@ -138,15 +138,24 @@ export function RootFolderBar({
                 key={folderConfig.id}
                 variant="ghost"
                 size="icon"
-                className={`h-11 w-11 ${colorClasses}`}
+                className={`h-13 w-13 flex-col gap-1 ${colorClasses}`}
                 onClick={() => handleClick(folderConfig.id)}
                 suppressHydrationWarning
                 data-tour={getFolderTourAttr(folderConfig.id)}
               >
-                <Icon
-                  icon={folderConfig.icon}
-                  className="h-6 w-6 flex items-center justify-center"
-                />
+                <Div className="h-5 w-5 flex items-center justify-center shrink-0">
+                  <Icon
+                    icon={folderConfig.icon}
+                    className="h-5 w-5 flex items-center justify-center"
+                  />
+                </Div>
+                <Span className="text-[9px] font-medium leading-none opacity-80">
+                  {t(
+                    `app.api.agent.chat.config.foldersShort.${folderConfig.id}` as Parameters<
+                      typeof t
+                    >[0],
+                  )}
+                </Span>
               </Button>
             );
           })}

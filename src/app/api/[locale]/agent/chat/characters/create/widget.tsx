@@ -133,7 +133,7 @@ function ModelSelectorWrapper({
         <Div className="text-red-500 text-sm mb-2">{error.message}</Div>
       )}
       <ModelSelector
-        modelSelection={modelSelection}
+        modelSelection={modelSelection ?? undefined}
         onChange={onChange}
         t={t}
         locale={locale}

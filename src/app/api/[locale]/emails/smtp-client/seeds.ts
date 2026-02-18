@@ -135,9 +135,9 @@ function getSmtpAccount2Config(logger: EndpointLogger): NewSmtpAccount | null {
     totalEmailsSent: 0,
     campaignTypes: [CampaignType.LEAD_CAMPAIGN],
     emailJourneyVariants: [
-      EmailJourneyVariant.PERSONAL_APPROACH,
-      EmailJourneyVariant.RESULTS_FOCUSED,
-      EmailJourneyVariant.PERSONAL_RESULTS,
+      EmailJourneyVariant.UNCENSORED_CONVERT,
+      EmailJourneyVariant.SIDE_HUSTLE,
+      EmailJourneyVariant.QUIET_RECOMMENDATION,
     ],
     emailCampaignStages: [
       EmailCampaignStage.INITIAL,
@@ -196,8 +196,20 @@ export async function dev(logger: EndpointLogger): Promise<void> {
         .limit(1);
 
       if (existingAccount.length > 0) {
+        // Update to keep selection criteria in sync with current enum values
+        await db
+          .update(smtpAccounts)
+          .set({
+            campaignTypes: account.campaignTypes,
+            emailJourneyVariants: account.emailJourneyVariants,
+            emailCampaignStages: account.emailCampaignStages,
+            countries: account.countries,
+            languages: account.languages,
+            updatedAt: new Date(),
+          })
+          .where(eq(smtpAccounts.name, account.name));
         logger.debug(
-          `✅ SMTP account already exists: ${account.name} (${account.fromEmail})`,
+          `✅ Updated SMTP account: ${account.name} (${account.fromEmail})`,
         );
         continue;
       }

@@ -697,7 +697,9 @@ export function useAIStream(
 
               case StreamEventType.CONTENT_DELTA: {
                 // Skip content deltas in drain mode - server is handling final DB writes
-                if (isDrainingRef.current) {break;}
+                if (isDrainingRef.current) {
+                  break;
+                }
 
                 const eventData = event.data as ContentDeltaEventData;
                 // Get fresh state from store to avoid stale closure
@@ -798,7 +800,9 @@ export function useAIStream(
 
               case StreamEventType.REASONING_DELTA: {
                 // Skip in drain mode - UI already shows finalized content
-                if (isDrainingRef.current) {break;}
+                if (isDrainingRef.current) {
+                  break;
+                }
 
                 const eventData = event.data as ReasoningDeltaEventData;
                 // Get fresh state from store to avoid stale closure
@@ -1179,7 +1183,9 @@ export function useAIStream(
 
               case StreamEventType.AUDIO_CHUNK: {
                 // Skip audio in drain mode
-                if (isDrainingRef.current) {break;}
+                if (isDrainingRef.current) {
+                  break;
+                }
 
                 const eventData = event.data as AudioChunkEventData;
                 logger.debug("[AUDIO_CHUNK] Received", {
@@ -1211,7 +1217,9 @@ export function useAIStream(
 
               case StreamEventType.COMPACTING_DELTA: {
                 // Skip in drain mode
-                if (isDrainingRef.current) {break;}
+                if (isDrainingRef.current) {
+                  break;
+                }
 
                 const eventData = event.data as CompactingDeltaEventData;
                 // Get fresh state from store

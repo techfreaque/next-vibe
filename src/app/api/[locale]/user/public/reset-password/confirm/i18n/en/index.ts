@@ -6,14 +6,14 @@ export const translations = {
     title: "Your {{appName}} Password Has Been Reset",
     subject: "Password Successfully Reset - {{appName}}",
     previewText:
-      "Your password has been reset successfully. You can now log in and continue chatting with 38 AI models.",
+      "Your password has been reset successfully. You can now log in and continue chatting with {{modelCount}} AI models.",
     greeting: "Hello,",
     confirmationMessage:
       "Your {{appName}} password has been successfully reset.",
     successMessage:
       "Your password reset is complete! You can now log in to your account with your new password and continue exploring uncensored AI conversations.",
     loginInstructions:
-      "You can now log in with your new password and access all 38 AI models.",
+      "You can now log in with your new password and access all {{modelCount}} AI models.",
     loginButton: "Log In to {{appName}}",
     securityInfo:
       "This password change was completed from {{ipAddress}} on {{resetTime}}.",

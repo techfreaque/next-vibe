@@ -21,7 +21,7 @@ import {
 } from "next-vibe-ui/ui/select";
 import { P } from "next-vibe-ui/ui/typography";
 import type { ReactElement } from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useEmailPreviewRender } from "@/app/api/[locale]/emails/preview/render/hooks/hooks";
 import type { PreviewFieldConfig } from "@/app/api/[locale]/emails/registry/types";
@@ -81,28 +81,27 @@ export function EmailPreviewClient({
     setCurrentProps(exampleProps);
   }, [exampleProps]);
 
+  // Stable refs so callbacks never need to re-create due to render-unstable values
+  const createRef = useRef(previewEndpoint.create);
+  createRef.current = previewEndpoint.create;
+  const currentPropsRef = useRef(currentProps);
+  currentPropsRef.current = currentProps;
+
   const updatePreview = useCallback(
     (props: Record<string, string | number | boolean>) => {
-      previewEndpoint.create.form.setValue("templateId", templateId);
-      previewEndpoint.create.form.setValue("language", selectedLanguage);
-      previewEndpoint.create.form.setValue("country", selectedCountry);
-      previewEndpoint.create.form.setValue("props", props);
-      void previewEndpoint.create.onSubmit();
+      createRef.current.form.setValue("templateId", templateId);
+      createRef.current.form.setValue("language", selectedLanguage);
+      createRef.current.form.setValue("country", selectedCountry);
+      createRef.current.form.setValue("props", props);
+      void createRef.current.onSubmit();
     },
-    [templateId, selectedLanguage, selectedCountry, previewEndpoint.create],
+    [templateId, selectedLanguage, selectedCountry],
   );
 
-  // Initial preview render
+  // Re-fetch preview when template, language or country changes
   useEffect(() => {
-    updatePreview(currentProps);
-  }, [
-    templateId,
-    selectedLanguage,
-    selectedCountry,
-    exampleProps,
-    currentProps,
-    updatePreview,
-  ]);
+    updatePreview(currentPropsRef.current);
+  }, [templateId, selectedLanguage, selectedCountry, updatePreview]);
 
   const handlePropsChange = useCallback(
     (newProps: Record<string, string | number | boolean>) => {
@@ -134,7 +133,6 @@ export function EmailPreviewClient({
                 value={selectedLanguage}
                 onValueChange={(value) => {
                   setSelectedLanguage(value as typeof selectedLanguage);
-                  updatePreview(currentProps);
                 }}
               >
                 <SelectTrigger id="preview-language">
@@ -168,7 +166,6 @@ export function EmailPreviewClient({
                 value={selectedCountry}
                 onValueChange={(value) => {
                   setSelectedCountry(value as typeof selectedCountry);
-                  updatePreview(currentProps);
                 }}
               >
                 <SelectTrigger id="preview-country">

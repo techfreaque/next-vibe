@@ -816,7 +816,7 @@ function EditFavBeforeAddButton({
       navigate(createFavoriteDefinitions.default.POST, {
         data: {
           characterId: char.id,
-          icon: fullChar.icon,
+          icon: fullChar.icon ?? undefined,
           name: fullChar.name,
           tagline: fullChar.tagline,
           description: fullChar.description,
@@ -1100,7 +1100,7 @@ function CharacterFavoriteActions({
     navigate(createFavoriteDefinitions.default.POST, {
       data: {
         characterId: char.id,
-        icon: fullChar.icon,
+        icon: fullChar.icon ?? undefined,
         name: fullChar.name,
         tagline: fullChar.tagline,
         description: fullChar.description,

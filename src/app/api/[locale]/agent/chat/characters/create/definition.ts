@@ -482,13 +482,13 @@ export type ManualModelSelection = Extract<
 export function isFiltersSelection(
   sel: CharacterModelSelection,
 ): sel is FiltersModelSelection {
-  return sel.selectionType === ModelSelectionType.FILTERS;
+  return sel !== null && sel.selectionType === ModelSelectionType.FILTERS;
 }
 
 export function isManualSelection(
   sel: CharacterModelSelection,
 ): sel is ManualModelSelection {
-  return sel.selectionType === ModelSelectionType.MANUAL;
+  return sel !== null && sel.selectionType === ModelSelectionType.MANUAL;
 }
 
 const definitions = { POST } as const;

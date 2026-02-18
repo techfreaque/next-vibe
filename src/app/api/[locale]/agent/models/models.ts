@@ -59,8 +59,10 @@ export enum ModelId {
   UNCENSORED_LM_V1_2 = "uncensored-lm-v1.2",
   CLAUDE_HAIKU_4_5 = "claude-haiku-4.5",
   CLAUDE_SONNET_4_5 = "claude-sonnet-4.5",
+  CLAUDE_SONNET_4_6 = "claude-sonnet-4.6",
   CLAUDE_OPUS_4_5 = "claude-opus-4.5",
   CLAUDE_OPUS_4_6 = "claude-opus-4.6",
+  GLM_5 = "glm-5",
   GLM_4_7 = "glm-4.7",
   GLM_4_7_FLASH = "glm-4.7-flash",
   GLM_4_6 = "glm-4.6",
@@ -509,6 +511,40 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 1000000,
     icon: "si-anthropic",
     openRouterModel: "anthropic/claude-sonnet-4.5",
+    creditCost: calculateCreditCost,
+    inputTokenCost: 3,
+    outputTokenCost: 15,
+
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.CREATIVE,
+      ModelUtility.REASONING,
+      ModelUtility.LEGACY,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
+    weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
+  },
+  [ModelId.CLAUDE_SONNET_4_6]: {
+    id: ModelId.CLAUDE_SONNET_4_6,
+    name: "Claude Sonnet 4.6",
+    provider: "anthropic",
+    apiProvider: ApiProvider.OPENROUTER,
+    description: "app.api.agent.chat.models.descriptions.claudeSonnet46",
+    parameterCount: undefined,
+    contextWindow: 1000000,
+    icon: "si-anthropic",
+    openRouterModel: "anthropic/claude-sonnet-4.6",
     creditCost: calculateCreditCost,
     inputTokenCost: 3,
     outputTokenCost: 15,
@@ -976,6 +1012,32 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
 
+  [ModelId.GLM_5]: {
+    id: ModelId.GLM_5,
+    name: "GLM-5",
+    provider: "zAi",
+    apiProvider: ApiProvider.OPENROUTER,
+    description: "app.chat.models.descriptions.glm5",
+    parameterCount: undefined,
+    contextWindow: 205000,
+    icon: "si-zendesk",
+    openRouterModel: "z-ai/glm-5",
+    creditCost: calculateCreditCost,
+    inputTokenCost: 0.3,
+    outputTokenCost: 2.55,
+
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
   [ModelId.GLM_4_7]: {
     id: ModelId.GLM_4_7,
     name: "GLM 4.7",
@@ -990,7 +1052,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     inputTokenCost: 0.4,
     outputTokenCost: 1.5,
 
-    utilities: [ModelUtility.SMART, ModelUtility.CHAT, ModelUtility.ANALYSIS],
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.SMART,
+      ModelUtility.CHAT,
+      ModelUtility.ANALYSIS,
+    ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.BALANCED,
@@ -1032,7 +1099,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     inputTokenCost: 0.05,
     outputTokenCost: 0.22,
 
-    utilities: [ModelUtility.LEGACY, ModelUtility.CHAT, ModelUtility.FAST],
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
     speed: SpeedLevel.FAST,
@@ -1493,3 +1560,27 @@ export function calculateCreditCost(
  * Dynamically calculated from modelOptions object
  */
 export const TOTAL_MODEL_COUNT = Object.keys(modelOptions).length;
+
+/**
+ * Featured models by category for use in marketing content, emails, etc.
+ */
+export const FEATURED_MODELS = {
+  // Representative picks per category — used in marketing content and emails
+  mainstream: [
+    modelOptions[ModelId.CLAUDE_OPUS_4_6].name,
+    modelOptions[ModelId.GPT_5_2_PRO].name,
+    modelOptions[ModelId.GEMINI_3_PRO].name,
+    modelOptions[ModelId.GROK_4].name,
+  ],
+  open: [
+    modelOptions[ModelId.DEEPSEEK_R1].name,
+    modelOptions[ModelId.KIMI_K2_5].name,
+    modelOptions[ModelId.GLM_5].name,
+  ],
+  uncensored: [
+    modelOptions[ModelId.UNCENSORED_LM_V1_2].name,
+    modelOptions[ModelId.FREEDOMGPT_LIBERTY].name,
+    modelOptions[ModelId.GAB_AI_ARYA].name,
+    modelOptions[ModelId.VENICE_UNCENSORED].name,
+  ],
+} as const;

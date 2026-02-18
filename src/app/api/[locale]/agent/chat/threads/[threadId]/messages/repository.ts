@@ -199,7 +199,6 @@ export async function createUserMessage(params: {
     parentId: params.parentId,
     depth: params.depth,
     authorId: params.userId ?? null,
-    authorName: params.authorName,
     isAI: false,
     metadata,
   });

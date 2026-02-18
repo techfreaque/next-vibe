@@ -129,9 +129,9 @@ export const translations: typeof enTranslations = {
     },
     // Email journey variant options
     emailJourneyVariants: {
-      personalApproach: "Persönlicher Ansatz",
-      resultsFocused: "Ergebnisorientiert",
-      personalResults: "Persönliche Ergebnisse",
+      uncensoredConvert: "Unzensierter Konverter",
+      sideHustle: "Nebenverdienst",
+      quietRecommendation: "Stille Empfehlung",
     },
     // Email campaign stage options
     emailCampaignStages: {

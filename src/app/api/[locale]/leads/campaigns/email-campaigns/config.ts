@@ -14,14 +14,15 @@ import { emailCampaignConfigSchema, emailCampaignResultSchema } from "./types";
 
 /**
  * Email Campaign Stage Delays (in days)
+ * Must match the SCHEDULING_RULES delays in emails/services/scheduler.ts
  */
 export const STAGE_DELAYS = {
   INITIAL: 0,
-  FOLLOWUP_1: 20,
-  FOLLOWUP_2: 40,
-  FOLLOWUP_3: 60,
-  NURTURE: 90,
-  REACTIVATION: 120,
+  FOLLOWUP_1: 3,
+  FOLLOWUP_2: 5,
+  FOLLOWUP_3: 7,
+  NURTURE: 14,
+  REACTIVATION: 30,
 } as const;
 
 /**
@@ -36,6 +37,8 @@ export const PRODUCTION_CONFIG: EmailCampaignConfigType = {
     EmailCampaignStage.FOLLOWUP_1,
     EmailCampaignStage.FOLLOWUP_2,
     EmailCampaignStage.FOLLOWUP_3,
+    EmailCampaignStage.NURTURE,
+    EmailCampaignStage.REACTIVATION,
   ],
   delayBetweenStages: {
     [EmailCampaignStage.INITIAL]: STAGE_DELAYS.INITIAL,
@@ -64,6 +67,8 @@ export const DEVELOPMENT_CONFIG: EmailCampaignConfigType = {
     EmailCampaignStage.FOLLOWUP_1,
     EmailCampaignStage.FOLLOWUP_2,
     EmailCampaignStage.FOLLOWUP_3,
+    EmailCampaignStage.NURTURE,
+    EmailCampaignStage.REACTIVATION,
   ],
   delayBetweenStages: {
     [EmailCampaignStage.INITIAL]: STAGE_DELAYS.INITIAL,
@@ -100,9 +105,9 @@ export function getDefaultConfig(): EmailCampaignConfigType {
 export function getSchedule(): string {
   return env.NODE_ENV === Environment.PRODUCTION
     ? // eslint-disable-next-line i18next/no-literal-string
-      "*/1 7-15 * * 1-5" // Production: Every 3 minutes, Monday-Friday, 7-15 UTC
+      "*/1 7-15 * * 1-5" // Production: Every 1 minute, Monday-Friday, 7-15 UTC
     : // eslint-disable-next-line i18next/no-literal-string
-      "*/1 * * * *"; // Development: Every 3 minutes, always
+      "*/1 * * * *"; // Development: Every 1 minute, always
 }
 
 /**

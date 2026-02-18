@@ -10,15 +10,15 @@ export const translations: typeof enTranslations = {
     title: "Zresetuj swoje hasło {{appName}}",
     subject: "Żądanie resetowania hasła - {{appName}}",
     previewText:
-      "Zresetuj swoje hasło, aby odzyskać dostęp do swojego konta {{appName}} i kontynuować rozmowy z 38 modelami AI.",
+      "Zresetuj swoje hasło, aby odzyskać dostęp do swojego konta {{appName}} i kontynuować rozmowy z {{modelCount}} modelami AI.",
     greeting: "Witaj,",
     requestInfo:
       "Otrzymaliśmy prośbę o zresetowanie hasła do Twojego konta {{appName}}.",
     instructions:
-      "Kliknij przycisk poniżej, aby utworzyć nowe hasło. Ten link jest ważny przez 24 godziny i może być użyty tylko raz.",
+      "Kliknij przycisk poniżej, aby utworzyć nowe hasło. Ten link jest ważny przez {{hours}} godziny i może być użyty tylko raz.",
     buttonText: "Zresetuj moje hasło",
     expirationInfo:
-      "Ten bezpieczny link wygasa za 24 godziny dla Twojego bezpieczeństwa.",
+      "Ten bezpieczny link wygasa za {{hours}} godziny dla Twojego bezpieczeństwa.",
     securityInfo:
       "Dla Twojego bezpieczeństwa, to resetowanie hasła zostało zażądane z {{ipAddress}} dnia {{requestTime}}.",
     didntRequest: "Nie żądałeś tego?",
@@ -57,7 +57,7 @@ export const translations: typeof enTranslations = {
     },
     deliveryInfo: {
       estimatedTime: "w ciągu 5 minut",
-      expiresAt: "24 godziny od teraz",
+      expiresAt: "4 godziny od teraz",
     },
     nextSteps: {
       checkEmail: "Sprawdź swoją skrzynkę odbiorczą i folder spam",

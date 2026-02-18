@@ -18,6 +18,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { definitionsRegistry } from "../../unified-interface/shared/endpoints/definitions/registry";
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type { Platform } from "../../unified-interface/shared/types/platform";
+import { getPreferredToolName } from "../../unified-interface/shared/utils/path";
 import { getTranslatorFromEndpoint } from "../../unified-interface/unified-ui/widgets/_shared/field-helpers";
 import type {
   HelpListRequestOutput,
@@ -38,60 +39,76 @@ class HelpListRepository {
     logger: EndpointLogger,
     platform: Platform,
   ): ResponseType<HelpListResponseOutput> {
-    logger.debug("Discovering available commands");
+    logger.debug("Discovering available commands", {
+      category: data.category,
+      format: data.format,
+    });
 
     try {
       // Use unified endpoint listing service (filtered by user permissions from JWT)
       const endpoints = definitionsRegistry.getEndpointsForUser(platform, user);
 
-      // Sort endpoints by category and toolName
-      const sortedEndpoints = endpoints.toSorted((a, b) => {
-        const catA = a.category || "";
-        const catB = b.category || "";
-        const catCompare = catA.localeCompare(catB);
+      // Translate all endpoints first so we can sort and filter by translated values
+      const translated = endpoints.map((ep) => {
+        const { t } = getTranslatorFromEndpoint(ep)(locale);
+        const displayName = getPreferredToolName(ep);
+        const translatedCategory = ep.category ? t(ep.category) : "";
+        const translatedDescription = ep.description
+          ? t(ep.description)
+          : displayName;
+
+        return { ep, displayName, translatedCategory, translatedDescription };
+      });
+
+      // Apply category filter against translated category name (case-insensitive)
+      const filtered = data.category
+        ? translated.filter(({ translatedCategory, displayName }) => {
+            const query = data.category!.toLowerCase();
+            return (
+              translatedCategory.toLowerCase().includes(query) ||
+              displayName.toLowerCase().includes(query)
+            );
+          })
+        : translated;
+
+      // Sort by translated category then by display name
+      const sorted = filtered.toSorted((a, b) => {
+        const catCompare = a.translatedCategory.localeCompare(
+          b.translatedCategory,
+        );
         if (catCompare !== 0) {
           return catCompare;
         }
-        const toolNameA = a.path.join("_");
-        const toolNameB = b.path.join("_");
-        return toolNameA.localeCompare(toolNameB);
+        return a.displayName.localeCompare(b.displayName);
       });
 
-      // Format commands for API response
-      const formattedCommands = sortedEndpoints.map((ep) => {
-        const { t } = getTranslatorFromEndpoint(ep)(locale);
-
-        // Use first alias if available, otherwise use full tool name
-        const displayName =
-          ep.aliases && ep.aliases.length > 0
-            ? ep.aliases[0]
-            : ep.path.join("_");
-
-        const translatedDescription =
-          data.showDescriptions && ep.description
-            ? t(ep.description)
-            : displayName;
-
-        return {
-          alias: displayName,
-          message: translatedDescription,
-          description:
-            data.showDescriptions && ep.description
-              ? translatedDescription
-              : undefined,
-          category: ep.category ? t(ep.category) : "",
-          aliases:
+      // Format commands for response
+      const formattedCommands = sorted.map(
+        ({ ep, displayName, translatedCategory, translatedDescription }) => {
+          // Secondary aliases (all aliases beyond the first)
+          const secondaryAliases =
             data.showAliases && ep.aliases && ep.aliases.length > 1
               ? ep.aliases.slice(1).join(", ")
+              : undefined;
+
+          return {
+            alias: displayName,
+            message: translatedDescription,
+            description: data.showDescriptions
+              ? translatedDescription
               : undefined,
-          // Add display name for GROUPED_LIST
-          rule: displayName,
-        };
-      });
+            category: translatedCategory,
+            aliases: secondaryAliases,
+            rule: displayName,
+          };
+        },
+      );
 
       logger.debug("Command discovery completed", {
-        totalCommands: formattedCommands.length,
-        filteredBy: data.category || "none",
+        total: endpoints.length,
+        filtered: formattedCommands.length,
+        category: data.category || "none",
+        format: data.format,
       });
 
       const response: HelpListResponseOutput = {

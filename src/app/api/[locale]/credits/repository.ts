@@ -2619,7 +2619,11 @@ export class CreditRepository {
     cost: number,
     feature: string,
     logger: EndpointLogger,
-  ): Promise<{ success: boolean; messageId?: string; partialDeduction?: boolean }> {
+  ): Promise<{
+    success: boolean;
+    messageId?: string;
+    partialDeduction?: boolean;
+  }> {
     if (cost <= 0) {
       logger.debug("Skipping credit deduction - zero or negative cost", {
         feature,

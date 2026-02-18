@@ -1,250 +1,265 @@
-import { translations as componentsTranslations } from "../../components/i18n/en";
-import { translations as resultsTranslations } from "../../results/i18n/en";
-
 export const translations = {
-  components: componentsTranslations,
-  results: resultsTranslations,
   emailJourneys: {
     components: {
       defaults: {
-        signatureName: "Your Partner in Growth",
+        signatureName: "A fellow unbottled.ai user",
+        previewLeadId: "preview-lead-id",
+        previewEmail: "preview@example.com",
+        previewBusinessName: "Acme Corp",
+        previewContactName: "Preview User",
+        previewPhone: "+1234567890",
+        previewCampaignId: "preview-campaign-id",
+      },
+      footer: {
+        unsubscribeText: "You're receiving this because you opted in.",
+        unsubscribeLink: "Unsubscribe",
       },
       journeyInfo: {
-        personalApproach: {
-          name: "Personal Approach",
-          description: "Build genuine connections with personalized messaging",
+        uncensoredConvert: {
+          name: "Uncensored Convert",
+          description: "An enthusiast sharing their discovery of unbottled.ai",
         },
-        resultsFocused: {
-          name: "Results Focused",
-          description: "Emphasize concrete outcomes and measurable results",
+        sideHustle: {
+          name: "Side Hustle",
+          description: "A transparent affiliate sharing real use cases",
         },
-        personalResults: {
-          name: "Personal + Results",
-          description: "Combine personal touch with results-driven messaging",
+        quietRecommendation: {
+          name: "Quiet Recommendation",
+          description: "A low-key professional passing along a tested tool",
         },
       },
     },
     leads: {
       journeys: {
-        personalPractical: {
+        uncensoredConvert: {
           initial: {
-            subject: "Let's build something amazing together",
-            previewText: "A personal note about working together",
-            greeting: "Hi {{businessName}},",
-            personalIntro:
-              "I wanted to reach out personally because I believe we could create something really valuable together.",
-            connectionValue:
-              "What caught my attention about your business is the potential I see for growth and impact.",
-            practicalTransition:
-              "But let me be practical - you're probably wondering what this actually means for you.",
-            plansBridge:
-              "Here's what I'm thinking in terms of concrete next steps:",
-            ctaText: "Let's Talk About Your Goals",
-            signature: "Looking forward to connecting,",
-            signatureClosing: "Best regards",
+            subject: "found something I had to share with you",
+            previewText:
+              "not sure why I'm even telling you this but here we go",
+            greeting: "Hey,",
+            opening:
+              "Ok so I don't usually send cold emails. I actually find them kind of annoying. But I found something a few weeks ago that I keep telling people about and I figured I'd just put it in writing.",
+            discovery:
+              'I was down a rabbit hole at like 11pm, frustrated with ChatGPT refusing to help me write some marketing copy because it thought the phrasing was "potentially misleading" (it wasn\'t). Someone in a forum mentioned unbottled.ai and I just tried it on a whim.',
+            whatItDoes:
+              "It's an AI that actually does what you ask. No hedging, no moral lectures, no random refusals. I've used it for copywriting, research, competitor analysis, drafting stuff I didn't want to explain to a cautious AI. It just works.",
+            affiliateDisclosure:
+              "Full transparency: if you sign up through my link I get a small cut. That's part of why I'm writing this. But I'd be telling people about it either way - I've already sent the link to three people just in normal conversation.",
+            ctaText: "Try unbottled.ai (my affiliate link)",
+            signature: " -  Chris",
             postScript:
-              "P.S. No pressure - if the timing isn't right, I completely understand.",
+              "P.S. There's a free trial so you can poke around before committing to anything.",
           },
           followup1: {
-            subject: "Your roadmap for the next 90 days",
-            previewText: "Breaking down the journey into practical steps",
-            defaultBusinessName: "there",
-            greeting: "Hi {{businessName}},",
-            personalReflection:
-              "I've been thinking about our potential collaboration, and I wanted to share something more concrete with you.",
-            thoughtProcess:
-              "Rather than generic promises, let me walk you through exactly what the first 90 days could look like:",
-            timelineTitle: "Your 90-Day Roadmap:",
-            week1Title: "Week 1: Foundation",
-            week1Content:
-              "We'll sit down and really understand your business goals and challenges.",
-            month2Title: "Month 2: Implementation",
-            month2Content: "This is where we start seeing real momentum build.",
-            week3Title: "Week 3-4: Quick Wins",
-            week3Content:
-              "You'll see the first tangible results - usually faster than expected.",
-            roadmapIntro:
-              "What I like about this approach is that you're not waiting 6 months to see if things are working.",
-            personalCommitment:
-              "Here's something I want you to know: I'm personally invested in your success. This isn't just another client relationship for me.",
-            nextSteps:
-              "If this resonates with you, let's have a real conversation about it.",
-            ctaText: "Schedule Your Strategy Call",
-            signature: "Excited about the possibilities,",
-            signatureClosing: "Warm regards",
+            subject: "what I've actually been using it for",
+            previewText: "concrete stuff, not vague promises",
+            greeting: "Hey again,",
+            recap:
+              "I sent you something a few weeks back about unbottled.ai. In case you're still curious, here are some actual things I've done with it since:",
+            useCases:
+              'Wrote a full landing page for a client in about 20 minutes. Drafted a legal-ish disclaimer (obviously got it reviewed). Ran a fake "interview" with a competitor\'s product to find weaknesses. Generated 40 subject line variations for an email test. None of these required me to explain myself or rephrase things five times to get past a filter.',
+            differentFromOthers:
+              "The difference from other AI tools isn't speed or some special feature. It's that it treats you like an adult who knows what they're doing. Sounds small. It's not.",
+            ctaText: "Check it out",
+            signature: " -  Chris",
             postScript:
-              "P.S. I've helped similar businesses achieve [specific result] - happy to share those stories when we talk.",
+              "P.S. Still using my affiliate link because I might as well be honest about it.",
           },
           followup2: {
-            subject: "How we'd actually work together",
-            previewText: "Real examples and flexible approaches",
-            defaultBusinessName: "there",
-            greeting: "Hi {{businessName}},",
-            personalContext:
-              "I know you're busy, so I wanted to share something that might help you see if we're a good fit:",
-            caseStudyIntro:
-              "Recently, I worked with a business similar to yours. Here's what actually happened:",
-            methodExplanation:
-              "The reason this worked wasn't magic - it was a systematic approach to [specific area].",
-            applicationTo:
-              "For your business, I see similar opportunities, particularly around [specific opportunity].",
-            realResults:
-              "But here's what really matters - this isn't about what I've done for others, it's about what makes sense for you.",
-            flexibleOptions:
-              "Some clients need intensive support right away. Others prefer to start small and build from there. Both approaches work - it's about what fits your situation.",
-            practicalNext:
-              "If you're curious about which approach might work best for you, let's have a conversation about it.",
-            ctaText: "Let's Discuss Your Situation",
-            signature: "Here to help,",
-            postScript:
-              "P.S. If you want to see more specific examples or talk to a past client, just let me know.",
+            subject: "the specific thing that annoyed me about ChatGPT",
+            previewText: "and why unbottled.ai fixed it for me",
+            greeting: "Last one from me on this, I promise.",
+            specificExample:
+              "I wanted to write copy for a supplement brand that makes bold claims. Every mainstream AI would either water them down or flat out refuse. I spent maybe 45 minutes going in circles. Switched to unbottled.ai, had copy in 8 minutes. The client approved it same day.",
+            comparison:
+              "I'm not saying ChatGPT is bad. It's great for a lot of things. But if you work in anything adjacent to marketing, sales copy, legal edge cases, adult content, or just anything that requires a bit of bluntness - you'll hit the wall eventually.",
+            nudge:
+              "If any of that sounds like your world, it's worth 5 minutes to try the free version.",
+            ctaText: "Try it free",
+            signature: " -  Chris",
           },
           followup3: {
-            subject: "One last thought before I go",
-            previewText: "Final thoughts and an open door",
-            defaultBusinessName: "there",
-            greeting: "Hi {{businessName}},",
-            finalReflection:
-              "I've reached out a few times because I genuinely see potential in working together. But I also know that timing is everything.",
-            marketTiming:
-              "Sometimes the best business relationships start when you're not quite ready - because that's when you're most thoughtful about making the right choice.",
-            personalCommitment:
-              "If we do end up working together, I want it to be because it makes real sense for your business, not because you felt pressured.",
-            practicalOffer:
-              "So here's my practical offer: If you ever want to have a no-pressure conversation about your business goals, I'm here.",
-            noHighPressure:
-              "No sales pitch. No hard sell. Just a genuine conversation about where you want to take your business and whether we might be able to help.",
-            finalCTA:
-              "The door's open whenever you're ready to walk through it.",
-            ctaText: "Let's Have That Conversation",
-            signature: "Wishing you all the best,",
-            postScript:
-              "P.S. Even if we never work together, I'd love to hear how your business evolves. Feel free to stay in touch.",
-          },
-          reactivation: {
-            subject: "Something new I wanted to share with you",
-            previewText: "Updates and new opportunities",
-            defaultBusinessName: "there",
-            greeting: "Hi {{businessName}},",
-            reconnection:
-              "It's been a while since we last connected, and I wanted to reach out because some things have evolved that I think you'll find interesting.",
-            newDevelopments:
-              "Since we last spoke, we've developed some new approaches that are particularly relevant to businesses like yours.",
-            specificOffer:
-              "What's different now is that we've refined our process based on what we've learned from working with companies in your space.",
-            practicalEvolution:
-              "The practical result is that we can now offer more targeted solutions with faster implementation timelines.",
-            updatedResults:
-              "Recent clients have been seeing [specific new results] - which is notably better than what we were achieving before.",
-            investmentUpdate:
-              "I should also mention that our pricing structure has evolved to be more flexible and accessible.",
-            personalInvitation:
-              "If you're curious about these developments, I'd genuinely enjoy catching up and sharing what's new.",
-            ctaText: "Let's Reconnect",
-            signature: "Hope to hear from you,",
-            postScript:
-              "P.S. Even if you're not interested right now, I'd love to stay in touch and hear how things are going with your business.",
+            subject: "okay I'll stop after this one",
+            previewText: "just leaving this here",
+            greeting: "Hey,",
+            lastPitch:
+              "I've sent a couple of emails about unbottled.ai and I'll leave it alone after this. If it's not relevant to what you do, totally fair.",
+            honesty:
+              "If you ever find yourself fighting with an AI that won't cooperate - remember this is an option. Link's below. Affiliate, yes. Still genuine.",
+            ctaText: "unbottled.ai",
+            signature: " -  Chris",
           },
           nurture: {
-            subject: "Quick thought for your business",
-            previewText: "A helpful insight I wanted to share",
-            defaultBusinessName: "there",
-            greeting: "Hi {{businessName}},",
-            friendlyCheckIn:
-              "I know you're busy, so I'll keep this brief. I came across something recently that made me think of your business.",
-            practicalInsight:
-              "I've noticed that businesses in your space often struggle with [specific challenge]. The ones that succeed usually approach it by [specific strategy].",
-            specificSuggestion:
-              "For your situation specifically, you might want to consider [practical suggestion]. It's a relatively simple change that can make a real difference.",
-            genuineCare:
-              "I'm sharing this not as a sales pitch, but because I genuinely want to see your business succeed - whether we work together or not.",
-            helpfulResource:
-              "If you want to explore this further, I put together a quick resource that might help. No strings attached.",
-            ctaText: "Get the Resource",
-            signature: "Rooting for your success,",
-            postScript:
-              "P.S. If this isn't relevant to you right now, feel free to ignore it. I'll check in again sometime with something else that might be useful.",
+            subject: "they added something worth mentioning",
+            previewText: "small update on unbottled.ai",
+            greeting: "Hey,",
+            newFeature:
+              "Just a short one. unbottled.ai rolled out some new model options recently including some that are specifically good at long-form content. If you write a lot of articles, reports, or scripts it's notably better than it was.",
+            stillRelevant:
+              "Free trial still up. Affiliate link still mine. Just thought it was worth flagging.",
+            ctaText: "See what's new",
+            signature: " -  Chris",
+          },
+          reactivation: {
+            subject: "circling back one more time",
+            previewText: "a lot has changed since I first mentioned this",
+            greeting: "Hey,",
+            checkIn:
+              "I know it's been a while since I last brought up unbottled.ai. I kept using it and it's genuinely gotten better - faster responses, more model choices, and they fixed some of the rough edges.",
+            update:
+              "If you looked at it before and weren't impressed, it might be worth another look. If you never tried it, the free trial is still there. Same affiliate link, same honest recommendation.",
+            ctaText: "Take another look",
+            signature: " -  Chris",
           },
         },
-        personal: {
+        sideHustle: {
           initial: {
-            subject: "Welcome to our service",
-            previewText: "Getting started with your journey",
-            greeting: "Hi {{businessName}},",
-            intro: "Welcome! We're excited to have you on board.",
-            serviceDescription:
-              "Our service is designed to help you achieve your goals efficiently.",
-            convenience: "Everything you need, right at your fingertips.",
-            ctaText: "Get Started",
-            signature: "Welcome aboard,",
-            postScript: "P.S. If you have any questions, we're here to help.",
+            subject:
+              "I'm an affiliate for this. Here's why I think it matters.",
+            previewText:
+              "transparent from the start - I get a cut if you sign up",
+            greeting: "Hey,",
+            opening:
+              "I want to be upfront about something before I say anything else: I'm an affiliate for unbottled.ai, which means I earn a commission if you sign up through my link. I tell you this because I only affiliate with things I actually use, and I think that distinction matters.",
+            myStory:
+              "I started using unbottled.ai about 4 months ago to write copy for my freelance clients. Before that I was using a combination of ChatGPT and manual editing to work around content filters. unbottled.ai cut that process roughly in half because it doesn't fight me. I then started recommending it to clients as part of my process. Then I realized I could earn a bit passively by just being open about it.",
+            affiliateHonesty:
+              "So yes - there's money in this for me. But I also genuinely use it every week for actual paid work. If it stopped being good, I'd stop recommending it. It hasn't stopped being good.",
+            proof:
+              "I used it this week to: write 3 product descriptions for an e-commerce client, draft a pitch email for my own outreach (meta, I know), summarize a 40-page PDF into a 1-page brief. All without fighting filters or rewording prompts.",
+            ctaText: "Try unbottled.ai (affiliate link)",
+            signature: " -  Jordan",
+            postScript:
+              "P.S. Free trial available. No credit card needed to start.",
           },
           followup1: {
-            subject: "How are things going?",
-            previewText: "Checking in on your experience",
-            greeting: "Hi {{businessName}},",
-            intro: "I wanted to check in and see how things are going.",
-            empathy:
-              "I know getting started with something new can be challenging.",
-            question: "How has your experience been so far?",
-            socialProof: {
-              quote:
-                "This service has transformed how we work - couldn't be happier!",
-              author: "Happy Customer",
-            },
-            ctaText: "Share Your Feedback",
-            signature: "Looking forward to hearing from you,",
+            subject: "what I did with it this week (actual work stuff)",
+            previewText: "concrete use cases, not hype",
+            greeting: "Hey,",
+            thisWeek:
+              "Quick update. This week I used unbottled.ai to write onboarding emails for a SaaS client's new user flow. Six emails, two variations each, complete with subject line options. That would have taken me most of a day with my old process. It took about 90 minutes.",
+            clientWork:
+              "The client didn't know I used AI. They approved the copy with minor edits. That's kind of the point - not that AI is doing the creative work, but that it speeds up the scaffolding so I can focus on making it actually good.",
+            howYouCanToo:
+              "If you do any kind of writing work - copy, content, comms, anything - this is worth trying. The affiliate link means I earn something if you sign up, but I'm sharing this because it's genuinely part of how I work now.",
+            ctaText: "Check it out",
+            signature: " -  Jordan",
           },
           followup2: {
-            subject: "Our story and mission",
-            previewText: "Why we do what we do",
-            greeting: "Hi {{businessName}},",
-            intro: "I wanted to share a bit about why we do what we do.",
-            mission:
-              "Our mission is to make professional services accessible to everyone.",
-            story1:
-              "We started because we saw businesses struggling with outdated solutions.",
-            story2:
-              "Today, we're proud to help hundreds of businesses succeed.",
-            ctaText: "Learn More About Us",
-            signature: "With purpose,",
-            closing: "Thank you for being part of our journey.",
+            subject: "the affiliate part is also kind of interesting actually",
+            previewText:
+              "how passive income from a tool you use actually works",
+            greeting: "Hey,",
+            anotherUseCase:
+              "Another week, another real use case: I used unbottled.ai to write the cold outreach emails I'm sending right now - including this one, which is a bit circular but also kind of proves the point.",
+            passiveIncome:
+              "On the affiliate side: I've been earning small but consistent monthly income just from recommending this to people in normal conversation and through my newsletter. It's not life-changing money but it's real, and it compounds. The model is simple - people sign up, I earn a percentage of their subscription for as long as they're a customer.",
+            callToAction:
+              "If you run any kind of content, freelancing, or marketing operation, this could make sense for you to affiliate too. Or just use it as a tool. Both are valid. Link below either way.",
+            ctaText: "Try unbottled.ai",
+            signature: " -  Jordan",
+            postScript:
+              "P.S. Yes, affiliate link. Yes, I earn money. Yes, I actually use it. All three are true.",
           },
           followup3: {
-            subject: "Final check-in",
-            previewText: "One last message from us",
-            greeting: "Hi {{businessName}},",
-            intro:
-              "This is my last message unless you'd like to continue hearing from us.",
-            reflection:
-              "I've reached out because I genuinely believe we could help your business.",
-            noPressure:
-              "But I respect your time and don't want to be a bother.",
-            ctaText: "Stay Connected",
-            signature: "Best wishes,",
-            closing: "The door is always open if you change your mind later.",
+            subject: "last email from me on this, I promise",
+            previewText: "one number that made me think",
+            greeting: "Hey,",
+            monthlyEarnings:
+              "I'll keep this short. Last month I earned €147 in affiliate commissions from unbottled.ai just from people I'd mentioned it to in passing. That's not a business but it's a nice bonus for recommending something I use anyway.",
+            noHardSell:
+              "I'm not going to keep emailing you about it. If it hasn't clicked by now it probably won't. But if you ever want to try a capable, uncensored AI for content work - or just try the affiliate program - the link is below. No pressure, genuinely.",
+            ctaText: "unbottled.ai",
+            signature: " -  Jordan",
           },
           nurture: {
-            subject: "Quick tip for you",
-            previewText: "A helpful insight",
-            greeting: "Hi {{businessName}},",
-            intro: "I came across something I thought you'd find valuable.",
-            tip: "Here's a quick tip that can make a real difference:",
-            value:
-              "Small changes can lead to significant improvements over time.",
-            ctaText: "Learn More",
-            signature: "To your success,",
+            subject: "a small prompt trick that's been saving me time",
+            previewText: "works especially well with unbottled.ai",
+            greeting: "Hey,",
+            tip: "Quick tip I've been using: when I need to write something in a specific brand voice, I paste 3 examples of existing content and say \"write in this style\" before the actual request. unbottled.ai is particularly good at picking this up because it doesn't add its own hedging or softening on top.",
+            freeValue:
+              "No affiliate push this time - just a thing that works. If you haven't tried unbottled.ai yet and want to, the link is still there.",
+            ctaText: "unbottled.ai",
+            signature: " -  Jordan",
           },
           reactivation: {
-            subject: "Let's reconnect",
-            previewText: "We'd love to reconnect",
-            greeting: "Hi {{businessName}},",
-            intro: "It's been a while - I wanted to reach out.",
-            checkIn: "How have things been going with your business?",
-            offer: "We have some new offerings that might interest you.",
-            ctaText: "Explore What's New",
-            signature: "Hope to connect soon,",
-            closing: "Looking forward to hearing from you.",
+            subject: "they made some changes worth knowing about",
+            previewText: "unbottled.ai update + still my affiliate link",
+            greeting: "Hey,",
+            update:
+              "It's been a few months. unbottled.ai has gotten noticeably faster and they've added new model tiers. The one I use most now is better at maintaining long documents without drifting off-topic.",
+            newOpportunity:
+              "Still affiliate, still earning on it, still actually using it weekly. If you tried it before and moved on, might be worth another look. If you never tried it, free trial is still available.",
+            ctaText: "Check out what's new",
+            signature: " -  Jordan",
+          },
+        },
+        quietRecommendation: {
+          initial: {
+            subject: "tool worth knowing about",
+            previewText: "found it on a forum, tested it for 3 weeks",
+            greeting: "Hi,",
+            howIFoundIt:
+              "Someone in a dev forum mentioned unbottled.ai as an alternative to ChatGPT for tasks that keep hitting content filters. I tested it for about 3 weeks before deciding it was worth passing along.",
+            whatItDoesDifferently:
+              "The short version: it's an AI assistant that doesn't refuse tasks on vague policy grounds. Useful if you do anything in marketing, legal, creative writing, research, or really anything where mainstream AI tools tend to get in the way of actual work.",
+            affiliateNote:
+              "There's an affiliate link below - I earn a small commission if you sign up. Mentioning it because I'd rather be upfront than pretend it's not there.",
+            ctaText: "Take a look",
+            signature: " -  Sam",
+          },
+          followup1: {
+            subject: "what I actually built with it",
+            previewText: "three weeks of real use, not a sales pitch",
+            greeting: "Hi,",
+            specificThing:
+              "In my three weeks testing unbottled.ai: wrote a content brief for a client that needed some assertive positioning (worked great). Drafted a legal-adjacent policy document that two other AI tools had refused entirely. Ran some competitive research by asking it to play devil's advocate on my business model.",
+            builtWith:
+              "None of these are extraordinary tasks. They're just things that kept getting interrupted by guardrails elsewhere. If that friction sounds familiar, it's probably worth 10 minutes to try the free version.",
+            ctaText: "Try the free version",
+            signature: " -  Sam",
+          },
+          followup2: {
+            subject: "honest comparison with ChatGPT",
+            previewText: "where each is better",
+            greeting: "Hi,",
+            comparison:
+              'Where ChatGPT is better: general knowledge, coding, multi-step reasoning, anything "safe". Where unbottled.ai is better: tasks that require directness, work in sensitive categories, anything where you\'ve repeatedly had to rephrase to avoid a refusal.',
+            honestTake:
+              "I use both. They're not in direct competition for me. But if you've ever been blocked by an AI on something legitimate, unbottled.ai is the practical solution. Free trial, affiliate link, no high-pressure anything.",
+            ctaText: "unbottled.ai",
+            signature: " -  Sam",
+          },
+          followup3: {
+            subject: "last one",
+            previewText: "won't keep emailing about this",
+            greeting: "Hi,",
+            lastOne:
+              "Last email about unbottled.ai from me. It's a solid tool for the specific cases where mainstream AI tools won't cooperate. Affiliate link below if you're curious.",
+            stayInTouch:
+              "If this isn't relevant to your work, no worries at all.",
+            ctaText: "unbottled.ai",
+            signature: " -  Sam",
+          },
+          nurture: {
+            subject: "small update from unbottled.ai",
+            previewText: "worth knowing if you're in the market",
+            greeting: "Hi,",
+            update:
+              "unbottled.ai added some new model options recently. If you looked at it before and the output quality wasn't there, it's worth another try - the newer models are a step up. Affiliate link still active if you want to sign up.",
+            ctaText: "See what's new",
+            signature: " -  Sam",
+          },
+          reactivation: {
+            subject: "checking in",
+            previewText: "brief note",
+            greeting: "Hi,",
+            checkIn:
+              "It's been a while. Just checking in - if you ever did try unbottled.ai I'd be curious what you thought. And if you didn't, it's still around, still improved, free trial still available.",
+            whatChanged:
+              "They've added better long-form support and faster response times since I first mentioned it. Affiliate link below.",
+            ctaText: "Take a look",
+            signature: " -  Sam",
           },
         },
       },

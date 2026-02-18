@@ -45,54 +45,56 @@ const AB_TEST_CONSTANTS = {
 /**
  * Journey Variant Metadata
  */
-const JOURNEY_VARIANT_METADATA: Record<
-  (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
-  {
-    name: string;
-    description: string;
-    color: string;
-    icon: IconKey;
-    characteristics: readonly string[];
-  }
+const JOURNEY_VARIANT_METADATA: Partial<
+  Record<
+    (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
+    {
+      name: string;
+      description: string;
+      color: string;
+      icon: IconKey;
+      characteristics: readonly string[];
+    }
+  >
 > = {
-  [EmailJourneyVariant.PERSONAL_APPROACH]: {
-    name: "Personal & Human Touch",
+  [EmailJourneyVariant.UNCENSORED_CONVERT]: {
+    name: "Uncensored Convert",
     description:
-      "Emphasizes personal connection, human expertise, and relationship building",
-    color: "#10B981", // Emerald
-    icon: "user",
-    characteristics: [
-      "Personal storytelling",
-      "Human connection",
-      "Relationship building",
-      "Trust and credibility",
-      "Consultative approach",
-    ] as const,
-  },
-  [EmailJourneyVariant.RESULTS_FOCUSED]: {
-    name: "Results & Social Proof",
-    description: "Focuses on metrics, case studies, and proven results",
-    color: "#3B82F6", // Blue
-    icon: "trending-up",
-    characteristics: [
-      "Data-driven messaging",
-      "Case studies",
-      "ROI focus",
-      "Performance metrics",
-      "Social proof",
-    ] as const,
-  },
-  [EmailJourneyVariant.PERSONAL_RESULTS]: {
-    name: "Personal Approach & Results Focused",
-    description: "Combines personal touch with results-driven messaging",
-    color: "#8B5CF6", // Purple
+      "Enthusiast persona sharing a genuine discovery with affiliate transparency",
+    color: "#F59E0B", // Amber
     icon: "zap",
     characteristics: [
-      "Personal relationship building",
-      "Data-driven results",
-      "Case studies",
-      "Authentic communication",
-      "Results-focused CTAs",
+      "Casual, conspiratorial tone",
+      "Genuine personal story",
+      "Affiliate transparency",
+      "Anti-censorship angle",
+      "Enthusiast energy",
+    ] as const,
+  },
+  [EmailJourneyVariant.SIDE_HUSTLE]: {
+    name: "Side Hustle",
+    description: "Transparent affiliate marketer sharing real weekly use cases",
+    color: "#10B981", // Emerald
+    icon: "trending-up",
+    characteristics: [
+      "Full affiliate disclosure upfront",
+      "Weekly use-case updates",
+      "Passive income story",
+      "Practical proof, not hype",
+      "Honest hustle energy",
+    ] as const,
+  },
+  [EmailJourneyVariant.QUIET_RECOMMENDATION]: {
+    name: "Quiet Recommendation",
+    description: "Low-key professional passing along a tool tested for weeks",
+    color: "#6B7280", // Gray
+    icon: "user",
+    characteristics: [
+      "Short, high signal-to-noise",
+      "No hype, just specifics",
+      "3-week testing backstory",
+      "Honest comparison to ChatGPT",
+      "Minimal affiliate mention",
     ] as const,
   },
 };
@@ -103,17 +105,23 @@ const JOURNEY_VARIANT_METADATA: Record<
  */
 const DEFAULT_AB_TEST_CONFIG: ABTestConfig = {
   name: "Email Journey A/B Test",
-  description: "Testing two different email journey approaches",
+  description: "Testing three unbottled.ai affiliate email journey approaches",
   isActive: true,
   startDate: new Date("2024-01-01"),
   variants: {
-    [EmailJourneyVariant.RESULTS_FOCUSED]: {
-      weight: 50,
-      description: "Data-driven with case studies and metrics",
+    [EmailJourneyVariant.UNCENSORED_CONVERT]: {
+      weight: 34,
+      description:
+        "Enthusiast who discovered unbottled.ai and shares it with affiliate link",
     },
-    [EmailJourneyVariant.PERSONAL_RESULTS]: {
-      weight: 50,
-      description: "Personal approach with results-driven messaging",
+    [EmailJourneyVariant.SIDE_HUSTLE]: {
+      weight: 33,
+      description: "Transparent affiliate marketer with real weekly use cases",
+    },
+    [EmailJourneyVariant.QUIET_RECOMMENDATION]: {
+      weight: 33,
+      description:
+        "Low-key professional recommendation after 3 weeks of testing",
     },
   },
   targetAudience: {
@@ -145,12 +153,12 @@ export class ABTestingService {
   ): (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant] {
     // Check if A/B test is active
     if (!this.config.isActive) {
-      return EmailJourneyVariant.PERSONAL_APPROACH; // Default fallback
+      return EmailJourneyVariant.UNCENSORED_CONVERT; // Default fallback
     }
 
     // Check if lead meets target audience criteria
     if (!this.isTargetAudience(leadData)) {
-      return EmailJourneyVariant.PERSONAL_APPROACH; // Default for non-target audience
+      return EmailJourneyVariant.UNCENSORED_CONVERT; // Default for non-target audience
     }
 
     // Use lead ID to create deterministic assignment with higher precision
@@ -187,7 +195,7 @@ export class ABTestingService {
       totalWeight: cumulativeWeight,
       variants: Object.keys(this.config.variants),
     });
-    return EmailJourneyVariant.PERSONAL_APPROACH;
+    return EmailJourneyVariant.UNCENSORED_CONVERT;
   }
 
   /**
@@ -322,7 +330,13 @@ export function getABTestSummary(
       id: key,
       name: variant.description,
       weight: variant.weight,
-      metadata: JOURNEY_VARIANT_METADATA[key],
+      metadata: JOURNEY_VARIANT_METADATA[key] ?? {
+        name: key,
+        description: variant.description,
+        color: "#6B7280",
+        icon: "user",
+        characteristics: [] as const,
+      },
     })),
     isValid: validation.isValid,
   };
