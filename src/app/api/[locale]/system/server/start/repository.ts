@@ -96,15 +96,26 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           unifiedTaskRunnerRepository.environment = "production";
           unifiedTaskRunnerRepository.supportsSideTasks = false; // Production: cron tasks only
 
-          // Start the task runner
-          const startResult = await unifiedTaskRunnerRepository.manageRunner(
-            { action: "start", taskFilter: "cron", dryRun: false },
-            user,
-            locale,
-            logger,
-          );
+          // Start the task runner in the background - manageRunner("start") blocks forever,
+          // so we must NOT await it or Next.js will never start.
+          void unifiedTaskRunnerRepository
+            .manageRunner(
+              { action: "start", taskFilter: "cron", dryRun: false },
+              user,
+              locale,
+              logger,
+            )
+            .catch((error) => {
+              logger.error("Task runner exited unexpectedly", {
+                error: parseError(error).message,
+              });
+            });
 
-          if (startResult.success) {
+          // Give the task runner a moment to initialize before proceeding
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
+          const status = unifiedTaskRunnerRepository.getStatus();
+          if (status.running) {
             this.taskRunnerStarted = true;
             output.push("   ✅ Unified task runner started successfully");
             output.push(
@@ -118,8 +129,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             errors.push("Failed to start unified task runner");
             output.push("   ❌ Failed to start unified task runner");
             logger.error("Failed to start task runner", {
-              message: startResult.message,
-              errorCode: startResult.errorType.errorCode,
+              message: "Task runner did not reach running state",
             });
           }
         } catch (error) {

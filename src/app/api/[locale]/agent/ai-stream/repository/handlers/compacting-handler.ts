@@ -92,7 +92,6 @@ export class CompactingHandler {
       depth,
       sequenceId,
       ctx,
-      isIncognito,
       userId,
       user,
       model,

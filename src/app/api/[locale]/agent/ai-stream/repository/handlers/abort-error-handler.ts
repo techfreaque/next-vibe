@@ -32,12 +32,12 @@ function flattenMessage(msg: ModelMessage): string {
   // role prefix adds a small overhead
   parts.push(String(msg.role));
 
-  const content = (msg as { content?: unknown }).content;
+  const { content } = msg;
 
   if (typeof content === "string") {
     parts.push(content);
   } else if (Array.isArray(content)) {
-    for (const part of content as Array<Record<string, unknown>>) {
+    for (const part of content as Array<Record<string, string | number | boolean | null | undefined>>) {
       if (part.type === "text" && typeof part.text === "string") {
         parts.push(part.text);
       } else if (part.type === "tool-call") {

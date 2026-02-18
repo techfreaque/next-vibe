@@ -51,12 +51,9 @@ export function createMessageMetadata(
   // Author information (public/shared threads only)
   if (
     (rootFolderId === "public" || rootFolderId === "shared") &&
-    message.authorName
+    message.authorId
   ) {
-    const authorInfo = message.authorId
-      ? `${message.authorName}(${message.authorId.slice(-8)})`
-      : message.authorName;
-    parts.push(`Author:${authorInfo}`);
+    parts.push(`Author:${message.authorId.slice(-8)}`);
   }
 
   // Votes (show if either upvotes or downvotes > 0)
@@ -74,16 +71,6 @@ export function createMessageMetadata(
   // Timestamp (absolute, cache-stable)
   const timestamp = formatAbsoluteTimestamp(message.createdAt, timezone);
   parts.push(`Posted:${timestamp}`);
-
-  // Status indicators (only if present)
-  const statusParts: string[] = [];
-  if (message.edited) {
-    statusParts.push("edited");
-  }
-
-  if (statusParts.length > 0) {
-    parts.push(statusParts.join(","));
-  }
 
   return parts.join(" | ");
 }

@@ -43,11 +43,11 @@ export function ErrorMessageBubble({
       }
     } else {
       // Fallback if not a valid ErrorResponse
-      displayContent = t(message.content);
+      displayContent = message.content ?? "";
     }
   } catch {
-    // If JSON parsing fails, treat it as a regular translation key
-    displayContent = t(message.content);
+    // If JSON parsing fails, show content as-is
+    displayContent = message.content ?? "";
   }
 
   return (

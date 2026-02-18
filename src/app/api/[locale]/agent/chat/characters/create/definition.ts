@@ -303,9 +303,7 @@ const { POST } = createEndpoint({
       modelSelection: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.OBJECT,
-        schema: modelSelectionSchemaSimple.default({
-          selectionType: ModelSelectionType.FILTERS,
-        }),
+        schema: modelSelectionSchemaSimple.nullable(),
       }),
 
       // === RESPONSE ===

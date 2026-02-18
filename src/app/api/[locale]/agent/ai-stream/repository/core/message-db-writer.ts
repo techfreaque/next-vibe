@@ -896,10 +896,9 @@ export class MessageDbWriter {
     state.timer = setTimeout(() => {
       state.timer = null;
       state.inflightPromise = this.writeNow(messageId, state.content).catch(
-        (err: unknown) => {
-          this.logger.error("[MessageDbWriter] Throttled update failed", {
+        (err: Error) => {
+          this.logger.error("[MessageDbWriter] Throttled update failed", err, {
             messageId,
-            error: err instanceof Error ? err.message : String(err),
           });
         },
       );
