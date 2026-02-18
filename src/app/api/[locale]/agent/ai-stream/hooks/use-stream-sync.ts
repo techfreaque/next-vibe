@@ -51,7 +51,6 @@ export function useStreamSync(deps: StreamSyncDeps): void {
         // Check if we need to update the message
         const needsUpdate =
           existingMsg.content !== streamMsg.content ||
-          existingMsg.tokens !== (streamMsg.totalTokens || null) ||
           existingMsg.character !== (streamMsg.character || null) ||
           JSON.stringify(existingMsg.metadata?.toolCall) !==
             JSON.stringify(streamMsg.toolCall) ||
@@ -61,7 +60,6 @@ export function useStreamSync(deps: StreamSyncDeps): void {
         if (needsUpdate) {
           updateMessage(streamMsg.messageId, {
             content: streamMsg.content,
-            tokens: streamMsg.totalTokens || null,
             character: streamMsg.character || null,
             metadata: {
               ...existingMsg.metadata,
@@ -95,9 +93,6 @@ export function useStreamSync(deps: StreamSyncDeps): void {
           parentId: streamMsg.parentId,
           depth: streamMsg.depth,
           authorId: null,
-          authorName: null,
-          authorAvatar: null,
-          authorColor: null,
           isAI: streamMsg.role === ChatMessageRole.ASSISTANT,
           model: streamMsg.model || null,
           character: streamMsg.character || null,
@@ -106,9 +101,6 @@ export function useStreamSync(deps: StreamSyncDeps): void {
             : null,
           errorMessage: streamMsg.error || null,
           errorCode: null,
-          edited: false,
-          originalId: null,
-          tokens: streamMsg.totalTokens || null,
           metadata: {
             ...(streamMsg.toolCall ? { toolCall: streamMsg.toolCall } : {}),
             ...(streamMsg.promptTokens !== undefined

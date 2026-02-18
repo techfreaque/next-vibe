@@ -6,9 +6,23 @@ import type { JSX } from "react";
 
 import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/hooks/store";
 
-export function LoadingIndicator(): JSX.Element | null {
-  const isStreaming = useAIStreamStore((state) => state.isStreaming);
-  return isStreaming ? (
+export function LoadingIndicator({
+  sequenceId,
+}: {
+  sequenceId: string | null;
+}): JSX.Element | null {
+  const isActivelyStreaming = useAIStreamStore((state) => {
+    if (!state.isStreaming) {
+      return false;
+    }
+    if (!sequenceId) {
+      return false;
+    }
+    return Object.values(state.streamingMessages).some(
+      (msg) => msg.sequenceId === sequenceId && msg.isStreaming,
+    );
+  });
+  return isActivelyStreaming ? (
     <Div className={cn("flex items-start gap-3", "animate-fade-in")}>
       <Div className="flex-1">
         <Div className="flex items-center gap-2">

@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseField,
@@ -40,6 +42,7 @@ import {
   SmtpSecurityType,
   SmtpSecurityTypeOptions,
 } from "../enum";
+import { SmtpCreateContainer } from "./widget";
 
 /**
  * POST endpoint definition - Create SMTP account
@@ -54,16 +57,12 @@ const { POST } = createEndpoint({
   tags: ["app.api.emails.smtpClient.tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.smtpClient.create.container.title",
-      description: "app.api.emails.smtpClient.create.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: SmtpCreateContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { request: "data", response: true } }),
+
       // === ACCOUNT INFORMATION ===
       accountInfo: objectField(
         {
@@ -446,7 +445,7 @@ const { POST } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {

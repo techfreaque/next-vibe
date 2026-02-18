@@ -33,7 +33,8 @@ interface AssistantMessageActionsProps {
   onDelete?: (messageId: string) => void;
   className?: string;
   logger: EndpointLogger;
-  tokens: number | null;
+  promptTokens: number | null;
+  completionTokens: number | null;
   creditCost: number | null;
 }
 
@@ -47,7 +48,8 @@ export function AssistantMessageActions({
   onDelete,
   className,
   logger,
-  tokens,
+  promptTokens,
+  completionTokens,
   creditCost,
 }: AssistantMessageActionsProps): React.JSX.Element {
   const { t } = simpleT(locale);
@@ -163,7 +165,8 @@ export function AssistantMessageActions({
 
       {/* Show actual cost/tokens if available - right-aligned */}
       {((creditCost !== null && creditCost !== undefined) ||
-        (tokens !== null && tokens !== undefined)) && (
+        (promptTokens !== null && promptTokens !== undefined) ||
+        (completionTokens !== null && completionTokens !== undefined)) && (
         <Div className="text-xs text-muted-foreground ml-auto flex items-center gap-1.5">
           {creditCost !== null && creditCost !== undefined && (
             <Span
@@ -175,12 +178,13 @@ export function AssistantMessageActions({
               {t("app.chat.common.assistantMessageActions.credits")}
             </Span>
           )}
-          {tokens !== null && tokens !== undefined && (
+          {(promptTokens !== null || completionTokens !== null) && (
             <Span
               title={t("app.chat.common.assistantMessageActions.tokensUsed")}
               className="text-muted-foreground/70"
             >
-              • {tokens.toLocaleString()}{" "}
+              •{" "}
+              {((promptTokens ?? 0) + (completionTokens ?? 0)).toLocaleString()}{" "}
               {t("app.chat.common.assistantMessageActions.tokens")}
             </Span>
           )}

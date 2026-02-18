@@ -2,10 +2,7 @@
  * ToolErrorHandler - Handles tool error events during streaming
  */
 
-import type { ReadableStreamDefaultController } from "node:stream/web";
-
 import type { JSONValue } from "ai";
-import { eq } from "drizzle-orm";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -13,13 +10,11 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
-import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import { chatMessages, type ToolCall } from "../../../chat/db";
-import { ChatMessageRole } from "../../../chat/enum";
-import { createToolMessage } from "../../../chat/threads/[threadId]/messages/repository";
-import { createStreamEvent, formatSSEEvent } from "../../events";
+import { type ToolCall } from "../../../chat/db";
+import type { MessageDbWriter } from "../core/message-db-writer";
 
 export class ToolErrorHandler {
   /**
@@ -48,8 +43,8 @@ export class ToolErrorHandler {
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
-    controller: ReadableStreamDefaultController<Uint8Array>;
-    encoder: TextEncoder;
+    user: JwtPayloadType;
+    dbWriter: MessageDbWriter;
     logger: EndpointLogger;
   }): Promise<{
     currentParentId: string | null;
@@ -64,8 +59,8 @@ export class ToolErrorHandler {
       sequenceId,
       isIncognito,
       userId,
-      controller,
-      encoder,
+      user,
+      dbWriter,
       logger,
     } = params;
 
@@ -75,7 +70,6 @@ export class ToolErrorHandler {
 
     const { messageId: toolMessageId, toolCallData } = pendingToolMessage;
 
-    // Extract error from the tool-error event and structure it for translation
     const error: ErrorResponseType =
       "error" in part && part.error
         ? typeof part.error === "object" &&
@@ -102,98 +96,37 @@ export class ToolErrorHandler {
       messageId: toolMessageId,
     });
 
-    // Add error to tool call data (for UI)
     const toolCallWithError: ToolCall = {
       ...toolCallData.toolCall,
       error,
     };
 
-    // Emit MESSAGE_CREATED event with updated toolCall for TOOL message
-    const toolMessageEvent = createStreamEvent.messageCreated({
-      messageId: toolMessageId,
+    await dbWriter.emitToolResult({
+      toolMessageId,
       threadId,
-      role: ChatMessageRole.TOOL,
-      content: null, // Tool messages have no text content
       parentId: toolCallData.parentId,
       depth: toolCallData.depth,
+      userId,
       model,
       character,
       sequenceId,
-      toolCall: toolCallWithError, // Include tool call data with error
+      toolCall: toolCallWithError,
+      toolName: part.toolName,
+      result: undefined,
+      error,
+      skipSseEmit: false,
+      user,
     });
-    controller.enqueue(encoder.encode(formatSSEEvent(toolMessageEvent)));
 
-    logger.info("[AI Stream] TOOL MESSAGE_CREATED event sent", {
+    logger.info("[AI Stream] TOOL_RESULT event sent (error)", {
       messageId: toolMessageId,
       toolName: part.toolName,
       isIncognito,
     });
 
-    // Update TOOL message in DB with error (server mode only - incognito stores in localStorage)
-    if (!isIncognito) {
-      const updateResult = await db
-        .update(chatMessages)
-        .set({
-          metadata: { toolCall: toolCallWithError },
-          updatedAt: new Date(),
-        })
-        .where(eq(chatMessages.id, toolMessageId))
-        .returning({ id: chatMessages.id });
-
-      if (updateResult.length === 0) {
-        logger.error(
-          "[AI Stream] CRITICAL: Tool message update failed - message not found in DB",
-          {
-            messageId: toolMessageId,
-            toolCallId: part.toolCallId,
-            toolName: part.toolName,
-            threadId,
-          },
-        );
-        // Fallback: create message if update failed
-        await createToolMessage({
-          messageId: toolMessageId,
-          threadId,
-          toolCall: toolCallWithError,
-          parentId: toolCallData.parentId,
-          depth: toolCallData.depth,
-          userId,
-          sequenceId,
-          model,
-          character,
-          logger,
-        });
-        logger.warn("[AI Stream] Created missing tool message as fallback", {
-          messageId: toolMessageId,
-        });
-      } else {
-        logger.debug("[AI Stream] Tool message updated in DB with error", {
-          messageId: toolMessageId,
-          toolName: part.toolName,
-        });
-      }
-    }
-
-    // Emit TOOL_RESULT event to frontend with error
-    const toolResultEvent = createStreamEvent.toolResult({
-      messageId: toolMessageId,
-      toolName: part.toolName,
-      result: undefined,
-      error,
-      toolCall: toolCallWithError,
-    });
-    controller.enqueue(encoder.encode(formatSSEEvent(toolResultEvent)));
-
-    logger.info("[AI Stream] TOOL_RESULT event sent (error)", {
-      messageId: toolMessageId,
-      toolName: part.toolName,
-    });
-
-    // After tool error, next message should be a child of the TOOL message
-    // NO separate ERROR message - error is displayed in the TOOL message UI
     return {
-      currentParentId: toolMessageId, // Next message is child of TOOL
-      currentDepth: toolCallData.depth + 1, // One level deeper than TOOL
+      currentParentId: toolMessageId,
+      currentDepth: toolCallData.depth,
     };
   }
 }

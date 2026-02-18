@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -19,7 +19,11 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { cronTasks } from "../../cron/db";
-import { CronTaskPriority, TaskCategory } from "../../enum";
+import {
+  CronTaskEnabledFilter,
+  CronTaskPriority,
+  TaskCategory,
+} from "../../enum";
 import type {
   CronTaskCreateRequestOutput,
   CronTaskCreateResponseOutput,
@@ -92,55 +96,50 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
   ): Promise<ResponseType<CronTaskListResponseOutput>> {
     try {
       logger.info("Starting cron tasks retrieval");
-      logger.debug("Request data", data);
 
       // Build query conditions
       const conditions = [];
 
-      // Apply enabled filter
-      if (data.enabled !== undefined) {
-        conditions.push(eq(cronTasks.enabled, data.enabled));
-        logger.debug("Applied enabled filter", {
-          enabled: data.enabled,
-        });
+      if (data.enabled === CronTaskEnabledFilter.ENABLED) {
+        conditions.push(eq(cronTasks.enabled, true));
+      } else if (data.enabled === CronTaskEnabledFilter.DISABLED) {
+        conditions.push(eq(cronTasks.enabled, false));
       }
+      // CronTaskEnabledFilter.ALL or undefined → no filter
 
-      // Apply multi-select status filter - skip for now since field doesn't exist
+      // status filter maps to lastExecutionStatus
       if (data.status && data.status.length > 0) {
-        // Since we don't have lastExecutionStatus in the current schema,
-        // we'll filter by enabled status as a placeholder
-        logger.debug("Applied status filter", { statuses: data.status });
+        conditions.push(inArray(cronTasks.lastExecutionStatus, data.status));
       }
 
-      // Apply multi-select priority filter
       if (data.priority && data.priority.length > 0) {
         conditions.push(inArray(cronTasks.priority, data.priority));
-        logger.debug("Applied priority filter", {
-          priorities: data.priority,
-        });
       }
 
-      // Apply multi-select category filter
       if (data.category && data.category.length > 0) {
         conditions.push(inArray(cronTasks.category, data.category));
-        logger.debug("Applied category filter", {
-          categories: data.category,
-        });
       }
 
       // Handle pagination
-      const limit = data.limit ? parseInt(data.limit, 10) : 10;
+      const limit = data.limit ? parseInt(data.limit, 10) : 100;
       const offset = data.offset ? parseInt(data.offset, 10) : 0;
 
-      // Default sort order by creation date
-      const sortOrder = desc(cronTasks.createdAt);
+      const whereClause =
+        conditions.length > 0 ? and(...conditions) : undefined;
+
+      // Get total count (separate query before applying limit/offset)
+      const [countRow] = await db
+        .select({ total: count(cronTasks.id) })
+        .from(cronTasks)
+        .where(whereClause);
+      const totalTasks = countRow?.total ?? 0;
 
       // Execute query with pagination
       const tasks = await db
         .select()
         .from(cronTasks)
-        .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .orderBy(sortOrder)
+        .where(whereClause)
+        .orderBy(desc(cronTasks.createdAt))
         .limit(limit)
         .offset(offset);
 
@@ -149,22 +148,12 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       // Format tasks with computed fields
       const formattedTasks = tasks.map((task) => formatTaskResponse(task));
 
-      // Get total count for pagination
-      const totalTasks = formattedTasks.length;
-
       const response: CronTaskListResponseOutput = {
         tasks: formattedTasks,
         totalTasks,
       };
 
       logger.vibe("🚀 Successfully retrieved cron tasks list");
-      logger.debug("Response summary", {
-        totalTasks,
-        filtersApplied: conditions.length,
-        limit,
-        offset,
-      });
-
       return success(response);
     } catch (error) {
       const parsedError = parseError(error);
@@ -184,7 +173,6 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
   ): Promise<ResponseType<CronTaskCreateResponseOutput>> {
     try {
       logger.info("Starting cron task creation");
-      logger.debug("Request data", data);
 
       // Check if task with same name already exists
       const existingTask = await db

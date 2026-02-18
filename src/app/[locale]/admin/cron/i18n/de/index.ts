@@ -41,6 +41,8 @@ export const translations: typeof enTranslations = {
     commonSchedules: "Häufige Zeitpläne",
   },
   nav: {
+    status: "Status",
+    status_description: "Überwachen Sie den Systemstatus und aktive Aufgaben",
     stats: "Statistiken",
     stats_description:
       "Zeigen Sie Statistiken und Leistungsmetriken für Cron-Aufgaben an",

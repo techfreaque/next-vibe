@@ -207,7 +207,7 @@ const SortableItem = React.memo(function SortableItem({
                 modelId={item.modelId}
                 variant="text"
                 className="text-xs text-muted-foreground"
-                t={simpleT(locale as CountryLanguage).t}
+                t={simpleT(locale).t}
                 locale={locale}
               />
             )}

@@ -11,9 +11,7 @@ import {
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { ChatMessageRole } from "../../../chat/enum";
-import { createErrorMessage } from "../../../chat/threads/[threadId]/messages/repository";
-import { createStreamEvent, formatSSEEvent } from "../../events";
+import type { MessageDbWriter } from "../core/message-db-writer";
 
 export class TimeoutErrorHandler {
   /**
@@ -23,26 +21,22 @@ export class TimeoutErrorHandler {
     maxDuration: number;
     model: string;
     threadId: string;
-    isIncognito: boolean;
     userId: string | undefined;
     lastParentId: string | null;
     lastDepth: number;
     lastSequenceId: string | null;
-    controller: ReadableStreamDefaultController;
-    encoder: TextEncoder;
+    dbWriter: MessageDbWriter;
     logger: EndpointLogger;
   }): Promise<void> {
     const {
       maxDuration,
       model,
       threadId,
-      isIncognito,
       userId,
       lastParentId,
       lastDepth,
       lastSequenceId,
-      controller,
-      encoder,
+      dbWriter,
       logger,
     } = params;
 
@@ -60,40 +54,15 @@ export class TimeoutErrorHandler {
       messageParams: { maxDuration: maxDuration.toString() },
     });
 
-    const errorMessageId = crypto.randomUUID();
-    const { serializeError } = await import("../../error-utils");
-
-    // Emit ERROR message event for UI
-    const errorMessageEvent = createStreamEvent.messageCreated({
-      messageId: errorMessageId,
+    // Emit MESSAGE_CREATED SSE + save to DB + emit ERROR SSE
+    await dbWriter.emitErrorMessage({
       threadId,
-      role: ChatMessageRole.ERROR,
-      content: serializeError(timeoutError),
+      errorType: "TIMEOUT_ERROR",
+      error: timeoutError,
       parentId: lastParentId,
       depth: lastDepth,
       sequenceId: lastSequenceId,
-      model: null,
-      character: null,
+      userId,
     });
-    controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
-
-    // Save ERROR message to DB (server mode only - incognito stores in localStorage)
-    if (!isIncognito) {
-      await createErrorMessage({
-        messageId: errorMessageId,
-        threadId,
-        content: serializeError(timeoutError),
-        errorType: "TIMEOUT_ERROR",
-        parentId: lastParentId,
-        depth: lastDepth,
-        userId,
-        sequenceId: lastSequenceId,
-        logger,
-      });
-    }
-
-    // Emit ERROR event to stop the stream
-    const errorEvent = createStreamEvent.error(timeoutError);
-    controller.enqueue(encoder.encode(formatSSEEvent(errorEvent)));
   }
 }

@@ -8,6 +8,8 @@ import { z } from "zod";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   requestResponseField,
@@ -43,6 +45,7 @@ import {
   SmtpSecurityType,
   SmtpSecurityTypeOptions,
 } from "../../enum";
+import { SmtpEditContainer } from "./widget";
 
 /**
  * GET endpoint for retrieving SMTP account by ID
@@ -279,17 +282,12 @@ const { PUT } = createEndpoint({
   tags: ["app.api.emails.smtpClient.tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.smtpClient.edit.id.put.container.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.put.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data&urlPathParams", response: true },
-    {
+  fields: customWidgetObject({
+    render: SmtpEditContainer,
+    usage: { request: "data&urlPathParams", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { request: "data", response: true } }),
+
       // === URL PARAMETER ===
       id: requestUrlPathParamsResponseField({
         type: WidgetType.FORM_FIELD,
@@ -477,7 +475,7 @@ const { PUT } = createEndpoint({
         schema: z.array(z.enum(Languages)).optional(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {

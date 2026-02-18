@@ -101,4 +101,12 @@ export const translations: typeof enTranslations = {
     title: "Sukces",
     description: "Foldery pobrane pomyślnie",
   },
+  widget: {
+    title: "Foldery IMAP",
+    refresh: "Odśwież",
+    sync: "Synchronizuj foldery",
+    empty: "Brak folderów",
+    messages: "Wiadomości",
+    unseen: "Nieprzeczytane",
+  },
 };

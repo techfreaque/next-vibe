@@ -17,6 +17,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 /**
  * GET endpoint definition - Get pulse status
@@ -24,13 +25,13 @@ import {
  */
 const pulseStatusEndpoint = createEndpoint({
   method: Methods.GET,
-  path: ["system", "tasks", "pulse", "status"],
+  path: ["system", "unified-interface", "tasks", "pulse", "status"],
   title: "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.title",
   description:
     "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.description",
   icon: "activity",
   category: "app.api.system.unifiedInterface.tasks.pulseSystem.status.category",
-  allowedRoles: [],
+  allowedRoles: [UserRole.ADMIN],
   aliases: ["pulse:status"],
   tags: [
     "app.api.system.unifiedInterface.tasks.pulseSystem.status.tags.status",

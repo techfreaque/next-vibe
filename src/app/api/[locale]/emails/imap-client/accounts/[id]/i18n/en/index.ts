@@ -254,4 +254,13 @@ export const translations = {
       description: "Account deleted successfully",
     },
   },
+  widget: {
+    put: {
+      title: "Edit IMAP Account",
+      basicInfo: "Basic Info",
+      server: "Server Connection",
+      auth: "Authentication",
+      sync: "Sync Configuration",
+    },
+  },
 };

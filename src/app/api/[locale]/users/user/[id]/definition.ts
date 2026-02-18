@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   requestUrlPathParamsField,
@@ -25,6 +27,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema } from "../../../shared/types/common.schema";
+import { UserDeleteContainer, UserDetailContainer } from "./widget";
 
 /**
  * Get User Endpoint Definition
@@ -39,16 +42,11 @@ const { GET } = createEndpoint({
   tags: ["app.api.users.user.tag" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.users.user.id.id.get.container.title" as const,
-      description:
-        "app.api.users.user.id.id.get.container.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "urlPathParams", response: true },
-    {
+  fields: customWidgetObject({
+    render: UserDetailContainer,
+    usage: { request: "urlPathParams", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
       // === URL PARAMS ===
       id: requestUrlPathParamsField({
         type: WidgetType.FORM_FIELD,
@@ -275,7 +273,7 @@ const { GET } = createEndpoint({
         schema: dateSchema,
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
@@ -704,16 +702,11 @@ const { DELETE } = createEndpoint({
   tags: ["app.api.users.user.tag" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.users.user.id.id.delete.container.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.container.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "urlPathParams", response: true },
-    {
+  fields: customWidgetObject({
+    render: UserDeleteContainer,
+    usage: { request: "urlPathParams", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
       // === URL PARAMS ===
       id: requestUrlPathParamsField({
         type: WidgetType.FORM_FIELD,
@@ -745,7 +738,7 @@ const { DELETE } = createEndpoint({
         schema: dateSchema.describe("When the user was deleted"),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {

@@ -179,6 +179,12 @@ export const translations = {
         label: "Offset",
         description: "Number of transactions to skip for pagination",
       },
+      targetUserId: {
+        label: "Target User ID",
+      },
+      targetLeadId: {
+        label: "Target Lead ID",
+      },
       id: "Transaction ID",
       amount: "Amount",
       type: "Type",

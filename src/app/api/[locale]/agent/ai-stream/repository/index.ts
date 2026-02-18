@@ -24,7 +24,6 @@ import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
 } from "../definition";
-import { createStreamEvent, formatSSEEvent } from "../events";
 import { CompactingHandler } from "./handlers/compacting-handler";
 import { MessageContextBuilder } from "./handlers/message-context-builder";
 import { StreamErrorCatchHandler } from "./handlers/stream-error-catch-handler";
@@ -146,6 +145,7 @@ export class AiStreamRepository {
               userMessageMetadata,
               fileUploadPromise,
               isNewThread,
+              isIncognito,
               threadId: threadResultThreadId,
               rootFolderId: data.rootFolderId,
               subFolderId: data.subFolderId,
@@ -200,7 +200,6 @@ export class AiStreamRepository {
                   depth: ctx.currentDepth,
                   sequenceId: ctx.sequenceId,
                   ctx,
-                  controller,
                   isIncognito,
                   userId,
                   user,
@@ -224,7 +223,7 @@ export class AiStreamRepository {
 
                 // STOP - don't continue with broken state
                 ctx.cleanup();
-                controller.close();
+                ctx.dbWriter.closeController();
                 return;
               }
 
@@ -257,17 +256,17 @@ export class AiStreamRepository {
                 );
 
                 // Emit error event to frontend
-                const errorResponse = fail({
-                  message:
-                    "app.api.agent.chat.aiStream.errors.compactingRebuildFailed" as const,
-                  errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                });
-                const errorEvent = createStreamEvent.error(errorResponse);
-                controller.enqueue(encoder.encode(formatSSEEvent(errorEvent)));
+                ctx.dbWriter.emitError(
+                  fail({
+                    message:
+                      "app.api.agent.chat.aiStream.errors.compactingRebuildFailed" as const,
+                    errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  }),
+                );
 
                 // STOP - don't continue with broken state
                 ctx.cleanup();
-                controller.close();
+                ctx.dbWriter.closeController();
                 return;
               }
 
@@ -314,8 +313,6 @@ export class AiStreamRepository {
               emittedToolResultIds,
               ttsHandler,
               user,
-              controller,
-              encoder,
               logger,
             });
           } catch (error) {
@@ -325,10 +322,7 @@ export class AiStreamRepository {
               maxDuration,
               model: data.model,
               threadId: threadResultThreadId,
-              isIncognito,
               userId,
-              controller,
-              encoder,
               logger,
             });
           }

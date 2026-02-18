@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   requestUrlPathParamsField,
@@ -26,6 +28,7 @@ import {
   ImapAuthMethodOptions,
   ImapSpecialUseType,
 } from "../../enum";
+import { ImapAccountEditContainer } from "./widget";
 
 /**
  * Get IMAP Account Endpoint (GET)
@@ -297,17 +300,12 @@ const { PUT } = createEndpoint({
   tags: ["app.api.emails.imapClient.tags.accounts"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.imapClient.accounts.id.post.form.title",
-      description:
-        "app.api.emails.imapClient.accounts.id.post.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data&urlPathParams", response: true },
-    {
+  fields: customWidgetObject({
+    render: ImapAccountEditContainer,
+    usage: { request: "data&urlPathParams", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { request: "data", response: true } }),
+
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField({
         type: WidgetType.FORM_FIELD,
@@ -532,7 +530,7 @@ const { PUT } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {

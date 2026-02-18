@@ -134,16 +134,10 @@ export function ChatMessages({
         sequenceId: streamMsg.sequenceId ?? null,
         // Required fields with defaults
         authorId: null,
-        authorName: null,
-        authorAvatar: null,
-        authorColor: null,
         isAI: streamMsg.role === "assistant",
         errorType: null,
         errorMessage: null,
         errorCode: null,
-        edited: false,
-        originalId: null,
-        tokens: null,
         metadata: {
           ...(streamMsg.toolCall ? { toolCall: streamMsg.toolCall } : {}),
           ...(streamMsg.isCompacting !== undefined

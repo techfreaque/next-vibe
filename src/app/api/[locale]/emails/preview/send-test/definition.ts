@@ -7,7 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  backButton,
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
@@ -25,6 +26,8 @@ import {
   LanguagesOptions,
 } from "@/i18n/core/config";
 
+import { EmailPreviewSendTestContainer } from "./widget";
+
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["emails", "preview", "send-test"],
@@ -35,14 +38,12 @@ const { POST } = createEndpoint({
   icon: "send",
   allowedRoles: [UserRole.ADMIN] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.preview.sendTest.post.container.title" as const,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: EmailPreviewSendTestContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { request: "data", response: true } }),
+
       // === REQUEST FIELDS ===
       templateId: requestField({
         type: WidgetType.FORM_FIELD,
@@ -119,7 +120,7 @@ const { POST } = createEndpoint({
         schema: z.string(),
       }),
     },
-  ),
+  }),
 
   examples: {
     requests: {

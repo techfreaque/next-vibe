@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
@@ -36,6 +38,7 @@ import {
   LeadStatusOptions,
 } from "../enum";
 import type { CsvImportJobStatus } from "./enum";
+import { LeadsImportContainer } from "./widget";
 
 /**
  * Import Leads from CSV Endpoint (POST)
@@ -60,16 +63,11 @@ const { POST } = createEndpoint({
     firstCliArgKey: "fileName",
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.import.post.form.title" as const,
-      description: "app.api.leads.import.post.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: LeadsImportContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
       // === REQUEST FIELDS ===
       file: requestField({
         type: WidgetType.FORM_FIELD,
@@ -292,7 +290,7 @@ const { POST } = createEndpoint({
         schema: z.uuid().optional(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

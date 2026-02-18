@@ -3,7 +3,12 @@
  * Replaces scattered closure variables to prevent memory leaks
  */
 
+import type { ReadableStreamDefaultController } from "node:stream/web";
+
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
 import type { ToolCall } from "../../../chat/db";
+import { MessageDbWriter } from "./message-db-writer";
 
 export interface PendingToolData {
   messageId: string;
@@ -19,6 +24,8 @@ export interface PendingToolData {
  * MUST call cleanup() when stream ends to prevent memory leaks
  */
 export class StreamContext {
+  /** Centralised, throttled DB writer for all assistant message writes */
+  readonly dbWriter: MessageDbWriter;
   // Pre-generated ASSISTANT message ID (for cache stability)
   // Used only for the FIRST assistant message in a stream
   private readonly initialAssistantMessageId: string;
@@ -58,6 +65,10 @@ export class StreamContext {
     initialParentId: string | null;
     initialDepth: number;
     initialAssistantMessageId: string;
+    isIncognito: boolean;
+    logger: EndpointLogger;
+    controller: ReadableStreamDefaultController<Uint8Array>;
+    encoder: TextEncoder;
   }) {
     this.sequenceId = params.sequenceId;
     this.currentParentId = params.initialParentId;
@@ -66,6 +77,20 @@ export class StreamContext {
     this.lastDepth = params.initialDepth;
     this.lastSequenceId = params.sequenceId;
     this.initialAssistantMessageId = params.initialAssistantMessageId;
+    this.dbWriter = new MessageDbWriter(
+      params.isIncognito,
+      params.logger,
+      params.controller,
+      params.encoder,
+    );
+  }
+
+  /**
+   * The pre-generated ID for the first ASSISTANT message in this stream.
+   * Used as a fallback messageId when the stream aborts before any content is generated.
+   */
+  get preGeneratedAssistantMessageId(): string {
+    return this.initialAssistantMessageId;
   }
 
   /**
@@ -94,8 +119,11 @@ export class StreamContext {
 
   /**
    * Cleanup - MUST be called when stream ends
+   * Flushes any pending DB writes before clearing state.
    */
   cleanup(): void {
+    // Flush any remaining throttled writes (fire-and-forget; best effort at cleanup)
+    void this.dbWriter.flushAll();
     this.currentAssistantContent = "";
     this.currentAssistantMessageId = null;
     this.pendingToolMessages.clear();

@@ -168,4 +168,10 @@ export const translations: typeof enTranslations = {
       description: "Vorgang erfolgreich abgeschlossen",
     },
   },
+  widget: {
+    title: "IMAP-Nachrichten",
+    refresh: "Aktualisieren",
+    empty: "Keine Nachrichten gefunden",
+    hasAttachments: "Hat Anhänge",
+  },
 };

@@ -53,6 +53,11 @@ export const translations: typeof enTranslations = {
     system: "System",
     monitoring: "Monitorowanie",
   },
+  enabledFilter: {
+    all: "Wszystkie",
+    enabled: "Włączone",
+    disabled: "Wyłączone",
+  },
   sort: {
     asc: "Rosnąco",
     desc: "Malejąco",

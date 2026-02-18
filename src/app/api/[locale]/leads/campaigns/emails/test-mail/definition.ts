@@ -22,6 +22,8 @@ import {
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseField,
@@ -41,6 +43,8 @@ import {
   LanguagesOptions,
 } from "@/i18n/core/config";
 
+import { TestEmailContainer } from "./widget";
+
 /**
  * Send Test Email Endpoint (POST)
  */
@@ -54,16 +58,11 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "send",
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.campaigns.emails.testMail.post.form.title",
-      description:
-        "app.api.leads.campaigns.emails.testMail.post.form.description",
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: TestEmailContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
       // SMTP Account Selection
       campaignType: requestField({
         type: WidgetType.FORM_FIELD,
@@ -300,7 +299,7 @@ const { POST } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

@@ -41,8 +41,9 @@ export class CronHistoryRepository {
       logger.debug("Fetching task execution history", { filters: data });
 
       // Parse pagination with type safety
-      const limit = data?.limit ? parseInt(data.limit, 10) : 50;
-      const offset = data?.offset ? parseInt(data.offset, 10) : 0;
+      const limit =
+        data?.limit && Number(data.limit) > 0 ? Number(data.limit) : 50;
+      const offset = data?.offset ? Number(data.offset) : 0;
 
       // Build conditions
       const conditions = [];

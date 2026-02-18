@@ -1,4 +1,6 @@
 #!/bin/bash
+git stash
+git pull
 set -e
 
 # Build and start

@@ -41,6 +41,8 @@ export const translations: typeof enTranslations = {
     commonSchedules: "Popularne harmonogramy",
   },
   nav: {
+    status: "Status",
+    status_description: "Monitoruj stan systemu cron i aktywne zadania",
     stats: "Statystyki",
     stats_description: "Zobacz statystyki i metryki wydajności zadań cron",
     tasks: "Zadania",

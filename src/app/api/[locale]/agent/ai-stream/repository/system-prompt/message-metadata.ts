@@ -80,9 +80,7 @@ export function createMessageMetadata(
   if (message.edited) {
     statusParts.push("edited");
   }
-  if (message.originalId) {
-    statusParts.push("branched");
-  }
+
   if (statusParts.length > 0) {
     parts.push(statusParts.join(","));
   }

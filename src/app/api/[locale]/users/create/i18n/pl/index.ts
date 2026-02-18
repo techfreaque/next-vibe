@@ -230,6 +230,22 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  widget: {
+    headerCreated: "Użytkownik utworzony",
+    headerCreate: "Utwórz użytkownika",
+    headerSubtitle: "Utwórz nowe konto administratora lub klienta",
+    activeBadge: "Aktywny",
+    verifiedBadge: "Zweryfikowany",
+    copiedTooltip: "Skopiowano!",
+    copyUserIdTooltip: "Kopiuj ID użytkownika",
+    copyIdButton: "Kopiuj ID",
+    copiedButton: "Skopiowano!",
+    viewUserButton: "Zobacz użytkownika",
+    fullProfileButton: "Pełny profil",
+    creditHistoryButton: "Historia kredytów",
+    createAnotherButton: "Utwórz kolejnego użytkownika",
+    createdPrefix: "Utworzony",
+  },
   email: {
     users: {
       welcome: {

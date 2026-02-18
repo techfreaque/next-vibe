@@ -4,9 +4,7 @@
 
 import "server-only";
 
-import type { ReadableStreamDefaultController } from "node:stream/web";
-
-import type { JSONValue, streamText, TextStreamPart, ToolSet } from "ai";
+import type { JSONValue, TextStreamPart, ToolSet } from "ai";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -28,10 +26,6 @@ export class StreamPartHandler {
   static async processPart<TOOLS extends ToolSet>(params: {
     part: TextStreamPart<TOOLS>;
     ctx: StreamContext;
-    streamResult: {
-      usage: ReturnType<typeof streamText>["usage"];
-      finishReason: ReturnType<typeof streamText>["finishReason"];
-    };
     threadId: string;
     model: ModelId;
     character: string;
@@ -42,14 +36,11 @@ export class StreamPartHandler {
     streamAbortController: AbortController;
     emittedToolResultIds: Set<string> | undefined;
     ttsHandler: StreamingTTSHandler | null;
-    controller: ReadableStreamDefaultController<Uint8Array>;
-    encoder: TextEncoder;
     logger: EndpointLogger;
   }): Promise<{ shouldAbort: boolean }> {
     const {
       part,
       ctx,
-      streamResult,
       threadId,
       model,
       character,
@@ -60,22 +51,13 @@ export class StreamPartHandler {
       streamAbortController,
       emittedToolResultIds,
       ttsHandler,
-      controller,
-      encoder,
       logger,
     } = params;
 
     if (part.type === "finish-step") {
       const { shouldAbort } = await FinishStepHandler.processFinishStep({
         ctx,
-        streamResult: {
-          usage: streamResult.usage,
-          finishReason: streamResult.finishReason,
-        },
-        isIncognito,
         streamAbortController,
-        controller,
-        encoder,
         logger,
       });
 
@@ -93,11 +75,9 @@ export class StreamPartHandler {
         model,
         character,
         sequenceId: ctx.sequenceId,
-        isIncognito,
         userId,
         getNextAssistantMessageId: ctx.getNextAssistantMessageId.bind(ctx),
-        controller,
-        encoder,
+        dbWriter: ctx.dbWriter,
         logger,
         ttsHandler,
       });
@@ -107,8 +87,6 @@ export class StreamPartHandler {
         ctx.lastAssistantMessageId = result.currentAssistantMessageId;
       }
 
-      // If a new ASSISTANT message was created, update currentParentId/currentDepth
-      // Note: TTS handler messageId is already set inside processTextDelta
       if (result.wasCreated) {
         ctx.currentParentId = result.currentAssistantMessageId;
         ctx.currentDepth = result.newDepth;
@@ -130,11 +108,9 @@ export class StreamPartHandler {
         model,
         character,
         sequenceId: ctx.sequenceId,
-        isIncognito,
         userId,
         getNextAssistantMessageId: ctx.getNextAssistantMessageId.bind(ctx),
-        controller,
-        encoder,
+        dbWriter: ctx.dbWriter,
         logger,
       });
       ctx.currentAssistantMessageId = result.currentAssistantMessageId;
@@ -143,7 +119,6 @@ export class StreamPartHandler {
         ctx.lastAssistantMessageId = result.currentAssistantMessageId;
       }
 
-      // If a new ASSISTANT message was created, update currentParentId/currentDepth
       if (result.wasCreated) {
         ctx.currentParentId = result.currentAssistantMessageId;
         ctx.currentDepth = result.newDepth;
@@ -160,9 +135,7 @@ export class StreamPartHandler {
         reasoningText,
         currentAssistantMessageId: ctx.currentAssistantMessageId,
         currentAssistantContent: ctx.currentAssistantContent,
-        controller,
-        encoder,
-        logger,
+        dbWriter: ctx.dbWriter,
       });
 
       return { shouldAbort: false };
@@ -173,9 +146,7 @@ export class StreamPartHandler {
         ctx.currentAssistantContent = ReasoningHandler.processReasoningEnd({
           currentAssistantMessageId: ctx.currentAssistantMessageId,
           currentAssistantContent: ctx.currentAssistantContent,
-          controller,
-          encoder,
-          logger,
+          dbWriter: ctx.dbWriter,
         });
         ctx.isInReasoningBlock = false;
       }
@@ -212,8 +183,7 @@ export class StreamPartHandler {
           user,
           toolsConfig,
           streamAbortController,
-          controller,
-          encoder,
+          dbWriter: ctx.dbWriter,
           logger,
         });
         ctx.currentAssistantMessageId = result.currentAssistantMessageId;
@@ -223,7 +193,6 @@ export class StreamPartHandler {
           ctx.lastAssistantMessageId = result.currentAssistantMessageId;
         }
 
-        // Track if this tool requires confirmation
         if (result.requiresConfirmation) {
           ctx.stepHasToolsAwaitingConfirmation = true;
           logger.info(
@@ -235,13 +204,8 @@ export class StreamPartHandler {
           );
         }
 
-        // Update currentParentId/currentDepth to chain each tool call to the previous message
-        // This creates: USER → ASSISTANT → TOOL1 → TOOL2 → ASSISTANT (next step)
-        // The next tool call should be a child of THIS tool message
         ctx.currentParentId = result.pendingToolMessage.messageId;
         ctx.currentDepth = result.pendingToolMessage.toolCallData.depth;
-
-        // Track the last tool message for the next step
         ctx.lastParentId = result.pendingToolMessage.messageId;
         ctx.lastDepth = result.pendingToolMessage.toolCallData.depth;
 
@@ -273,8 +237,8 @@ export class StreamPartHandler {
           sequenceId: ctx.sequenceId,
           isIncognito,
           userId,
-          controller,
-          encoder,
+          user,
+          dbWriter: ctx.dbWriter,
           logger,
         });
         if (result) {
@@ -312,16 +276,12 @@ export class StreamPartHandler {
         sequenceId: ctx.sequenceId,
         isIncognito,
         userId,
-        controller,
-        encoder,
+        user,
+        dbWriter: ctx.dbWriter,
         logger,
         emittedToolResultIds,
       });
       if (result) {
-        // Update currentParentId/currentDepth for the next tool call
-        // But DON'T update lastParentId/lastDepth here because tool results
-        // can arrive in any order (async). lastParentId/lastDepth should only
-        // be updated when tool CALLS arrive (which is the correct order).
         ctx.currentParentId = result.currentParentId;
         ctx.currentDepth = result.currentDepth;
         ctx.pendingToolMessages.delete(part.toolCallId);

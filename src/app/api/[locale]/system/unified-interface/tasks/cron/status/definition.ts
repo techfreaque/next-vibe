@@ -7,7 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  backButton,
+  customWidgetObject,
   requestField,
   responseArrayField,
   responseField,
@@ -15,11 +16,12 @@ import {
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
+import { CronStatusContainer } from "./widget";
 
 /**
  * GET endpoint definition - Get cron status
@@ -27,7 +29,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
  */
 const { GET: cronStatusGetEndpoint } = createEndpoint({
   method: Methods.GET,
-  path: ["system", "tasks", "cron", "status"],
+  path: ["system", "unified-interface", "tasks", "cron", "status"],
   title: "app.api.system.unifiedInterface.tasks.cronSystem.status.title",
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.status.description",
@@ -99,17 +101,12 @@ const { GET: cronStatusGetEndpoint } = createEndpoint({
       "app.api.system.unifiedInterface.tasks.cronSystem.status.description",
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.unifiedInterface.tasks.cronSystem.status.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.status.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: CronStatusContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
+
       // === REQUEST FIELDS ===
       taskId: requestField({
         type: WidgetType.FORM_FIELD,
@@ -187,7 +184,7 @@ const { GET: cronStatusGetEndpoint } = createEndpoint({
         }),
       ),
     },
-  ),
+  }),
 
   examples: {
     requests: {

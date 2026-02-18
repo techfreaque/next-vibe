@@ -120,4 +120,11 @@ export const translations: typeof enTranslations = {
     title: "Erfolg",
     description: "Vorgang erfolgreich abgeschlossen",
   },
+  widget: {
+    title: "Vollständige IMAP-Synchronisierung",
+    options: "Synchronisierungsoptionen",
+    result: "Synchronisierungsergebnis",
+    duration: "Dauer",
+    errors: "Fehler",
+  },
 };

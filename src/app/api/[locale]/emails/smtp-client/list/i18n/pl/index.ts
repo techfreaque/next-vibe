@@ -1,7 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Lista kont SMTP",
+  title: "Konta SMTP",
   description: "Pobierz paginowaną listę kont SMTP z opcjami filtrowania",
 
   container: {
@@ -110,5 +110,12 @@ export const translations: typeof enTranslations = {
   success: {
     title: "Konta SMTP pobrane",
     description: "Pomyślnie pobrano listę kont SMTP",
+  },
+  widget: {
+    create: "Dodaj konto",
+    refresh: "Odśwież",
+    emptyState: "Brak skonfigurowanych kont SMTP",
+    priority: "Priorytet",
+    sent: "Wysłane",
   },
 };

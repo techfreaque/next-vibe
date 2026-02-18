@@ -15,7 +15,7 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import { TaskPriorityDB, TaskStatusDB } from "../enum";
+import { CronTaskPriorityDB, CronTaskStatusDB } from "../enum";
 
 /**
  * Side Tasks Table
@@ -28,7 +28,7 @@ export const sideTasks = pgTable("side_tasks", {
   version: text("version").notNull().default("1.0.0"),
   category: text("category").notNull(),
   enabled: boolean("enabled").notNull().default(true),
-  priority: text("priority", { enum: TaskPriorityDB }).notNull(),
+  priority: text("priority", { enum: CronTaskPriorityDB }).notNull(),
 
   // Side task specific configuration
   autoRestart: boolean("auto_restart").notNull().default(true),
@@ -73,7 +73,7 @@ export const sideTaskExecutions = pgTable("side_task_executions", {
 
   // Execution type and status
   type: text("type").notNull(), // start, stop, restart, health_check, error
-  status: text("status", { enum: TaskStatusDB }).notNull(),
+  status: text("status", { enum: CronTaskStatusDB }).notNull(),
 
   // Timing
   startedAt: timestamp("started_at").notNull(),

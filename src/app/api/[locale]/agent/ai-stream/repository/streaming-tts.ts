@@ -59,6 +59,8 @@ export class StreamingTTSHandler {
   private readonly user: JwtPayloadType;
   private isEnabled: boolean;
   private totalCharactersProcessed = 0;
+  /** Serialises concurrent addDelta / flush calls to prevent duplicate chunk emissions */
+  private processingChain: Promise<void> = Promise.resolve();
 
   constructor(params: {
     controller: ReadableStreamDefaultController<Uint8Array>;
@@ -94,19 +96,17 @@ export class StreamingTTSHandler {
 
   /**
    * Add a text delta to the buffer
-   * May trigger TTS generation if boundary is detected
+   * May trigger TTS generation if boundary is detected.
+   * Serialised via processingChain to prevent concurrent emitChunk calls.
    */
   async addDelta(delta: string): Promise<void> {
-    // Use info level for key diagnostics since debug might be filtered
-    this.logger.info("[Streaming TTS] addDelta called", {
-      deltaLength: delta.length,
-      deltaPreview: delta.substring(0, 50),
-      isEnabled: this.isEnabled,
-      hasMessageId: !!this.messageId,
-      messageId: this.messageId,
-      bufferLength: this.buffer.length,
-    });
+    this.processingChain = this.processingChain.then(() =>
+      this.addDeltaInternal(delta),
+    );
+    return this.processingChain;
+  }
 
+  private async addDeltaInternal(delta: string): Promise<void> {
     if (!this.isEnabled) {
       this.logger.info("[Streaming TTS] Skipping - TTS not enabled");
       return;
@@ -418,9 +418,17 @@ export class StreamingTTSHandler {
 
   /**
    * Flush any remaining content in the buffer
-   * Call this when the stream ends
+   * Call this when the stream ends.
+   * Waits for all pending addDelta calls to finish before flushing.
    */
   async flush(): Promise<void> {
+    this.processingChain = this.processingChain.then(() =>
+      this.flushInternal(),
+    );
+    return this.processingChain;
+  }
+
+  private async flushInternal(): Promise<void> {
     this.logger.info("[Streaming TTS] flush() called", {
       isEnabled: this.isEnabled,
       hasMessageId: !!this.messageId,

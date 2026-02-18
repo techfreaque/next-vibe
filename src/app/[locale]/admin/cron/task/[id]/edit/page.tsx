@@ -1,99 +1,16 @@
-/**
- * Cron Task Edit Page
- * Admin page for editing a specific cron task
- */
+import type { JSX } from "react";
 
-import type { Metadata } from "next";
-import { Div } from "next-vibe-ui/ui/div";
-import { H1, P } from "next-vibe-ui/ui/typography";
-import type React from "react";
-
-import { CronTaskEditClient } from "@/app/api/[locale]/system/unified-interface/tasks/cron/task/_components/cron-task-edit-client";
-import type { IndividualCronTaskType } from "@/app/api/[locale]/system/unified-interface/tasks/cron/task/[id]/definition";
-import {
-  CronTaskPriority,
-  TaskCategory,
-} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
-interface CronTaskEditPageProps {
-  params: Promise<{
-    locale: CountryLanguage;
-    id: string;
-  }>;
-}
+import { CronTaskEditPageClient } from "./page-client";
 
 export default async function CronTaskEditPage({
   params,
-}: CronTaskEditPageProps): Promise<React.JSX.Element> {
+}: {
+  params: Promise<{ locale: CountryLanguage; id: string }>;
+}): Promise<JSX.Element> {
   const { locale, id } = await params;
-  const { t } = simpleT(locale);
-
-  // Require admin user authentication
-  const user = await requireAdminUser(
-    locale,
-    `/${locale}/admin/cron/task/${id}/edit`,
-  );
-
-  // TODO: Fetch task data from API endpoint
-  // For now, create stub data to demonstrate the structure
-  const taskWithComputedFields: IndividualCronTaskType = {
-    id,
-    name: "Sample Task", // eslint-disable-line i18next/no-literal-string -- Stub data
-    description: "Task description", // eslint-disable-line i18next/no-literal-string -- Stub data
-    version: "1.0.0", // eslint-disable-line i18next/no-literal-string -- Stub data
-    category: TaskCategory.SYSTEM,
-    schedule: "0 * * * *", // eslint-disable-line i18next/no-literal-string -- Stub data
-    timezone: "UTC", // eslint-disable-line i18next/no-literal-string -- Stub data
-    enabled: true,
-    priority: CronTaskPriority.MEDIUM,
-    timeout: 3600,
-    retries: 3,
-    retryDelay: 5000,
-    lastExecutedAt: null,
-    lastExecutionStatus: null,
-    lastExecutionError: null,
-    lastExecutionDuration: null,
-    nextExecutionAt: null,
-    executionCount: 0,
-    successCount: 0,
-    errorCount: 0,
-    averageExecutionTime: null,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  return (
-    <Div className="container mx-auto py-6">
-      <Div className="mb-6">
-        <H1 className="text-3xl font-bold">
-          {t("app.admin.cron.taskDetails.edit")}
-        </H1>
-        <P className="text-muted-foreground">
-          {t("app.admin.cron.taskDetails.editDescription")}
-        </P>
-      </Div>
-
-      <CronTaskEditClient
-        taskId={id}
-        locale={locale}
-        initialData={taskWithComputedFields}
-        user={user}
-      />
-    </Div>
-  );
-}
-
-export async function generateMetadata({
-  params,
-}: CronTaskEditPageProps): Promise<Metadata> {
-  const { locale } = await params;
-  const { t } = simpleT(locale);
-
-  return {
-    title: t("app.admin.cron.taskDetails.edit"),
-    description: t("app.admin.cron.taskDetails.editDescription"),
-  };
+  const user = await requireAdminUser(locale, `/${locale}/admin/cron/tasks`);
+  return <CronTaskEditPageClient locale={locale} user={user} id={id} />;
 }

@@ -19,6 +19,8 @@ export async function getSeedModule(
   switch (moduleName) {
     case "folders":
       return (await import("../../agent/chat/folders/seeds")) as EnvironmentSeeds;
+    case "tasks":
+      return (await import("../unified-interface/tasks/seeds")) as EnvironmentSeeds;
     case "leads":
       return (await import("../../leads/seeds")) as EnvironmentSeeds;
     case "users":
@@ -48,6 +50,7 @@ export async function getSeedModule(
 export function getAllSeedModuleNames(): string[] {
   return [
     "folders",
+    "tasks",
     "leads",
     "users",
     "user",

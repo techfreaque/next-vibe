@@ -148,7 +148,6 @@ export const branchRepository = {
           authorId: newMessage.authorId,
           isAI: newMessage.isAI,
           model: newMessage.model,
-          tokens: newMessage.tokens,
           createdAt: newMessage.createdAt.toISOString(),
           updatedAt: newMessage.updatedAt.toISOString(),
         },

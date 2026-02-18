@@ -139,5 +139,14 @@ export const translations = {
       title: "Success",
       description: "Test email sent successfully",
     },
+    widget: {
+      title: "Send Test Email",
+      successMessage: "Test email sent successfully",
+      sentTo: "Sent to: ",
+      subject: "Subject: ",
+      sentAt: "Sent at: ",
+      campaignConfig: "Campaign Config",
+      sendAnother: "Send Another",
+    },
   },
 };

@@ -83,4 +83,9 @@ export const translations: typeof enTranslations = {
     title: "Synchronisation abgeschlossen",
     description: "IMAP-Ordnersynchronisation erfolgreich abgeschlossen",
   },
+  widget: {
+    title: "Ordner synchronisieren",
+    result: "Synchronisierungsergebnis",
+    duration: "Dauer",
+  },
 };

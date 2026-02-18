@@ -1,7 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Pobierz email według ID",
+  title: "Szczegóły e-maila",
   description:
     "Pobierz pojedynczy email na podstawie jego unikalnego identyfikatora",
   container: {
@@ -112,5 +112,25 @@ export const translations: typeof enTranslations = {
   success: {
     title: "Email pobrany",
     description: "Szczegóły emaila zostały pomyślnie pobrane",
+  },
+  widget: {
+    parties: "Strony",
+    to: "Do",
+    from: "Od",
+    timestamps: "Znaczniki czasu",
+    sentAt: "Wysłano",
+    deliveredAt: "Dostarczono",
+    openedAt: "Otwarto",
+    clickedAt: "Kliknięto",
+    technical: "Szczegóły techniczne",
+    template: "Szablon",
+    provider: "Dostawca",
+    externalId: "Zewnętrzny ID",
+    retryCount: "Liczba ponowień",
+    error: "Błąd",
+    associations: "Powiązania",
+    lead: "Lead",
+    user: "Użytkownik",
+    notFound: "E-mail nie znaleziony",
   },
 };

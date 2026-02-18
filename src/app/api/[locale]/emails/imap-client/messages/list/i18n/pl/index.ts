@@ -167,4 +167,10 @@ export const translations: typeof enTranslations = {
       description: "Operacja zakończona pomyślnie",
     },
   },
+  widget: {
+    title: "Wiadomości IMAP",
+    refresh: "Odśwież",
+    empty: "Brak wiadomości",
+    hasAttachments: "Ma załączniki",
+  },
 };

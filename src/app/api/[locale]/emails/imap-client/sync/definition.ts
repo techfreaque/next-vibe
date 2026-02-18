@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
@@ -20,6 +22,8 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
+import { ImapSyncContainer } from "./widget";
 
 /**
  * Trigger IMAP Sync Endpoint (POST)
@@ -35,16 +39,12 @@ const { POST } = createEndpoint({
   tags: ["app.api.emails.imapClient.tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.imapClient.sync.container.title",
-      description: "app.api.emails.imapClient.sync.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: ImapSyncContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { request: "data", response: true } }),
+
       // === REQUEST FIELDS ===
       accountIds: requestField({
         type: WidgetType.FORM_FIELD,
@@ -161,7 +161,7 @@ const { POST } = createEndpoint({
         ),
       ),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {

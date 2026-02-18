@@ -726,7 +726,7 @@ function RootFolderBar({
               variant="ghost"
               size="icon"
               className={cn("h-11 w-11", colorClasses)}
-              onClick={() => onSelectFolder(folderConfig.id as DefaultFolderId)}
+              onClick={() => onSelectFolder(folderConfig.id)}
             >
               <Icon icon={folderConfig.icon} className="h-6 w-6" />
             </Button>

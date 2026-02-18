@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseField,
@@ -26,6 +28,7 @@ import {
   ImapSpecialUseType,
   ImapSyncStatus,
 } from "../../enum";
+import { ImapAccountCreateContainer } from "./widget";
 
 /**
  * Create IMAP Account Endpoint (POST)
@@ -41,16 +44,12 @@ const { POST } = createEndpoint({
   icon: "inbox",
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.imapClient.accounts.create.container.title",
-      description:
-        "app.api.emails.imapClient.accounts.create.container.description",
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: ImapAccountCreateContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { request: "data", response: true } }),
+
       // === BASIC ACCOUNT INFO ===
       basicInfo: objectField(
         {
@@ -204,7 +203,7 @@ const { POST } = createEndpoint({
             description:
               "app.api.emails.imapClient.accounts.create.enabled.description",
             columns: 12,
-            schema: z.boolean().default(true).optional(),
+            schema: z.boolean().default(true),
           }),
 
           syncInterval: requestField({
@@ -217,7 +216,7 @@ const { POST } = createEndpoint({
             placeholder:
               "app.api.emails.imapClient.accounts.create.syncInterval.placeholder",
             columns: 12,
-            schema: z.coerce.number().min(10).default(60).optional(),
+            schema: z.coerce.number().min(10).default(60),
           }),
 
           maxMessages: requestField({
@@ -230,7 +229,7 @@ const { POST } = createEndpoint({
             placeholder:
               "app.api.emails.imapClient.accounts.create.maxMessages.placeholder",
             columns: 12,
-            schema: z.coerce.number().min(1).default(1000).optional(),
+            schema: z.coerce.number().min(1).default(1000),
           }),
 
           syncFolders: requestField({
@@ -474,7 +473,7 @@ const { POST } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {

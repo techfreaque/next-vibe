@@ -24,6 +24,8 @@ import type {
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { CronTasksRepository } from "../cron/repository";
+import { parseCronExpression } from "../cron-formatter";
 import { CronTaskStatus } from "../enum";
 import type {
   CronTask,
@@ -72,7 +74,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
 
   private runningTasks = new Map<string, TaskStatus>();
   private runningProcesses = new Map<string, AbortController>();
-  private isRunning = false;
+  isRunning = false;
   private errors: Array<{
     taskName: string;
     error: string;
@@ -80,8 +82,8 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
   }> = [];
 
   // Execution context stored when runner starts
-  private locale!: CountryLanguage;
-  private logger!: EndpointLogger;
+  locale!: CountryLanguage;
+  logger!: EndpointLogger;
   private cronUser: JwtPrivatePayloadType = CRON_SYSTEM_USER;
 
   async manageRunner(
@@ -111,7 +113,9 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
           });
 
         case "start":
-          this.isRunning = true;
+          // Load task registry and start the runner for real
+          await this.startAndBlock(locale, logger);
+          // Never reached when blocking - but needed for restart case
           return success({
             success: true,
             actionResult: data.action,
@@ -132,7 +136,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
 
         case "restart":
           await this.stop(locale);
-          this.isRunning = true;
+          await this.startAndBlock(locale, logger);
           return success({
             success: true,
             actionResult: data.action,
@@ -184,19 +188,52 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
     // Mark task as running
     this.markTaskAsRunning(taskName, "cron");
 
-    try {
-      // Ensure execution context is available
-      if (!this.logger) {
-        const errorMsg = "Task runner not properly initialized with logger";
-        this.markTaskAsFailed(taskName, errorMsg);
-        return fail({
-          message:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: errorMsg, taskName },
-        });
-      }
+    // Ensure execution context is available
+    if (!this.logger) {
+      const errorMsg = "Task runner not properly initialized with logger";
+      this.markTaskAsFailed(taskName, errorMsg);
+      return fail({
+        message:
+          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMsg, taskName },
+      });
+    }
 
+    // Look up task DB record to get its ID and priority
+    const dbTaskResponse = await CronTasksRepository.getTaskByName(
+      taskName,
+      this.logger,
+    );
+    const dbTask = dbTaskResponse.success ? dbTaskResponse.data : null;
+
+    const executionId = crypto.randomUUID();
+    const startedAt = new Date();
+
+    // Create execution record in DB (if task is known to DB)
+    let executionDbId: string | null = null;
+    if (dbTask) {
+      const execResponse = await CronTasksRepository.createExecution(
+        {
+          taskId: dbTask.id,
+          taskName,
+          executionId,
+          status: CronTaskStatus.RUNNING,
+          priority: dbTask.priority,
+          startedAt,
+          config: {},
+          triggeredBy: "schedule",
+        },
+        this.logger,
+      );
+      if (execResponse.success) {
+        executionDbId = execResponse.data.id;
+      }
+    }
+
+    const startTime = Date.now();
+
+    try {
       // Execute task with required props
       const result = await task.run({
         logger: this.logger,
@@ -204,11 +241,40 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
         cronUser: this.cronUser,
       });
 
+      const durationMs = Date.now() - startTime;
+
       // Check if task returned an error
       if (result && typeof result === "object" && "error" in result) {
         const errorMsg =
           typeof result.error === "string" ? result.error : "Task failed";
         this.markTaskAsFailed(taskName, errorMsg);
+
+        // Persist failure
+        if (dbTask && executionDbId) {
+          await CronTasksRepository.updateExecution(
+            executionDbId,
+            {
+              status: CronTaskStatus.FAILED,
+              completedAt: new Date(),
+              durationMs,
+              error: { message: errorMsg },
+            },
+            this.logger,
+          );
+          await CronTasksRepository.updateTask(
+            dbTask.id,
+            {
+              lastExecutedAt: startedAt,
+              lastExecutionStatus: CronTaskStatus.FAILED,
+              lastExecutionError: errorMsg,
+              lastExecutionDuration: durationMs,
+              executionCount: dbTask.executionCount + 1,
+              errorCount: dbTask.errorCount + 1,
+            },
+            this.logger,
+          );
+        }
+
         return fail({
           message:
             "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
@@ -218,6 +284,32 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
       }
 
       this.markTaskAsCompleted(taskName);
+
+      // Persist success
+      if (dbTask && executionDbId) {
+        await CronTasksRepository.updateExecution(
+          executionDbId,
+          {
+            status: CronTaskStatus.COMPLETED,
+            completedAt: new Date(),
+            durationMs,
+          },
+          this.logger,
+        );
+        await CronTasksRepository.updateTask(
+          dbTask.id,
+          {
+            lastExecutedAt: startedAt,
+            lastExecutionStatus: CronTaskStatus.COMPLETED,
+            lastExecutionError: null,
+            lastExecutionDuration: durationMs,
+            executionCount: dbTask.executionCount + 1,
+            successCount: dbTask.successCount + 1,
+          },
+          this.logger,
+        );
+      }
+
       return success({
         status: CronTaskStatus.COMPLETED,
         message:
@@ -225,7 +317,35 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
       });
     } catch (error) {
       const errorMsg = parseError(error).message;
+      const durationMs = Date.now() - startTime;
       this.markTaskAsFailed(taskName, errorMsg);
+
+      // Persist failure
+      if (dbTask && executionDbId) {
+        await CronTasksRepository.updateExecution(
+          executionDbId,
+          {
+            status: CronTaskStatus.FAILED,
+            completedAt: new Date(),
+            durationMs,
+            error: { message: errorMsg },
+          },
+          this.logger,
+        );
+        await CronTasksRepository.updateTask(
+          dbTask.id,
+          {
+            lastExecutedAt: startedAt,
+            lastExecutionStatus: CronTaskStatus.FAILED,
+            lastExecutionError: errorMsg,
+            lastExecutionDuration: durationMs,
+            executionCount: dbTask.executionCount + 1,
+            errorCount: dbTask.errorCount + 1,
+          },
+          this.logger,
+        );
+      }
+
       return fail({
         message:
           "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
@@ -444,16 +564,12 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
           taskNames: cronTasks.map((t) => t.name),
         });
 
-        // For now, just log that we would schedule them
-        // In a real implementation, you'd use a cron scheduler here
         cronTasks.forEach((task) => {
-          if (task.enabled) {
-            this.logger.debug(
-              `Would schedule cron task: ${task.name} with schedule: ${task.schedule}`,
-            );
-          } else {
+          if (!task.enabled) {
             this.logger.debug(`Skipping disabled cron task: ${task.name}`);
+            return;
           }
+          this.scheduleCronTask(task, signal);
         });
       }
 
@@ -470,6 +586,144 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
         error: errorMsg,
       });
     }
+  }
+
+  /**
+   * Load task registry, call start(), then block forever (never returns).
+   * Used by manageRunner("start") when invoked via CLI or HTTP.
+   * Exits cleanly on SIGINT/SIGTERM.
+   */
+  private async startAndBlock(
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<never> {
+    const { taskRegistry } =
+      await import("@/app/api/[locale]/system/generated/tasks-index");
+
+    // Upsert task definitions into DB so they appear in the UI
+    const { dev: seedTasks } =
+      await import("@/app/api/[locale]/system/unified-interface/tasks/seeds");
+    await seedTasks(logger);
+
+    const abortController = new AbortController();
+    const { signal } = abortController;
+
+    this.environment = "production";
+    this.supportsSideTasks = true;
+
+    const startResult = this.start(
+      taskRegistry.allTasks,
+      signal,
+      locale,
+      logger,
+    );
+    if (!startResult.success) {
+      logger.error("Failed to start task runner", {
+        message: startResult.message,
+      });
+      process.exit(1);
+    }
+
+    logger.info(
+      `Task runner started with ${taskRegistry.allTasks.length} tasks. Press Ctrl+C to stop.`,
+    );
+
+    // Block forever - only exits via process signals
+    await new Promise<void>((resolve) => {
+      const shutdown = (): void => {
+        logger.info("Shutting down task runner...");
+        abortController.abort();
+        void this.stop(locale).then(() => {
+          resolve();
+          return undefined;
+        });
+      };
+
+      process.once("SIGINT", shutdown);
+      process.once("SIGTERM", shutdown);
+    });
+
+    // Process exits after stop() completes above; this line never actually runs
+    return Promise.reject<never>(new Error("unreachable"));
+  }
+
+  /**
+   * Schedule a cron task using setTimeout loops driven by cron-parser.
+   * Calculates next execution time, waits, executes, then reschedules.
+   */
+  private scheduleCronTask(task: CronTask, signal: AbortSignal): void {
+    const scheduleNext = (): void => {
+      if (signal.aborted || !this.isRunning) {
+        this.logger.debug(`Cron task stopped scheduling: ${task.name}`);
+        return;
+      }
+
+      const interval = parseCronExpression(this.logger, task.schedule);
+      if (!interval) {
+        this.logger.error(
+          `Invalid cron schedule for task ${task.name}: ${task.schedule}`,
+        );
+        return;
+      }
+
+      const nextRun = interval.next().toDate();
+      const now = new Date();
+      const delayMs = Math.max(0, nextRun.getTime() - now.getTime());
+
+      this.logger.debug(
+        `Next run for ${task.name} in ${Math.round(delayMs / 1000)}s`,
+        {
+          schedule: task.schedule,
+          nextRun: nextRun.toISOString(),
+        },
+      );
+
+      const timeoutId = setTimeout(() => {
+        if (signal.aborted || !this.isRunning) {
+          return;
+        }
+
+        this.logger.debug(`Executing cron task: ${task.name}`);
+        void this.executeCronTask(task)
+          .then((result) => {
+            if (!result.success) {
+              this.logger.error(`Cron task failed: ${task.name}`, {
+                message: result.message,
+              });
+              if (task.onError) {
+                void task.onError({
+                  error: new Error(result.message),
+                  logger: this.logger,
+                  locale: this.locale,
+                  cronUser: this.cronUser,
+                });
+              }
+            } else {
+              this.logger.debug(`Cron task completed: ${task.name}`);
+            }
+            return undefined;
+          })
+          .catch((error) => {
+            this.logger.error(
+              `Cron task threw: ${task.name}`,
+              parseError(error),
+            );
+          })
+          .finally(() => {
+            // Reschedule for next run
+            scheduleNext();
+          });
+      }, delayMs);
+
+      // Store timeout handle so we can cancel on stop
+      const controller = new AbortController();
+      this.runningProcesses.set(`cron-timer:${task.name}`, controller);
+      signal.addEventListener("abort", () => {
+        clearTimeout(timeoutId);
+      });
+    };
+
+    scheduleNext();
   }
 
   async stop(locale: CountryLanguage): Promise<ResponseType<void>> {

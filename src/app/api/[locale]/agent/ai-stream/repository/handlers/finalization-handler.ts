@@ -2,128 +2,62 @@
  * FinalizationHandler - Finalizes ASSISTANT messages at stream end
  */
 
-import type { ReadableStreamDefaultController } from "node:stream/web";
-
-import type { streamText } from "ai";
-import { eq, sql } from "drizzle-orm";
-
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { db } from "../../../../system/db";
-import { chatMessages } from "../../../chat/db";
-import { createStreamEvent, formatSSEEvent } from "../../events";
+import type { MessageDbWriter } from "../core/message-db-writer";
 
 export class FinalizationHandler {
   /**
-   * Finalize ASSISTANT message at stream end
+   * Finalize ASSISTANT message at stream end.
+   *
+   * Closes any open reasoning block, emits CONTENT_DONE SSE, flushes + writes
+   * final content to DB, and writes token metadata. Pass null for token params
+   * when usage is not available (e.g. mid-stream tool-loop step finalization).
    */
   static async finalizeAssistantMessage(params: {
     currentAssistantMessageId: string;
     currentAssistantContent: string;
     isInReasoningBlock: boolean;
-    streamResult: {
-      finishReason:
-        | Awaited<ReturnType<typeof streamText>["finishReason"]>
-        | ReturnType<typeof streamText>["finishReason"];
-      usage:
-        | Awaited<ReturnType<typeof streamText>["usage"]>
-        | ReturnType<typeof streamText>["usage"];
-    };
-    isIncognito: boolean;
-    controller: ReadableStreamDefaultController<Uint8Array>;
-    encoder: TextEncoder;
+    finishReason: string | null | undefined;
+    totalTokens: number | null | undefined;
+    promptTokens: number | null | undefined;
+    completionTokens: number | null | undefined;
+    dbWriter: MessageDbWriter;
     logger: EndpointLogger;
   }): Promise<void> {
     const {
       currentAssistantMessageId,
       isInReasoningBlock,
-      streamResult,
-      isIncognito,
-      controller,
-      encoder,
+      finishReason,
+      totalTokens,
+      promptTokens,
+      completionTokens,
+      dbWriter,
       logger,
     } = params;
 
     let { currentAssistantContent } = params;
 
-    // If reasoning block is still open, close it at stream end
+    // If reasoning block is still open, close it
     if (isInReasoningBlock) {
       const thinkCloseTag = "</think>";
       currentAssistantContent += thinkCloseTag;
-
-      // Emit closing tag delta
-      const thinkCloseDelta = createStreamEvent.contentDelta({
-        messageId: currentAssistantMessageId,
-        delta: thinkCloseTag,
-      });
-      controller.enqueue(encoder.encode(formatSSEEvent(thinkCloseDelta)));
+      dbWriter.emitClosingDelta(currentAssistantMessageId, thinkCloseTag);
     }
 
-    // Emit CONTENT_DONE event immediately without waiting for usage/finishReason
-    // These will be null during mid-stream finalization (between steps)
-    const contentDoneEvent = createStreamEvent.contentDone({
+    // Emit CONTENT_DONE + flush + write final content + token metadata to DB
+    await dbWriter.emitContentDone({
       messageId: currentAssistantMessageId,
       content: currentAssistantContent,
-      totalTokens: null, // Will be updated at stream completion
-      finishReason: null, // Will be known at stream completion
+      finishReason: finishReason ?? null,
+      totalTokens: totalTokens ?? null,
+      promptTokens: promptTokens ?? null,
+      completionTokens: completionTokens ?? null,
     });
-    controller.enqueue(encoder.encode(formatSSEEvent(contentDoneEvent)));
 
-    // Update ASSISTANT message in database with current content (no tokens yet)
-    if (!isIncognito && currentAssistantContent) {
-      await db
-        .update(chatMessages)
-        .set({
-          content: currentAssistantContent.trim() || null,
-          updatedAt: new Date(),
-        })
-        .where(eq(chatMessages.id, currentAssistantMessageId));
-
-      logger.debug("Updated ASSISTANT message in database", {
-        messageId: currentAssistantMessageId,
-        contentLength: currentAssistantContent.length,
-      });
-    }
-
-    // Try to get usage/finishReason for logging, but don't block if not available
-    void Promise.all([streamResult.finishReason, streamResult.usage])
-      .then(([finishReason, usage]) => {
-        logger.debug("Finalized ASSISTANT message", {
-          messageId: currentAssistantMessageId,
-          contentLength: currentAssistantContent.length,
-          tokens: usage.totalTokens,
-          finishReason: finishReason || "unknown",
-        });
-
-        // Update with final token count and metadata if we have it
-        if (!isIncognito && usage.totalTokens) {
-          const inputTokens = usage.inputTokens ?? 0;
-          const outputTokens = usage.outputTokens ?? 0;
-
-          void db
-            .update(chatMessages)
-            .set({
-              tokens: usage.totalTokens,
-              metadata: sql`COALESCE(${chatMessages.metadata}, '{}') || ${JSON.stringify(
-                {
-                  promptTokens: inputTokens,
-                  completionTokens: outputTokens,
-                  totalTokens: usage.totalTokens,
-                  finishReason: finishReason || null,
-                },
-              )}::jsonb`,
-            })
-            .where(eq(chatMessages.id, currentAssistantMessageId));
-        }
-        return undefined;
-      })
-      .catch(() => {
-        // Promises may not resolve during mid-stream, that's OK
-        logger.debug("Finalized ASSISTANT message (usage pending)", {
-          messageId: currentAssistantMessageId,
-          contentLength: currentAssistantContent.length,
-        });
-        return undefined;
-      });
+    logger.debug("[FinalizationHandler] Persisted ASSISTANT message", {
+      messageId: currentAssistantMessageId,
+      contentLength: currentAssistantContent.length,
+    });
   }
 }

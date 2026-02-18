@@ -63,4 +63,32 @@ export const translations: typeof enTranslations = {
       description: "Ein Konflikt ist aufgetreten",
     },
   },
+  widget: {
+    title: "Systemstatus",
+    loading: "Status wird geladen...",
+    uptime: "Betriebszeit",
+    tasks: "Aufgaben",
+    emptyTasks: "Keine Aufgaben gefunden",
+    status: {
+      healthy: "Gesund",
+      warning: "Warnung",
+      critical: "Kritisch",
+      unknown: "Unbekannt",
+    },
+    stats: {
+      activeTasks: "Aktive Aufgaben",
+      totalTasks: "Gesamtaufgaben",
+      systemHealth: "Systemgesundheit",
+    },
+    task: {
+      lastRun: "Letzter:",
+      nextRun: "Nächster:",
+    },
+    actions: {
+      tasks: "Aufgaben",
+      history: "Verlauf",
+      stats: "Statistiken",
+      refresh: "Aktualisieren",
+    },
+  },
 };

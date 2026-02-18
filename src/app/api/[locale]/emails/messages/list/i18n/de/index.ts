@@ -1,7 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "E-Mails auflisten",
+  title: "E-Mail-Liste",
   description:
     "Eine paginierte Liste von E-Mails mit Filterung und Paginierung abrufen",
   container: {
@@ -181,5 +181,26 @@ export const translations: typeof enTranslations = {
   success: {
     title: "Erfolg",
     description: "E-Mails erfolgreich abgerufen",
+  },
+  widget: {
+    to: "An",
+    retries: "Wiederholungen",
+    opened: "Geöffnet",
+    clicked: "Geklickt",
+    stats: "Statistiken",
+    refresh: "Aktualisieren",
+    searchPlaceholder: "E-Mails suchen...",
+    clearSearch: "Löschen",
+    emptyState: "Keine E-Mails gefunden",
+    emptyFiltered: "Keine E-Mails entsprechen Ihren Filtern",
+    page: "Seite",
+    tabs: {
+      all: "Alle",
+      sent: "Gesendet",
+      delivered: "Zugestellt",
+      opened: "Geöffnet",
+      failed: "Fehlgeschlagen",
+      bounced: "Zurückgewiesen",
+    },
   },
 };

@@ -1,5 +1,5 @@
 export const translations = {
-  title: "List Emails",
+  title: "Email List",
   description:
     "Retrieve a paginated list of emails with filtering and pagination",
   container: {
@@ -176,5 +176,26 @@ export const translations = {
   success: {
     title: "Success",
     description: "Emails retrieved successfully",
+  },
+  widget: {
+    to: "To",
+    retries: "Retries",
+    opened: "Opened",
+    clicked: "Clicked",
+    stats: "Stats",
+    refresh: "Refresh",
+    searchPlaceholder: "Search emails...",
+    clearSearch: "Clear",
+    emptyState: "No emails found",
+    emptyFiltered: "No emails match your filters",
+    page: "Page",
+    tabs: {
+      all: "All",
+      sent: "Sent",
+      delivered: "Delivered",
+      opened: "Opened",
+      failed: "Failed",
+      bounced: "Bounced",
+    },
   },
 };

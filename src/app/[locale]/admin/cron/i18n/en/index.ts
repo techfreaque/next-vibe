@@ -39,6 +39,8 @@ export const translations = {
     commonSchedules: "Common Schedules",
   },
   nav: {
+    status: "Status",
+    status_description: "Monitor cron system health and active tasks",
     stats: "Statistics",
     stats_description:
       "View cron task execution statistics and performance metrics",

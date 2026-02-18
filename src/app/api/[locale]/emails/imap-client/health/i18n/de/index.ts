@@ -118,4 +118,18 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  widget: {
+    title: "IMAP-Status",
+    accountsHealthy: "Gesunde Konten",
+    accountsTotal: "Konten gesamt",
+    connectionsActive: "Aktive Verbindungen",
+    connectionErrors: "Verbindungsfehler",
+    performance: "Leistung",
+    avgResponseTime: "Ø Antwortzeit",
+    uptime: "Betriebszeit",
+    serverStatus: "Serverstatus",
+    syncStats: "Synchronisierungsstatistiken",
+    totalSyncs: "Synchronisierungen gesamt",
+    lastSyncTime: "Letzte Synchronisierung",
+  },
 };

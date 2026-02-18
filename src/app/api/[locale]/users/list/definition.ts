@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   requestResponseField,
@@ -33,10 +35,7 @@ import {
   UserStatusFilter,
   UserStatusFilterOptions,
 } from "../enum";
-
-interface TotalCount {
-  response: { paginationInfo: { totalCount: number } };
-}
+import { UsersListContainer } from "./widget";
 
 /**
  * Get Users List Endpoint (GET)
@@ -53,25 +52,11 @@ const { GET } = createEndpoint({
   category: "app.api.users.category" as const,
   tags: ["app.api.users.list.tag" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.users.list.get.form.title" as const,
-      description: "app.api.users.list.get.form.description" as const,
-      layoutType: LayoutType.STACKED,
-      getCount: (data: TotalCount) =>
-        data?.response?.paginationInfo?.totalCount,
-      submitButton: {
-        text: "app.api.users.list.get.actions.refresh" as const,
-        loadingText: "app.api.users.list.get.actions.refreshing" as const,
-        position: "header",
-        icon: "refresh-cw",
-        variant: "ghost",
-        size: "sm",
-      },
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: UsersListContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { request: "data", response: true } }),
       // === SEARCH & FILTERS ===
       searchFilters: objectField(
         {
@@ -284,7 +269,7 @@ const { GET } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {

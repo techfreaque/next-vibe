@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   requestUrlPathParamsField,
@@ -21,6 +23,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../../user/user-roles/enum";
+import { ImapMessageDetailContainer } from "./widget";
 
 /**
  * GET endpoint for IMAP message by ID
@@ -36,17 +39,14 @@ const { GET } = createEndpoint({
 
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.imapClient.messages.id.get.container.title",
-      description:
-        "app.api.emails.imapClient.messages.id.get.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "urlPathParams", response: true },
-    {
+  fields: customWidgetObject({
+    render: ImapMessageDetailContainer,
+    usage: { request: "urlPathParams", response: true } as const,
+    children: {
+      backButton: backButton({
+        usage: { request: "urlPathParams", response: true },
+      }),
+
       // === URL PARAM FIELDS ===
       id: requestUrlPathParamsField({
         type: WidgetType.FORM_FIELD,
@@ -237,7 +237,7 @@ const { GET } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

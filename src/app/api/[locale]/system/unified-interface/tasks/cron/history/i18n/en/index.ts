@@ -138,4 +138,49 @@ export const translations = {
     },
     unknownTask: "Unknown Task",
   },
+  widget: {
+    title: "Task Execution History",
+    loading: "Loading history...",
+    header: {
+      tasks: "Tasks",
+      stats: "Stats",
+      refresh: "Refresh",
+    },
+    summary: {
+      total: "Total",
+      successful: "Successful",
+      failed: "Failed",
+      successRate: "Success Rate",
+      avgDuration: "Avg Duration",
+    },
+    search: {
+      placeholder: "Search tasks...",
+    },
+    filter: {
+      all: "All",
+      running: "Running",
+      completed: "Completed",
+      failed: "Failed",
+      timeout: "Timeout",
+      cancelled: "Cancelled",
+    },
+    col: {
+      taskName: "Task Name",
+      status: "Status",
+      duration: "Duration",
+      started: "Started",
+      completed: "Completed",
+      environment: "Environment",
+      error: "Error",
+    },
+    empty: "No execution history found",
+    error: {
+      collapse: "Collapse error",
+    },
+    pagination: {
+      info: "Page {{page}} of {{totalPages}} ({{total}} total)",
+      prev: "Previous",
+      next: "Next",
+    },
+  },
 };

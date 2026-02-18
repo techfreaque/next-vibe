@@ -756,6 +756,9 @@ export const translations = {
           },
         },
       },
+      title: "Email Preview",
+      preview: "Preview",
+      version: "Version",
     },
     sendTest: {
       post: {
@@ -841,6 +844,8 @@ export const translations = {
         sendFailed: "Failed to send test email",
       },
       success: "Test email sent successfully to {email}",
+      title: "Send Test Email",
+      failed: "Failed to send test email",
     },
   },
 };

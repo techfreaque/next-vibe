@@ -153,6 +153,7 @@ export { MoreHorizontal } from "./MoreHorizontal";
 export { MoreVertical } from "./MoreVertical";
 export { Mountain } from "./Mountain";
 export { MousePointer } from "./MousePointer";
+export { MousePointerClick } from "./MousePointerClick";
 export { MoveLeft } from "./MoveLeft";
 export { Music } from "./Music";
 export { Navigation } from "./Navigation";

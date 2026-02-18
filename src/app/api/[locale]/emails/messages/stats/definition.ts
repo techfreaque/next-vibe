@@ -8,6 +8,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
@@ -16,7 +18,6 @@ import {
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -39,6 +40,7 @@ import {
   TimePeriod,
   TimePeriodOptions,
 } from "./enum";
+import { EmailStatsContainer } from "./widget";
 
 /**
  * Get Email Stats Endpoint (GET)
@@ -55,16 +57,12 @@ const { GET } = createEndpoint({
   icon: "bar-chart-3",
   tags: ["app.api.emails.tags.stats", "app.api.emails.tags.analytics"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.messages.stats.get.form.title",
-      description: "app.api.emails.messages.stats.get.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: EmailStatsContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { request: "data", response: true } }),
+
       // === REQUEST FIELDS (Filters) ===
 
       // Time-based filtering
@@ -711,7 +709,7 @@ const { GET } = createEndpoint({
         ),
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

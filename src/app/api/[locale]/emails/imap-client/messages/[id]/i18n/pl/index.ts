@@ -195,4 +195,18 @@ export const translations: typeof enTranslations = {
       description: "Operacja zakończona pomyślnie",
     },
   },
+  widget: {
+    title: "Wiadomość IMAP",
+    notFound: "Wiadomość nie znaleziona",
+    parties: "Strony",
+    from: "Od",
+    to: "Do",
+    timestamps: "Znaczniki czasu",
+    sentAt: "Wysłano",
+    receivedAt: "Odebrano",
+    flagged: "Oznaczona",
+    unread: "Nieprzeczytana",
+    hasAttachments: "Ma załączniki",
+    body: "Treść wiadomości",
+  },
 };

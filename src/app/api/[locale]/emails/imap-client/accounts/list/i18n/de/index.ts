@@ -129,4 +129,12 @@ export const translations: typeof enTranslations = {
     title: "Erfolg",
     description: "IMAP-Konten erfolgreich abgerufen",
   },
+  widget: {
+    title: "IMAP-Konten",
+    create: "Konto hinzufügen",
+    refresh: "Aktualisieren",
+    empty: "Keine IMAP-Konten konfiguriert",
+    disabled: "Deaktiviert",
+    lastSync: "Letzte Synchronisierung",
+  },
 };

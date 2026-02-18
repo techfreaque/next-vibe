@@ -8,22 +8,19 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
-  deleteButton,
-  navigateButtonField,
+  customWidgetObject,
   objectField,
   requestField,
   requestUrlPathParamsField,
   responseField,
   submitButton,
   widgetField,
-  widgetObjectField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
-  SpacingSize,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -44,6 +41,7 @@ import {
   LeadStatus,
   LeadStatusOptions,
 } from "../../enum";
+import { LeadDetailContainer } from "./widget";
 
 /**
  * Delete Lead Endpoint (DELETE)
@@ -189,53 +187,6 @@ const { PATCH } = createEndpoint({
         description: "app.api.leads.lead.id.patch.id.description",
         hidden: true,
         schema: z.uuid(),
-      }),
-
-      topActions: widgetObjectField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.INLINE,
-          gap: "2",
-          noCard: true,
-        },
-        { request: "data", response: true },
-        {
-          backButton: backButton({
-            label: "app.api.leads.lead.id.patch.backButton.label",
-            icon: "arrow-left",
-            variant: "outline",
-            usage: { request: "data", response: true },
-          }),
-          deleteButton: deleteButton({
-            label: "app.api.leads.lead.id.patch.deleteButton.label",
-            targetEndpoint: DELETE,
-            extractParams: (source) => ({
-              urlPathParams: {
-                id: (source.urlPathParams as { id: string | number })?.id,
-              },
-            }),
-            icon: "trash",
-            variant: "destructive",
-            className: "ml-auto",
-            popNavigationOnSuccess: 2, // Pop twice: edit -> details -> list
-            usage: { request: "data", response: true },
-          }),
-          saveButton: submitButton({
-            label: "app.api.leads.lead.id.patch.submitButton.label",
-            loadingText: "app.api.leads.lead.id.patch.submitButton.loadingText",
-            icon: "save",
-            variant: "primary",
-            usage: { request: "data", response: true },
-          }),
-        },
-      ),
-
-      // Separator between buttons and content
-      separator: widgetField({
-        type: WidgetType.SEPARATOR,
-        spacingTop: SpacingSize.RELAXED,
-        spacingBottom: SpacingSize.RELAXED,
-        usage: { request: "data", response: true },
       }),
 
       // === UPDATE FIELDS ===
@@ -873,18 +824,10 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "user",
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.lead.id.get.form.title",
-      description: "app.api.leads.lead.id.get.form.description",
-      layoutType: LayoutType.STACKED,
-      showSubmitButton: false,
-      paddingTop: "6",
-      noCard: true,
-    },
-    { request: "urlPathParams", response: true },
-    {
+  fields: customWidgetObject({
+    render: LeadDetailContainer,
+    usage: { request: "urlPathParams", response: true } as const,
+    children: {
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField({
         type: WidgetType.FORM_FIELD,
@@ -895,72 +838,6 @@ const { GET } = createEndpoint({
         hidden: true,
 
         schema: z.uuid(),
-      }),
-
-      // Top action buttons (back on left, edit/delete on right)
-      topActions: widgetObjectField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.INLINE,
-          gap: "2",
-          noCard: true,
-        },
-        { response: true },
-        {
-          // Back button (left side)
-          backButton: backButton({
-            icon: "arrow-left",
-            variant: "outline",
-            usage: { response: true },
-          }),
-
-          // Edit button - uses self-referencing GET endpoint for prefill
-          editButton: navigateButtonField({
-            targetEndpoint: PATCH,
-            extractParams: (source) => ({
-              urlPathParams: {
-                id: (
-                  source.responseData as {
-                    lead: { basicInfo: { id: string | number } };
-                  }
-                )?.lead?.basicInfo?.id,
-              },
-            }),
-            prefillFromGet: true,
-            label: "app.api.leads.lead.id.get.editButton.label",
-            icon: "pencil",
-            variant: "default",
-            className: "ml-auto",
-            usage: { response: true },
-          }),
-
-          // Delete button
-          deleteButton: deleteButton({
-            targetEndpoint: DELETE,
-            extractParams: (source) => ({
-              urlPathParams: {
-                id: (
-                  source.responseData as {
-                    lead: { basicInfo: { id: string | number } };
-                  }
-                )?.lead?.basicInfo?.id,
-              },
-            }),
-            label: "app.api.leads.lead.id.get.deleteButton.label",
-            icon: "trash",
-            variant: "destructive",
-            popNavigationOnSuccess: 1,
-            usage: { response: true },
-          }),
-        },
-      ),
-
-      // Separator between buttons and content
-      separator: widgetField({
-        type: WidgetType.SEPARATOR,
-        spacingTop: SpacingSize.RELAXED,
-        spacingBottom: SpacingSize.RELAXED,
-        usage: { response: true },
       }),
 
       // === RESPONSE FIELDS ===
@@ -1223,7 +1100,7 @@ const { GET } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

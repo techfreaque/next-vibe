@@ -77,4 +77,42 @@ export const translations: typeof enTranslations = {
       description: "Lista zadań importu została pobrana pomyślnie",
     },
   },
+  widget: {
+    status: {
+      pending: "Oczekujące",
+      running: "W toku",
+      completed: "Zakończone",
+      failed: "Nieudane",
+      stopped: "Zatrzymane",
+    },
+    filter: {
+      all: "Wszystkie",
+      pending: "Oczekujące",
+      running: "W toku",
+      completed: "Zakończone",
+      failed: "Nieudane",
+    },
+    progress: {
+      rows: "wierszy",
+    },
+    job: {
+      total: "Łącznie:",
+      processed: "Przetworzono:",
+      ok: "OK:",
+      fail: "Błąd:",
+      created: "Utworzono:",
+      done: "Gotowe:",
+    },
+    header: {
+      title: "Zadania Importu",
+      newImport: "Nowy Import",
+    },
+    loading: "Ładowanie zadań importu\u2026",
+    empty: {
+      title: "Nie znaleziono zadań importu",
+      withFilter: "Spróbuj innego filtra lub rozpocznij nowy import.",
+      withoutFilter: "Rozpocznij pierwszy import, aby go tutaj zobaczyć.",
+      newImport: "Nowy Import",
+    },
+  },
 };

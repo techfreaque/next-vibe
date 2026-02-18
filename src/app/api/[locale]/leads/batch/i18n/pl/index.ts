@@ -194,6 +194,56 @@ export const translations: typeof enTranslations = {
       description: "Operacja usuwania wsadowego zakończona pomyślnie",
     },
   },
+  widget: {
+    update: {
+      headerTitle: "Wsadowa aktualizacja leadów",
+      emptyStateTitle: "Wsadowa aktualizacja leadów",
+      emptyStateDescription:
+        "Zastosuj aktualizację pola do wielu leadów naraz na podstawie kryteriów filtrowania. Użyj",
+      emptyStateDescriptionStrong: "Testu",
+      emptyStateDescriptionSuffix:
+        "aby wyświetlić podgląd leadów, których to dotyczy, przed zatwierdzeniem zmian.",
+      emptyStateTip1:
+        "Ustaw filtry i kliknij Wyślij, aby najpierw uruchomić podgląd testu",
+      emptyStateTip2: "Odznacz Test, aby zastosować zmiany naprawdę",
+      highVolumeTitle: "Duża partia: {{count}} pasujących leadów",
+      highVolumeDescription:
+        "Dotyczy to dużej liczby rekordów. Sprawdź uważnie podgląd przed wyłączeniem Testu i ostatecznym przesłaniem.",
+      partialBatchTitle: "Przetworzono częściową partię",
+      partialBatchDescription:
+        "Przetworzono {{processed}} z {{matched}} pasujących leadów. Zwiększ Maks. rekordy lub uruchom ponownie, aby przetworzyć więcej.",
+      successTitle: "Operacja wsadowa zakończona",
+      failureTitle: "Operacja wsadowa nie powiodła się",
+      statMatched: "Dopasowane",
+      statProcessed: "Przetworzone",
+      statUpdated: "Zaktualizowane",
+      btnRunAgain: "Uruchom ponownie",
+      btnViewAllAffected: "Wyświetl wszystkie dotknięte leady",
+      btnViewInList: "Wyświetl na liście",
+      dryRunPreviewTitle:
+        "Podgląd testu ({{count}} leadów zostałoby dotkniętych)",
+      leadFallback: "Lead {{number}}",
+      errorsTitle: "{{count}} błąd(ów)",
+      errorRow: "Lead {{leadId}}: {{error}}",
+    },
+    delete: {
+      headerTitle: "Wsadowe usuwanie leadów",
+      warningTitle: "Ostrzeżenie: {{count}} lead zostanie trwale usunięty",
+      warningTitlePlural:
+        "Ostrzeżenie: {{count}} leady zostaną trwale usunięte",
+      warningDescription:
+        "Tej akcji nie można cofnąć. Wszystkie dane pasujących leadów zostaną trwale usunięte. Wyłącz Test i potwierdź, aby kontynuować.",
+      successTitle: "Usuwanie zakończone",
+      failureTitle: "Usuwanie nie powiodło się",
+      statMatched: "Dopasowane",
+      statDeleted: "Usunięte",
+      btnRunAgain: "Uruchom ponownie",
+      btnViewRemainingLeads: "Wyświetl pozostałe leady",
+      previewTitle: "{{count}} leadów zostanie trwale usuniętych",
+      leadFallback: "Lead {{number}}",
+      errorRow: "Lead {{leadId}}: {{error}}",
+    },
+  },
   email: {
     admin: {
       batchUpdate: {

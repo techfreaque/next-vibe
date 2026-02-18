@@ -35,8 +35,9 @@ export const translations: typeof enTranslations = {
         placeholder: "Kategorie auswählen...",
       },
       enabled: {
-        label: "Aktiviert",
+        label: "Status",
         description: "Nach Aktivierungsstatus filtern",
+        placeholder: "Alle Aufgaben",
       },
       limit: {
         label: "Limit",
@@ -230,6 +231,57 @@ export const translations: typeof enTranslations = {
         title: "Aufgabe erstellt",
         description: "Die Aufgabe wurde erfolgreich erstellt",
       },
+    },
+  },
+  widget: {
+    title: "Cron-Aufgaben",
+    loading: "Aufgaben werden geladen...",
+    header: {
+      stats: "Statistiken",
+      history: "Verlauf",
+      refresh: "Aktualisieren",
+      create: "Neue Aufgabe",
+    },
+    filter: {
+      all: "Alle",
+      running: "Laufend",
+      completed: "Abgeschlossen",
+      failed: "Fehlgeschlagen",
+      pending: "Ausstehend",
+      disabled: "Deaktiviert",
+      allPriorities: "Alle Prioritäten",
+      allCategories: "Alle Kategorien",
+    },
+    search: {
+      placeholder: "Aufgaben suchen...",
+    },
+    sort: {
+      nameAsc: "Name A-Z",
+      nameDesc: "Name Z-A",
+      schedule: "Zeitplan",
+      lastRunNewest: "Letzter Lauf (neueste)",
+      executionsMost: "Meiste Ausführungen",
+    },
+    task: {
+      executions: "Ausführungen:",
+      lastRun: "Letzter Lauf:",
+      never: "Nie",
+      nextRun: "Nächster Lauf:",
+      notScheduled: "Nicht geplant",
+    },
+    action: {
+      view: "Details anzeigen",
+      history: "Verlauf anzeigen",
+      edit: "Aufgabe bearbeiten",
+      delete: "Aufgabe löschen",
+    },
+    empty: {
+      noTasks: "Keine Cron-Aufgaben",
+      noTasksDesc: "Erstellen Sie Ihre erste Cron-Aufgabe",
+      noMatches: "Keine Aufgaben entsprechen Ihren Filtern",
+      noMatchesDesc:
+        "Versuchen Sie, Ihre Suche oder Filterkriterien anzupassen",
+      clearFilters: "Filter löschen",
     },
   },
 };

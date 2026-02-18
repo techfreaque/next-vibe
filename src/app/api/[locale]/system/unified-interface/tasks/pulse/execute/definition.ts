@@ -27,7 +27,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
  */
 const { POST } = createEndpoint({
   method: Methods.POST,
-  path: ["system", "tasks", "pulse", "execute"],
+  path: ["system", "unified-interface", "tasks", "pulse", "execute"],
   allowedRoles: [UserRole.ADMIN],
 
   title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.title",

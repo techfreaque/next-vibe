@@ -52,6 +52,11 @@ export const translations = {
     system: "System",
     monitoring: "Monitoring",
   },
+  enabledFilter: {
+    all: "All",
+    enabled: "Enabled",
+    disabled: "Disabled",
+  },
   sort: {
     asc: "Ascending",
     desc: "Descending",

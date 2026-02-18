@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -59,6 +59,12 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
     return null;
   }
 
+  // Stable serialized keys for object dependencies to prevent infinite re-renders
+  // when callers pass new object literals on every render
+  const urlPathParamsKey = JSON.stringify(options.urlPathParams ?? null);
+  const autoPrefillDataKey = JSON.stringify(options.autoPrefillData ?? null);
+  const initialStateKey = JSON.stringify(options.initialState ?? null);
+
   // Merge endpoint and hook options (hook takes priority)
   // Merge defaultValues separately to combine autoPrefillData and initialState
   const mergedFormOptions = useMemo(() => {
@@ -71,10 +77,12 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
       >,
     );
 
-    // Merge defaultValues priority: endpoint < hook < autoPrefill < initialState
+    // Merge defaultValues priority: endpoint < hook < urlPathParams < autoPrefill < initialState
+    // urlPathParams are included so requestUrlPathParamsField fields are pre-filled in the form
     const mergedDefaultValues = deepMerge(
       primaryEndpoint.options?.formOptions?.defaultValues,
       options.formOptions?.defaultValues,
+      options.urlPathParams,
       options.autoPrefillData,
       options.initialState,
     );
@@ -83,11 +91,13 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
       ...merged,
       defaultValues: mergedDefaultValues,
     } as ApiFormOptions<TEndpoint["types"]["RequestOutput"]>;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- serialized keys used for stable object comparison
   }, [
     primaryEndpoint.options,
     options.formOptions,
-    options.autoPrefillData,
-    options.initialState,
+    urlPathParamsKey,
+    autoPrefillDataKey,
+    initialStateKey,
   ]);
 
   const mergedMutationOptions = useMemo(() => {
@@ -117,11 +127,19 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
     mergedMutationOptions,
   );
 
-  // Reset form when autoPrefillData or initialState changes (after initial render)
-  // This handles cases where data is loaded asynchronously after mount
+  // Track the previous serialized prefill key to avoid resetting when object references
+  // change but values are identical (prevents infinite reset loops)
+  const prevPrefillKeyRef = useRef<string | null>(null);
+  const prefillKey = `${urlPathParamsKey}|${autoPrefillDataKey}|${initialStateKey}`;
+
+  // Reset form when prefill data actually changes (after initial render)
+  // Uses serialized comparison so new object literals don't cause spurious resets
+  // urlPathParams are included so requestUrlPathParamsField fields display their values
   useEffect(() => {
-    if (formResult?.form && (options.autoPrefillData || options.initialState)) {
+    if (formResult?.form && prefillKey !== prevPrefillKeyRef.current) {
+      prevPrefillKeyRef.current = prefillKey;
       const dataToReset = {
+        ...options.urlPathParams,
         ...options.autoPrefillData,
         ...options.initialState,
       };
@@ -129,7 +147,8 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
         formResult.form.reset(dataToReset);
       }
     }
-  }, [options.autoPrefillData, options.initialState, formResult?.form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- prefillKey is the stable serialized composite
+  }, [prefillKey, formResult?.form]);
 
   // If no URL parameters are needed, return the form result as-is
   if (!options.urlPathParams) {

@@ -15,7 +15,10 @@ import {
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { PulseHealthStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import {
+  PulseExecutionStatus,
+  PulseHealthStatus,
+} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 
 import type {
   NewPulseExecution,
@@ -363,53 +366,149 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       const startTime = Date.now();
       const pulseId = crypto.randomUUID();
 
-      // TODO: Implement actual task discovery and execution
-      // This is a simplified implementation for now
+      // Load task registry and unified runner
+      const { taskRegistry } =
+        await import("@/app/api/[locale]/system/generated/tasks-index");
+      const { unifiedTaskRunnerRepository } =
+        await import("../unified-runner/repository");
+      const { isCronTaskDue } = await import("../cron-formatter");
+
+      const now = new Date();
+      const tasksDue: string[] = [];
+      const tasksExecuted: string[] = [];
+      const tasksSucceeded: string[] = [];
+      const tasksFailed: string[] = [];
+      const tasksSkipped: string[] = [];
+
+      // Filter by taskNames if provided
+      const candidateTasks = options.taskNames
+        ? taskRegistry.cronTasks.filter((t) =>
+            options.taskNames!.includes(t.name),
+          )
+        : taskRegistry.cronTasks;
+
+      // Discover which tasks are due
+      for (const task of candidateTasks) {
+        if (!task.enabled) {
+          tasksSkipped.push(task.name);
+          continue;
+        }
+        const due = options.force || isCronTaskDue(logger, task.schedule, now);
+        if (due) {
+          tasksDue.push(task.name);
+        } else {
+          tasksSkipped.push(task.name);
+        }
+      }
+
+      // Execute due tasks (skip in dry run)
+      if (!options.dryRun) {
+        // Ensure runner has a logger context for task execution
+        if (!unifiedTaskRunnerRepository.logger) {
+          unifiedTaskRunnerRepository.logger = logger;
+        }
+
+        for (const taskName of tasksDue) {
+          const task = taskRegistry.tasksByName[taskName];
+          if (!task || task.type !== "cron") {
+            continue;
+          }
+
+          tasksExecuted.push(taskName);
+          logger.debug(`Pulse executing cron task: ${taskName}`);
+
+          const result =
+            await unifiedTaskRunnerRepository.executeCronTask(task);
+          if (result.success) {
+            tasksSucceeded.push(taskName);
+          } else {
+            tasksFailed.push(taskName);
+            logger.error(`Pulse: cron task failed: ${taskName}`, {
+              message: result.message,
+            });
+          }
+        }
+      }
+
       const summary = {
         pulseId,
-        executedAt: new Date().toISOString(),
-        totalTasksDiscovered: 0,
-        tasksDue: [],
-        tasksExecuted: [],
-        tasksSucceeded: [],
-        tasksFailed: [],
-        tasksSkipped: [],
+        executedAt: now.toISOString(),
+        totalTasksDiscovered: candidateTasks.length,
+        tasksDue,
+        tasksExecuted,
+        tasksSucceeded,
+        tasksFailed,
+        tasksSkipped,
         totalExecutionTimeMs: Date.now() - startTime,
       };
 
       // Record pulse execution for health tracking
-      if (!options.dryRun) {
-        await this.recordPulseExecution(
-          summary.tasksFailed.length === 0,
-          summary.totalExecutionTimeMs,
-          logger,
-        );
-      }
+      await this.recordPulseExecution(
+        tasksFailed.length === 0,
+        summary.totalExecutionTimeMs,
+        logger,
+        summary,
+      );
 
-      const response = {
+      return success({
         success: true,
         summary,
         isDryRun: options.dryRun || false,
-      };
-
-      return success(response);
-    } catch {
+      });
+    } catch (error) {
       return fail({
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
 
   /**
-   * Record a pulse execution for health tracking
+   * Record a pulse execution for health tracking and persist to pulseExecutions
    */
   async recordPulseExecution(
     isSuccessful: boolean,
     executionTimeMs: number,
     logger: EndpointLogger,
+    summary?: {
+      pulseId: string;
+      executedAt: string;
+      totalTasksDiscovered: number;
+      tasksDue: string[];
+      tasksExecuted: string[];
+      tasksSucceeded: string[];
+      tasksFailed: string[];
+      tasksSkipped: string[];
+      totalExecutionTimeMs: number;
+    },
   ): Promise<ResponseType<void>> {
     try {
+      // Persist to pulseExecutions table if summary is available
+      if (summary) {
+        await this.createExecution({
+          pulseId: summary.pulseId,
+          executionId: crypto.randomUUID(),
+          status: isSuccessful
+            ? PulseExecutionStatus.SUCCESS
+            : PulseExecutionStatus.FAILURE,
+          healthStatus: isSuccessful
+            ? PulseHealthStatus.HEALTHY
+            : PulseHealthStatus.WARNING,
+          startedAt: new Date(summary.executedAt),
+          completedAt: new Date(),
+          durationMs: summary.totalExecutionTimeMs,
+          totalTasksDiscovered: summary.totalTasksDiscovered,
+          tasksDue: summary.tasksDue,
+          tasksExecuted: summary.tasksExecuted,
+          tasksSucceeded: summary.tasksSucceeded,
+          tasksFailed: summary.tasksFailed,
+          tasksSkipped: summary.tasksSkipped,
+          totalExecutionTimeMs: summary.totalExecutionTimeMs,
+          triggeredBy: "schedule",
+        });
+      }
+
       const currentHealthResponse = await this.getCurrentHealth();
 
       if (!currentHealthResponse.success || !currentHealthResponse.data) {

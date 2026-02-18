@@ -77,4 +77,42 @@ export const translations: typeof enTranslations = {
       description: "Import-Jobs-Liste erfolgreich abgerufen",
     },
   },
+  widget: {
+    status: {
+      pending: "Ausstehend",
+      running: "Läuft",
+      completed: "Abgeschlossen",
+      failed: "Fehlgeschlagen",
+      stopped: "Gestoppt",
+    },
+    filter: {
+      all: "Alle",
+      pending: "Ausstehend",
+      running: "Läuft",
+      completed: "Abgeschlossen",
+      failed: "Fehlgeschlagen",
+    },
+    progress: {
+      rows: "Zeilen",
+    },
+    job: {
+      total: "Gesamt:",
+      processed: "Verarbeitet:",
+      ok: "OK:",
+      fail: "Fehler:",
+      created: "Erstellt:",
+      done: "Fertig:",
+    },
+    header: {
+      title: "Import-Jobs",
+      newImport: "Neuer Import",
+    },
+    loading: "Import-Jobs werden geladen\u2026",
+    empty: {
+      title: "Keine Import-Jobs gefunden",
+      withFilter: "Anderen Filter wählen oder neuen Import starten.",
+      withoutFilter: "Starten Sie Ihren ersten Import, um ihn hier zu sehen.",
+      newImport: "Neuer Import",
+    },
+  },
 };

@@ -7,20 +7,21 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  backButton,
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CronTaskPriorityDB, CronTaskStatusDB } from "../../enum";
+import { CronHistoryContainer } from "./widget";
 
 /**
  * GET endpoint definition - Get task execution history
@@ -28,7 +29,7 @@ import { CronTaskPriorityDB, CronTaskStatusDB } from "../../enum";
  */
 export const { GET } = createEndpoint({
   method: Methods.GET,
-  path: ["system", "tasks", "cron", "history"],
+  path: ["system", "unified-interface", "tasks", "cron", "history"],
   title: "app.api.system.unifiedInterface.tasks.cronSystem.history.get.title",
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.history.get.description",
@@ -37,18 +38,12 @@ export const { GET } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   tags: ["app.api.system.unifiedInterface.tasks.type.cron"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.history.get.request.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.history.get.request.description",
-      layoutType: LayoutType.GRID,
-      columns: 6,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: CronHistoryContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
+
       // === REQUEST FIELDS ===
       taskId: requestField({
         type: WidgetType.FORM_FIELD,
@@ -123,7 +118,7 @@ export const { GET } = createEndpoint({
           "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.limit.description",
         placeholder:
           "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.limit.placeholder",
-        schema: z.string().optional(),
+        schema: z.coerce.number().optional(),
       }),
       offset: requestField({
         type: WidgetType.FORM_FIELD,
@@ -134,7 +129,7 @@ export const { GET } = createEndpoint({
           "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.offset.description",
         placeholder:
           "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.offset.placeholder",
-        schema: z.string().optional(),
+        schema: z.coerce.number().optional(),
       }),
 
       // === RESPONSE FIELDS ===
@@ -189,7 +184,7 @@ export const { GET } = createEndpoint({
         }),
       }),
     },
-  ),
+  }),
   successTypes: {
     title:
       "app.api.system.unifiedInterface.tasks.cronSystem.history.get.success.title",
@@ -259,8 +254,8 @@ export const { GET } = createEndpoint({
         taskId: "123",
         startDate: "2021-01-01",
         endDate: "2021-01-31",
-        limit: "10",
-        offset: "0",
+        limit: 10,
+        offset: 0,
       },
     },
     responses: {

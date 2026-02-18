@@ -3,6 +3,10 @@
  * Business logic for cron system status monitoring
  */
 
+import "server-only";
+
+import { CronExpressionParser } from "cron-parser";
+import { count, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -11,10 +15,12 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { CronTaskStatus } from "../../enum";
+import { cronTasks } from "../db";
 import type {
   CronStatusRequestOutput,
   CronStatusResponseOutput,
@@ -31,6 +37,14 @@ export interface ICronStatusRepository {
   ): Promise<ResponseType<CronStatusResponseOutput>>;
 }
 
+function formatUptime(seconds: number): string {
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  // eslint-disable-next-line i18next/no-literal-string
+  return `${days}d ${hours}h ${minutes}m`;
+}
+
 /**
  * Cron Status Repository Implementation
  */
@@ -41,9 +55,6 @@ class CronStatusRepositoryImpl implements ICronStatusRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<CronStatusResponseOutput>> {
     try {
-      // Add await to satisfy async requirement
-      await Promise.resolve();
-
       logger.debug("Getting cron system status", {
         data: data,
         user: user.isPublic ? "public" : user.id,
@@ -51,65 +62,68 @@ class CronStatusRepositoryImpl implements ICronStatusRepository {
 
       const { taskId, detailed } = data;
 
-      // Mock uptime calculation - replace with actual system uptime
-      const uptimeMs = Date.now() - (Date.now() - 86400000 * 2); // 2 days ago
-      const uptimeHours = Math.floor(uptimeMs / (1000 * 60 * 60));
-      const uptimeDays = Math.floor(uptimeHours / 24);
-      const remainingHours = uptimeHours % 24;
-      // eslint-disable-next-line i18next/no-literal-string
-      const uptime = `${uptimeDays}d ${remainingHours}h 30m`;
+      // Total tasks count
+      const [taskCountRow] = await db
+        .select({ total: count(cronTasks.id) })
+        .from(cronTasks);
+      const totalTasks = taskCountRow?.total ?? 0;
 
-      // Mock schedule constants - these are cron expressions, not user-facing strings
-      // eslint-disable-next-line i18next/no-literal-string
-      const scheduleEvery30Min = "0 */30 * * *";
-      // eslint-disable-next-line i18next/no-literal-string
-      const scheduleDaily10AM = "0 10 * * *";
-      // eslint-disable-next-line i18next/no-literal-string
-      const scheduleDaily11PM = "0 23 * * *";
+      // Active tasks = enabled tasks
+      const [activeRow] = await db
+        .select({ active: count(cronTasks.id) })
+        .from(cronTasks)
+        .where(eq(cronTasks.enabled, true));
+      const activeTasks = activeRow?.active ?? 0;
 
-      // Mock tasks data - replace with actual database queries
-      const mockTasks = detailed
-        ? [
-            {
-              id: "task-1",
-              name: "email-campaign",
-              status: CronTaskStatus.RUNNING,
-              lastRun: "2023-07-21T11:30:00Z",
-              nextRun: "2023-07-21T12:30:00Z",
-              schedule: scheduleEvery30Min,
-            },
-            {
-              id: "task-2",
-              name: "data-sync",
-              status: CronTaskStatus.COMPLETED,
-              lastRun: "2023-07-21T10:00:00Z",
-              nextRun: "2023-07-22T10:00:00Z",
-              schedule: scheduleDaily10AM,
-            },
-            {
-              id: "task-3",
-              name: "cleanup-logs",
-              status: CronTaskStatus.SCHEDULED,
-              lastRun: "2023-07-20T23:00:00Z",
-              nextRun: "2023-07-21T23:00:00Z",
-              schedule: scheduleDaily11PM,
-            },
-          ]
-        : [];
+      // System status: healthy when all enabled tasks exist, warning if none enabled
+      const systemStatus: CronStatusResponseOutput["systemStatus"] =
+        totalTasks === 0 || activeTasks === 0 ? "warning" : "healthy";
 
-      // Filter by taskId if specified
-      const filteredTasks =
-        taskId && mockTasks
-          ? mockTasks.filter((task) => task.id === taskId)
-          : mockTasks;
+      // Real server uptime
+      const uptime = formatUptime(Math.floor(process.uptime()));
+
+      // Task list when detailed=true
+      let tasks: CronStatusResponseOutput["tasks"] = [];
+      if (detailed) {
+        const taskRows = await db
+          .select()
+          .from(cronTasks)
+          .limit(20)
+          .orderBy(cronTasks.createdAt);
+
+        tasks = taskRows
+          .filter((t) => !taskId || t.id === taskId)
+          .map((t) => {
+            let nextRun = t.nextExecutionAt?.toISOString() ?? null;
+            if (!nextRun && t.enabled) {
+              try {
+                const interval = CronExpressionParser.parse(t.schedule);
+                nextRun = interval.next().toISOString();
+              } catch {
+                // invalid schedule — leave null
+              }
+            }
+            const status = !t.enabled
+              ? CronTaskStatus.CANCELLED
+              : (t.lastExecutionStatus ?? CronTaskStatus.SCHEDULED);
+            return {
+              id: t.id,
+              name: t.name,
+              status,
+              lastRun: t.lastExecutedAt?.toISOString() ?? null,
+              nextRun,
+              schedule: t.schedule,
+            };
+          });
+      }
 
       const response: CronStatusResponseOutput = {
         success: true,
-        systemStatus: "healthy",
-        activeTasks: 3,
-        totalTasks: 15,
+        systemStatus,
+        activeTasks,
+        totalTasks,
         uptime,
-        tasks: filteredTasks,
+        tasks,
       };
 
       logger.debug("Cron status retrieved successfully", {

@@ -98,32 +98,6 @@ export const cronTaskExecutions = pgTable("cron_task_executions", {
 });
 
 /**
- * Cron Task Schedules Table
- * Manages cron scheduling information
- */
-export const cronTaskSchedules = pgTable("cron_task_schedules", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  taskId: uuid("task_id")
-    .notNull()
-    .references(() => cronTasks.id, { onDelete: "cascade" }),
-  taskName: text("task_name").notNull(),
-  schedule: text("schedule").notNull(),
-  timezone: text("timezone").notNull().default("UTC"),
-
-  // Scheduling state
-  isActive: boolean("is_active").notNull().default(true),
-  lastRunAt: timestamp("last_run_at"),
-  nextRunAt: timestamp("next_run_at"),
-
-  // Statistics
-  totalRuns: integer("total_runs").notNull().default(0),
-  consecutiveFailures: integer("consecutive_failures").notNull().default(0),
-
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-/**
  * Zod schemas for validation
  */
 export const insertCronTaskSchema = createInsertSchema(cronTasks);
@@ -133,11 +107,6 @@ export const insertCronTaskExecutionSchema =
   createInsertSchema(cronTaskExecutions);
 export const selectCronTaskExecutionSchema =
   createSelectSchema(cronTaskExecutions);
-
-export const insertCronTaskScheduleSchema =
-  createInsertSchema(cronTaskSchedules);
-export const selectCronTaskScheduleSchema =
-  createSelectSchema(cronTaskSchedules);
 
 /**
  * Type exports for cron tasks
@@ -149,6 +118,3 @@ export type CronTaskExecution = z.infer<typeof selectCronTaskExecutionSchema>;
 export type NewCronTaskExecution = z.infer<
   typeof insertCronTaskExecutionSchema
 >;
-
-export type CronTaskSchedule = z.infer<typeof selectCronTaskScheduleSchema>;
-export type NewCronTaskSchedule = z.infer<typeof insertCronTaskScheduleSchema>;

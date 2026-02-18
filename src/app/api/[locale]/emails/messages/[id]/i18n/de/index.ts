@@ -1,7 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "E-Mail nach ID abrufen",
+  title: "E-Mail-Details",
   description: "Eine einzelne E-Mail anhand ihrer eindeutigen Kennung abrufen",
   container: {
     title: "E-Mail-Details",
@@ -115,5 +115,25 @@ export const translations: typeof enTranslations = {
   success: {
     title: "E-Mail abgerufen",
     description: "E-Mail-Details erfolgreich abgerufen",
+  },
+  widget: {
+    parties: "Beteiligte",
+    to: "An",
+    from: "Von",
+    timestamps: "Zeitstempel",
+    sentAt: "Gesendet am",
+    deliveredAt: "Zugestellt am",
+    openedAt: "Geöffnet am",
+    clickedAt: "Geklickt am",
+    technical: "Technische Details",
+    template: "Vorlage",
+    provider: "Anbieter",
+    externalId: "Externe ID",
+    retryCount: "Wiederholungsanzahl",
+    error: "Fehler",
+    associations: "Verknüpfungen",
+    lead: "Lead",
+    user: "Benutzer",
+    notFound: "E-Mail nicht gefunden",
   },
 };

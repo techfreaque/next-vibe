@@ -61,4 +61,32 @@ export const translations = {
       description: "A conflict occurred",
     },
   },
+  widget: {
+    title: "System Status",
+    loading: "Loading status...",
+    uptime: "Uptime",
+    tasks: "Tasks",
+    emptyTasks: "No tasks found",
+    status: {
+      healthy: "Healthy",
+      warning: "Warning",
+      critical: "Critical",
+      unknown: "Unknown",
+    },
+    stats: {
+      activeTasks: "Active Tasks",
+      totalTasks: "Total Tasks",
+      systemHealth: "System Health",
+    },
+    task: {
+      lastRun: "Last:",
+      nextRun: "Next:",
+    },
+    actions: {
+      tasks: "Tasks",
+      history: "History",
+      stats: "Stats",
+      refresh: "Refresh",
+    },
+  },
 };

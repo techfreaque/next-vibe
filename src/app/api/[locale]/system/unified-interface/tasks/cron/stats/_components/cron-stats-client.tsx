@@ -34,10 +34,6 @@ import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useCronStats } from "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/hooks";
-import {
-  CronTaskPriority,
-  CronTaskStatus,
-} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -63,54 +59,6 @@ enum JSWeekday {
 interface CronStatsClientProps {
   locale: CountryLanguage;
   user: JwtPayloadType;
-}
-
-/**
- * Get priority translation key
- */
-function getPriorityTranslation(
-  priority: (typeof CronTaskPriority)[keyof typeof CronTaskPriority],
-): TranslationKey {
-  switch (priority) {
-    case CronTaskPriority.BACKGROUND:
-      return "app.admin.cron.stats.priority.low";
-    case CronTaskPriority.LOW:
-      return "app.admin.cron.stats.priority.low";
-    case CronTaskPriority.MEDIUM:
-      return "app.admin.cron.stats.priority.high";
-    case CronTaskPriority.HIGH:
-      return "app.admin.cron.stats.priority.high";
-    case CronTaskPriority.CRITICAL:
-      return "app.admin.cron.stats.priority.critical";
-    default:
-      return "app.admin.cron.stats.unknown";
-  }
-}
-
-/**
- * Get status translation key
- */
-function getStatusTranslation(
-  status: (typeof CronTaskStatus)[keyof typeof CronTaskStatus],
-): TranslationKey {
-  switch (status) {
-    case CronTaskStatus.PENDING:
-      return "app.admin.cron.stats.status.pending";
-    case CronTaskStatus.RUNNING:
-      return "app.admin.cron.stats.status.running";
-    case CronTaskStatus.COMPLETED:
-      return "app.admin.cron.stats.status.completed";
-    case CronTaskStatus.FAILED:
-      return "app.admin.cron.stats.status.failed";
-    case CronTaskStatus.TIMEOUT:
-      return "app.admin.cron.stats.status.timeout";
-    case CronTaskStatus.CANCELLED:
-      return "app.admin.cron.stats.status.cancelled";
-    case CronTaskStatus.SKIPPED:
-      return "app.admin.cron.stats.status.skipped";
-    default:
-      return "app.admin.cron.stats.unknown";
-  }
 }
 
 /**
@@ -150,7 +98,7 @@ export function CronStatsClient({
   const statsEndpoint = useCronStats(user, logger);
 
   const apiResponse = statsEndpoint.read.response;
-  const stats = apiResponse?.success ? apiResponse.data.data : null;
+  const stats = apiResponse?.success ? apiResponse.data : null;
   const isLoading = statsEndpoint.read.isLoading;
 
   // Stub implementations for missing functionality
@@ -552,7 +500,7 @@ export function CronStatsClient({
               <CronStatsDistributionChart
                 data={objectEntries(stats.tasksByPriority).map(
                   ([priority, count]) => ({
-                    name: t(getPriorityTranslation(priority)),
+                    name: t(priority),
                     value: count,
                   }),
                 )}
@@ -567,7 +515,7 @@ export function CronStatsClient({
               <CronStatsDistributionChart
                 data={objectEntries(stats.tasksByStatus).map(
                   ([status, count]) => ({
-                    name: t(getStatusTranslation(status)),
+                    name: t(status),
                     value: count,
                   }),
                 )}

@@ -8,6 +8,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
@@ -23,6 +25,9 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
+  CronTaskEnabledFilter,
+  CronTaskEnabledFilterDB,
+  CronTaskEnabledFilterOptions,
   CronTaskPriority,
   CronTaskPriorityDB,
   CronTaskPriorityOptions,
@@ -32,13 +37,14 @@ import {
   TaskCategoryDB,
   TaskCategoryOptions,
 } from "../../enum";
+import { CronTasksContainer } from "./widget";
 
 /**
  * GET /cron/tasks - List cron tasks
  */
 const { GET } = createEndpoint({
   method: Methods.GET,
-  path: ["system", "tasks", "cron", "tasks"],
+  path: ["system", "unified-interface", "tasks", "cron", "tasks"],
   title: "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.title",
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.description",
@@ -46,18 +52,12 @@ const { GET } = createEndpoint({
   category: "app.api.system.unifiedInterface.tasks.category",
   allowedRoles: [UserRole.ADMIN],
   tags: ["app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.title"],
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.container.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: CronTasksContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { request: "data", response: true } }),
+
       // Request fields for filtering
       status: requestField({
         type: WidgetType.FORM_FIELD,
@@ -100,13 +100,19 @@ const { GET } = createEndpoint({
       }),
       enabled: requestField({
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
+        fieldType: FieldDataType.SELECT,
         label:
           "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.enabled.label",
         description:
           "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.enabled.description",
+        placeholder:
+          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.enabled.placeholder",
+        options: CronTaskEnabledFilterOptions,
         columns: 6,
-        schema: z.boolean().optional(),
+        schema: z
+          .enum(CronTaskEnabledFilterDB)
+          .optional()
+          .default(CronTaskEnabledFilter.ALL),
       }),
       limit: requestField({
         type: WidgetType.FORM_FIELD,
@@ -294,7 +300,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.number(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
@@ -376,7 +382,7 @@ const { GET } = createEndpoint({
  */
 const { POST } = createEndpoint({
   method: Methods.POST,
-  path: ["system", "tasks", "cron", "tasks"],
+  path: ["system", "unified-interface", "tasks", "cron", "tasks"],
   title: "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.title",
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.description",

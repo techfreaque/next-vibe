@@ -66,4 +66,8 @@ export const translations: typeof enTranslations = {
       description: "Zadanie importu zostało pomyślnie zatrzymane",
     },
   },
+  widget: {
+    title: "Zatrzymaj zadanie importu",
+    successMessage: "Zadanie zostało pomyślnie zatrzymane",
+  },
 };

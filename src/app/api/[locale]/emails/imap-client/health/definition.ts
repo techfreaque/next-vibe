@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
@@ -19,6 +21,7 @@ import {
 
 import { UserRole } from "../../../user/user-roles/enum";
 import { ImapHealthStatus } from "../enum";
+import { ImapHealthContainer } from "./widget";
 
 /**
  * Get IMAP Health Status Endpoint (GET)
@@ -38,17 +41,12 @@ const { GET } = createEndpoint({
     "app.api.emails.imapClient.tags.monitoring",
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.imapClient.health.health.get.form.title",
-      description:
-        "app.api.emails.imapClient.health.health.get.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: undefined, response: true },
-    {
+  fields: customWidgetObject({
+    render: ImapHealthContainer,
+    usage: { response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
+
       // === RESPONSE FIELDS ===
       accountsHealthy: responseField({
         type: WidgetType.TEXT,
@@ -147,7 +145,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.number(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {

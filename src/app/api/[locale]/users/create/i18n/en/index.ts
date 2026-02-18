@@ -222,6 +222,22 @@ export const translations = {
       },
     },
   },
+  widget: {
+    headerCreated: "User Created",
+    headerCreate: "Create User",
+    headerSubtitle: "Create a new admin user or customer account",
+    activeBadge: "Active",
+    verifiedBadge: "Verified",
+    copiedTooltip: "Copied!",
+    copyUserIdTooltip: "Copy User ID",
+    copyIdButton: "Copy ID",
+    copiedButton: "Copied!",
+    viewUserButton: "View User",
+    fullProfileButton: "Full Profile",
+    creditHistoryButton: "Credit History",
+    createAnotherButton: "Create Another User",
+    createdPrefix: "Created",
+  },
   email: {
     users: {
       welcome: {

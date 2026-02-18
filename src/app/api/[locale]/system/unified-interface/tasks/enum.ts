@@ -161,6 +161,27 @@ export const TaskCategoryDB = [
 ] as const;
 
 /**
+ * Task Enabled Filter
+ * Tri-state filter: all tasks / enabled only / disabled only
+ */
+export const {
+  enum: CronTaskEnabledFilter,
+  options: CronTaskEnabledFilterOptions,
+  Value: CronTaskEnabledFilterValue,
+} = createEnumOptions({
+  ALL: "app.api.system.unifiedInterface.tasks.enabledFilter.all" as const,
+  ENABLED:
+    "app.api.system.unifiedInterface.tasks.enabledFilter.enabled" as const,
+  DISABLED:
+    "app.api.system.unifiedInterface.tasks.enabledFilter.disabled" as const,
+});
+export const CronTaskEnabledFilterDB = [
+  CronTaskEnabledFilter.ALL,
+  CronTaskEnabledFilter.ENABLED,
+  CronTaskEnabledFilter.DISABLED,
+] as const;
+
+/**
  * Sort Order
  */
 export const {
@@ -350,9 +371,3 @@ export function isFailureStatus(status: typeof CronTaskStatusValue): boolean {
 export function isSuccessStatus(status: typeof CronTaskStatusValue): boolean {
   return status === CronTaskStatus.COMPLETED;
 }
-
-/**
- * Backward compatibility aliases
- */
-export const TaskPriorityDB = CronTaskPriorityDB;
-export const TaskStatusDB = CronTaskStatusDB;

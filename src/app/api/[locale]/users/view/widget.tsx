@@ -5,7 +5,9 @@
 
 "use client";
 
+import { useRouter } from "next-vibe-ui/hooks";
 import { Badge } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import {
@@ -15,22 +17,34 @@ import {
   CheckCircle,
   Clock,
   Coins,
+  Copy,
   CreditCard,
   DollarSign,
+  ExternalLink,
   Gift,
+  History,
   Mail,
   MessageSquare,
+  Pencil,
   Shield,
+  ShoppingCart,
+  Trash2,
   TrendingUp,
   User,
   Users,
   XCircle,
 } from "next-vibe-ui/ui/icons";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
+import { useCallback, useState } from "react";
 
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetLocale,
+  useWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 
 import type definition from "./definition";
 import type { UserViewResponseOutput } from "./definition";
@@ -41,8 +55,6 @@ import type { UserViewResponseOutput } from "./definition";
 interface CustomWidgetProps {
   field: {
     value: UserViewResponseOutput | null | undefined;
-    backButton?: React.ReactNode;
-    title?: React.ReactNode;
   } & (typeof definition.GET)["fields"];
   fieldName: string;
 }
@@ -115,7 +127,73 @@ export function UserViewContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const t = useWidgetTranslation();
+  const router = useRouter();
+  const locale = useWidgetLocale();
+  const [editLoading, setEditLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const data = field.value;
+  const children = field.children;
+
+  const userId = data?.basicInfo?.id;
+
+  const handleViewCreditHistory = useCallback((): void => {
+    if (!userId) {
+      return;
+    }
+    router.push(`/${locale}/admin/users/${userId}/edit`);
+  }, [router, locale, userId]);
+
+  const handleEdit = useCallback((): void => {
+    if (!userId) {
+      return;
+    }
+    setEditLoading(true);
+    router.push(`/${locale}/admin/users/${userId}/edit`);
+    setEditLoading(false);
+  }, [router, locale, userId]);
+
+  const handleDelete = useCallback((): void => {
+    if (!userId) {
+      return;
+    }
+    setDeleteLoading(true);
+    router.push(`/${locale}/admin/users/${userId}/edit`);
+    setDeleteLoading(false);
+  }, [router, locale, userId]);
+
+  const handleViewSubscription = useCallback((): void => {
+    router.push(`/${locale}/admin/users/${userId ?? ""}/edit`);
+  }, [router, locale, userId]);
+
+  const handleViewReferralCodes = useCallback((): void => {
+    router.push(`/${locale}/admin/users/${userId ?? ""}/edit`);
+  }, [router, locale, userId]);
+
+  const handleViewReferralEarnings = useCallback((): void => {
+    router.push(`/${locale}/admin/users/${userId ?? ""}/edit`);
+  }, [router, locale, userId]);
+
+  const handleAddCredits = useCallback((): void => {
+    router.push(`/${locale}/admin/users/${userId ?? ""}/edit`);
+  }, [router, locale, userId]);
+
+  const handleViewLeadByEmail = useCallback((): void => {
+    router.push(`/${locale}/admin/leads/list`);
+  }, [router, locale]);
+
+  const [copyIdSuccess, setCopyIdSuccess] = useState(false);
+  const handleCopyUserId = useCallback((): void => {
+    if (!userId) {
+      return;
+    }
+    void navigator.clipboard.writeText(userId).then(() => {
+      setCopyIdSuccess(true);
+      setTimeout(() => {
+        setCopyIdSuccess(false);
+      }, 2000);
+      return undefined;
+    });
+  }, [userId]);
 
   if (!data) {
     return (
@@ -143,13 +221,45 @@ export function UserViewContainer({
 
   return (
     <Div className="flex flex-col gap-6">
-      {/* Top action bar with back button and title */}
-      {(field.backButton || field.title) && (
-        <Div className="flex items-center justify-between">
-          {field.backButton}
-          {field.title}
-        </Div>
-      )}
+      {/* Top action bar */}
+      <Div className="flex items-center gap-2">
+        <NavigateButtonWidget field={children.backButton} />
+        <Div className="flex-1" />
+        {userId && (
+          <>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleEdit}
+              disabled={editLoading}
+              className="gap-1"
+            >
+              {editLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Pencil className="h-4 w-4" />
+              )}
+              {t("app.api.users.view.widget.actions.edit")}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleDelete}
+              disabled={deleteLoading}
+              className="gap-1 text-destructive hover:text-destructive"
+            >
+              {deleteLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+              {t("app.api.users.view.widget.actions.delete")}
+            </Button>
+          </>
+        )}
+      </Div>
       {/* Basic User Information */}
       <Card>
         <CardHeader>
@@ -319,31 +429,31 @@ export function UserViewContainer({
         <CardContent>
           <Div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
-              title="Total Threads"
+              title={t("app.api.users.view.widget.stats.totalThreads")}
               value={chatStats.totalThreads}
               description={`${chatStats.activeThreads} active, ${chatStats.archivedThreads} archived`}
               icon={MessageSquare}
               colorClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
             />
             <StatCard
-              title="Total Messages"
+              title={t("app.api.users.view.widget.stats.totalMessages")}
               value={chatStats.totalMessages}
               description={`${chatStats.userMessages} user, ${chatStats.aiMessages} AI`}
               icon={Activity}
               colorClassName="bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400"
             />
             <StatCard
-              title="User Messages"
+              title={t("app.api.users.view.widget.stats.userMessages")}
               value={chatStats.userMessages}
               icon={User}
               colorClassName="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
             />
             <StatCard
-              title="Last Activity"
+              title={t("app.api.users.view.widget.stats.lastActivity")}
               value={
                 chatStats.lastActivityAt
                   ? formatDate(chatStats.lastActivityAt)
-                  : "Never"
+                  : t("app.api.users.view.widget.stats.never")
               }
               icon={Clock}
               colorClassName="bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400"
@@ -370,20 +480,20 @@ export function UserViewContainer({
               colorClassName="bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400"
             />
             <StatCard
-              title="Free Credits"
+              title={t("app.api.users.view.widget.stats.freeCredits")}
               value={creditInfo.freeCreditsRemaining.toFixed(2)}
-              description={`Period: ${creditInfo.freePeriodId || "N/A"}`}
+              description={`${t("app.api.users.view.widget.stats.freePeriod")}: ${creditInfo.freePeriodId || "N/A"}`}
               icon={Gift}
               colorClassName="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
             />
             <StatCard
-              title="Total Spent"
+              title={t("app.api.users.view.widget.stats.totalSpent")}
               value={creditInfo.totalCreditsSpent.toFixed(2)}
               icon={TrendingUp}
               colorClassName="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
             />
             <StatCard
-              title="Total Purchased"
+              title={t("app.api.users.view.widget.stats.totalPurchased")}
               value={creditInfo.totalCreditsPurchased.toFixed(2)}
               icon={CreditCard}
               colorClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
@@ -403,31 +513,31 @@ export function UserViewContainer({
         <CardContent>
           <Div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             <StatCard
-              title="Total Revenue"
+              title={t("app.api.users.view.widget.stats.totalRevenue")}
               value={formatCurrency(paymentStats.totalRevenueCents)}
-              description={`${paymentStats.totalPayments} payments`}
+              description={`${paymentStats.totalPayments} ${t("app.api.users.view.widget.stats.payments")}`}
               icon={DollarSign}
               colorClassName="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
             />
             <StatCard
-              title="Successful"
+              title={t("app.api.users.view.widget.stats.successful")}
               value={paymentStats.successfulPayments}
-              description={`Failed: ${paymentStats.failedPayments}`}
+              description={`${t("app.api.users.view.widget.stats.failed")}: ${paymentStats.failedPayments}`}
               icon={CheckCircle}
               colorClassName="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
             />
             <StatCard
-              title="Total Refunds"
+              title={t("app.api.users.view.widget.stats.totalRefunds")}
               value={formatCurrency(paymentStats.totalRefundsCents)}
               icon={XCircle}
               colorClassName="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
             />
             <StatCard
-              title="Last Payment"
+              title={t("app.api.users.view.widget.stats.lastPayment")}
               value={
                 paymentStats.lastPaymentAt
                   ? formatDate(paymentStats.lastPaymentAt)
-                  : "Never"
+                  : t("app.api.users.view.widget.stats.never")
               }
               icon={Calendar}
               colorClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
@@ -619,6 +729,106 @@ export function UserViewContainer({
                 {formatDate(recentActivity.lastPayment)}
               </P>
             </Div>
+          </Div>
+        </CardContent>
+      </Card>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ExternalLink className="h-5 w-5" />
+            {t("app.api.users.view.widget.sections.quickActions")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleViewCreditHistory}
+              className="gap-2"
+            >
+              <History className="h-4 w-4" />
+              {t("app.api.users.view.widget.actions.viewCreditHistory")}
+            </Button>
+
+            {paymentStats.hasActiveSubscription && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleViewSubscription}
+                className="gap-2"
+              >
+                <CreditCard className="h-4 w-4" />
+                {t("app.api.users.view.widget.actions.viewSubscription")}
+              </Button>
+            )}
+
+            {referralStats.activeReferralCodes > 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleViewReferralCodes}
+                className="gap-2"
+              >
+                <Gift className="h-4 w-4" />
+                {t("app.api.users.view.widget.actions.viewReferralCodes")}
+              </Button>
+            )}
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleViewReferralEarnings}
+              className="gap-2"
+            >
+              <TrendingUp className="h-4 w-4" />
+              {t("app.api.users.view.widget.actions.viewReferralEarnings")}
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleAddCredits}
+              className="gap-2"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              {t("app.api.users.view.widget.actions.addCredits")}
+            </Button>
+
+            {basicInfo.email && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleViewLeadByEmail}
+                className="gap-2"
+              >
+                <Users className="h-4 w-4" />
+                {t("app.api.users.view.widget.actions.viewLead")}
+              </Button>
+            )}
+
+            {userId && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleCopyUserId}
+                className="gap-2"
+              >
+                <Copy className="h-4 w-4" />
+                {copyIdSuccess
+                  ? t("app.api.users.view.widget.actions.copied")
+                  : t("app.api.users.view.widget.actions.copyUserId")}
+              </Button>
+            )}
           </Div>
         </CardContent>
       </Card>

@@ -120,13 +120,11 @@ export function ExecutionHistory({
   const queryLoading = historyEndpoint.read.isLoading || false;
 
   // Get current form values for pagination display
-  const currentOffset = parseInt(
-    historyEndpoint.read.form?.getValues("offset") || "0",
-    10,
+  const currentOffset = Number(
+    historyEndpoint.read.form?.getValues("offset") ?? 0,
   );
-  const currentLimit = parseInt(
-    historyEndpoint.read.form?.getValues("limit") || "20",
-    10,
+  const currentLimit = Number(
+    historyEndpoint.read.form?.getValues("limit") ?? 20,
   );
 
   const getDuration = (execution: CronExecutionType): string => {
@@ -153,8 +151,8 @@ export function ExecutionHistory({
       priority: undefined,
       startDate: undefined,
       endDate: undefined,
-      limit: "20",
-      offset: "0",
+      limit: 20,
+      offset: 0,
     });
   };
 
@@ -376,10 +374,7 @@ export function ExecutionHistory({
                 size="sm"
                 onClick={() => {
                   const newOffset = Math.max(0, currentOffset - currentLimit);
-                  historyEndpoint.read.form?.setValue(
-                    "offset",
-                    newOffset.toString(),
-                  );
+                  historyEndpoint.read.form?.setValue("offset", newOffset);
                 }}
                 disabled={currentOffset === 0}
               >
@@ -390,10 +385,7 @@ export function ExecutionHistory({
                 size="sm"
                 onClick={() => {
                   const newOffset = currentOffset + currentLimit;
-                  historyEndpoint.read.form?.setValue(
-                    "offset",
-                    newOffset.toString(),
-                  );
+                  historyEndpoint.read.form?.setValue("offset", newOffset);
                 }}
                 disabled={!(apiResponse?.success && apiResponse.data.hasMore)}
               >

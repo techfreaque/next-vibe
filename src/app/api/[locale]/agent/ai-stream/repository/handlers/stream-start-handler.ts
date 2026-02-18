@@ -81,6 +81,7 @@ export class StreamStartHandler {
         }>
       | undefined;
     isNewThread: boolean;
+    isIncognito: boolean;
     threadId: string;
     rootFolderId: DefaultFolderId;
     subFolderId: string | null;
@@ -109,6 +110,7 @@ export class StreamStartHandler {
       userMessageMetadata,
       fileUploadPromise,
       isNewThread,
+      isIncognito,
       threadId,
       rootFolderId,
       subFolderId,
@@ -123,14 +125,17 @@ export class StreamStartHandler {
       logger,
     } = params;
 
-    // Initialize stream context
+    // Initialize stream context (creates MessageDbWriter with controller + encoder)
     const ctx = StreamContextInitializer.initializeContext({
       userMessageId,
       effectiveParentMessageId,
       messageDepth,
       toolConfirmationResults,
       aiMessageId,
+      isIncognito,
       logger,
+      controller,
+      encoder,
     });
 
     // Create streaming TTS handler if voice mode enabled
@@ -151,14 +156,12 @@ export class StreamStartHandler {
       });
     }
 
-    // Emit initial events and capture which tool results were already emitted
-    // This prevents duplicate TOOL_RESULT emissions during streaming
+    // Emit initial events via dbWriter (no direct controller access)
     const emittedToolResultIds = InitialEventsHandler.emitInitialEvents({
       isNewThread,
       threadId,
       rootFolderId,
       subFolderId: subFolderId || null,
-      // Use effectiveContent for thread title (includes transcribed text for voice input)
       content: effectiveContent,
       operation,
       userMessageId,
@@ -169,17 +172,15 @@ export class StreamStartHandler {
       toolConfirmationResults,
       voiceTranscription,
       userMessageMetadata,
-      controller,
-      encoder,
+      dbWriter: ctx.dbWriter,
       logger,
     });
 
-    // Handle file upload promise in background (server threads only)
+    // Handle file upload promise in background
     FileUploadEventHandler.attachFileUploadListener({
       fileUploadPromise,
       userMessageId,
-      controller,
-      encoder,
+      dbWriter: ctx.dbWriter,
       logger,
     });
 

@@ -101,4 +101,12 @@ export const translations: typeof enTranslations = {
     title: "Erfolg",
     description: "Ordner erfolgreich abgerufen",
   },
+  widget: {
+    title: "IMAP-Ordner",
+    refresh: "Aktualisieren",
+    sync: "Ordner synchronisieren",
+    empty: "Keine Ordner gefunden",
+    messages: "Nachrichten",
+    unseen: "Ungelesen",
+  },
 };

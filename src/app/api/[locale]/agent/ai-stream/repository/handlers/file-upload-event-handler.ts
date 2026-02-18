@@ -7,7 +7,7 @@ import "server-only";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { parseError } from "../../../../shared/utils";
-import { createStreamEvent, formatSSEEvent } from "../../events";
+import type { MessageDbWriter } from "../core/message-db-writer";
 
 export class FileUploadEventHandler {
   /**
@@ -28,15 +28,11 @@ export class FileUploadEventHandler {
         }>
       | undefined;
     userMessageId: string | null;
-    controller: ReadableStreamDefaultController;
-    encoder: TextEncoder;
+    dbWriter: MessageDbWriter;
     logger: EndpointLogger;
   }): void {
-    const { fileUploadPromise, userMessageId, controller, encoder, logger } =
-      params;
+    const { fileUploadPromise, userMessageId, dbWriter, logger } = params;
 
-    // Handle file upload promise in background (server threads only)
-    // When upload completes, emit FILES_UPLOADED event to update UI
     if (fileUploadPromise && userMessageId) {
       void fileUploadPromise
         .then((result) => {
@@ -49,29 +45,15 @@ export class FileUploadEventHandler {
               },
             );
 
-            // Emit FILES_UPLOADED event to update UI with attachment metadata
-            const filesUploadedEvent = createStreamEvent.filesUploaded({
+            dbWriter.emitFilesUploaded({
               messageId: result.userMessageId,
               attachments: result.attachments,
             });
 
-            try {
-              controller.enqueue(
-                encoder.encode(formatSSEEvent(filesUploadedEvent)),
-              );
-              logger.info("[File Processing] FILES_UPLOADED event emitted", {
-                messageId: result.userMessageId,
-                attachmentCount: result.attachments.length,
-              });
-            } catch (error) {
-              logger.error(
-                "[File Processing] Failed to emit FILES_UPLOADED event",
-                {
-                  error: parseError(error),
-                  messageId: result.userMessageId,
-                },
-              );
-            }
+            logger.info("[File Processing] FILES_UPLOADED event emitted", {
+              messageId: result.userMessageId,
+              attachmentCount: result.attachments.length,
+            });
           } else {
             logger.warn(
               "[File Processing] File upload failed - no event emitted",

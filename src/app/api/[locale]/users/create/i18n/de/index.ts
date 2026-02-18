@@ -241,6 +241,22 @@ export const translations = {
       },
     },
   },
+  widget: {
+    headerCreated: "Benutzer erstellt",
+    headerCreate: "Benutzer erstellen",
+    headerSubtitle: "Neuen Admin-Benutzer oder Kundenkonto erstellen",
+    activeBadge: "Aktiv",
+    verifiedBadge: "Verifiziert",
+    copiedTooltip: "Kopiert!",
+    copyUserIdTooltip: "Benutzer-ID kopieren",
+    copyIdButton: "ID kopieren",
+    copiedButton: "Kopiert!",
+    viewUserButton: "Benutzer anzeigen",
+    fullProfileButton: "Vollständiges Profil",
+    creditHistoryButton: "Kreditverlauf",
+    createAnotherButton: "Weiteren Benutzer erstellen",
+    createdPrefix: "Erstellt",
+  },
   email: {
     users: {
       welcome: {

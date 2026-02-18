@@ -152,7 +152,6 @@ export class MessageRepository {
           authorId: message.authorId,
           isAI: message.isAI,
           model: message.model,
-          tokens: message.tokens,
           createdAt: message.createdAt.toISOString(),
           updatedAt: message.updatedAt.toISOString(),
         },

@@ -4,8 +4,6 @@
 
 import "server-only";
 
-import type { ReadableStreamDefaultController } from "node:stream/web";
-
 import type { JSONValue } from "ai";
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
@@ -25,68 +23,43 @@ export class StreamErrorCatchHandler {
     maxDuration: number;
     model: ModelId;
     threadId: string;
-    isIncognito: boolean;
     userId: string | undefined;
-    controller: ReadableStreamDefaultController<Uint8Array>;
-    encoder: TextEncoder;
     logger: EndpointLogger;
   }): Promise<void> {
-    const {
-      error,
-      ctx,
-      maxDuration,
-      model,
-      threadId,
-      isIncognito,
-      userId,
-      controller,
-      encoder,
-      logger,
-    } = params;
+    const { error, ctx, maxDuration, model, threadId, userId, logger } = params;
 
-    // Note: Abort errors are now handled inline in stream-execution-handler
-    // This ensures events are emitted before the controller closes
-    // So this handler should only see non-abort errors
+    // Note: Abort errors are handled inline in stream-execution-handler.
+    // This handler only receives non-abort errors.
 
-    // Check if this is a timeout error
     if (error instanceof Error && error.message === "Stream timeout") {
       await TimeoutErrorHandler.handleTimeout({
         maxDuration,
         model,
         threadId,
-        isIncognito,
         userId,
         lastParentId: ctx.lastParentId,
         lastDepth: ctx.lastDepth,
         lastSequenceId: ctx.lastSequenceId,
-        controller,
-        encoder,
+        dbWriter: ctx.dbWriter,
         logger,
       });
 
-      // Cleanup on timeout
       ctx.cleanup();
-
-      controller.close();
+      ctx.dbWriter.closeController();
       return;
     }
 
-    // All other errors (including AI_NoOutputGeneratedError from provider validation)
-    // should be sent to the frontend as error messages
     await StreamErrorHandler.handleStreamError({
       error: error instanceof Error ? error : (error as JSONValue),
       threadId,
-      isIncognito,
       userId,
       lastParentId: ctx.lastParentId,
       lastDepth: ctx.lastDepth,
       lastSequenceId: ctx.lastSequenceId,
-      controller,
-      encoder,
+      dbWriter: ctx.dbWriter,
       logger,
     });
 
-    // Cleanup on error
     ctx.cleanup();
   }
 }

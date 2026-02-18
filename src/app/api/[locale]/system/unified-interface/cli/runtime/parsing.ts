@@ -504,30 +504,15 @@ export class CliInputParser {
       params.namedArgs,
     );
 
-    // eslint-disable-next-line i18next/no-literal-string
-    logger.debug(
-      `[CLI INPUT PARSER] Data collection (hasContextData: ${!!contextData}, hasCliData: ${cliData ? Object.keys(cliData).length > 0 : false}, interactive: ${interactive})`,
-    );
-
     if (contextData || (cliData && Object.keys(cliData).length > 0)) {
       // Merge context options (interactive, dryRun) into data only if explicitly set
       // Don't merge if they're CLI defaults to allow schema defaults to apply
       const optionsData = CliInputParser.buildOptionsData(interactive, dryRun);
 
-      // eslint-disable-next-line i18next/no-literal-string
-      logger.debug(
-        `[CLI INPUT PARSER] Building options data (interactive: ${optionsData.interactive}, dryRun: ${optionsData.dryRun})`,
-      );
-
       const mergedData = CliInputParser.mergeData(
         optionsData,
         contextData || {},
         cliData || {},
-      );
-
-      // eslint-disable-next-line i18next/no-literal-string
-      logger.debug(
-        `[CLI INPUT PARSER] Final merged data (keys: ${Object.keys(mergedData).join(", ")})`,
       );
 
       inputData.data = mergedData;
@@ -583,25 +568,39 @@ export class CliInputParser {
     if (endpoint?.requestUrlPathParamsSchema && !urlPathParams) {
       // Check if schema is empty
       if (!isEmptySchema(endpoint.requestUrlPathParamsSchema)) {
-        logger.info("🔗 URL Parameters:");
-        const formData = await CliInputParser.generateFormFromEndpoint(
-          endpoint,
-          "urlPathParams",
-        );
-        // Extract only scalar values for URL params (strings, numbers, booleans)
-        const urlParams: CliUrlParams = {};
-        for (const [key, value] of Object.entries(formData)) {
-          if (
-            typeof value === "string" ||
-            typeof value === "number" ||
-            typeof value === "boolean" ||
-            value === null ||
-            value === undefined
-          ) {
-            urlParams[key] = value;
+        // Parse the full merged input through the URL params schema — it will
+        // strip unknown keys and apply defaults, giving us exactly what belongs
+        // in urlPathParams without any manual key inspection.
+        const merged = { ...(contextData ?? {}), ...(cliData ?? {}) };
+        const parsed = endpoint.requestUrlPathParamsSchema.safeParse(merged);
+
+        if (
+          parsed.success &&
+          Object.keys(parsed.data as CliRequestData).length > 0
+        ) {
+          inputData.urlPathParams = parsed.data as CliUrlParams;
+        } else {
+          // Fall back to interactive prompt when data doesn't satisfy the schema
+          logger.info("🔗 URL Parameters:");
+          const formData = await CliInputParser.generateFormFromEndpoint(
+            endpoint,
+            "urlPathParams",
+          );
+          // Extract only scalar values for URL params (strings, numbers, booleans)
+          const urlParams: CliUrlParams = {};
+          for (const [key, value] of Object.entries(formData)) {
+            if (
+              typeof value === "string" ||
+              typeof value === "number" ||
+              typeof value === "boolean" ||
+              value === null ||
+              value === undefined
+            ) {
+              urlParams[key] = value;
+            }
           }
+          inputData.urlPathParams = urlParams;
         }
-        inputData.urlPathParams = urlParams;
       }
     } else if (urlPathParams) {
       inputData.urlPathParams = urlPathParams;

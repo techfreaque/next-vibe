@@ -80,4 +80,9 @@ export const translations = {
     title: "Sync Completed",
     description: "IMAP folder synchronization completed successfully",
   },
+  widget: {
+    title: "Sync Folders",
+    result: "Sync Result",
+    duration: "Duration",
+  },
 };

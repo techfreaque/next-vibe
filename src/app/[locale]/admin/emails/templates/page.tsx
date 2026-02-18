@@ -14,6 +14,7 @@ import {
   getAllTemplateMetadata,
   getTemplatesByCategory,
 } from "@/app/api/[locale]/emails/registry/generated";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -28,6 +29,7 @@ export default async function EmailTemplatesPage({
 }: EmailTemplatesPageProps): Promise<React.JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
+  await requireAdminUser(locale, `/${locale}/admin/emails/templates`);
 
   // Get all templates and group by category
   const allTemplates = getAllTemplateMetadata();

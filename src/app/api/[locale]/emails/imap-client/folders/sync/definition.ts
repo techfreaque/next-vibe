@@ -7,19 +7,20 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  backButton,
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../../user/user-roles/enum";
+import { ImapFoldersSyncContainer } from "./widget";
 
 /**
  * POST endpoint for syncing IMAP folders
@@ -39,17 +40,12 @@ const { POST } = createEndpoint({
     description: "app.api.emails.imapClient.folders.sync.success.description",
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.imapClient.folders.sync.container.title",
-      description:
-        "app.api.emails.imapClient.folders.sync.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: ImapFoldersSyncContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { request: "data", response: true } }),
+
       // === REQUEST FIELDS ===
       accountId: requestField({
         type: WidgetType.FORM_FIELD,
@@ -121,7 +117,7 @@ const { POST } = createEndpoint({
         schema: z.boolean(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

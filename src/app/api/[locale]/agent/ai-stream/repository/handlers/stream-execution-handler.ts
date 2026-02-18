@@ -4,8 +4,6 @@
 
 import "server-only";
 
-import type { ReadableStreamDefaultController } from "node:stream/web";
-
 import type { ModelMessage } from "ai";
 import { stepCountIs, streamText as aiStreamText } from "ai";
 
@@ -20,7 +18,6 @@ import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/to
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import { createStreamEvent, formatSSEEvent } from "../../events";
 import { MAX_TOOL_CALLS } from "../core/constants";
 import type { ProviderFactory } from "../core/provider-factory";
 import type { StreamContext } from "../core/stream-context";
@@ -49,8 +46,6 @@ export class StreamExecutionHandler {
     emittedToolResultIds: Set<string> | undefined;
     ttsHandler: StreamingTTSHandler | null;
     user: JwtPayloadType;
-    controller: ReadableStreamDefaultController<Uint8Array>;
-    encoder: TextEncoder;
     logger: EndpointLogger;
   }): Promise<void> {
     const {
@@ -70,8 +65,6 @@ export class StreamExecutionHandler {
       emittedToolResultIds,
       ttsHandler,
       user,
-      controller,
-      encoder,
       logger,
     } = params;
 
@@ -98,7 +91,6 @@ export class StreamExecutionHandler {
       ...(tools
         ? {
             tools,
-            // Enable multi-step tool calling loop - AI can call tools up to MAX_TOOL_CALLS times
             stopWhen: stepCountIs(MAX_TOOL_CALLS),
             onStepFinish: (): void => {
               // Tool arguments are already sent via tool-call stream events
@@ -112,10 +104,6 @@ export class StreamExecutionHandler {
         const { shouldAbort } = await StreamPartHandler.processPart({
           part,
           ctx,
-          streamResult: {
-            usage: streamResult.usage,
-            finishReason: streamResult.finishReason,
-          },
           threadId,
           model,
           character,
@@ -126,8 +114,6 @@ export class StreamExecutionHandler {
           streamAbortController,
           emittedToolResultIds,
           ttsHandler,
-          controller,
-          encoder,
           logger,
         });
 
@@ -143,8 +129,6 @@ export class StreamExecutionHandler {
         const { wasHandled } = await AbortErrorHandler.handleAbortError({
           error: streamError,
           ctx,
-          controller,
-          encoder,
           logger,
           threadId,
           isIncognito,
@@ -157,12 +141,12 @@ export class StreamExecutionHandler {
         });
 
         if (wasHandled) {
-          // Abort was handled, return cleanly
           return;
         }
       }
 
-      // Not an abort error, re-throw
+      // Not an abort error, re-throw to outer StreamErrorCatchHandler
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Re-throw is necessary here to propagate to StreamErrorCatchHandler
       throw streamError;
     }
 
@@ -202,40 +186,20 @@ export class StreamExecutionHandler {
       rawUsageData: JSON.stringify(usageData),
     });
 
-    const messageIdForTokens =
-      ctx.lastAssistantMessageId || ctx.currentAssistantMessageId;
-
-    if (messageIdForTokens) {
-      const finishReason = await streamResult.finishReason;
-
-      const tokensEvent = createStreamEvent.tokensUpdated({
-        messageId: messageIdForTokens,
-        promptTokens: inputTokens,
-        completionTokens: outputTokens,
-        totalTokens: usageData.totalTokens ?? 0,
-        finishReason: finishReason || null,
-        creditCost: actualCreditCost,
-      });
-      controller.enqueue(encoder.encode(formatSSEEvent(tokensEvent)));
-    } else {
-      logger.warn(
-        "Cannot emit TOKENS_UPDATED: no assistant message ID available",
-      );
-    }
+    const finishReason = await streamResult.finishReason;
 
     await StreamCompletionHandler.handleCompletion({
       ctx,
-      streamResult: {
-        usage: streamResult.usage,
-        finishReason: streamResult.finishReason,
+      usage: {
+        inputTokens,
+        outputTokens,
+        totalTokens: usageData.totalTokens ?? 0,
       },
+      finishReason: finishReason ?? null,
       ttsHandler,
       user,
       modelCost: actualCreditCost,
       model,
-      isIncognito,
-      controller,
-      encoder,
       logger,
     });
   }

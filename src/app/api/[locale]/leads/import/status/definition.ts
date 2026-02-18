@@ -7,10 +7,13 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
   responseField,
+  widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -26,6 +29,7 @@ import {
   CsvImportJobStatusDB,
   CsvImportJobStatusOptions,
 } from "../enum";
+import { ImportStatusContainer } from "./widget";
 
 /**
  * List Import Jobs Endpoint (GET)
@@ -45,15 +49,27 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.ADMIN] as const,
   icon: "activity",
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.import.status.get.form.title",
-      description: "app.api.leads.import.status.get.form.description",
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: ImportStatusContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({
+        usage: { request: "data", response: true },
+        inline: true,
+      }),
+
+      submitButton: widgetField({
+        type: WidgetType.SUBMIT_BUTTON,
+        text: "app.api.leads.import.status.get.actions.refresh" as const,
+        loadingText:
+          "app.api.leads.import.status.get.actions.refreshing" as const,
+        icon: "refresh-cw",
+        variant: "ghost",
+        size: "sm",
+        inline: true,
+        usage: { request: "data", response: true },
+      }),
+
       // === QUERY PARAMETERS ===
       filters: objectField(
         {
@@ -239,7 +255,7 @@ const { GET } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

@@ -118,4 +118,18 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  widget: {
+    title: "Stan IMAP",
+    accountsHealthy: "Zdrowe konta",
+    accountsTotal: "Konta łącznie",
+    connectionsActive: "Aktywne połączenia",
+    connectionErrors: "Błędy połączeń",
+    performance: "Wydajność",
+    avgResponseTime: "Śr. czas odpowiedzi",
+    uptime: "Czas działania",
+    serverStatus: "Status serwera",
+    syncStats: "Statystyki synchronizacji",
+    totalSyncs: "Synchronizacje łącznie",
+    lastSyncTime: "Ostatnia synchronizacja",
+  },
 };

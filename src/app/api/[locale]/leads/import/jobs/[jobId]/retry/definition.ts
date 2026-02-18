@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestUrlPathParamsField,
   responseField,
@@ -19,6 +21,8 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
+import { ImportJobRetryContainer } from "../widget";
 
 /**
  * Retry Import Job Endpoint (POST)
@@ -34,16 +38,12 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "rotate-ccw",
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.import.jobs.jobId.retry.post.form.title",
-      description:
-        "app.api.leads.import.jobs.jobId.retry.post.form.description",
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "urlPathParams", response: true },
-    {
+  fields: customWidgetObject({
+    render: ImportJobRetryContainer,
+    usage: { request: "urlPathParams", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
+
       // === URL PARAMETERS ===
       jobId: requestUrlPathParamsField({
         type: WidgetType.FORM_FIELD,
@@ -81,7 +81,7 @@ const { POST } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

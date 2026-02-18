@@ -149,4 +149,18 @@ export const translations = {
     title: "SMTP Account Created",
     description: "Successfully created SMTP account",
   },
+  widget: {
+    container: {
+      title: "New SMTP Account",
+    },
+    host: {
+      label: "Host",
+    },
+    username: {
+      label: "Username",
+    },
+    fromEmail: {
+      label: "From Email",
+    },
+  },
 };

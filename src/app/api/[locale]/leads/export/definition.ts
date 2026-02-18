@@ -7,14 +7,14 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  backButton,
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -41,6 +41,7 @@ import {
   LeadStatusOptions,
   MimeType,
 } from "../enum";
+import { LeadsExportContainer } from "./widget";
 
 /**
  * Export Leads Endpoint (GET)
@@ -55,16 +56,11 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "download",
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.export.get.form.title",
-      description: "app.api.leads.export.get.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { response: true, request: "data" },
-    {
+  fields: customWidgetObject({
+    render: LeadsExportContainer,
+    usage: { response: true, request: "data" } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
       // === REQUEST FIELDS ===
       format: requestField({
         type: WidgetType.FORM_FIELD,
@@ -194,7 +190,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.date(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

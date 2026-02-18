@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   requestUrlPathParamsField,
@@ -27,13 +29,14 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CronTaskPriorityOptions, CronTaskStatusDB } from "../../../enum";
+import { CronTaskDetailContainer } from "./widget";
 
 /**
  * GET /cron/task/[id] - Get individual task
  */
 const { GET } = createEndpoint({
   method: Methods.GET,
-  path: ["system", "tasks", "cron", "task", "[id]"],
+  path: ["system", "unified-interface", "tasks", "cron", "task", "[id]"],
   title: "app.api.system.unifiedInterface.tasks.cronSystem.task.get.title",
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.task.get.description",
@@ -41,18 +44,12 @@ const { GET } = createEndpoint({
   category: "app.api.system.unifiedInterface.tasks.category",
   allowedRoles: [UserRole.ADMIN],
   tags: ["app.api.system.unifiedInterface.tasks.cronSystem.task.get.title"],
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.task.get.container.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.task.get.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "urlPathParams", response: true },
-    {
+  fields: customWidgetObject({
+    render: CronTaskDetailContainer,
+    usage: { request: "urlPathParams", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
+
       // URL parameter
       id: requestUrlPathParamsField({
         type: WidgetType.FORM_FIELD,
@@ -96,7 +93,7 @@ const { GET } = createEndpoint({
         }),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
@@ -203,7 +200,7 @@ const { GET } = createEndpoint({
  */
 const { PUT } = createEndpoint({
   method: Methods.PUT,
-  path: ["system", "tasks", "cron", "task", "[id]"],
+  path: ["system", "unified-interface", "tasks", "cron", "task", "[id]"],
   title: "app.api.system.unifiedInterface.tasks.cronSystem.task.put.title",
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.task.put.description",
@@ -223,6 +220,8 @@ const { PUT } = createEndpoint({
     },
     { request: "data&urlPathParams", response: true },
     {
+      backButton: backButton({ usage: { request: "data", response: true } }),
+
       // URL parameter
       id: requestUrlPathParamsField({
         type: WidgetType.FORM_FIELD,
@@ -245,7 +244,7 @@ const { PUT } = createEndpoint({
         placeholder:
           "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.placeholder",
         columns: 12,
-        schema: z.string().min(1),
+        schema: z.string().min(1).optional(),
       }),
 
       description: requestField({
@@ -271,7 +270,7 @@ const { PUT } = createEndpoint({
         placeholder:
           "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.schedule.placeholder",
         columns: 6,
-        schema: z.string().min(1),
+        schema: z.string().min(1).optional(),
       }),
 
       enabled: requestField({
@@ -282,7 +281,7 @@ const { PUT } = createEndpoint({
         description:
           "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.enabled.description",
         columns: 6,
-        schema: z.boolean(),
+        schema: z.boolean().optional(),
       }),
 
       priority: requestField({
@@ -296,7 +295,7 @@ const { PUT } = createEndpoint({
           "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.priority.placeholder",
         options: CronTaskPriorityOptions,
         columns: 6,
-        schema: z.enum(CronTaskPriorityDB),
+        schema: z.enum(CronTaskPriorityDB).optional(),
       }),
 
       timeout: requestField({
@@ -483,7 +482,7 @@ const { PUT } = createEndpoint({
  */
 const { DELETE } = createEndpoint({
   method: Methods.DELETE,
-  path: ["system", "tasks", "cron", "task", "[id]"],
+  path: ["system", "unified-interface", "tasks", "cron", "task", "[id]"],
   title: "app.api.system.unifiedInterface.tasks.cronSystem.task.delete.title",
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.task.delete.description",

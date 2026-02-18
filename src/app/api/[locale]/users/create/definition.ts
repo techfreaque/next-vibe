@@ -8,6 +8,8 @@ import { z } from "zod";
 import { leadId } from "@/app/api/[locale]/leads/types";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
@@ -32,6 +34,7 @@ import {
 } from "@/i18n/core/config";
 
 import { dateSchema } from "../../shared/types/common.schema";
+import { UserCreateContainer } from "./widget";
 
 /**
  * Users Create Endpoint Definition
@@ -50,15 +53,11 @@ const { POST } = createEndpoint({
     "app.api.users.tags.admin" as const,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.users.create.post.form.title" as const,
-      description: "app.api.users.create.post.form.description" as const,
-      layoutType: LayoutType.VERTICAL,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: UserCreateContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
       // === ESSENTIAL USER INFORMATION ===
       basicInfo: objectField(
         {
@@ -348,7 +347,7 @@ const { POST } = createEndpoint({
         schema: dateSchema,
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

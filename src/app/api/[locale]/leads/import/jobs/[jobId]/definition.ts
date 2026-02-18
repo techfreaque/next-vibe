@@ -1,12 +1,14 @@
 /**
  * Import Job Management API Definition
- * Individual job operations (update, delete)
+ * Individual job operations (get, update, delete)
  */
 
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   requestUrlPathParamsField,
@@ -22,6 +24,307 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CsvImportJobStatus } from "../../enum";
+import { ImportJobStatusContainer } from "./widget";
+
+/**
+ * Get Import Job Status Endpoint (GET)
+ * Retrieves current status and progress of a specific import job
+ */
+const { GET } = createEndpoint({
+  method: Methods.GET,
+  path: ["leads", "import", "jobs", ":jobId"],
+  title: "app.api.leads.import.jobs.jobId.get.title",
+  description: "app.api.leads.import.jobs.jobId.get.description",
+  category: "app.api.leads.category",
+  tags: ["app.api.leads.tags.leads", "app.api.leads.tags.management"],
+  allowedRoles: [UserRole.ADMIN],
+  icon: "activity",
+
+  fields: customWidgetObject({
+    render: ImportJobStatusContainer,
+    usage: { request: "urlPathParams", response: true } as const,
+    children: {
+      // === URL PARAMETERS ===
+      jobId: requestUrlPathParamsField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.leads.import.jobs.jobId.get.jobId.label",
+        description: "app.api.leads.import.jobs.jobId.get.jobId.description",
+        columns: 12,
+        hidden: true,
+        schema: z.uuid(),
+      }),
+
+      // Navigation back
+      backButton: backButton({
+        usage: { response: true },
+      }),
+
+      // === RESPONSE FIELDS ===
+      job: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          title: "app.api.leads.import.jobs.jobId.get.response.title",
+          description:
+            "app.api.leads.import.jobs.jobId.get.response.description",
+          layoutType: LayoutType.STACKED,
+        },
+        { response: true },
+        {
+          info: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title: "app.api.leads.import.jobs.jobId.get.response.info.title",
+              description:
+                "app.api.leads.import.jobs.jobId.get.response.info.description",
+              layoutType: LayoutType.GRID,
+              columns: 2,
+            },
+            { response: true },
+            {
+              id: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.get.response.id.content",
+                schema: z.uuid(),
+              }),
+              fileName: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.get.response.fileName.content",
+                schema: z.string(),
+              }),
+              status: responseField({
+                type: WidgetType.BADGE,
+                text: "app.api.leads.import.jobs.jobId.get.response.status.content",
+                schema: z.enum(CsvImportJobStatus),
+              }),
+            },
+          ),
+
+          progress: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.leads.import.jobs.jobId.get.response.progress.title",
+              description:
+                "app.api.leads.import.jobs.jobId.get.response.progress.description",
+              layoutType: LayoutType.GRID,
+              columns: 3,
+            },
+            { response: true },
+            {
+              totalRows: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.get.response.totalRows.content",
+                schema: z.coerce.number().nullable(),
+              }),
+              processedRows: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.get.response.processedRows.content",
+                schema: z.coerce.number(),
+              }),
+              successfulImports: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.get.response.successfulImports.content",
+                schema: z.coerce.number(),
+              }),
+              failedImports: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.get.response.failedImports.content",
+                schema: z.coerce.number(),
+              }),
+              duplicateEmails: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.get.response.duplicateEmails.content",
+                schema: z.coerce.number(),
+              }),
+            },
+          ),
+
+          configuration: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.leads.import.jobs.jobId.get.response.configuration.title",
+              description:
+                "app.api.leads.import.jobs.jobId.get.response.configuration.description",
+              layoutType: LayoutType.GRID,
+              columns: 2,
+            },
+            { response: true },
+            {
+              currentBatchStart: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.get.response.currentBatchStart.content",
+                schema: z.coerce.number(),
+              }),
+              batchSize: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.get.response.batchSize.content",
+                schema: z.coerce.number(),
+              }),
+              retryCount: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.get.response.retryCount.content",
+                schema: z.coerce.number(),
+              }),
+              maxRetries: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.get.response.maxRetries.content",
+                schema: z.coerce.number(),
+              }),
+              error: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.get.response.error.content",
+                schema: z.string().nullable(),
+              }),
+            },
+          ),
+
+          timestamps: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.leads.import.jobs.jobId.get.response.timestamps.title",
+              description:
+                "app.api.leads.import.jobs.jobId.get.response.timestamps.description",
+              layoutType: LayoutType.GRID,
+              columns: 2,
+            },
+            { response: true },
+            {
+              createdAt: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.get.response.createdAt.content",
+                schema: z.string(),
+              }),
+              updatedAt: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.get.response.updatedAt.content",
+                schema: z.string(),
+              }),
+              startedAt: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.get.response.startedAt.content",
+                schema: z.string().nullable(),
+              }),
+              completedAt: responseField({
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.leads.import.jobs.jobId.get.response.completedAt.content",
+                schema: z.string().nullable(),
+              }),
+            },
+          ),
+        },
+      ),
+    },
+  }),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "app.api.leads.import.jobs.jobId.get.errors.validation.title",
+      description:
+        "app.api.leads.import.jobs.jobId.get.errors.validation.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "app.api.leads.import.jobs.jobId.get.errors.unauthorized.title",
+      description:
+        "app.api.leads.import.jobs.jobId.get.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "app.api.leads.import.jobs.jobId.get.errors.forbidden.title",
+      description:
+        "app.api.leads.import.jobs.jobId.get.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "app.api.leads.import.jobs.jobId.get.errors.notFound.title",
+      description:
+        "app.api.leads.import.jobs.jobId.get.errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "app.api.leads.import.jobs.jobId.get.errors.server.title",
+      description:
+        "app.api.leads.import.jobs.jobId.get.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "app.api.leads.import.jobs.jobId.get.errors.unknown.title",
+      description:
+        "app.api.leads.import.jobs.jobId.get.errors.unknown.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "app.api.leads.import.jobs.jobId.get.errors.network.title",
+      description:
+        "app.api.leads.import.jobs.jobId.get.errors.network.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "app.api.leads.import.jobs.jobId.get.errors.unsavedChanges.title",
+      description:
+        "app.api.leads.import.jobs.jobId.get.errors.unsavedChanges.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "app.api.leads.import.jobs.jobId.get.errors.conflict.title",
+      description:
+        "app.api.leads.import.jobs.jobId.get.errors.conflict.description",
+    },
+  },
+
+  successTypes: {
+    title: "app.api.leads.import.jobs.jobId.get.success.title",
+    description: "app.api.leads.import.jobs.jobId.get.success.description",
+  },
+
+  examples: {
+    urlPathParams: {
+      default: { jobId: "550e8400-e29b-41d4-a716-446655440000" },
+    },
+    responses: {
+      default: {
+        job: {
+          info: {
+            id: "550e8400-e29b-41d4-a716-446655440000",
+            fileName: "leads.csv",
+            status: CsvImportJobStatus.PROCESSING,
+          },
+          progress: {
+            totalRows: 1000,
+            processedRows: 500,
+            successfulImports: 480,
+            failedImports: 20,
+            duplicateEmails: 5,
+          },
+          configuration: {
+            currentBatchStart: 500,
+            batchSize: 100,
+            retryCount: 0,
+            maxRetries: 3,
+            error: null,
+          },
+          timestamps: {
+            createdAt: "2024-01-01T00:00:00Z",
+            updatedAt: "2024-01-01T00:05:00Z",
+            startedAt: "2024-01-01T00:00:00Z",
+            completedAt: null,
+          },
+        },
+      },
+    },
+  },
+});
 
 /**
  * Update Import Job Endpoint (PATCH)
@@ -492,6 +795,11 @@ const { DELETE } = createEndpoint({
 });
 
 // Export types following modern pattern
+export type ImportJobGetRequestInput = typeof GET.types.RequestInput;
+export type ImportJobGetRequestOutput = typeof GET.types.RequestOutput;
+export type ImportJobGetResponseInput = typeof GET.types.ResponseInput;
+export type ImportJobGetResponseOutput = typeof GET.types.ResponseOutput;
+
 export type ImportJobPatchRequestInput = typeof PATCH.types.RequestInput;
 export type ImportJobPatchRequestOutput = typeof PATCH.types.RequestOutput;
 export type ImportJobPatchResponseInput = typeof PATCH.types.ResponseInput;
@@ -512,6 +820,7 @@ export type ImportJobUpdateResponseOutput = ImportJobPatchResponseOutput;
  * Export definitions
  */
 const definitions = {
+  GET,
   PATCH,
   DELETE,
 } as const;

@@ -63,4 +63,8 @@ export const translations = {
       description: "Import job stopped successfully",
     },
   },
+  widget: {
+    title: "Stop Import Job",
+    successMessage: "Job stopped successfully",
+  },
 };

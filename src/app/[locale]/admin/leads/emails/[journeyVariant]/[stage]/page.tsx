@@ -114,10 +114,7 @@ export default async function EmailPreviewPage({
                   {t("app.admin.leads.leads.admin.emails.preview_title")}
                 </H1>
                 <P className="text-gray-600 dark:text-gray-400">
-                  {journeyInfo.name} -{" "}
-                  {stage
-                    .replaceAll("_", " ")
-                    .replaceAll(/\b\w/g, (l) => l.toUpperCase())}
+                  {t(journeyInfo.name)} - {t(stage)}
                 </P>
               </Div>
             </Div>
@@ -125,7 +122,7 @@ export default async function EmailPreviewPage({
               <Span className="font-medium">
                 {t("app.admin.leads.leads.admin.emails.subject")}:
               </Span>{" "}
-              {emailPreview.subject}
+              {t(emailPreview.subject)}
             </Div>
           </Div>
         </Div>
@@ -182,11 +179,7 @@ export default async function EmailPreviewPage({
                     size="sm"
                     className="flex items-center flex flex-row gap-1"
                   >
-                    <Span>
-                      {nextStage
-                        .replaceAll("_", " ")
-                        .replaceAll(/\b\w/g, (l) => l.toUpperCase())}
-                    </Span>
+                    <Span>{t(nextStage)}</Span>
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </Link>

@@ -4,8 +4,6 @@
 
 import "server-only";
 
-import type { streamText } from "ai";
-
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { StreamContext } from "../core/stream-context";
@@ -17,40 +15,24 @@ export class FinishStepHandler {
    */
   static async processFinishStep(params: {
     ctx: StreamContext;
-    streamResult: {
-      usage: ReturnType<typeof streamText>["usage"];
-      finishReason: ReturnType<typeof streamText>["finishReason"];
-    };
-    isIncognito: boolean;
     streamAbortController: AbortController;
-    controller: ReadableStreamDefaultController<Uint8Array>;
-    encoder: TextEncoder;
     logger: EndpointLogger;
   }): Promise<{ shouldAbort: boolean }> {
-    const {
-      ctx,
-      streamResult,
-      isIncognito,
-      streamAbortController,
-      controller,
-      encoder,
-      logger,
-    } = params;
+    const { ctx, streamAbortController, logger } = params;
 
-    // Finalize current ASSISTANT message before resetting for next step
+    // Finalize current ASSISTANT message before resetting for next step.
+    // For tool-loop steps the usage/finishReason promises may not resolve yet,
+    // so we pass null - the content is what matters here for DB persistence.
     if (ctx.currentAssistantMessageId && ctx.currentAssistantContent) {
-      // Pass promises directly - don't await them here as they may not resolve until later
       await FinalizationHandler.finalizeAssistantMessage({
         currentAssistantMessageId: ctx.currentAssistantMessageId,
         currentAssistantContent: ctx.currentAssistantContent,
         isInReasoningBlock: ctx.isInReasoningBlock,
-        streamResult: {
-          finishReason: streamResult.finishReason,
-          usage: streamResult.usage,
-        },
-        isIncognito,
-        controller,
-        encoder,
+        finishReason: null,
+        totalTokens: null,
+        promptTokens: null,
+        completionTokens: null,
+        dbWriter: ctx.dbWriter,
         logger,
       });
     }
@@ -60,18 +42,12 @@ export class FinishStepHandler {
     if (ctx.stepHasToolsAwaitingConfirmation) {
       logger.info(
         "[AI Stream] Step complete - tools require confirmation, aborting stream",
-        {
-          toolCallsInStep: ctx.pendingToolMessages.size,
-        },
+        { toolCallsInStep: ctx.pendingToolMessages.size },
       );
 
-      // Abort the stream to stop the AI SDK from processing further
       streamAbortController.abort(new Error("Tool requires user confirmation"));
+      ctx.dbWriter.closeController();
 
-      // Close the controller to stop sending events to client
-      controller.close();
-
-      // Signal to exit the loop - stream is done until user confirms
       return { shouldAbort: true };
     }
 
@@ -79,23 +55,16 @@ export class FinishStepHandler {
     if (ctx.shouldStopLoop) {
       logger.info(
         "[AI Stream] Step complete - model requested loop stop via noLoop, aborting stream",
-        {
-          toolCallsInStep: ctx.pendingToolMessages.size,
-        },
+        { toolCallsInStep: ctx.pendingToolMessages.size },
       );
 
-      // Abort the stream to stop the AI SDK from processing further
       streamAbortController.abort(new Error("Model requested loop stop"));
+      ctx.dbWriter.closeController();
 
-      // Close the controller to stop sending events to client
-      controller.close();
-
-      // Signal to exit the loop - model has enough information
       return { shouldAbort: true };
     }
 
     // After a step finishes, update currentParentId/currentDepth to point to the last message
-    // The next ASSISTANT message should be a CHILD of the last tool message, so increment depth
     logger.debug("[AI Stream] Step finished - updating parent chain", {
       oldParentId: ctx.currentParentId,
       newParentId: ctx.lastParentId,

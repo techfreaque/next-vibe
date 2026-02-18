@@ -163,4 +163,10 @@ export const translations = {
       description: "Operation completed successfully",
     },
   },
+  widget: {
+    title: "IMAP Messages",
+    refresh: "Refresh",
+    empty: "No messages found",
+    hasAttachments: "Has attachments",
+  },
 };

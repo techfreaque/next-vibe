@@ -8,11 +8,14 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
-import { useWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetContext,
+  useWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { PaginationWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/pagination/react";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
-import { simpleT } from "@/i18n/core/shared";
 
+import NavigateButtonWidget from "../../system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import type definition from "./definition";
 import type { CreditsHistoryGetResponseOutput } from "./definition";
 
@@ -33,7 +36,7 @@ export function CreditHistoryContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const context = useWidgetContext();
   const { locale } = context;
-  const { t } = simpleT(locale as Parameters<typeof simpleT>[0]);
+  const t = useWidgetTranslation();
   const children = field.children;
 
   const transactions = field.value?.transactions ?? [];
@@ -41,6 +44,7 @@ export function CreditHistoryContainer({
 
   return (
     <Div className="flex flex-col gap-0">
+      <NavigateButtonWidget field={children.backButton} />
       {/* Transactions List */}
       <Div className="flex flex-col gap-3">
         {transactions.length > 0 ? (

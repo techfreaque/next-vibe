@@ -2,8 +2,6 @@
  * StreamErrorHandler - Handles stream errors and emits error events
  */
 
-import type { ReadableStreamDefaultController } from "node:stream/web";
-
 import type { JSONValue } from "ai";
 import {
   ErrorResponseTypes,
@@ -13,10 +11,7 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import { ChatMessageRole } from "../../../chat/enum";
-import { createErrorMessage } from "../../../chat/threads/[threadId]/messages/repository";
-import { serializeError } from "../../error-utils";
-import { createStreamEvent, formatSSEEvent } from "../../events";
+import type { MessageDbWriter } from "../core/message-db-writer";
 
 export class StreamErrorHandler {
   /**
@@ -25,25 +20,21 @@ export class StreamErrorHandler {
   static async handleStreamError(params: {
     error: Error | JSONValue;
     threadId: string;
-    isIncognito: boolean;
     userId: string | undefined;
     lastParentId: string | null;
     lastDepth: number;
     lastSequenceId: string | null;
-    controller: ReadableStreamDefaultController<Uint8Array>;
-    encoder: TextEncoder;
+    dbWriter: MessageDbWriter;
     logger: EndpointLogger;
   }): Promise<void> {
     const {
       error,
       threadId,
-      isIncognito,
       userId,
       lastParentId,
       lastDepth,
       lastSequenceId,
-      controller,
-      encoder,
+      dbWriter,
       logger,
     } = params;
 
@@ -58,7 +49,6 @@ export class StreamErrorHandler {
       errorType: errorName,
     });
 
-    // Detect specific error types based on error message or name
     let translationKey: TranslationKey;
     let errorType = ErrorResponseTypes.UNKNOWN_ERROR;
 
@@ -107,57 +97,24 @@ export class StreamErrorHandler {
         "app.api.agent.chat.aiStream.errors.invalidRequest" satisfies TranslationKey;
       errorType = ErrorResponseTypes.BAD_REQUEST;
     } else {
-      // Generic stream error as fallback
       translationKey =
         "app.api.agent.chat.aiStream.errors.streamError" satisfies TranslationKey;
       errorType = ErrorResponseTypes.UNKNOWN_ERROR;
     }
 
-    // Create structured error with translation key
-    const structuredError = fail({
-      message: translationKey,
-      errorType,
-    });
+    const structuredError = fail({ message: translationKey, errorType });
 
-    const errorMessageId = crypto.randomUUID();
-
-    // Emit ERROR message event for UI
-    const errorMessageEvent = createStreamEvent.messageCreated({
-      messageId: errorMessageId,
+    // Emit MESSAGE_CREATED SSE + save to DB + emit ERROR SSE
+    await dbWriter.emitErrorMessage({
       threadId,
-      role: ChatMessageRole.ERROR,
-      content: serializeError(structuredError),
+      errorType: "STREAM_ERROR",
+      error: structuredError,
       parentId: lastParentId,
       depth: lastDepth,
       sequenceId: lastSequenceId,
-      model: null,
-      character: null,
+      userId,
     });
-    controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
 
-    // Save ERROR message to DB (server mode only - incognito stores in localStorage)
-    if (!isIncognito) {
-      await createErrorMessage({
-        messageId: errorMessageId,
-        threadId,
-        content: serializeError(structuredError),
-        errorType: "STREAM_ERROR",
-        parentId: lastParentId,
-        depth: lastDepth,
-        userId,
-        sequenceId: lastSequenceId,
-        logger,
-      });
-    }
-
-    // Emit error event to update UI state
-    const errorEvent = createStreamEvent.error(
-      fail({
-        message: errorMessage,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      }),
-    );
-    controller.enqueue(encoder.encode(formatSSEEvent(errorEvent)));
-    controller.close();
+    dbWriter.closeController();
   }
 }

@@ -116,4 +116,12 @@ export const translations = {
       },
     },
   },
+  widget: {
+    title: "IMAP Configuration",
+    server: "Server Settings",
+    connection: "Connection Settings",
+    sync: "Sync Settings",
+    resilience: "Resilience Settings",
+    monitoring: "Monitoring Settings",
+  },
 };

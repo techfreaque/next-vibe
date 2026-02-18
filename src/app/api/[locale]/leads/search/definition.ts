@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
@@ -24,6 +26,7 @@ import { Countries, Languages } from "@/i18n/core/config";
 
 import { dateSchema } from "../../shared/types/common.schema";
 import { EmailCampaignStage, LeadSource, LeadStatus } from "../enum";
+import { LeadsSearchContainer } from "./widget";
 
 // Inline schema to avoid deprecated schema.ts imports
 const leadResponseSchema = z.object({
@@ -74,16 +77,11 @@ const { GET } = createEndpoint({
     "app.api.leads.tags.search" as const,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.search.get.form.title" as const,
-      description: "app.api.leads.search.get.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: LeadsSearchContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
       // === QUERY PARAMETERS ===
       search: requestField({
         type: WidgetType.FORM_FIELD,
@@ -149,7 +147,7 @@ const { GET } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {

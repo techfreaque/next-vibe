@@ -40,7 +40,7 @@ function getSeriesColor(series: { color?: string }, index: number): string {
 }
 
 interface CronStatsChartProps {
-  data: Partial<NonNullable<CronStatsResponseType["data"]["historicalData"]>>;
+  data: Partial<NonNullable<CronStatsResponseType["historicalData"]>>;
   title: string;
   type?: "line" | "area" | "bar";
   height?: number;

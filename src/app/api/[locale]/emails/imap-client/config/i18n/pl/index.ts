@@ -118,4 +118,12 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  widget: {
+    title: "Konfiguracja IMAP",
+    server: "Ustawienia serwera",
+    connection: "Ustawienia połączenia",
+    sync: "Ustawienia synchronizacji",
+    resilience: "Ustawienia odporności",
+    monitoring: "Ustawienia monitorowania",
+  },
 };

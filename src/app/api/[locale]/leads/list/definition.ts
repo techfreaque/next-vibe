@@ -8,7 +8,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
-  navigateButtonField,
+  customWidgetObject,
   objectField,
   objectOptionalField,
   requestField,
@@ -33,7 +33,6 @@ import {
 
 import { paginationField } from "../../system/unified-interface/unified-ui/widgets/containers/pagination/types";
 import { UserRole } from "../../user/user-roles/enum";
-import createLeadDefinitions from "../create/definition";
 import {
   EmailCampaignStage,
   EmailCampaignStageFilter,
@@ -52,7 +51,7 @@ import {
   SortOrder,
   SortOrderOptions,
 } from "../enum";
-import leadSingleDefinitions from "../lead/[id]/definition";
+import { LeadsListContainer } from "./widget";
 
 /**
  * Get Leads List Endpoint (GET)
@@ -72,13 +71,10 @@ const { GET } = createEndpoint({
   ],
   icon: "list",
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: LeadsListContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
       title: widgetField({
         type: WidgetType.TITLE,
         content: "app.api.leads.list.get.title" as const,
@@ -94,17 +90,7 @@ const { GET } = createEndpoint({
         usage: { request: "data", response: true },
         inline: true,
       }),
-      createButton: navigateButtonField({
-        targetEndpoint: createLeadDefinitions.POST,
-        extractParams: () => ({}),
-        prefillFromGet: false,
-        label: "app.api.leads.list.get.createButton.label" as const,
-        icon: "plus",
-        variant: "default",
-        className: "ml-auto",
-        inline: true,
-        usage: { request: "data", response: true },
-      }),
+
       submitButton: widgetField({
         type: WidgetType.SUBMIT_BUTTON,
         text: "app.api.leads.list.get.actions.refresh" as const,
@@ -280,14 +266,6 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               columns: 12,
-              metadata: {
-                onRowClick: {
-                  targetEndpoint: leadSingleDefinitions.GET,
-                  extractParams: (lead: { id: string }) => ({
-                    urlPathParams: { id: lead.id as string },
-                  }),
-                },
-              },
             },
             objectField(
               {
@@ -421,51 +399,6 @@ const { GET } = createEndpoint({
                   hidden: true,
                   schema: z.string(),
                 }),
-                // Action buttons
-                viewButton: navigateButtonField({
-                  targetEndpoint: leadSingleDefinitions.GET,
-                  extractParams: (source) => ({
-                    urlPathParams: {
-                      id: String(
-                        (source.itemData as { id: string | number })?.id,
-                      ),
-                    },
-                  }),
-                  prefillFromGet: false,
-                  icon: "eye",
-                  variant: "ghost",
-                  usage: { response: true },
-                }),
-                editButton: navigateButtonField({
-                  targetEndpoint: leadSingleDefinitions.PATCH,
-                  extractParams: (source) => ({
-                    urlPathParams: {
-                      id: String(
-                        (source.itemData as { id: string | number })?.id,
-                      ),
-                    },
-                  }),
-                  prefillFromGet: true,
-                  getEndpoint: leadSingleDefinitions.GET,
-                  icon: "pencil",
-                  variant: "ghost",
-                  usage: { response: true },
-                }),
-                deleteButton: navigateButtonField({
-                  targetEndpoint: leadSingleDefinitions.DELETE,
-                  extractParams: (source) => ({
-                    urlPathParams: {
-                      id: String(
-                        (source.itemData as { id: string | number })?.id,
-                      ),
-                    },
-                  }),
-                  prefillFromGet: false,
-                  icon: "trash",
-                  variant: "ghost",
-                  renderInModal: true,
-                  usage: { response: true },
-                }),
               },
             ),
           ),
@@ -477,7 +410,7 @@ const { GET } = createEndpoint({
         order: 5,
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {

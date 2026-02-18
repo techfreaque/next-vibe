@@ -168,4 +168,18 @@ export const translations: typeof enTranslations = {
     title: "Konto SMTP utworzone",
     description: "Pomyślnie utworzono konto SMTP",
   },
+  widget: {
+    container: {
+      title: "Nowe konto SMTP",
+    },
+    host: {
+      label: "Host",
+    },
+    username: {
+      label: "Nazwa użytkownika",
+    },
+    fromEmail: {
+      label: "E-mail nadawcy",
+    },
+  },
 };

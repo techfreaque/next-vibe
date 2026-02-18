@@ -2,20 +2,13 @@
  * TextHandler - Handles text delta processing during streaming
  */
 
-import type { ReadableStreamDefaultController } from "node:stream/web";
-
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { ChatMessageRole } from "../../../chat/enum";
-import { createTextMessage } from "../../../chat/threads/[threadId]/messages/repository";
-import { createStreamEvent, formatSSEEvent } from "../../events";
+import type { MessageDbWriter } from "../core/message-db-writer";
 import type { StreamingTTSHandler } from "../streaming-tts";
 
 export class TextHandler {
-  /**
-   * Process text-delta event from stream
-   */
   static async processTextDelta(params: {
     textDelta: string;
     currentAssistantMessageId: string | null;
@@ -26,11 +19,9 @@ export class TextHandler {
     model: ModelId;
     character: string;
     sequenceId: string;
-    isIncognito: boolean;
     userId: string | undefined;
     getNextAssistantMessageId: () => string;
-    controller: ReadableStreamDefaultController<Uint8Array>;
-    encoder: TextEncoder;
+    dbWriter: MessageDbWriter;
     logger: EndpointLogger;
     ttsHandler: StreamingTTSHandler | null;
   }): Promise<{
@@ -48,211 +39,79 @@ export class TextHandler {
       model,
       character,
       sequenceId,
-      isIncognito,
       userId,
       getNextAssistantMessageId,
-      controller,
-      encoder,
+      dbWriter,
       logger,
       ttsHandler,
     } = params;
 
     let { currentAssistantMessageId } = params;
 
-    if (textDelta !== undefined && textDelta !== null && textDelta !== "") {
-      // Add text to current ASSISTANT message (or create if doesn't exist)
-      if (!currentAssistantMessageId) {
-        const messageId = getNextAssistantMessageId();
-        const result = await this.createAssistantMessage({
-          initialContent: textDelta,
-          threadId,
-          parentId: currentParentId,
-          depth: currentDepth,
-          model,
-          character,
-          sequenceId,
-          isIncognito,
-          userId,
-          messageId,
-          controller,
-          encoder,
-          logger,
-        });
-        currentAssistantMessageId = result.messageId;
-
-        // IMPORTANT: Set messageId on TTS handler BEFORE calling addDelta
-        // Otherwise the chunk will be skipped because messageId is not set
-        if (ttsHandler) {
-          ttsHandler.setMessageId(result.messageId);
-          // Don't await - let TTS process in background to avoid blocking stream
-          void ttsHandler.addDelta(textDelta);
-        }
-
-        return {
-          currentAssistantMessageId,
-          currentAssistantContent: result.content,
-          wasCreated: true,
-          newDepth: currentDepth,
-        };
-      }
-      // Accumulate content
-      const newContent = currentAssistantContent + textDelta;
-
-      // Emit content-delta event
-      this.emitContentDelta({
-        messageId: currentAssistantMessageId,
-        delta: textDelta,
-        controller,
-        encoder,
-        logger,
-      });
-
-      // Send delta to TTS handler for audio generation
-      // Don't await - let TTS process in background to avoid blocking stream
-      if (ttsHandler) {
-        void ttsHandler.addDelta(textDelta);
-      }
-
+    if (!textDelta) {
       return {
-        currentAssistantMessageId,
-        currentAssistantContent: newContent,
+        currentAssistantMessageId: currentAssistantMessageId!,
+        currentAssistantContent,
         wasCreated: false,
         newDepth: currentDepth,
       };
     }
 
-    return {
-      currentAssistantMessageId: currentAssistantMessageId!,
-      currentAssistantContent,
-      wasCreated: false,
-      newDepth: currentDepth,
-    };
-  }
+    // First delta: create the message
+    if (!currentAssistantMessageId) {
+      const messageId = getNextAssistantMessageId();
 
-  /**
-   * Create new ASSISTANT message in stream
-   */
-  private static async createAssistantMessage(params: {
-    initialContent: string;
-    threadId: string;
-    parentId: string | null;
-    depth: number;
-    model: ModelId;
-    character: string;
-    sequenceId: string;
-    isIncognito: boolean;
-    userId: string | undefined;
-    messageId: string;
-    controller: ReadableStreamDefaultController<Uint8Array>;
-    encoder: TextEncoder;
-    logger: EndpointLogger;
-  }): Promise<{ messageId: string; content: string }> {
-    const {
-      initialContent,
-      threadId,
-      parentId,
-      depth,
-      model,
-      character,
-      sequenceId,
-      isIncognito,
-      userId,
-      messageId,
-      controller,
-      encoder,
-      logger,
-    } = params;
-
-    logger.debug("[AI Stream] Creating ASSISTANT message", {
-      messageId,
-      parentId,
-      depth,
-      sequenceId,
-      threadId,
-    });
-
-    // Emit MESSAGE_CREATED event with empty content
-    const messageEvent = createStreamEvent.messageCreated({
-      messageId,
-      threadId,
-      role: ChatMessageRole.ASSISTANT,
-      content: "",
-      parentId,
-      depth,
-      model,
-      character,
-      sequenceId,
-    });
-    controller.enqueue(encoder.encode(formatSSEEvent(messageEvent)));
-
-    logger.debug("[AI Stream] MESSAGE_CREATED event sent for ASSISTANT", {
-      messageId,
-      isIncognito,
-      contentLength: initialContent.length,
-    });
-
-    // Emit CONTENT_DELTA event for initial content
-    if (initialContent) {
-      this.emitContentDelta({
+      logger.debug("[AI Stream] Creating ASSISTANT message", {
         messageId,
-        delta: initialContent,
-        controller,
-        encoder,
-        logger,
+        parentId: currentParentId,
+        depth: currentDepth,
       });
-    }
 
-    // Save ASSISTANT message to database if not incognito
-    if (!isIncognito && initialContent) {
-      const result = await createTextMessage({
+      // Emits MESSAGE_CREATED + CONTENT_DELTA SSE, then inserts to DB
+      await dbWriter.emitMessageCreated({
         messageId,
         threadId,
-        content: initialContent,
-        parentId,
-        depth,
+        content: textDelta,
+        parentId: currentParentId,
+        depth: currentDepth,
         userId,
         model,
         character,
         sequenceId,
-        logger,
       });
-      if (!result.success) {
-        logger.warn("Failed to persist ASSISTANT message - continuing stream", {
-          messageId,
-          error: result.message,
-        });
+
+      currentAssistantMessageId = messageId;
+
+      if (ttsHandler) {
+        ttsHandler.setMessageId(messageId);
+        void ttsHandler.addDelta(textDelta);
       }
+
+      return {
+        currentAssistantMessageId,
+        currentAssistantContent: textDelta,
+        wasCreated: true,
+        newDepth: currentDepth,
+      };
     }
 
-    logger.debug("ASSISTANT message created", {
-      messageId,
-    });
+    // Subsequent deltas: emit SSE + throttled DB update
+    const newContent = currentAssistantContent + textDelta;
+    dbWriter.emitDeltaAndSchedule(
+      currentAssistantMessageId,
+      textDelta,
+      newContent,
+    );
 
-    return { messageId, content: initialContent };
-  }
+    if (ttsHandler) {
+      void ttsHandler.addDelta(textDelta);
+    }
 
-  /**
-   * Emit content delta event
-   */
-  private static emitContentDelta(params: {
-    messageId: string;
-    delta: string;
-    controller: ReadableStreamDefaultController<Uint8Array>;
-    encoder: TextEncoder;
-    logger: EndpointLogger;
-  }): void {
-    const { messageId, delta, controller, encoder, logger } = params;
-
-    logger.debug("[AI Stream] Emitting CONTENT_DELTA", {
-      messageId,
-      deltaLength: delta.length,
-      delta: delta.slice(0, 50),
-    });
-
-    const deltaEvent = createStreamEvent.contentDelta({
-      messageId,
-      delta,
-    });
-    controller.enqueue(encoder.encode(formatSSEEvent(deltaEvent)));
+    return {
+      currentAssistantMessageId,
+      currentAssistantContent: newContent,
+      wasCreated: false,
+      newDepth: currentDepth,
+    };
   }
 }

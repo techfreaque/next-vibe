@@ -95,4 +95,9 @@ export const translations: typeof enTranslations = {
     title: "Synchronizacja zakończona",
     description: "Synchronizacja wiadomości IMAP zakończona pomyślnie",
   },
+  widget: {
+    title: "Synchronizuj wiadomości",
+    result: "Wynik synchronizacji",
+    duration: "Czas trwania",
+  },
 };

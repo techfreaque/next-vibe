@@ -420,9 +420,6 @@ export const chatMessages = pgTable(
 
     // Author information (for multi-user support)
     authorId: text("author_id"), // User ID or "local"
-    authorName: text("author_name"),
-    authorAvatar: text("author_avatar"),
-    authorColor: text("author_color"),
     isAI: boolean("is_ai").default(false).notNull(),
 
     // AI-specific fields
@@ -435,9 +432,6 @@ export const chatMessages = pgTable(
     errorCode: text("error_code"),
 
     // Metadata
-    edited: boolean("edited").default(false).notNull(),
-    originalId: uuid("original_id"), // If this is an edit
-    tokens: integer("tokens"),
     metadata: jsonb("metadata").$type<MessageMetadata>().default({}),
 
     // Voting

@@ -28,6 +28,7 @@ import { simpleT } from "@/i18n/core/shared";
 
 import { AssistantMessageActions } from "./assistant-message-actions";
 import { CompactingMessage } from "./compacting-message";
+import { ErrorMessageBubble } from "./error-message-bubble";
 import { FileAttachments } from "./file-attachments";
 import { LoadingIndicator } from "./loading-indicator";
 import { MessageAuthorInfo } from "./message-author";
@@ -170,29 +171,6 @@ const ToolMessage = memo(
 );
 
 /**
- * Error Message - memoized to prevent re-renders
- */
-interface ErrorMessageProps {
-  message: ChatMessage;
-  locale: CountryLanguage;
-}
-
-const ErrorMessage = memo(function ErrorMessage({
-  message,
-  locale,
-}: ErrorMessageProps): JSX.Element {
-  const { t } = simpleT(locale);
-  return (
-    <Div className="mb-3 last:mb-0 p-3 border border-destructive/60 bg-destructive/10 rounded-md">
-      <Div className="text-destructive font-medium mb-1">
-        {t("app.chat.messages.error")}
-      </Div>
-      <Div className="text-foreground">{message.content ?? ""}</Div>
-    </Div>
-  );
-});
-
-/**
  * Assistant Content Message - memoized to prevent re-renders
  */
 interface AssistantContentMessageProps {
@@ -253,6 +231,7 @@ interface MessagesListProps {
   allMessages: ChatMessage[];
   primaryId: string;
   primaryThreadId: string;
+  sequenceId: string | null;
   locale: CountryLanguage;
   user: JwtPayloadType;
   logger: EndpointLogger;
@@ -264,6 +243,7 @@ const MessagesList = memo(function MessagesList({
   allMessages,
   primaryId,
   primaryThreadId,
+  sequenceId,
   locale,
   user,
   logger,
@@ -503,9 +483,7 @@ const MessagesList = memo(function MessagesList({
         }
 
         if (message.role === "error") {
-          return (
-            <ErrorMessage key={message.id} message={message} locale={locale} />
-          );
+          return <ErrorMessageBubble key={message.id} message={message} />;
         }
 
         if (message.role === "assistant") {
@@ -536,7 +514,7 @@ const MessagesList = memo(function MessagesList({
       })}
 
       {/* Show streaming placeholder when no content yet */}
-      <LoadingIndicator />
+      <LoadingIndicator sequenceId={sequenceId} />
     </>
   );
 });
@@ -552,7 +530,6 @@ interface MessageActionsWrapperProps {
   onAnswerAsModel?: (messageId: string) => void;
   onDelete?: (messageId: string) => void;
   logger: EndpointLogger;
-  tokens: number | null;
   model: ChatMessage["model"];
   promptTokens: number | null;
   completionTokens: number | null;
@@ -565,7 +542,6 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
   onAnswerAsModel,
   onDelete,
   logger,
-  tokens,
   model,
   promptTokens,
   completionTokens,
@@ -623,7 +599,8 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
       onAnswerAsModel={onAnswerAsModel}
       onDelete={onDelete}
       logger={logger}
-      tokens={tokens}
+      promptTokens={promptTokens}
+      completionTokens={completionTokens}
       creditCost={creditCost}
     />
   );
@@ -713,17 +690,10 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
 
   // Calculate group totals by summing all messages in the sequence
   const groupTotals = useMemo(() => {
-    let totalTokens = 0;
     let totalPromptTokens = 0;
     let totalCompletionTokens = 0;
 
     for (const msg of allMessages) {
-      // Sum tokens field
-      if (msg.tokens) {
-        totalTokens += msg.tokens;
-      }
-
-      // Sum metadata tokens
       if (msg.metadata?.promptTokens) {
         totalPromptTokens += msg.metadata.promptTokens;
       }
@@ -733,7 +703,6 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
     }
 
     return {
-      tokens: totalTokens > 0 ? totalTokens : null,
       promptTokens: totalPromptTokens > 0 ? totalPromptTokens : null,
       completionTokens:
         totalCompletionTokens > 0 ? totalCompletionTokens : null,
@@ -759,6 +728,7 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
             allMessages={allMessages}
             primaryId={primary.id}
             primaryThreadId={primary.threadId}
+            sequenceId={primary.sequenceId}
             locale={locale}
             user={user}
             logger={logger}
@@ -776,7 +746,6 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
             onAnswerAsModel={onAnswerAsModel}
             onDelete={onDelete}
             logger={logger}
-            tokens={groupTotals.tokens}
             model={primary.model}
             promptTokens={groupTotals.promptTokens}
             completionTokens={groupTotals.completionTokens}

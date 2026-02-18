@@ -48,7 +48,7 @@ export const { GET } = createEndpoint({
       userId: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        schema: z.string(),
+        schema: z.uuid(),
         label: "app.api.users.view.get.userId.label" as const,
         hidden: true,
       }),

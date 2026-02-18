@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseField,
@@ -24,6 +26,7 @@ import {
   CronTaskPriorityOptions,
 } from "../../../../system/unified-interface/tasks/enum";
 import { UserRole } from "../../../../user/user-roles/enum";
+import { CampaignStarterConfigContainer } from "./widget";
 
 /**
  * Get Campaign Starter Configuration Endpoint (GET)
@@ -270,17 +273,11 @@ const { PUT } = createEndpoint({
     "app.api.leads.tags.campaigns" as const,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.form.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.form.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: CampaignStarterConfigContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
       // Request fields
       dryRun: requestField({
         type: WidgetType.FORM_FIELD,
@@ -543,7 +540,7 @@ const { PUT } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

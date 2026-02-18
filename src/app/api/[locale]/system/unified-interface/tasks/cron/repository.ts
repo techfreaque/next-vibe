@@ -19,11 +19,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type {
   CronTask,
   CronTaskExecution,
-  CronTaskSchedule,
   NewCronTask,
   NewCronTaskExecution,
 } from "./db";
-import { cronTaskExecutions, cronTasks, cronTaskSchedules } from "./db";
+import { cronTaskExecutions, cronTasks } from "./db";
 
 /**
  * Implementation of Cron Tasks Repository
@@ -376,69 +375,6 @@ export class CronTasksRepository {
           "app.api.system.unifiedInterface.tasks.common.cronRepositoryRecentExecutionsFetchFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message, limit },
-      });
-    }
-  }
-
-  static async getTaskSchedules(
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskSchedule[]>> {
-    try {
-      logger.debug("Fetching task schedules");
-      const schedules = await db
-        .select()
-        .from(cronTaskSchedules)
-        .orderBy(cronTaskSchedules.nextRunAt);
-      return success(schedules as CronTaskSchedule[]);
-    } catch (error) {
-      const parsedError = parseError(error);
-      logger.error("Failed to fetch task schedules", {
-        error: parsedError.message,
-      });
-      return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositorySchedulesFetchFailed",
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message },
-      });
-    }
-  }
-
-  static async updateSchedule(
-    taskId: string,
-    updates: Partial<CronTaskSchedule>,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskSchedule>> {
-    try {
-      logger.debug("Updating task schedule", {
-        taskId,
-        updates: Object.keys(updates),
-      });
-      const [updatedSchedule] = await db
-        .update(cronTaskSchedules)
-        .set({ ...updates, updatedAt: new Date() })
-        .where(eq(cronTaskSchedules.taskId, taskId))
-        .returning();
-
-      if (!updatedSchedule) {
-        return fail({
-          message: ErrorResponseTypes.NOT_FOUND.errorKey,
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
-      return success(updatedSchedule as CronTaskSchedule);
-    } catch (error) {
-      const parsedError = parseError(error);
-      logger.error("Failed to update task schedule", {
-        taskId,
-        error: parsedError.message,
-      });
-      return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositoryScheduleUpdateFailed",
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message, taskId },
       });
     }
   }

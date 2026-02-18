@@ -33,8 +33,9 @@ export const translations = {
         placeholder: "Select category...",
       },
       enabled: {
-        label: "Enabled",
+        label: "Status",
         description: "Filter by enabled status",
+        placeholder: "All tasks",
       },
       limit: {
         label: "Limit",
@@ -223,6 +224,56 @@ export const translations = {
         title: "Task created",
         description: "The task has been created successfully",
       },
+    },
+  },
+  widget: {
+    title: "Cron Tasks",
+    loading: "Loading tasks...",
+    header: {
+      stats: "Stats",
+      history: "History",
+      refresh: "Refresh",
+      create: "New Task",
+    },
+    filter: {
+      all: "All",
+      running: "Running",
+      completed: "Completed",
+      failed: "Failed",
+      pending: "Pending",
+      disabled: "Disabled",
+      allPriorities: "All Priorities",
+      allCategories: "All Categories",
+    },
+    search: {
+      placeholder: "Search tasks...",
+    },
+    sort: {
+      nameAsc: "Name A-Z",
+      nameDesc: "Name Z-A",
+      schedule: "Schedule",
+      lastRunNewest: "Last Run (newest)",
+      executionsMost: "Most Executions",
+    },
+    task: {
+      executions: "Executions:",
+      lastRun: "Last run:",
+      never: "Never",
+      nextRun: "Next run:",
+      notScheduled: "Not scheduled",
+    },
+    action: {
+      view: "View details",
+      history: "View history",
+      edit: "Edit task",
+      delete: "Delete task",
+    },
+    empty: {
+      noTasks: "No cron tasks",
+      noTasksDesc: "Create your first cron task to get started",
+      noMatches: "No tasks match your filters",
+      noMatchesDesc: "Try adjusting your search or filter criteria",
+      clearFilters: "Clear Filters",
     },
   },
 };

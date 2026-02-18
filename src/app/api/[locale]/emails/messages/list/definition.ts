@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   objectOptionalField,
   requestField,
@@ -35,6 +37,7 @@ import {
   SortOrder,
   SortOrderOptions,
 } from "../enum";
+import { EmailsListContainer } from "./widget";
 
 /**
  * Get Emails List Endpoint (GET)
@@ -50,15 +53,11 @@ const { GET } = createEndpoint({
   tags: ["app.api.emails.messages.tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.messages.list.container.title",
-      description: "app.api.emails.messages.list.container.description",
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: EmailsListContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { request: "data", response: true } }),
       // === FILTER AND SEARCH ===
       filters: objectField(
         {
@@ -479,7 +478,7 @@ const { GET } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {

@@ -194,12 +194,6 @@ const { GET } = createEndpoint({
               "app.api.agent.chat.threads.threadId.messages.messageId.get.response.message.model.content" as const,
             schema: z.string().nullable(),
           }),
-          tokens: responseField({
-            type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.threads.threadId.messages.messageId.get.response.message.tokens.content" as const,
-            schema: z.coerce.number().nullable(),
-          }),
           createdAt: responseField({
             type: WidgetType.TEXT,
             content:
@@ -243,7 +237,6 @@ const { GET } = createEndpoint({
           authorId: "770e8400-e29b-41d4-a716-446655440000",
           isAI: false,
           model: null,
-          tokens: null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },

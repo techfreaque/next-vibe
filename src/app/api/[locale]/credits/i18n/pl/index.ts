@@ -182,6 +182,12 @@ export const translations: typeof enTranslations = {
         label: "Przesunięcie",
         description: "Liczba transakcji do pominięcia dla stronicowania",
       },
+      targetUserId: {
+        label: "ID docelowego użytkownika",
+      },
+      targetLeadId: {
+        label: "ID docelowego leada",
+      },
       id: "ID transakcji",
       amount: "Kwota",
       type: "Typ",

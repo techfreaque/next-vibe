@@ -66,4 +66,8 @@ export const translations: typeof enTranslations = {
       description: "Import-Job erfolgreich wiederholt",
     },
   },
+  widget: {
+    title: "Import-Job wiederholen",
+    successMessage: "Job-Wiederholung erfolgreich gestartet",
+  },
 };

@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
@@ -38,6 +40,7 @@ import {
   LeadStatusFilterOptions,
   LeadStatusOptions,
 } from "../enum";
+import { LeadsBatchDeleteContainer, LeadsBatchUpdateContainer } from "./widget";
 
 /**
  * Batch Update Endpoint (PATCH)
@@ -56,15 +59,11 @@ const { PATCH } = createEndpoint({
     "app.api.leads.tags.batch" as const,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.batch.patch.form.title" as const,
-      description: "app.api.leads.batch.patch.form.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: LeadsBatchUpdateContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
       // Filter criteria
       search: requestField({
         type: WidgetType.FORM_FIELD,
@@ -80,10 +79,7 @@ const { PATCH } = createEndpoint({
         label: "app.api.leads.batch.patch.status.label" as const,
         description: "app.api.leads.batch.patch.status.description" as const,
         options: LeadStatusFilterOptions,
-        schema: z
-          .enum(LeadStatusFilter)
-          .optional()
-          .default(LeadStatusFilter.ALL),
+        schema: z.enum(LeadStatusFilter).default(LeadStatusFilter.ALL),
       }),
       currentCampaignStage: requestField({
         type: WidgetType.FORM_FIELD,
@@ -94,7 +90,6 @@ const { PATCH } = createEndpoint({
         options: EmailCampaignStageFilterOptions,
         schema: z
           .enum(EmailCampaignStageFilter)
-          .optional()
           .default(EmailCampaignStageFilter.ALL),
       }),
       source: requestField({
@@ -103,10 +98,7 @@ const { PATCH } = createEndpoint({
         label: "app.api.leads.batch.patch.source.label" as const,
         description: "app.api.leads.batch.patch.source.description" as const,
         options: LeadSourceFilterOptions,
-        schema: z
-          .enum(LeadSourceFilter)
-          .optional()
-          .default(LeadSourceFilter.ALL),
+        schema: z.enum(LeadSourceFilter).default(LeadSourceFilter.ALL),
       }),
       scope: requestField({
         type: WidgetType.FORM_FIELD,
@@ -116,7 +108,6 @@ const { PATCH } = createEndpoint({
         options: BatchOperationScopeOptions,
         schema: z
           .enum(BatchOperationScope)
-          .optional()
           .default(BatchOperationScope.ALL_PAGES),
       }),
       dryRun: requestField({
@@ -292,7 +283,7 @@ const { PATCH } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
@@ -396,15 +387,11 @@ const { DELETE } = createEndpoint({
     "app.api.leads.tags.batch" as const,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.batch.delete.form.title" as const,
-      description: "app.api.leads.batch.delete.form.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: LeadsBatchDeleteContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
       // Filter criteria (same as PATCH)
       search: requestField({
         type: WidgetType.FORM_FIELD,
@@ -419,10 +406,7 @@ const { DELETE } = createEndpoint({
         label: "app.api.leads.batch.delete.status.label" as const,
         description: "app.api.leads.batch.delete.status.description" as const,
         options: LeadStatusFilterOptions,
-        schema: z
-          .enum(LeadStatusFilter)
-          .optional()
-          .default(LeadStatusFilter.ALL),
+        schema: z.enum(LeadStatusFilter).default(LeadStatusFilter.ALL),
       }),
       confirmDelete: requestField({
         type: WidgetType.FORM_FIELD,
@@ -564,7 +548,7 @@ const { DELETE } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

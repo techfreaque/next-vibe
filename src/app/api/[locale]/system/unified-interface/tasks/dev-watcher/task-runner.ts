@@ -22,12 +22,8 @@ import type { TaskRunner } from "../types/repository";
  * Determine if a file change should trigger generator execution
  */
 const shouldTriggerGeneration = (filename: string): boolean => {
-  // Skip temporary files, node_modules, and generated files
+  // Skip node_modules, generated dirs, temp files
   if (
-    // FOR NOW WE SKIP ALL EXCEPT:
-    !filename.includes("definition.ts") ||
-    !filename.includes("route.ts") ||
-    // JUST FOR NOW
     // eslint-disable-next-line i18next/no-literal-string
     filename.includes("node_modules") ||
     // eslint-disable-next-line i18next/no-literal-string
@@ -41,6 +37,11 @@ const shouldTriggerGeneration = (filename: string): boolean => {
     // eslint-disable-next-line i18next/no-literal-string
     filename.includes(".tmp")
   ) {
+    return false;
+  }
+
+  // Only trigger for definition.ts or route.ts changes
+  if (!filename.includes("definition.ts") && !filename.includes("route.ts")) {
     return false;
   }
 

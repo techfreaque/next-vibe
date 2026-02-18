@@ -173,4 +173,23 @@ export const translations: typeof enTranslations = {
     cancel: "Abbrechen",
   },
   notFound: "Konto nicht gefunden",
+  widget: {
+    put: {
+      title: "SMTP-Konto bearbeiten",
+      container: {
+        title: "SMTP-Konto bearbeiten",
+      },
+    },
+    fields: {
+      host: {
+        label: "Host",
+      },
+      username: {
+        label: "Benutzername",
+      },
+      fromEmail: {
+        label: "Absender-E-Mail",
+      },
+    },
+  },
 };

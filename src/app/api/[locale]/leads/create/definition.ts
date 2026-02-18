@@ -8,6 +8,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseField,
@@ -33,6 +34,7 @@ import {
 import { dateSchema } from "../../shared/types/common.schema";
 import { UserRole } from "../../user/user-roles/enum";
 import { LeadSource, LeadSourceOptions, LeadStatus } from "../enum";
+import { LeadCreateContainer } from "./widget";
 
 /**
  * Create Lead Endpoint (POST)
@@ -48,17 +50,11 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "user-plus",
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.create.post.title",
-      description: "app.api.leads.create.post.description",
-      layoutType: LayoutType.STACKED,
-      paddingTop: "6",
-      noCard: true,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: LeadCreateContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
       // Top action buttons
       topActions: widgetObjectField(
         {
@@ -355,7 +351,7 @@ const { POST } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {

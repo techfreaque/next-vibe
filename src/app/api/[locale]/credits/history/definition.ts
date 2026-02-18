@@ -7,8 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   objectFieldNew,
+  requestField,
   responseArrayField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
@@ -42,8 +44,31 @@ const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: CreditHistoryContainer,
-    usage: { response: true, request: "data" } as const,
+    usage: { response: true, request: "data" },
     children: {
+      backButton: backButton({
+        usage: { response: true, request: "data" },
+      }),
+      // === ADMIN: optional target user override ===
+      targetUserId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.agent.chat.credits.history.get.targetUserId.label" as const,
+        hidden: true,
+        schema: z.string().optional(),
+      }),
+
+      // === ADMIN: optional target lead override ===
+      targetLeadId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.agent.chat.credits.history.get.targetLeadId.label" as const,
+        hidden: true,
+        schema: z.string().optional(),
+      }),
+
       // === TRANSACTION LIST ===
       transactions: responseArrayField(
         {
@@ -156,6 +181,14 @@ const { GET } = createEndpoint({
   examples: {
     requests: {
       default: {
+        paginationInfo: {
+          page: 1,
+          limit: 50,
+        },
+      },
+      adminView: {
+        targetLeadId: "123e4567-e89b-12d3-a456-426614174001",
+        targetUserId: "123e4567-e89b-12d3-a456-426614174000",
         paginationInfo: {
           page: 1,
           limit: 50,

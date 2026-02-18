@@ -99,4 +99,12 @@ export const translations = {
     title: "Success",
     description: "Folders retrieved successfully",
   },
+  widget: {
+    title: "IMAP Folders",
+    refresh: "Refresh",
+    sync: "Sync Folders",
+    empty: "No folders found",
+    messages: "Messages",
+    unseen: "Unseen",
+  },
 };

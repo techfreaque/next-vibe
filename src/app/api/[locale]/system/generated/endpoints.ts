@@ -103,48 +103,48 @@ import { default as endpointDefinition_GET_90 } from "../unified-interface/tasks
 import { default as endpointDefinition_GET_91 } from "../unified-interface/tasks/side-tasks/definition";
 import { default as endpointDefinition_POST_92 } from "../unified-interface/tasks/side-tasks/definition";
 import { default as endpointDefinition_GET_93 } from "../unified-interface/tasks/types/definition";
-import { default as endpointDefinition_POST_94 } from "../unified-interface/tasks/pulse/definition";
-import { default as endpointDefinition_GET_95 } from "../unified-interface/tasks/pulse/status/definition";
-import { default as endpointDefinition_POST_96 } from "../unified-interface/tasks/pulse/execute/definition";
-import { default as endpointDefinition_POST_97 } from "../unified-interface/tasks/unified-runner/definition";
-import { default as endpointDefinition_POST_98 } from "../unified-interface/mcp/serve/definition";
-import { default as endpointDefinition_GET_99 } from "../unified-interface/ai/tools/definition";
-import { default as endpointDefinition_POST_100 } from "../unified-interface/cli/setup/uninstall/definition";
-import { default as endpointDefinition_POST_101 } from "../unified-interface/cli/setup/update/definition";
-import { default as endpointDefinition_POST_102 } from "../unified-interface/cli/setup/status/definition";
-import { default as endpointDefinition_POST_103 } from "../unified-interface/cli/setup/install/definition";
-import { default as endpointDefinition_POST_104 } from "../unified-interface/react-native/generate/definition";
-import { default as endpointDefinition_POST_105 } from "../check/testing/test/definition";
-import { default as endpointDefinition_POST_106 } from "../check/vibe-check/definition";
-import { default as endpointDefinition_POST_107 } from "../check/typecheck/definition";
-import { default as endpointDefinition_POST_108 } from "../check/lint/definition";
-import { default as endpointDefinition_POST_109 } from "../check/config/create/definition";
-import { default as endpointDefinition_POST_110 } from "../check/oxlint/definition";
-import { default as endpointDefinition_POST_111 } from "../release-tool/definition";
-import { default as endpointDefinition_POST_112 } from "../builder/definition";
-import { default as endpointDefinition_POST_113 } from "../generators/generate-all/definition";
-import { default as endpointDefinition_POST_114 } from "../generators/endpoint/definition";
-import { default as endpointDefinition_POST_115 } from "../generators/route-handlers/definition";
-import { default as endpointDefinition_POST_116 } from "../generators/client-routes-index/definition";
-import { default as endpointDefinition_POST_117 } from "../generators/endpoints/definition";
-import { default as endpointDefinition_POST_118 } from "../generators/env/definition";
-import { default as endpointDefinition_POST_119 } from "../generators/endpoints-index/definition";
-import { default as endpointDefinition_POST_120 } from "../generators/email-templates/definition";
-import { default as endpointDefinition_POST_121 } from "../generators/task-index/definition";
-import { default as endpointDefinition_POST_122 } from "../generators/seeds/definition";
-import { default as endpointDefinition_POST_123 } from "../generators/generate-trpc-router/definition";
-import { default as endpointDefinition_POST_124 } from "../generators/generate-trpc-router/validation/definition";
-import { default as endpointDefinition_GET_125 } from "../../leads/lead/[id]/definition";
-import { default as endpointDefinition_PATCH_126 } from "../../leads/lead/[id]/definition";
-import { default as endpointDefinition_DELETE_127 } from "../../leads/lead/[id]/definition";
-import { default as endpointDefinition_POST_128 } from "../../leads/tracking/engagement/definition";
-import { default as endpointDefinition_GET_129 } from "../../leads/tracking/engagement/definition";
-import { default as endpointDefinition_GET_130 } from "../../leads/search/definition";
-import { default as endpointDefinition_GET_131 } from "../../leads/campaigns/campaign-starter/campaign-starter-config/definition";
-import { default as endpointDefinition_PUT_132 } from "../../leads/campaigns/campaign-starter/campaign-starter-config/definition";
-import { default as endpointDefinition_POST_133 } from "../../leads/campaigns/emails/test-mail/definition";
-import { default as endpointDefinition_GET_134 } from "../../leads/list/definition";
-import { default as endpointDefinition_POST_135 } from "../../leads/import/definition";
+import { default as endpointDefinition_GET_94 } from "../unified-interface/tasks/pulse/status/definition";
+import { default as endpointDefinition_POST_95 } from "../unified-interface/tasks/pulse/execute/definition";
+import { default as endpointDefinition_POST_96 } from "../unified-interface/tasks/unified-runner/definition";
+import { default as endpointDefinition_POST_97 } from "../unified-interface/mcp/serve/definition";
+import { default as endpointDefinition_GET_98 } from "../unified-interface/ai/tools/definition";
+import { default as endpointDefinition_POST_99 } from "../unified-interface/cli/setup/uninstall/definition";
+import { default as endpointDefinition_POST_100 } from "../unified-interface/cli/setup/update/definition";
+import { default as endpointDefinition_POST_101 } from "../unified-interface/cli/setup/status/definition";
+import { default as endpointDefinition_POST_102 } from "../unified-interface/cli/setup/install/definition";
+import { default as endpointDefinition_POST_103 } from "../unified-interface/react-native/generate/definition";
+import { default as endpointDefinition_POST_104 } from "../check/testing/test/definition";
+import { default as endpointDefinition_POST_105 } from "../check/vibe-check/definition";
+import { default as endpointDefinition_POST_106 } from "../check/typecheck/definition";
+import { default as endpointDefinition_POST_107 } from "../check/lint/definition";
+import { default as endpointDefinition_POST_108 } from "../check/config/create/definition";
+import { default as endpointDefinition_POST_109 } from "../check/oxlint/definition";
+import { default as endpointDefinition_POST_110 } from "../release-tool/definition";
+import { default as endpointDefinition_POST_111 } from "../builder/definition";
+import { default as endpointDefinition_POST_112 } from "../generators/generate-all/definition";
+import { default as endpointDefinition_POST_113 } from "../generators/endpoint/definition";
+import { default as endpointDefinition_POST_114 } from "../generators/route-handlers/definition";
+import { default as endpointDefinition_POST_115 } from "../generators/client-routes-index/definition";
+import { default as endpointDefinition_POST_116 } from "../generators/endpoints/definition";
+import { default as endpointDefinition_POST_117 } from "../generators/env/definition";
+import { default as endpointDefinition_POST_118 } from "../generators/endpoints-index/definition";
+import { default as endpointDefinition_POST_119 } from "../generators/email-templates/definition";
+import { default as endpointDefinition_POST_120 } from "../generators/task-index/definition";
+import { default as endpointDefinition_POST_121 } from "../generators/seeds/definition";
+import { default as endpointDefinition_POST_122 } from "../generators/generate-trpc-router/definition";
+import { default as endpointDefinition_POST_123 } from "../generators/generate-trpc-router/validation/definition";
+import { default as endpointDefinition_GET_124 } from "../../leads/lead/[id]/definition";
+import { default as endpointDefinition_PATCH_125 } from "../../leads/lead/[id]/definition";
+import { default as endpointDefinition_DELETE_126 } from "../../leads/lead/[id]/definition";
+import { default as endpointDefinition_POST_127 } from "../../leads/tracking/engagement/definition";
+import { default as endpointDefinition_GET_128 } from "../../leads/tracking/engagement/definition";
+import { default as endpointDefinition_GET_129 } from "../../leads/search/definition";
+import { default as endpointDefinition_GET_130 } from "../../leads/campaigns/campaign-starter/campaign-starter-config/definition";
+import { default as endpointDefinition_PUT_131 } from "../../leads/campaigns/campaign-starter/campaign-starter-config/definition";
+import { default as endpointDefinition_POST_132 } from "../../leads/campaigns/emails/test-mail/definition";
+import { default as endpointDefinition_GET_133 } from "../../leads/list/definition";
+import { default as endpointDefinition_POST_134 } from "../../leads/import/definition";
+import { default as endpointDefinition_GET_135 } from "../../leads/import/jobs/[jobId]/definition";
 import { default as endpointDefinition_PATCH_136 } from "../../leads/import/jobs/[jobId]/definition";
 import { default as endpointDefinition_DELETE_137 } from "../../leads/import/jobs/[jobId]/definition";
 import { default as endpointDefinition_POST_138 } from "../../leads/import/jobs/[jobId]/stop/definition";
@@ -784,188 +784,183 @@ function initializeEndpoints(): Record<string, ApiSection> {
   );
   setNestedPath(
     endpoints,
-    ["system", "unified-interface", "tasks", "pulse", "POST"],
-    endpointDefinition_POST_94.POST,
-  );
-  setNestedPath(
-    endpoints,
     ["system", "unified-interface", "tasks", "pulse", "status", "GET"],
-    endpointDefinition_GET_95.GET,
+    endpointDefinition_GET_94.GET,
   );
   setNestedPath(
     endpoints,
     ["system", "unified-interface", "tasks", "pulse", "execute", "POST"],
-    endpointDefinition_POST_96.POST,
+    endpointDefinition_POST_95.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "unified-interface", "tasks", "unified-runner", "POST"],
-    endpointDefinition_POST_97.POST,
+    endpointDefinition_POST_96.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "unified-interface", "mcp", "serve", "POST"],
-    endpointDefinition_POST_98.POST,
+    endpointDefinition_POST_97.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "unified-interface", "ai", "tools", "GET"],
-    endpointDefinition_GET_99.GET,
+    endpointDefinition_GET_98.GET,
   );
   setNestedPath(
     endpoints,
     ["system", "unified-interface", "cli", "setup", "uninstall", "POST"],
-    endpointDefinition_POST_100.POST,
+    endpointDefinition_POST_99.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "unified-interface", "cli", "setup", "update", "POST"],
-    endpointDefinition_POST_101.POST,
+    endpointDefinition_POST_100.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "unified-interface", "cli", "setup", "status", "POST"],
-    endpointDefinition_POST_102.POST,
+    endpointDefinition_POST_101.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "unified-interface", "cli", "setup", "install", "POST"],
-    endpointDefinition_POST_103.POST,
+    endpointDefinition_POST_102.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "unified-interface", "react-native", "generate", "POST"],
-    endpointDefinition_POST_104.POST,
+    endpointDefinition_POST_103.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "check", "testing", "test", "POST"],
-    endpointDefinition_POST_105.POST,
+    endpointDefinition_POST_104.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "check", "vibe-check", "POST"],
-    endpointDefinition_POST_106.POST,
+    endpointDefinition_POST_105.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "check", "typecheck", "POST"],
-    endpointDefinition_POST_107.POST,
+    endpointDefinition_POST_106.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "check", "lint", "POST"],
-    endpointDefinition_POST_108.POST,
+    endpointDefinition_POST_107.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "check", "config", "create", "POST"],
-    endpointDefinition_POST_109.POST,
+    endpointDefinition_POST_108.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "check", "oxlint", "POST"],
-    endpointDefinition_POST_110.POST,
+    endpointDefinition_POST_109.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "release-tool", "POST"],
-    endpointDefinition_POST_111.POST,
+    endpointDefinition_POST_110.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "builder", "POST"],
-    endpointDefinition_POST_112.POST,
+    endpointDefinition_POST_111.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "generators", "generate-all", "POST"],
-    endpointDefinition_POST_113.POST,
+    endpointDefinition_POST_112.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "generators", "endpoint", "POST"],
-    endpointDefinition_POST_114.POST,
+    endpointDefinition_POST_113.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "generators", "route-handlers", "POST"],
-    endpointDefinition_POST_115.POST,
+    endpointDefinition_POST_114.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "generators", "client-routes-index", "POST"],
-    endpointDefinition_POST_116.POST,
+    endpointDefinition_POST_115.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "generators", "endpoints", "POST"],
-    endpointDefinition_POST_117.POST,
+    endpointDefinition_POST_116.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "generators", "env", "POST"],
-    endpointDefinition_POST_118.POST,
+    endpointDefinition_POST_117.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "generators", "endpoints-index", "POST"],
-    endpointDefinition_POST_119.POST,
+    endpointDefinition_POST_118.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "generators", "email-templates", "POST"],
-    endpointDefinition_POST_120.POST,
+    endpointDefinition_POST_119.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "generators", "task-index", "POST"],
-    endpointDefinition_POST_121.POST,
+    endpointDefinition_POST_120.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "generators", "seeds", "POST"],
-    endpointDefinition_POST_122.POST,
+    endpointDefinition_POST_121.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "generators", "generate-trpc-router", "POST"],
-    endpointDefinition_POST_123.POST,
+    endpointDefinition_POST_122.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "generators", "generate-trpc-router", "validation", "POST"],
-    endpointDefinition_POST_124.POST,
+    endpointDefinition_POST_123.POST,
   );
   setNestedPath(
     endpoints,
     ["leads", "lead", "[id]", "GET"],
-    endpointDefinition_GET_125.GET,
+    endpointDefinition_GET_124.GET,
   );
   setNestedPath(
     endpoints,
     ["leads", "lead", "[id]", "PATCH"],
-    endpointDefinition_PATCH_126.PATCH,
+    endpointDefinition_PATCH_125.PATCH,
   );
   setNestedPath(
     endpoints,
     ["leads", "lead", "[id]", "DELETE"],
-    endpointDefinition_DELETE_127.DELETE,
+    endpointDefinition_DELETE_126.DELETE,
   );
   setNestedPath(
     endpoints,
     ["leads", "tracking", "engagement", "POST"],
-    endpointDefinition_POST_128.POST,
+    endpointDefinition_POST_127.POST,
   );
   setNestedPath(
     endpoints,
     ["leads", "tracking", "engagement", "GET"],
-    endpointDefinition_GET_129.GET,
+    endpointDefinition_GET_128.GET,
   );
   setNestedPath(
     endpoints,
     ["leads", "search", "GET"],
-    endpointDefinition_GET_130.GET,
+    endpointDefinition_GET_129.GET,
   );
   setNestedPath(
     endpoints,
@@ -976,7 +971,7 @@ function initializeEndpoints(): Record<string, ApiSection> {
       "campaign-starter-config",
       "GET",
     ],
-    endpointDefinition_GET_131.GET,
+    endpointDefinition_GET_130.GET,
   );
   setNestedPath(
     endpoints,
@@ -987,22 +982,27 @@ function initializeEndpoints(): Record<string, ApiSection> {
       "campaign-starter-config",
       "PUT",
     ],
-    endpointDefinition_PUT_132.PUT,
+    endpointDefinition_PUT_131.PUT,
   );
   setNestedPath(
     endpoints,
     ["leads", "campaigns", "emails", "test-mail", "POST"],
-    endpointDefinition_POST_133.POST,
+    endpointDefinition_POST_132.POST,
   );
   setNestedPath(
     endpoints,
     ["leads", "list", "GET"],
-    endpointDefinition_GET_134.GET,
+    endpointDefinition_GET_133.GET,
   );
   setNestedPath(
     endpoints,
     ["leads", "import", "POST"],
-    endpointDefinition_POST_135.POST,
+    endpointDefinition_POST_134.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["leads", "import", "jobs", "[jobId]", "GET"],
+    endpointDefinition_GET_135.GET,
   );
   setNestedPath(
     endpoints,

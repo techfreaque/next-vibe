@@ -65,6 +65,7 @@ import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 import { simpleT } from "@/i18n/core/shared";
@@ -2250,17 +2251,25 @@ export class CreditRepository {
     const { page, limit } = data.paginationInfo;
     const offset = (page - 1) * limit;
 
-    const result = user.id
+    // Only admins may use targetUserId / targetLeadId to view another entity's history
+    const isAdmin = user.isPublic
+      ? false
+      : user.roles?.includes(UserRole.ADMIN) && data.targetLeadId;
+    const effectiveLeadId = isAdmin ? data.targetLeadId! : user.leadId;
+    const effectiveUserId =
+      (isAdmin ? data.targetUserId : user.id) || undefined;
+
+    const result = effectiveUserId
       ? await CreditRepository.getTransactions(
-          user.id,
-          user.leadId,
+          effectiveUserId,
+          effectiveLeadId,
           limit,
           offset,
           logger,
           locale,
         )
       : await CreditRepository.getTransactionsByLeadId(
-          user.leadId,
+          effectiveLeadId,
           limit,
           offset,
           logger,

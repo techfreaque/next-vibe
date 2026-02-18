@@ -5,7 +5,6 @@
 import "server-only";
 
 import type { ModelMessage } from "ai";
-import { eq } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -15,19 +14,86 @@ import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { getModelById } from "@/app/api/[locale]/agent/models/models";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import { createStreamEvent, formatSSEEvent } from "../../events";
 import type { StreamContext } from "../core/stream-context";
 
 /**
- * Estimate token count based on full context
- * Includes: system prompt + tools + message history + AI response
- * Rough approximation: ~3.5 characters per token for English text
+ * Flatten a ModelMessage into a plain string the way the model actually sees it.
+ * Handles text, tool-call, tool-result, and image content parts.
+ * ~3.5 characters per token for English text.
+ */
+function flattenMessage(msg: ModelMessage): string {
+  const parts: string[] = [];
+
+  // role prefix adds a small overhead
+  parts.push(String(msg.role));
+
+  const content = (msg as { content?: unknown }).content;
+
+  if (typeof content === "string") {
+    parts.push(content);
+  } else if (Array.isArray(content)) {
+    for (const part of content as Array<Record<string, unknown>>) {
+      if (part.type === "text" && typeof part.text === "string") {
+        parts.push(part.text);
+      } else if (part.type === "tool-call") {
+        // tool name + serialized args
+        parts.push(String(part.toolName ?? ""));
+        if (part.args !== undefined) {
+          parts.push(
+            typeof part.args === "string"
+              ? part.args
+              : JSON.stringify(part.args),
+          );
+        }
+      } else if (part.type === "tool-result") {
+        parts.push(String(part.toolName ?? ""));
+        if (part.result !== undefined) {
+          parts.push(
+            typeof part.result === "string"
+              ? part.result
+              : JSON.stringify(part.result),
+          );
+        }
+      } else if (part.type === "image") {
+        // images count as tokens but we can't measure them well — use a fixed overhead
+        parts.push("[image]");
+      } else if (part.type === "reasoning" && typeof part.text === "string") {
+        parts.push(part.text);
+      }
+    }
+  }
+
+  return parts.join(" ");
+}
+
+/**
+ * Flatten tool definitions to the text a model sees (name + description).
+ * The AI SDK stores parameters as a jsonSchema() wrapper, not a plain object,
+ * so we only extract the string fields we can reliably access.
+ */
+function flattenTools(tools: Record<string, CoreTool>): string {
+  const parts: string[] = [];
+  for (const [name, tool] of Object.entries(tools)) {
+    parts.push(name);
+    const t = tool as { description?: string };
+    if (t.description) {
+      parts.push(t.description);
+    }
+  }
+  return parts.join(" ");
+}
+
+/**
+ * Estimate token count based on full context.
+ * Flattens everything to plain text before measuring, mirroring what the model tokenises.
+ * Includes: system prompt + tool definitions (names/descriptions/params) +
+ *           full message history (all content parts) + partial AI response so far.
+ * Rough approximation: ~3.5 characters per token for English text.
  */
 function estimateTokensFromContext(params: {
   systemPrompt?: string;
@@ -41,30 +107,24 @@ function estimateTokensFromContext(params: {
 } {
   const { systemPrompt, messages, tools, aiResponse } = params;
 
-  // Estimate system prompt tokens
   const systemPromptTokens = systemPrompt
     ? Math.ceil(systemPrompt.length / 3.5)
     : 0;
 
-  // Estimate tools tokens (tools are typically JSON-ified)
-  const toolsTokens = tools ? Math.ceil(JSON.stringify(tools).length / 3.5) : 0;
+  const toolsText = tools ? flattenTools(tools) : "";
+  const toolsTokens = toolsText ? Math.ceil(toolsText.length / 3.5) : 0;
 
-  // Estimate message history tokens
-  const messagesTokens = messages
-    ? Math.ceil(JSON.stringify(messages).length / 3.5)
+  const messagesText = messages ? messages.map(flattenMessage).join(" ") : "";
+  const messagesTokens = messagesText
+    ? Math.ceil(messagesText.length / 3.5)
     : 0;
 
-  // Estimate AI response tokens
   const completionTokens = aiResponse ? Math.ceil(aiResponse.length / 3.5) : 0;
 
   const promptTokens = systemPromptTokens + toolsTokens + messagesTokens;
   const totalTokens = promptTokens + completionTokens;
 
-  return {
-    promptTokens,
-    completionTokens,
-    totalTokens,
-  };
+  return { promptTokens, completionTokens, totalTokens };
 }
 
 export class AbortErrorHandler {
@@ -74,8 +134,6 @@ export class AbortErrorHandler {
   static async handleAbortError(params: {
     error: Error;
     ctx: StreamContext;
-    controller: ReadableStreamDefaultController<Uint8Array>;
-    encoder: TextEncoder;
     logger: EndpointLogger;
     threadId: string;
     isIncognito: boolean;
@@ -89,8 +147,6 @@ export class AbortErrorHandler {
     const {
       error,
       ctx,
-      controller,
-      encoder,
       logger,
       threadId,
       isIncognito,
@@ -107,36 +163,42 @@ export class AbortErrorHandler {
       !(
         error.name === "AbortError" ||
         error.message === "Client disconnected" ||
-        error.message === "Tool requires user confirmation"
+        error.message === "Tool requires user confirmation" ||
+        error.message === "Model requested loop stop"
       )
     ) {
       return { wasHandled: false };
     }
 
+    const isToolConfirmation =
+      error.message === "Tool requires user confirmation";
+    const isLoopStop = error.message === "Model requested loop stop";
+
     logger.info("[AI Stream] Stream aborted", {
       message: error.message,
       errorName: error.name,
-      reason:
-        error.message === "Tool requires user confirmation"
-          ? "waiting_for_tool_confirmation"
+      reason: isToolConfirmation
+        ? "waiting_for_tool_confirmation"
+        : isLoopStop
+          ? "model_requested_loop_stop"
           : "client_disconnected",
       hasPartialContent: !!ctx.currentAssistantContent,
       contentLength: ctx.currentAssistantContent.length,
     });
 
-    // Save partial content and pending tools to database (for non-incognito, non-tool-confirmation cases)
-    if (!isIncognito && error.message !== "Tool requires user confirmation") {
+    // Save partial content and pending tools to database (non-incognito, non-tool-confirmation, non-loop-stop)
+    // Tool confirmation and loop stop both close the controller early in finish-step-handler,
+    // so SSE emission would panic. Only client-disconnect warrants partial content save + notification.
+    if (!isIncognito && !isToolConfirmation && !isLoopStop) {
       try {
         let totalCredits = 0;
 
-        // Save assistant message if there's partial content
         if (ctx.currentAssistantMessageId && ctx.currentAssistantContent) {
           logger.info("[AI Stream] Saving partial content to database", {
             messageId: ctx.currentAssistantMessageId,
             contentLength: ctx.currentAssistantContent.length,
           });
 
-          // Estimate tokens with full context (system + tools + messages + AI response)
           const tokenEstimate = estimateTokensFromContext({
             systemPrompt,
             messages,
@@ -144,19 +206,16 @@ export class AbortErrorHandler {
             aiResponse: ctx.currentAssistantContent,
           });
 
-          // Get model pricing and calculate credits
           const modelInfo = getModelById(model);
           let modelCreditCost = 0;
           if (modelInfo) {
             if (typeof modelInfo.creditCost === "function") {
-              // Token-based model - use the function to calculate credits
               modelCreditCost = modelInfo.creditCost(
                 modelInfo,
                 tokenEstimate.promptTokens,
                 tokenEstimate.completionTokens,
               );
             } else if (typeof modelInfo.creditCost === "number") {
-              // Credit-based model - use fixed cost
               modelCreditCost = modelInfo.creditCost;
             }
           }
@@ -169,28 +228,25 @@ export class AbortErrorHandler {
             completionTokens: tokenEstimate.completionTokens,
             totalTokens: tokenEstimate.totalTokens,
             modelCreditCost,
-            hasSystemPrompt: !!systemPrompt,
-            hasMessages: !!messages,
-            hasTools: !!tools,
           });
 
-          // Update the message with partial content and estimated tokens
-          await db
-            .update(chatMessages)
-            .set({
-              content: ctx.currentAssistantContent,
-              tokens: tokenEstimate.totalTokens,
-              updatedAt: new Date(),
-            })
-            .where(eq(chatMessages.id, ctx.currentAssistantMessageId));
+          // Flush + write final partial content to DB, emit CONTENT_DONE SSE
+          await ctx.dbWriter.emitContentDone({
+            messageId: ctx.currentAssistantMessageId,
+            content: ctx.currentAssistantContent,
+            finishReason: "stop",
+            totalTokens: tokenEstimate.totalTokens,
+            promptTokens: tokenEstimate.promptTokens,
+            completionTokens: tokenEstimate.completionTokens,
+          });
 
           logger.info("[AI Stream] Saved partial content to database", {
             messageId: ctx.currentAssistantMessageId,
             totalTokens: tokenEstimate.totalTokens,
           });
 
-          // Emit TOKENS_UPDATED event for credit accounting
-          const tokensEvent = createStreamEvent.tokensUpdated({
+          // Emit TOKENS_UPDATED for credit accounting
+          ctx.dbWriter.emitTokensUpdated({
             messageId: ctx.currentAssistantMessageId,
             promptTokens: tokenEstimate.promptTokens,
             completionTokens: tokenEstimate.completionTokens,
@@ -198,51 +254,22 @@ export class AbortErrorHandler {
             finishReason: "stop",
             creditCost: modelCreditCost,
           });
-          controller.enqueue(encoder.encode(formatSSEEvent(tokensEvent)));
 
-          // Actually deduct model credits from database (for both token-based and credit-based models)
+          // Deduct model credits and emit CREDITS_DEDUCTED
           if (userId && modelCreditCost > 0) {
-            const deductResult =
-              await CreditRepository.deductCreditsForModelUsage(
-                user,
-                modelCreditCost,
-                model,
-                logger,
-              );
+            await ctx.dbWriter.deductAndEmitCredits({
+              user,
+              amount: modelCreditCost,
+              feature: `model:${model}`,
+              type: "model",
+              model,
+            });
 
-            if (deductResult.success) {
-              // Emit CREDITS_DEDUCTED event for frontend
-              const modelCreditsEvent = createStreamEvent.creditsDeducted({
-                amount: modelCreditCost,
-                feature: `model:${model}`,
-                type: "model",
-                partial: deductResult.partialDeduction,
-              });
-              controller.enqueue(
-                encoder.encode(formatSSEEvent(modelCreditsEvent)),
-              );
-
-              logger.info("[AI Stream] Deducted and emitted model credits", {
-                amount: modelCreditCost,
-                model,
-                partial: deductResult.partialDeduction,
-              });
-            } else {
-              logger.error("[AI Stream] Failed to deduct model credits", {
-                amount: modelCreditCost,
-                model,
-              });
-            }
+            logger.info("[AI Stream] Deducted and emitted model credits", {
+              amount: modelCreditCost,
+              model,
+            });
           }
-
-          // Emit CONTENT_DONE with the partial content
-          const contentDoneEvent = createStreamEvent.contentDone({
-            messageId: ctx.currentAssistantMessageId,
-            content: ctx.currentAssistantContent,
-            totalTokens: tokenEstimate.totalTokens,
-            finishReason: "stop",
-          });
-          controller.enqueue(encoder.encode(formatSSEEvent(contentDoneEvent)));
         }
 
         // Save pending tool messages to database
@@ -255,7 +282,6 @@ export class AbortErrorHandler {
             const { messageId, toolCallData } = pendingTool;
             const { toolCall, parentId, depth } = toolCallData;
 
-            // Save tool message to database
             await db.insert(chatMessages).values({
               id: messageId,
               threadId: threadId,
@@ -265,49 +291,26 @@ export class AbortErrorHandler {
               depth: depth,
               sequenceId: ctx.sequenceId,
               authorId: userId ?? null,
-              isAI: true, // Tool executions are part of AI flow
+              isAI: true,
               model: model,
               character: null,
-              metadata: {
-                toolCall: toolCall,
-              },
+              metadata: { toolCall: toolCall },
             });
 
-            // Add tool execution credits if the tool had creditsUsed
             if (toolCall.creditsUsed && toolCall.creditsUsed > 0) {
               totalCredits += toolCall.creditsUsed;
 
-              // Actually deduct credits from database for this tool
-              const deductResult =
-                await CreditRepository.deductCreditsForFeature(
-                  user,
-                  toolCall.creditsUsed,
-                  toolCall.toolName,
-                  logger,
-                );
+              await ctx.dbWriter.deductAndEmitCredits({
+                user,
+                amount: toolCall.creditsUsed,
+                feature: toolCall.toolName,
+                type: "tool",
+              });
 
-              if (deductResult.success) {
-                // Emit CREDITS_DEDUCTED event for this tool
-                const toolCreditsEvent = createStreamEvent.creditsDeducted({
-                  amount: toolCall.creditsUsed,
-                  feature: toolCall.toolName,
-                  type: "tool",
-                });
-                controller.enqueue(
-                  encoder.encode(formatSSEEvent(toolCreditsEvent)),
-                );
-
-                logger.info("[AI Stream] Deducted and emitted tool credits", {
-                  toolName: toolCall.toolName,
-                  amount: toolCall.creditsUsed,
-                  messageId: deductResult.messageId,
-                });
-              } else {
-                logger.error("[AI Stream] Failed to deduct tool credits", {
-                  toolName: toolCall.toolName,
-                  amount: toolCall.creditsUsed,
-                });
-              }
+              logger.info("[AI Stream] Deducted and emitted tool credits", {
+                toolName: toolCall.toolName,
+                amount: toolCall.creditsUsed,
+              });
             }
 
             logger.info("[AI Stream] Saved pending tool message", {
@@ -317,23 +320,32 @@ export class AbortErrorHandler {
           }
         }
 
-        // Emit total CREDITS_DEDUCTED event for model usage
         if (userId && totalCredits > 0) {
           logger.info("[AI Stream] Total credits for aborted stream", {
             totalCredits,
           });
         }
 
-        // Emit error message to inform user about interruption
-        const errorResponse = fail({
-          message:
-            "app.api.agent.chat.aiStream.info.streamInterrupted" as const,
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        // Write interruption error message to DB + emit SSE (SSE may not reach client
+        // since the connection is dropped, but the DB write always happens).
+        // Store the plain translation key as content so the bubble renders it without
+        // an error type label or error code — it's an informational stop, not an error.
+        await ctx.dbWriter.emitErrorMessage({
+          threadId,
+          errorType: "STREAM_ERROR",
+          error: fail({
+            message:
+              "app.api.agent.chat.aiStream.info.streamInterrupted" as const,
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          }),
+          content: "app.api.agent.chat.aiStream.info.streamInterrupted",
+          parentId: ctx.lastParentId,
+          depth: ctx.lastDepth,
+          sequenceId: ctx.sequenceId,
+          userId,
         });
-        const errorEvent = createStreamEvent.error(errorResponse);
-        controller.enqueue(encoder.encode(formatSSEEvent(errorEvent)));
 
-        logger.info("[AI Stream] Emitted interruption notification to user", {
+        logger.info("[AI Stream] Saved interruption error message to DB", {
           hasPartialContent: !!ctx.currentAssistantMessageId,
           pendingToolsCount: ctx.pendingToolMessages.size,
         });
@@ -346,27 +358,23 @@ export class AbortErrorHandler {
       }
     }
 
-    // For tool confirmation, controller is already closed in processToolCall
-    // For user abort, we DON'T close the controller here - let the normal flow handle it
-    // This allows all events to be properly sent to the client
-    if (error.message !== "Tool requires user confirmation") {
-      // Only emit a fallback stopped event if we have no message content
-      // (this handles cases where stream was aborted before any content was generated)
+    // For tool confirmation and loop stop, controller is already closed in finish-step-handler.
+    // For client disconnect, emit a fallback stopped event if there was no content yet,
+    // then close the controller.
+    if (!isToolConfirmation && !isLoopStop) {
       if (!ctx.currentAssistantMessageId || !ctx.currentAssistantContent) {
-        const stoppedEvent = createStreamEvent.contentDone({
-          messageId: ctx.lastSequenceId ?? "",
+        // Stream aborted before any content was generated - emit an empty CONTENT_DONE
+        // using the pre-generated assistant message ID so the frontend can close the slot.
+        ctx.dbWriter.emitContentDoneRaw({
+          messageId: ctx.preGeneratedAssistantMessageId,
           content: "",
           totalTokens: null,
           finishReason: "stop",
         });
-        controller.enqueue(encoder.encode(formatSSEEvent(stoppedEvent)));
       }
-
-      // DON'T close controller here - it will be closed by the caller
-      // This ensures all enqueued events are actually sent
+      ctx.dbWriter.closeController();
     }
 
-    // Cleanup on abort
     ctx.cleanup();
 
     return { wasHandled: true };

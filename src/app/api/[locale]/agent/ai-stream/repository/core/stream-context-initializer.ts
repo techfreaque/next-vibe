@@ -4,6 +4,8 @@
 
 import "server-only";
 
+import type { ReadableStreamDefaultController } from "node:stream/web";
+
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { ToolCall } from "../../../chat/db";
@@ -23,7 +25,10 @@ export class StreamContextInitializer {
       toolCall: ToolCall;
     }>;
     aiMessageId: string;
+    isIncognito: boolean;
     logger: EndpointLogger;
+    controller: ReadableStreamDefaultController<Uint8Array>;
+    encoder: TextEncoder;
   }): StreamContext {
     const {
       userMessageId,
@@ -31,7 +36,10 @@ export class StreamContextInitializer {
       messageDepth,
       toolConfirmationResults,
       aiMessageId,
+      isIncognito,
       logger,
+      controller,
+      encoder,
     } = params;
 
     // Calculate initial parent and depth for AI message
@@ -54,6 +62,10 @@ export class StreamContextInitializer {
       initialParentId: initialParentForContext,
       initialDepth: initialDepthForContext,
       initialAssistantMessageId: aiMessageId,
+      isIncognito,
+      logger,
+      controller,
+      encoder,
     });
 
     // Update last known values for error handling (accessible in catch blocks)

@@ -66,4 +66,8 @@ export const translations: typeof enTranslations = {
       description: "Import-Job erfolgreich gestoppt",
     },
   },
+  widget: {
+    title: "Import-Job stoppen",
+    successMessage: "Job erfolgreich gestoppt",
+  },
 };

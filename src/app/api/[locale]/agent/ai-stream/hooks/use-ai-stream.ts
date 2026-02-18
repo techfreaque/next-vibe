@@ -206,9 +206,6 @@ function handleMessageCreatedEvent(params: {
           depth: eventData.depth,
           sequenceId: eventData.sequenceId ?? null,
           authorId: isIncognito ? "incognito" : "system", // Use "system" for non-incognito TOOL messages
-          authorName: null,
-          authorAvatar: null,
-          authorColor: null,
           isAI:
             eventData.role === ChatMessageRole.ASSISTANT ||
             eventData.role === ChatMessageRole.TOOL,
@@ -219,9 +216,6 @@ function handleMessageCreatedEvent(params: {
           errorMessage:
             eventData.role === ChatMessageRole.ERROR ? eventData.content : null,
           errorCode: null,
-          edited: false,
-          originalId: null,
-          tokens: null,
           metadata: {
             ...(eventData.metadata || {}),
             ...(toolCall ? { toolCall } : {}),
@@ -252,9 +246,6 @@ function handleMessageCreatedEvent(params: {
                 depth: eventData.depth,
                 sequenceId: eventData.sequenceId ?? null,
                 authorId: "incognito",
-                authorName: null,
-                authorAvatar: null, // Incognito has no avatar
-                authorColor: null, // Incognito has no color
                 isAI:
                   eventData.role === ChatMessageRole.ASSISTANT ||
                   eventData.role === ChatMessageRole.TOOL,
@@ -269,9 +260,6 @@ function handleMessageCreatedEvent(params: {
                     ? eventData.content
                     : null,
                 errorCode: null,
-                edited: false,
-                originalId: null,
-                tokens: null,
                 metadata: eventData.metadata
                   ? { ...eventData.metadata, ...(toolCall ? { toolCall } : {}) }
                   : toolCall
@@ -311,6 +299,18 @@ export function useAIStream(
 ): UseAIStreamReturn {
   const store = useAIStreamStore();
   const abortControllerRef = useRef<AbortController | null>(null);
+  /** Holds the active SSE reader so a new stream start can cancel it immediately. */
+  const readerRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(
+    null,
+  );
+  /** Tracks the thread ID of the active stream so stopStream can add UI error messages. */
+  const activeThreadIdRef = useRef<string | null>(null);
+  /**
+   * When true the user has requested stop but we are still draining the
+   * remaining SSE events from the server so DB writes / credit events land.
+   * Audio enqueuing and UI streaming updates are suppressed in drain mode.
+   */
+  const isDrainingRef = useRef(false);
 
   /**
    * Start an AI stream
@@ -320,10 +320,16 @@ export function useAIStream(
       data: AiStreamPostRequestOutput,
       options: StreamOptions = {},
     ): Promise<void> => {
-      // Cancel any existing stream
+      // Cancel any existing stream immediately (no drain — a new stream is starting)
+      if (readerRef.current) {
+        void readerRef.current.cancel();
+      }
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
+
+      // Reset drain flag for new stream
+      isDrainingRef.current = false;
 
       // Reset audio queue to prevent old audio from playing
       const audioQueue = getAudioQueue();
@@ -332,6 +338,9 @@ export function useAIStream(
       // Create new abort controller
       const abortController = new AbortController();
       abortControllerRef.current = abortController;
+
+      // Track active thread ID so stopStream can add UI messages
+      activeThreadIdRef.current = data.threadId ?? null;
 
       // Generate stream ID
       const streamId = crypto.randomUUID();
@@ -490,18 +499,12 @@ export function useAIStream(
                   depth,
                   sequenceId: null,
                   authorId: "system",
-                  authorName: null,
-                  authorAvatar: null,
-                  authorColor: null,
                   isAI: false,
                   model: null,
                   character: null,
                   errorType: "HTTP_ERROR",
                   errorMessage,
                   errorCode: errorCode ?? null,
-                  edited: false,
-                  originalId: null,
-                  tokens: null,
                   metadata: {},
                   upvotes: 0,
                   downvotes: 0,
@@ -565,18 +568,12 @@ export function useAIStream(
                   depth,
                   sequenceId: null,
                   authorId: "system",
-                  authorName: null,
-                  authorAvatar: null,
-                  authorColor: null,
                   isAI: false,
                   model: null,
                   character: null,
                   errorType: "STREAM_ERROR",
                   errorMessage: errorResponse.message,
                   errorCode: null,
-                  edited: false,
-                  originalId: null,
-                  tokens: null,
                   metadata: {},
                   upvotes: 0,
                   downvotes: 0,
@@ -604,6 +601,7 @@ export function useAIStream(
 
         // Process SSE stream
         const reader = response.body.getReader();
+        readerRef.current = reader;
         const decoder = new TextDecoder();
         let buffer = "";
 
@@ -656,17 +654,13 @@ export function useAIStream(
                   },
                 );
 
-                // Update the user message with transcribed text
-                // Preserve existing metadata (like attachments) while removing isTranscribing flag
-                const currentMessage =
-                  useChatStore.getState().messages[eventData.messageId];
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const { isTranscribing, ...preservedMetadata } =
-                  currentMessage?.metadata ?? {};
-
+                // Update the user message with transcribed text.
+                // Explicitly set isTranscribing: false so the merge in updateMessage
+                // overwrites the existing true value — the store merges metadata, so
+                // omitting the key would leave the old value in place.
                 useChatStore.getState().updateMessage(eventData.messageId, {
                   content: eventData.text,
-                  metadata: preservedMetadata,
+                  metadata: { isTranscribing: false },
                 });
                 break;
               }
@@ -681,17 +675,12 @@ export function useAIStream(
                   },
                 );
 
-                // Update the user message with uploaded attachment metadata
-                // Remove isUploadingAttachments flag and add actual attachment data
-                const currentMessage =
-                  useChatStore.getState().messages[eventData.messageId];
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const { isUploadingAttachments, ...preservedMetadata } =
-                  currentMessage?.metadata ?? {};
-
+                // Update the user message with uploaded attachment metadata.
+                // Explicitly set isUploadingAttachments: false so the merge in
+                // updateMessage overwrites the existing true value.
                 useChatStore.getState().updateMessage(eventData.messageId, {
                   metadata: {
-                    ...preservedMetadata,
+                    isUploadingAttachments: false,
                     attachments: eventData.attachments,
                   },
                 });
@@ -707,6 +696,9 @@ export function useAIStream(
               }
 
               case StreamEventType.CONTENT_DELTA: {
+                // Skip content deltas in drain mode - server is handling final DB writes
+                if (isDrainingRef.current) {break;}
+
                 const eventData = event.data as ContentDeltaEventData;
                 // Get fresh state from store to avoid stale closure
                 let currentMessage =
@@ -768,9 +760,6 @@ export function useAIStream(
                           depth: currentMessage.depth,
                           sequenceId: currentMessage.sequenceId ?? null,
                           authorId: "incognito",
-                          authorName: null,
-                          authorAvatar: null, // Incognito has no avatar
-                          authorColor: null, // Incognito has no color
                           isAI:
                             currentMessage.role === ChatMessageRole.ASSISTANT,
                           model: currentMessage.model ?? null,
@@ -778,9 +767,6 @@ export function useAIStream(
                           errorType: null,
                           errorMessage: null,
                           errorCode: null,
-                          edited: false,
-                          originalId: null,
-                          tokens: currentMessage.totalTokens ?? null,
                           metadata: {},
                           upvotes: 0,
                           downvotes: 0,
@@ -811,6 +797,9 @@ export function useAIStream(
               }
 
               case StreamEventType.REASONING_DELTA: {
+                // Skip in drain mode - UI already shows finalized content
+                if (isDrainingRef.current) {break;}
+
                 const eventData = event.data as ReasoningDeltaEventData;
                 // Get fresh state from store to avoid stale closure
                 const currentMessage =
@@ -861,10 +850,7 @@ export function useAIStream(
                             parentId: currentMessage.parentId,
                             depth: currentMessage.depth,
                             sequenceId: currentMessage.sequenceId ?? null,
-                            authorId: "incognito",
-                            authorName: null,
-                            authorAvatar: null, // Incognito has no avatar
-                            authorColor: null, // Incognito has no color
+                            authorId: "Anonymous",
                             isAI:
                               currentMessage.role === ChatMessageRole.ASSISTANT,
                             model: currentMessage.model ?? null,
@@ -872,9 +858,6 @@ export function useAIStream(
                             errorType: null,
                             errorMessage: null,
                             errorCode: null,
-                            edited: false,
-                            originalId: null,
-                            tokens: currentMessage.totalTokens ?? null,
                             metadata: {},
                             upvotes: 0,
                             downvotes: 0,
@@ -1121,18 +1104,12 @@ export function useAIStream(
                             parentId: message.parentId,
                             depth: message.depth,
                             authorId: "incognito",
-                            authorName: null,
-                            authorAvatar: null,
-                            authorColor: null,
                             isAI: message.role === ChatMessageRole.ASSISTANT,
                             model: message.model ?? null,
                             character: message.character ?? null,
                             errorType: null,
                             errorMessage: null,
                             errorCode: null,
-                            edited: false,
-                            originalId: null,
-                            tokens: eventData.totalTokens ?? null,
                             metadata: {},
                             upvotes: 0,
                             downvotes: 0,
@@ -1148,7 +1125,6 @@ export function useAIStream(
                             .getState()
                             .updateMessage(message.messageId, {
                               content: eventData.content,
-                              tokens: eventData.totalTokens ?? null,
                             });
                         } catch (storageError) {
                           logger.error("Failed to update incognito message", {
@@ -1161,7 +1137,6 @@ export function useAIStream(
                           .getState()
                           .updateMessage(message.messageId, {
                             content: eventData.content,
-                            tokens: eventData.totalTokens,
                           });
                       }
                     } catch (error) {
@@ -1203,6 +1178,9 @@ export function useAIStream(
               }
 
               case StreamEventType.AUDIO_CHUNK: {
+                // Skip audio in drain mode
+                if (isDrainingRef.current) {break;}
+
                 const eventData = event.data as AudioChunkEventData;
                 logger.debug("[AUDIO_CHUNK] Received", {
                   messageId: eventData.messageId,
@@ -1232,6 +1210,9 @@ export function useAIStream(
               }
 
               case StreamEventType.COMPACTING_DELTA: {
+                // Skip in drain mode
+                if (isDrainingRef.current) {break;}
+
                 const eventData = event.data as CompactingDeltaEventData;
                 // Get fresh state from store
                 const currentMessage =
@@ -1423,18 +1404,12 @@ export function useAIStream(
                         depth,
                         sequenceId: null,
                         authorId: "system",
-                        authorName: null,
-                        authorAvatar: null,
-                        authorColor: null,
                         isAI: false,
                         model: null,
                         character: null,
                         errorType,
                         errorMessage,
                         errorCode,
-                        edited: false,
-                        originalId: null,
-                        tokens: null,
                         metadata: {},
                         upvotes: 0,
                         downvotes: 0,
@@ -1482,8 +1457,15 @@ export function useAIStream(
       } catch (error) {
         if (error instanceof Error) {
           if (error.name === "AbortError") {
-            logger.info("Stream aborted by user - finalizing messages");
-            // Finalize any streaming messages that are still in progress
+            if (isDrainingRef.current) {
+              // AbortError during drain mode means the external signal (options.signal)
+              // was used to abort. Finalize messages that are still streaming.
+              logger.info(
+                "Stream aborted (external signal) during drain - finalizing",
+              );
+            } else {
+              logger.info("Stream aborted - finalizing messages");
+            }
             const streamingMessages = store.streamingMessages;
             Object.values(streamingMessages).forEach((msg) => {
               if (msg.isStreaming) {
@@ -1491,7 +1473,7 @@ export function useAIStream(
                   msg.messageId,
                   msg.content,
                   msg.totalTokens,
-                  "stop", // User stopped generation
+                  "stop",
                 );
               }
             });
@@ -1524,18 +1506,12 @@ export function useAIStream(
                     depth,
                     sequenceId: null,
                     authorId: "system",
-                    authorName: null,
-                    authorAvatar: null,
-                    authorColor: null,
                     isAI: false,
                     model: null,
                     character: null,
                     errorType: "STREAM_ERROR",
                     errorMessage: error.message,
                     errorCode: null,
-                    edited: false,
-                    originalId: null,
-                    tokens: null,
                     metadata: {},
                     upvotes: 0,
                     downvotes: 0,
@@ -1562,18 +1538,30 @@ export function useAIStream(
         store.stopStream();
       } finally {
         abortControllerRef.current = null;
+        readerRef.current = null;
+        activeThreadIdRef.current = null;
+        isDrainingRef.current = false;
       }
     },
     [locale, logger, store, t],
   );
 
   /**
-   * Stop the current stream
+   * Stop the current stream.
+   *
+   * 1. Freezes the UI immediately (finalizes streaming messages).
+   * 2. Adds a "stream interrupted" error message to the chat UI.
+   * 3. Cancels the SSE reader — drops the connection, triggers ReadableStream.cancel()
+   *    on the server → abort-error-handler saves partial content + credits to DB
+   *    and writes the interruption error message to DB.
    */
   const stopStream = useCallback(() => {
     logger.info("Stop stream requested by user");
 
-    // Finalize any streaming messages immediately for UI feedback
+    // Stop audio immediately
+    getAudioQueue().stop();
+
+    // Freeze the UI immediately for responsiveness
     const streamingMessages = store.streamingMessages;
     Object.values(streamingMessages).forEach((msg) => {
       if (msg.isStreaming) {
@@ -1581,18 +1569,60 @@ export function useAIStream(
           msg.messageId,
           msg.content,
           msg.totalTokens,
-          "stop", // User stopped generation
+          "stop",
         );
       }
     });
 
-    // Abort the fetch request
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
+    // Add the interruption error message to the chat UI.
+    // Store the translation key directly as content — the bubble's JSON parse will fail
+    // and fall back to t(message.content), rendering just the message with no error label.
+    const activeThreadId = activeThreadIdRef.current;
+    if (activeThreadId) {
+      // Grab sequenceId from the active streaming assistant message so the error
+      // gets grouped into GroupedAssistantMessage together with the partial response.
+      const streamingMsgs = Object.values(
+        useAIStreamStore.getState().streamingMessages,
+      );
+      const activeAssistant = streamingMsgs.find(
+        (m) =>
+          m.threadId === activeThreadId && m.role === ChatMessageRole.ASSISTANT,
+      );
+      const activeSequenceId = activeAssistant?.sequenceId ?? null;
+
+      const { parentId, depth } = getLastMessageForErrorParent(activeThreadId);
+      useChatStore.getState().addMessage({
+        id: crypto.randomUUID(),
+        threadId: activeThreadId,
+        role: ChatMessageRole.ERROR,
+        content: "app.api.agent.chat.aiStream.info.streamInterrupted",
+        parentId,
+        depth,
+        sequenceId: activeSequenceId,
+        authorId: "system",
+        isAI: false,
+        model: null,
+        character: null,
+        errorType: "STREAM_ERROR",
+        errorMessage: t("app.api.agent.chat.aiStream.info.streamInterrupted"),
+        errorCode: null,
+        metadata: {},
+        upvotes: 0,
+        downvotes: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        searchVector: null,
+      });
     }
+
+    // Cancel the reader — drops the connection, triggers server cancel() callback
+    // → streamAbortController.abort("Client disconnected") → abort-error-handler runs.
+    if (readerRef.current) {
+      void readerRef.current.cancel();
+    }
+
     store.stopStream();
-  }, [store, logger]);
+  }, [store, logger, t]);
 
   return {
     startStream,

@@ -352,7 +352,7 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
     const dateTruncFormat = this.getDateTruncFormat(timePeriod);
     const historicalData = await db
       .select({
-        period: sql<string>`date_trunc(${dateTruncFormat}, ${users.createdAt})::text`,
+        period: sql<string>`date_trunc(${sql.raw(`'${dateTruncFormat}'`)}, ${users.createdAt})::text`,
         count: sql<number>`count(*)::int`,
       })
       .from(users)
@@ -362,8 +362,12 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
           lte(users.createdAt, dateRange.to),
         ),
       )
-      .groupBy(sql`date_trunc(${dateTruncFormat}, ${users.createdAt})`)
-      .orderBy(sql`date_trunc(${dateTruncFormat}, ${users.createdAt})`);
+      .groupBy(
+        sql`date_trunc(${sql.raw(`'${dateTruncFormat}'`)}, ${users.createdAt})`,
+      )
+      .orderBy(
+        sql`date_trunc(${sql.raw(`'${dateTruncFormat}'`)}, ${users.createdAt})`,
+      );
 
     const growthChart = historicalData.map((item) => ({
       x: this.formatPeriodLabel(item.period, timePeriod),

@@ -75,4 +75,42 @@ export const translations = {
       description: "Import jobs list retrieved successfully",
     },
   },
+  widget: {
+    status: {
+      pending: "Pending",
+      running: "Running",
+      completed: "Completed",
+      failed: "Failed",
+      stopped: "Stopped",
+    },
+    filter: {
+      all: "All",
+      pending: "Pending",
+      running: "Running",
+      completed: "Completed",
+      failed: "Failed",
+    },
+    progress: {
+      rows: "rows",
+    },
+    job: {
+      total: "Total:",
+      processed: "Processed:",
+      ok: "OK:",
+      fail: "Fail:",
+      created: "Created:",
+      done: "Done:",
+    },
+    header: {
+      title: "Import Jobs",
+      newImport: "New Import",
+    },
+    loading: "Loading import jobs\u2026",
+    empty: {
+      title: "No import jobs found",
+      withFilter: "Try a different filter or start a new import.",
+      withoutFilter: "Start your first import to see it here.",
+      newImport: "New Import",
+    },
+  },
 };

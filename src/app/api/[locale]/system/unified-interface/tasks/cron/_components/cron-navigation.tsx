@@ -10,7 +10,7 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { History, List, TrendingUp } from "next-vibe-ui/ui/icons";
+import { Activity, History, List, TrendingUp } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
@@ -21,7 +21,13 @@ import { simpleT } from "@/i18n/core/shared";
 
 interface CronNavigationProps {
   locale: CountryLanguage;
-  currentPage?: "overview" | "tasks" | "history" | "stats" | "settings";
+  currentPage?:
+    | "overview"
+    | "status"
+    | "tasks"
+    | "history"
+    | "stats"
+    | "settings";
   children?: React.ReactNode;
 }
 
@@ -34,8 +40,15 @@ export function CronNavigation({
 
   const navigationItems = [
     {
+      key: "status",
+      href: `/${locale}/admin/cron/status`,
+      icon: Activity,
+      label: t("app.admin.cron.nav.status"),
+      description: t("app.admin.cron.nav.status_description"),
+    },
+    {
       key: "stats",
-      href: `/${locale}/admin/stats`,
+      href: `/${locale}/admin/cron/stats`,
       icon: TrendingUp,
       label: t("app.admin.cron.nav.stats"),
       description: t("app.admin.cron.nav.stats_description"),
@@ -60,7 +73,7 @@ export function CronNavigation({
     <>
       <Card>
         <CardContent className="p-6">
-          <Div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
+          <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {navigationItems.map((item) => {
               const Icon = item.icon;
               const isActive = item.key === currentPage;

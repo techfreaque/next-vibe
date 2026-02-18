@@ -120,4 +120,12 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  widget: {
+    title: "IMAP-Konfiguration",
+    server: "Servereinstellungen",
+    connection: "Verbindungseinstellungen",
+    sync: "Synchronisierungseinstellungen",
+    resilience: "Ausfallsicherheitseinstellungen",
+    monitoring: "Überwachungseinstellungen",
+  },
 };

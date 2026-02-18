@@ -141,5 +141,14 @@ export const translations: typeof enTranslations = {
       title: "Sukces",
       description: "Testowy e-mail wysłany pomyślnie",
     },
+    widget: {
+      title: "Wyślij testowy e-mail",
+      successMessage: "Testowy e-mail wysłany pomyślnie",
+      sentTo: "Wysłano do: ",
+      subject: "Temat: ",
+      sentAt: "Wysłano o: ",
+      campaignConfig: "Konfiguracja kampanii",
+      sendAnother: "Wyślij kolejny",
+    },
   },
 };

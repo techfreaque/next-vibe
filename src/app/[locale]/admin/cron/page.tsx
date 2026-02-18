@@ -1,21 +1,16 @@
-/**
- * Cron Admin Page
- * Main cron admin page that redirects to overview
- */
+import type { JSX } from "react";
 
-import { redirect } from "next-vibe-ui/lib/redirect";
-
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-interface CronAdminPageProps {
-  params: Promise<{ locale: CountryLanguage }>;
-}
+import { CronStatusPageClient } from "./status/page-client";
 
 export default async function CronAdminPage({
   params,
-}: CronAdminPageProps): Promise<never> {
+}: {
+  params: Promise<{ locale: CountryLanguage }>;
+}): Promise<JSX.Element> {
   const { locale } = await params;
-
-  // Redirect to the stats page
-  redirect(`/${locale}/admin/cron/stats`);
+  const user = await requireAdminUser(locale, `/${locale}/admin/cron/tasks`);
+  return <CronStatusPageClient locale={locale} user={user} />;
 }

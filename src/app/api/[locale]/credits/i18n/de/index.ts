@@ -186,6 +186,12 @@ export const translations: typeof enTranslations = {
         description:
           "Anzahl der zu überspringenden Transaktionen für Paginierung",
       },
+      targetUserId: {
+        label: "Ziel-Benutzer-ID",
+      },
+      targetLeadId: {
+        label: "Ziel-Lead-ID",
+      },
       id: "Transaktions-ID",
       amount: "Betrag",
       type: "Typ",

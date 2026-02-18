@@ -760,6 +760,9 @@ export const translations: typeof enTranslations = {
           },
         },
       },
+      title: "E-Mail-Vorschau",
+      preview: "Vorschau",
+      version: "Version",
     },
     sendTest: {
       post: {
@@ -845,6 +848,8 @@ export const translations: typeof enTranslations = {
         sendFailed: "Test-E-Mail konnte nicht gesendet werden",
       },
       success: "Test-E-Mail erfolgreich an {email} gesendet",
+      title: "Test-E-Mail senden",
+      failed: "Test-E-Mail konnte nicht gesendet werden",
     },
   },
 };

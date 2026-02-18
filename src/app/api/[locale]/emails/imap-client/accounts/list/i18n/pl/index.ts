@@ -127,4 +127,12 @@ export const translations: typeof enTranslations = {
     title: "Sukces",
     description: "Konta IMAP pobrane pomyślnie",
   },
+  widget: {
+    title: "Konta IMAP",
+    create: "Dodaj konto",
+    refresh: "Odśwież",
+    empty: "Brak skonfigurowanych kont IMAP",
+    disabled: "Wyłączone",
+    lastSync: "Ostatnia synchronizacja",
+  },
 };

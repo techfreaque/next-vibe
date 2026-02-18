@@ -7,14 +7,14 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  backButton,
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -30,6 +30,10 @@ import {
   LeadSource,
   LeadSourceOptions,
 } from "../../enum";
+import {
+  LeadClickTrackingContainer,
+  LeadEngagementTrackingContainer,
+} from "./widget";
 
 /**
  * Metadata schema for engagement tracking
@@ -92,17 +96,12 @@ const { POST } = createEndpoint({
     firstCliArgKey: "engagementType",
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.tracking.engagement.post.form.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.post.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: LeadEngagementTrackingContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
+
       // === REQUEST FIELDS ===
       leadId: requestField({
         type: WidgetType.FORM_FIELD,
@@ -242,7 +241,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
@@ -391,17 +390,12 @@ const { GET } = createEndpoint({
     firstCliArgKey: "id",
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.tracking.engagement.get.form.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.get.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: LeadClickTrackingContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
+
       // === REQUEST FIELDS (Query Parameters) ===
       id: requestField({
         type: WidgetType.FORM_FIELD,
@@ -526,7 +520,7 @@ const { GET } = createEndpoint({
         schema: z.boolean(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

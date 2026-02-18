@@ -1,16 +1,9 @@
-/**
- * SMTP Accounts Page
- * Page for managing SMTP accounts without navigation (handled by layout)
- */
-
-import { Div } from "next-vibe-ui/ui/div";
-import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { SmtpAccountsClient } from "@/app/api/[locale]/emails/smtp-client/list/_components/smtp-accounts-client";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { SmtpAccountsPageClient } from "./page-client";
 
 export default async function SmtpAccountsPage({
   params,
@@ -18,20 +11,9 @@ export default async function SmtpAccountsPage({
   params: Promise<{ locale: CountryLanguage }>;
 }): Promise<JSX.Element> {
   const { locale } = await params;
-  const { t } = simpleT(locale);
-  const user = await requireAdminUser(locale);
-
-  return (
-    <Div className="flex flex-col gap-6">
-      {/* Page Description */}
-      <Div>
-        <P className="text-gray-600 dark:text-gray-400">
-          {t("app.admin.emails.smtp.list.description")}
-        </P>
-      </Div>
-
-      {/* Client Component handles all interactions */}
-      <SmtpAccountsClient locale={locale} user={user} />
-    </Div>
+  const user = await requireAdminUser(
+    locale,
+    `/${locale}/admin/emails/smtp/accounts`,
   );
+  return <SmtpAccountsPageClient locale={locale} user={user} />;
 }

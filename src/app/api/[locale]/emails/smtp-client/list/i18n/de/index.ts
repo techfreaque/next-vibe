@@ -1,7 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "SMTP-Konten auflisten",
+  title: "SMTP-Konten",
   description: "Paginierte Liste der SMTP-Konten mit Filteroptionen abrufen",
 
   container: {
@@ -110,5 +110,12 @@ export const translations: typeof enTranslations = {
   success: {
     title: "SMTP-Konten abgerufen",
     description: "SMTP-Konten-Liste erfolgreich abgerufen",
+  },
+  widget: {
+    create: "Konto hinzufügen",
+    refresh: "Aktualisieren",
+    emptyState: "Keine SMTP-Konten konfiguriert",
+    priority: "Priorität",
+    sent: "Gesendet",
   },
 };

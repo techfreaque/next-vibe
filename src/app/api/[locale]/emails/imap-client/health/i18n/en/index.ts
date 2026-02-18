@@ -112,4 +112,18 @@ export const translations = {
       },
     },
   },
+  widget: {
+    title: "IMAP Health",
+    accountsHealthy: "Healthy Accounts",
+    accountsTotal: "Total Accounts",
+    connectionsActive: "Active Connections",
+    connectionErrors: "Connection Errors",
+    performance: "Performance",
+    avgResponseTime: "Avg. Response Time",
+    uptime: "Uptime",
+    serverStatus: "Server Status",
+    syncStats: "Sync Statistics",
+    totalSyncs: "Total Syncs",
+    lastSyncTime: "Last Sync Time",
+  },
 };

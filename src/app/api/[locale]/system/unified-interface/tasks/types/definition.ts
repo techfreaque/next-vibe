@@ -24,7 +24,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
  */
 const { GET } = createEndpoint({
   method: Methods.GET,
-  path: ["system", "tasks", "types"],
+  path: ["system", "unified-interface", "tasks", "types"],
   title: "app.api.system.unifiedInterface.tasks.types.get.title",
   description: "app.api.system.unifiedInterface.tasks.types.get.description",
   icon: "list",
@@ -70,7 +70,7 @@ const { GET } = createEndpoint({
           },
         ],
         columns: 4,
-        schema: z.enum(["list", "validate", "export"]),
+        schema: z.enum(["list", "validate", "export"]).default("list"),
       }),
 
       typeCategory: requestField({

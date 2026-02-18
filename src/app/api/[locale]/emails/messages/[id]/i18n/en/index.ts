@@ -1,5 +1,5 @@
 export const translations = {
-  title: "Get Email by ID",
+  title: "Email Detail",
   description: "Retrieve a single email by its unique identifier",
   container: {
     title: "Email Details",
@@ -109,5 +109,25 @@ export const translations = {
   success: {
     title: "Email Retrieved",
     description: "Email details retrieved successfully",
+  },
+  widget: {
+    parties: "Parties",
+    to: "To",
+    from: "From",
+    timestamps: "Timestamps",
+    sentAt: "Sent At",
+    deliveredAt: "Delivered At",
+    openedAt: "Opened At",
+    clickedAt: "Clicked At",
+    technical: "Technical Details",
+    template: "Template",
+    provider: "Provider",
+    externalId: "External ID",
+    retryCount: "Retry Count",
+    error: "Error",
+    associations: "Associations",
+    lead: "Lead",
+    user: "User",
+    notFound: "Email not found",
   },
 };

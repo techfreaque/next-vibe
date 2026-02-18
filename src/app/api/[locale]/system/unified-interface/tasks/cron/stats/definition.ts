@@ -7,14 +7,14 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  backButton,
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -23,6 +23,8 @@ import {
   CronTaskStatus,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
+import { CronStatsContainer } from "./widget";
 
 // Stats period enum
 const statsPeriodSchema = z.enum(["hour", "day", "week", "month"]);
@@ -36,7 +38,7 @@ const statsTypeSchema = z.enum(["overview", "performance", "errors", "trends"]);
  */
 const { GET } = createEndpoint({
   method: Methods.GET,
-  path: ["system", "tasks", "cron", "stats"],
+  path: ["system", "unified-interface", "tasks", "cron", "stats"],
   title: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.title",
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.description",
@@ -45,18 +47,11 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   aliases: ["cron:stats", "tasks:cron:stats"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.form.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: CronStatsContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
       // === REQUEST FIELDS ===
       period: requestField({
         type: WidgetType.FORM_FIELD,
@@ -265,181 +260,323 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      totalTasks: responseField({
         type: WidgetType.TEXT,
         content:
-          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.success.title",
-        schema: z.boolean(),
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.totalTasks.title",
+        schema: z.coerce.number(),
       }),
 
-      data: responseField({
+      executedTasks: responseField({
         type: WidgetType.TEXT,
         content:
-          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.data.title",
-        schema: z.object({
-          // Basic stats fields
-          totalTasks: z.coerce.number(),
-          executedTasks: z.coerce.number(),
-          successfulTasks: z.coerce.number(),
-          failedTasks: z.coerce.number(),
-          averageExecutionTime: z.coerce.number(),
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.executedTasks.title",
+        schema: z.coerce.number(),
+      }),
 
-          // Extended stats fields for comprehensive dashboard
-          totalExecutions: z.coerce.number().optional(),
-          executionsLast24h: z.coerce.number().optional(),
-          successRate: z.coerce.number().optional(),
-          successfulExecutions: z.coerce.number().optional(),
-          activeTasks: z.coerce.number().optional(),
-          systemLoad: z.coerce.number().optional(),
-          queueSize: z.coerce.number().optional(),
-          failedExecutions: z.coerce.number().optional(),
-          failureRate: z.coerce.number().optional(),
-          avgExecutionTime: z.coerce.number().optional(),
-          medianExecutionTime: z.coerce.number().optional(),
-          minExecutionTime: z.coerce.number().optional(),
-          maxExecutionTime: z.coerce.number().optional(),
-          healthyTasks: z.coerce.number().optional(),
-          degradedTasks: z.coerce.number().optional(),
-          pendingExecutions: z.coerce.number().optional(),
-          runningExecutions: z.coerce.number().optional(),
+      successfulTasks: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.successfulTasks.title",
+        schema: z.coerce.number(),
+      }),
 
-          // Distribution fields
-          tasksByPriority: z
-            .record(z.enum(CronTaskPriority), z.coerce.number())
-            .optional(),
-          tasksByStatus: z
-            .record(z.enum(CronTaskStatus), z.coerce.number())
-            .optional(),
-          executionsByHour: z.record(z.string(), z.coerce.number()).optional(),
-          executionsByDay: z.record(z.string(), z.coerce.number()).optional(),
+      failedTasks: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.failedTasks.title",
+        schema: z.coerce.number(),
+      }),
 
-          // Top tasks and problem tasks
-          topPerformingTasks: z
-            .array(
-              z.object({
-                taskName: z.string(),
-                executions: z.coerce.number(),
-                successRate: z.coerce.number(),
-                avgDuration: z.coerce.number(),
-              }),
-            )
-            .optional(),
+      averageExecutionTime: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.averageExecutionTime.title",
+        schema: z.coerce.number(),
+      }),
 
-          problemTasks: z
-            .array(
-              z.object({
-                taskName: z.string(),
-                failures: z.coerce.number(),
-                executions: z.coerce.number(),
-                lastError: z.string().optional(),
-                failureRate: z.coerce.number(),
-                lastFailure: z.string().optional(),
-              }),
-            )
-            .optional(),
+      totalExecutions: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.totalExecutions.title",
+        schema: z.coerce.number().optional(),
+      }),
 
-          // Grouped statistics
-          groupedStats: z
-            .object({
-              byTaskName: z
-                .array(
-                  z.object({
-                    taskName: z.string(),
-                    executions: z.coerce.number(),
-                    successes: z.coerce.number(),
-                    failures: z.coerce.number(),
-                    successRate: z.coerce.number(),
-                    avgDuration: z.coerce.number(),
-                  }),
-                )
-                .optional(),
-              byPriority: z
-                .array(
-                  z.object({
-                    priority: z.string(),
-                    taskCount: z.coerce.number(),
-                    executions: z.coerce.number(),
-                    successRate: z.coerce.number(),
-                    avgDuration: z.coerce.number(),
-                  }),
-                )
-                .optional(),
-              byHealthStatus: z
-                .array(
-                  z.object({
-                    healthStatus: z.string(),
-                    taskCount: z.coerce.number(),
-                    percentage: z.coerce.number(),
-                  }),
-                )
-                .optional(),
-              byExecutionTime: z
-                .array(
-                  z.object({
-                    timeRange: z.string(),
-                    count: z.coerce.number(),
-                    percentage: z.coerce.number(),
-                    avgDuration: z.coerce.number(),
-                  }),
-                )
-                .optional(),
-            })
-            .optional(),
+      executionsLast24h: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.executionsLast24h.title",
+        schema: z.coerce.number().optional(),
+      }),
 
-          // Recent activity and daily stats
-          recentActivity: z
-            .array(
-              z.object({
-                id: z.string(),
-                taskName: z.string(),
-                status: z.string(),
-                timestamp: z.string(),
-                type: z.string(),
-                duration: z.coerce.number().optional(),
-              }),
-            )
-            .optional(),
+      successRate: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.successRate.title",
+        schema: z.coerce.number().optional(),
+      }),
 
-          dailyStats: z
-            .array(
-              z.object({
-                date: z.string(),
-                executions: z.coerce.number(),
-                successes: z.coerce.number(),
-                failures: z.coerce.number(),
-                avgDuration: z.coerce.number(),
-                uniqueTasks: z.coerce.number(),
-              }),
-            )
-            .optional(),
+      successfulExecutions: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.successfulExecutions.title",
+        schema: z.coerce.number().optional(),
+      }),
 
-          // Task-specific statistics
-          taskStats: z
-            .record(
-              z.string(),
-              z.object({
-                priority: z.string(),
-                healthStatus: z.string(),
-                successfulExecutions: z.coerce.number(),
-                totalExecutions: z.coerce.number(),
-                successRate: z.coerce.number(),
-                avgDuration: z.coerce.number(),
-                isEnabled: z.boolean(),
-              }),
-            )
-            .optional(),
+      failedExecutions: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.failedExecutions.title",
+        schema: z.coerce.number().optional(),
+      }),
 
-          // Historical data for charts
-          historicalData: z
-            .record(
-              z.string(),
-              z.array(z.object({ date: z.string(), value: z.coerce.number() })),
-            )
-            .optional(),
-        }),
+      failureRate: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.failureRate.title",
+        schema: z.coerce.number().optional(),
+      }),
+
+      avgExecutionTime: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.avgExecutionTime.title",
+        schema: z.coerce.number().optional(),
+      }),
+
+      minExecutionTime: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.minExecutionTime.title",
+        schema: z.coerce.number().optional(),
+      }),
+
+      maxExecutionTime: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.maxExecutionTime.title",
+        schema: z.coerce.number().optional(),
+      }),
+
+      pendingExecutions: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.pendingExecutions.title",
+        schema: z.coerce.number().optional(),
+      }),
+
+      runningExecutions: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.runningExecutions.title",
+        schema: z.coerce.number().optional(),
+      }),
+
+      activeTasks: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.activeTasks.title",
+        schema: z.coerce.number().optional(),
+      }),
+
+      healthyTasks: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.healthyTasks.title",
+        schema: z.coerce.number().optional(),
+      }),
+
+      degradedTasks: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.degradedTasks.title",
+        schema: z.coerce.number().optional(),
+      }),
+
+      systemLoad: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.systemLoad.title",
+        schema: z.coerce.number().optional(),
+      }),
+
+      queueSize: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.queueSize.title",
+        schema: z.coerce.number().optional(),
+      }),
+
+      medianExecutionTime: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.medianExecutionTime.title",
+        schema: z.coerce.number().optional(),
+      }),
+
+      tasksByPriority: responseField({
+        type: WidgetType.KEY_VALUE,
+        schema: z
+          .record(z.enum(CronTaskPriority), z.coerce.number())
+          .optional(),
+      }),
+
+      tasksByStatus: responseField({
+        type: WidgetType.KEY_VALUE,
+        schema: z.record(z.enum(CronTaskStatus), z.coerce.number()).optional(),
+      }),
+
+      executionsByHour: responseField({
+        type: WidgetType.KEY_VALUE,
+        schema: z.record(z.string(), z.coerce.number()).optional(),
+      }),
+
+      executionsByDay: responseField({
+        type: WidgetType.KEY_VALUE,
+        schema: z.record(z.string(), z.coerce.number()).optional(),
+      }),
+
+      topPerformingTasks: responseField({
+        type: WidgetType.TEXT,
+        schema: z
+          .array(
+            z.object({
+              taskName: z.string(),
+              executions: z.coerce.number(),
+              successRate: z.coerce.number(),
+              avgDuration: z.coerce.number(),
+            }),
+          )
+          .optional(),
+      }),
+
+      problemTasks: responseField({
+        type: WidgetType.TEXT,
+        schema: z
+          .array(
+            z.object({
+              taskName: z.string(),
+              failures: z.coerce.number(),
+              executions: z.coerce.number(),
+              lastError: z.string().optional(),
+              failureRate: z.coerce.number(),
+              lastFailure: z.string().optional(),
+            }),
+          )
+          .optional(),
+      }),
+
+      groupedStats: responseField({
+        type: WidgetType.TEXT,
+        schema: z
+          .object({
+            byTaskName: z
+              .array(
+                z.object({
+                  taskName: z.string(),
+                  executions: z.coerce.number(),
+                  successes: z.coerce.number(),
+                  failures: z.coerce.number(),
+                  successRate: z.coerce.number(),
+                  avgDuration: z.coerce.number(),
+                }),
+              )
+              .optional(),
+            byPriority: z
+              .array(
+                z.object({
+                  priority: z.string(),
+                  taskCount: z.coerce.number(),
+                  executions: z.coerce.number(),
+                  successRate: z.coerce.number(),
+                  avgDuration: z.coerce.number(),
+                }),
+              )
+              .optional(),
+            byHealthStatus: z
+              .array(
+                z.object({
+                  healthStatus: z.string(),
+                  taskCount: z.coerce.number(),
+                  percentage: z.coerce.number(),
+                }),
+              )
+              .optional(),
+            byExecutionTime: z
+              .array(
+                z.object({
+                  timeRange: z.string(),
+                  count: z.coerce.number(),
+                  percentage: z.coerce.number(),
+                  avgDuration: z.coerce.number(),
+                }),
+              )
+              .optional(),
+          })
+          .optional(),
+      }),
+
+      recentActivity: responseField({
+        type: WidgetType.TEXT,
+        schema: z
+          .array(
+            z.object({
+              id: z.string(),
+              taskName: z.string(),
+              status: z.string(),
+              timestamp: z.string(),
+              type: z.string(),
+              duration: z.coerce.number().optional(),
+            }),
+          )
+          .optional(),
+      }),
+
+      dailyStats: responseField({
+        type: WidgetType.TEXT,
+        schema: z
+          .array(
+            z.object({
+              date: z.string(),
+              executions: z.coerce.number(),
+              successes: z.coerce.number(),
+              failures: z.coerce.number(),
+              avgDuration: z.coerce.number(),
+              uniqueTasks: z.coerce.number(),
+            }),
+          )
+          .optional(),
+      }),
+
+      taskStats: responseField({
+        type: WidgetType.TEXT,
+        schema: z
+          .record(
+            z.string(),
+            z.object({
+              priority: z.string(),
+              healthStatus: z.string(),
+              successfulExecutions: z.coerce.number(),
+              totalExecutions: z.coerce.number(),
+              successRate: z.coerce.number(),
+              avgDuration: z.coerce.number(),
+              isEnabled: z.boolean(),
+            }),
+          )
+          .optional(),
+      }),
+
+      historicalData: responseField({
+        type: WidgetType.TEXT,
+        schema: z
+          .record(
+            z.string(),
+            z.array(z.object({ date: z.string(), value: z.coerce.number() })),
+          )
+          .optional(),
       }),
     },
-  ),
+  }),
 
   tags: ["app.api.system.unifiedInterface.tasks.cronSystem.stats.get.tag"],
 
@@ -521,24 +658,18 @@ const { GET } = createEndpoint({
     },
     responses: {
       default: {
-        success: true,
-        data: {
-          totalTasks: 25,
-          executedTasks: 23,
-          successfulTasks: 21,
-          failedTasks: 2,
-          averageExecutionTime: 1250,
-        },
+        totalTasks: 25,
+        executedTasks: 23,
+        successfulTasks: 21,
+        failedTasks: 2,
+        averageExecutionTime: 1250,
       },
       performance: {
-        success: true,
-        data: {
-          totalTasks: 50,
-          executedTasks: 48,
-          successfulTasks: 45,
-          failedTasks: 3,
-          averageExecutionTime: 950,
-        },
+        totalTasks: 50,
+        executedTasks: 48,
+        successfulTasks: 45,
+        failedTasks: 3,
+        averageExecutionTime: 950,
       },
     },
   },

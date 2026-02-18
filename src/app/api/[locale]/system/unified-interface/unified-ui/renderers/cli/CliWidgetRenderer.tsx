@@ -157,6 +157,18 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
           )}
         />
       );
+
+    case WidgetType.CUSTOM_WIDGET:
+      // Custom React widgets can't run in CLI — fall back to ContainerWidgetInk
+      // which iterates over the children (standard widgets) and renders them.
+      return (
+        <ContainerWidgetInk
+          fieldName={fieldName}
+          field={asField<Parameters<typeof ContainerWidgetInk>[0]["field"]>(
+            field,
+          )}
+        />
+      );
     case WidgetType.SEPARATOR:
       return (
         <SeparatorWidgetInk

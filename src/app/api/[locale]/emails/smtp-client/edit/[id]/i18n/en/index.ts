@@ -171,4 +171,23 @@ export const translations = {
     cancel: "Cancel",
   },
   notFound: "Account not found",
+  widget: {
+    put: {
+      title: "Edit SMTP Account",
+      container: {
+        title: "Edit SMTP Account",
+      },
+    },
+    fields: {
+      host: {
+        label: "Host",
+      },
+      username: {
+        label: "Username",
+      },
+      fromEmail: {
+        label: "From Email",
+      },
+    },
+  },
 };

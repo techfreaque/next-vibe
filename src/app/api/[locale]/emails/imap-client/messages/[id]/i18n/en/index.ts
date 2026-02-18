@@ -188,4 +188,18 @@ export const translations = {
       description: "Operation completed successfully",
     },
   },
+  widget: {
+    title: "IMAP Message",
+    notFound: "Message not found",
+    parties: "Parties",
+    from: "From",
+    to: "To",
+    timestamps: "Timestamps",
+    sentAt: "Sent At",
+    receivedAt: "Received At",
+    flagged: "Flagged",
+    unread: "Unread",
+    hasAttachments: "Has Attachments",
+    body: "Message Body",
+  },
 };

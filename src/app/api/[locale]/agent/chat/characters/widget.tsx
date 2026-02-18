@@ -1274,10 +1274,7 @@ function FavoritesList({
             )}
             onClick={(e) => {
               if (!isActive && !isActivating) {
-                void handleActivateFavorite(
-                  e as React.MouseEvent<HTMLButtonElement>,
-                  fav.id,
-                );
+                void handleActivateFavorite(e, fav.id);
               }
             }}
           >

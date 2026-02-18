@@ -201,4 +201,18 @@ export const translations: typeof enTranslations = {
       description: "Vorgang erfolgreich abgeschlossen",
     },
   },
+  widget: {
+    title: "IMAP-Nachricht",
+    notFound: "Nachricht nicht gefunden",
+    parties: "Beteiligte",
+    from: "Von",
+    to: "An",
+    timestamps: "Zeitstempel",
+    sentAt: "Gesendet am",
+    receivedAt: "Empfangen am",
+    flagged: "Markiert",
+    unread: "Ungelesen",
+    hasAttachments: "Hat Anhänge",
+    body: "Nachrichteninhalt",
+  },
 };

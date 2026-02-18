@@ -1,4 +1,14 @@
 export const translations = {
+  widget: {
+    headerLeadCreated: "Lead Created",
+    headerCreateLead: "Create Lead",
+    subheaderFillDetails: "Fill in the details below",
+    fallbackLeadName: "Lead",
+    buttonCopyId: "Copy ID",
+    buttonViewLead: "View Lead",
+    buttonEditLead: "Edit Lead",
+    buttonBackToList: "Back to List",
+  },
   post: {
     title: "Create Lead",
     description: "Create a new lead in the system",

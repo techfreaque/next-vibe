@@ -124,4 +124,12 @@ export const translations = {
     title: "Success",
     description: "IMAP accounts retrieved successfully",
   },
+  widget: {
+    title: "IMAP Accounts",
+    create: "Add Account",
+    refresh: "Refresh",
+    empty: "No IMAP accounts configured",
+    disabled: "Disabled",
+    lastSync: "Last sync",
+  },
 };

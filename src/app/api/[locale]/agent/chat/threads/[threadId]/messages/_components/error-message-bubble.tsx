@@ -29,14 +29,11 @@ export function ErrorMessageBubble({
     const parsed = JSON.parse(message.content || "{}") as ErrorResponseType;
     if (parsed && typeof parsed === "object" && "message" in parsed) {
       errorData = parsed;
-      displayContent = t(
-        parsed.message as TranslationKey,
-        parsed.messageParams,
-      );
+      displayContent = t(parsed.message, parsed.messageParams);
 
       // Also translate the error type if available
       if (parsed.errorType?.errorKey) {
-        errorTypeDisplay = t(parsed.errorType.errorKey as TranslationKey);
+        errorTypeDisplay = t(parsed.errorType.errorKey);
       }
 
       // Handle nested causes
@@ -46,11 +43,11 @@ export function ErrorMessageBubble({
       }
     } else {
       // Fallback if not a valid ErrorResponse
-      displayContent = t(message.content as TranslationKey);
+      displayContent = t(message.content);
     }
   } catch {
     // If JSON parsing fails, treat it as a regular translation key
-    displayContent = t(message.content as TranslationKey);
+    displayContent = t(message.content);
   }
 
   return (

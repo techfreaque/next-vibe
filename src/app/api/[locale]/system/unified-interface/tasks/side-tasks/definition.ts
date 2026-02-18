@@ -22,16 +22,18 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 // Side task action enum
-const sideTaskActionSchema = z.enum([
-  "list",
-  "get",
-  "create",
-  "update",
-  "delete",
-  "stats",
-  "executions",
-  "health-check",
-]);
+const sideTaskActionSchema = z
+  .enum([
+    "list",
+    "get",
+    "create",
+    "update",
+    "delete",
+    "stats",
+    "executions",
+    "health-check",
+  ])
+  .default("list");
 
 /**
  * POST endpoint definition - Side task management
@@ -39,7 +41,7 @@ const sideTaskActionSchema = z.enum([
  */
 const sideTasksPostEndpoint = createEndpoint({
   method: Methods.POST,
-  path: ["system", "tasks", "side-tasks"],
+  path: ["system", "unified-interface", "tasks", "side-tasks"],
   title: "app.api.system.unifiedInterface.tasks.sideTasks.get.title",
   description:
     "app.api.system.unifiedInterface.tasks.sideTasks.get.description",
@@ -290,7 +292,7 @@ const sideTasksPostEndpoint = createEndpoint({
  */
 const sideTasksGetEndpoint = createEndpoint({
   method: Methods.GET,
-  path: ["system", "tasks", "side-tasks"],
+  path: ["system", "unified-interface", "tasks", "side-tasks"],
   title: "app.api.system.unifiedInterface.tasks.sideTasks.get.title",
   description:
     "app.api.system.unifiedInterface.tasks.sideTasks.get.description",

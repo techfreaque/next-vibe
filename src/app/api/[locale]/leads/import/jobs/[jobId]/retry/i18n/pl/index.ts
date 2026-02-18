@@ -66,4 +66,8 @@ export const translations: typeof enTranslations = {
       description: "Zadanie importu zostało pomyślnie ponowione",
     },
   },
+  widget: {
+    title: "Ponów zadanie importu",
+    successMessage: "Ponowienie zadania zostało pomyślnie zainicjowane",
+  },
 };

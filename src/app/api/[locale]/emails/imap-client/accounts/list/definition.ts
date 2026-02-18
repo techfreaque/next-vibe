@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
@@ -32,6 +34,7 @@ import {
   SortOrder,
   SortOrderOptions,
 } from "../../enum";
+import { ImapAccountsListContainer } from "./widget";
 
 /**
  * Get IMAP Accounts List Endpoint (GET)
@@ -48,17 +51,12 @@ const { GET } = createEndpoint({
   icon: "inbox",
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.imapClient.accounts.list.container.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: ImapAccountsListContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { request: "data", response: true } }),
+
       // === REQUEST FIELDS ===
       page: requestField({
         type: WidgetType.FORM_FIELD,
@@ -321,7 +319,7 @@ const { GET } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {

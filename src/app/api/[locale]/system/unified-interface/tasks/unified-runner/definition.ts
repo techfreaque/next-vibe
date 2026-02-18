@@ -26,7 +26,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
  */
 const { POST } = createEndpoint({
   method: Methods.POST,
-  path: ["system", "tasks", "unified-runner"],
+  path: ["system", "unified-interface", "tasks", "unified-runner"],
   aliases: ["unified-runner", "task-runner", "runner"],
   title: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.title",
   description:
@@ -35,6 +35,9 @@ const { POST } = createEndpoint({
   category: "app.api.system.unifiedInterface.tasks.category",
   allowedRoles: [UserRole.ADMIN],
   tags: ["app.api.system.unifiedInterface.tasks.unifiedRunner.post.title"],
+  cli: {
+    firstCliArgKey: "action",
+  },
   fields: objectField(
     {
       type: WidgetType.CONTAINER,

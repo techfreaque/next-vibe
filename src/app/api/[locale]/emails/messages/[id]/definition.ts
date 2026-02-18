@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestUrlPathParamsField,
   responseField,
@@ -22,6 +24,7 @@ import {
 import { dateSchema } from "../../../shared/types/common.schema";
 import { UserRole } from "../../../user/user-roles/enum";
 import { EmailStatus, EmailType } from "../enum";
+import { EmailDetailContainer } from "./widget";
 
 const { GET } = createEndpoint({
   method: Methods.GET,
@@ -33,16 +36,13 @@ const { GET } = createEndpoint({
   tags: ["app.api.emails.messages.tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.messages.id.container.title",
-      description: "app.api.emails.messages.id.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "urlPathParams", response: true },
-    {
+  fields: customWidgetObject({
+    render: EmailDetailContainer,
+    usage: { request: "urlPathParams", response: true } as const,
+    children: {
+      backButton: backButton({
+        usage: { request: "urlPathParams", response: true },
+      }),
       // === URL PARAMETER ===
       id: requestUrlPathParamsField({
         type: WidgetType.FORM_FIELD,
@@ -172,7 +172,7 @@ const { GET } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {

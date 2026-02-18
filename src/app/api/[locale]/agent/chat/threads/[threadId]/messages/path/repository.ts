@@ -154,7 +154,6 @@ export const pathRepository = {
           authorId: msg.authorId,
           isAI: msg.isAI,
           model: msg.model,
-          tokens: msg.tokens,
           createdAt: msg.createdAt.toISOString(),
           updatedAt: msg.updatedAt.toISOString(),
         })),

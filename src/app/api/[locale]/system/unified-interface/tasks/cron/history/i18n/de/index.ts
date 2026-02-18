@@ -143,4 +143,49 @@ export const translations: typeof enTranslations = {
     },
     unknownTask: "Unbekannter Task",
   },
+  widget: {
+    title: "Ausführungsverlauf",
+    loading: "Verlauf wird geladen...",
+    header: {
+      tasks: "Aufgaben",
+      stats: "Statistiken",
+      refresh: "Aktualisieren",
+    },
+    summary: {
+      total: "Gesamt",
+      successful: "Erfolgreich",
+      failed: "Fehlgeschlagen",
+      successRate: "Erfolgsrate",
+      avgDuration: "Ø Dauer",
+    },
+    search: {
+      placeholder: "Aufgaben suchen...",
+    },
+    filter: {
+      all: "Alle",
+      running: "Laufend",
+      completed: "Abgeschlossen",
+      failed: "Fehlgeschlagen",
+      timeout: "Zeitüberschreitung",
+      cancelled: "Abgebrochen",
+    },
+    col: {
+      taskName: "Aufgabenname",
+      status: "Status",
+      duration: "Dauer",
+      started: "Gestartet",
+      completed: "Abgeschlossen",
+      environment: "Umgebung",
+      error: "Fehler",
+    },
+    empty: "Kein Ausführungsverlauf gefunden",
+    error: {
+      collapse: "Fehler einklappen",
+    },
+    pagination: {
+      info: "Seite {{page}} von {{totalPages}} ({{total}} gesamt)",
+      prev: "Zurück",
+      next: "Weiter",
+    },
+  },
 };

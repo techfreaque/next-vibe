@@ -72,6 +72,7 @@ function tryParseValue(value: string): ParsedValue {
 /**
  * Parse search params and convert dot notation to nested objects
  * Also handles JSON-stringified values for complex nested objects
+ * Also handles bracket notation for arrays: status[0]=a&status[1]=b => { status: ["a", "b"] }
  * Example: ?user.name=John&user.age=30 => { user: { name: "John", age: "30" } }
  * Example: ?filters={"status":"active"} => { filters: { status: "active" } }
  */
@@ -79,7 +80,19 @@ export function parseSearchParams(searchParams: URLSearchParams): ParsedObject {
   const result: ParsedObject = {};
 
   for (const [key, value] of searchParams.entries()) {
-    if (key.includes(".")) {
+    // Handle bracket notation for arrays: name[0], name[1], etc.
+    const bracketMatch = /^([^[]+)\[(\d+)\]$/.exec(key);
+    if (bracketMatch) {
+      const arrayKey = bracketMatch[1];
+      const index = parseInt(bracketMatch[2], 10);
+      if (arrayKey) {
+        if (!(arrayKey in result)) {
+          result[arrayKey] = [];
+        }
+        const arr = result[arrayKey] as ParsedValue[];
+        arr[index] = tryParseValue(value);
+      }
+    } else if (key.includes(".")) {
       // Handle dot notation for nested objects
       const parts = key.split(".");
       let current: ParsedObject = result;

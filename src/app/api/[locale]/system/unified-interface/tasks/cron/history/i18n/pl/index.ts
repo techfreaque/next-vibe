@@ -140,4 +140,49 @@ export const translations: typeof enTranslations = {
     },
     unknownTask: "Nieznane zadanie",
   },
+  widget: {
+    title: "Historia wykonań zadań",
+    loading: "Ładowanie historii...",
+    header: {
+      tasks: "Zadania",
+      stats: "Statystyki",
+      refresh: "Odśwież",
+    },
+    summary: {
+      total: "Łącznie",
+      successful: "Pomyślne",
+      failed: "Nieudane",
+      successRate: "Wskaźnik sukcesu",
+      avgDuration: "Śr. czas trwania",
+    },
+    search: {
+      placeholder: "Szukaj zadań...",
+    },
+    filter: {
+      all: "Wszystkie",
+      running: "Uruchomione",
+      completed: "Ukończone",
+      failed: "Nieudane",
+      timeout: "Przekroczono czas",
+      cancelled: "Anulowane",
+    },
+    col: {
+      taskName: "Nazwa zadania",
+      status: "Status",
+      duration: "Czas trwania",
+      started: "Rozpoczęto",
+      completed: "Ukończono",
+      environment: "Środowisko",
+      error: "Błąd",
+    },
+    empty: "Nie znaleziono historii wykonań",
+    error: {
+      collapse: "Zwiń błąd",
+    },
+    pagination: {
+      info: "Strona {{page}} z {{totalPages}} (łącznie {{total}})",
+      prev: "Poprzednia",
+      next: "Następna",
+    },
+  },
 };

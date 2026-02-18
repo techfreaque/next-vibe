@@ -63,4 +63,8 @@ export const translations = {
       description: "Import job retried successfully",
     },
   },
+  widget: {
+    title: "Retry Import Job",
+    successMessage: "Job retry initiated successfully",
+  },
 };

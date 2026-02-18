@@ -118,4 +118,11 @@ export const translations = {
     title: "Success",
     description: "Operation completed successfully",
   },
+  widget: {
+    title: "Full IMAP Sync",
+    options: "Sync Options",
+    result: "Sync Result",
+    duration: "Duration",
+    errors: "Errors",
+  },
 };

@@ -184,7 +184,7 @@ export async function execute(
       // TODO: Update locale quota calculation to use repository
       // const localeInfo = await calculateLocaleQuota(locale, weeklyQuota, config, distribution, now);
       const localeInfo = {
-        baseLeadsPerRun: weeklyQuotaNum / 7,
+        baseLeadsPerRun: Math.floor(weeklyQuotaNum / 7),
         adjustedLeadsPerRun: 0,
         failedLeadsCount: 0,
       }; // Temporary placeholder

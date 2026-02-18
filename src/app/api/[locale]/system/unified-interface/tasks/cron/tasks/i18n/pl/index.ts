@@ -35,8 +35,9 @@ export const translations: typeof enTranslations = {
         placeholder: "Wybierz kategorię...",
       },
       enabled: {
-        label: "Włączone",
+        label: "Status",
         description: "Filtruj według statusu włączenia",
+        placeholder: "Wszystkie zadania",
       },
       limit: {
         label: "Limit",
@@ -225,6 +226,56 @@ export const translations: typeof enTranslations = {
         title: "Zadanie utworzone",
         description: "Zadanie zostało pomyślnie utworzone",
       },
+    },
+  },
+  widget: {
+    title: "Zadania Cron",
+    loading: "Ładowanie zadań...",
+    header: {
+      stats: "Statystyki",
+      history: "Historia",
+      refresh: "Odśwież",
+      create: "Nowe zadanie",
+    },
+    filter: {
+      all: "Wszystkie",
+      running: "Uruchomione",
+      completed: "Ukończone",
+      failed: "Nieudane",
+      pending: "Oczekujące",
+      disabled: "Wyłączone",
+      allPriorities: "Wszystkie priorytety",
+      allCategories: "Wszystkie kategorie",
+    },
+    search: {
+      placeholder: "Szukaj zadań...",
+    },
+    sort: {
+      nameAsc: "Nazwa A-Z",
+      nameDesc: "Nazwa Z-A",
+      schedule: "Harmonogram",
+      lastRunNewest: "Ostatnie uruchomienie (najnowsze)",
+      executionsMost: "Najwięcej wykonań",
+    },
+    task: {
+      executions: "Wykonania:",
+      lastRun: "Ostatni przebieg:",
+      never: "Nigdy",
+      nextRun: "Następny przebieg:",
+      notScheduled: "Nie zaplanowano",
+    },
+    action: {
+      view: "Pokaż szczegóły",
+      history: "Pokaż historię",
+      edit: "Edytuj zadanie",
+      delete: "Usuń zadanie",
+    },
+    empty: {
+      noTasks: "Brak zadań cron",
+      noTasksDesc: "Utwórz swoje pierwsze zadanie cron",
+      noMatches: "Żadne zadania nie pasują do filtrów",
+      noMatchesDesc: "Spróbuj dostosować kryteria wyszukiwania lub filtrowania",
+      clearFilters: "Wyczyść filtry",
     },
   },
 };

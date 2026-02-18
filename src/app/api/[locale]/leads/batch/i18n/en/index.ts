@@ -188,6 +188,55 @@ export const translations = {
       description: "Batch delete operation completed successfully",
     },
   },
+  widget: {
+    update: {
+      headerTitle: "Batch Update Leads",
+      emptyStateTitle: "Batch Update Leads",
+      emptyStateDescription:
+        "Apply a field update to many leads at once based on filter criteria. Use",
+      emptyStateDescriptionStrong: "Dry Run",
+      emptyStateDescriptionSuffix:
+        "to preview which leads will be affected before committing changes.",
+      emptyStateTip1:
+        "Set filters and click Submit to run a dry-run preview first",
+      emptyStateTip2: "Uncheck Dry Run to apply changes for real",
+      highVolumeTitle: "Large batch: {{count}} leads matched",
+      highVolumeDescription:
+        "This will affect a large number of records. Review the preview carefully before disabling Dry Run and submitting for real.",
+      partialBatchTitle: "Partial batch processed",
+      partialBatchDescription:
+        "{{processed}} of {{matched}} matched leads were processed. Increase Max Records or run again to process more.",
+      successTitle: "Batch operation completed",
+      failureTitle: "Batch operation failed",
+      statMatched: "Matched",
+      statProcessed: "Processed",
+      statUpdated: "Updated",
+      btnRunAgain: "Run Again",
+      btnViewAllAffected: "View All Affected Leads",
+      btnViewInList: "View in List",
+      dryRunPreviewTitle: "Dry Run Preview ({{count}} leads would be affected)",
+      leadFallback: "Lead {{number}}",
+      errorsTitle: "{{count}} error(s)",
+      errorRow: "Lead {{leadId}}: {{error}}",
+    },
+    delete: {
+      headerTitle: "Batch Delete Leads",
+      warningTitle: "Warning: {{count}} lead will be permanently deleted",
+      warningTitlePlural:
+        "Warning: {{count}} leads will be permanently deleted",
+      warningDescription:
+        "This action cannot be undone. All data for the matched leads will be permanently removed. Disable Dry Run and confirm to proceed.",
+      successTitle: "Deletion completed",
+      failureTitle: "Deletion failed",
+      statMatched: "Matched",
+      statDeleted: "Deleted",
+      btnRunAgain: "Run Again",
+      btnViewRemainingLeads: "View Remaining Leads",
+      previewTitle: "{{count}} leads will be permanently deleted",
+      leadFallback: "Lead {{number}}",
+      errorRow: "Lead {{leadId}}: {{error}}",
+    },
+  },
   email: {
     admin: {
       batchUpdate: {

@@ -6,8 +6,10 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
+  backButton,
+  customWidgetObject,
+  objectField,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
@@ -21,6 +23,7 @@ import {
 
 import { UserRole } from "../../../user/user-roles/enum";
 import { ImapLoggingLevel, ImapLoggingLevelOptions } from "./enum";
+import { ImapConfigContainer } from "./widget";
 
 /**
  * Get IMAP Configuration Endpoint (GET)
@@ -374,16 +377,12 @@ const { POST } = createEndpoint({
   icon: "settings",
   tags: ["app.api.emails.imapClient.tags.config" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.imapClient.config.form.title" as const,
-      description: "app.api.emails.imapClient.config.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: ImapConfigContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { request: "data", response: true } }),
+
       // Host field
       host: requestField({
         type: WidgetType.FORM_FIELD,
@@ -694,7 +693,7 @@ const { POST } = createEndpoint({
         schema: z.string(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

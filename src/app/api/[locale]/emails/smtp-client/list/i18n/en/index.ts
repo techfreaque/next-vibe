@@ -1,5 +1,5 @@
 export const translations = {
-  title: "List SMTP Accounts",
+  title: "SMTP Accounts",
   description: "Get paginated list of SMTP accounts with filtering options",
 
   container: {
@@ -108,5 +108,12 @@ export const translations = {
   success: {
     title: "SMTP Accounts Retrieved",
     description: "Successfully retrieved SMTP accounts list",
+  },
+  widget: {
+    create: "Add Account",
+    refresh: "Refresh",
+    emptyState: "No SMTP accounts configured",
+    priority: "Priority",
+    sent: "Sent",
   },
 };

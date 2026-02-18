@@ -193,6 +193,56 @@ export const translations: typeof enTranslations = {
       description: "Batch-Löschung erfolgreich abgeschlossen",
     },
   },
+  widget: {
+    update: {
+      headerTitle: "Leads Stapel-Aktualisierung",
+      emptyStateTitle: "Leads Stapel-Aktualisierung",
+      emptyStateDescription:
+        "Wenden Sie ein Feldupdate auf viele Leads auf einmal anhand von Filterkriterien an. Verwenden Sie",
+      emptyStateDescriptionStrong: "Testlauf",
+      emptyStateDescriptionSuffix:
+        "um eine Vorschau der betroffenen Leads zu sehen, bevor Sie Änderungen übernehmen.",
+      emptyStateTip1:
+        "Filter setzen und Absenden klicken, um zuerst einen Testlauf zu starten",
+      emptyStateTip2:
+        "Testlauf deaktivieren, um Änderungen tatsächlich anzuwenden",
+      highVolumeTitle: "Großer Stapel: {{count}} Leads gefunden",
+      highVolumeDescription:
+        "Dies betrifft eine große Anzahl von Datensätzen. Überprüfen Sie die Vorschau sorgfältig, bevor Sie den Testlauf deaktivieren und tatsächlich einreichen.",
+      partialBatchTitle: "Teilstapel verarbeitet",
+      partialBatchDescription:
+        "{{processed}} von {{matched}} gefundenen Leads wurden verarbeitet. Erhöhen Sie Max. Datensätze oder führen Sie den Vorgang erneut aus.",
+      successTitle: "Stapelvorgang abgeschlossen",
+      failureTitle: "Stapelvorgang fehlgeschlagen",
+      statMatched: "Gefunden",
+      statProcessed: "Verarbeitet",
+      statUpdated: "Aktualisiert",
+      btnRunAgain: "Erneut ausführen",
+      btnViewAllAffected: "Alle betroffenen Leads anzeigen",
+      btnViewInList: "In Liste anzeigen",
+      dryRunPreviewTitle:
+        "Testlauf-Vorschau ({{count}} Leads würden betroffen sein)",
+      leadFallback: "Lead {{number}}",
+      errorsTitle: "{{count}} Fehler",
+      errorRow: "Lead {{leadId}}: {{error}}",
+    },
+    delete: {
+      headerTitle: "Leads Stapel-Löschung",
+      warningTitle: "Warnung: {{count}} Lead wird dauerhaft gelöscht",
+      warningTitlePlural: "Warnung: {{count}} Leads werden dauerhaft gelöscht",
+      warningDescription:
+        "Diese Aktion kann nicht rückgängig gemacht werden. Alle Daten der gefundenen Leads werden dauerhaft entfernt. Testlauf deaktivieren und bestätigen, um fortzufahren.",
+      successTitle: "Löschung abgeschlossen",
+      failureTitle: "Löschung fehlgeschlagen",
+      statMatched: "Gefunden",
+      statDeleted: "Gelöscht",
+      btnRunAgain: "Erneut ausführen",
+      btnViewRemainingLeads: "Verbleibende Leads anzeigen",
+      previewTitle: "{{count}} Leads werden dauerhaft gelöscht",
+      leadFallback: "Lead {{number}}",
+      errorRow: "Lead {{leadId}}: {{error}}",
+    },
+  },
   email: {
     admin: {
       batchUpdate: {

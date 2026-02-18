@@ -1,6 +1,16 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  widget: {
+    headerLeadCreated: "Lead stworzony",
+    headerCreateLead: "Stwórz lead",
+    subheaderFillDetails: "Wypełnij poniższe szczegóły",
+    fallbackLeadName: "Lead",
+    buttonCopyId: "Kopiuj ID",
+    buttonViewLead: "Zobacz lead",
+    buttonEditLead: "Edytuj lead",
+    buttonBackToList: "Powrót do listy",
+  },
   post: {
     title: "Stwórz lead",
     description: "Stwórz nowy lead w systemie",

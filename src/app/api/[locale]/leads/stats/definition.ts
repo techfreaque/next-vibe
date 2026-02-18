@@ -12,6 +12,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
@@ -43,6 +45,7 @@ import {
   SortOrder,
   SortOrderOptions,
 } from "../enum";
+import { LeadsStatsContainer } from "./widget";
 
 // ========== Zod Schemas for Complex Response Types ==========
 
@@ -255,16 +258,11 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "bar-chart-3",
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.stats.container.title",
-      description: "app.api.leads.stats.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: LeadsStatsContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { response: true } }),
       // === REQUEST FIELDS (Filters) ===
 
       // Time-based filtering
@@ -1127,7 +1125,7 @@ const { GET } = createEndpoint({
         schema: dataRangeSchema,
       }),
     },
-  ),
+  }),
 
   examples: {
     requests: {

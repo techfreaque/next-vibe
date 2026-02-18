@@ -1,50 +1,16 @@
-/**
- * Cron Stats Admin Page
- * Comprehensive cron statistics dashboard for administrators
- */
+import type { JSX } from "react";
 
-import type { Metadata } from "next";
-import { Div } from "next-vibe-ui/ui/div";
-import type React from "react";
-
-import { CronStatsClient } from "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/_components/cron-stats-client";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
-interface CronStatsPageProps {
-  params: Promise<{
-    locale: CountryLanguage;
-  }>;
-}
+import { CronStatsPageClient } from "./page-client";
 
-/**
- * Generate metadata for the cron stats page
- */
-export async function generateMetadata({
-  params,
-}: CronStatsPageProps): Promise<Metadata> {
-  const { locale } = await params;
-  const { t } = simpleT(locale);
-
-  return {
-    title: t("app.admin.cron.stats.pageTitle"),
-    description: t("app.admin.cron.stats.pageDescription"),
-  };
-}
-
-/**
- * Cron Stats Admin Page Component
- * Server-side page that renders the client-side stats dashboard
- */
 export default async function CronStatsPage({
   params,
-}: CronStatsPageProps): Promise<React.JSX.Element> {
+}: {
+  params: Promise<{ locale: CountryLanguage }>;
+}): Promise<JSX.Element> {
   const { locale } = await params;
   const user = await requireAdminUser(locale, `/${locale}/admin/cron/stats`);
-  return (
-    <Div className="flex flex-col gap-6">
-      <CronStatsClient locale={locale} user={user} />
-    </Div>
-  );
+  return <CronStatsPageClient locale={locale} user={user} />;
 }
