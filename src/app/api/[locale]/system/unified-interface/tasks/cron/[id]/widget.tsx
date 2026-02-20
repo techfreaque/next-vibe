@@ -293,7 +293,17 @@ export function CronTaskDetailContainer({
 
         <Div className="flex-1 min-w-0">
           <Div className="font-bold text-lg truncate leading-tight">
-            {task.name}
+            {task.displayName}
+          </Div>
+          <Div
+            style={{
+              fontFamily: "monospace",
+              fontSize: "0.72rem",
+              color: "var(--muted-foreground)",
+              marginTop: "1px",
+            }}
+          >
+            {task.routeId}
           </Div>
         </Div>
 
@@ -347,9 +357,23 @@ export function CronTaskDetailContainer({
       </Div>
 
       <Div className="px-4 pt-4 flex flex-col gap-4">
-        {/* ── Header: name + enabled badge ── */}
+        {/* ── Header: displayName + routeId + enabled badge ── */}
         <Div className="flex flex-wrap items-center gap-3 pb-1">
-          <Div className="text-2xl font-bold leading-snug">{task.name}</Div>
+          <Div className="text-2xl font-bold leading-snug">
+            {task.displayName}
+          </Div>
+          <Div
+            style={{
+              fontFamily: "monospace",
+              fontSize: "0.78rem",
+              color: "var(--muted-foreground)",
+              background: "var(--muted)",
+              borderRadius: "4px",
+              padding: "2px 8px",
+            }}
+          >
+            {task.routeId}
+          </Div>
           <Badge
             label={
               task.enabled
@@ -449,6 +473,37 @@ export function CronTaskDetailContainer({
                 <Div>{task.timezone}</Div>
               </InfoRow>
             )}
+            <InfoRow
+              label={t(
+                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.owner",
+              )}
+            >
+              {task.userId === null ? (
+                <Badge
+                  label={t(
+                    "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.ownerSystem",
+                  )}
+                  className="bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300"
+                />
+              ) : (
+                <Badge
+                  label={t(
+                    "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.ownerUser",
+                  )}
+                  className="bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300"
+                />
+              )}
+            </InfoRow>
+            <InfoRow
+              label={t(
+                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.outputMode",
+              )}
+            >
+              <Badge
+                label={t(task.outputMode)}
+                className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+              />
+            </InfoRow>
             <InfoRow
               label={t(
                 "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.createdAt",

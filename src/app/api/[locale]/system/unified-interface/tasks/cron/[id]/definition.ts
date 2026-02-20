@@ -26,11 +26,13 @@ import {
 import {
   CronTaskPriority,
   CronTaskPriorityDB,
+  CronTaskPriorityOptions,
   TaskCategory,
+  TaskOutputModeDB,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { CronTaskPriorityOptions, CronTaskStatusDB } from "../../enum";
+import { cronTaskResponseSchema } from "../tasks/definition";
 import { CronTaskDetailContainer } from "./widget";
 
 /**
@@ -73,31 +75,7 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         content:
           "app.api.system.unifiedInterface.tasks.cronSystem.task.get.response.task.title",
-        schema: z.object({
-          id: z.string(),
-          name: z.string(),
-          description: z.string().nullable(),
-          version: z.string(),
-          category: z.string(),
-          schedule: z.string(),
-          timezone: z.string().nullable(),
-          enabled: z.boolean(),
-          priority: z.enum(CronTaskPriorityDB),
-          timeout: z.number().nullable(),
-          retries: z.number().nullable(),
-          retryDelay: z.number().nullable(),
-          lastExecutedAt: z.string().nullable(),
-          lastExecutionStatus: z.enum(CronTaskStatusDB).nullable(),
-          lastExecutionError: z.string().nullable(),
-          lastExecutionDuration: z.number().nullable(),
-          nextExecutionAt: z.string().nullable(),
-          executionCount: z.number(),
-          successCount: z.number(),
-          errorCount: z.number(),
-          averageExecutionTime: z.number().nullable(),
-          createdAt: z.string(),
-          updatedAt: z.string(),
-        }),
+        schema: cronTaskResponseSchema,
       }),
     },
   }),
@@ -174,7 +152,8 @@ const { GET } = createEndpoint({
       default: {
         task: {
           id: "task-123",
-          name: "Example Task",
+          routeId: "cron-steps",
+          displayName: "Example Task",
           description: "An example cron task",
           version: "1.0.0",
           category: TaskCategory.SYSTEM,
@@ -185,6 +164,9 @@ const { GET } = createEndpoint({
           timeout: 3600,
           retries: 3,
           retryDelay: 5000,
+          defaultConfig: {},
+          outputMode: TaskOutputModeDB[0],
+          notificationTargets: [],
           lastExecutedAt: null,
           lastExecutionStatus: null,
           lastExecutionError: null,
@@ -194,6 +176,8 @@ const { GET } = createEndpoint({
           successCount: 0,
           errorCount: 0,
           averageExecutionTime: null,
+          tags: [],
+          userId: null,
           createdAt: "2024-01-01T00:00:00Z",
           updatedAt: "2024-01-01T00:00:00Z",
         },
@@ -270,15 +254,15 @@ const { PUT } = createEndpoint({
       }),
 
       // Request data fields
-      name: requestField({
+      displayName: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.label",
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.displayName.label",
         description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.description",
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.displayName.description",
         placeholder:
-          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.placeholder",
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.displayName.placeholder",
         columns: 12,
         schema: z.string().min(1).optional(),
       }),
@@ -334,6 +318,17 @@ const { PUT } = createEndpoint({
         schema: z.enum(CronTaskPriorityDB).optional(),
       }),
 
+      outputMode: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.outputMode.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.outputMode.description",
+        columns: 6,
+        schema: z.enum(TaskOutputModeDB).optional(),
+      }),
+
       timeout: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
@@ -360,36 +355,23 @@ const { PUT } = createEndpoint({
         schema: z.coerce.number().optional(),
       }),
 
+      defaultConfig: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.defaultConfig.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.defaultConfig.description",
+        columns: 12,
+        schema: z.unknown().optional(),
+      }),
+
       // Response fields
       task: responseField({
         type: WidgetType.TEXT,
         content:
           "app.api.system.unifiedInterface.tasks.cronSystem.task.put.response.task.title",
-        schema: z.object({
-          id: z.string(),
-          name: z.string(),
-          description: z.string().nullable(),
-          version: z.string(),
-          category: z.string(),
-          schedule: z.string(),
-          timezone: z.string().nullable(),
-          enabled: z.boolean(),
-          priority: z.enum(CronTaskPriorityDB),
-          timeout: z.number().nullable(),
-          retries: z.number().nullable(),
-          retryDelay: z.number().nullable(),
-          lastExecutedAt: z.string().nullable(),
-          lastExecutionStatus: z.enum(CronTaskStatusDB).nullable(),
-          lastExecutionError: z.string().nullable(),
-          lastExecutionDuration: z.number().nullable(),
-          nextExecutionAt: z.string().nullable(),
-          executionCount: z.number(),
-          successCount: z.number(),
-          errorCount: z.number(),
-          averageExecutionTime: z.number().nullable(),
-          createdAt: z.string(),
-          updatedAt: z.string(),
-        }),
+        schema: cronTaskResponseSchema,
       }),
 
       success: responseField({
@@ -471,11 +453,12 @@ const { PUT } = createEndpoint({
     },
     requests: {
       default: {
-        name: "Updated Task",
+        displayName: "Updated Task",
         description: "An updated cron task",
         schedule: "0 */2 * * *",
         enabled: false,
         priority: CronTaskPriority.HIGH,
+        outputMode: TaskOutputModeDB[0],
         timeout: 7200,
         retries: 5,
       },
@@ -484,7 +467,8 @@ const { PUT } = createEndpoint({
       default: {
         task: {
           id: "task-123",
-          name: "Updated Task",
+          routeId: "cron-steps",
+          displayName: "Updated Task",
           description: "An updated cron task",
           version: "1.0.0",
           category: TaskCategory.SYSTEM,
@@ -495,6 +479,9 @@ const { PUT } = createEndpoint({
           timeout: 7200,
           retries: 5,
           retryDelay: 5000,
+          defaultConfig: {},
+          outputMode: TaskOutputModeDB[0],
+          notificationTargets: [],
           lastExecutedAt: null,
           lastExecutionStatus: null,
           lastExecutionError: null,
@@ -504,6 +491,8 @@ const { PUT } = createEndpoint({
           successCount: 0,
           errorCount: 0,
           averageExecutionTime: null,
+          tags: [],
+          userId: null,
           createdAt: "2024-01-01T00:00:00Z",
           updatedAt: "2024-01-02T00:00:00Z",
         },

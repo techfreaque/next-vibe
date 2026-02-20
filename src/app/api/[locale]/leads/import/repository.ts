@@ -503,7 +503,7 @@ export class LeadsImportRepository {
           await db
             .update(cronTasks)
             .set({ enabled: true, updatedAt: new Date() })
-            .where(eq(cronTasks.name, "csv-processor"));
+            .where(eq(cronTasks.routeId, "csv-processor"));
 
           logger.info("Enabled csv-processor cron task", {
             userId: user.id,

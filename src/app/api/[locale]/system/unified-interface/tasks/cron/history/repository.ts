@@ -107,7 +107,7 @@ export class CronHistoryRepository {
         .select({
           id: cronTaskExecutions.id,
           taskId: cronTaskExecutions.taskId,
-          taskName: cronTasks.name,
+          taskName: cronTasks.routeId,
           status: cronTaskExecutions.status,
           priority: cronTasks.priority,
           startedAt: cronTaskExecutions.startedAt,

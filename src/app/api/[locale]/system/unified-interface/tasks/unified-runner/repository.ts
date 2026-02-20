@@ -17,6 +17,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
@@ -31,7 +32,39 @@ import type {
   UnifiedRunnerRequestOutput,
   UnifiedRunnerResponseOutput,
 } from "./definition";
-import type { CronTask, Task, TaskRunner, TaskStatus } from "./types";
+import type {
+  CronTask,
+  ResolveRouteIdResult,
+  Task,
+  TaskConfig,
+  TaskRunner,
+  TaskStatus,
+} from "./types";
+
+/**
+ * Resolve a routeId to determine how to execute it.
+ * Resolution order:
+ *  1. "cron-steps" literal → { kind: "steps" }
+ *  2. aliasToPathMap (endpoint aliases/paths) → { kind: "endpoint" }
+ *  3. unknown → { kind: "unknown" }
+ */
+export async function resolveRouteId(
+  routeId: string,
+): Promise<ResolveRouteIdResult> {
+  if (routeId === "cron-steps") {
+    return { kind: "steps" };
+  }
+
+  // Check endpoint aliases/paths
+  const { getFullPath } =
+    await import("@/app/api/[locale]/system/generated/endpoint");
+  const path = getFullPath(routeId);
+  if (path !== null) {
+    return { kind: "endpoint", path };
+  }
+
+  return { kind: "unknown" };
+}
 
 // System user for cron task execution
 const CRON_SYSTEM_USER: JwtPrivatePayloadType = {
@@ -227,12 +260,22 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
       });
     }
 
-    // Look up task DB record to get its ID and priority
-    const dbTaskResponse = await CronTasksRepository.getTaskByName(
+    // Look up system task DB record by routeId to get its ID, priority, and config
+    const dbTaskResponse = await CronTasksRepository.getSystemTaskByRouteId(
       taskName,
       this.logger,
     );
     const dbTask = dbTaskResponse.success ? dbTaskResponse.data : null;
+
+    // Resolve config: prefer DB defaultConfig, fall back to task's own default
+    // dbTask.defaultConfig is jsonb (unknown) — treat as TaskConfig only if it's a plain object
+    const dbConfig =
+      dbTask?.defaultConfig !== null &&
+      typeof dbTask?.defaultConfig === "object" &&
+      !Array.isArray(dbTask.defaultConfig)
+        ? (dbTask.defaultConfig as TaskConfig)
+        : undefined;
+    const config: TaskConfig = dbConfig ?? task.defaultConfig ?? {};
 
     const executionId = crypto.randomUUID();
     const startedAt = new Date();
@@ -248,7 +291,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
           status: CronTaskStatus.RUNNING,
           priority: dbTask.priority,
           startedAt,
-          config: {},
+          config,
           triggeredBy: "schedule",
         },
         this.logger,
@@ -261,22 +304,22 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
     const startTime = Date.now();
 
     try {
-      // Execute task with required props
-      const result = await task.run({
-        logger: this.logger,
+      // Dispatch to the route identified by task.routeId
+      const { RouteExecutionExecutor } =
+        await import("@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor");
+      const result = await RouteExecutionExecutor.executeGenericHandler({
+        toolName: task.routeId,
+        data: config,
+        urlPathParams: {},
+        user: this.cronUser,
         locale: this.locale,
-        cronUser: this.cronUser,
+        logger: this.logger,
+        platform: Platform.CLI,
       });
 
       const durationMs = Date.now() - startTime;
 
-      // Check if task returned an error (success: false from fail())
-      if (
-        result &&
-        typeof result === "object" &&
-        "success" in result &&
-        !result.success
-      ) {
+      if (!result.success) {
         const errorMsg =
           "message" in result && typeof result.message === "string"
             ? result.message
@@ -323,10 +366,9 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
 
       // Persist success
       if (dbTask && executionDbId) {
-        // Extract .data from ResponseType wrapper if present (success: true, data: T)
         const resultPayload: CronTaskExecution["result"] =
-          result && typeof result === "object" && "data" in result
-            ? (result.data as CronTaskExecution["result"])
+          result.data !== undefined && result.data !== null
+            ? result.data
             : null;
         await CronTasksRepository.updateExecution(
           executionDbId,

@@ -7,45 +7,18 @@
 
 /* eslint-disable i18next/no-literal-string */
 
-import { eq, notInArray, sql } from "drizzle-orm";
+import { and, isNull, notInArray, sql } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { userRoles } from "@/app/api/[locale]/user/db";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { NewCronTask } from "./cron/db";
 import { cronTasks } from "./cron/db";
 import { CronTaskPriority } from "./enum";
 
 /**
- * Find the admin user id to assign as owner of seeded system tasks.
- * Returns null if no admin user exists yet (seeds run before user seeds in some envs).
- */
-async function findAdminUserId(logger: EndpointLogger): Promise<string | null> {
-  try {
-    const [adminRole] = await db
-      .select({ userId: userRoles.userId })
-      .from(userRoles)
-      .where(eq(userRoles.role, UserPermissionRole.ADMIN))
-      .limit(1);
-
-    if (adminRole) {
-      logger.debug(`Found admin user for seeded tasks: ${adminRole.userId}`);
-      return adminRole.userId;
-    }
-
-    logger.debug("No admin user found yet, seeding tasks without userId");
-    return null;
-  } catch (error) {
-    logger.debug("Could not find admin user, seeding tasks without userId");
-    return null;
-  }
-}
-
-/**
  * Upsert all cron tasks from the task registry into the DB.
- * Uses ON CONFLICT (name) DO UPDATE to keep definitions current.
+ * System tasks (userId IS NULL) use the partial unique index on routeId.
  * Task runners are excluded (dev-only infrastructure tasks).
  */
 async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
@@ -65,51 +38,60 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
     `Upserting ${cronTaskDefs.length} cron task definitions into DB`,
   );
 
-  // Find admin user to assign as owner of system tasks
-  const adminUserId = await findAdminUserId(logger);
-
   const taskRows: NewCronTask[] = cronTaskDefs.map((task) => ({
-    name: task.name,
+    // System tasks: routeId points to the route, displayName uses the task name
+    routeId: task.routeId,
+    displayName: task.name,
     description: task.description,
     category: String(task.category),
     schedule: task.schedule,
     enabled: task.enabled,
-    // priority is already the correct DB enum string value from CronTaskPriority
     priority: task.priority ?? CronTaskPriority.MEDIUM,
     timeout: task.timeout ?? 300000,
-    defaultConfig: {},
-    userId: adminUserId,
+    defaultConfig: task.defaultConfig ?? {},
+    // System tasks have no user owner (null userId)
+    userId: null,
   }));
 
-  // Upsert: on name conflict only update non-user-configurable metadata.
-  // Do NOT overwrite enabled/schedule/priority/timeout — those are user-overridable
-  // via the UI and must survive restarts.
-  await db
-    .insert(cronTasks)
-    .values(taskRows)
-    .onConflictDoUpdate({
-      target: cronTasks.name,
-      set: {
-        description: sql`excluded.description`,
-        category: sql`excluded.category`,
-        updatedAt: new Date(),
-      },
-    });
+  // Upsert using the partial unique index on routeId WHERE userId IS NULL.
+  // We use raw SQL for the conflict target since Drizzle doesn't natively support
+  // partial index conflict targets.
+  // Do NOT overwrite enabled/schedule/priority/timeout — those are user-overridable.
+  for (const row of taskRows) {
+    await db
+      .insert(cronTasks)
+      .values(row)
+      .onConflictDoUpdate({
+        target: [cronTasks.routeId],
+        targetWhere: isNull(cronTasks.userId),
+        set: {
+          displayName: sql`excluded.display_name`,
+          description: sql`excluded.description`,
+          category: sql`excluded.category`,
+          updatedAt: new Date(),
+        },
+      });
+  }
 
   logger.debug(
     `Successfully upserted ${taskRows.length} cron task definitions`,
   );
 
-  // Remove stale tasks (renamed or deleted from the registry)
-  const activeNames = taskRows.map((t) => t.name);
+  // Remove stale system tasks (renamed or deleted from the registry)
+  const activeRouteIds = taskRows.map((t) => t.routeId);
   const deleted = await db
     .delete(cronTasks)
-    .where(notInArray(cronTasks.name, activeNames))
-    .returning({ name: cronTasks.name });
+    .where(
+      and(
+        notInArray(cronTasks.routeId, activeRouteIds),
+        isNull(cronTasks.userId),
+      ),
+    )
+    .returning({ routeId: cronTasks.routeId });
 
   if (deleted.length > 0) {
     logger.debug(
-      `Removed ${deleted.length} stale cron task(s): ${deleted.map((t) => t.name).join(", ")}`,
+      `Removed ${deleted.length} stale system cron task(s): ${deleted.map((t) => t.routeId).join(", ")}`,
     );
   }
 }

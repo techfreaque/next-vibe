@@ -70,7 +70,7 @@ export class CampaignStarterConfigRepository {
     const [cronTask] = await db
       .select()
       .from(cronTasks)
-      .where(eq(cronTasks.name, "campaign-starter"))
+      .where(eq(cronTasks.routeId, "campaign-starter"))
       .limit(1);
 
     if (!cronTask) {
@@ -135,11 +135,12 @@ export class CampaignStarterConfigRepository {
     const [existingCronTask] = await db
       .select()
       .from(cronTasks)
-      .where(eq(cronTasks.name, "campaign-starter"))
+      .where(eq(cronTasks.routeId, "campaign-starter"))
       .limit(1);
 
     const cronData = {
-      name: "campaign-starter" as const,
+      routeId: "campaign-starter",
+      displayName: "campaign-starter",
 
       version: "1.0.0", // Required field
       category: "LEAD_MANAGEMENT",
@@ -152,7 +153,6 @@ export class CampaignStarterConfigRepository {
       retries: cronSettings.retries,
       retryDelay: cronSettings.retryDelay,
       defaultConfig: {},
-      createdAt: new Date(),
       updatedAt: new Date(),
     };
 
@@ -161,7 +161,7 @@ export class CampaignStarterConfigRepository {
       await db
         .update(cronTasks)
         .set(cronData)
-        .where(eq(cronTasks.name, "campaign-starter"));
+        .where(eq(cronTasks.routeId, "campaign-starter"));
     } else {
       // Create new cron task
       await db.insert(cronTasks).values(cronData);

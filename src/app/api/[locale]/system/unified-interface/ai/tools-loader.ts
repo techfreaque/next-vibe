@@ -52,8 +52,19 @@ function createToolFromEndpoint(
   const zodSchemaWithTransforms = generateInputSchema(endpoint);
 
   // Target draft-7 to ensure compatibility with AI SDK's JSONSchema7 type
+  // io:"input" converts the input side of transforms (what AI should pass, not the output)
+  // unrepresentable:"any" prevents throwing on types that can't be represented
+  // override handles edge cases: transform inputs and z.custom() types
   const jsonSchemaObject = z.toJSONSchema(zodSchemaWithTransforms, {
     target: "draft-7",
+    io: "input",
+    unrepresentable: "any",
+    override: (ctx) => {
+      // For custom types (e.g. z.custom<T>()), describe as generic JSON object
+      if (ctx.zodSchema._zod.def.type === "custom") {
+        ctx.jsonSchema.type = "object";
+      }
+    },
   });
 
   // Wrap JSON Schema in AI SDK's jsonSchema() function

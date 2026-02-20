@@ -38,7 +38,7 @@ export const CHAT_CONSTANTS = {
 /**
  * Agent message content length limit
  */
-export const AGENT_MESSAGE_LENGTH = 10000;
+export const AGENT_MESSAGE_LENGTH = 40000;
 
 /**
  * Default AI tools enabled for new chats

@@ -55,7 +55,7 @@ interface CliOptions {
  * CLI Constants to avoid literal strings
  */
 const CLI_NAME = "vibe" as const;
-const CLI_VERSION = "2.0.0" as const;
+const CLI_VERSION = "3.0.0" as const;
 const DEFAULT_OUTPUT = "pretty" as const;
 
 import { env } from "@/config/env";

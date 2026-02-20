@@ -17,7 +17,11 @@ import type { z } from "zod";
 
 import { users } from "@/app/api/[locale]/user/db";
 
-import { CronTaskPriorityDB, CronTaskStatusDB } from "../enum";
+import {
+  CronTaskPriorityDB,
+  CronTaskStatusDB,
+  TaskOutputModeDB,
+} from "../enum";
 
 /**
  * Cron Tasks Table
@@ -25,7 +29,14 @@ import { CronTaskPriorityDB, CronTaskStatusDB } from "../enum";
  */
 export const cronTasks = pgTable("cron_tasks", {
   id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull().unique(),
+  /**
+   * routeId — which handler to call (was: name)
+   * Accepts: task name (e.g. "lead-email-campaigns"), endpoint alias (e.g. "cron:stats"),
+   * full endpoint path, or "cron-steps" for dynamic step tasks.
+   */
+  routeId: text("route_id").notNull(),
+  /** Human-readable label — separate from routeId for display */
+  displayName: text("display_name").notNull(),
   description: text("description"),
   version: text("version").notNull().default("1.0.0"),
   category: text("category").notNull(),
@@ -36,7 +47,19 @@ export const cronTasks = pgTable("cron_tasks", {
   timeout: integer("timeout").default(300000), // 5 minutes default
   retries: integer("retries").default(3),
   retryDelay: integer("retry_delay").default(30000), // 30 seconds default
+  /**
+   * defaultConfig — validated by the resolved route's/task's configSchema
+   * For "cron-steps" tasks: { steps: CronStep[] }
+   * For system tasks: whatever the task's configSchema defines
+   */
   defaultConfig: jsonb("default_config").notNull().default({}),
+
+  /** Output mode after execution */
+  outputMode: text("output_mode", { enum: TaskOutputModeDB })
+    .notNull()
+    .default(TaskOutputModeDB[0]),
+  /** Notification targets (email/sms/webhook) for non-store-only modes */
+  notificationTargets: jsonb("notification_targets").notNull().default([]),
 
   // Execution tracking
   lastExecutedAt: timestamp("last_executed_at"),
@@ -73,6 +96,7 @@ export const cronTaskExecutions = pgTable("cron_task_executions", {
   taskId: uuid("task_id")
     .notNull()
     .references(() => cronTasks.id, { onDelete: "cascade" }),
+  /** Snapshot of routeId at execution time */
   taskName: text("task_name").notNull(),
   executionId: text("execution_id").notNull().unique(),
   status: text("status", { enum: CronTaskStatusDB }).notNull(),
@@ -88,6 +112,13 @@ export const cronTaskExecutions = pgTable("cron_task_executions", {
   result: jsonb("result"),
   error: jsonb("error"),
   errorStack: text("error_stack"),
+
+  // Steps execution results (for cron-steps tasks)
+  stepResults: jsonb("step_results"),
+  /** Thread created/used by an ai_agent step */
+  threadId: uuid("thread_id"),
+  /** Total token count across all ai_agent steps */
+  tokenCount: integer("token_count"),
 
   // Execution context
   isManual: boolean("is_manual").notNull().default(false),
@@ -116,7 +147,7 @@ export const selectCronTaskExecutionSchema =
 /**
  * Type exports for cron tasks
  */
-export type CronTask = z.infer<typeof selectCronTaskSchema>;
+export type CronTaskRow = z.infer<typeof selectCronTaskSchema>;
 export type NewCronTask = z.infer<typeof insertCronTaskSchema>;
 
 export type CronTaskExecution = z.infer<typeof selectCronTaskExecutionSchema>;

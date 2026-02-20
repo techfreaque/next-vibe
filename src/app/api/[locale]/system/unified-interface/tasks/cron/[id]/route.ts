@@ -22,9 +22,36 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
   },
   [Methods.PUT]: {
     handler: async ({ data, urlPathParams, user, logger }) => {
+      const updates: Partial<
+        Parameters<typeof CronTasksRepository.updateTask>[1]
+      > = {};
+      if (data.displayName !== undefined) {
+        updates.displayName = data.displayName;
+      }
+      if (data.description !== undefined) {
+        updates.description = data.description;
+      }
+      if (data.schedule !== undefined) {
+        updates.schedule = data.schedule;
+      }
+      if (data.enabled !== undefined) {
+        updates.enabled = data.enabled;
+      }
+      if (data.priority !== undefined) {
+        updates.priority = data.priority;
+      }
+      if (data.outputMode !== undefined) {
+        updates.outputMode = data.outputMode;
+      }
+      if (data.timeout !== undefined) {
+        updates.timeout = data.timeout;
+      }
+      if (data.retries !== undefined) {
+        updates.retries = data.retries;
+      }
       return await CronTasksRepository.updateTask(
         urlPathParams.id,
-        data,
+        updates,
         user,
         logger,
       );

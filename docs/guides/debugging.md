@@ -50,8 +50,8 @@ vibe <command> --verbose
 **Enable permanently in development** - edit `src/config/debug.ts`:
 
 ```typescript
-export let enableDebugLogger = false;  // change to true
-export let debugMiddleware = false;    // change to true for middleware logs
+export let enableDebugLogger = false; // change to true
+export let debugMiddleware = false; // change to true for middleware logs
 ```
 
 Set these back to `false` before committing. The `-v` flag sets them at runtime via `enableDebug()`.

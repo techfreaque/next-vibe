@@ -12,10 +12,6 @@ import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface
 
 // Import client env modules
 import {
-  envClient as env_envClient,
-  envClientSchema as env_envClientSchema,
-} from "../../../../../config/env-client";
-import {
   contactClientEnv,
   contactClientEnvSchema,
 } from "../../contact/env-client";
@@ -38,7 +34,6 @@ const platform = {
 
 // Module registry for introspection
 export const envClientModules = {
-  env: { env: env_envClient, schema: env_envClientSchema },
   contact: { env: contactClientEnv, schema: contactClientEnvSchema },
   payment: { env: paymentClientEnv, schema: paymentClientEnvSchema },
 } as const;
@@ -47,9 +42,7 @@ export const envClientModules = {
 export { platform };
 
 // Combined client schema
-export const envClientSchema = env_envClientSchema.merge(
-  contactClientEnvSchema,
-).merge(
+export const envClientSchema = contactClientEnvSchema.merge(
   paymentClientEnvSchema,
 );
 

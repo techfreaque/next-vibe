@@ -188,7 +188,7 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
       if (type === "overview" || type === "performance" || type === "errors") {
         const perTaskRows = await db
           .select({
-            taskName: cronTasks.name,
+            taskName: cronTasks.routeId,
             priority: cronTasks.priority,
             enabled: cronTasks.enabled,
             executions: count(cronTaskExecutions.id),
@@ -212,7 +212,7 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
           .where(taskUserCondition)
           .groupBy(
             cronTasks.id,
-            cronTasks.name,
+            cronTasks.routeId,
             cronTasks.priority,
             cronTasks.enabled,
           )
@@ -347,7 +347,7 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
       const recentRows = await db
         .select({
           id: cronTaskExecutions.id,
-          taskName: cronTasks.name,
+          taskName: cronTasks.routeId,
           status: cronTaskExecutions.status,
           startedAt: cronTaskExecutions.startedAt,
           durationMs: cronTaskExecutions.durationMs,

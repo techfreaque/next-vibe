@@ -89,7 +89,7 @@ import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
 } from "@/app/api/[locale]/system/unified-interface/tasks/constants";
-import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/types/repository";
+import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 
 import { taskRepository } from "./repository";
 import type { TaskResponseOutput } from "./types";

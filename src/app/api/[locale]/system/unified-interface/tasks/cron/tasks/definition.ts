@@ -36,8 +36,50 @@ import {
   TaskCategory,
   TaskCategoryDB,
   TaskCategoryOptions,
+  TaskOutputModeDB,
 } from "../../enum";
 import { CronTasksContainer } from "./widget";
+
+/** Reusable task response shape — keep in sync with CronTaskResponse in repository.ts */
+export const cronTaskResponseSchema = z.object({
+  id: z.string(),
+  routeId: z.string(),
+  displayName: z.string(),
+  description: z.string().nullable(),
+  version: z.string(),
+  category: z.string(),
+  schedule: z.string(),
+  timezone: z.string().nullable(),
+  enabled: z.boolean(),
+  priority: z.enum(CronTaskPriorityDB),
+  timeout: z.number().nullable(),
+  retries: z.number().nullable(),
+  retryDelay: z.number().nullable(),
+  defaultConfig: z.record(z.string(), z.unknown()).optional().default({}),
+  outputMode: z.enum(TaskOutputModeDB),
+  notificationTargets: z
+    .array(
+      z.object({
+        type: z.enum(["email", "sms", "webhook"]),
+        target: z.string(),
+      }),
+    )
+    .optional()
+    .default([]),
+  lastExecutedAt: z.string().nullable(),
+  lastExecutionStatus: z.enum(CronTaskStatusDB).nullable(),
+  lastExecutionError: z.string().nullable(),
+  lastExecutionDuration: z.number().nullable(),
+  nextExecutionAt: z.string().nullable(),
+  executionCount: z.number(),
+  successCount: z.number(),
+  errorCount: z.number(),
+  averageExecutionTime: z.number().nullable(),
+  tags: z.array(z.string()).optional().default([]),
+  userId: z.string().nullable(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
 
 /**
  * GET /cron/tasks - List cron tasks
@@ -163,10 +205,16 @@ const { GET } = createEndpoint({
                 "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.id",
               schema: z.string(),
             }),
-            name: responseField({
+            routeId: responseField({
               type: WidgetType.TEXT,
               content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.name",
+                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.routeId",
+              schema: z.string(),
+            }),
+            displayName: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.displayName",
               schema: z.string(),
             }),
             description: responseField({
@@ -228,6 +276,18 @@ const { GET } = createEndpoint({
               content:
                 "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.retryDelay",
               schema: z.number().nullable(),
+            }),
+            outputMode: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.outputMode",
+              schema: z.enum(TaskOutputModeDB),
+            }),
+            userId: responseField({
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.userId",
+              schema: z.string().nullable(),
             }),
             lastExecutedAt: responseField({
               type: WidgetType.TEXT,
@@ -413,15 +473,27 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // Request fields
-      name: requestField({
+      routeId: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.name.label",
+          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.routeId.label",
         description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.name.description",
+          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.routeId.description",
         placeholder:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.name.placeholder",
+          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.routeId.placeholder",
+        columns: 12,
+        schema: z.string().min(1),
+      }),
+      displayName: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.displayName.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.displayName.description",
+        placeholder:
+          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.displayName.placeholder",
         columns: 12,
         schema: z.string().min(1),
       }),
@@ -481,6 +553,16 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.boolean().default(true),
       }),
+      outputMode: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.outputMode.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.outputMode.description",
+        columns: 6,
+        schema: z.enum(TaskOutputModeDB).default(TaskOutputModeDB[0]),
+      }),
       timeout: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
@@ -511,37 +593,23 @@ const { POST } = createEndpoint({
         columns: 4,
         schema: z.coerce.number().default(5000),
       }),
+      defaultConfig: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.defaultConfig.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.defaultConfig.description",
+        columns: 12,
+        schema: z.unknown().optional(),
+      }),
 
       // Response - return the created task
       task: responseField({
         type: WidgetType.TEXT,
         content:
           "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.response.task.title",
-        schema: z.object({
-          id: z.string(),
-          name: z.string(),
-          description: z.string().nullable(),
-          version: z.string(),
-          category: z.string(),
-          schedule: z.string(),
-          timezone: z.string().nullable(),
-          enabled: z.boolean(),
-          priority: z.enum(CronTaskPriorityDB),
-          timeout: z.number().nullable(),
-          retries: z.number().nullable(),
-          retryDelay: z.number().nullable(),
-          lastExecutedAt: z.string().nullable(),
-          lastExecutionStatus: z.enum(CronTaskStatusDB).nullable(),
-          lastExecutionError: z.string().nullable(),
-          lastExecutionDuration: z.number().nullable(),
-          nextExecutionAt: z.string().nullable(),
-          executionCount: z.number(),
-          successCount: z.number(),
-          errorCount: z.number(),
-          averageExecutionTime: z.number().nullable(),
-          createdAt: z.string(),
-          updatedAt: z.string(),
-        }),
+        schema: cronTaskResponseSchema,
       }),
     },
   ),
@@ -611,22 +679,26 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        name: "Daily Cleanup Task",
+        routeId: "cron-steps",
+        displayName: "Daily Cleanup Task",
         description: "Cleans up old data",
         schedule: "0 0 * * *",
         priority: CronTaskPriority.MEDIUM,
         category: TaskCategory.MAINTENANCE,
         enabled: true,
+        outputMode: TaskOutputModeDB[0],
         timeout: 300000,
         retries: 3,
         retryDelay: 5000,
+        defaultConfig: { steps: [] },
       },
     },
     responses: {
       default: {
         task: {
           id: "task-123",
-          name: "Daily Cleanup Task",
+          routeId: "cron-steps",
+          displayName: "Daily Cleanup Task",
           description: "Cleans up old data",
           version: "1.0.0",
           category: TaskCategory.MAINTENANCE,
@@ -637,6 +709,9 @@ const { POST } = createEndpoint({
           timeout: 300000,
           retries: 3,
           retryDelay: 5000,
+          defaultConfig: {},
+          outputMode: TaskOutputModeDB[0],
+          notificationTargets: [],
           lastExecutedAt: null,
           lastExecutionStatus: null,
           lastExecutionError: null,
@@ -646,6 +721,8 @@ const { POST } = createEndpoint({
           successCount: 0,
           errorCount: 0,
           averageExecutionTime: null,
+          tags: [],
+          userId: null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
@@ -669,7 +746,7 @@ export type CronTaskCreateRequestOutput = typeof POST.types.RequestOutput;
 export type CronTaskCreateResponseInput = typeof POST.types.ResponseInput;
 export type CronTaskCreateResponseOutput = typeof POST.types.ResponseOutput;
 
-// Individual task type extracted from response
-export type CronTaskResponseType = CronTaskListResponseOutput["tasks"][number];
+// Individual task type — derived from canonical schema (includes all fields)
+export type CronTaskResponseType = z.infer<typeof cronTaskResponseSchema>;
 
 export default endpoints;

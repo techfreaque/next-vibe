@@ -16,10 +16,11 @@ import { z } from "zod";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function zodSchemaToJsonSchema(schema: z.ZodTypeAny): any {
   try {
-    // z.toJSONSchema automatically strips transforms and refinements
-    // No manual stripping needed
+    // z.toJSONSchema handles most schemas; unrepresentable:"any" ensures
+    // fields with transforms/pipelines still appear (as {} / any) rather than throwing
     const jsonSchema = z.toJSONSchema(schema, {
       target: "draft-7",
+      unrepresentable: "any",
     });
 
     // Post-process: Remove fields with default values from required array

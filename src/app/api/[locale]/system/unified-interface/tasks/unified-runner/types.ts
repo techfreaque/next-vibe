@@ -5,10 +5,7 @@
 
 import "server-only";
 
-import type {
-  ErrorResponseType,
-  ResponseType,
-} from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import type { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -199,11 +196,10 @@ export interface StepResult {
 
 export type ResolveRouteIdResult =
   | { kind: "endpoint"; path: string }
-  | { kind: "task"; task: CronTask }
   | { kind: "steps" }
   | { kind: "unknown" };
 
-/** Structured result data returned by a cron task's run() function */
+/** Structured result data returned by a cron task run */
 export interface CronTaskRunResult {
   [key: string]:
     | string
@@ -217,14 +213,15 @@ export interface CronTaskRunResult {
 
 /**
  * Cron Task — scheduled task driven by the pulse runner.
- * Use the generic TConfig to narrow the config type in individual task files,
- * while the base type (TConfig = TaskConfig) is the structural contract used
- * when storing tasks in registries / Task[] arrays.
+ * Pure metadata object: the pulse runner dispatches execution to the route
+ * identified by `routeId`, passing `defaultConfig` as the request data.
  */
-export interface CronTask<TConfig extends TaskConfig = TaskConfig> {
+export interface CronTask {
   type: "cron";
-  /** Unique task name — used as routeId in DB for system tasks */
+  /** Unique task identifier — stored in DB and used for scheduling */
   name: string;
+  /** Route to invoke when this task fires. Resolved via resolveRouteId(). */
+  routeId: string;
   description: string;
   schedule: string;
   category: (typeof TaskCategory)[keyof typeof TaskCategory];
@@ -233,27 +230,8 @@ export interface CronTask<TConfig extends TaskConfig = TaskConfig> {
   timeout?: number;
   /** Output notification mode */
   outputMode?: (typeof TaskOutputMode)[keyof typeof TaskOutputMode];
-  /** Zod schema for validating defaultConfig — used by executor for central validation */
-  configSchema?: z.ZodSchema<TaskConfig>;
-  /** Default configuration values — validated against configSchema at runtime */
+  /** Default request data passed to the route handler on each execution */
   defaultConfig?: TaskConfig;
-  run(props: {
-    logger: EndpointLogger;
-    locale: CountryLanguage;
-    cronUser: JwtPrivatePayloadType;
-    /** Config loaded from DB (validated against configSchema) */
-    config: TConfig;
-  }):
-    | Promise<void | ErrorResponseType | ResponseType<CronTaskRunResult>>
-    | void
-    | ErrorResponseType
-    | ResponseType<CronTaskRunResult>;
-  onError?(props: {
-    error: Error;
-    logger: EndpointLogger;
-    locale: CountryLanguage;
-    cronUser: JwtPrivatePayloadType;
-  }): Promise<void> | void;
 }
 
 /**
@@ -286,7 +264,7 @@ export interface TaskRunner {
   }) => Promise<void>;
 }
 
-export type Task = CronTask<TaskConfig> | TaskRunner;
+export type Task = CronTask | TaskRunner;
 
 /**
  * Task Discovery and Registration
