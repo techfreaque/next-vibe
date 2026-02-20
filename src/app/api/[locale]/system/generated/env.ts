@@ -13,6 +13,7 @@ import type { z } from "zod";
 import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
 
 // Import env modules
+import { env, envSchema } from "../../../../../config/env";
 import { agentEnv, agentEnvSchema } from "../../agent/env";
 import { emailEnv, emailEnvSchema } from "../../emails/env";
 import {
@@ -27,7 +28,6 @@ import { paymentEnv, paymentEnvSchema } from "../../payment/env";
 import { smsEnv, smsEnvSchema } from "../../sms/env";
 import { hostingEnv, hostingEnvSchema } from "../hosting/env";
 import { serverSystemEnv, serverSystemEnvSchema } from "../server/env";
-import { cliEnv, cliEnvSchema } from "../unified-interface/cli/env";
 
 // Platform detection
 const platform = {
@@ -38,6 +38,7 @@ const platform = {
 
 // Module registry for introspection
 export const envModules = {
+  env: { env: env, schema: envSchema },
   agent: { env: agentEnv, schema: agentEnvSchema },
   email: { env: emailEnv, schema: emailEnvSchema },
   imap: { env: imapClientEnv, schema: imapClientEnvSchema },
@@ -46,19 +47,18 @@ export const envModules = {
   sms: { env: smsEnv, schema: smsEnvSchema },
   hosting: { env: hostingEnv, schema: hostingEnvSchema },
   serverSystem: { env: serverSystemEnv, schema: serverSystemEnvSchema },
-  cli: { env: cliEnv, schema: cliEnvSchema },
 } as const;
 
 // Combined schema using merge
-export const envSchema = agentEnvSchema
+export const envSchema = envSchema
+  .merge(agentEnvSchema)
   .merge(emailEnvSchema)
   .merge(imapClientEnvSchema)
   .merge(leadsCampaignsEnvSchema)
   .merge(paymentEnvSchema)
   .merge(smsEnvSchema)
   .merge(hostingEnvSchema)
-  .merge(serverSystemEnvSchema)
-  .merge(cliEnvSchema);
+  .merge(serverSystemEnvSchema);
 
 export type Env = z.infer<typeof envSchema>;
 

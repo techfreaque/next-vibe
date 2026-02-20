@@ -15,9 +15,8 @@ import {
   UserPermissionRole,
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-
-import { cliEnv } from "../env";
 
 /**
  * Default CLI user configuration
@@ -29,7 +28,7 @@ const DEFAULT_CLI_USER_ID = "00000000-0000-0000-0000-000000000001";
  * Returns null if VIBE_CLI_USER_EMAIL is not set
  */
 export function getCliUserEmail(): string | null {
-  return cliEnv.VIBE_CLI_USER_EMAIL ?? null;
+  return env.VIBE_CLI_USER_EMAIL ?? null;
 }
 
 /**

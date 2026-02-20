@@ -17,7 +17,6 @@ import {
 import { Environment, parseError } from "next-vibe/shared/utils";
 import { redirect } from "next-vibe-ui/lib/redirect";
 
-import { cliEnv } from "@/app/api/[locale]/system/unified-interface/cli/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
@@ -813,7 +812,7 @@ export class AuthRepository {
       if (!token) {
         if (isCliPlatform(context.platform)) {
           // Try CLI email auth if no token (works for both CLI and CLI_PACKAGE)
-          const cliEmail = cliEnv.VIBE_CLI_USER_EMAIL;
+          const cliEmail = env.VIBE_CLI_USER_EMAIL;
           if (cliEmail) {
             logger.debug("Attempting CLI email authentication");
             return await AuthRepository.authenticateUserByEmail(

@@ -77,10 +77,15 @@ export const translations: typeof enTranslations = {
         label: "Aufgaben-ID",
         description: "Eindeutige Kennung der Aufgabe",
       },
-      name: {
-        label: "Aufgabenname",
-        description: "Name der Aufgabe",
-        placeholder: "Aufgabennamen eingeben",
+      displayName: {
+        label: "Anzeigename",
+        description: "Menschenlesbares Label für diese Aufgabe",
+        placeholder: "Anzeigenamen eingeben",
+      },
+      outputMode: {
+        label: "Ausgabemodus",
+        description: "Wann Benachrichtigungen nach der Ausführung senden",
+        placeholder: "Ausgabemodus auswählen",
       },
       description: {
         label: "Beschreibung",
@@ -264,6 +269,8 @@ export const translations: typeof enTranslations = {
     disabled: "Deaktiviert",
     identity: "Identität",
     id: "Aufgaben-ID",
+    routeId: "Route-ID",
+    displayName: "Anzeigename",
     version: "Version",
     category: "Kategorie",
     priority: "Priorität",
@@ -271,6 +278,15 @@ export const translations: typeof enTranslations = {
     timezone: "Zeitzone",
     createdAt: "Erstellt",
     updatedAt: "Aktualisiert",
+    owner: "Eigentümer",
+    ownerSystem: "System",
+    ownerUser: "Benutzer",
+    outputMode: "Ausgabemodus",
+    outputModes: {
+      storeOnly: "Nur speichern",
+      notifyOnFailure: "Bei Fehler benachrichtigen",
+      notifyAlways: "Immer benachrichtigen",
+    },
     stats: {
       totalExecutions: "Gesamtausführungen",
       successful: "Erfolgreich",

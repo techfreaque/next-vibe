@@ -199,6 +199,14 @@ export const translations: typeof enTranslations = {
     cronRepositoryStatisticsFetchFailed:
       "Fehler beim Abrufen der Cron-Aufgabenstatistiken",
   },
+  outputMode: {
+    storeOnly: "Nur speichern",
+    notifyOnFailure: "Bei Fehler benachrichtigen",
+    notifyAlways: "Immer benachrichtigen",
+  },
+  dbHealthCheck: {
+    description: "Überprüft die Datenbankverbindungsgesundheit jede Minute",
+  },
   csvProcessor: {
     description: "Verarbeitet CSV-Importaufträge in Blöcken",
   },

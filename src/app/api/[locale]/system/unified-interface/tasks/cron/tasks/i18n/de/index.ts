@@ -143,10 +143,21 @@ export const translations: typeof enTranslations = {
       description: "Neue Cron-Aufgabe konfigurieren",
     },
     fields: {
-      name: {
-        label: "Aufgabenname",
-        description: "Eindeutiger Name für die Aufgabe",
-        placeholder: "Aufgabennamen eingeben...",
+      routeId: {
+        label: "Route-ID",
+        description:
+          "Handler-Bezeichner: Aufgabenname, Endpunktalias oder 'cron-steps'",
+        placeholder: "Route-ID eingeben...",
+      },
+      displayName: {
+        label: "Anzeigename",
+        description: "Menschenlesbares Label für diese Aufgabe",
+        placeholder: "Anzeigenamen eingeben...",
+      },
+      outputMode: {
+        label: "Ausgabemodus",
+        description: "Wann Benachrichtigungen nach der Ausführung senden",
+        placeholder: "Ausgabemodus auswählen...",
       },
       description: {
         label: "Beschreibung",
@@ -268,12 +279,23 @@ export const translations: typeof enTranslations = {
       never: "Nie",
       nextRun: "Nächster Lauf:",
       notScheduled: "Nicht geplant",
+      routeId: "Route-ID",
+      owner: {
+        system: "System",
+        user: "Benutzer",
+      },
+      outputMode: {
+        storeOnly: "Nur speichern",
+        notifyOnFailure: "Bei Fehler benachrichtigen",
+        notifyAlways: "Immer benachrichtigen",
+      },
     },
     action: {
       view: "Details anzeigen",
       history: "Verlauf anzeigen",
       edit: "Aufgabe bearbeiten",
       delete: "Aufgabe löschen",
+      runNow: "Jetzt ausführen",
     },
     empty: {
       noTasks: "Keine Cron-Aufgaben",

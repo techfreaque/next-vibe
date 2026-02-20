@@ -76,10 +76,15 @@ export const translations: typeof enTranslations = {
         label: "ID zadania",
         description: "Unikalny identyfikator zadania",
       },
-      name: {
-        label: "Nazwa zadania",
-        description: "Nazwa zadania",
-        placeholder: "Wprowadź nazwę zadania",
+      displayName: {
+        label: "Wyświetlana nazwa",
+        description: "Czytelna dla człowieka etykieta tego zadania",
+        placeholder: "Wprowadź wyświetlaną nazwę",
+      },
+      outputMode: {
+        label: "Tryb wyjścia",
+        description: "Kiedy wysyłać powiadomienia po wykonaniu",
+        placeholder: "Wybierz tryb wyjścia",
       },
       description: {
         label: "Opis",
@@ -257,6 +262,8 @@ export const translations: typeof enTranslations = {
     disabled: "Wyłączone",
     identity: "Tożsamość",
     id: "ID zadania",
+    routeId: "ID trasy",
+    displayName: "Wyświetlana nazwa",
     version: "Wersja",
     category: "Kategoria",
     priority: "Priorytet",
@@ -264,6 +271,15 @@ export const translations: typeof enTranslations = {
     timezone: "Strefa czasowa",
     createdAt: "Utworzono",
     updatedAt: "Zaktualizowano",
+    owner: "Właściciel",
+    ownerSystem: "System",
+    ownerUser: "Użytkownik",
+    outputMode: "Tryb wyjścia",
+    outputModes: {
+      storeOnly: "Tylko zapisz",
+      notifyOnFailure: "Powiadom przy błędzie",
+      notifyAlways: "Zawsze powiadamiaj",
+    },
     stats: {
       totalExecutions: "Łączne wykonania",
       successful: "Pomyślne",

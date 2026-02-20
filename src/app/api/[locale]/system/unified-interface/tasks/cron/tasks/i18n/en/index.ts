@@ -136,10 +136,21 @@ export const translations = {
       description: "Configure a new cron task",
     },
     fields: {
-      name: {
-        label: "Task Name",
-        description: "Unique name for the task",
-        placeholder: "Enter task name...",
+      routeId: {
+        label: "Route ID",
+        description:
+          "Handler identifier: task name, endpoint alias, or 'cron-steps'",
+        placeholder: "Enter route ID...",
+      },
+      displayName: {
+        label: "Display Name",
+        description: "Human-readable label for this task",
+        placeholder: "Enter display name...",
+      },
+      outputMode: {
+        label: "Output Mode",
+        description: "When to send notifications after execution",
+        placeholder: "Select output mode...",
       },
       description: {
         label: "Description",
@@ -261,12 +272,23 @@ export const translations = {
       never: "Never",
       nextRun: "Next run:",
       notScheduled: "Not scheduled",
+      routeId: "Route ID",
+      owner: {
+        system: "System",
+        user: "User",
+      },
+      outputMode: {
+        storeOnly: "Store Only",
+        notifyOnFailure: "Notify on Failure",
+        notifyAlways: "Notify Always",
+      },
     },
     action: {
       view: "View details",
       history: "View history",
       edit: "Edit task",
       delete: "Delete task",
+      runNow: "Run Now",
     },
     empty: {
       noTasks: "No cron tasks",

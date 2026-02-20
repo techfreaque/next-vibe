@@ -58,12 +58,13 @@ const CLI_NAME = "vibe" as const;
 const CLI_VERSION = "2.0.0" as const;
 const DEFAULT_OUTPUT = "pretty" as const;
 
-import { cliEnv } from "./env";
+import { env } from "@/config/env";
+
 import { RouteDelegationHandler } from "./runtime/route-executor";
 
 const program = new Command();
 
-const { t: earlyT } = simpleT(cliEnv.VIBE_CLI_LOCALE);
+const { t: earlyT } = simpleT(env.VIBE_CLI_LOCALE);
 
 program
   .name(CLI_NAME)
@@ -90,7 +91,7 @@ program
   .option(
     "-l, --locale <locale>",
     earlyT("app.api.system.unifiedInterface.cli.vibe.help.locale"),
-    cliEnv.VIBE_CLI_LOCALE,
+    env.VIBE_CLI_LOCALE,
   )
   .option(
     "-o, --output <format>",

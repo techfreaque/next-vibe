@@ -8,10 +8,16 @@ import { z } from "zod";
 
 import { Environment } from "@/app/api/[locale]/shared/utils/env-util";
 import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { defaultLocale } from "@/i18n/core/config";
 
 import { createSchema } from "./env-client";
 
-export const { env, schema: envSchema } = defineEnv({
+export const {
+  env,
+  schema: envSchema,
+  examples: envExamples,
+} = defineEnv({
   NODE_ENV: {
     schema: createSchema(
       z.enum(Environment),
@@ -67,5 +73,17 @@ export const { env, schema: envSchema } = defineEnv({
         .transform((v) => v === "true"),
     ),
     example: "false",
+  },
+  VIBE_CLI_USER_EMAIL: {
+    schema: z.string().email().optional(),
+    example: "admin@example.com",
+    comment: "CLI user email",
+  },
+  VIBE_CLI_LOCALE: {
+    schema: (z.string() as z.Schema<CountryLanguage>)
+      .optional()
+      .default(defaultLocale),
+    example: "en-GLOBAL",
+    comment: "CLI locale setting",
   },
 });

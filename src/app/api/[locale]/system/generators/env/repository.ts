@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -125,6 +125,8 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
       // eslint-disable-next-line i18next/no-literal-string
       const apiCorePath = ["src", "app", "api", "[locale]"];
       const apiDir = join(process.cwd(), ...apiCorePath);
+      // eslint-disable-next-line i18next/no-literal-string
+      const configDir = join(process.cwd(), "src", "config");
 
       const excludeDirs = [
         "node_modules",
@@ -135,27 +137,25 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
         "shared", // Exclude the shared/env utilities
       ];
 
-      // Discover server env files (only from API directory, not manual config)
+      // Discover server env files (from API directory and config directory)
       logger.debug("Discovering server env files");
-      const serverEnvFilePaths = findFilesRecursively(
-        apiDir,
-        "env.ts",
-        excludeDirs,
-      ).filter((filePath) => {
+      const serverOutputPath = join(data.outputDir, "env.ts");
+      const serverEnvFilePaths = [
+        ...findFilesRecursively(apiDir, "env.ts", excludeDirs),
+        ...findFilesRecursively(configDir, "env.ts", excludeDirs),
+      ].filter((filePath) => {
         // Exclude the generated output file itself
-        const serverOutputPath = join(data.outputDir, "env.ts");
         return filePath !== join(process.cwd(), serverOutputPath);
       });
 
-      // Discover client env files (only from API directory, not manual config)
+      // Discover client env files (from API directory and config directory)
       logger.debug("Discovering client env files");
-      const clientEnvFilePaths = findFilesRecursively(
-        apiDir,
-        "env-client.ts",
-        excludeDirs,
-      ).filter((filePath) => {
+      const clientOutputPath = join(data.outputDir, "env-client.ts");
+      const clientEnvFilePaths = [
+        ...findFilesRecursively(apiDir, "env-client.ts", excludeDirs),
+        ...findFilesRecursively(configDir, "env-client.ts", excludeDirs),
+      ].filter((filePath) => {
         // Exclude the generated output file itself
-        const clientOutputPath = join(data.outputDir, "env-client.ts");
         return filePath !== join(process.cwd(), clientOutputPath);
       });
 
@@ -262,8 +262,6 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
       }
 
       // Generate output files
-      const serverOutputPath = join(data.outputDir, "env.ts");
-      const clientOutputPath = join(data.outputDir, "env-client.ts");
       const envExamplePath = ".env.example";
 
       if (!data.dryRun) {
@@ -290,14 +288,48 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
         );
 
         // Generate .env.example file
-        const envExampleContent = await this.generateEnvExampleContent([
+        // Sort so src/config modules appear first, then pair each directory's
+        // env.ts (server) immediately followed by env-client.ts (client).
+        // Within a pair, server comes first so client keys win deduplication.
+        const configPath = join(process.cwd(), "src", "config");
+        const allModules = [
           ...validServerModules,
           ...validClientModules,
-        ]);
+        ].toSorted((a, b): number => {
+          const aDir = dirname(a.filePath);
+          const bDir = dirname(b.filePath);
+          const aIsConfig = aDir === configPath;
+          const bIsConfig = bDir === configPath;
+          // config directory always comes first
+          if (aIsConfig && !bIsConfig) {
+            return -1;
+          }
+          if (!aIsConfig && bIsConfig) {
+            return 1;
+          }
+          // group by directory
+          if (aDir !== bDir) {
+            return aDir.localeCompare(bDir);
+          }
+          // within same directory: server (env.ts) before client (env-client.ts)
+          if (a.isClient !== b.isClient) {
+            return a.isClient ? 1 : -1;
+          }
+          return 0;
+        });
+        const { content: envExampleContent, keys: envKeys } =
+          await this.generateEnvExampleContent(allModules);
         await writeGeneratedFile(
           join(process.cwd(), envExamplePath),
           envExampleContent,
           false,
+        );
+
+        // Update Dockerfile and docker-compose.prod.yml with the same key list
+        await this.updateDockerfile(join(process.cwd(), "Dockerfile"), envKeys);
+        await this.updateDockerCompose(
+          join(process.cwd(), "docker-compose.prod.yml"),
+          envKeys,
         );
       }
 
@@ -364,15 +396,35 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
       ),
     );
 
+    // Reserved names exported by the generated file itself
+    const RESERVED = new Set(["env", "envSchema"]);
+
+    // Build per-module aliased names to avoid collisions with generated exports
+    const aliasedModules = sortedModules.map((m) => {
+      const needsAlias =
+        RESERVED.has(m.exportName) || RESERVED.has(m.schemaExportName);
+      const prefix = needsAlias ? `${m.moduleName}_` : "";
+      return {
+        ...m,
+        importedEnvName: needsAlias
+          ? `${m.exportName} as ${prefix}${m.exportName}`
+          : m.exportName,
+        importedSchemaName: needsAlias
+          ? `${m.schemaExportName} as ${prefix}${m.schemaExportName}`
+          : m.schemaExportName,
+        localEnvName: `${prefix}${m.exportName}`,
+        localSchemaName: `${prefix}${m.schemaExportName}`,
+      };
+    });
+
     // Generate imports
     const imports: string[] = [];
-    for (const mod of sortedModules) {
+    for (const mod of aliasedModules) {
       const relativePath = getRelativeImportPath(mod.filePath, outputFile);
-      const singleLineImport = `import { ${mod.exportName}, ${mod.schemaExportName} } from "${relativePath}";`;
+      const singleLineImport = `import { ${mod.importedEnvName}, ${mod.importedSchemaName} } from "${relativePath}";`;
       if (singleLineImport.length > 80) {
-        // Split across multiple lines
         imports.push(
-          `import {\n  ${mod.exportName},\n  ${mod.schemaExportName},\n} from "${relativePath}";`,
+          `import {\n  ${mod.importedEnvName},\n  ${mod.importedSchemaName},\n} from "${relativePath}";`,
         );
       } else {
         imports.push(singleLineImport);
@@ -380,29 +432,27 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
     }
 
     // Generate module names for registry
-    const moduleEntries = sortedModules
+    const moduleEntries = aliasedModules
       .map(
         (m) =>
-          `  ${m.moduleName}: { env: ${m.exportName}, schema: ${m.schemaExportName} },`,
+          `  ${m.moduleName}: { env: ${m.localEnvName}, schema: ${m.localSchemaName} },`,
       )
       .join("\n");
 
     // Generate schema merge chain for server - check full single line length first
-    const singleLineServerChain = sortedModules
+    const singleLineServerChain = aliasedModules
       .map((m, i) =>
-        i === 0 ? `${m.schemaExportName}` : `.merge(${m.schemaExportName})`,
+        i === 0 ? `${m.localSchemaName}` : `.merge(${m.localSchemaName})`,
       )
       .join("");
     const fullServerDeclaration = `export const envSchema = ${singleLineServerChain}`;
 
     let serverSchemaChain: string;
-    if (fullServerDeclaration.length > 80 && sortedModules.length > 1) {
+    if (fullServerDeclaration.length > 80 && aliasedModules.length > 1) {
       // Use multiline format with newlines before each merge
-      serverSchemaChain = sortedModules
+      serverSchemaChain = aliasedModules
         .map((m, i) =>
-          i === 0
-            ? `${m.schemaExportName}`
-            : `\n  .merge(${m.schemaExportName})`,
+          i === 0 ? `${m.localSchemaName}` : `\n  .merge(${m.localSchemaName})`,
         )
         .join("");
     } else {
@@ -496,15 +546,35 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
       ),
     );
 
+    // Reserved names exported by the generated file itself
+    const RESERVED = new Set(["envClient", "envClientSchema"]);
+
+    // Build per-module aliased names to avoid collisions with generated exports
+    const aliasedModules = sortedModules.map((m) => {
+      const needsAlias =
+        RESERVED.has(m.exportName) || RESERVED.has(m.schemaExportName);
+      const prefix = needsAlias ? `${m.moduleName}_` : "";
+      return {
+        ...m,
+        importedEnvName: needsAlias
+          ? `${m.exportName} as ${prefix}${m.exportName}`
+          : m.exportName,
+        importedSchemaName: needsAlias
+          ? `${m.schemaExportName} as ${prefix}${m.schemaExportName}`
+          : m.schemaExportName,
+        localEnvName: `${prefix}${m.exportName}`,
+        localSchemaName: `${prefix}${m.schemaExportName}`,
+      };
+    });
+
     // Generate imports
     const imports: string[] = [];
-    for (const mod of sortedModules) {
+    for (const mod of aliasedModules) {
       const relativePath = getRelativeImportPath(mod.filePath, outputFile);
-      const singleLineImport = `import { ${mod.exportName}, ${mod.schemaExportName} } from "${relativePath}";`;
+      const singleLineImport = `import { ${mod.importedEnvName}, ${mod.importedSchemaName} } from "${relativePath}";`;
       if (singleLineImport.length > 80) {
-        // Split across multiple lines
         imports.push(
-          `import {\n  ${mod.exportName},\n  ${mod.schemaExportName},\n} from "${relativePath}";`,
+          `import {\n  ${mod.importedEnvName},\n  ${mod.importedSchemaName},\n} from "${relativePath}";`,
         );
       } else {
         imports.push(singleLineImport);
@@ -512,29 +582,29 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
     }
 
     // Generate module names for registry
-    const moduleEntries = sortedModules
+    const moduleEntries = aliasedModules
       .map(
         (m) =>
-          `  ${m.moduleName}: { env: ${m.exportName}, schema: ${m.schemaExportName} },`,
+          `  ${m.moduleName}: { env: ${m.localEnvName}, schema: ${m.localSchemaName} },`,
       )
       .join("\n");
 
     // Generate schema merge chain for client - check full single line length first
-    const singleLineClientChain = sortedModules
+    const singleLineClientChain = aliasedModules
       .map((m, i) =>
-        i === 0 ? `${m.schemaExportName}` : `.merge(${m.schemaExportName})`,
+        i === 0 ? `${m.localSchemaName}` : `.merge(${m.localSchemaName})`,
       )
       .join("");
     const fullClientDeclaration = `export const envClientSchema = ${singleLineClientChain}`;
 
     let schemaChain: string;
-    if (fullClientDeclaration.length > 80 && sortedModules.length > 1) {
+    if (fullClientDeclaration.length > 80 && aliasedModules.length > 1) {
       // Use multiline format with arguments on separate lines
-      schemaChain = sortedModules
+      schemaChain = aliasedModules
         .map((m, i) =>
           i === 0
-            ? `${m.schemaExportName}`
-            : `.merge(\n  ${m.schemaExportName},\n)`,
+            ? `${m.localSchemaName}`
+            : `.merge(\n  ${m.localSchemaName},\n)`,
         )
         .join("");
     } else {
@@ -604,10 +674,13 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
 
   /**
    * Generate .env.example file content
+   * Client module definitions take priority over server ones for shared keys
+   * (e.g. NEXT_PUBLIC_* vars are owned by the client module).
+   * Returns both the file content and the ordered list of emitted keys.
    */
   private async generateEnvExampleContent(
     modules: EnvFileInfo[],
-  ): Promise<string> {
+  ): Promise<{ content: string; keys: string[] }> {
     const lines: string[] = [
       "# ============================================================================",
       "# AUTO-GENERATED FILE - DO NOT EDIT MANUALLY",
@@ -617,34 +690,148 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
       "",
     ];
 
-    for (const mod of modules) {
-      // Import examples from the module
-      const moduleImport = await import(mod.filePath);
-      const examples = moduleImport[mod.examplesExportName];
+    // Pass 1: build a map of key -> owning module (client wins over server)
+    interface KeyOwner {
+      example: string;
+      comment?: string;
+      isClient: boolean;
+    }
+    const keyOwner = new Map<string, KeyOwner>();
 
-      if (!examples || examples.length === 0) {
+    for (const mod of modules) {
+      const moduleImport = await import(mod.filePath);
+      const examples = moduleImport[mod.examplesExportName] as Array<{
+        key: string;
+        example: string;
+        comment?: string;
+      }>;
+      if (!examples) {
         continue;
       }
 
-      // Add source file comment
+      for (const entry of examples) {
+        const existing = keyOwner.get(entry.key);
+        // Client definition beats server; otherwise first seen wins
+        if (!existing || (!existing.isClient && mod.isClient)) {
+          keyOwner.set(entry.key, {
+            example: entry.example,
+            comment: entry.comment,
+            isClient: mod.isClient,
+          });
+        }
+      }
+    }
+
+    // Pass 2: render in module order, skipping keys already emitted
+    const emittedKeys = new Set<string>();
+
+    for (const mod of modules) {
+      const moduleImport = await import(mod.filePath);
+      const examples = moduleImport[mod.examplesExportName] as Array<{
+        key: string;
+        example: string;
+        comment?: string;
+      }>;
+      if (!examples) {
+        continue;
+      }
+
+      // Only include keys whose preferred owner is this module
+      const ownedEntries = examples.filter((entry) => {
+        if (emittedKeys.has(entry.key)) {
+          return false;
+        }
+        const owner = keyOwner.get(entry.key);
+        return owner?.isClient === mod.isClient;
+      });
+
+      if (ownedEntries.length === 0) {
+        continue;
+      }
+
       const relativeSourcePath = mod.filePath
         .replace(process.cwd(), "")
         .replace(/^\//, "");
       lines.push(`# Source: ${relativeSourcePath}`);
       lines.push(`# ${mod.moduleName}`);
 
-      // Add each example
-      for (const entry of examples) {
-        if (entry.comment) {
-          lines.push(`# ${entry.comment}`);
+      for (const entry of ownedEntries) {
+        const owner = keyOwner.get(entry.key);
+        if (owner?.comment) {
+          lines.push(`# ${owner.comment}`);
         }
-        lines.push(`${entry.key}="${entry.example}"`);
+        lines.push(`${entry.key}="${owner?.example ?? entry.example}"`);
+        emittedKeys.add(entry.key);
       }
 
       lines.push("");
     }
 
-    return lines.join("\n");
+    return { content: lines.join("\n"), keys: [...emittedKeys] };
+  }
+
+  /**
+   * Update Dockerfile ARG and ENV blocks with current env keys.
+   * Replaces the region between sentinel comments.
+   */
+  private async updateDockerfile(
+    dockerfilePath: string,
+    keys: string[],
+  ): Promise<void> {
+    const { readFileSync } = await import("node:fs");
+    const START = "# BEGIN_GENERATED_ENV_ARGS";
+    const END = "# END_GENERATED_ENV_ARGS";
+
+    const argLines = keys.map((k) => `ARG ${k}`).join("\n");
+    const envLines = keys.map((k) => `ENV ${k}=$${k}`).join("\n");
+    const generated = `${START}\n${argLines}\n\n${envLines}\n${END}`;
+
+    const original = readFileSync(dockerfilePath, "utf8");
+
+    let updated: string;
+    if (original.includes(START)) {
+      updated = original.replace(
+        new RegExp(`${START}[\\s\\S]*?${END}`),
+        generated,
+      );
+    } else {
+      // Insert before COPY . .
+      updated = original.replace("COPY . .", `${generated}\n\nCOPY . .`);
+    }
+
+    await writeGeneratedFile(dockerfilePath, updated, false);
+  }
+
+  /**
+   * Update docker-compose.prod.yml build args block with current env keys.
+   * Replaces the region between sentinel comments.
+   */
+  private async updateDockerCompose(
+    composePath: string,
+    keys: string[],
+  ): Promise<void> {
+    const { readFileSync } = await import("node:fs");
+    const START = "# BEGIN_GENERATED_ENV_ARGS";
+    const END = "# END_GENERATED_ENV_ARGS";
+    const INDENT = "        ";
+
+    const argLines = keys.map((k) => `${INDENT}${k}: \${${k}}`).join("\n");
+    const generated = `${INDENT}${START}\n${argLines}\n${INDENT}${END}`;
+
+    const original = readFileSync(composePath, "utf8");
+
+    let updated: string;
+    if (original.includes(START)) {
+      updated = original.replace(
+        new RegExp(`${INDENT}${START}[\\s\\S]*?${INDENT}${END}`),
+        generated,
+      );
+    } else {
+      // Insert inside args: block — after "args:" line
+      updated = original.replace(/( +args:\n)/, `$1${generated}\n`);
+    }
+
+    await writeGeneratedFile(composePath, updated, false);
   }
 }
 

@@ -193,6 +193,14 @@ export const translations = {
     cronRepositoryScheduleUpdateFailed: "Failed to update cron task schedule",
     cronRepositoryStatisticsFetchFailed: "Failed to fetch cron task statistics",
   },
+  outputMode: {
+    storeOnly: "Store Only",
+    notifyOnFailure: "Notify on Failure",
+    notifyAlways: "Notify Always",
+  },
+  dbHealthCheck: {
+    description: "Verifies database connection health every minute",
+  },
   csvProcessor: {
     description: "Processes CSV import jobs in chunks",
   },

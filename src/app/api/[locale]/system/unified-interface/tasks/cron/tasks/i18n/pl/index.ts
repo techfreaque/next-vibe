@@ -138,10 +138,21 @@ export const translations: typeof enTranslations = {
       description: "Skonfiguruj nowe zadanie cron",
     },
     fields: {
-      name: {
-        label: "Nazwa zadania",
-        description: "Unikalna nazwa zadania",
-        placeholder: "Wprowadź nazwę zadania...",
+      routeId: {
+        label: "ID trasy",
+        description:
+          "Identyfikator obsługi: nazwa zadania, alias endpointu lub 'cron-steps'",
+        placeholder: "Wprowadź ID trasy...",
+      },
+      displayName: {
+        label: "Wyświetlana nazwa",
+        description: "Czytelna dla człowieka etykieta tego zadania",
+        placeholder: "Wprowadź wyświetlaną nazwę...",
+      },
+      outputMode: {
+        label: "Tryb wyjścia",
+        description: "Kiedy wysyłać powiadomienia po wykonaniu",
+        placeholder: "Wybierz tryb wyjścia...",
       },
       description: {
         label: "Opis",
@@ -263,12 +274,23 @@ export const translations: typeof enTranslations = {
       never: "Nigdy",
       nextRun: "Następny przebieg:",
       notScheduled: "Nie zaplanowano",
+      routeId: "ID trasy",
+      owner: {
+        system: "System",
+        user: "Użytkownik",
+      },
+      outputMode: {
+        storeOnly: "Tylko zapisz",
+        notifyOnFailure: "Powiadom przy błędzie",
+        notifyAlways: "Zawsze powiadamiaj",
+      },
     },
     action: {
       view: "Pokaż szczegóły",
       history: "Pokaż historię",
       edit: "Edytuj zadanie",
       delete: "Usuń zadanie",
+      runNow: "Uruchom teraz",
     },
     empty: {
       noTasks: "Brak zadań cron",

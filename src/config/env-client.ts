@@ -26,7 +26,11 @@ export function createSchema<T extends z.ZodTypeAny, U extends z.ZodTypeAny>(
     : U;
 }
 
-export const { envClient, schema: envClientSchema } = defineEnvClient({
+export const {
+  envClient,
+  schema: envClientSchema,
+  examples: envClientExamples,
+} = defineEnvClient({
   NODE_ENV: {
     schema: createSchema(
       z.enum(Environment),

@@ -74,10 +74,15 @@ export const translations = {
         label: "Task ID",
         description: "Unique identifier of the task",
       },
-      name: {
-        label: "Task Name",
-        description: "Name of the task",
-        placeholder: "Enter task name",
+      displayName: {
+        label: "Display Name",
+        description: "Human-readable label for this task",
+        placeholder: "Enter display name",
+      },
+      outputMode: {
+        label: "Output Mode",
+        description: "When to send notifications after execution",
+        placeholder: "Select output mode",
       },
       description: {
         label: "Description",
@@ -255,6 +260,8 @@ export const translations = {
     disabled: "Disabled",
     identity: "Identity",
     id: "Task ID",
+    routeId: "Route ID",
+    displayName: "Display Name",
     version: "Version",
     category: "Category",
     priority: "Priority",
@@ -262,6 +269,15 @@ export const translations = {
     timezone: "Timezone",
     createdAt: "Created",
     updatedAt: "Updated",
+    owner: "Owner",
+    ownerSystem: "System",
+    ownerUser: "User",
+    outputMode: "Output Mode",
+    outputModes: {
+      storeOnly: "Store Only",
+      notifyOnFailure: "Notify on Failure",
+      notifyAlways: "Notify Always",
+    },
     stats: {
       totalExecutions: "Total Executions",
       successful: "Successful",

@@ -31,4 +31,6 @@ export const envClient: EnvClient = {
   NEXT_PUBLIC_APP_URL: `http://${devServerIp}:3000`,
   NEXT_PUBLIC_TEST_SERVER_URL: `http://${devServerIp}:3000`,
   NEXT_PUBLIC_DEBUG_PRODUCTION: false,
+  NEXT_PUBLIC_LOCAL_MODE: false,
+  NEXT_PUBLIC_PROJECT_URL: "https://unbottled.ai",
 };
