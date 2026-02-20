@@ -87,5 +87,11 @@ export const translations: typeof enTranslations = {
     title: "Ordner synchronisieren",
     result: "Synchronisierungsergebnis",
     duration: "Dauer",
+    foldersProcessed: "Verarbeitete Ordner",
+    foldersAdded: "Hinzugefügte Ordner",
+    foldersUpdated: "Aktualisierte Ordner",
+    foldersDeleted: "Gelöschte Ordner",
+    submit: "Sync starten",
+    submitting: "Synchronisiere...",
   },
 };

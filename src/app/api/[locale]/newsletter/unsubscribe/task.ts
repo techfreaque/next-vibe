@@ -17,6 +17,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
 
+import { campaignSchedulerService } from "@/app/api/[locale]/leads/campaigns/emails/services/scheduler";
 import { leads } from "@/app/api/[locale]/leads/db";
 import { LeadStatus } from "@/app/api/[locale]/leads/enum";
 import { db } from "@/app/api/[locale]/system/db";
@@ -31,7 +32,7 @@ import {
 import type {
   Task,
   TaskExecutionContext,
-} from "@/app/api/[locale]/system/unified-interface/tasks/types/repository";
+} from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 
 import { newsletterSubscriptions } from "../db";
 import { NewsletterSubscriptionStatus } from "../enum";
@@ -123,6 +124,13 @@ async function executeNewsletterUnsubscribeSync(
               updatedAt: new Date(),
             })
             .where(eq(leads.id, lead.leadId));
+
+          // Halt all active campaigns
+          await campaignSchedulerService.haltCampaignsForStatusChange(
+            lead.leadId,
+            LeadStatus.UNSUBSCRIBED,
+            logger,
+          );
 
           leadsUpdated++;
         }
@@ -258,7 +266,8 @@ async function executeNewsletterUnsubscribeSync(
 const newsletterUnsubscribeSyncTask: Task = {
   type: "cron",
   name: "newsletter-unsubscribe-sync",
-  description: "tasks.newsletter_unsubscribe_sync.description",
+  description:
+    "app.api.system.unifiedInterface.tasks.newsletterUnsubscribeSync.description",
   schedule: CRON_SCHEDULES.EVERY_6_HOURS, // Every 6 hours
   category: TaskCategory.MAINTENANCE,
   enabled: false,

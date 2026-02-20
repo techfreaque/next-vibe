@@ -16,7 +16,7 @@ export const translations = {
     custom: "Custom Range",
   },
   get: {
-    title: "Get Email Statistics",
+    title: "Email Statistics",
     description: "Retrieve comprehensive email statistics and metrics",
     form: {
       title: "Email Statistics Request",
@@ -245,5 +245,7 @@ export const translations = {
     avgRetries: "Avg. Retries",
     avgDeliveryMs: "Avg. Delivery Time",
     viewList: "View List",
+    refresh: "Refresh",
+    search: "Search emails...",
   },
 };

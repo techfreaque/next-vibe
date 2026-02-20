@@ -1,6 +1,7 @@
 import { translations as emailServiceTranslations } from "../../email-service/i18n/en";
 import { translations as imapClientTranslations } from "../../imap-client/i18n/en";
 import { translations as messagesTranslations } from "../../messages/i18n/en";
+import { translations as messagingTranslations } from "../../messaging/i18n/en";
 import { translations as sendTranslations } from "../../send/i18n/en";
 import { translations as smtpClientTranslations } from "../../smtp-client/i18n/en";
 
@@ -38,6 +39,9 @@ export const translations = {
     smtpCampaignType: {
       leadCampaign: "Lead Campaign",
       newsletter: "Newsletter",
+      signupNurture: "Signup Nurture",
+      retention: "Retention",
+      winback: "Winback",
       transactional: "Transactional",
       notification: "Notification",
       system: "System",
@@ -266,6 +270,13 @@ export const translations = {
       good: "Good",
       warning: "Warning",
       error: "Error",
+    },
+    bulkMessageAction: {
+      markRead: "Mark as Read",
+      markUnread: "Mark as Unread",
+      flag: "Flag",
+      unflag: "Unflag",
+      delete: "Delete",
     },
     imapLoggingLevel: {
       error: "Error",
@@ -815,6 +826,8 @@ export const translations = {
       title: "Email Preview",
       preview: "Preview",
       version: "Version",
+      submit: "Render Preview",
+      submitting: "Rendering...",
     },
     sendTest: {
       post: {
@@ -902,6 +915,9 @@ export const translations = {
       success: "Test email sent successfully to {email}",
       title: "Send Test Email",
       failed: "Failed to send test email",
+      submit: "Send Test Email",
+      submitting: "Sending...",
     },
   },
+  messaging: messagingTranslations,
 };

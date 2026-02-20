@@ -390,7 +390,9 @@ export function ThreadedMessage({
         <UserProfileCard
           userId={hoveredUserId}
           userName={
-            message.authorName || t("app.chat.threadedView.userFallback")
+            message.authorId
+              ? message.authorId.slice(-8)
+              : t("app.chat.threadedView.userFallback")
           }
           messages={allMessages}
           position={userCardPosition}

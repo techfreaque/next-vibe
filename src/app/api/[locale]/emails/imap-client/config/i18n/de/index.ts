@@ -125,7 +125,10 @@ export const translations: typeof enTranslations = {
     server: "Servereinstellungen",
     connection: "Verbindungseinstellungen",
     sync: "Synchronisierungseinstellungen",
+    cache: "Cache-Einstellungen",
     resilience: "Ausfallsicherheitseinstellungen",
     monitoring: "Überwachungseinstellungen",
+    submit: "Konfiguration speichern",
+    submitting: "Speichern...",
   },
 };

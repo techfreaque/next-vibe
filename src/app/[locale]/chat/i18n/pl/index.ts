@@ -464,6 +464,9 @@ export const translations: typeof enTranslations = {
     enabledTitle: "Brave Search włączone (+0,65 kredytu za wyszukiwanie)",
     disabledTitle: "Brave Search wyłączone (+0,65 kredytu za wyszukiwanie)",
     creditIndicator: "+0,65",
+    unconfiguredTitle: "Wyszukiwanie sieciowe nie skonfigurowane",
+    unconfiguredBrave: "Dla Brave Search, dodaj do pliku .env:",
+    unconfiguredKagi: "Dla Kagi Search, dodaj do pliku .env:",
   },
   toolsButton: {
     title: "Konfiguruj narzędzia AI",
@@ -604,6 +607,9 @@ export const translations: typeof enTranslations = {
     manualSelect: "Wybierz ręcznie...",
     best: "NAJLEPSZY",
     bestForFilter: "Najlepszy dla tego filtra",
+    setupRequired: "Wymagana konfiguracja",
+    providerUnconfigured: "Klucz API dostawcy nie skonfigurowany",
+    addEnvKey: "Dodaj do .env",
     noMatchingModels: "Żadne modele nie pasują do filtrów",
     noModelsWarning:
       "Żadne modele nie pasują do tych filtrów. Dostosuj ustawienia.",
@@ -988,6 +994,9 @@ export const translations: typeof enTranslations = {
     },
   },
   voiceMode: {
+    unconfiguredTitle: "Głos nie skonfigurowany",
+    unconfiguredDescription:
+      "Dodaj EDEN_AI_API_KEY do pliku .env, aby włączyć głos. Klucz dostępny na app.edenai.run",
     inputMode: "Tryb wprowadzania głosowego",
     transcribeMode: "Transkrybuj",
     transcribeModeDescription: "Nagrywaj → Tekst pojawi się w polu",

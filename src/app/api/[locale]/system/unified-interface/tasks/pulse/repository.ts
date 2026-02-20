@@ -4,7 +4,7 @@
  * Following interface + implementation pattern
  */
 
-import { count, desc, eq, sql } from "drizzle-orm";
+import { count, desc, eq, inArray, sql } from "drizzle-orm";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
@@ -20,6 +20,7 @@ import {
   PulseHealthStatus,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 
+import { cronTasks as cronTasksTable } from "../cron/db";
 import type {
   NewPulseExecution,
   NewPulseHealth,
@@ -387,9 +388,29 @@ export class PulseHealthRepository implements IPulseHealthRepository {
           )
         : taskRegistry.cronTasks;
 
+      // Fetch enabled status from DB (overrides in-memory defaults)
+      const candidateNames = candidateTasks.map((t) => t.name);
+      const dbEnabledRows =
+        candidateNames.length > 0
+          ? await db
+              .select({
+                name: cronTasksTable.name,
+                enabled: cronTasksTable.enabled,
+              })
+              .from(cronTasksTable)
+              .where(inArray(cronTasksTable.name, candidateNames))
+          : [];
+      const dbEnabledMap = new Map(
+        dbEnabledRows.map((r) => [r.name, r.enabled]),
+      );
+
       // Discover which tasks are due
       for (const task of candidateTasks) {
-        if (!task.enabled) {
+        // DB enabled status takes precedence; fall back to in-memory default
+        const isEnabled = dbEnabledMap.has(task.name)
+          ? dbEnabledMap.get(task.name)
+          : task.enabled;
+        if (!isEnabled) {
           tasksSkipped.push(task.name);
           continue;
         }
@@ -549,7 +570,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
             ? 0
             : health.consecutiveFailures + 1,
           avgExecutionTimeMs: Math.round(
-            (health.avgExecutionTimeMs || 0 + executionTimeMs) / 2,
+            ((health.avgExecutionTimeMs || 0) + executionTimeMs) / 2,
           ),
           successRate: newSuccessRate,
           totalExecutions: newTotalExecutions,

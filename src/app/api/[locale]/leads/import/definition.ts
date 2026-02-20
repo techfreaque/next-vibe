@@ -71,11 +71,11 @@ const { POST } = createEndpoint({
       // === REQUEST FIELDS ===
       file: requestField({
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.FILE,
         label: "app.api.leads.import.post.file.label" as const,
         description: "app.api.leads.import.post.file.description" as const,
-        placeholder: "app.api.leads.import.post.file.placeholder" as const,
         helpText: "app.api.leads.import.post.file.helpText" as const,
+        accept: ".csv,text/csv",
         columns: 12,
         schema: z.string().min(1),
       }),
@@ -87,7 +87,7 @@ const { POST } = createEndpoint({
         placeholder: "app.api.leads.import.post.fileName.placeholder" as const,
         helpText: "app.api.leads.import.post.fileName.helpText" as const,
         columns: 12,
-        schema: z.string().min(1),
+        schema: z.string().optional(),
       }),
       skipDuplicates: requestField({
         type: WidgetType.FORM_FIELD,
@@ -176,7 +176,7 @@ const { POST } = createEndpoint({
         helpText:
           "app.api.leads.import.post.useChunkedProcessing.helpText" as const,
         columns: 6,
-        schema: z.boolean().default(false),
+        schema: z.boolean().default(true),
       }),
       batchSize: requestField({
         type: WidgetType.FORM_FIELD,
@@ -185,7 +185,7 @@ const { POST } = createEndpoint({
         description: "app.api.leads.import.post.batchSize.description" as const,
         helpText: "app.api.leads.import.post.batchSize.helpText" as const,
         columns: 6,
-        schema: z.coerce.number().min(10).max(1000).default(2000),
+        schema: z.coerce.number().min(10).max(2000).default(2000),
       }),
 
       // === RESPONSE FIELDS ===

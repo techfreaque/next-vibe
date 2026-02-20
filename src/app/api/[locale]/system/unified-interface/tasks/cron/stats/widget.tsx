@@ -662,6 +662,10 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
     router.push(`/${locale}/admin/cron/history`);
   }, [router, locale]);
 
+  const handleViewPulse = useCallback((): void => {
+    router.push(`/${locale}/admin/cron/pulse`);
+  }, [router, locale]);
+
   // ─── Derived values ───────────────────────────────────────────────────────
 
   const successRate = useMemo(() => {
@@ -756,6 +760,17 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
         </Button>
         <Button
           type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleViewPulse}
+        >
+          <Activity className="h-4 w-4 mr-1" />
+          {t(
+            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.viewPulse",
+          )}
+        </Button>
+        <Button
+          type="button"
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
@@ -767,13 +782,61 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
         </Button>
       </Div>
 
+      {/* ── System Status Banner ───────────────────────────────────────────── */}
+      {data?.systemStatus && (
+        <Div
+          className={cn(
+            "flex items-center gap-3 rounded-lg border px-4 py-2.5",
+            data.systemStatus === "healthy"
+              ? "bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800"
+              : data.systemStatus === "warning"
+                ? "bg-yellow-50 border-yellow-200 dark:bg-yellow-950/30 dark:border-yellow-800"
+                : "bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800",
+          )}
+        >
+          {data.systemStatus === "healthy" ? (
+            <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+          ) : data.systemStatus === "warning" ? (
+            <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
+          ) : (
+            <XCircle className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0" />
+          )}
+          <Span
+            className={cn(
+              "text-sm font-semibold uppercase tracking-wide",
+              data.systemStatus === "healthy"
+                ? "text-green-700 dark:text-green-300"
+                : data.systemStatus === "warning"
+                  ? "text-yellow-700 dark:text-yellow-300"
+                  : "text-red-700 dark:text-red-300",
+            )}
+          >
+            {t(
+              `app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.systemStatus.${data.systemStatus}`,
+            )}
+          </Span>
+          {data.uptime && (
+            <Span className="text-xs text-muted-foreground ml-auto">
+              {t(
+                "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.uptime",
+              )}
+              {`: ${data.uptime}`}
+            </Span>
+          )}
+        </Div>
+      )}
+
       {/* ── Primary KPI Cards ──────────────────────────────────────────────── */}
       <Div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <StatCard
           label={t(
             "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.totalTasks",
           )}
-          value={data?.totalTasks}
+          value={
+            data?.activeTasks !== undefined && data?.totalTasks !== undefined
+              ? `${data.activeTasks}/${data.totalTasks}`
+              : data?.totalTasks
+          }
           icon={<Activity className="h-3.5 w-3.5 text-muted-foreground" />}
         />
         <StatCard

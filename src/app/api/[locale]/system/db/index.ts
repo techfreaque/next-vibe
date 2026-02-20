@@ -11,6 +11,8 @@ import * as agentChatSchema from "../../agent/chat/db";
 import * as creditSchema from "../../credits/db";
 import * as leadsSchema from "../../leads/db";
 import * as referralSchema from "../../referral/db";
+import * as sshSchema from "../../ssh/db";
+import * as cronTasksSchema from "../../system/unified-interface/tasks/cron/db";
 import * as userSchema from "../../user/db";
 
 /**
@@ -36,8 +38,10 @@ export const db = drizzle(pool, {
     ...userSchema,
     ...agentChatSchema,
     ...creditSchema,
+    ...cronTasksSchema,
     ...leadsSchema,
     ...referralSchema,
+    ...sshSchema,
   },
 });
 

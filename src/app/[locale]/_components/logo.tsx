@@ -28,9 +28,15 @@ export function Logo({
 }): JSX.Element {
   const { t } = simpleT(locale);
   const Component = disabled ? Div : Link;
+  const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
+  const href = isLocalMode
+    ? envClient.NEXT_PUBLIC_PROJECT_URL
+    : `/${locale}${pathName}`;
   return (
     <Component
-      href={`/${locale}${pathName}`}
+      href={href}
+      target={isLocalMode ? "_blank" : undefined}
+      rel={isLocalMode ? "noopener noreferrer" : undefined}
       className={cn(
         "inline-flex items-center gap-1.5 no-underline! hover:no-underline!",
         linkClassName,

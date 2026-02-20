@@ -38,6 +38,7 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -51,6 +52,7 @@ import {
   LeadSortFieldOptions,
   LeadSourceFilter,
   LeadSourceFilterOptions,
+  type LeadStatusFilter,
   SortOrder,
   SortOrderOptions,
 } from "../enum";
@@ -69,57 +71,70 @@ interface CustomWidgetProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  NEW: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  PENDING:
+  "app.api.leads.enums.leadStatus.new":
+    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  "app.api.leads.enums.leadStatus.pending":
     "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  CAMPAIGN_RUNNING:
+  "app.api.leads.enums.leadStatus.campaignRunning":
     "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  WEBSITE_USER:
+  "app.api.leads.enums.leadStatus.websiteUser":
     "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
-  NEWSLETTER_SUBSCRIBER:
+  "app.api.leads.enums.leadStatus.newsletterSubscriber":
     "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
-  IN_CONTACT:
+  "app.api.leads.enums.leadStatus.inContact":
     "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  SIGNED_UP: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
-  SUBSCRIPTION_CONFIRMED:
+  "app.api.leads.enums.leadStatus.signedUp":
+    "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
+  "app.api.leads.enums.leadStatus.subscriptionConfirmed":
     "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  UNSUBSCRIBED:
+  "app.api.leads.enums.leadStatus.unsubscribed":
     "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
-  BOUNCED: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  INVALID: "bg-red-200 text-red-900 dark:bg-red-900/50 dark:text-red-200",
+  "app.api.leads.enums.leadStatus.bounced":
+    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  "app.api.leads.enums.leadStatus.invalid":
+    "bg-red-200 text-red-900 dark:bg-red-900/50 dark:text-red-200",
 };
 
 const CAMPAIGN_STAGE_COLORS: Record<string, string> = {
-  NOT_STARTED:
+  "app.api.leads.enums.emailCampaignStage.notStarted":
     "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-  INITIAL: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
-  FOLLOWUP_1:
+  "app.api.leads.enums.emailCampaignStage.initial":
+    "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
+  "app.api.leads.enums.emailCampaignStage.followup1":
     "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
-  FOLLOWUP_2:
+  "app.api.leads.enums.emailCampaignStage.followup2":
     "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-900/30 dark:text-fuchsia-300",
-  FOLLOWUP_3:
+  "app.api.leads.enums.emailCampaignStage.followup3":
     "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
-  COMPLETED:
+  "app.api.leads.enums.emailCampaignStage.nurture":
     "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+  "app.api.leads.enums.emailCampaignStage.reactivation":
+    "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
 };
 
 /** Status tab values for quick filtering */
 const STATUS_TAB_VALUES = [
   { labelKey: "app.api.leads.list.widget.tabAll", value: null },
-  { labelKey: "app.api.leads.list.widget.tabNew", value: "NEW" },
+  {
+    labelKey: "app.api.leads.list.widget.tabNew",
+    value: "app.api.leads.enums.leadStatusFilter.new",
+  },
   {
     labelKey: "app.api.leads.list.widget.tabCampaign",
-    value: "CAMPAIGN_RUNNING",
+    value: "app.api.leads.enums.leadStatusFilter.campaignRunning",
   },
   {
     labelKey: "app.api.leads.list.widget.tabConfirmed",
-    value: "SUBSCRIPTION_CONFIRMED",
+    value: "app.api.leads.enums.leadStatusFilter.subscriptionConfirmed",
   },
   {
     labelKey: "app.api.leads.list.widget.tabUnsubscribed",
-    value: "UNSUBSCRIBED",
+    value: "app.api.leads.enums.leadStatusFilter.unsubscribed",
   },
-  { labelKey: "app.api.leads.list.widget.tabBounced", value: "BOUNCED" },
+  {
+    labelKey: "app.api.leads.list.widget.tabBounced",
+    value: "app.api.leads.enums.leadStatusFilter.bounced",
+  },
 ] as const;
 
 const SOURCE_ALL = LeadSourceFilter.ALL;
@@ -165,7 +180,7 @@ function LeadRow({
                   "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
               )}
             >
-              {lead.status.replace(/_/g, " ")}
+              {t(lead.status)}
             </Span>
           )}
           {isConverted && (
@@ -181,7 +196,7 @@ function LeadRow({
                   "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
               )}
             >
-              {lead.currentCampaignStage.replace(/_/g, " ")}
+              {t(lead.currentCampaignStage)}
             </Span>
           )}
         </Div>
@@ -193,9 +208,7 @@ function LeadRow({
             <Span className="flex-shrink-0">{lead.country}</Span>
           )}
           {lead.source && (
-            <Span className="flex-shrink-0">
-              {lead.source.replace(/_/g, " ")}
-            </Span>
+            <Span className="flex-shrink-0">{t(lead.source)}</Span>
           )}
         </Div>
         {lead.createdAt && (
@@ -278,15 +291,15 @@ function LeadRow({
 
 export function LeadsListContainer({
   field,
-  fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const router = useRouter();
   const t = useWidgetTranslation();
-  const form = useWidgetForm();
+  const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
+  const navigation = useWidgetNavigation();
 
   const activeStatuses: string[] = form?.watch("statusFilters.status") ?? [];
   const activeSources: string[] = form?.watch("statusFilters.source") ?? [];
@@ -315,10 +328,12 @@ export function LeadsListContainer({
 
   const handleToggleStatus = useCallback(
     (status: string): void => {
-      const current: string[] = form?.getValues("statusFilters.status") ?? [];
-      const next = current.includes(status)
-        ? current.filter((s) => s !== status)
-        : [...current, status];
+      const current = form?.getValues("statusFilters.status") ?? [];
+      const typed =
+        status as (typeof LeadStatusFilter)[keyof typeof LeadStatusFilter];
+      const next = current.includes(typed)
+        ? current.filter((s) => s !== typed)
+        : [...current, typed];
       form?.setValue("statusFilters.status", next);
       if (onSubmit) {
         onSubmit();
@@ -329,10 +344,12 @@ export function LeadsListContainer({
 
   const handleSourceChange = useCallback(
     (value: string): void => {
+      const typed =
+        value as (typeof LeadSourceFilter)[keyof typeof LeadSourceFilter];
       if (value === SOURCE_ALL) {
         form?.setValue("statusFilters.source", []);
       } else {
-        form?.setValue("statusFilters.source", [value]);
+        form?.setValue("statusFilters.source", [typed]);
       }
       if (onSubmit) {
         onSubmit();
@@ -343,7 +360,10 @@ export function LeadsListContainer({
 
   const handleSortByChange = useCallback(
     (value: string): void => {
-      form?.setValue("sortingOptions.sortBy", value);
+      form?.setValue(
+        "sortingOptions.sortBy",
+        value as (typeof LeadSortField)[keyof typeof LeadSortField],
+      );
       if (onSubmit) {
         onSubmit();
       }
@@ -353,7 +373,10 @@ export function LeadsListContainer({
 
   const handleSortOrderChange = useCallback(
     (value: string): void => {
-      form?.setValue("sortingOptions.sortOrder", value);
+      form?.setValue(
+        "sortingOptions.sortOrder",
+        value as (typeof SortOrder)[keyof typeof SortOrder],
+      );
       if (onSubmit) {
         onSubmit();
       }
@@ -377,13 +400,21 @@ export function LeadsListContainer({
 
   const handleDelete = useCallback(
     (lead: Lead): void => {
-      router.push(`/${locale}/admin/leads/${lead.id}/edit`);
+      void (async (): Promise<void> => {
+        const leadDef =
+          await import("@/app/api/[locale]/leads/lead/[id]/definition");
+        navigation.push(leadDef.default.DELETE, {
+          urlPathParams: { id: lead.id },
+          renderInModal: true,
+          popNavigationOnSuccess: 1,
+        });
+      })();
     },
-    [router, locale],
+    [navigation],
   );
 
   const handleCreate = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/list`);
+    router.push(`/${locale}/admin/leads/create`);
   }, [router, locale]);
 
   const handleRefresh = useCallback((): void => {
@@ -391,16 +422,43 @@ export function LeadsListContainer({
   }, [endpointMutations]);
 
   const handleExport = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/list`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const exportDef =
+        await import("@/app/api/[locale]/leads/export/definition");
+      const currentSearch = form?.getValues("statusFilters.search") ?? "";
+      navigation.push(exportDef.default.GET, {
+        renderInModal: true,
+        data: {
+          search: currentSearch || undefined,
+        },
+      });
+    })();
+  }, [navigation, form]);
 
   const handleImport = useCallback((): void => {
     router.push(`/${locale}/admin/leads/import`);
   }, [router, locale]);
 
   const handleBatchUpdate = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/list`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const batchDef =
+        await import("@/app/api/[locale]/leads/batch/definition");
+      const currentSearch = form?.getValues("statusFilters.search") ?? "";
+      const currentStatus = form?.getValues("statusFilters.status") ?? [];
+      const currentSource = form?.getValues("statusFilters.source") ?? [];
+      const currentCampaignStage =
+        form?.getValues("statusFilters.currentCampaignStage") ?? [];
+      navigation.push(batchDef.default.PATCH, {
+        renderInModal: true,
+        data: {
+          search: currentSearch || undefined,
+          status: currentStatus,
+          currentCampaignStage: currentCampaignStage,
+          source: currentSource,
+        },
+      });
+    })();
+  }, [navigation, form]);
 
   const handleStats = useCallback((): void => {
     router.push(`/${locale}/admin/leads/stats`);
@@ -591,7 +649,7 @@ export function LeadsListContainer({
         {/* Text search */}
         <Div className="relative flex-1 min-w-[160px]">
           <TextFieldWidget
-            fieldName={`${fieldName}.statusFilters.search`}
+            fieldName="statusFilters.search"
             field={children.statusFilters.children.search}
           />
         </Div>
@@ -666,7 +724,7 @@ export function LeadsListContainer({
                     STATUS_COLORS[status]?.split(" ")[0] ?? "bg-gray-400",
                   )}
                 />
-                {status.replace(/_/g, " ")}: {count}
+                {t(status)}: {count}
               </Button>
             ))}
         </Div>

@@ -149,6 +149,7 @@ export const translations: typeof enTranslations = {
     header: {
       tasks: "Aufgaben",
       stats: "Statistiken",
+      pulse: "Pulse",
       refresh: "Aktualisieren",
     },
     summary: {
@@ -179,8 +180,10 @@ export const translations: typeof enTranslations = {
       error: "Fehler",
     },
     empty: "Kein Ausführungsverlauf gefunden",
+    result: "Ergebnis",
     error: {
       collapse: "Fehler einklappen",
+      label: "Fehler",
     },
     pagination: {
       info: "Seite {{page}} von {{totalPages}} ({{total}} gesamt)",

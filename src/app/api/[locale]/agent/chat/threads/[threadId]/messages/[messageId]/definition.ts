@@ -31,7 +31,11 @@ import { ChatMessageRole, ChatMessageRoleOptions } from "../../../../enum";
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.REMOTE_SKILL,
+  ] as const,
 
   title:
     "app.api.agent.chat.threads.threadId.messages.messageId.get.title" as const,
@@ -252,7 +256,11 @@ const { GET } = createEndpoint({
 const { PATCH } = createEndpoint({
   method: Methods.PATCH,
   path: ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.REMOTE_SKILL,
+  ] as const,
 
   title:
     "app.api.agent.chat.threads.threadId.messages.messageId.patch.title" as const,

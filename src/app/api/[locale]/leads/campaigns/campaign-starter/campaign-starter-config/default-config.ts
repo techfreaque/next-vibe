@@ -8,7 +8,7 @@ import { Environment } from "next-vibe/shared/utils/env-util";
 import { CronTaskPriority } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { env } from "@/config/env";
 
-import type { CampaignStarterConfigType } from "./definition";
+import type { CampaignStarterConfigPutRequestOutput } from "./definition";
 
 /**
  * Interface for cron settings (all required fields)
@@ -25,7 +25,7 @@ export interface CronSettings {
 /**
  * Production Configuration
  */
-export const PRODUCTION_CONFIG: CampaignStarterConfigType = {
+export const PRODUCTION_CONFIG: CampaignStarterConfigPutRequestOutput = {
   // Production configuration
   dryRun: false,
   minAgeHours: 0,
@@ -51,7 +51,7 @@ export const PRODUCTION_CONFIG: CampaignStarterConfigType = {
 /**
  * Development Configuration
  */
-export const DEVELOPMENT_CONFIG: CampaignStarterConfigType = {
+export const DEVELOPMENT_CONFIG: CampaignStarterConfigPutRequestOutput = {
   // Non-production configuration (testing)
   dryRun: false,
   minAgeHours: 0,
@@ -82,7 +82,7 @@ export const DEVELOPMENT_CONFIG: CampaignStarterConfigType = {
 /**
  * Get configuration based on environment
  */
-export function getDefaultConfig(): CampaignStarterConfigType {
+export function getDefaultConfig(): CampaignStarterConfigPutRequestOutput {
   return env.NODE_ENV === Environment.PRODUCTION
     ? PRODUCTION_CONFIG
     : DEVELOPMENT_CONFIG;
@@ -108,7 +108,7 @@ export function getDefaultCronSettings(): CronSettings {
 /**
  * Get complete default configuration (campaign + cron settings)
  */
-export function getDefaultConfigWithCron(): CampaignStarterConfigType {
+export function getDefaultConfigWithCron(): CampaignStarterConfigPutRequestOutput {
   const campaignConfig = getDefaultConfig();
   const cronConfig = getDefaultCronSettings();
 

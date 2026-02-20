@@ -8,33 +8,35 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import { EmailStatus } from "../../../../emails/messages/enum";
+import {
+  CampaignType,
+  type CampaignTypeValue,
+} from "../../../../emails/smtp-client/enum";
 import { emailCampaigns, leads } from "../../../db";
-import type { EmailJourneyVariant, EmailProvider } from "../../../enum";
+import type {
+  EmailCampaignStageValues,
+  EmailJourneyVariantValues,
+  EmailProviderValues,
+} from "../../../enum";
 import { EmailCampaignStage, LeadStatus } from "../../../enum";
 import type { CampaignSchedulingOptions } from "../types";
 import { abTestingService } from "./ab-testing";
-
-// Type aliases for enum values
-type EmailCampaignStageValues =
-  (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
-type EmailJourneyVariantValues =
-  (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant];
-type EmailProviderValues = (typeof EmailProvider)[keyof typeof EmailProvider];
 
 /**
  * Campaign Scheduling Rules
  * Defines timing between email stages
  */
+type SchedulableStage = Exclude<
+  typeof EmailCampaignStageValues,
+  (typeof EmailCampaignStage)["NOT_STARTED"]
+>;
+
 const SCHEDULING_RULES: {
-  [stage in Exclude<
-    EmailCampaignStageValues,
-    (typeof EmailCampaignStage)["NOT_STARTED"]
-  >]: {
+  [stage in SchedulableStage]: {
     delay: number; // In milliseconds
-    nextStage: EmailCampaignStageValues | null;
+    nextStage: SchedulableStage | null;
   };
 } = {
   [EmailCampaignStage.INITIAL]: {
@@ -68,42 +70,66 @@ const SCHEDULING_RULES: {
  */
 export class CampaignSchedulerService {
   /**
-   * Check if lead is eligible for email campaigns
-   * Leads are ineligible if they are converted, unsubscribed, or have invalid status
+   * Check if lead is eligible to receive a given campaign type.
+   * UNSUBSCRIBED, BOUNCED, INVALID always block all campaigns.
+   * Other statuses are allowed depending on the campaign type.
    */
-  private isLeadEligibleForCampaign(lead: typeof leads.$inferSelect): boolean {
-    const ineligibleStatuses: Array<
-      (typeof LeadStatus)[keyof typeof LeadStatus]
-    > = [
+  private isLeadEligibleForCampaign(
+    lead: typeof leads.$inferSelect,
+    campaignType: typeof CampaignTypeValue,
+  ): boolean {
+    // Always block terminal opt-out/bounce/invalid statuses
+    const alwaysBlocked: Array<(typeof LeadStatus)[keyof typeof LeadStatus]> = [
       LeadStatus.UNSUBSCRIBED,
-      LeadStatus.SIGNED_UP,
-      LeadStatus.SUBSCRIPTION_CONFIRMED,
       LeadStatus.BOUNCED,
       LeadStatus.INVALID,
     ];
+    if (alwaysBlocked.includes(lead.status)) {
+      return false;
+    }
 
-    return (
-      !ineligibleStatuses.includes(lead.status) &&
-      !lead.convertedAt &&
-      !lead.signedUpAt &&
-      !lead.subscriptionConfirmedAt
-    );
+    // Campaign-type specific eligibility
+    switch (campaignType) {
+      case CampaignType.LEAD_CAMPAIGN:
+      case CampaignType.NEWSLETTER:
+        // Cold / newsletter nurture: only pre-signup leads
+        return !lead.signedUpAt && !lead.convertedAt;
+      case CampaignType.SIGNUP_NURTURE:
+        // Signed-up leads without a subscription
+        return !!lead.signedUpAt && !lead.subscriptionConfirmedAt;
+      case CampaignType.RETENTION:
+        // Active subscribers
+        return !!lead.subscriptionConfirmedAt;
+      case CampaignType.WINBACK:
+        // Churned: was a subscriber, no longer
+        return !!lead.signedUpAt && !lead.subscriptionConfirmedAt;
+      default:
+        return true;
+    }
   }
 
   /**
-   * Schedule initial email campaign for a new lead
+   * Schedule initial email campaign for a new lead.
+   * Creates or updates the lead_campaigns row for the given campaignType,
+   * then schedules the INITIAL email send.
    */
   async scheduleInitialCampaign(
     leadId: string,
     options: {
-      journeyVariant?: EmailJourneyVariantValues;
+      campaignType?: typeof CampaignTypeValue;
+      journeyVariant?: typeof EmailJourneyVariantValues;
       priority?: "low" | "normal" | "high";
       metadata?: Record<string, string | number | boolean>;
     } = {},
     logger: EndpointLogger,
   ): Promise<string | null> {
     try {
-      logger.info("campaign.schedule.initial.start", { leadId, options });
+      const campaignType = options.campaignType ?? CampaignType.LEAD_CAMPAIGN;
+      logger.info("campaign.schedule.initial.start", {
+        leadId,
+        campaignType,
+        options,
+      });
 
       // Get lead data
       const [lead] = await db
@@ -117,8 +143,8 @@ export class CampaignSchedulerService {
         return null;
       }
 
-      // Check if lead is eligible for campaigns
-      if (!this.isLeadEligibleForCampaign(lead)) {
+      // Check if lead is eligible for this campaign type
+      if (!this.isLeadEligibleForCampaign(lead, campaignType)) {
         logger.info("campaign.schedule.initial.skip.ineligible", {
           leadId,
           status: lead.status,
@@ -127,7 +153,7 @@ export class CampaignSchedulerService {
         return null;
       }
 
-      // Assign journey variant using A/B testing
+      // Assign journey variant using A/B testing (only meaningful for COLD campaigns)
       const journeyVariant =
         options.journeyVariant ||
         abTestingService.assignJourneyVariant(leadId, logger, {
@@ -135,13 +161,16 @@ export class CampaignSchedulerService {
           source: lead.source || undefined,
         });
 
-      // Update lead with assigned journey variant
+      // Upsert lead_campaigns row — one row per lead+campaignType
+      const now = new Date();
+
+      // Update lead with assigned journey variant (kept for backwards compat / denormalized view)
       await db
         .update(leads)
         .set({
           emailJourneyVariant: journeyVariant,
           currentCampaignStage: EmailCampaignStage.INITIAL,
-          updatedAt: new Date(),
+          updatedAt: now,
         })
         .where(eq(leads.id, leadId));
 
@@ -149,9 +178,10 @@ export class CampaignSchedulerService {
       const campaignId = await this.scheduleEmail(
         {
           leadId,
+          campaignType,
           journeyVariant,
           stage: EmailCampaignStage.INITIAL,
-          scheduledAt: new Date(), // Send immediately
+          scheduledAt: now,
           metadata: options.metadata,
         },
         logger,
@@ -161,6 +191,7 @@ export class CampaignSchedulerService {
         // Schedule next stage
         await this.scheduleNextStage(
           leadId,
+          campaignType,
           EmailCampaignStage.INITIAL,
           journeyVariant,
           logger,
@@ -186,19 +217,21 @@ export class CampaignSchedulerService {
     try {
       const {
         leadId,
+        campaignType,
         journeyVariant,
         stage,
         scheduledAt,
         metadata = {},
       } = options;
 
-      // Check if email already scheduled for this stage
+      // Check if email already scheduled for this lead+campaignType+stage
       const existingCampaign = await db
         .select()
         .from(emailCampaigns)
         .where(
           and(
             eq(emailCampaigns.leadId, leadId),
+            eq(emailCampaigns.campaignType, campaignType),
             eq(emailCampaigns.stage, stage),
             eq(emailCampaigns.journeyVariant, journeyVariant),
           ),
@@ -208,21 +241,20 @@ export class CampaignSchedulerService {
       if (existingCampaign.length > 0) {
         logger.info("campaign.schedule.email.already.scheduled", {
           leadId,
+          campaignType,
           stage,
           existingCampaignId: existingCampaign[0].id,
         });
         return existingCampaign[0].id;
       }
 
-      // Create email campaign record
-      // Note: subject will be updated when email is rendered and sent
       const [campaign] = await db
         .insert(emailCampaigns)
         .values({
           leadId,
+          campaignType,
           stage,
           journeyVariant,
-          // Use template name as temporary subject - will be replaced with actual subject when rendered
           subject: `${journeyVariant}_${stage}`,
           templateName: `${journeyVariant}_${stage}`,
           scheduledAt,
@@ -243,11 +275,9 @@ export class CampaignSchedulerService {
    */
   async scheduleNextStage(
     leadId: string,
-    currentStage: Exclude<
-      EmailCampaignStageValues,
-      (typeof EmailCampaignStage)["NOT_STARTED"]
-    >,
-    journeyVariant: EmailJourneyVariantValues,
+    campaignType: typeof CampaignTypeValue,
+    currentStage: SchedulableStage,
+    journeyVariant: typeof EmailJourneyVariantValues,
     logger: EndpointLogger,
   ): Promise<string | null> {
     try {
@@ -260,11 +290,15 @@ export class CampaignSchedulerService {
         return null;
       }
 
-      const nextScheduledAt = new Date(Date.now() + rule.delay);
+      const nextRule = SCHEDULING_RULES[rule.nextStage];
+      const nextScheduledAt = new Date(
+        Date.now() + (nextRule?.delay ?? rule.delay),
+      );
 
       return await this.scheduleEmail(
         {
           leadId,
+          campaignType,
           journeyVariant,
           stage: rule.nextStage,
           scheduledAt: nextScheduledAt,
@@ -282,7 +316,8 @@ export class CampaignSchedulerService {
   }
 
   /**
-   * Get pending emails ready to be sent
+   * Get pending emails ready to be sent.
+   * Excludes emails for campaigns that have been halted (haltedAt is set).
    */
   async getPendingEmails(
     limit = 100,
@@ -291,8 +326,9 @@ export class CampaignSchedulerService {
     Array<{
       id: string;
       leadId: string;
-      stage: EmailCampaignStageValues;
-      journeyVariant: EmailJourneyVariantValues;
+      campaignType: typeof CampaignTypeValue;
+      stage: typeof EmailCampaignStageValues;
+      journeyVariant: typeof EmailJourneyVariantValues;
       scheduledAt: Date;
       lead: {
         id: string;
@@ -309,6 +345,7 @@ export class CampaignSchedulerService {
         .select({
           id: emailCampaigns.id,
           leadId: emailCampaigns.leadId,
+          campaignType: emailCampaigns.campaignType,
           stage: emailCampaigns.stage,
           journeyVariant: emailCampaigns.journeyVariant,
           scheduledAt: emailCampaigns.scheduledAt,
@@ -321,31 +358,27 @@ export class CampaignSchedulerService {
             eq(emailCampaigns.status, EmailStatus.PENDING),
             lt(emailCampaigns.scheduledAt, now),
             isNull(emailCampaigns.sentAt),
-            // Only send to leads with running campaigns (after campaign starter)
-            eq(leads.status, LeadStatus.CAMPAIGN_RUNNING),
-            // Exclude converted leads
-            isNull(leads.convertedAt),
             // Only process leads with email addresses
             isNotNull(leads.email),
+            // Exclude converted leads
+            isNull(leads.convertedAt),
           ),
         )
         .orderBy(emailCampaigns.scheduledAt)
         .limit(limit);
 
-      logger.info("campaign.pending.emails.retrieved", {
-        count: pendingCampaigns.length,
-        limit,
-      });
+      logger.debug(`Pending emails: ${pendingCampaigns.length}/${limit}`);
 
       return pendingCampaigns.map((campaign) => ({
         id: campaign.id,
         leadId: campaign.leadId,
-        stage: campaign.stage as EmailCampaignStageValues,
-        journeyVariant: campaign.journeyVariant as EmailJourneyVariantValues,
+        campaignType: campaign.campaignType,
+        stage: campaign.stage,
+        journeyVariant: campaign.journeyVariant,
         scheduledAt: campaign.scheduledAt,
         lead: {
           id: campaign.lead.id,
-          email: campaign.lead.email!, // We filtered for isNotNull(leads.email) above
+          email: campaign.lead.email!,
           businessName: campaign.lead.businessName,
           status: campaign.lead.status,
         },
@@ -362,19 +395,40 @@ export class CampaignSchedulerService {
   async markEmailAsSent(
     campaignId: string,
     logger: EndpointLogger,
-    emailProvider: EmailProviderValues,
+    emailProvider: typeof EmailProviderValues,
     externalId: string | null = null,
+    smtpAccountId: string | null = null,
   ): Promise<boolean> {
     try {
-      await db
+      const now = new Date();
+
+      const [sent] = await db
         .update(emailCampaigns)
         .set({
           status: EmailStatus.SENT,
-          sentAt: new Date(),
+          sentAt: now,
           externalId,
           emailProvider,
+          smtpAccountId,
         })
-        .where(eq(emailCampaigns.id, campaignId));
+        .where(eq(emailCampaigns.id, campaignId))
+        .returning({
+          leadId: emailCampaigns.leadId,
+          stage: emailCampaigns.stage,
+        });
+
+      // Advance lead's campaign stage and lastEmailSentAt
+      if (sent) {
+        await db
+          .update(leads)
+          .set({
+            currentCampaignStage: sent.stage,
+            lastEmailSentAt: now,
+            emailsSent: sql`${leads.emailsSent} + 1`,
+            updatedAt: now,
+          })
+          .where(eq(leads.id, sent.leadId));
+      }
 
       logger.info("campaign.mark.email.sent", {
         campaignId,
@@ -392,52 +446,144 @@ export class CampaignSchedulerService {
   }
 
   /**
-   * Cancel scheduled emails for a lead
+   * Halt a campaign for a lead.
+   * Marks the lead_campaigns row as halted and cancels all pending email sends
+   * for that campaign type. If no campaignType is given, halts all campaigns.
+   * Does NOT require a TFunction — safe to call from any server context.
    */
-  async cancelScheduledEmails(
+  async haltCampaign(
     leadId: string,
-    t: TFunction,
     logger: EndpointLogger,
-    reason: string | null = null,
+    options: {
+      campaignType?: typeof CampaignTypeValue;
+      reason?: string;
+    } = {},
   ): Promise<number> {
     try {
+      const now = new Date();
+      const { campaignType, reason = "system_halt" } = options;
+
+      // Cancel pending email sends for the lead (filtered by campaignType if provided)
+      const emailConditions = campaignType
+        ? and(
+            eq(emailCampaigns.leadId, leadId),
+            eq(emailCampaigns.campaignType, campaignType),
+            eq(emailCampaigns.status, EmailStatus.PENDING),
+            isNull(emailCampaigns.sentAt),
+          )
+        : and(
+            eq(emailCampaigns.leadId, leadId),
+            eq(emailCampaigns.status, EmailStatus.PENDING),
+            isNull(emailCampaigns.sentAt),
+          );
+
       const result = await db
         .update(emailCampaigns)
         .set({
           status: EmailStatus.FAILED,
-          metadata: {
-            cancelReason:
-              reason ||
-              t(
-                "app.api.leads.campaigns.emails.services.scheduler.cancelledBySystem",
-              ),
-          },
+          error: reason,
+          updatedAt: now,
         })
-        .where(
-          and(
-            eq(emailCampaigns.leadId, leadId),
-            eq(emailCampaigns.status, EmailStatus.PENDING),
-            isNull(emailCampaigns.sentAt),
-          ),
-        );
+        .where(emailConditions);
 
-      logger.info("campaign.cancel.scheduled.emails", {
+      const cancelledCount = result.rowCount ?? 0;
+      logger.info("campaign.halt", {
         leadId,
+        campaignType: campaignType ?? "all",
         reason,
-        cancelledCount: result.rowCount || 0,
+        cancelledEmails: cancelledCount,
       });
 
-      return result.rowCount || 0;
+      return cancelledCount;
     } catch (error) {
-      logger.error(
-        "campaign.cancel.scheduled.emails.error",
-        parseError(error),
-        {
-          leadId,
-        },
-      );
+      logger.error("campaign.halt.error", parseError(error), { leadId });
       return 0;
     }
+  }
+
+  /**
+   * Halt campaigns based on a lead status transition.
+   * Spec halting rules:
+   * → NEWSLETTER_SUBSCRIBER:  halt LEAD_CAMPAIGN
+   * → SIGNED_UP:              halt LEAD_CAMPAIGN + NEWSLETTER
+   * → SUBSCRIPTION_CONFIRMED: halt SIGNUP_NURTURE
+   * → SIGNED_UP (churn):      halt RETENTION  (caller must pass reason="churn")
+   * → UNSUBSCRIBED/BOUNCED/INVALID: halt all
+   */
+  async haltCampaignsForStatusChange(
+    leadId: string,
+    newStatus: (typeof LeadStatus)[keyof typeof LeadStatus],
+    logger: EndpointLogger,
+    options: { churn?: boolean } = {},
+  ): Promise<void> {
+    const haltTargets: Array<typeof CampaignTypeValue | undefined> = [];
+
+    switch (newStatus) {
+      case LeadStatus.NEWSLETTER_SUBSCRIBER:
+        haltTargets.push(CampaignType.LEAD_CAMPAIGN);
+        break;
+      case LeadStatus.SIGNED_UP:
+        if (options.churn) {
+          haltTargets.push(CampaignType.RETENTION);
+        } else {
+          haltTargets.push(CampaignType.LEAD_CAMPAIGN, CampaignType.NEWSLETTER);
+        }
+        break;
+      case LeadStatus.SUBSCRIPTION_CONFIRMED:
+        haltTargets.push(CampaignType.SIGNUP_NURTURE);
+        break;
+      case LeadStatus.UNSUBSCRIBED:
+      case LeadStatus.BOUNCED:
+      case LeadStatus.INVALID:
+        // halt all — pass undefined to haltCampaign
+        haltTargets.push(undefined);
+        break;
+      default:
+        return;
+    }
+
+    for (const campaignType of haltTargets) {
+      await this.haltCampaign(leadId, logger, {
+        campaignType,
+        reason: `status_change:${newStatus}`,
+      });
+    }
+
+    // Enqueue the next campaign per spec halting table
+    let nextCampaignType: typeof CampaignTypeValue | null = null;
+    switch (newStatus) {
+      case LeadStatus.NEWSLETTER_SUBSCRIBER:
+        nextCampaignType = CampaignType.NEWSLETTER;
+        break;
+      case LeadStatus.SIGNED_UP:
+        nextCampaignType = options.churn
+          ? CampaignType.WINBACK
+          : CampaignType.SIGNUP_NURTURE;
+        break;
+      case LeadStatus.SUBSCRIPTION_CONFIRMED:
+        nextCampaignType = CampaignType.RETENTION;
+        break;
+    }
+
+    if (nextCampaignType) {
+      await this.scheduleInitialCampaign(
+        leadId,
+        { campaignType: nextCampaignType },
+        logger,
+      );
+    }
+  }
+
+  /**
+   * @deprecated Use haltCampaign instead.
+   * Kept for any callers that still use TFunction-based cancellation.
+   */
+  async cancelScheduledEmails(
+    leadId: string,
+    logger: EndpointLogger,
+    reason: string | null = null,
+  ): Promise<number> {
+    return this.haltCampaign(leadId, logger, { reason: reason ?? undefined });
   }
 
   /**
@@ -446,7 +592,7 @@ export class CampaignSchedulerService {
    */
   async getCampaignStats(
     logger: EndpointLogger,
-    journeyVariant: EmailJourneyVariantValues | null = null,
+    journeyVariant: typeof EmailJourneyVariantValues | null = null,
   ): Promise<{
     total: number;
     pending: number;

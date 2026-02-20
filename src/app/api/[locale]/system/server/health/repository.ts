@@ -125,7 +125,7 @@ export class HealthCheckRepositoryImpl implements HealthCheckRepositoryInterface
           name: envInfo.environment,
           nodeEnv: envInfo.nodeEnv,
           platform: envInfo.platform.name,
-          supportsSideTasks: envInfo.config.supportsSideTasks,
+          supportsTaskRunners: envInfo.config.supportsTaskRunners,
         },
         database: databaseStatus || {
           status: "unknown" as const,

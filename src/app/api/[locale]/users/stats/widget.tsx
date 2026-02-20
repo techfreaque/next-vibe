@@ -479,7 +479,7 @@ export function UsersStatsContainer({
       {generatedAt && (
         <Div className="text-xs text-muted-foreground text-right">
           {t("app.api.users.stats.widget.generatedAt")}{" "}
-          {new Date(generatedAt as string).toLocaleString()}
+          {generatedAt.toLocaleString()}
         </Div>
       )}
     </Div>

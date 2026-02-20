@@ -111,8 +111,8 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
           performanceMetrics: {
             priority: newAccount.priority || undefined,
             totalEmailsSent: newAccount.totalEmailsSent || 0,
-            createdAt: newAccount.createdAt.toISOString(),
-            updatedAt: newAccount.updatedAt.toISOString(),
+            createdAt: newAccount.createdAt,
+            updatedAt: newAccount.updatedAt,
           },
         },
       };

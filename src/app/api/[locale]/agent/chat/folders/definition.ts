@@ -41,7 +41,12 @@ import { FoldersListContainer } from "./widget";
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "chat", "folders"],
-  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.REMOTE_SKILL,
+  ] as const,
 
   title: "app.api.agent.chat.folders.get.title" as const,
   description: "app.api.agent.chat.folders.get.description" as const,
@@ -51,7 +56,7 @@ const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: FoldersListContainer,
-    usage: { request: "data", response: true } as const,
+    usage: { response: true, request: "data" } as const,
     children: {
       // === REQUEST FILTERS ===
       rootFolderId: requestField({

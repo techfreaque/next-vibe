@@ -20,16 +20,43 @@ export const translations: typeof enTranslations = {
         uncensoredConvert: {
           name: "Niecenzurowana konwersja",
           description: "Entuzjasta dzielący się swoim odkryciem unbottled.ai",
+          longDescription:
+            "Entuzjasta dzielący się prawdziwym odkryciem z transparentnością afiliacyjną",
+          characteristics: {
+            tone: "Swobodny, spiskowczy ton",
+            story: "Prawdziwa osobista historia",
+            transparency: "Transparentność afiliacyjna",
+            angle: "Kąt anty-cenzury",
+            energy: "Energia entuzjasty",
+          },
         },
         sideHustle: {
           name: "Dodatkowy zarobek",
           description:
             "Transparentny afiliant dzielący się prawdziwymi przypadkami użycia",
+          longDescription:
+            "Transparentny marketer afiliacyjny dzielący się prawdziwymi cotygodniowymi przypadkami użycia",
+          characteristics: {
+            disclosure: "Pełne ujawnienie afiliacji od początku",
+            updates: "Cotygodniowe aktualizacje przypadków użycia",
+            income: "Historia pasywnego dochodu",
+            proof: "Praktyczny dowód, nie hype",
+            energy: "Uczciwa energia hustle",
+          },
         },
         quietRecommendation: {
           name: "Cicha rekomendacja",
           description:
             "Spokojny profesjonalista przekazujący przetestowane narzędzie",
+          longDescription:
+            "Spokojny profesjonalista przekazujący narzędzie testowane przez tygodnie",
+          characteristics: {
+            signal: "Krótki, wysoki stosunek sygnału do szumu",
+            specifics: "Bez hype, tylko konkrety",
+            testing: "Historia testowania przez 3 tygodnie",
+            comparison: "Uczciwe porównanie z ChatGPT",
+            affiliate: "Minimalne wzmianki o afiliacji",
+          },
         },
       },
     },

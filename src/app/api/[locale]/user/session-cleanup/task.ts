@@ -21,7 +21,7 @@ import {
   CronTaskPriority,
   TaskCategory,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/types/repository";
+import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 
 import { sessionCleanupRepository } from "./repository";
 import type { SessionCleanupResponseOutput } from "./types";
@@ -76,7 +76,7 @@ export const taskConfig = {
 const sessionCleanupTask: Task = {
   type: "cron",
   name: "user-session-cleanup",
-  description: "app.api.user.sessionCleanup.task.description",
+  description: "app.api.user.session-cleanup.task.description",
   schedule: CRON_SCHEDULES.DAILY_6AM, // Daily at 6 AM
   category: TaskCategory.MAINTENANCE,
   enabled: true,

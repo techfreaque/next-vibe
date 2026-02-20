@@ -13,8 +13,10 @@ import {
   Loader2,
   Plus,
   RefreshCw,
+  Search,
   Server,
 } from "next-vibe-ui/ui/icons";
+import { Input } from "next-vibe-ui/ui/input";
 import {
   Select,
   SelectContent,
@@ -33,11 +35,11 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 
 import { SortOrder, SortOrderOptions } from "../../messages/enum";
 import {
+  CampaignTypeFilter,
+  CampaignTypeFilterOptions,
   SmtpAccountSortField,
   SmtpAccountSortFieldOptions,
   SmtpAccountStatus,
@@ -150,9 +152,7 @@ function AccountRow({
 
 export function SmtpAccountsListContainer({
   field,
-  fieldName,
 }: CustomWidgetProps): React.JSX.Element {
-  const children = field.children;
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const t = useWidgetTranslation();
@@ -167,6 +167,9 @@ export function SmtpAccountsListContainer({
     form?.watch("status") ?? SmtpAccountStatusFilter.ANY;
   const activeHealthStatus: string =
     form?.watch("healthStatus") ?? SmtpHealthStatusFilter.ANY;
+  const activeCampaignType: string =
+    form?.watch("campaignType") ?? CampaignTypeFilter.ANY;
+  const searchValue: string = form?.watch("search") ?? "";
   const currentPage: number = form?.watch("page") ?? 1;
   const limit: number = form?.watch("limit") ?? 10;
 
@@ -234,6 +237,16 @@ export function SmtpAccountsListContainer({
     [form, onSubmit],
   );
 
+  const handleCampaignTypeChange = useCallback(
+    (value: string): void => {
+      form?.setValue("campaignType", value);
+      if (onSubmit) {
+        onSubmit();
+      }
+    },
+    [form, onSubmit],
+  );
+
   const handlePageChange = useCallback(
     (page: number): void => {
       form?.setValue("page", page);
@@ -250,7 +263,6 @@ export function SmtpAccountsListContainer({
     <Div className="flex flex-col gap-0">
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
-        <NavigateButtonWidget field={children.backButton} />
         <Span className="font-semibold text-base">
           {t("app.api.emails.smtpClient.list.title")}
           {total > 0 && (
@@ -283,14 +295,24 @@ export function SmtpAccountsListContainer({
 
       {/* Search + sort */}
       <Div className="px-4 pt-3 pb-2 flex items-center gap-2 flex-wrap">
-        <Div className="flex-1 min-w-[160px]">
-          <TextFieldWidget
-            fieldName={`${fieldName}.search`}
-            field={children.search}
+        <Div className="flex-1 min-w-[160px] relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Input
+            value={searchValue}
+            onChange={(e) => {
+              form?.setValue("search", e.target.value);
+              if (onSubmit) {
+                onSubmit();
+              }
+            }}
+            placeholder={t(
+              "app.api.emails.smtpClient.list.widget.searchPlaceholder",
+            )}
+            className="pl-9 h-9"
           />
         </Div>
         <Select value={sortBy} onValueChange={handleSortByChange}>
-          <SelectTrigger className="h-9 min-w-[140px]">
+          <SelectTrigger className="h-9 w-[140px] flex-shrink-0">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -302,7 +324,7 @@ export function SmtpAccountsListContainer({
           </SelectContent>
         </Select>
         <Select value={sortOrder} onValueChange={handleSortOrderChange}>
-          <SelectTrigger className="h-9 min-w-[80px]">
+          <SelectTrigger className="h-9 w-[90px] flex-shrink-0">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -315,50 +337,62 @@ export function SmtpAccountsListContainer({
         </Select>
       </Div>
 
-      {/* Status filter chips */}
-      <Div className="px-4 pb-1 flex items-center gap-1.5 flex-wrap">
-        {SmtpAccountStatusFilterOptions.map((opt) => {
-          const isActive = opt.value === activeStatus;
-          return (
-            <Button
-              key={opt.value}
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => handleStatusChange(opt.value)}
-              className={
-                isActive
-                  ? "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-primary text-primary-foreground border-primary"
-                  : "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
-              }
-            >
-              {t(opt.label)}
-            </Button>
-          );
-        })}
-      </Div>
-
-      {/* Health status filter chips */}
-      <Div className="px-4 pb-2 flex items-center gap-1.5 flex-wrap">
-        {SmtpHealthStatusFilterOptions.map((opt) => {
-          const isActive = opt.value === activeHealthStatus;
-          return (
-            <Button
-              key={opt.value}
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => handleHealthStatusChange(opt.value)}
-              className={
-                isActive
-                  ? "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-primary text-primary-foreground border-primary"
-                  : "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
-              }
-            >
-              {t(opt.label)}
-            </Button>
-          );
-        })}
+      {/* Filter row: status chips + health + campaign type selects */}
+      <Div className="px-4 py-2 flex items-center gap-2 border-b flex-wrap">
+        {/* Status chips */}
+        <Div className="flex items-center gap-1.5 flex-wrap">
+          {SmtpAccountStatusFilterOptions.map((opt) => {
+            const isActive = opt.value === activeStatus;
+            return (
+              <Button
+                key={opt.value}
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => handleStatusChange(opt.value)}
+                className={
+                  isActive
+                    ? "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-primary text-primary-foreground border-primary"
+                    : "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
+                }
+              >
+                {t(opt.label)}
+              </Button>
+            );
+          })}
+        </Div>
+        <Div className="flex-1" />
+        {/* Health + campaign selects */}
+        <Select
+          value={activeHealthStatus}
+          onValueChange={handleHealthStatusChange}
+        >
+          <SelectTrigger className="h-8 w-[110px] flex-shrink-0 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SmtpHealthStatusFilterOptions.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {t(opt.label)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={activeCampaignType}
+          onValueChange={handleCampaignTypeChange}
+        >
+          <SelectTrigger className="h-8 w-[130px] flex-shrink-0 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {CampaignTypeFilterOptions.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {t(opt.label)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </Div>
 
       {/* Account list */}

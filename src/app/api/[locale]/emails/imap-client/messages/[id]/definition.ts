@@ -82,7 +82,7 @@ const { GET } = createEndpoint({
           recipientEmail: responseField({
             type: WidgetType.TEXT,
             content: "app.api.emails.imapClient.messages.tag",
-            schema: z.email(),
+            schema: z.string(),
           }),
           recipientName: responseField({
             type: WidgetType.TEXT,
@@ -92,7 +92,7 @@ const { GET } = createEndpoint({
           senderEmail: responseField({
             type: WidgetType.TEXT,
             content: "app.api.emails.imapClient.messages.tag",
-            schema: z.email(),
+            schema: z.string(),
           }),
           senderName: responseField({
             type: WidgetType.TEXT,
@@ -117,7 +117,7 @@ const { GET } = createEndpoint({
           accountId: responseField({
             type: WidgetType.TEXT,
             content: "app.api.emails.imapClient.tags.accounts",
-            schema: z.uuid(),
+            schema: z.uuid().optional(),
           }),
           bodyText: responseField({
             type: WidgetType.TEXT,
@@ -440,7 +440,7 @@ const { PATCH } = createEndpoint({
           recipientEmail: responseField({
             type: WidgetType.TEXT,
             content: "app.api.emails.imapClient.messages.tag",
-            schema: z.email(),
+            schema: z.string(),
           }),
           recipientName: responseField({
             type: WidgetType.TEXT,
@@ -450,7 +450,7 @@ const { PATCH } = createEndpoint({
           senderEmail: responseField({
             type: WidgetType.TEXT,
             content: "app.api.emails.imapClient.messages.tag",
-            schema: z.email(),
+            schema: z.string(),
           }),
           senderName: responseField({
             type: WidgetType.TEXT,
@@ -475,7 +475,7 @@ const { PATCH } = createEndpoint({
           accountId: responseField({
             type: WidgetType.TEXT,
             content: "app.api.emails.imapClient.tags.accounts",
-            schema: z.uuid(),
+            schema: z.uuid().optional(),
           }),
           bodyText: responseField({
             type: WidgetType.TEXT,

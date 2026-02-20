@@ -34,7 +34,11 @@ import { ThreadStatus, ThreadStatusOptions } from "../../enum";
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "chat", "threads", "[threadId]"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.REMOTE_SKILL,
+  ] as const,
 
   title: "app.api.agent.chat.threads.threadId.get.title" as const,
   description: "app.api.agent.chat.threads.threadId.get.description" as const,

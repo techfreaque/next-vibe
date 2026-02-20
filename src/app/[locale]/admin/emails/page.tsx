@@ -16,6 +16,6 @@ export default async function EmailsAdminPage({
 }: EmailsAdminPageProps): Promise<never> {
   const { locale } = await params;
 
-  // Redirect to the stats page
-  redirect(`/${locale}/admin/emails/stats`);
+  // Redirect to the inbox
+  redirect(`/${locale}/admin/emails/imap/messages`);
 }

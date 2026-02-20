@@ -19,6 +19,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import type { Countries, Languages } from "@/i18n/core/config";
 
 import { importRepository } from "../../import/repository";
@@ -467,7 +468,7 @@ export class LeadsImportRepository {
       // Convert the request data to the generic config format
       const config: CsvImportConfig = {
         file: data.file,
-        fileName: data.fileName,
+        fileName: data.fileName ?? "import.csv",
         skipDuplicates: data.skipDuplicates ?? true,
         updateExisting: data.updateExisting ?? false,
         defaultCountry: data.defaultCountry,
@@ -476,7 +477,7 @@ export class LeadsImportRepository {
         defaultCampaignStage:
           data.defaultCampaignStage ?? EmailCampaignStage.NOT_STARTED,
         defaultSource: data.defaultSource ?? LeadSource.CSV_IMPORT,
-        useChunkedProcessing: data.useChunkedProcessing ?? false,
+        useChunkedProcessing: data.useChunkedProcessing ?? true,
         batchSize: data.batchSize ?? 100,
       };
 
@@ -497,6 +498,19 @@ export class LeadsImportRepository {
 
       // Map the generic result to the leads-specific response format
       if (result.success) {
+        // Enable the csv-processor cron task only when a chunked job was created
+        if (result.data.isChunkedProcessing) {
+          await db
+            .update(cronTasks)
+            .set({ enabled: true, updatedAt: new Date() })
+            .where(eq(cronTasks.name, "csv-processor"));
+
+          logger.info("Enabled csv-processor cron task", {
+            userId: user.id,
+            fileName: data.fileName,
+          });
+        }
+
         return success({
           batchId: result.data.batchId,
           totalRows: result.data.totalRows,

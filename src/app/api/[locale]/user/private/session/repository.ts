@@ -17,7 +17,6 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { DbId } from "@/app/api/[locale]/system/db/types";
-import { createDefaultCliUser } from "@/app/api/[locale]/system/unified-interface/cli/auth/cli-user";
 import { AUTH_TOKEN_COOKIE_NAME } from "@/config/constants";
 
 import type { NewSession, Session } from "./db";
@@ -44,22 +43,6 @@ export class SessionRepository {
 
       if (results.length > 0) {
         return success(results[0]);
-      }
-
-      // If not found in database and it looks like a JWT token, handle as CLI token
-      // CLI tokens are JWTs that are self-contained and don't require database sessions
-      if (token?.startsWith("eyJ")) {
-        // This looks like a JWT token (starts with eyJ which is base64 for {"alg")
-        // For CLI operations, we create a mock session that never expires
-        const defaultCliUser = createDefaultCliUser();
-        const mockSession: Session = {
-          id: "cli-session-id",
-          userId: defaultCliUser.id ?? "cli-user-id",
-          token: token,
-          expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
-          createdAt: new Date(),
-        };
-        return success(mockSession);
       }
 
       // Token not found in database and not a JWT

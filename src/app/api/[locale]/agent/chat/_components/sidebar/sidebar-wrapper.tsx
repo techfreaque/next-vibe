@@ -8,7 +8,6 @@ import type { JSX, ReactNode } from "react";
 import { useEffect, useState } from "react";
 
 import { SidebarFooter } from "@/app/api/[locale]/agent/chat/_components/sidebar/footer/sidebar-footer";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import foldersDefinition from "@/app/api/[locale]/agent/chat/folders/definition";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatSidebar } from "@/app/api/[locale]/agent/chat/threads/_components/sidebar";
@@ -62,9 +61,6 @@ function WidgetSidebar({
         className="flex-1 h-full overflow-hidden"
         endpointOptions={{
           read: {
-            initialState: {
-              rootFolderId: DefaultFolderId.PRIVATE,
-            },
             queryOptions: {
               refetchOnWindowFocus: false,
               staleTime: 30 * 1000,

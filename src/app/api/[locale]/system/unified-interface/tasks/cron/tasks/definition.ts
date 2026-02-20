@@ -50,7 +50,12 @@ const { GET } = createEndpoint({
     "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.description",
   icon: "clock",
   category: "app.api.system.unifiedInterface.tasks.category",
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [
+    UserRole.CUSTOMER,
+    UserRole.PARTNER_ADMIN,
+    UserRole.PARTNER_EMPLOYEE,
+    UserRole.ADMIN,
+  ],
   tags: ["app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.title"],
   fields: customWidgetObject({
     render: CronTasksContainer,
@@ -388,7 +393,12 @@ const { POST } = createEndpoint({
     "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.description",
   icon: "clock",
   category: "app.api.system.unifiedInterface.tasks.category",
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [
+    UserRole.CUSTOMER,
+    UserRole.PARTNER_ADMIN,
+    UserRole.PARTNER_EMPLOYEE,
+    UserRole.ADMIN,
+  ],
   tags: ["app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.title"],
   fields: objectField(
     {

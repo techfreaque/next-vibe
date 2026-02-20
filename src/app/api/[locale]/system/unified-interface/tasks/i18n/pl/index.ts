@@ -1,7 +1,5 @@
 import { translations as cronTranslations } from "../../cron/i18n/pl";
 import { translations as pulseTranslations } from "../../pulse/i18n/pl";
-import { translations as sideTasksTranslations } from "../../side-tasks/i18n/pl";
-import { translations as typesTranslations } from "../../types/i18n/pl";
 import { translations as unifiedRunnerTranslations } from "../../unified-runner/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
@@ -163,25 +161,6 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
-    // Side Tasks errors
-    fetchSideTaskByName: "Nie udało się pobrać zadania w tle według nazwy",
-    updateSideTask: "Nie udało się zaktualizować zadania w tle",
-    deleteSideTask: "Nie udało się usunąć zadania w tle",
-    createSideTaskExecution: "Nie udało się utworzyć wykonania zadania w tle",
-    updateSideTaskExecution:
-      "Nie udało się zaktualizować wykonania zadania w tle",
-    fetchSideTaskExecutions: "Nie udało się pobrać wykonań zadań w tle",
-    fetchRecentSideTaskExecutions:
-      "Nie udało się pobrać ostatnich wykonań zadań w tle",
-    createSideTaskHealthCheck:
-      "Nie udało się utworzyć sprawdzenia zdrowia zadania w tle",
-    fetchLatestHealthCheck:
-      "Nie udało się pobrać ostatniego sprawdzenia zdrowia",
-    fetchHealthCheckHistory: "Nie udało się pobrać historii sprawdzeń zdrowia",
-    fetchSideTaskStatistics: "Nie udało się pobrać statystyk zadań w tle",
-    sideTaskNotFound: "Zadanie w tle nie znalezione",
-    sideTaskExecutionNotFound: "Wykonanie zadania w tle nie znalezione",
-
     // Cron Tasks errors
     fetchCronTasks: "Nie udało się pobrać zadań Cron",
     createCronTask: "Nie udało się utworzyć zadania Cron",
@@ -192,18 +171,11 @@ export const translations: typeof enTranslations = {
     fetchCronStatus: "Nie udało się pobrać statusu systemu Cron",
     cronTaskNotFound: "Zadanie Cron nie znalezione",
 
-    // Types errors
-    fetchTaskTypes: "Nie udało się pobrać typów zadań",
-    validateTaskTypes: "Nie udało się zwalidować typów zadań",
-    exportTaskTypes: "Nie udało się wyeksportować typów zadań",
-    unsupportedExportFormat: "Nieobsługiwany format eksportu",
-
     // Unified Runner errors
     startTaskRunner: "Nie udało się uruchomić Task Runnera",
     stopTaskRunner: "Nie udało się zatrzymać Task Runnera",
     getTaskRunnerStatus: "Nie udało się pobrać statusu Task Runnera",
     executeCronTask: "Nie udało się wykonać zadania Cron",
-    executeSideTask: "Nie udało się wykonać zadania w tle",
 
     // Pulse errors
     executePulse: "Nie udało się wykonać Pulse",
@@ -228,9 +200,16 @@ export const translations: typeof enTranslations = {
     cronRepositoryStatisticsFetchFailed:
       "Nie udało się pobrać statystyk zadań cron",
   },
+  csvProcessor: {
+    description: "Przetwarza zadania importu CSV w partiach",
+  },
+  imapSync: {
+    description: "Automatycznie synchronizuje konta IMAP, foldery i wiadomości",
+  },
+  newsletterUnsubscribeSync: {
+    description: "Synchronizuje statusy leadów dla wypisań z newslettera",
+  },
   cronSystem: cronTranslations,
   pulseSystem: pulseTranslations,
-  sideTasks: sideTasksTranslations,
-  types: typesTranslations,
   unifiedRunner: unifiedRunnerTranslations,
 };

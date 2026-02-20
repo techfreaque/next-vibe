@@ -112,7 +112,7 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
           email: createdUser.email,
           privateName: createdUser.privateName,
           publicName: createdUser.publicName,
-          createdAt: createdUser.createdAt.toISOString(),
+          createdAt: createdUser.createdAt,
         },
         responseId: createdUser.id,
         responseLeadId: null,
@@ -126,8 +126,8 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
           id: r.id,
           role: r.role,
         })),
-        responseCreatedAt: createdUser.createdAt.toISOString(),
-        responseUpdatedAt: createdUser.updatedAt.toISOString(),
+        responseCreatedAt: createdUser.createdAt,
+        responseUpdatedAt: createdUser.updatedAt,
       };
 
       // Send SMS notifications (fire and forget - don't fail user creation if SMS fails)

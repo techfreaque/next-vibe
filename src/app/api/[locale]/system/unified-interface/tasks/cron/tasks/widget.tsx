@@ -240,7 +240,7 @@ function TaskRow({
 
         {task.description && (
           <Span className="text-xs text-muted-foreground block truncate mb-1">
-            {task.description}
+            {t(task.description)}
           </Span>
         )}
 
@@ -641,7 +641,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const handleView = useCallback(
     (task: Task): void => {
       void (async (): Promise<void> => {
-        const m = await import("../task/[id]/definition");
+        const m = await import("../[id]/definition");
         navigate(m.default.GET, { urlPathParams: { id: task.id } });
       })();
     },
@@ -651,7 +651,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const handleEdit = useCallback(
     (task: Task): void => {
       void (async (): Promise<void> => {
-        const m = await import("../task/[id]/definition");
+        const m = await import("../[id]/definition");
         navigate(m.default.PUT, {
           urlPathParams: { id: task.id },
           data: {
@@ -673,7 +673,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const handleDelete = useCallback(
     (task: Task): void => {
       void (async (): Promise<void> => {
-        const m = await import("../task/[id]/definition");
+        const m = await import("../[id]/definition");
         navigate(m.default.DELETE, {
           urlPathParams: { id: task.id },
           renderInModal: true,

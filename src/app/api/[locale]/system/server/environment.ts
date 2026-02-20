@@ -23,7 +23,7 @@ export type ServerEnvironmentType = "development" | "production" | "serverless";
 export interface EnvironmentConfig {
   environment: ServerEnvironmentType;
   nodeEnv: string;
-  supportsSideTasks: boolean;
+  supportsTaskRunners: boolean;
   supportsHotReload: boolean;
   enableDebugLogging: boolean;
   enableTaskRunner: boolean;
@@ -104,7 +104,7 @@ export function getEnvironmentConfig(
       return {
         environment: "development",
         nodeEnv: "development",
-        supportsSideTasks: true,
+        supportsTaskRunners: true,
         supportsHotReload: true,
         enableDebugLogging: true,
         enableTaskRunner: true,
@@ -118,7 +118,7 @@ export function getEnvironmentConfig(
       return {
         environment: "production",
         nodeEnv: "production",
-        supportsSideTasks: true,
+        supportsTaskRunners: true,
         supportsHotReload: false,
         enableDebugLogging: false,
         enableTaskRunner: true,
@@ -132,7 +132,7 @@ export function getEnvironmentConfig(
       return {
         environment: "serverless",
         nodeEnv: "production",
-        supportsSideTasks: false,
+        supportsTaskRunners: false,
         supportsHotReload: false,
         enableDebugLogging: false,
         enableTaskRunner: false,
@@ -146,7 +146,7 @@ export function getEnvironmentConfig(
       return {
         environment: "development",
         nodeEnv: "development",
-        supportsSideTasks: true,
+        supportsTaskRunners: true,
         supportsHotReload: true,
         enableDebugLogging: true,
         enableTaskRunner: true,

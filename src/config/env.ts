@@ -27,6 +27,18 @@ export const { env, schema: envSchema } = defineEnv({
     schema: createSchema(z.string().url(), z.string().url().optional()),
     example: "http://localhost:3000",
   },
+  NEXT_PUBLIC_PROJECT_URL: {
+    schema: z.string().url().default("https://unbottled.ai"),
+    example: "https://unbottled.ai",
+  },
+  NEXT_PUBLIC_LOCAL_MODE: {
+    schema: z
+      .string()
+      .optional()
+      .default("true")
+      .transform((v) => v !== "false"),
+    example: "true",
+  },
   NEXT_PUBLIC_TEST_SERVER_URL: {
     schema: createSchema(z.string().url(), z.string().url().optional()),
     example: "http://localhost:4000",

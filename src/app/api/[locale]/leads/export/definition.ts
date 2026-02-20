@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -26,12 +27,6 @@ import {
   LanguagesOptions,
 } from "@/i18n/core/config";
 
-import type {
-  ExportFormatValues,
-  LeadSourceValues,
-  LeadStatusValues,
-  MimeTypeValues,
-} from "../enum";
 import {
   ExportFormat,
   ExportFormatOptions,
@@ -128,7 +123,7 @@ const { GET } = createEndpoint({
         label: "app.api.leads.export.get.dateFrom.label",
         description: "app.api.leads.export.get.dateFrom.description",
         columns: 6,
-        schema: z.coerce.date().optional(),
+        schema: dateSchema.optional(),
       }),
 
       dateTo: requestField({
@@ -137,7 +132,7 @@ const { GET } = createEndpoint({
         label: "app.api.leads.export.get.dateTo.label",
         description: "app.api.leads.export.get.dateTo.description",
         columns: 6,
-        schema: z.coerce.date().optional(),
+        schema: dateSchema.optional(),
       }),
 
       includeMetadata: requestField({
@@ -268,29 +263,6 @@ export type LeadExportRequestInput = typeof GET.types.RequestInput;
 export type LeadExportRequestOutput = typeof GET.types.RequestOutput;
 export type LeadExportResponseInput = typeof GET.types.ResponseInput;
 export type LeadExportResponseOutput = typeof GET.types.ResponseOutput;
-
-// Explicit types for repository compatibility (matches Zod schema above)
-export interface ExportQueryType {
-  format: typeof ExportFormatValues;
-  status?: typeof LeadStatusValues;
-  country?: Countries;
-  language?: Languages;
-  source?: typeof LeadSourceValues;
-  search?: string;
-  dateFrom?: Date;
-  dateTo?: Date;
-  includeMetadata: boolean;
-  includeEngagementData: boolean;
-  limit?: number;
-}
-
-export interface ExportResponseType {
-  fileName: string;
-  fileContent: string;
-  mimeType: typeof MimeTypeValues;
-  totalRecords: number;
-  exportedAt: Date;
-}
 
 /**
  * Export definitions

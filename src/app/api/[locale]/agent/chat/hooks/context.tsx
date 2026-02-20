@@ -13,6 +13,7 @@ import {
   useChat,
   type UseChatReturn,
 } from "@/app/api/[locale]/agent/chat/hooks/hooks";
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -55,6 +56,8 @@ interface ChatProviderProps {
   initialCredits: CreditsGetResponseOutput;
   /** Root folder permissions computed server-side */
   rootFolderPermissions: RootFolderPermissions;
+  /** Which AI provider keys are configured (computed server-side) */
+  envAvailability: AgentEnvAvailability;
 }
 
 /**
@@ -71,6 +74,7 @@ export function ChatProvider({
   currentSubFolderId,
   initialCredits,
   rootFolderPermissions,
+  envAvailability,
 }: ChatProviderProps): JSX.Element {
   // Create logger once - memoize to prevent infinite re-renders
   // The timestamp is only used for logging context, not for identity
@@ -89,6 +93,7 @@ export function ChatProvider({
     currentSubFolderId,
     initialCredits,
     rootFolderPermissions,
+    envAvailability,
   );
 
   return <ChatContext.Provider value={chat}>{children}</ChatContext.Provider>;

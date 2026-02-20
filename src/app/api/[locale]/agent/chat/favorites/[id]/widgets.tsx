@@ -282,14 +282,7 @@ export function FavoriteEditContainer({
               <Div className="flex items-start gap-4 p-6 rounded-xl border bg-card transition-colors">
                 {/* Editable Icon Field in icon position */}
                 <Div className="flex-shrink-0">
-                  <IconFieldWidget
-                    fieldName="icon"
-                    field={withValue(
-                      children.icon,
-                      characterData?.icon || "sparkles",
-                      null,
-                    )}
-                  />
+                  <IconFieldWidget fieldName="icon" field={children.icon} />
                 </Div>
 
                 {/* Character Content */}

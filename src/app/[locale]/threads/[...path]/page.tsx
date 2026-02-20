@@ -23,6 +23,8 @@ import { FolderRepository } from "@/app/api/[locale]/agent/chat/folders/[id]/rep
 import { RootFolderPermissionsRepository } from "@/app/api/[locale]/agent/chat/folders/root-permissions/repository";
 import { ChatProvider } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ThreadByIdRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/repository";
+import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { EnvAvailabilityProvider } from "@/app/api/[locale]/agent/env-availability-context";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
@@ -155,17 +157,22 @@ export default async function ThreadsPathPage({
     redirect(`/${locale}/threads/${initialRootFolderId}/${NEW_MESSAGE_ID}`);
   }
 
+  const envAvailability = getAgentEnvAvailability();
+
   return (
-    <ChatProvider
-      user={user}
-      locale={locale}
-      activeThreadId={initialThreadId}
-      currentRootFolderId={initialRootFolderId}
-      currentSubFolderId={initialSubFolderId}
-      initialCredits={creditsToUse}
-      rootFolderPermissions={rootFolderPermissions}
-    >
-      <ChatInterface user={user} />
-    </ChatProvider>
+    <EnvAvailabilityProvider availability={envAvailability}>
+      <ChatProvider
+        user={user}
+        locale={locale}
+        activeThreadId={initialThreadId}
+        currentRootFolderId={initialRootFolderId}
+        currentSubFolderId={initialSubFolderId}
+        initialCredits={creditsToUse}
+        rootFolderPermissions={rootFolderPermissions}
+        envAvailability={envAvailability}
+      >
+        <ChatInterface user={user} />
+      </ChatProvider>
+    </EnvAvailabilityProvider>
   );
 }

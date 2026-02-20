@@ -8,6 +8,8 @@ export const translations: typeof enTranslations = {
     smtp: "SMTP-Konten",
     smtpDescription: "SMTP-E-Mail-Konten und -Konfigurationen verwalten",
     templates: "E-Mail-Vorlagen",
+    messagingAccounts: "Messaging-Konten",
+    messagingCompose: "Nachricht senden",
   },
   admin: {
     title: "E-Mail-Verwaltung",

@@ -84,7 +84,10 @@ const { GET } = createEndpoint({
         placeholder:
           "app.api.emails.imapClient.messages.list.get.accountId.placeholder",
         columns: 6,
-        schema: z.uuid(),
+        schema: z.preprocess(
+          (v) => (v === "" ? undefined : v),
+          z.uuid().optional(),
+        ),
       }),
 
       folderId: requestField({
@@ -96,7 +99,10 @@ const { GET } = createEndpoint({
         placeholder:
           "app.api.emails.imapClient.messages.list.get.folderId.placeholder",
         columns: 6,
-        schema: z.uuid().optional(),
+        schema: z.preprocess(
+          (v) => (v === "" ? undefined : v),
+          z.uuid().optional(),
+        ),
       }),
 
       search: requestField({
@@ -107,6 +113,18 @@ const { GET } = createEndpoint({
           "app.api.emails.imapClient.messages.list.get.search.description",
         placeholder:
           "app.api.emails.imapClient.messages.list.get.search.placeholder",
+        columns: 12,
+        schema: z.string().optional(),
+      }),
+
+      threadId: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.emails.imapClient.messages.list.get.threadId.label",
+        description:
+          "app.api.emails.imapClient.messages.list.get.threadId.description",
+        placeholder:
+          "app.api.emails.imapClient.messages.list.get.threadId.placeholder",
         columns: 12,
         schema: z.string().optional(),
       }),

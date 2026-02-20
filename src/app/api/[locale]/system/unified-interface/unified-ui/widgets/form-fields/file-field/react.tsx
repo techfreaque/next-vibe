@@ -162,7 +162,12 @@ export function FileFieldWidget<
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      formField.onChange(file.name);
+                      const reader = new FileReader();
+                      reader.addEventListener("load", (): void => {
+                        const base64 = (reader.result as string).split(",")[1];
+                        formField.onChange(base64);
+                      });
+                      reader.readAsDataURL(file);
                     } else {
                       formField.onChange(null);
                     }

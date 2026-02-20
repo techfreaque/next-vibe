@@ -126,5 +126,13 @@ export const translations: typeof enTranslations = {
     result: "Synchronisierungsergebnis",
     duration: "Dauer",
     errors: "Fehler",
+    accountsProcessed: "Verarbeitete Konten",
+    foldersProcessed: "Verarbeitete Ordner",
+    messagesProcessed: "Verarbeitete Nachrichten",
+    messagesAdded: "Hinzugefügte Nachrichten",
+    messagesUpdated: "Aktualisierte Nachrichten",
+    messagesDeleted: "Gelöschte Nachrichten",
+    submit: "Sync starten",
+    submitting: "Synchronisiere...",
   },
 };

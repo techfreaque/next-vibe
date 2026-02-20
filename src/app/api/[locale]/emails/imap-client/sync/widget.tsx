@@ -11,8 +11,8 @@ import React from "react";
 import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
 import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
+import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import type definition from "./definition";
@@ -37,7 +37,6 @@ export function ImapSyncContainer({
     <Div className="flex flex-col gap-0">
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
-        <NavigateButtonWidget field={children.backButton} />
         <Span className="font-semibold text-base">
           {t("app.api.emails.imapClient.sync.title")}
         </Span>
@@ -49,8 +48,12 @@ export function ImapSyncContainer({
         {/* Options */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.imapClient.sync.options")}
+            {t("app.api.emails.imapClient.sync.widget.options")}
           </Span>
+          <TextareaFieldWidget
+            fieldName={`${fieldName}.accountIds`}
+            field={children.accountIds}
+          />
           <Div className="grid grid-cols-2 gap-3">
             <BooleanFieldWidget
               fieldName={`${fieldName}.force`}
@@ -71,7 +74,7 @@ export function ImapSyncContainer({
         {result !== null && result !== undefined && (
           <Div className="rounded-lg border p-4 flex flex-col gap-2">
             <Span className="text-sm font-semibold">
-              {t("app.api.emails.imapClient.sync.result")}
+              {t("app.api.emails.imapClient.sync.widget.result")}
             </Span>
             {[
               ["accountsProcessed", result.accountsProcessed],
@@ -86,14 +89,14 @@ export function ImapSyncContainer({
                 className="flex items-center justify-between text-sm"
               >
                 <Span className="text-muted-foreground">
-                  {t(`app.api.emails.imapClient.sync.${String(key)}`)}
+                  {t(`app.api.emails.imapClient.sync.widget.${String(key)}`)}
                 </Span>
                 <Span className="font-semibold">{String(val)}</Span>
               </Div>
             ))}
             <Div className="flex items-center justify-between text-sm">
               <Span className="text-muted-foreground">
-                {t("app.api.emails.imapClient.sync.duration")}
+                {t("app.api.emails.imapClient.sync.widget.duration")}
               </Span>
               <Span className="font-semibold">
                 {result.duration}
@@ -103,7 +106,7 @@ export function ImapSyncContainer({
             {result.errors.length > 0 && (
               <Div className="mt-2">
                 <Span className="text-xs font-semibold text-red-600">
-                  {t("app.api.emails.imapClient.sync.errors")}
+                  {t("app.api.emails.imapClient.sync.widget.errors")}
                 </Span>
                 {result.errors.map((err, i) => (
                   <Div key={i} style={{ color: "#ef4444", fontSize: "12px" }}>
@@ -119,8 +122,8 @@ export function ImapSyncContainer({
         <Div className="flex items-center justify-end pt-2">
           <SubmitButtonWidget
             field={{
-              text: "app.api.emails.imapClient.sync.submit",
-              loadingText: "app.api.emails.imapClient.sync.submitting",
+              text: "app.api.emails.imapClient.sync.widget.submit",
+              loadingText: "app.api.emails.imapClient.sync.widget.submitting",
               icon: "refresh-cw",
               variant: "primary",
               size: "sm",

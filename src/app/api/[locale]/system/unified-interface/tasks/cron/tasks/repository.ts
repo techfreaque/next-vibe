@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { and, count, desc, eq, inArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNull } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -17,6 +17,9 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { cronTasks } from "../../cron/db";
 import {
@@ -42,7 +45,16 @@ const UNIQUE_CONSTRAINT_ERROR = "unique constraint";
  */
 function formatTaskResponse(
   task: typeof cronTasks.$inferSelect,
+  logger: EndpointLogger,
 ): CronTaskResponseType {
+  const nextExecutionAt = task.enabled
+    ? (calculateNextExecutionTime(
+        task.schedule,
+        task.timezone ?? "UTC",
+        logger,
+      )?.toISOString() ?? null)
+    : null;
+
   const formatted: CronTaskResponseType = {
     id: task.id,
     name: task.name,
@@ -60,7 +72,7 @@ function formatTaskResponse(
     lastExecutionStatus: task.lastExecutionStatus,
     lastExecutionError: task.lastExecutionError,
     lastExecutionDuration: task.lastExecutionDuration,
-    nextExecutionAt: task.nextExecutionAt?.toISOString() || null,
+    nextExecutionAt,
     executionCount: task.executionCount,
     successCount: task.successCount,
     errorCount: task.errorCount,
@@ -77,11 +89,13 @@ function formatTaskResponse(
 export interface ICronTasksListRepository {
   getTasks(
     data: CronTaskListRequestOutput,
+    user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskListResponseOutput>>;
 
   createTask(
     data: CronTaskCreateRequestOutput,
+    user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskCreateResponseOutput>>;
 }
@@ -92,13 +106,28 @@ export interface ICronTasksListRepository {
 class CronTasksListRepositoryImpl implements ICronTasksListRepository {
   async getTasks(
     data: CronTaskListRequestOutput,
+    user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskListResponseOutput>> {
     try {
       logger.info("Starting cron tasks retrieval");
 
+      const isAdmin =
+        !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+
       // Build query conditions
       const conditions = [];
+
+      // Filter by user ownership: admin sees all, others see only their own tasks
+      if (!isAdmin) {
+        const userId = !user.isPublic ? user.id : null;
+        if (userId) {
+          conditions.push(eq(cronTasks.userId, userId));
+        } else {
+          // Public users can't see any tasks
+          conditions.push(isNull(cronTasks.id));
+        }
+      }
 
       if (data.enabled === CronTaskEnabledFilter.ENABLED) {
         conditions.push(eq(cronTasks.enabled, true));
@@ -146,7 +175,9 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       logger.info("Retrieved tasks from database", { count: tasks.length });
 
       // Format tasks with computed fields
-      const formattedTasks = tasks.map((task) => formatTaskResponse(task));
+      const formattedTasks = tasks.map((task) =>
+        formatTaskResponse(task, logger),
+      );
 
       const response: CronTaskListResponseOutput = {
         tasks: formattedTasks,
@@ -169,6 +200,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
 
   async createTask(
     data: CronTaskCreateRequestOutput,
+    user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskCreateResponseOutput>> {
     try {
@@ -192,6 +224,8 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         });
       }
 
+      const userId = !user.isPublic ? user.id : null;
+
       // Prepare task data for insertion
       const taskData = {
         name: data.name,
@@ -208,6 +242,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         executionCount: 0,
         successCount: 0,
         errorCount: 0,
+        userId,
       };
 
       logger.debug("Inserting task into database", taskData);

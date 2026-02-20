@@ -127,9 +127,9 @@ const { POST } = createEndpoint({
             placeholder: "app.api.leads.create.post.phone.placeholder",
             columns: 6,
             schema: z
-              .string()
-              .regex(/^\+?[1-9]\d{1,14}$/)
-              .optional(),
+              .union([z.string().regex(/^\+?[1-9]\d{1,14}$/), z.literal("")])
+              .optional()
+              .transform((v) => (v === "" ? undefined : v)),
           }),
 
           website: requestField({
@@ -139,7 +139,10 @@ const { POST } = createEndpoint({
             description: "app.api.leads.create.post.website.description",
             placeholder: "app.api.leads.create.post.website.placeholder",
             columns: 6,
-            schema: z.string().url().optional(),
+            schema: z
+              .union([z.string().url(), z.literal("")])
+              .optional()
+              .transform((v) => (v === "" ? undefined : v)),
           }),
         },
       ),
@@ -197,7 +200,7 @@ const { POST } = createEndpoint({
             placeholder: "app.api.leads.create.post.source.placeholder",
             columns: 12,
             options: LeadSourceOptions,
-            schema: z.enum(LeadSource).optional(),
+            schema: z.enum(LeadSource),
           }),
 
           notes: requestField({
@@ -428,7 +431,7 @@ const { POST } = createEndpoint({
           country: "US",
           language: "en",
         },
-        leadDetails: {},
+        leadDetails: { source: LeadSource.CSV_IMPORT },
       },
     },
     responses: {
@@ -473,7 +476,7 @@ const { POST } = createEndpoint({
             language: "en",
           },
           trackingInfo: {
-            source: null,
+            source: LeadSource.WEBSITE,
             emailsSent: 0,
             currentCampaignStage: null,
           },

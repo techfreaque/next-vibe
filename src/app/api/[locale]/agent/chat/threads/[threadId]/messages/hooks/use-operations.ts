@@ -485,7 +485,7 @@ export function useMessageOperations(
 
   const stopGeneration = useCallback((): void => {
     logger.debug("Message operations: Stopping generation and TTS playback");
-    aiStream.stopStream();
+    aiStream.stopStream(activeThreadId ?? undefined);
 
     // Also stop TTS playback if it's playing
     if (typeof window !== "undefined") {
@@ -503,7 +503,7 @@ export function useMessageOperations(
           );
         });
     }
-  }, [logger, aiStream]);
+  }, [logger, aiStream, activeThreadId]);
 
   return {
     sendMessage,

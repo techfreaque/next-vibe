@@ -146,6 +146,7 @@ export const translations: typeof enTranslations = {
     header: {
       tasks: "Zadania",
       stats: "Statystyki",
+      pulse: "Pulse",
       refresh: "Odśwież",
     },
     summary: {
@@ -176,8 +177,10 @@ export const translations: typeof enTranslations = {
       error: "Błąd",
     },
     empty: "Nie znaleziono historii wykonań",
+    result: "Wynik",
     error: {
       collapse: "Zwiń błąd",
+      label: "Błąd",
     },
     pagination: {
       info: "Strona {{page}} z {{totalPages}} (łącznie {{total}})",

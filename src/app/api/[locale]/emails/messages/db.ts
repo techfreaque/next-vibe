@@ -19,6 +19,8 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { ImapLoggingLevel } from "../imap-client/config/enum";
 import { imapAccounts, imapFolders } from "../imap-client/db";
 import { ImapSyncStatus, ImapSyncStatusDB } from "../imap-client/enum";
+import { messagingAccounts } from "../messaging/db";
+import { MessageChannel, MessageChannelDB } from "../messaging/enum";
 import { smtpAccounts } from "../smtp-client/db";
 import { EmailProvider, EmailStatus, EmailStatusDB, EmailTypeDB } from "./enum";
 
@@ -84,6 +86,18 @@ export const emails = pgTable(
     // Relations
     userId: uuid("user_id"), // If sent to a user
     leadId: uuid("lead_id"), // If sent to a lead
+
+    // Channel (multi-channel unified inbox)
+    channel: text("channel", { enum: MessageChannelDB })
+      .notNull()
+      .default(MessageChannel.EMAIL),
+
+    // Phone fields (for SMS, WhatsApp, Telegram)
+    fromPhone: text("from_phone"), // Sender phone/ID
+    toPhone: text("to_phone"), // Recipient phone/chat ID
+
+    // Messaging account reference (for SMS/WhatsApp/Telegram)
+    messagingAccountId: uuid("messaging_account_id"),
 
     // SMTP-specific fields
     smtpAccountId: uuid("smtp_account_id"), // Reference to SMTP account used for sending
@@ -159,6 +173,11 @@ export const emails = pgTable(
     imapAccountIdIdx: index("emails_imap_account_id_idx").on(
       table.imapAccountId,
     ),
+    channelIdx: index("emails_channel_idx").on(table.channel),
+    toPhoneIdx: index("emails_to_phone_idx").on(table.toPhone),
+    messagingAccountIdIdx: index("emails_messaging_account_id_idx").on(
+      table.messagingAccountId,
+    ),
     isReadIdx: index("emails_is_read_idx").on(table.isRead),
     isFlaggedIdx: index("emails_is_flagged_idx").on(table.isFlagged),
     threadIdIdx: index("emails_thread_id_idx").on(table.threadId),
@@ -182,6 +201,10 @@ export const emailsRelations = relations(emails, ({ one }) => ({
   imapAccount: one(imapAccounts, {
     fields: [emails.imapAccountId],
     references: [imapAccounts.id],
+  }),
+  messagingAccount: one(messagingAccounts, {
+    fields: [emails.messagingAccountId],
+    references: [messagingAccounts.id],
   }),
 }));
 

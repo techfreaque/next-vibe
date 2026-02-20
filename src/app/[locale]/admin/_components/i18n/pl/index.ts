@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
     users: "Użytkownicy",
     emails: "E-maile",
     cronTasks: "Zadania Cron",
+    sshAccess: "SSH / Maszyna",
     admin: "Admin",
     adminPanel: "Panel admina",
     administrator: "Administrator",

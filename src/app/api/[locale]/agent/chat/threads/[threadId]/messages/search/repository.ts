@@ -145,7 +145,7 @@ export class MessageSearchRepository {
           role: r.role,
           rank: r.rank,
           headline: r.headline,
-          createdAt: r.createdAt.toISOString(),
+          createdAt: r.createdAt,
         })),
         totalCount,
       });

@@ -81,6 +81,60 @@ export const translations = {
     cannotLinkLeadToItself: "Cannot link lead to itself",
     linkFailed: "Failed to link leads",
   },
+  filters: {
+    search: {
+      label: "Search",
+      description: "Search leads by email or business name",
+      placeholder: "Enter email or business name...",
+    },
+    status: {
+      label: "Status",
+      description: "Filter by lead status",
+      placeholder: "All statuses",
+    },
+    currentCampaignStage: {
+      label: "Campaign Stage",
+      description: "Filter by email campaign stage",
+      placeholder: "All stages",
+    },
+    source: {
+      label: "Source",
+      description: "Filter by lead source",
+      placeholder: "All sources",
+    },
+    country: {
+      label: "Country",
+      description: "Filter by country",
+      placeholder: "All countries",
+    },
+    language: {
+      label: "Language",
+      description: "Filter by language",
+      placeholder: "All languages",
+    },
+    sortBy: {
+      label: "Sort By",
+      description: "Choose the field to sort by",
+      placeholder: "Sort field",
+    },
+    sortOrder: {
+      label: "Sort Order",
+      description: "Sort ascending or descending",
+      placeholder: "Sort order",
+    },
+    statusFilters: {
+      title: "Status & Campaign Filters",
+      description: "Filter by status, campaign stage, and source",
+    },
+    locationFilters: {
+      title: "Location Filters",
+      description: "Filter by country and language",
+    },
+    sortingOptions: {
+      title: "Sorting Options",
+      description: "Configure the sort order",
+    },
+  },
   batch: batchTranslations,
   campaigns: campaignsTranslations,
   create: createTranslations,
@@ -182,7 +236,6 @@ export const translations = {
       emailCampaign: "Email Campaign",
       referral: "Referral",
       csvImport: "CSV Import",
-      api: "API",
     },
     leadStatusFilter: {
       all: "All",
@@ -215,7 +268,6 @@ export const translations = {
       emailCampaign: "Email Campaign",
       referral: "Referral",
       csvImport: "CSV Import",
-      api: "API",
     },
     batchOperationScope: {
       currentPage: "Current Page",

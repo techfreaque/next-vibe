@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
     custom: "Niestandardowy Zakres",
   },
   get: {
-    title: "Pobierz Statystyki E-maili",
+    title: "Statystyki E-maili",
     description: "Pobierz kompleksowe statystyki i metryki e-maili",
     form: {
       title: "Żądanie Statystyk E-maili",
@@ -246,5 +246,7 @@ export const translations: typeof enTranslations = {
     avgRetries: "Śr. ponowień",
     avgDeliveryMs: "Śr. czas dostarczenia",
     viewList: "Wyświetl listę",
+    refresh: "Odśwież",
+    search: "Szukaj e-maili...",
   },
 };

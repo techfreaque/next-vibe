@@ -8,7 +8,7 @@ import {
   CronTaskPriority,
   TaskCategory,
 } from "../../unified-interface/tasks/enum";
-import type { Task } from "../../unified-interface/tasks/types/repository";
+import type { Task } from "../../unified-interface/tasks/unified-runner/types";
 
 /**
  * Database Migration Health Check Cron Task
@@ -71,7 +71,7 @@ const autoMigrationRunnerTask: Task = {
  * Monitors migration backups and cleanup
  */
 const migrationBackupMonitorTask: Task = {
-  type: "side",
+  type: "task-runner",
   name: "migration-backup-monitor",
   // eslint-disable-next-line i18next/no-literal-string
   description: "Monitor migration backups and cleanup old backups",

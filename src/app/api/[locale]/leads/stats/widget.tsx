@@ -36,6 +36,7 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
@@ -204,6 +205,7 @@ function ClickableBarRow({
   barColor,
   max,
   onClick,
+  t,
 }: {
   category: string;
   value: number;
@@ -211,6 +213,7 @@ function ClickableBarRow({
   barColor: string;
   max: number;
   onClick?: () => void;
+  t: (key: string) => string;
 }): React.JSX.Element {
   const widthPercent = `${(value / max) * 100}%`;
   return (
@@ -233,7 +236,7 @@ function ClickableBarRow({
       }
     >
       <Span className="text-xs text-muted-foreground w-28 truncate flex-shrink-0">
-        {category.replace(/_/g, " ")}
+        {t(category)}
       </Span>
       <Div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
         <Div
@@ -264,12 +267,14 @@ function GroupedStatsSection({
   title,
   items,
   colorMap,
+  t,
 }: {
   title: string;
   items:
     | Array<{ category: string; value: number; percentage?: number }>
     | undefined;
   colorMap?: Record<string, string>;
+  t: (key: string) => string;
 }): React.JSX.Element | null {
   if (!items?.length) {
     return null;
@@ -289,6 +294,7 @@ function GroupedStatsSection({
             percentage={item.percentage}
             barColor={colorMap?.[item.category] ?? "hsl(var(--primary))"}
             max={max}
+            t={t}
           />
         ))}
       </Div>
@@ -403,27 +409,25 @@ function ConversionFunnel({
 // ─── Status color map matching list widget ────────────────────────────────────
 
 const STATUS_BAR_COLORS: Record<string, string> = {
-  NEW: "#3b82f6",
-  PENDING: "#eab308",
-  CAMPAIGN_RUNNING: "#a855f7",
-  WEBSITE_USER: "#06b6d4",
-  NEWSLETTER_SUBSCRIBER: "#6366f1",
-  IN_CONTACT: "#f97316",
-  SIGNED_UP: "#14b8a6",
-  SUBSCRIPTION_CONFIRMED: "#22c55e",
-  UNSUBSCRIBED: "#9ca3af",
-  BOUNCED: "#ef4444",
-  INVALID: "#b91c1c",
+  "app.api.leads.enums.leadStatus.new": "#3b82f6",
+  "app.api.leads.enums.leadStatus.pending": "#eab308",
+  "app.api.leads.enums.leadStatus.campaignRunning": "#a855f7",
+  "app.api.leads.enums.leadStatus.websiteUser": "#06b6d4",
+  "app.api.leads.enums.leadStatus.newsletterSubscriber": "#6366f1",
+  "app.api.leads.enums.leadStatus.inContact": "#f97316",
+  "app.api.leads.enums.leadStatus.signedUp": "#14b8a6",
+  "app.api.leads.enums.leadStatus.subscriptionConfirmed": "#22c55e",
+  "app.api.leads.enums.leadStatus.unsubscribed": "#9ca3af",
+  "app.api.leads.enums.leadStatus.bounced": "#ef4444",
+  "app.api.leads.enums.leadStatus.invalid": "#b91c1c",
 };
 
 const SOURCE_BAR_COLORS: Record<string, string> = {
-  WEBSITE: "#3b82f6",
-  REFERRAL: "#22c55e",
-  SOCIAL_MEDIA: "#ec4899",
-  EMAIL: "#eab308",
-  SEARCH: "#f97316",
-  DIRECT: "#06b6d4",
-  OTHER: "#9ca3af",
+  "app.api.leads.enums.leadSource.website": "#3b82f6",
+  "app.api.leads.enums.leadSource.referral": "#22c55e",
+  "app.api.leads.enums.leadSource.socialMedia": "#ec4899",
+  "app.api.leads.enums.leadSource.emailCampaign": "#eab308",
+  "app.api.leads.enums.leadSource.csvImport": "#f97316",
 };
 
 // ─── Quick action buttons ─────────────────────────────────────────────────────
@@ -459,7 +463,6 @@ function QuickActionButton({
 
 export function LeadsStatsContainer({
   field,
-  fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
@@ -467,7 +470,7 @@ export function LeadsStatsContainer({
   const locale = useWidgetLocale();
   const t = useWidgetTranslation();
   const onSubmit = useWidgetOnSubmit();
-  const form = useWidgetForm();
+  const form = useWidgetForm<typeof definition.GET>();
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const data = field.value;
@@ -621,55 +624,37 @@ export function LeadsStatsContainer({
         <Div className="rounded-lg border p-4 flex flex-col gap-3 bg-muted/20">
           <Div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             <SelectFieldWidget
-              fieldName={`${fieldName}.timePeriod`}
+              fieldName="timePeriod"
               field={children.timePeriod}
             />
             <SelectFieldWidget
-              fieldName={`${fieldName}.dateRangePreset`}
+              fieldName="dateRangePreset"
               field={children.dateRangePreset}
             />
             <SelectFieldWidget
-              fieldName={`${fieldName}.chartType`}
+              fieldName="chartType"
               field={children.chartType}
             />
+            <SelectFieldWidget fieldName="status" field={children.status} />
+            <SelectFieldWidget fieldName="source" field={children.source} />
+            <SelectFieldWidget fieldName="country" field={children.country} />
+            <SelectFieldWidget fieldName="language" field={children.language} />
             <SelectFieldWidget
-              fieldName={`${fieldName}.status`}
-              field={children.status}
-            />
-            <SelectFieldWidget
-              fieldName={`${fieldName}.source`}
-              field={children.source}
-            />
-            <SelectFieldWidget
-              fieldName={`${fieldName}.country`}
-              field={children.country}
-            />
-            <SelectFieldWidget
-              fieldName={`${fieldName}.language`}
-              field={children.language}
-            />
-            <SelectFieldWidget
-              fieldName={`${fieldName}.campaignStage`}
+              fieldName="campaignStage"
               field={children.campaignStage}
             />
             <SelectFieldWidget
-              fieldName={`${fieldName}.comparisonPeriod`}
+              fieldName="comparisonPeriod"
               field={children.comparisonPeriod}
             />
+            <SelectFieldWidget fieldName="sortBy" field={children.sortBy} />
             <SelectFieldWidget
-              fieldName={`${fieldName}.sortBy`}
-              field={children.sortBy}
-            />
-            <SelectFieldWidget
-              fieldName={`${fieldName}.sortOrder`}
+              fieldName="sortOrder"
               field={children.sortOrder}
             />
+            <TextFieldWidget fieldName="search" field={children.search} />
             <TextFieldWidget
-              fieldName={`${fieldName}.search`}
-              field={children.search}
-            />
-            <TextFieldWidget
-              fieldName={`${fieldName}.journeyVariant`}
+              fieldName="journeyVariant"
               field={children.journeyVariant}
             />
             {(
@@ -684,18 +669,30 @@ export function LeadsStatsContainer({
             ).map((key) => (
               <Div key={key} className="flex flex-col gap-1">
                 <Span className="text-xs text-muted-foreground">
-                  {(children[key] as { label?: string }).label ?? key}
+                  {t(children[key].label)}
                 </Span>
                 <Input
                   type="date"
-                  value={(form?.watch(key) as string | undefined) ?? ""}
+                  value={String(form?.watch(key) ?? "")}
                   onChange={(e) => {
-                    form?.setValue(key, e.target.value);
+                    form?.setValue(key, new Date(e.target.value));
                   }}
                   className="h-9"
                 />
               </Div>
             ))}
+            <NumberFieldWidget
+              fieldName="minEmailsOpened"
+              field={children.minEmailsOpened}
+            />
+            <NumberFieldWidget
+              fieldName="minEmailsClicked"
+              field={children.minEmailsClicked}
+            />
+            <NumberFieldWidget
+              fieldName="minEmailsSent"
+              field={children.minEmailsSent}
+            />
           </Div>
           <Div className="flex flex-wrap gap-3">
             {(
@@ -724,9 +721,7 @@ export function LeadsStatsContainer({
                     form?.setValue(key, checked === true);
                   }}
                 />
-                <Span className="text-sm">
-                  {(children[key] as { label?: string }).label ?? key}
-                </Span>
+                <Span className="text-sm">{t(children[key].label)}</Span>
               </Label>
             ))}
           </Div>
@@ -882,6 +877,7 @@ export function LeadsStatsContainer({
                     }
                     max={byStatusMax}
                     onClick={() => handleNavigateToStatus()}
+                    t={t}
                   />
                 ))}
               </Div>
@@ -911,6 +907,7 @@ export function LeadsStatsContainer({
                     }
                     max={bySourceMax}
                     onClick={() => handleNavigateToSource()}
+                    t={t}
                   />
                 ))}
               </Div>
@@ -920,10 +917,12 @@ export function LeadsStatsContainer({
           <GroupedStatsSection
             title={t("app.api.leads.stats.widget.byCountry")}
             items={groupedStats.byCountry}
+            t={t}
           />
           <GroupedStatsSection
             title={t("app.api.leads.stats.widget.byCampaignStage")}
             items={groupedStats.byCampaignStage}
+            t={t}
           />
         </Div>
       )}
@@ -942,7 +941,7 @@ export function LeadsStatsContainer({
                     {i + 1}.
                   </Span>
                   <Span className="flex-1 truncate">
-                    {campaign.campaignName}
+                    {t(campaign.campaignName)}
                   </Span>
                   {campaign.openRate !== null &&
                     campaign.openRate !== undefined && (
@@ -984,7 +983,7 @@ export function LeadsStatsContainer({
           </Div>
           <Div className="flex flex-col gap-2">
             {topSources.slice(0, 5).map((src, i) => {
-              const sourceName = src.source.replace(/_/g, " ");
+              const sourceName = t(src.source);
               return (
                 <Button
                   key={i}
@@ -1036,14 +1035,14 @@ export function LeadsStatsContainer({
                   <Div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary mt-1.5" />
                   <Div className="flex-1 min-w-0">
                     <Span className="text-muted-foreground text-xs">
-                      {act.type.replace(/_/g, " ")}
+                      {t(act.type)}
                     </Span>
                     {act.leadEmail && (
                       <Span className="ml-2 truncate">{act.leadEmail}</Span>
                     )}
                     {act.details?.status && (
                       <Span className="ml-2 text-xs text-muted-foreground">
-                        ({act.details.status.replace(/_/g, " ")})
+                        ({t(act.details.status)})
                       </Span>
                     )}
                   </Div>

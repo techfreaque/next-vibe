@@ -29,16 +29,28 @@ import { MessageConverter } from "./message-converter";
  * Build compacting instructions (without conversation text)
  */
 function buildCompactingInstructions(): string {
-  return `You are now in compacting mode. Your task is to compact the conversation history above to save tokens while preserving essential context.
+  return `You are a conversation summarizer. Your task is to compress the conversation history above into a compact summary that preserves all essential context for continuing the conversation.
 
-**Instructions:**
-1. Summarize the key points, decisions, and important information from the conversation
-2. Maintain chronological flow and preserve critical context
-3. Focus on facts, decisions, user preferences, and important details mentioned
-4. Remove redundant greetings, small talk, and repetitive content
-5. Keep technical details, code snippets, and specific instructions
-6. Preserve any important tool usage and results
-7. Output ONLY the summary in a clear, organized format - no meta-commentary`;
+**What to preserve:**
+- Key decisions, conclusions, and outcomes reached
+- Important facts, data, or values mentioned by the user
+- User preferences, constraints, and goals stated
+- Significant code, technical details, or instructions (keep verbatim if important)
+- The most recent topic/task being worked on
+- Results of tool calls and actions taken
+
+**What to omit:**
+- System instructions, character personas, or role-play framing
+- Tool definitions, function signatures, or available-tool descriptions
+- Greetings, pleasantries, and filler exchanges
+- Redundant or superseded information
+- Any content that is only relevant to the system and not to the user conversation
+
+**Format:**
+- Write in past tense from a neutral observer perspective
+- Group related points together
+- Use bullet points for clarity
+- Output ONLY the summary — no preamble, no meta-commentary, no section headers like "Summary:"`;
 }
 
 /**
@@ -63,8 +75,6 @@ export class CompactingHandler {
     user: JwtPayloadType;
     model: ModelId;
     character: string | null;
-    systemPrompt: string;
-    tools: Parameters<typeof streamText>[0]["tools"];
     providerModel: Parameters<typeof streamText>[0]["model"];
     abortSignal: AbortSignal;
     logger: EndpointLogger;
@@ -96,8 +106,6 @@ export class CompactingHandler {
       user,
       model,
       character,
-      systemPrompt,
-      tools,
       providerModel,
       abortSignal,
       logger,
@@ -161,9 +169,10 @@ export class CompactingHandler {
     try {
       const streamResult = await streamText({
         model: providerModel,
-        system: systemPrompt,
+        // Do NOT pass system prompt or tools — compacting is a pure summarization
+        // task that should not be influenced by character personas, tool definitions,
+        // or other system-level instructions that would bloat the context.
         messages: compactingMessages,
-        tools,
         temperature: 0.3,
         abortSignal,
       });

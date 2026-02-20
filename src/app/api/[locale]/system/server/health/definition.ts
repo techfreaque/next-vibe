@@ -130,10 +130,10 @@ const { GET } = createEndpoint({
               "app.api.system.server.health.get.response.environment.platform.title",
             schema: z.string(),
           }),
-          supportsSideTasks: responseField({
+          supportsTaskRunners: responseField({
             type: WidgetType.TEXT,
             content:
-              "app.api.system.server.health.get.response.environment.supportsSideTasks.title",
+              "app.api.system.server.health.get.response.environment.supportsTaskRunners.title",
             schema: z.boolean(),
           }),
         },
@@ -435,7 +435,7 @@ const { GET } = createEndpoint({
           name: "development",
           nodeEnv: "development",
           platform: "Local/Server",
-          supportsSideTasks: true,
+          supportsTaskRunners: true,
         },
         database: {
           status: "connected",
@@ -480,7 +480,7 @@ const { GET } = createEndpoint({
           name: "development",
           nodeEnv: "development",
           platform: "Local/Server",
-          supportsSideTasks: true,
+          supportsTaskRunners: true,
         },
         database: {
           status: "connected",
@@ -543,7 +543,7 @@ const { GET } = createEndpoint({
           name: "development",
           nodeEnv: "development",
           platform: "Local/Server",
-          supportsSideTasks: true,
+          supportsTaskRunners: true,
         },
         database: {
           status: "connected",

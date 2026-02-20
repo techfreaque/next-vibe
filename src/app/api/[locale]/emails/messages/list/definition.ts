@@ -26,6 +26,12 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema } from "../../../shared/types/common.schema";
 import {
+  MessageChannel,
+  MessageChannelDB,
+  MessageChannelFilter,
+  MessageChannelFilterOptions,
+} from "../../messaging/enum";
+import {
   EmailSortField,
   EmailSortFieldOptions,
   EmailStatus,
@@ -79,6 +85,18 @@ const { GET } = createEndpoint({
               "app.api.emails.messages.list.fields.search.placeholder",
             helpText: "app.api.emails.messages.list.fields.search.label",
             schema: z.string().optional(),
+          }),
+
+          channel: requestField({
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "app.api.emails.messages.list.fields.channel.label",
+            description:
+              "app.api.emails.messages.list.fields.channel.description",
+            options: MessageChannelFilterOptions,
+            schema: z
+              .enum(MessageChannelFilter)
+              .default(MessageChannelFilter.ANY),
           }),
 
           status: requestField({
@@ -232,6 +250,13 @@ const { GET } = createEndpoint({
                   type: WidgetType.BADGE,
                   text: "app.api.emails.messages.list.response.emails.item.status",
                   schema: z.enum(EmailStatus),
+                }),
+                channel: responseField({
+                  type: WidgetType.BADGE,
+                  text: "app.api.emails.messages.list.response.emails.item.channel",
+                  schema: z
+                    .enum(MessageChannelDB)
+                    .default(MessageChannel.EMAIL),
                 }),
               },
             ),

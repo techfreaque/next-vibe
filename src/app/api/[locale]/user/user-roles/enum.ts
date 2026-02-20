@@ -21,6 +21,7 @@ export const {
  * These are NEVER stored in database or assigned to users
  * They control which platforms can access an endpoint (_OFF) or bypass auth
  * MCP_ON is an opt-in marker - only endpoints with MCP_ON are accessible via MCP
+ * REMOTE_SKILL is an opt-in marker - only endpoints with REMOTE_SKILL appear in AI skill markdown files (AGENT.md, PUBLIC_USER_SKILL.md, USER_WITH_ACCOUNT_SKILL.md)
  */
 export const {
   enum: PlatformMarker,
@@ -33,6 +34,7 @@ export const {
   WEB_OFF: "app.api.user.userRoles.enums.userRole.webOff",
   MCP_ON: "app.api.user.userRoles.enums.userRole.mcpOn",
   PRODUCTION_OFF: "app.api.user.userRoles.enums.userRole.productionOff",
+  REMOTE_SKILL: "app.api.user.userRoles.enums.userRole.remoteSkill",
 });
 
 /**
@@ -78,7 +80,8 @@ export function isPlatformMarker(
     role === PlatformMarker.AI_TOOL_OFF ||
     role === PlatformMarker.MCP_ON ||
     role === PlatformMarker.PRODUCTION_OFF ||
-    role === PlatformMarker.CLI_AUTH_BYPASS
+    role === PlatformMarker.CLI_AUTH_BYPASS ||
+    role === PlatformMarker.REMOTE_SKILL
   );
 }
 

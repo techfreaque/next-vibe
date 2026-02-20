@@ -14,6 +14,7 @@ export enum PathType {
   NO_PATH = "no_path",
   SINGLE_FILE = "single_file",
   FOLDER = "folder",
+  MULTIPLE_PATHS = "multiple_paths",
 }
 
 /**
@@ -22,6 +23,8 @@ export enum PathType {
 export interface TypecheckConfig {
   pathType: PathType;
   targetPath?: string;
+  /** Resolved list of paths when pathType is MULTIPLE_PATHS */
+  targetPaths?: string[];
   cacheKey: string;
   buildInfoFile: string;
   tempConfigFile?: string;
@@ -29,10 +32,23 @@ export interface TypecheckConfig {
 
 /**
  * Determine the path type for TypeScript checking
- * @param path - Path to check
+ * @param path - Path to check (string or array of strings)
  */
-export function determinePathType(path: string | undefined): PathType {
-  if (!path || path.trim() === "") {
+export function determinePathType(
+  path: string | string[] | undefined,
+): PathType {
+  if (!path || (Array.isArray(path) && path.length === 0)) {
+    return PathType.NO_PATH;
+  }
+
+  if (Array.isArray(path)) {
+    if (path.length === 1) {
+      return determinePathType(path[0]);
+    }
+    return PathType.MULTIPLE_PATHS;
+  }
+
+  if (path.trim() === "") {
     return PathType.NO_PATH;
   }
 
@@ -63,23 +79,27 @@ export function determinePathType(path: string | undefined): PathType {
  * Generate a cache key based on path type
  * Note: Cache keys are internal identifiers, not user-facing strings
  * @param pathType - Type of path (file, folder, or no path)
- * @param targetPath - Target path to generate key for
+ * @param targetPath - Target path(s) to generate key for
  */
 export function generateCacheKey(
   pathType: PathType,
-  targetPath?: string,
+  targetPath?: string | string[],
 ): string {
   // eslint-disable-next-line i18next/no-literal-string
   const baseKey = `typecheck_${pathType}`;
 
-  if (!targetPath) {
+  if (!targetPath || (Array.isArray(targetPath) && targetPath.length === 0)) {
     return `${baseKey}_project`;
   }
+
+  const pathForHash = Array.isArray(targetPath)
+    ? targetPath.toSorted().join("|")
+    : targetPath;
 
   // Create hash of the path for consistent cache keys
   // eslint-disable-next-line i18next/no-literal-string
   const pathHash = createHash("md5")
-    .update(targetPath)
+    .update(pathForHash)
     .digest("hex")
     .slice(0, 8);
 
@@ -87,17 +107,33 @@ export function generateCacheKey(
     return `${baseKey}_file_${pathHash}`;
   }
 
+  if (pathType === PathType.MULTIPLE_PATHS) {
+    return `${baseKey}_multi_${pathHash}`;
+  }
+
   // eslint-disable-next-line i18next/no-literal-string
   return `${baseKey}_folder_${pathHash}`;
 }
 
 /**
+ * Resolve a single path to a file/glob pattern for inclusion in tsconfig.
+ * Files become exact paths; directories become glob patterns.
+ */
+function resolvePathToInclude(path: string): string {
+  const resolvedPath = resolve(path);
+  if (existsSync(resolvedPath) && statSync(resolvedPath).isFile()) {
+    return path;
+  }
+  return `${path}/**/*`;
+}
+
+/**
  * Create TypeScript checking configuration
- * @param path - Path to check (file or directory)
+ * @param path - Path(s) to check (file, directory, or array of either)
  * @param cachePath - Path to cache directory
  */
 export function createTypecheckConfig(
-  path: string | undefined,
+  path: string | string[] | undefined,
   cachePath: string,
 ): TypecheckConfig {
   const pathType = determinePathType(path);
@@ -107,9 +143,16 @@ export function createTypecheckConfig(
     mkdirSync(cachePath, { recursive: true });
   }
 
+  const needsTempConfig =
+    pathType === PathType.SINGLE_FILE ||
+    pathType === PathType.FOLDER ||
+    pathType === PathType.MULTIPLE_PATHS;
+
   const result: TypecheckConfig = {
     pathType,
-    targetPath: path,
+    // For single string paths keep targetPath for filtering; for arrays use targetPaths
+    targetPath: Array.isArray(path) ? undefined : path,
+    targetPaths: Array.isArray(path) ? path : undefined,
     cacheKey,
     buildInfoFile: join(
       pathType === PathType.NO_PATH ? "." : cachePath,
@@ -120,13 +163,20 @@ export function createTypecheckConfig(
     ),
   };
 
-  // Create temporary config file for single files and folders (not for no-path scenario)
-  if (pathType === PathType.SINGLE_FILE || pathType === PathType.FOLDER) {
+  if (needsTempConfig) {
     // eslint-disable-next-line i18next/no-literal-string
     result.tempConfigFile = join(cachePath, `tsconfig.${cacheKey}.json`);
   }
 
   return result;
+}
+
+/**
+ * Resolve a list of paths to tsconfig include patterns.
+ * Files become exact paths; directories become glob patterns.
+ */
+export function resolvePathsToIncludes(paths: string[]): string[] {
+  return paths.map(resolvePathToInclude);
 }
 
 /**

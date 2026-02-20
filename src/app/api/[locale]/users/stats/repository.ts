@@ -505,7 +505,7 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         growthChart,
       },
       businessInsights: {
-        generatedAt: new Date().toISOString(),
+        generatedAt: new Date(),
       },
     };
   }

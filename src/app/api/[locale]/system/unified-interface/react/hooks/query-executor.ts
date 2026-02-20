@@ -189,12 +189,16 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
     // Build the endpoint URL with locale and replace URL path parameters
     let endpointUrl = `${envClient.NEXT_PUBLIC_APP_URL}/api/${locale}`;
 
-    // Build path from endpoint.path array, replacing [param] placeholders
+    // Build path from endpoint.path array, replacing [param] or :param placeholders
     for (const segment of endpoint.path) {
-      // Check if this segment is a URL parameter (wrapped in brackets)
-      if (segment.startsWith("[") && segment.endsWith("]")) {
-        // Extract parameter name (e.g., "[id]" → "id")
-        const paramName = segment.slice(1, -1);
+      // Check if this segment is a URL parameter (wrapped in brackets or prefixed with colon)
+      const isBracketParam = segment.startsWith("[") && segment.endsWith("]");
+      const isColonParam = segment.startsWith(":");
+      if (isBracketParam || isColonParam) {
+        // Extract parameter name (e.g., "[id]" → "id", ":id" → "id")
+        const paramName = isBracketParam
+          ? segment.slice(1, -1)
+          : segment.slice(1);
 
         // Get value from pathParams
         const paramValue = pathParams?.[paramName as keyof typeof pathParams];

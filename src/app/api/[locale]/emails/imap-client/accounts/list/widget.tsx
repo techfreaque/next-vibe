@@ -12,7 +12,9 @@ import {
   Loader2,
   Plus,
   RefreshCw,
+  Search,
 } from "next-vibe-ui/ui/icons";
+import { Input } from "next-vibe-ui/ui/input";
 import {
   Select,
   SelectContent,
@@ -31,8 +33,6 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 
 import {
   ImapAccountSortField,
@@ -111,7 +111,12 @@ function AccountRow({
           {account.lastSyncAt !== null && account.lastSyncAt !== undefined && (
             <Span>
               {t("app.api.emails.imapClient.accounts.list.lastSync")}:{" "}
-              {account.lastSyncAt}
+              {new Date(account.lastSyncAt).toLocaleString([], {
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </Span>
           )}
         </Div>
@@ -122,9 +127,7 @@ function AccountRow({
 
 export function ImapAccountsListContainer({
   field,
-  fieldName,
 }: CustomWidgetProps): React.JSX.Element {
-  const children = field.children;
   const { push: navigate } = useWidgetNavigation();
   const { endpointMutations } = useWidgetContext();
   const t = useWidgetTranslation();
@@ -136,6 +139,8 @@ export function ImapAccountsListContainer({
   const sortOrder: string = form?.watch("sortOrder") ?? SortOrder.DESC;
   const activeStatus: string =
     form?.watch("status") ?? ImapAccountStatusFilter.ALL;
+  const enabledFilter: boolean | undefined = form?.watch("enabled");
+  const searchValue: string = form?.watch("search") ?? "";
   const currentPage: number = form?.watch("page") ?? 1;
   const limit: number = form?.watch("limit") ?? 20;
 
@@ -168,6 +173,14 @@ export function ImapAccountsListContainer({
     [form, onSubmit],
   );
 
+  const handleEnabledToggle = useCallback((): void => {
+    const next = enabledFilter === true ? undefined : true;
+    form?.setValue("enabled", next);
+    if (onSubmit) {
+      onSubmit();
+    }
+  }, [form, onSubmit, enabledFilter]);
+
   const handlePageChange = useCallback(
     (page: number): void => {
       form?.setValue("page", page);
@@ -186,8 +199,20 @@ export function ImapAccountsListContainer({
         const editDef = await import("../[id]/definition");
         navigate(editDef.default.PUT, {
           urlPathParams: { id: account.id },
-          prefillFromGet: true,
-          getEndpoint: editDef.default.GET,
+          data: {
+            name: account.name,
+            email: account.email,
+            host: account.host,
+            port: account.port,
+            secure: account.secure,
+            username: account.username,
+            authMethod: account.authMethod,
+            enabled: account.enabled,
+            syncInterval: account.syncInterval,
+            maxMessages: account.maxMessages,
+            connectionTimeout: account.connectionTimeout,
+            keepAlive: account.keepAlive,
+          },
           popNavigationOnSuccess: 1,
         });
       })();
@@ -210,7 +235,6 @@ export function ImapAccountsListContainer({
     <Div className="flex flex-col gap-0">
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
-        <NavigateButtonWidget field={children.backButton} />
         <Span className="font-semibold text-base">
           {t("app.api.emails.imapClient.accounts.list.title")}
           {total > 0 && (
@@ -243,14 +267,24 @@ export function ImapAccountsListContainer({
 
       {/* Search + sort */}
       <Div className="px-4 pt-3 pb-2 flex items-center gap-2 flex-wrap">
-        <Div className="flex-1 min-w-[160px]">
-          <TextFieldWidget
-            fieldName={`${fieldName}.search`}
-            field={children.search}
+        <Div className="flex-1 min-w-[160px] relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Input
+            value={searchValue}
+            onChange={(e) => {
+              form?.setValue("search", e.target.value);
+              if (onSubmit) {
+                onSubmit();
+              }
+            }}
+            placeholder={t(
+              "app.api.emails.imapClient.accounts.list.searchPlaceholder",
+            )}
+            className="pl-9 h-9"
           />
         </Div>
         <Select value={sortBy} onValueChange={handleSortByChange}>
-          <SelectTrigger className="h-9 min-w-[140px]">
+          <SelectTrigger className="h-9 w-[140px] flex-shrink-0">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -262,7 +296,7 @@ export function ImapAccountsListContainer({
           </SelectContent>
         </Select>
         <Select value={sortOrder} onValueChange={handleSortOrderChange}>
-          <SelectTrigger className="h-9 min-w-[80px]">
+          <SelectTrigger className="h-9 w-[90px] flex-shrink-0">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -276,7 +310,7 @@ export function ImapAccountsListContainer({
       </Div>
 
       {/* Status filter chips */}
-      <Div className="px-4 pb-2 flex items-center gap-1.5 flex-wrap">
+      <Div className="px-4 pb-1 flex items-center gap-1.5 flex-wrap">
         {ImapAccountStatusFilterOptions.map((opt) => {
           const isActive = opt.value === activeStatus;
           return (
@@ -301,6 +335,19 @@ export function ImapAccountsListContainer({
             </Button>
           );
         })}
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={handleEnabledToggle}
+          className={
+            enabledFilter === true
+              ? "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-primary text-primary-foreground border-primary"
+              : "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
+          }
+        >
+          {t("app.api.emails.imapClient.accounts.list.enabledOnly")}
+        </Button>
       </Div>
 
       {/* Account list */}

@@ -7,12 +7,12 @@ import "server-only";
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-
-import definitions from "./definition";
 import {
   renderAdminSignupNotification,
   renderRegisterMail,
 } from "@/app/api/[locale]/user/public/signup/email";
+
+import definitions from "./definition";
 import { userCreateRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({

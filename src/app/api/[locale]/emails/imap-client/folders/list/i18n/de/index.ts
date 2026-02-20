@@ -1,7 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "IMAP-Ordner auflisten",
+  title: "Ordner",
   description: "Liste der IMAP-Ordner abrufen",
   category: "API Endpunkt",
   tag: "Ordner",
@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
     list: "Liste",
   },
   container: {
-    title: "Ordner-Container",
+    title: "Ordner",
     description: "Container für Ordner-Listendaten",
   },
   page: {
@@ -101,6 +101,13 @@ export const translations: typeof enTranslations = {
     title: "Erfolg",
     description: "Ordner erfolgreich abgerufen",
   },
+  empty: "Keine Ordner gefunden",
+  refresh: "Aktualisieren",
+  sync: "Ordner synchronisieren",
+  messages: "Nachrichten",
+  unseen: "Ungelesen",
+  more: "mehr",
+  showLess: "Weniger anzeigen",
   widget: {
     title: "IMAP-Ordner",
     refresh: "Aktualisieren",
@@ -108,5 +115,7 @@ export const translations: typeof enTranslations = {
     empty: "Keine Ordner gefunden",
     messages: "Nachrichten",
     unseen: "Ungelesen",
+    more: "mehr",
+    showLess: "Weniger anzeigen",
   },
 };

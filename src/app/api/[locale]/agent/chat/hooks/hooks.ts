@@ -15,6 +15,7 @@ import {
   useState,
 } from "react";
 
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -247,6 +248,9 @@ export interface UseChatReturn {
   searchThreads: (query: string) => Array<{ id: string; title: string }>;
 
   user: JwtPayloadType;
+
+  /** Which AI provider integrations are configured (passed from server) */
+  envAvailability: AgentEnvAvailability;
 }
 
 /**
@@ -278,6 +282,7 @@ export function useChat(
   currentSubFolderId: string | null,
   initialCredits: CreditsGetResponseOutput,
   rootFolderPermissions: RootFolderPermissions,
+  envAvailability: AgentEnvAvailability,
 ): UseChatReturn {
   // Get stores - subscribe to specific properties
   const threads = useChatStore((state) => state.threads);
@@ -706,5 +711,8 @@ export function useChat(
 
     // Search
     searchThreads,
+
+    // Env availability (which provider keys are configured)
+    envAvailability,
   };
 }

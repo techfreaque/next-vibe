@@ -115,20 +115,19 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
       source: lead.source || undefined,
       notes: lead.notes || undefined,
       convertedUserId: lead.convertedUserId,
-      convertedAt: lead.convertedAt?.toISOString() ?? null,
-      signedUpAt: lead.signedUpAt?.toISOString() ?? null,
-      subscriptionConfirmedAt:
-        lead.subscriptionConfirmedAt?.toISOString() ?? null,
+      convertedAt: lead.convertedAt ?? null,
+      signedUpAt: lead.signedUpAt ?? null,
+      subscriptionConfirmedAt: lead.subscriptionConfirmedAt ?? null,
       currentCampaignStage: lead.currentCampaignStage,
       emailsSent: lead.emailsSent,
-      lastEmailSentAt: lead.lastEmailSentAt?.toISOString() ?? null,
-      unsubscribedAt: lead.unsubscribedAt?.toISOString() ?? null,
+      lastEmailSentAt: lead.lastEmailSentAt ?? null,
+      unsubscribedAt: lead.unsubscribedAt ?? null,
       emailsOpened: lead.emailsOpened,
       emailsClicked: lead.emailsClicked,
-      lastEngagementAt: lead.lastEngagementAt?.toISOString() ?? null,
+      lastEngagementAt: lead.lastEngagementAt ?? null,
       metadata: lead.metadata || undefined,
-      createdAt: lead.createdAt.toISOString(),
-      updatedAt: lead.updatedAt.toISOString(),
+      createdAt: lead.createdAt,
+      updatedAt: lead.updatedAt,
     }));
 
     return success({

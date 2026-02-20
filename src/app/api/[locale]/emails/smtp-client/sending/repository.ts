@@ -944,6 +944,9 @@ export class SmtpSendingRepository {
       case CampaignType.LEAD_CAMPAIGN:
         return EmailType.LEAD_CAMPAIGN;
       case CampaignType.NEWSLETTER:
+      case CampaignType.SIGNUP_NURTURE:
+      case CampaignType.RETENTION:
+      case CampaignType.WINBACK:
         return EmailType.MARKETING;
       case CampaignType.TRANSACTIONAL:
         return EmailType.TRANSACTIONAL;

@@ -44,6 +44,7 @@ const { GET } = createEndpoint({
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
+    UserRole.REMOTE_SKILL,
   ] as const,
   fields: objectUnionField(
     {

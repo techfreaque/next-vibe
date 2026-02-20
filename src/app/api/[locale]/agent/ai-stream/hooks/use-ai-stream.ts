@@ -112,8 +112,9 @@ export interface UseAIStreamReturn {
     data: AiStreamPostRequestOutput,
     options?: StreamOptions,
   ) => Promise<void>;
-  stopStream: () => void;
+  stopStream: (threadId?: string) => void;
   isStreaming: boolean;
+  isStreamingThread: (threadId: string) => boolean;
   streamingMessages: Record<string, StreamingMessage>;
   threads: Record<string, StreamingThread>;
 }
@@ -291,6 +292,7 @@ function handleMessageCreatedEvent(params: {
 /**
  * Hook for AI streaming operations
  * Uses fetch + SSE parsing with Zustand state management
+ * Supports concurrent streams across different threads.
  */
 export function useAIStream(
   locale: CountryLanguage,
@@ -298,53 +300,56 @@ export function useAIStream(
   t: TFunction,
 ): UseAIStreamReturn {
   const store = useAIStreamStore();
-  const abortControllerRef = useRef<AbortController | null>(null);
-  /** Holds the active SSE reader so a new stream start can cancel it immediately. */
-  const readerRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(
-    null,
-  );
-  /** Tracks the thread ID of the active stream so stopStream can add UI error messages. */
-  const activeThreadIdRef = useRef<string | null>(null);
+
+  // All refs are Maps keyed by threadId so concurrent streams don't interfere.
+  const readerRefs = useRef<
+    Map<string, ReadableStreamDefaultReader<Uint8Array>>
+  >(new Map());
+  const abortControllerRefs = useRef<Map<string, AbortController>>(new Map());
   /**
-   * When true the user has requested stop but we are still draining the
-   * remaining SSE events from the server so DB writes / credit events land.
+   * When true for a given threadId the user has requested stop but we are
+   * still draining remaining SSE events so DB writes / credit events land.
    * Audio enqueuing and UI streaming updates are suppressed in drain mode.
    */
-  const isDrainingRef = useRef(false);
+  const isDrainingRefs = useRef<Map<string, boolean>>(new Map());
 
   /**
-   * Start an AI stream
+   * Start an AI stream.
+   * Only cancels an existing stream for the SAME thread — other threads are unaffected.
    */
   const startStream = useCallback(
     async (
       data: AiStreamPostRequestOutput,
       options: StreamOptions = {},
     ): Promise<void> => {
-      // Cancel any existing stream immediately (no drain — a new stream is starting)
-      if (readerRef.current) {
-        void readerRef.current.cancel();
+      const threadId = data.threadId ?? "";
+
+      // Cancel only the existing stream for THIS thread
+      const existingReader = readerRefs.current.get(threadId);
+      if (existingReader) {
+        void existingReader.cancel();
+        readerRefs.current.delete(threadId);
       }
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
+      const existingController = abortControllerRefs.current.get(threadId);
+      if (existingController) {
+        existingController.abort();
+        abortControllerRefs.current.delete(threadId);
       }
 
-      // Reset drain flag for new stream
-      isDrainingRef.current = false;
+      // Reset drain flag for new stream on this thread
+      isDrainingRefs.current.set(threadId, false);
 
       // Reset audio queue to prevent old audio from playing
       const audioQueue = getAudioQueue();
       audioQueue.stop();
 
-      // Create new abort controller
+      // Create new abort controller for this thread
       const abortController = new AbortController();
-      abortControllerRef.current = abortController;
+      abortControllerRefs.current.set(threadId, abortController);
 
-      // Track active thread ID so stopStream can add UI messages
-      activeThreadIdRef.current = data.threadId ?? null;
-
-      // Generate stream ID
+      // Generate stream ID and register in store (per-thread)
       const streamId = crypto.randomUUID();
-      store.startStream(streamId);
+      store.startStream(threadId, streamId);
 
       try {
         // Make fetch request
@@ -536,7 +541,7 @@ export function useAIStream(
             duration: Infinity, // Never auto-dismiss
           });
 
-          store.stopStream();
+          store.stopStream(threadId);
           return;
         }
 
@@ -595,13 +600,13 @@ export function useAIStream(
               });
           }
 
-          store.stopStream();
+          store.stopStream(threadId);
           return;
         }
 
         // Process SSE stream
         const reader = response.body.getReader();
-        readerRef.current = reader;
+        readerRefs.current.set(threadId, reader);
         const decoder = new TextDecoder();
         let buffer = "";
 
@@ -619,6 +624,8 @@ export function useAIStream(
           // Process complete events (separated by \n\n)
           const events = buffer.split("\n\n");
           buffer = events.pop() || ""; // Keep incomplete event in buffer
+
+          const isDraining = isDrainingRefs.current.get(threadId) ?? false;
 
           for (const eventString of events) {
             if (!eventString.trim()) {
@@ -697,7 +704,7 @@ export function useAIStream(
 
               case StreamEventType.CONTENT_DELTA: {
                 // Skip content deltas in drain mode - server is handling final DB writes
-                if (isDrainingRef.current) {
+                if (isDraining) {
                   break;
                 }
 
@@ -713,7 +720,7 @@ export function useAIStream(
                   // Create a placeholder message
                   store.addMessage({
                     messageId: eventData.messageId,
-                    threadId: data.threadId || "",
+                    threadId: threadId || "",
                     role: ChatMessageRole.ASSISTANT,
                     content: "",
                     parentId: null,
@@ -800,7 +807,7 @@ export function useAIStream(
 
               case StreamEventType.REASONING_DELTA: {
                 // Skip in drain mode - UI already shows finalized content
-                if (isDrainingRef.current) {
+                if (isDraining) {
                   break;
                 }
 
@@ -1183,7 +1190,7 @@ export function useAIStream(
 
               case StreamEventType.AUDIO_CHUNK: {
                 // Skip audio in drain mode
-                if (isDrainingRef.current) {
+                if (isDraining) {
                   break;
                 }
 
@@ -1217,7 +1224,7 @@ export function useAIStream(
 
               case StreamEventType.COMPACTING_DELTA: {
                 // Skip in drain mode
-                if (isDrainingRef.current) {
+                if (isDraining) {
                   break;
                 }
 
@@ -1375,9 +1382,7 @@ export function useAIStream(
                 const errorResponse = event.data;
 
                 // Create ERROR message in chat so users can see what went wrong
-                // Get the current thread ID from the active stream
-                const activeThreadId =
-                  store.threads[Object.keys(store.threads)[0]]?.threadId;
+                const activeThreadId = threadId;
 
                 if (activeThreadId) {
                   // Import chat store dynamically to avoid circular dependencies
@@ -1461,11 +1466,12 @@ export function useAIStream(
         }
 
         // Stream completed successfully
-        store.stopStream();
+        store.stopStream(threadId);
       } catch (error) {
         if (error instanceof Error) {
           if (error.name === "AbortError") {
-            if (isDrainingRef.current) {
+            const isDraining = isDrainingRefs.current.get(threadId) ?? false;
+            if (isDraining) {
               // AbortError during drain mode means the external signal (options.signal)
               // was used to abort. Finalize messages that are still streaming.
               logger.info(
@@ -1474,9 +1480,10 @@ export function useAIStream(
             } else {
               logger.info("Stream aborted - finalizing messages");
             }
+            // Only finalize messages belonging to this thread
             const streamingMessages = store.streamingMessages;
             Object.values(streamingMessages).forEach((msg) => {
-              if (msg.isStreaming) {
+              if (msg.isStreaming && msg.threadId === threadId) {
                 store.finalizeMessage(
                   msg.messageId,
                   msg.content,
@@ -1489,7 +1496,7 @@ export function useAIStream(
             logger.error("Stream error", { error: error.message });
 
             // Create ERROR message in chat for unexpected errors
-            const activeThreadId = data.threadId;
+            const activeThreadId = threadId;
 
             if (activeThreadId) {
               const errorResponse = fail({
@@ -1543,99 +1550,101 @@ export function useAIStream(
             }
           }
         }
-        store.stopStream();
+        store.stopStream(threadId);
       } finally {
-        abortControllerRef.current = null;
-        readerRef.current = null;
-        activeThreadIdRef.current = null;
-        isDrainingRef.current = false;
+        readerRefs.current.delete(threadId);
+        abortControllerRefs.current.delete(threadId);
+        isDrainingRefs.current.delete(threadId);
       }
     },
     [locale, logger, store, t],
   );
 
   /**
-   * Stop the current stream.
+   * Stop the stream for a specific thread (or all threads if no threadId given).
    *
-   * 1. Freezes the UI immediately (finalizes streaming messages).
+   * 1. Freezes the UI immediately (finalizes streaming messages for that thread).
    * 2. Adds a "stream interrupted" error message to the chat UI.
-   * 3. Cancels the SSE reader — drops the connection, triggers ReadableStream.cancel()
-   *    on the server → abort-error-handler saves partial content + credits to DB
-   *    and writes the interruption error message to DB.
+   * 3. Cancels the SSE reader for that thread — drops the connection.
+   *    The server continues running and writing to DB regardless.
    */
-  const stopStream = useCallback(() => {
-    logger.info("Stop stream requested by user");
+  const stopStream = useCallback(
+    (threadId?: string) => {
+      logger.info("Stop stream requested by user", { threadId });
 
-    // Stop audio immediately
-    getAudioQueue().stop();
+      // Stop audio immediately
+      getAudioQueue().stop();
 
-    // Freeze the UI immediately for responsiveness
-    const streamingMessages = store.streamingMessages;
-    Object.values(streamingMessages).forEach((msg) => {
-      if (msg.isStreaming) {
-        store.finalizeMessage(
-          msg.messageId,
-          msg.content,
-          msg.totalTokens,
-          "stop",
+      const threadIds = threadId
+        ? [threadId]
+        : [...abortControllerRefs.current.keys()];
+
+      for (const tid of threadIds) {
+        // Freeze the UI immediately for this thread
+        const streamingMessages = store.streamingMessages;
+        Object.values(streamingMessages).forEach((msg) => {
+          if (msg.isStreaming && msg.threadId === tid) {
+            store.finalizeMessage(
+              msg.messageId,
+              msg.content,
+              msg.totalTokens,
+              "stop",
+            );
+          }
+        });
+
+        // Add the interruption error message to the chat UI.
+        const streamingMsgs = Object.values(
+          useAIStreamStore.getState().streamingMessages,
         );
+        const activeAssistant = streamingMsgs.find(
+          (m) => m.threadId === tid && m.role === ChatMessageRole.ASSISTANT,
+        );
+        const activeSequenceId = activeAssistant?.sequenceId ?? null;
+
+        const { parentId, depth } = getLastMessageForErrorParent(tid);
+        useChatStore.getState().addMessage({
+          id: crypto.randomUUID(),
+          threadId: tid,
+          role: ChatMessageRole.ERROR,
+          content: "app.api.agent.chat.aiStream.info.streamInterrupted",
+          parentId,
+          depth,
+          sequenceId: activeSequenceId,
+          authorId: "system",
+          isAI: false,
+          model: null,
+          character: null,
+          errorType: "STREAM_ERROR",
+          errorMessage: t("app.api.agent.chat.aiStream.info.streamInterrupted"),
+          errorCode: null,
+          metadata: {},
+          upvotes: 0,
+          downvotes: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          searchVector: null,
+        });
+
+        // Cancel the reader for this thread — drops the SSE connection.
+        // The server keeps going and writes to DB.
+        const reader = readerRefs.current.get(tid);
+        if (reader) {
+          void reader.cancel();
+          readerRefs.current.delete(tid);
+        }
+
+        store.stopStream(tid);
       }
-    });
-
-    // Add the interruption error message to the chat UI.
-    // Store the translation key directly as content — the bubble's JSON parse will fail
-    // and fall back to t(message.content), rendering just the message with no error label.
-    const activeThreadId = activeThreadIdRef.current;
-    if (activeThreadId) {
-      // Grab sequenceId from the active streaming assistant message so the error
-      // gets grouped into GroupedAssistantMessage together with the partial response.
-      const streamingMsgs = Object.values(
-        useAIStreamStore.getState().streamingMessages,
-      );
-      const activeAssistant = streamingMsgs.find(
-        (m) =>
-          m.threadId === activeThreadId && m.role === ChatMessageRole.ASSISTANT,
-      );
-      const activeSequenceId = activeAssistant?.sequenceId ?? null;
-
-      const { parentId, depth } = getLastMessageForErrorParent(activeThreadId);
-      useChatStore.getState().addMessage({
-        id: crypto.randomUUID(),
-        threadId: activeThreadId,
-        role: ChatMessageRole.ERROR,
-        content: "app.api.agent.chat.aiStream.info.streamInterrupted",
-        parentId,
-        depth,
-        sequenceId: activeSequenceId,
-        authorId: "system",
-        isAI: false,
-        model: null,
-        character: null,
-        errorType: "STREAM_ERROR",
-        errorMessage: t("app.api.agent.chat.aiStream.info.streamInterrupted"),
-        errorCode: null,
-        metadata: {},
-        upvotes: 0,
-        downvotes: 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        searchVector: null,
-      });
-    }
-
-    // Cancel the reader — drops the connection, triggers server cancel() callback
-    // → streamAbortController.abort("Client disconnected") → abort-error-handler runs.
-    if (readerRef.current) {
-      void readerRef.current.cancel();
-    }
-
-    store.stopStream();
-  }, [store, logger, t]);
+    },
+    [store, logger, t],
+  );
 
   return {
     startStream,
     stopStream,
     isStreaming: store.isStreaming,
+    isStreamingThread: store.isStreamingThread,
     streamingMessages: store.streamingMessages,
     threads: store.threads,
   };

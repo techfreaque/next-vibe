@@ -5,6 +5,7 @@ export const translations = {
     users: "Users",
     emails: "Emails",
     cronTasks: "Cron Tasks",
+    sshAccess: "SSH / Machine",
     admin: "Admin",
     adminPanel: "Admin Panel",
     administrator: "Administrator",

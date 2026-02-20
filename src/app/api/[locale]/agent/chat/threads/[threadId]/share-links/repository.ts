@@ -96,8 +96,8 @@ export class ShareLinksRepository {
         requireAuth: link.requireAuth,
         active: link.active,
         accessCount: link.accessCount,
-        lastAccessedAt: link.lastAccessedAt?.toISOString() ?? null,
-        createdAt: link.createdAt.toISOString(),
+        lastAccessedAt: link.lastAccessedAt ?? null,
+        createdAt: link.createdAt,
         editAction: link.id, // Link ID for edit action
         deleteAction: link.id, // Link ID for delete action
       }));

@@ -40,6 +40,20 @@ export const { envClient, schema: envClientSchema } = defineEnvClient({
     value: process.env.NEXT_PUBLIC_APP_URL,
     example: "http://localhost:3000",
   },
+  NEXT_PUBLIC_PROJECT_URL: {
+    schema: z.string().url().default("https://unbottled.ai"),
+    value: process.env.NEXT_PUBLIC_PROJECT_URL,
+    example: "https://unbottled.ai",
+  },
+  NEXT_PUBLIC_LOCAL_MODE: {
+    schema: z
+      .string()
+      .optional()
+      .default("true")
+      .transform((v) => v !== "false"),
+    value: process.env.NEXT_PUBLIC_LOCAL_MODE,
+    example: "true",
+  },
   NEXT_PUBLIC_TEST_SERVER_URL: {
     schema: createSchema(z.string(), z.string().optional()),
     value: process.env.NEXT_PUBLIC_TEST_SERVER_URL,

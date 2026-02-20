@@ -22,13 +22,17 @@ import {
   convertLanguageFilter,
   type Countries,
   type CountryFilter,
+  type CountryLanguage,
   type LanguageFilter,
   type Languages,
 } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { newsletterSubscriptions } from "../newsletter/db";
 import { NewsletterSubscriptionStatus } from "../newsletter/enum";
+import type { BatchUpdateRequestOutput } from "./batch/definition";
+import { campaignSchedulerService } from "./campaigns/emails/services/scheduler";
 import type { LeadCreateRequestTypeOutput } from "./create/definition";
 import {
   emailCampaigns,
@@ -65,7 +69,10 @@ import {
   MimeType,
   SortOrder,
 } from "./enum";
-import type { ExportQueryType, ExportResponseType } from "./export/definition";
+import type {
+  LeadExportRequestOutput,
+  LeadExportResponseOutput,
+} from "./export/definition";
 import type { LeadListGetRequestTypeOutput } from "./list/definition";
 import type { LeadEngagementResponseOutput } from "./tracking/engagement/definition";
 import type {
@@ -76,22 +83,6 @@ import type {
   LeadWithEmailType,
   UnsubscribeType,
 } from "./types";
-
-// Type aliases for enum values
-type LeadSortFieldType = typeof LeadSortFieldValues;
-type SortOrderType = typeof SortOrderValues;
-type BatchOperationScopeType = typeof BatchOperationScopeValues;
-type LeadStatusType = typeof LeadStatusValues;
-type EmailCampaignStageType = typeof EmailCampaignStageValues;
-type LeadSourceType = typeof LeadSourceValues;
-type EngagementTypesType = typeof EngagementTypesValues;
-
-// Type aliases for filter values (CountryFilter and LanguageFilter are imported from i18n/core/config)
-type LeadStatusFilterType = typeof LeadStatusFilterValues;
-type EmailCampaignStageFilterType = typeof EmailCampaignStageFilterValues;
-type LeadSourceFilterType = typeof LeadSourceFilterValues;
-
-const INVALID_STATUS_TRANSITION_ERROR = "Invalid status transition";
 
 /**
  * Utility function to ensure a lead has an email
@@ -143,7 +134,7 @@ export class LeadsRepository {
           id: string;
           businessName: string;
           email: string | null;
-          status: LeadStatusType;
+          status: typeof LeadStatusValues;
         };
         contactDetails: {
           phone: string | null;
@@ -152,14 +143,14 @@ export class LeadsRepository {
           language: string;
         };
         trackingInfo: {
-          source: LeadSourceType | null;
+          source: typeof LeadSourceValues | null;
           emailsSent: number;
           currentCampaignStage: string | null;
         };
         metadata: {
           notes: string | null;
-          createdAt: string;
-          updatedAt: string;
+          createdAt: Date;
+          updatedAt: Date;
         };
       };
     }>
@@ -198,7 +189,7 @@ export class LeadsRepository {
       const businessName = data.contactInfo?.businessName ?? "";
       const phone = data.contactInfo?.phone ?? null;
       const website = data.contactInfo?.website ?? null;
-      const source = data.leadDetails?.source ?? null;
+      const source = data.leadDetails?.source;
       const notes = data.leadDetails?.notes ?? null;
 
       const [createdLead] = await db
@@ -246,8 +237,8 @@ export class LeadsRepository {
           },
           metadata: {
             notes: createdLead.notes,
-            createdAt: createdLead.createdAt.toISOString(),
-            updatedAt: createdLead.updatedAt.toISOString(),
+            createdAt: createdLead.createdAt,
+            updatedAt: createdLead.updatedAt,
           },
         },
       });
@@ -803,7 +794,14 @@ export class LeadsRepository {
         });
       }
 
-      // 2. Also unsubscribe from newsletter
+      // 2. Halt all active campaigns
+      await campaignSchedulerService.haltCampaignsForStatusChange(
+        updatedLead.id,
+        LeadStatus.UNSUBSCRIBED,
+        logger,
+      );
+
+      // 3. Also unsubscribe from newsletter
       await LeadsRepository.unsubscribeFromNewsletterInternal(email, logger);
 
       logger.debug("Lead and newsletter unsubscribed successfully", {
@@ -1223,6 +1221,12 @@ export class LeadsRepository {
           userId: options.userId,
           email: options.email,
         });
+        // Halt COLD and NEWSLETTER_NURTURE campaigns on signup
+        await campaignSchedulerService.haltCampaignsForStatusChange(
+          leadId,
+          LeadStatus.SIGNED_UP,
+          logger,
+        );
       }
 
       return result;
@@ -1242,7 +1246,7 @@ export class LeadsRepository {
   static async recordEngagementInternal(
     data: {
       leadId: string;
-      engagementType: EngagementTypesType;
+      engagementType: typeof EngagementTypesValues;
       campaignId?: string;
       metadata?: Record<string, string | number | boolean>;
       ipAddress?: string;
@@ -1348,10 +1352,10 @@ export class LeadsRepository {
         responseEngagementType: engagement.engagementType,
         responseCampaignId: engagement.campaignId || undefined,
         responseMetadata: engagement.metadata || {},
-        timestamp: engagement.timestamp.toISOString(),
+        timestamp: engagement.timestamp,
         ipAddress: engagement.ipAddress || undefined,
         userAgent: engagement.userAgent || undefined,
-        createdAt: engagement.timestamp.toISOString(),
+        createdAt: engagement.timestamp,
         responseLeadId: engagement.leadId,
       });
     } catch (error) {
@@ -1370,7 +1374,7 @@ export class LeadsRepository {
   static async recordEngagement(
     data: {
       leadId: string;
-      engagementType: EngagementTypesType;
+      engagementType: typeof EngagementTypesValues;
       campaignId?: string;
       metadata?: Record<string, string | number | boolean>;
       ipAddress?: string;
@@ -1385,14 +1389,13 @@ export class LeadsRepository {
    * Export leads to CSV or Excel
    */
   static async exportLeads(
-    query: ExportQueryType,
+    query: LeadExportRequestOutput,
     logger: EndpointLogger,
     t: TFunction,
-  ): Promise<ResponseType<ExportResponseType>> {
+  ): Promise<ResponseType<LeadExportResponseOutput>> {
     try {
       logger.debug("Exporting leads", {
         format: query.format,
-        limit: query.limit,
       });
 
       // Build where conditions (similar to listLeads)
@@ -1594,28 +1597,9 @@ export class LeadsRepository {
    * Batch update leads based on filter criteria
    */
   static async batchUpdateLeads(
-    data: {
-      search?: string;
-      status?: LeadStatusFilterType;
-      currentCampaignStage?: EmailCampaignStageFilterType;
-      country?: CountryFilter;
-      language?: LanguageFilter;
-      source?: LeadSourceFilterType;
-      sortBy?: LeadSortFieldType[];
-      sortOrder?: SortOrderType[];
-      scope?: BatchOperationScopeType;
-      page?: number;
-      pageSize?: number;
-      updates: {
-        status?: LeadStatusType;
-        currentCampaignStage?: EmailCampaignStageType;
-        source?: LeadSourceType;
-        notes?: string;
-      };
-      dryRun?: boolean;
-      maxRecords?: number;
-    },
+    data: BatchUpdateRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       success: boolean;
@@ -1627,8 +1611,8 @@ export class LeadsRepository {
         id: string;
         email: string | null;
         businessName: string;
-        currentStatus: LeadStatusType;
-        currentCampaignStage: EmailCampaignStageType | null;
+        currentStatus: typeof LeadStatusValues;
+        currentCampaignStage: typeof EmailCampaignStageValues | null;
       }> | null;
     }>
   > {
@@ -1637,14 +1621,7 @@ export class LeadsRepository {
         search,
         status,
         currentCampaignStage,
-        country,
-        language,
         source,
-        sortBy = [LeadSortField.CREATED_AT],
-        sortOrder = [SortOrder.DESC],
-        scope = BatchOperationScope.ALL_PAGES,
-        page = 1,
-        pageSize = 20,
         updates,
         dryRun = false,
         maxRecords = 1000,
@@ -1655,8 +1632,6 @@ export class LeadsRepository {
           search,
           status,
           currentCampaignStage,
-          country,
-          language,
           source,
         },
         updates: Object.keys(updates),
@@ -1670,7 +1645,9 @@ export class LeadsRepository {
       // Handle status filters (can be array)
       if (status && Array.isArray(status) && status.length > 0) {
         const mappedStatuses = status
-          .map((filter: LeadStatusFilterType) => mapStatusFilter(filter))
+          .map((filter: typeof LeadStatusFilterValues) =>
+            mapStatusFilter(filter),
+          )
           .filter(
             (s): s is NonNullable<ReturnType<typeof mapStatusFilter>> =>
               s !== null,
@@ -1694,7 +1671,7 @@ export class LeadsRepository {
         currentCampaignStage.length > 0
       ) {
         const mappedStages = currentCampaignStage
-          .map((filter: EmailCampaignStageFilterType) =>
+          .map((filter: typeof EmailCampaignStageFilterValues) =>
             mapCampaignStageFilter(filter),
           )
           .filter(
@@ -1716,7 +1693,9 @@ export class LeadsRepository {
       // Handle source filters (can be array)
       if (source && Array.isArray(source) && source.length > 0) {
         const mappedSources = source
-          .map((filter: LeadSourceFilterType) => mapSourceFilter(filter))
+          .map((filter: typeof LeadSourceFilterValues) =>
+            mapSourceFilter(filter),
+          )
           .filter(
             (s): s is NonNullable<ReturnType<typeof mapSourceFilter>> =>
               s !== null,
@@ -1730,40 +1709,6 @@ export class LeadsRepository {
         const dbSource = mapSourceFilter(source);
         if (dbSource !== null) {
           conditions.push(eq(leads.source, dbSource));
-        }
-      }
-
-      // Handle country filters (can be array)
-      if (country && Array.isArray(country) && country.length > 0) {
-        const mappedCountries = country
-          .map((filter: CountryFilter) => convertCountryFilter(filter))
-          .filter((c): c is NonNullable<Countries> => c !== null);
-        if (mappedCountries.length > 0) {
-          conditions.push(
-            or(...mappedCountries.map((c) => eq(leads.country, c)))!,
-          );
-        }
-      } else if (country && !Array.isArray(country)) {
-        const dbCountry = convertCountryFilter(country);
-        if (dbCountry !== null) {
-          conditions.push(eq(leads.country, dbCountry));
-        }
-      }
-
-      // Handle language filters (can be array)
-      if (language && Array.isArray(language) && language.length > 0) {
-        const mappedLanguages = language
-          .map((filter: LanguageFilter) => convertLanguageFilter(filter))
-          .filter((l): l is NonNullable<Languages> => l !== null);
-        if (mappedLanguages.length > 0) {
-          conditions.push(
-            or(...mappedLanguages.map((l) => eq(leads.language, l)))!,
-          );
-        }
-      } else if (language && !Array.isArray(language)) {
-        const dbLanguage = convertLanguageFilter(language);
-        if (dbLanguage !== null) {
-          conditions.push(eq(leads.language, dbLanguage));
         }
       }
 
@@ -1781,52 +1726,13 @@ export class LeadsRepository {
       const queryWithConditions =
         conditions.length > 0 ? baseQuery.where(and(...conditions)) : baseQuery;
 
-      // Apply sorting
-      const sortByField = Array.isArray(sortBy)
-        ? sortBy[0]
-        : (sortBy ?? LeadSortField.CREATED_AT);
-      const sortDirection = Array.isArray(sortOrder)
-        ? sortOrder[0]
-        : (sortOrder ?? SortOrder.DESC);
+      // Apply default ordering by createdAt DESC for batch operations
+      const queryWithOrdering = queryWithConditions.orderBy(
+        desc(leads.createdAt),
+      );
 
-      let orderClause;
-      switch (sortByField) {
-        case LeadSortField.EMAIL:
-          orderClause =
-            sortDirection === SortOrder.ASC ? leads.email : desc(leads.email);
-          break;
-        case LeadSortField.BUSINESS_NAME:
-          orderClause =
-            sortDirection === SortOrder.ASC
-              ? leads.businessName
-              : desc(leads.businessName);
-          break;
-        case LeadSortField.UPDATED_AT:
-          orderClause =
-            sortDirection === SortOrder.ASC
-              ? leads.updatedAt
-              : desc(leads.updatedAt);
-          break;
-        case LeadSortField.LAST_ENGAGEMENT_AT:
-          orderClause =
-            sortDirection === SortOrder.ASC
-              ? leads.lastEngagementAt
-              : desc(leads.lastEngagementAt);
-          break;
-        default:
-          orderClause =
-            sortDirection === SortOrder.ASC
-              ? leads.createdAt
-              : desc(leads.createdAt);
-      }
-
-      const queryWithOrdering = queryWithConditions.orderBy(orderClause);
-
-      // Apply scope-based pagination or limit - Drizzle maintains type through method chaining
-      const finalQuery =
-        scope === BatchOperationScope.CURRENT_PAGE
-          ? queryWithOrdering.limit(pageSize).offset((page - 1) * pageSize)
-          : queryWithOrdering.limit(maxRecords);
+      // Apply scope-based limit - batch always processes all matching records up to maxRecords
+      const finalQuery = queryWithOrdering.limit(maxRecords);
 
       // Get matching leads
       const matchingLeads = await finalQuery;
@@ -1897,9 +1803,12 @@ export class LeadsRepository {
               updates.status !== lead.status &&
               !isStatusTransitionAllowed(lead.status, updates.status)
             ) {
+              const { t } = simpleT(locale);
               errors.push({
                 leadId: lead.id,
-                error: INVALID_STATUS_TRANSITION_ERROR,
+                error: t(
+                  "app.api.leads.leadsErrors.batch.update.error.invalidTransition",
+                ),
               });
               continue;
             }
@@ -1948,14 +1857,20 @@ export class LeadsRepository {
   static async batchDeleteLeads(
     data: {
       search?: string;
-      status?: LeadStatusFilterType;
-      currentCampaignStage?: EmailCampaignStageFilterType;
+      status?:
+        | typeof LeadStatusFilterValues
+        | (typeof LeadStatusFilterValues)[];
+      currentCampaignStage?:
+        | typeof EmailCampaignStageFilterValues
+        | (typeof EmailCampaignStageFilterValues)[];
       country?: CountryFilter;
       language?: LanguageFilter;
-      source?: LeadSourceFilterType;
-      sortBy?: LeadSortFieldType[];
-      sortOrder?: SortOrderType[];
-      scope?: BatchOperationScopeType;
+      source?:
+        | typeof LeadSourceFilterValues
+        | (typeof LeadSourceFilterValues)[];
+      sortBy?: (typeof LeadSortFieldValues)[];
+      sortOrder?: (typeof SortOrderValues)[];
+      scope?: typeof BatchOperationScopeValues;
       page?: number;
       pageSize?: number;
       confirmDelete: boolean;
@@ -1974,8 +1889,8 @@ export class LeadsRepository {
         id: string;
         email: string | null;
         businessName: string;
-        currentStatus: LeadStatusType;
-        currentCampaignStage: EmailCampaignStageType | null;
+        currentStatus: typeof LeadStatusValues;
+        currentCampaignStage: typeof EmailCampaignStageValues | null;
       }> | null;
     }>
   > {
@@ -2041,7 +1956,9 @@ export class LeadsRepository {
       // Handle status filters (can be array)
       if (status && Array.isArray(status) && status.length > 0) {
         const mappedStatuses = status
-          .map((filter: LeadStatusFilterType) => mapStatusFilter(filter))
+          .map((filter: typeof LeadStatusFilterValues) =>
+            mapStatusFilter(filter),
+          )
           .filter(
             (s): s is NonNullable<ReturnType<typeof mapStatusFilter>> =>
               s !== null,
@@ -2065,7 +1982,7 @@ export class LeadsRepository {
         currentCampaignStage.length > 0
       ) {
         const mappedStages = currentCampaignStage
-          .map((filter: EmailCampaignStageFilterType) =>
+          .map((filter: typeof EmailCampaignStageFilterValues) =>
             mapCampaignStageFilter(filter),
           )
           .filter(
@@ -2087,7 +2004,9 @@ export class LeadsRepository {
       // Handle source filters (can be array)
       if (source && Array.isArray(source) && source.length > 0) {
         const mappedSources = source
-          .map((filter: LeadSourceFilterType) => mapSourceFilter(filter))
+          .map((filter: typeof LeadSourceFilterValues) =>
+            mapSourceFilter(filter),
+          )
           .filter(
             (s): s is NonNullable<ReturnType<typeof mapSourceFilter>> =>
               s !== null,

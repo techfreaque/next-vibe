@@ -50,8 +50,8 @@ export const translations = {
         platform: {
           title: "Platform",
         },
-        supportsSideTasks: {
-          title: "Supports Side Tasks",
+        supportsTaskRunners: {
+          title: "Supports Task Runners",
         },
       },
       database: {

@@ -115,8 +115,8 @@ export function ThreadedMessageContent({
               {message.role === "user"
                 ? currentUserId && message.authorId === currentUserId
                   ? t("app.chat.threadedView.youLabel")
-                  : message.authorName
-                    ? message.authorName
+                  : message.authorId
+                    ? message.authorId.slice(-8)
                     : t("app.chat.threadedView.anonymous")
                 : message.role === "assistant" && message.model
                   ? getModelById(message.model).name

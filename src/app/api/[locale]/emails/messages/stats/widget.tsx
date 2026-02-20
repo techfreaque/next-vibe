@@ -7,7 +7,8 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Loader2, RefreshCw } from "next-vibe-ui/ui/icons";
+import { Loader2, RefreshCw, Search } from "next-vibe-ui/ui/icons";
+import { Input } from "next-vibe-ui/ui/input";
 import {
   Select,
   SelectContent,
@@ -26,8 +27,6 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 
 import { SortOrder, SortOrderOptions } from "../../imap-client/enum";
 import {
@@ -116,9 +115,7 @@ function RateBar({
 
 export function EmailStatsContainer({
   field,
-  fieldName,
 }: CustomWidgetProps): React.JSX.Element {
-  const children = field.children;
   const data = field.value;
   const t = useWidgetTranslation();
   const locale = useWidgetLocale();
@@ -227,7 +224,6 @@ export function EmailStatsContainer({
     <Div className="flex flex-col gap-0">
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
-        <NavigateButtonWidget field={children.backButton} />
         <Span className="font-semibold text-base">
           {t("app.api.emails.messages.stats.get.title")}
         </Span>
@@ -256,7 +252,7 @@ export function EmailStatsContainer({
         {/* Time period + date range preset + chart type */}
         <Div className="flex items-center gap-2 flex-wrap">
           <Select value={timePeriod} onValueChange={handleTimePeriodChange}>
-            <SelectTrigger className="h-9 min-w-[140px]">
+            <SelectTrigger className="h-9 w-[120px] flex-shrink-0">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -271,7 +267,7 @@ export function EmailStatsContainer({
             value={dateRangePreset}
             onValueChange={handleDateRangePresetChange}
           >
-            <SelectTrigger className="h-9 min-w-[160px]">
+            <SelectTrigger className="h-9 w-[150px] flex-shrink-0">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -283,7 +279,7 @@ export function EmailStatsContainer({
             </SelectContent>
           </Select>
           <Select value={chartType} onValueChange={handleChartTypeChange}>
-            <SelectTrigger className="h-9 min-w-[120px]">
+            <SelectTrigger className="h-9 w-[140px] flex-shrink-0">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -310,8 +306,36 @@ export function EmailStatsContainer({
           </Button>
         </Div>
 
-        {/* Status + type filter chips */}
-        <Div className="flex items-center gap-1.5 flex-wrap">
+        {/* Custom date range inputs */}
+        {dateRangePreset === DateRangePreset.custom && (
+          <Div className="flex items-center gap-2 flex-wrap">
+            <Input
+              type="date"
+              className="h-9 w-[160px] flex-shrink-0 text-sm"
+              value={form?.watch("dateFrom") ?? ""}
+              onChange={(e) => {
+                form?.setValue("dateFrom", e.target.value);
+                if (onSubmit) {
+                  onSubmit();
+                }
+              }}
+            />
+            <Input
+              type="date"
+              className="h-9 w-[160px] flex-shrink-0 text-sm"
+              value={form?.watch("dateTo") ?? ""}
+              onChange={(e) => {
+                form?.setValue("dateTo", e.target.value);
+                if (onSubmit) {
+                  onSubmit();
+                }
+              }}
+            />
+          </Div>
+        )}
+
+        {/* Status filter chips — scrollable */}
+        <Div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
           {EmailStatusFilterOptions.map((opt) => {
             const isActive = activeStatus === opt.value;
             return (
@@ -321,11 +345,12 @@ export function EmailStatsContainer({
                 variant="ghost"
                 size="sm"
                 onClick={() => handleStatusChange(opt.value)}
-                className={
+                className={cn(
+                  "flex-shrink-0 inline-flex items-center px-2.5 py-1 h-7 rounded-full text-xs font-medium border",
                   isActive
-                    ? "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-primary text-primary-foreground border-primary"
-                    : "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
-                }
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground",
+                )}
               >
                 {t(opt.label)}
               </Button>
@@ -333,7 +358,8 @@ export function EmailStatsContainer({
           })}
         </Div>
 
-        <Div className="flex items-center gap-1.5 flex-wrap">
+        {/* Type filter chips — scrollable */}
+        <Div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
           {EmailTypeFilterOptions.map((opt) => {
             const isActive = activeType === opt.value;
             return (
@@ -343,11 +369,12 @@ export function EmailStatsContainer({
                 variant="ghost"
                 size="sm"
                 onClick={() => handleTypeChange(opt.value)}
-                className={
+                className={cn(
+                  "flex-shrink-0 inline-flex items-center px-2.5 py-1 h-7 rounded-full text-xs font-medium border",
                   isActive
-                    ? "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-primary text-primary-foreground border-primary"
-                    : "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
-                }
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground",
+                )}
               >
                 {t(opt.label)}
               </Button>
@@ -356,15 +383,23 @@ export function EmailStatsContainer({
         </Div>
 
         {/* Search + sort */}
-        <Div className="flex items-center gap-2 flex-wrap">
-          <Div className="flex-1 min-w-[160px]">
-            <TextFieldWidget
-              fieldName={`${fieldName}.search`}
-              field={children.search}
+        <Div className="flex items-center gap-2">
+          <Div className="flex-1 relative min-w-0">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <Input
+              value={form?.watch("search") ?? ""}
+              onChange={(e) => {
+                form?.setValue("search", e.target.value);
+                if (onSubmit) {
+                  onSubmit();
+                }
+              }}
+              placeholder={t("app.api.emails.messages.stats.widget.search")}
+              className="pl-9 h-9"
             />
           </Div>
           <Select value={sortBy} onValueChange={handleSortByChange}>
-            <SelectTrigger className="h-9 min-w-[140px]">
+            <SelectTrigger className="h-9 w-[140px] flex-shrink-0">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -376,7 +411,7 @@ export function EmailStatsContainer({
             </SelectContent>
           </Select>
           <Select value={sortOrder} onValueChange={handleSortOrderChange}>
-            <SelectTrigger className="h-9 min-w-[80px]">
+            <SelectTrigger className="h-9 w-[110px] flex-shrink-0">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

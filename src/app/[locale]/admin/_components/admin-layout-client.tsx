@@ -15,6 +15,7 @@ import {
   Mail,
   Menu,
   Shield,
+  Terminal,
   Users,
   X,
 } from "next-vibe-ui/ui/icons";
@@ -29,6 +30,7 @@ import { useState } from "react";
 import CountrySelector from "@/app/[locale]/_components/country-selector";
 import { ThemeToggle } from "@/app/[locale]/_components/theme-toggle";
 import type { UserGetResponseOutput } from "@/app/api/[locale]/users/user/[id]/definition";
+import { envClient } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -54,38 +56,54 @@ export function AdminLayoutClient({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { t } = useTranslation();
 
-  const navigation = [
+  const allNavigation = [
     {
       name: t("app.admin.components.navigation.dashboard"),
       href: `/${locale}/admin`,
       icon: Home,
       current: pathname === `/${locale}/admin`,
+      hidden: false,
     },
     {
       name: t("app.admin.components.navigation.leadManagement"),
       href: `/${locale}/admin/leads` as const,
       icon: Users,
       current: pathname.startsWith(`/${locale}/admin/leads`),
+      hidden: envClient.NEXT_PUBLIC_LOCAL_MODE,
     },
     {
       name: t("app.admin.components.navigation.users"),
       href: `/${locale}/admin/users` as const,
       icon: Users,
       current: pathname.startsWith(`/${locale}/admin/users`),
+      hidden: false,
     },
     {
       name: t("app.admin.components.navigation.emails"),
       href: `/${locale}/admin/emails` as const,
       icon: Mail,
       current: pathname.startsWith(`/${locale}/admin/emails`),
+      hidden: false,
     },
     {
       name: t("app.admin.components.navigation.cronTasks"),
       href: `/${locale}/admin/cron` as const,
       icon: Clock,
       current: pathname.startsWith(`/${locale}/admin/cron`),
+      hidden: false,
     },
-  ] as const satisfies readonly NavigationItem[];
+    {
+      name: t("app.admin.components.navigation.sshAccess"),
+      href: `/${locale}/admin/ssh` as const,
+      icon: Terminal,
+      current: pathname.startsWith(`/${locale}/admin/ssh`),
+      hidden: false,
+    },
+  ];
+
+  const navigation = allNavigation.filter(
+    (item) => !item.hidden,
+  ) satisfies readonly NavigationItem[];
 
   return (
     <Div className="min-h-screen bg-gray-50 dark:bg-gray-900">

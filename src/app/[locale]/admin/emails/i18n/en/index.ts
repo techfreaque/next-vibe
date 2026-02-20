@@ -3,6 +3,7 @@
 import { translations as componentsTranslations } from "../../_components/i18n/en";
 import { translations as imapTranslations } from "../../imap/i18n/en";
 import { translations as listTranslations } from "../../list/i18n/en";
+import { translations as messagingTranslations } from "../../messaging/i18n/en";
 import { translations as smtpTranslations } from "../../smtp/i18n/en";
 import { translations as statsTranslations } from "../../stats/i18n/en";
 import { translations as templatesTranslations } from "../../templates/i18n/en";
@@ -10,6 +11,7 @@ import { translations as templatesTranslations } from "../../templates/i18n/en";
 export const translations = {
   components: componentsTranslations,
   imap: imapTranslations,
+  messaging: messagingTranslations,
   smtp: smtpTranslations,
   list: listTranslations,
   stats: statsTranslations,

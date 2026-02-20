@@ -84,9 +84,7 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
         )
         .limit(batchSize);
 
-      logger.debug("Bootstrapping pending leads into campaigns", {
-        count: pendingLeads.length,
-      });
+      logger.debug(`Bootstrapping ${pendingLeads.length} pending leads`);
 
       let bootstrapped = 0;
 
@@ -124,10 +122,9 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
         }
       }
 
-      logger.info("Pending leads bootstrapped", {
-        bootstrapped,
-        total: pendingLeads.length,
-      });
+      logger.info(
+        `Bootstrapped ${bootstrapped}/${pendingLeads.length} pending leads`,
+      );
       return success(bootstrapped);
     } catch (error) {
       logger.error("Failed to bootstrap pending leads", {
@@ -147,11 +144,9 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailCampaignResultType>> {
     try {
-      logger.debug("Processing email campaign stage", {
-        stage,
-        batchSize: options.batchSize,
-        dryRun: options.dryRun,
-      });
+      logger.debug(
+        `Processing stage: ${stage} (batch=${options.batchSize}, dryRun=${options.dryRun})`,
+      );
 
       const result = createEmptyEmailCampaignResult();
 
@@ -164,7 +159,7 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
       result.leadsProcessed = pendingEmails.length;
 
       if (pendingEmails.length === 0) {
-        logger.debug("No pending emails found", { stage });
+        logger.debug(`No pending emails for stage: ${stage}`);
         return success(result);
       }
 
@@ -277,12 +272,14 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
             continue;
           }
 
-          // Mark email as sent in the campaigns table
+          // Mark email as sent in the campaigns table, including the SMTP account used
+          // so the rate limiter can accurately count campaign sends per account
           await campaignSchedulerService.markEmailAsSent(
             campaign.id,
             logger,
             EmailProvider.SMTP,
             sendResult.data?.messageId ?? null,
+            sendResult.data?.accountId ?? null,
           );
 
           result.emailsSent++;
@@ -304,12 +301,9 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
         }
       }
 
-      logger.debug("Stage processing completed", {
-        stage,
-        leadsProcessed: result.leadsProcessed,
-        emailsSent: result.emailsSent,
-        emailsFailed: result.emailsFailed,
-      });
+      logger.debug(
+        `Stage ${stage} done: ${result.emailsSent} sent, ${result.emailsFailed} failed, ${result.leadsProcessed} processed`,
+      );
 
       return success(result);
     } catch (error) {

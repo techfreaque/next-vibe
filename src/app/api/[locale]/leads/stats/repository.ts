@@ -44,7 +44,6 @@ import {
 import {
   ActivityType,
   EmailCampaignStageFilter,
-  type LeadSource,
   LeadSourceFilter,
   LeadStatus,
   LeadStatusFilter,
@@ -1154,7 +1153,11 @@ export class LeadStatsRepository {
         emailsClicked: sql<number>`COALESCE(SUM(${leads.emailsClicked}), 0)::int`,
       })
       .from(leads)
-      .where(whereConditions)
+      .where(
+        whereConditions
+          ? and(whereConditions, isNotNull(leads.source))
+          : isNotNull(leads.source),
+      )
       .groupBy(leads.source)
       .orderBy(
         desc(sql`COUNT(CASE WHEN ${leads.convertedAt} IS NOT NULL THEN 1 END)`),
@@ -1166,13 +1169,11 @@ export class LeadStatsRepository {
       const convertedLeads = Number(source.convertedLeads);
 
       return {
-        source:
-          (source.source as (typeof LeadSource)[keyof typeof LeadSource]) ||
-          ("website" as (typeof LeadSource)[keyof typeof LeadSource]),
+        source: source.source,
         leadsGenerated: totalLeads,
         conversionRate: totalLeads > 0 ? convertedLeads / totalLeads : 0,
         qualityScore: totalLeads > 0 ? (convertedLeads / totalLeads) * 10 : 0, // Simple quality score based on conversion rate
-      };
+      } satisfies LeadsStatsResponseOutput["topPerformingSources"][number];
     });
   }
 

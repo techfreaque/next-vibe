@@ -127,5 +127,13 @@ export const translations: typeof enTranslations = {
     result: "Wynik synchronizacji",
     duration: "Czas trwania",
     errors: "Błędy",
+    accountsProcessed: "Przetworzone konta",
+    foldersProcessed: "Przetworzone foldery",
+    messagesProcessed: "Przetworzone wiadomości",
+    messagesAdded: "Dodane wiadomości",
+    messagesUpdated: "Zaktualizowane wiadomości",
+    messagesDeleted: "Usunięte wiadomości",
+    submit: "Rozpocznij sync",
+    submitting: "Synchronizowanie...",
   },
 };

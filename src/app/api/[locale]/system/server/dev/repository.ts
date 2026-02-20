@@ -26,8 +26,8 @@ import {
   formatTask,
   formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
-import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/types/repository";
 import { unifiedTaskRunnerRepository } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/repository";
+import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import { useTurbopack } from "@/config/constants";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -645,13 +645,20 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
 
       // Set environment to development
       unifiedTaskRunnerRepository.environment = "development";
-      unifiedTaskRunnerRepository.supportsSideTasks = true;
+
+      // Create abort controller so task runners can be stopped on shutdown
+      const controller = new AbortController();
+      process.once("SIGINT", () => {
+        controller.abort();
+      });
+      process.once("SIGTERM", () => {
+        controller.abort();
+      });
 
       // Start the task runner with filtered tasks
-      const signal = new AbortController().signal;
       const startResult = unifiedTaskRunnerRepository.start(
         devTasks,
-        signal,
+        controller.signal,
         locale,
         logger,
       );
@@ -659,7 +666,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       if (startResult.success) {
         logger.debug("Unified task runner started successfully", {
           environment: "development",
-          supportsSideTasks: true,
+          supportsTaskRunners: true,
           taskCount: devTasks.length,
           taskNames: devTasks.map((t) => t.name),
         });

@@ -13,6 +13,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { LeadsRepository } from "../repository";
 import type {
@@ -34,12 +35,13 @@ export class BatchRepository {
   static async batchUpdateLeads(
     data: BatchUpdateRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<BatchUpdateResponseOutput>> {
     logger.debug("Batch update leads operation", {
       dataKeys: Object.keys(data),
     });
 
-    const result = await LeadsRepository.batchUpdateLeads(data, logger);
+    const result = await LeadsRepository.batchUpdateLeads(data, logger, locale);
 
     if (result.success && result.data) {
       return success({

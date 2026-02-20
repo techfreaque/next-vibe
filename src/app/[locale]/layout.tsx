@@ -108,7 +108,9 @@ export default async function RootLayoutServer({
             __html: JSON.stringify(structuredData),
           }}
         />
-        {env.ENABLE_ANALYTICS ? <Analytics /> : null}
+        {env.ENABLE_ANALYTICS && !env.NEXT_PUBLIC_LOCAL_MODE ? (
+          <Analytics />
+        ) : null}
       </Body>
     </Html>
   );

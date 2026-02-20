@@ -199,7 +199,7 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               content:
                 "app.api.emails.smtpClient.list.response.account.createdAt",
-              schema: z.string().datetime(),
+              schema: dateSchema,
             }),
           },
         ),

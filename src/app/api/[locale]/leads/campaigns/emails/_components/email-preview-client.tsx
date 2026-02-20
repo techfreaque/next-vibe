@@ -133,7 +133,7 @@ export function EmailPreviewClient({
                   {t("app.admin.leads.leads.admin.emails.recipient")}:
                 </Span>
                 <Span className="ml-2 text-gray-600 dark:text-gray-400">
-                  {emailPreview.to}
+                  {t(emailPreview.to)}
                 </Span>
               </Div>
               <Div>
@@ -141,7 +141,7 @@ export function EmailPreviewClient({
                   {t("app.admin.leads.leads.admin.emails.subject")}:
                 </Span>
                 <Span className="ml-2 text-gray-600 dark:text-gray-400">
-                  {emailPreview.subject}
+                  {t(emailPreview.subject)}
                 </Span>
               </Div>
             </Div>

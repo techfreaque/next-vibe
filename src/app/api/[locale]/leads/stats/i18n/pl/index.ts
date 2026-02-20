@@ -387,6 +387,8 @@ export const translations: typeof enTranslations = {
     topSources: "Najlepsze źródła",
     viewAll: "Wyświetl wszystkie",
     recentActivity: "Ostatnia aktywność",
+    filters: "Filtry",
+    applyFilters: "Zastosuj filtry",
     openRateSuffix: "% otwarć",
     conversionRateSuffix: "% konw.",
     emDash: "—",

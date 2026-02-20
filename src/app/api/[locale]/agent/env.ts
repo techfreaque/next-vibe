@@ -1,5 +1,9 @@
 /**
  * Agent Environment
+ *
+ * When NEXT_PUBLIC_LOCAL_MODE is enabled (default for self-hosted installs),
+ * all AI provider API keys are optional. Missing keys disable the corresponding
+ * feature with user-friendly setup instructions rather than crashing on startup.
  */
 
 import "server-only";
@@ -8,50 +12,61 @@ import { z } from "zod";
 
 import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 
+// In LOCAL_MODE all AI keys are optional - the app starts without them
+// and shows setup instructions instead of errors when features are used.
+const isLocalMode = process.env.NEXT_PUBLIC_LOCAL_MODE !== "false";
+
+const requiredOrOptionalString = (
+  required: boolean,
+): z.ZodString | z.ZodDefault<z.ZodOptional<z.ZodString>> =>
+  required ? z.string().min(1) : z.string().optional().default("");
+
 // Base fields shared by both storage types
 const baseFields = {
   OPENROUTER_API_KEY: {
-    schema: z.string().min(1),
+    schema: requiredOrOptionalString(!isLocalMode),
     example: "sk-or-v1-...",
-    comment: "OpenRouter API key",
+    comment: "OpenRouter API key - get yours at https://openrouter.ai/keys",
   },
   UNCENSORED_AI_API_KEY: {
-    schema: z.string(),
+    schema: z.string().optional().default(""),
     example: "your-uncensored-ai-key",
     comment: "Uncensored AI API key",
   },
   FREEDOMGPT_API_KEY: {
-    schema: z.string(),
+    schema: z.string().optional().default(""),
     example: "your-freedomgpt-key",
     comment: "FreedomGPT API key",
   },
   GAB_AI_API_KEY: {
-    schema: z.string(),
+    schema: z.string().optional().default(""),
     example: "your-gab-ai-key",
     comment: "Gab AI API key",
   },
   VENICE_AI_API_KEY: {
-    schema: z.string(),
+    schema: z.string().optional().default(""),
     example: "your-venice-ai-key",
-    comment: "Venice AI API key",
+    comment: "Venice AI API key - get yours at https://venice.ai",
   },
   EDEN_AI_API_KEY: {
-    schema: z.string().min(1),
+    schema: requiredOrOptionalString(!isLocalMode),
     example: "your-eden-ai-key",
-    comment: "Eden AI API key",
+    comment:
+      "Eden AI API key (voice/TTS) - get yours at https://app.edenai.run/user/settings#api",
   },
   BRAVE_SEARCH_API_KEY: {
-    schema: z.string(),
+    schema: z.string().optional().default(""),
     example: "your-brave-search-key",
-    comment: "Brave Search API key",
+    comment:
+      "Brave Search API key - get yours at https://api.search.brave.com/app/keys",
   },
   KAGI_API_KEY: {
-    schema: z.string(),
+    schema: z.string().optional().default(""),
     example: "your-kagi-api-key",
-    comment: "Kagi API key",
+    comment: "Kagi API key - get yours at https://kagi.com/settings?p=api",
   },
   SCRAPPEY_API_KEY: {
-    schema: z.string(),
+    schema: z.string().optional().default(""),
     example: "your-scrappey-key",
     comment: "Scrappey API key",
   },

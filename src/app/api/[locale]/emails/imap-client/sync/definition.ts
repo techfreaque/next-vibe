@@ -53,7 +53,7 @@ const { POST } = createEndpoint({
         description: "app.api.emails.imapClient.sync.accountIds.description",
         placeholder: "app.api.emails.imapClient.sync.accountIds.placeholder",
         columns: 12,
-        schema: z.array(z.uuid()).optional(),
+        schema: z.string().optional(),
       }),
 
       force: requestField({
@@ -216,7 +216,7 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        accountIds: ["123e4567-e89b-12d3-a456-426614174000"],
+        accountIds: "123e4567-e89b-12d3-a456-426614174000",
         force: false,
         dryRun: false,
         maxMessages: 1000,

@@ -16,15 +16,10 @@ export const {
   Value: TaskTypeValue,
 } = createEnumOptions({
   CRON: "app.api.system.unifiedInterface.tasks.type.cron" as const,
-  SIDE: "app.api.system.unifiedInterface.tasks.type.side" as const,
   TASK_RUNNER:
     "app.api.system.unifiedInterface.tasks.type.task_runner" as const,
 });
-export const TaskTypeDB = [
-  TaskType.CRON,
-  TaskType.SIDE,
-  TaskType.TASK_RUNNER,
-] as const;
+export const TaskTypeDB = [TaskType.CRON, TaskType.TASK_RUNNER] as const;
 
 /**
  * Task Priority Levels
@@ -216,6 +211,65 @@ export const PulseHealthStatusDB = [
   PulseHealthStatus.WARNING,
   PulseHealthStatus.CRITICAL,
   PulseHealthStatus.UNKNOWN,
+] as const;
+
+/**
+ * Task Output Mode
+ * Controls what happens after a cron task execution completes
+ */
+export const {
+  enum: TaskOutputMode,
+  options: TaskOutputModeOptions,
+  Value: TaskOutputModeValue,
+} = createEnumOptions({
+  STORE_ONLY:
+    "app.api.system.unifiedInterface.tasks.outputMode.storeOnly" as const,
+  NOTIFY_ON_FAILURE:
+    "app.api.system.unifiedInterface.tasks.outputMode.notifyOnFailure" as const,
+  NOTIFY_ALWAYS:
+    "app.api.system.unifiedInterface.tasks.outputMode.notifyAlways" as const,
+});
+export const TaskOutputModeDB = [
+  TaskOutputMode.STORE_ONLY,
+  TaskOutputMode.NOTIFY_ON_FAILURE,
+  TaskOutputMode.NOTIFY_ALWAYS,
+] as const;
+
+/**
+ * Cron Step Type
+ * Supported step types for cron-steps tasks
+ */
+export const {
+  enum: CronStepType,
+  options: CronStepTypeOptions,
+  Value: CronStepTypeValue,
+} = createEnumOptions({
+  CALL: "app.api.system.unifiedInterface.tasks.step.call" as const,
+  AI_AGENT: "app.api.system.unifiedInterface.tasks.step.aiAgent" as const,
+});
+export const CronStepTypeDB = [
+  CronStepType.CALL,
+  CronStepType.AI_AGENT,
+] as const;
+
+/**
+ * AI Agent Thread Mode
+ * How ai_agent steps manage chat threads
+ */
+export const {
+  enum: AiAgentThreadMode,
+  options: AiAgentThreadModeOptions,
+  Value: AiAgentThreadModeValue,
+} = createEnumOptions({
+  NONE: "app.api.system.unifiedInterface.tasks.step.threadMode.none" as const,
+  NEW: "app.api.system.unifiedInterface.tasks.step.threadMode.new" as const,
+  APPEND:
+    "app.api.system.unifiedInterface.tasks.step.threadMode.append" as const,
+});
+export const AiAgentThreadModeDB = [
+  AiAgentThreadMode.NONE,
+  AiAgentThreadMode.NEW,
+  AiAgentThreadMode.APPEND,
 ] as const;
 
 /**

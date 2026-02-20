@@ -8,6 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
+import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type {
@@ -67,6 +68,15 @@ export class KagiSearchRepository {
   ): Promise<ResponseType<KagiSearchGetResponseOutput>> {
     const { fail, success, ErrorResponseTypes } =
       await import("next-vibe/shared/types/response.schema");
+
+    // Guard: key not configured
+    if (!agentEnv.KAGI_API_KEY) {
+      logger.warn("Kagi API key not configured");
+      return fail({
+        message: buildMissingKeyMessage("kagiSearch"),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
 
     try {
       // Validate query

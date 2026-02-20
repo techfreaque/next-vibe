@@ -38,7 +38,11 @@ import { FolderCreateContainer } from "./widget";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["agent", "chat", "folders", "create"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.REMOTE_SKILL,
+  ] as const,
 
   title: "app.api.agent.chat.folders.post.title" as const,
   description: "app.api.agent.chat.folders.post.description" as const,

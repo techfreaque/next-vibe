@@ -57,7 +57,9 @@ const { POST } = createEndpoint({
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
+    UserRole.REMOTE_SKILL,
   ],
+  allowedLocalModeRoles: [] as const,
 
   fields: scopedObjectField(scopedTranslation, {
     type: WidgetType.CONTAINER,

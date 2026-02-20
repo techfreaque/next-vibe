@@ -60,7 +60,7 @@ export type InferJwtPayloadType<TUserRoleValue extends UserRoleValue> =
  * Platform markers (CLI_OFF, WEB_OFF, etc.) don't affect JWT payload type
  *
  * Platform markers are identified by their values:
- * - CLI_OFF, CLI_AUTH_BYPASS, AI_TOOL_OFF, WEB_OFF, MCP_ON, PRODUCTION_OFF
+ * - CLI_OFF, CLI_AUTH_BYPASS, AI_TOOL_OFF, WEB_OFF, MCP_ON, PRODUCTION_OFF, REMOTE_SKILL
  */
 type FilterPlatformMarkers<TRoles extends readonly UserRoleValue[]> = Exclude<
   TRoles[number],
@@ -70,6 +70,7 @@ type FilterPlatformMarkers<TRoles extends readonly UserRoleValue[]> = Exclude<
   | typeof UserRole.WEB_OFF
   | typeof UserRole.MCP_ON
   | typeof UserRole.PRODUCTION_OFF
+  | typeof UserRole.REMOTE_SKILL
 >;
 
 /**

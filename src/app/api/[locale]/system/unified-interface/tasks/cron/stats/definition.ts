@@ -44,7 +44,12 @@ const { GET } = createEndpoint({
     "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.description",
   icon: "clock",
   category: "app.api.system.unifiedInterface.tasks.category",
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [
+    UserRole.CUSTOMER,
+    UserRole.PARTNER_ADMIN,
+    UserRole.PARTNER_EMPLOYEE,
+    UserRole.ADMIN,
+  ],
   aliases: ["cron:stats", "tasks:cron:stats"],
 
   fields: customWidgetObject({
@@ -377,6 +382,22 @@ const { GET } = createEndpoint({
         content:
           "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.activeTasks.title",
         schema: z.coerce.number().optional(),
+      }),
+
+      systemStatus: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.systemStatus.title",
+        schema: z
+          .enum(["healthy", "warning", "critical", "unknown"])
+          .optional(),
+      }),
+
+      uptime: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.uptime.title",
+        schema: z.string().optional(),
       }),
 
       healthyTasks: responseField({

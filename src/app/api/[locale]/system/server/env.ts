@@ -26,4 +26,10 @@ export const {
   NETLIFY_SITE_NAME: { schema: z.string().optional(), example: "my-site" },
   CLOUDFLARE_WORKERS: { schema: z.string().optional(), example: "true" },
   RAILWAY_ENVIRONMENT: { schema: z.string().optional(), example: "production" },
+
+  // Pulse runner interval in minutes (default: 1)
+  PULSE_INTERVAL_MINUTES: {
+    schema: z.coerce.number().int().positive().optional(),
+    example: "1",
+  },
 });

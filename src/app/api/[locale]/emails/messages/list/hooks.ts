@@ -10,6 +10,7 @@ import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/h
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import { MessageChannelFilter } from "../../messaging/enum";
 import {
   EmailSortField,
   EmailStatusFilter,
@@ -40,6 +41,7 @@ export function useEmailMessagesList(
         initialState: {
           filters: {
             search: undefined,
+            channel: MessageChannelFilter.ANY,
             status: EmailStatusFilter.ANY,
             type: EmailTypeFilter.ANY,
           },

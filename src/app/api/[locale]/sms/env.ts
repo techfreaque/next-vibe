@@ -24,6 +24,8 @@ export const {
       SmsProviders.AWS_SNS,
       SmsProviders.MESSAGEBIRD,
       SmsProviders.HTTP,
+      SmsProviders.WHATSAPP,
+      SmsProviders.TELEGRAM,
     ]),
     example: "twilio",
     comment: "Options: twilio, aws, aws-sns, messagebird, http",
@@ -115,5 +117,24 @@ export const {
   SMS_HTTP_CONTENT_TYPE: {
     schema: z.string().optional(),
     example: "application/json",
+  },
+
+  // WhatsApp Business Cloud API
+  WHATSAPP_PHONE_NUMBER_ID: {
+    schema: z.string().optional(),
+    example: "123456789012345",
+    comment: "WhatsApp Business provider — phone number ID from Meta dashboard",
+  },
+  WHATSAPP_ACCESS_TOKEN: {
+    schema: z.string().optional(),
+    example: "EAAxxxxxxxx",
+    comment: "WhatsApp Business provider — permanent access token",
+  },
+
+  // Telegram Bot API
+  TELEGRAM_BOT_TOKEN: {
+    schema: z.string().optional(),
+    example: "123456789:AAFxxxxxxxx",
+    comment: "Telegram Bot provider — token from BotFather",
   },
 });

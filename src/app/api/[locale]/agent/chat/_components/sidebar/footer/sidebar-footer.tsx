@@ -21,6 +21,7 @@ import type { JSX } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -119,8 +120,8 @@ export function SidebarFooter({
           >
             {/* Account Section */}
             <Div className="flex flex-col gap-0.5">
-              {/* Login/Profile - Primary action */}
-              {!isLoggedIn && (
+              {/* Login/Profile - Primary action (hidden in local mode: no self-signup) */}
+              {!isLoggedIn && !envClient.NEXT_PUBLIC_LOCAL_MODE && (
                 <Link href={`/${locale}/user/login`}>
                   <Button
                     variant="ghost"
@@ -135,32 +136,36 @@ export function SidebarFooter({
                 </Link>
               )}
 
-              {/* Subscription */}
-              <Link href={`/${locale}/subscription`}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-full justify-start"
-                  aria-label="Manage subscription"
-                  data-tour={TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON}
-                >
-                  <ShoppingCart className="h-3.5 w-3.5 mr-2" />
-                  {t("app.chat.credits.navigation.subscription")}
-                </Button>
-              </Link>
+              {/* Subscription (hidden in local mode: payment disabled) */}
+              {!envClient.NEXT_PUBLIC_LOCAL_MODE && (
+                <Link href={`/${locale}/subscription`}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-full justify-start"
+                    aria-label="Manage subscription"
+                    data-tour={TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON}
+                  >
+                    <ShoppingCart className="h-3.5 w-3.5 mr-2" />
+                    {t("app.chat.credits.navigation.subscription")}
+                  </Button>
+                </Link>
+              )}
 
-              {/* Referral */}
-              <Link href={`/${locale}/user/referral`}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start "
-                  aria-label="Referral program"
-                >
-                  <Handshake className="h-3.5 w-3.5 mr-2" />
-                  {t("app.chat.credits.navigation.referral")}
-                </Button>
-              </Link>
+              {/* Referral (hidden in local mode) */}
+              {!envClient.NEXT_PUBLIC_LOCAL_MODE && (
+                <Link href={`/${locale}/user/referral`}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start "
+                    aria-label="Referral program"
+                  >
+                    <Handshake className="h-3.5 w-3.5 mr-2" />
+                    {t("app.chat.credits.navigation.referral")}
+                  </Button>
+                </Link>
+              )}
 
               {/* Help */}
               <Link href={`/${locale}/help`}>

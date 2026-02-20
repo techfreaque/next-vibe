@@ -117,5 +117,6 @@ export const translations: typeof enTranslations = {
     emptyState: "Keine SMTP-Konten konfiguriert",
     priority: "Priorität",
     sent: "Gesendet",
+    searchPlaceholder: "Konten suchen...",
   },
 };

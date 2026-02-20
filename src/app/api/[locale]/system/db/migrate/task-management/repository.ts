@@ -24,7 +24,7 @@ import type {
  * Migration Task interface for internal operations
  */
 interface MigrationTask {
-  type: "cron" | "manual" | "side";
+  type: "cron" | "manual" | "task-runner";
   name: string;
   description: string;
   schedule?: string;
@@ -605,9 +605,9 @@ export class MigrationTaskManagementRepositoryImpl implements MigrationTaskManag
       },
     });
 
-    // Migration Backup Monitor Side Task
+    // Migration Backup Monitor Task Runner
     this.migrationTasks.set("migration-backup-monitor", {
-      type: "side",
+      type: "task-runner",
       name: "migration-backup-monitor",
       description: "Description",
       category: "maintenance",

@@ -14,7 +14,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { agentEnv } from "@/app/api/[locale]/agent/env";
+import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
 import {
+  ApiProvider,
   getModelById,
   type ModelOption,
 } from "@/app/api/[locale]/agent/models/models";
@@ -199,6 +202,40 @@ export async function setupAiStream(params: {
     });
   }
   const modelConfig = getModelById(data.model);
+
+  // Guard: check that the required API key for this model's provider is configured
+  const providerKeyMissing = ((): string | null => {
+    switch (modelConfig.apiProvider) {
+      case ApiProvider.OPENROUTER:
+        return agentEnv.OPENROUTER_API_KEY
+          ? null
+          : buildMissingKeyMessage("openRouter");
+      case ApiProvider.UNCENSORED_AI:
+        return agentEnv.UNCENSORED_AI_API_KEY
+          ? null
+          : buildMissingKeyMessage("uncensoredAI");
+      case ApiProvider.FREEDOMGPT:
+        return agentEnv.FREEDOMGPT_API_KEY
+          ? null
+          : buildMissingKeyMessage("freedomGPT");
+      case ApiProvider.GAB_AI:
+        return agentEnv.GAB_AI_API_KEY ? null : buildMissingKeyMessage("gabAI");
+      case ApiProvider.VENICE_AI:
+        return agentEnv.VENICE_AI_API_KEY
+          ? null
+          : buildMissingKeyMessage("veniceAI");
+      default:
+        return null;
+    }
+  })();
+
+  if (providerKeyMissing) {
+    logger.warn("AI provider API key not configured", { model: data.model });
+    return fail({
+      message: providerKeyMissing,
+      errorType: ErrorResponseTypes.BAD_REQUEST,
+    });
+  }
 
   const creditValidation = await CreditValidatorHandler.validateCredits({
     userId,

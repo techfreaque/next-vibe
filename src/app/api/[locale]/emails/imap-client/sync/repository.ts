@@ -46,14 +46,20 @@ export class ImapSyncRepository {
       });
 
       // Validate account IDs if provided
+      const accountIdList = data.accountIds
+        ? data.accountIds
+            .split(",")
+            .map((id) => id.trim())
+            .filter(Boolean)
+        : [];
       let accountsToSync = [];
-      if (data.accountIds && data.accountIds.length > 0) {
+      if (accountIdList.length > 0) {
         accountsToSync = await db
           .select()
           .from(imapAccounts)
-          .where(inArray(imapAccounts.id, data.accountIds));
+          .where(inArray(imapAccounts.id, accountIdList));
 
-        if (accountsToSync.length !== data.accountIds.length) {
+        if (accountsToSync.length !== accountIdList.length) {
           return fail({
             message: "app.api.emails.imapClient.sync.errors.validation.title",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
@@ -155,6 +161,7 @@ export class ImapSyncRepository {
             .set({
               syncStatus: ImapSyncStatus.SYNCED,
               syncError: null,
+              isConnected: true,
               updatedAt: new Date(),
             })
             .where(eq(imapAccounts.id, account.id));
@@ -173,6 +180,7 @@ export class ImapSyncRepository {
             .set({
               syncStatus: ImapSyncStatus.ERROR,
               syncError: parsedError.message,
+              isConnected: false,
               updatedAt: new Date(),
             })
             .where(eq(imapAccounts.id, account.id));

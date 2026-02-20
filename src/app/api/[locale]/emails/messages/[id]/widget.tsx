@@ -214,7 +214,7 @@ export function EmailDetailContainer({
               email.emailProvider !== undefined && (
                 <MetaRow
                   label={t("app.api.emails.messages.id.widget.provider")}
-                  value={email.emailProvider}
+                  value={t(email.emailProvider)}
                 />
               )}
             {email.externalId !== null && email.externalId !== undefined && (

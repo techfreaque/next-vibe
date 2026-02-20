@@ -16,7 +16,7 @@ export interface MultiSelectFieldWidgetConfig<
   TUsage extends FieldUsageConfig,
 > extends BaseFormFieldWidgetConfig<TKey, TUsage, "primitive", TSchema> {
   fieldType: FieldDataType.MULTISELECT;
-  options: Array<{
+  options: ReadonlyArray<{
     value: string | number;
     label: NoInfer<TKey>;
     labelParams?: Record<string, string | number>;

@@ -1,6 +1,7 @@
 import { translations as emailServiceTranslations } from "../../email-service/i18n/pl";
 import { translations as imapClientTranslations } from "../../imap-client/i18n/pl";
 import { translations as messagesTranslations } from "../../messages/i18n/pl";
+import { translations as messagingTranslations } from "../../messaging/i18n/pl";
 import { translations as sendTranslations } from "../../send/i18n/pl";
 import { translations as smtpClientTranslations } from "../../smtp-client/i18n/pl";
 import type { translations as enTranslations } from "../en";
@@ -39,6 +40,9 @@ export const translations: typeof enTranslations = {
     smtpCampaignType: {
       leadCampaign: "Kampania lead",
       newsletter: "Newsletter",
+      signupNurture: "Pielęgnacja po rejestracji",
+      retention: "Utrzymanie",
+      winback: "Odzyskanie",
       transactional: "Transakcyjny",
       notification: "Powiadomienie",
       system: "System",
@@ -267,6 +271,13 @@ export const translations: typeof enTranslations = {
       good: "Dobry",
       warning: "Ostrzeżenie",
       error: "Błąd",
+    },
+    bulkMessageAction: {
+      markRead: "Oznacz jako przeczytane",
+      markUnread: "Oznacz jako nieprzeczytane",
+      flag: "Oflaguj",
+      unflag: "Usuń flagę",
+      delete: "Usuń",
     },
     imapLoggingLevel: {
       error: "Błąd",
@@ -819,6 +830,8 @@ export const translations: typeof enTranslations = {
       title: "Podgląd e-maila",
       preview: "Podgląd",
       version: "Wersja",
+      submit: "Renderuj podgląd",
+      submitting: "Renderowanie...",
     },
     sendTest: {
       post: {
@@ -906,6 +919,9 @@ export const translations: typeof enTranslations = {
       success: "Test email sent successfully to {email}",
       title: "Wyślij testowy e-mail",
       failed: "Nie udało się wysłać testowego e-maila",
+      submit: "Wyślij testowy e-mail",
+      submitting: "Wysyłanie...",
     },
   },
+  messaging: messagingTranslations,
 };

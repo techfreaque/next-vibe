@@ -20,6 +20,7 @@ import type { z } from "zod";
 import { CountriesArr, LanguagesArr } from "@/i18n/core/config";
 
 import { EmailStatus, EmailStatusDB } from "../emails/messages/enum";
+import { CampaignType, CampaignTypeDB } from "../emails/smtp-client/enum";
 import { users } from "../user/db";
 import {
   EmailCampaignStage,
@@ -62,7 +63,7 @@ export const leads = pgTable("leads", {
   status: text("status", { enum: LeadStatusDB })
     .notNull()
     .default(LeadStatus.NEW),
-  source: text("source", { enum: LeadSourceDB }),
+  source: text("source", { enum: LeadSourceDB }).notNull(),
   notes: text("notes"),
 
   convertedUserId: uuid("converted_user_id").references(() => users.id),
@@ -112,6 +113,9 @@ export const emailCampaigns = pgTable("email_campaigns", {
     .references(() => leads.id, { onDelete: "cascade" }),
 
   // Campaign details
+  campaignType: text("campaign_type", { enum: CampaignTypeDB })
+    .notNull()
+    .default(CampaignType.LEAD_CAMPAIGN),
   stage: text("stage", { enum: EmailCampaignStageDB }).notNull(),
   journeyVariant: text("journey_variant", {
     enum: EmailJourneyVariantDB,

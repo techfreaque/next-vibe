@@ -73,7 +73,11 @@ export type BooleanWidgetSchema =
 /**
  * Date widgets: Date, DateTime, Time
  */
-export type DateWidgetSchema = typeof dateSchema;
+export type DateWidgetSchema =
+  | typeof dateSchema
+  | z.ZodOptional<typeof dateSchema>
+  | z.ZodNullable<typeof dateSchema>
+  | z.ZodDefault<typeof dateSchema>;
 
 /**
  * Array widgets: DataList, DataCards, GroupedList, DataTable

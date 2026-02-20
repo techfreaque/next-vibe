@@ -16,6 +16,8 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -32,6 +34,7 @@ import type {
 export class CronHistoryRepository {
   static async getTaskHistory(
     data: CronHistoryRequestOutput,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronHistoryResponseOutput>> {
@@ -40,6 +43,10 @@ export class CronHistoryRepository {
     try {
       logger.debug("Fetching task execution history", { filters: data });
 
+      const isAdmin =
+        !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+      const userId = !user.isPublic ? user.id : null;
+
       // Parse pagination with type safety
       const limit =
         data?.limit && Number(data.limit) > 0 ? Number(data.limit) : 50;
@@ -47,6 +54,18 @@ export class CronHistoryRepository {
 
       // Build conditions
       const conditions = [];
+
+      // Filter executions to only those belonging to the user's tasks (unless admin)
+      if (!isAdmin) {
+        if (userId) {
+          conditions.push(eq(cronTasks.userId, userId));
+        } else {
+          // Public users see nothing
+          conditions.push(
+            eq(cronTaskExecutions.id, "00000000-0000-0000-0000-000000000000"),
+          );
+        }
+      }
 
       if (data?.taskId) {
         conditions.push(eq(cronTaskExecutions.taskId, data.taskId));
@@ -95,6 +114,8 @@ export class CronHistoryRepository {
           completedAt: cronTaskExecutions.completedAt,
           durationMs: cronTaskExecutions.durationMs,
           error: cronTaskExecutions.error,
+          errorStack: cronTaskExecutions.errorStack,
+          result: cronTaskExecutions.result,
           environment: cronTaskExecutions.environment,
           createdAt: cronTaskExecutions.createdAt,
         })
@@ -195,6 +216,10 @@ export class CronHistoryRepository {
                     .errorType.errorKey,
                 }
               : null,
+            errorStack: exec.errorStack ?? null,
+            result:
+              (exec.result as CronHistoryResponseOutput["executions"][number]["result"]) ??
+              null,
             environment: exec.environment,
             createdAt: exec.createdAt.toISOString(),
           };

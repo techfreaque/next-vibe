@@ -129,7 +129,7 @@ export class VibeCheckRepository {
   }
 
   private static async runTypecheckCheck(
-    path: string,
+    path: string | string[] | undefined,
     timeout: number,
     config: CheckConfig,
     logger: EndpointLogger,
@@ -296,7 +296,7 @@ export class VibeCheckRepository {
         );
       }
 
-      // ESLint and TypeScript: run separately for each path (required for proper file handling)
+      // ESLint: run separately for each path (required for proper file handling)
       for (const path of pathsToCheck) {
         if (!effectiveData.skipEslint && configResult.config.eslint.enabled) {
           logger.info("Starting ESLint check...");
@@ -317,28 +317,36 @@ export class VibeCheckRepository {
             }),
           );
         }
+      }
 
-        if (
-          !effectiveData.skipTypecheck &&
-          configResult.config.typecheck.enabled
-        ) {
-          logger.info("Starting TypeScript check...");
-          promises.push(
-            this.runTypecheckCheck(
-              path || baseDir,
-              effectiveData.timeout,
-              configResult.config,
-              logger,
-              platform,
-            ).then((result) => {
-              if (firstCheckStart === 0) {
-                firstCheckStart = Date.now();
-              }
-              lastCheckEnd = Date.now();
-              return result;
-            }),
-          );
-        }
+      // TypeScript: single run for all paths combined — avoids parallel tsgo instances
+      if (
+        !effectiveData.skipTypecheck &&
+        configResult.config.typecheck.enabled
+      ) {
+        const nonEmptyPaths = pathsToCheck.filter(Boolean) as string[];
+        const typecheckPath =
+          nonEmptyPaths.length === 0
+            ? undefined
+            : nonEmptyPaths.length === 1
+              ? nonEmptyPaths[0]
+              : nonEmptyPaths;
+        logger.info("Starting TypeScript check...");
+        promises.push(
+          this.runTypecheckCheck(
+            typecheckPath,
+            effectiveData.timeout,
+            configResult.config,
+            logger,
+            platform,
+          ).then((result) => {
+            if (firstCheckStart === 0) {
+              firstCheckStart = Date.now();
+            }
+            lastCheckEnd = Date.now();
+            return result;
+          }),
+        );
       }
 
       const checkResults = await Promise.allSettled(promises);

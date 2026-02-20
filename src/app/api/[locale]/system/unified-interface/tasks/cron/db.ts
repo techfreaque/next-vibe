@@ -15,6 +15,8 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
+import { users } from "@/app/api/[locale]/user/db";
+
 import { CronTaskPriorityDB, CronTaskStatusDB } from "../enum";
 
 /**
@@ -53,6 +55,9 @@ export const cronTasks = pgTable("cron_tasks", {
 
   // Metadata
   tags: jsonb("tags").notNull().default([]),
+
+  // Ownership - null means system task (admin-seeded), otherwise user who created it
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
 
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),

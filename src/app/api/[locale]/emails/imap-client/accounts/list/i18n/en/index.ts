@@ -1,5 +1,5 @@
 export const translations = {
-  title: "List IMAP Accounts",
+  title: "Accounts",
   description: "Retrieve a paginated list of IMAP accounts with filtering",
   container: {
     title: "IMAP Accounts List",
@@ -124,6 +124,13 @@ export const translations = {
     title: "Success",
     description: "IMAP accounts retrieved successfully",
   },
+  create: "Add Account",
+  refresh: "Refresh",
+  empty: "No IMAP accounts configured",
+  disabled: "Disabled",
+  lastSync: "Last sync",
+  enabledOnly: "Enabled only",
+  searchPlaceholder: "Search accounts...",
   widget: {
     title: "IMAP Accounts",
     create: "Add Account",

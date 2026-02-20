@@ -35,7 +35,13 @@ import {
   useWidgetLocale,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
+import { FileFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/file-field/react";
+import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import type definition from "./definition";
 
@@ -150,10 +156,6 @@ export function LeadsImportContainer({
   const hasFailures = (data?.failedImports ?? 0) > 0;
   const hasSuccesses = (data?.successfulImports ?? 0) > 0;
 
-  // ---------------------------------------------------------------------------
-  // Navigation handlers (dynamic import to avoid circular deps)
-  // ---------------------------------------------------------------------------
-
   const handleCheckJobStatus = (jobId: string): void => {
     router.push(`/${locale}/admin/leads/import?jobId=${jobId}`);
   };
@@ -192,7 +194,6 @@ export function LeadsImportContainer({
             {t("app.api.leads.import.post.widget.headerTitle")}
           </Span>
         </Div>
-        {/* Export Template button — always visible */}
         <Link
           href={buildTemplateCsvDataUri()}
           download="leads-import-template.csv"
@@ -203,59 +204,102 @@ export function LeadsImportContainer({
         </Link>
       </Div>
 
-      {/* Empty state — guidance when no import has been run yet */}
+      {/* Form */}
       {!data && !isLoading && (
-        <Div className="rounded-lg border border-dashed bg-muted/30 p-6 flex flex-col gap-4">
-          <Div className="flex items-start gap-3">
-            <Info className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
-            <Div className="flex flex-col gap-1">
-              <Span className="font-medium text-sm">
-                {t("app.api.leads.import.post.widget.importGuideTitle")}
-              </Span>
-              <Span className="text-xs text-muted-foreground">
-                {t("app.api.leads.import.post.widget.importGuideSubtitle")}
-              </Span>
-              <Div className="flex flex-wrap gap-1 mt-1">
-                {CSV_COLUMNS.map((col) => (
-                  <CsvColumnBadge key={col} col={col} />
-                ))}
+        <>
+          {/* Guidance */}
+          <Div className="rounded-lg border border-dashed bg-muted/30 p-6 flex flex-col gap-4">
+            <Div className="flex items-start gap-3">
+              <Info className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+              <Div className="flex flex-col gap-1">
+                <Span className="font-medium text-sm">
+                  {t("app.api.leads.import.post.widget.importGuideTitle")}
+                </Span>
+                <Span className="text-xs text-muted-foreground">
+                  {t("app.api.leads.import.post.widget.importGuideSubtitle")}
+                </Span>
+                <Div className="flex flex-wrap gap-1 mt-1">
+                  {CSV_COLUMNS.map((col) => (
+                    <CsvColumnBadge key={col} col={col} />
+                  ))}
+                </Div>
+                <ImportGuideNote t={t} />
               </Div>
-              <ImportGuideNote t={t} />
+            </Div>
+
+            <Div className="flex items-start gap-3 border-t pt-3">
+              <FileText className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+              <Div className="flex flex-col gap-0.5">
+                <Span className="font-medium text-sm">
+                  {t("app.api.leads.import.post.widget.fileRequirementsTitle")}
+                </Span>
+                <Ul className="text-xs text-muted-foreground list-disc list-inside space-y-0.5">
+                  <Li>
+                    {t(
+                      "app.api.leads.import.post.widget.fileRequirementFormat",
+                    )}
+                  </Li>
+                  <Li>
+                    {t(
+                      "app.api.leads.import.post.widget.fileRequirementHeader",
+                    )}
+                  </Li>
+                  <Li>
+                    {t("app.api.leads.import.post.widget.fileRequirementSize")}
+                  </Li>
+                  <FileRequirementChunked t={t} />
+                </Ul>
+              </Div>
             </Div>
           </Div>
 
-          <Div className="flex items-start gap-3 border-t pt-3">
-            <FileText className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
-            <Div className="flex flex-col gap-0.5">
-              <Span className="font-medium text-sm">
-                {t("app.api.leads.import.post.widget.fileRequirementsTitle")}
-              </Span>
-              <Ul className="text-xs text-muted-foreground list-disc list-inside space-y-0.5">
-                <Li>
-                  {t("app.api.leads.import.post.widget.fileRequirementFormat")}
-                </Li>
-                <Li>
-                  {t("app.api.leads.import.post.widget.fileRequirementHeader")}
-                </Li>
-                <Li>
-                  {t("app.api.leads.import.post.widget.fileRequirementSize")}
-                </Li>
-                <FileRequirementChunked t={t} />
-              </Ul>
-            </Div>
-          </Div>
+          <FormAlertWidget field={{}} />
 
-          <Div className="border-t pt-3">
-            <Link
-              href={buildTemplateCsvDataUri()}
-              download="leads-import-template.csv"
-              className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
-            >
-              <Download className="h-3.5 w-3.5" />
-              {t("app.api.leads.import.post.widget.downloadTemplateLink")}
-            </Link>
-          </Div>
-        </Div>
+          <FileFieldWidget fieldName="file" field={children.file} />
+
+          <SelectFieldWidget
+            fieldName="defaultCountry"
+            field={children.defaultCountry}
+          />
+          <SelectFieldWidget
+            fieldName="defaultLanguage"
+            field={children.defaultLanguage}
+          />
+          <SelectFieldWidget
+            fieldName="defaultStatus"
+            field={children.defaultStatus}
+          />
+          <SelectFieldWidget
+            fieldName="defaultCampaignStage"
+            field={children.defaultCampaignStage}
+          />
+          <SelectFieldWidget
+            fieldName="defaultSource"
+            field={children.defaultSource}
+          />
+          <BooleanFieldWidget
+            fieldName="skipDuplicates"
+            field={children.skipDuplicates}
+          />
+          <BooleanFieldWidget
+            fieldName="updateExisting"
+            field={children.updateExisting}
+          />
+          <BooleanFieldWidget
+            fieldName="useChunkedProcessing"
+            field={children.useChunkedProcessing}
+          />
+          <NumberFieldWidget fieldName="batchSize" field={children.batchSize} />
+
+          <SubmitButtonWidget
+            field={{
+              text: "app.api.leads.import.post.widget.headerTitle",
+              loadingText: "app.api.leads.import.post.widget.loadingText",
+              icon: "upload",
+              variant: "primary",
+            }}
+          />
+        </>
       )}
 
       {/* Loading */}
@@ -287,7 +331,6 @@ export function LeadsImportContainer({
             </Div>
           </Div>
 
-          {/* Job action buttons */}
           <Div className="flex flex-wrap gap-2 pl-8">
             <Button
               size="sm"
@@ -368,7 +411,6 @@ export function LeadsImportContainer({
             </Div>
           </Div>
 
-          {/* Post-import action buttons */}
           <Div className="flex flex-wrap gap-2">
             {hasSuccesses && (
               <Button
@@ -400,7 +442,6 @@ export function LeadsImportContainer({
             )}
           </Div>
 
-          {/* Summary breakdown */}
           {summary && (
             <Div className="rounded-lg border bg-card p-4">
               <Span className="text-sm font-semibold block mb-3">
@@ -464,7 +505,6 @@ export function LeadsImportContainer({
             </Div>
           )}
 
-          {/* Errors table */}
           {errors.length > 0 && (
             <Div className="rounded-lg border border-red-200 bg-card">
               <Div className="px-4 py-3 border-b border-red-200 flex items-center gap-2">
@@ -494,7 +534,6 @@ export function LeadsImportContainer({
                     <Span className="text-red-600 dark:text-red-400 flex-1">
                       {err.error}
                     </Span>
-                    {/* Row-level navigation: find lead by email */}
                     {err.email && (
                       <Button
                         size="sm"

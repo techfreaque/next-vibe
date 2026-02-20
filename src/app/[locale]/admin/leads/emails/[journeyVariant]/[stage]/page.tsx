@@ -143,11 +143,7 @@ export default async function EmailPreviewPage({
                     className="flex items-center flex flex-row gap-1"
                   >
                     <ChevronLeft className="h-4 w-4" />
-                    <Span>
-                      {previousStage
-                        .replaceAll("_", " ")
-                        .replaceAll(/\b\w/g, (l) => l.toUpperCase())}
-                    </Span>
+                    <Span>{t(previousStage)}</Span>
                   </Button>
                 </Link>
               ) : (
@@ -165,7 +161,10 @@ export default async function EmailPreviewPage({
 
             <Div className="text-center">
               <Span className="text-sm text-gray-600 dark:text-gray-400">
-                {currentStageIndex + 1} of {currentJourneyStages.length} stages
+                {currentStageIndex + 1}{" "}
+                {t("app.admin.leads.leads.admin.emails.stage_of")}{" "}
+                {currentJourneyStages.length}{" "}
+                {t("app.admin.leads.leads.admin.emails.stages")}
               </Span>
             </Div>
 

@@ -699,7 +699,7 @@ export class TranslationReorganizeRepositoryImpl {
     message: string;
     backupInfo: {
       backupPath: string;
-      backupDate: string;
+      backupDate: Date;
       filesRestored: number;
       newBackupCreated?: string;
     };
@@ -853,7 +853,7 @@ export class TranslationReorganizeRepositoryImpl {
    * @param backupPath - The backup directory path
    * @returns ISO date string
    */
-  private extractBackupDate(backupPath: string): string {
+  private extractBackupDate(backupPath: string): Date {
     // Extract timestamp from backup path like "translations-2025-11-30T12-45-17-439Z"
     const match = backupPath.match(
       /translations-(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})-(\d{2})-(\d{3})Z/,
@@ -861,9 +861,11 @@ export class TranslationReorganizeRepositoryImpl {
     if (match) {
       // Convert back to ISO format: YYYY-MM-DDTHH:MM:SS.mmmZ
       const [, year, month, day, hour, minute, second, millisecond] = match;
-      return `${year}-${month}-${day}T${hour}:${minute}:${second}.${millisecond}Z`;
+      return new Date(
+        `${year}-${month}-${day}T${hour}:${minute}:${second}.${millisecond}Z`,
+      );
     }
-    return new Date().toISOString();
+    return new Date();
   }
 
   /**
@@ -1791,7 +1793,7 @@ export class TranslationReorganizeRepositoryImpl {
         unusedKeys: number;
         translationFiles: number;
         languages: string[];
-        lastAnalyzedAt: string;
+        lastAnalyzedAt: Date;
       };
     }>
   > {
@@ -1826,7 +1828,7 @@ export class TranslationReorganizeRepositoryImpl {
           unusedKeys,
           translationFiles,
           languages,
-          lastAnalyzedAt: new Date().toISOString(),
+          lastAnalyzedAt: new Date(),
         },
       });
     } catch (error) {

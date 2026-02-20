@@ -1,6 +1,6 @@
 /**
  * Custom Widget for Cron History
- * Displays cron task execution history with summary, filters, table and pagination
+ * Card list with collapsible result/error details and date range filter
  */
 
 "use client";
@@ -9,16 +9,20 @@ import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import {
+  Activity,
   BarChart3,
   CheckCircle,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   Clock,
   Loader2,
   RefreshCw,
   TrendingUp,
   XCircle,
 } from "next-vibe-ui/ui/icons";
+import { Pre } from "next-vibe-ui/ui/pre";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo, useState } from "react";
 
@@ -30,6 +34,7 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { DateFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/date-field/react";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
@@ -53,7 +58,6 @@ interface WidgetProps {
 
 const LIMIT = 50;
 
-// Status filter identifiers — used only as local UI state keys, not compared to execution.status
 type StatusFilter =
   | "ALL"
   | "RUNNING"
@@ -71,7 +75,6 @@ const STATUS_FILTER_KEYS: StatusFilter[] = [
   "CANCELLED",
 ];
 
-// Maps execution.status (enum i18n key values) to Tailwind color classes
 const STATUS_COLOR_MAP: Record<string, string> = {
   [CronTaskStatus.RUNNING]:
     "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
@@ -94,7 +97,6 @@ const STATUS_COLOR_MAP: Record<string, string> = {
 const DEFAULT_STATUS_CLASS =
   "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400";
 
-// Summary card color variants — defined as constants to avoid JSX literal string warnings
 const SUMMARY_VALUE_CLASS_SUCCESS =
   "text-xl font-bold tabular-nums text-green-600 dark:text-green-400";
 const SUMMARY_VALUE_CLASS_DANGER =
@@ -198,113 +200,145 @@ function StatusChip({
   );
 }
 
-function ExecutionRow({
+function ExecutionCard({
   execution,
-  isExpanded,
-  onToggleExpand,
+  expandedSection,
+  onToggle,
   t,
 }: {
   execution: Execution;
-  isExpanded: boolean;
-  onToggleExpand: () => void;
+  expandedSection: "error" | "result" | null;
+  onToggle: (section: "error" | "result") => void;
   t: ReturnType<typeof useWidgetTranslation>;
 }): React.JSX.Element {
-  const hasError = Boolean(execution.error);
+  const hasError = Boolean(execution.error) || Boolean(execution.errorStack);
+  const hasResult =
+    execution.result && Object.keys(execution.result).length > 0;
 
   return (
-    <>
-      <Div
-        className={cn(
-          "grid grid-cols-7 gap-2 py-2.5 border-b border-border/50 text-sm items-start transition-colors",
-          hasError
-            ? "cursor-pointer hover:bg-red-50/50 dark:hover:bg-red-950/20"
-            : "hover:bg-muted/30",
-        )}
-        onClick={hasError ? onToggleExpand : undefined}
-      >
-        {/* Task Name */}
-        <Div className="flex flex-col gap-0.5 min-w-0">
-          <Span className="font-medium truncate">{execution.taskName}</Span>
-          <Span className="text-xs text-muted-foreground font-mono truncate">
-            {execution.taskId.slice(0, 8)}
-          </Span>
-        </Div>
-
+    <Div className="rounded-lg border bg-card overflow-hidden">
+      {/* Card header row */}
+      <Div className="flex items-start gap-3 p-3">
         {/* Status badge */}
-        <Div className="flex items-center">
-          <Span
-            className={cn(
-              "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-              getStatusColorClass(execution.status),
-            )}
-          >
-            {t(execution.status)}
-          </Span>
-        </Div>
-
-        {/* Duration */}
-        <Span className="tabular-nums text-xs pt-1">
-          {formatDuration(execution.durationMs)}
-        </Span>
-
-        {/* Started */}
-        <Span className="text-xs pt-1 text-muted-foreground font-mono">
-          {formatDate(execution.startedAt)}
-        </Span>
-
-        {/* Completed */}
-        <Span className="text-xs pt-1 text-muted-foreground font-mono">
-          {formatDate(execution.completedAt)}
-        </Span>
-
-        {/* Environment */}
-        <Div className="flex items-center">
-          {execution.environment ? (
-            <Span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground">
-              {execution.environment}
-            </Span>
-          ) : (
-            <Span className="text-xs text-muted-foreground">—</Span>
+        <Span
+          className={cn(
+            "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 mt-0.5",
+            getStatusColorClass(execution.status),
           )}
+        >
+          {t(execution.status)}
+        </Span>
+
+        {/* Task name + meta */}
+        <Div className="flex flex-col gap-0.5 flex-1 min-w-0">
+          <Span className="font-medium text-sm">{execution.taskName}</Span>
+          <Div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground font-mono">
+            <Span>{formatDate(execution.startedAt)}</Span>
+            {execution.completedAt && (
+              // eslint-disable-next-line i18next/no-literal-string
+              <Span>{`\u2192 ${formatDate(execution.completedAt)}`}</Span>
+            )}
+            <Span className="font-sans tabular-nums">
+              {formatDuration(execution.durationMs)}
+            </Span>
+            {execution.environment && (
+              <Span className="bg-muted px-1 rounded">
+                {execution.environment}
+              </Span>
+            )}
+          </Div>
         </Div>
 
-        {/* Error preview */}
-        <Div className="flex items-center min-w-0">
-          {hasError ? (
-            <Span className="text-xs text-red-500 dark:text-red-400 truncate">
-              {isExpanded
-                ? t(
-                    "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.error.collapse",
-                  )
-                : (execution.error?.message ?? "")}
-            </Span>
-          ) : (
-            <Span className="text-xs text-muted-foreground">—</Span>
+        {/* Expand buttons */}
+        <Div className="flex items-center gap-1 flex-shrink-0">
+          {hasResult && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => onToggle("result")}
+              className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
+            >
+              {t(
+                "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.result",
+              )}
+              {expandedSection === "result" ? (
+                <ChevronUp className="h-3 w-3" />
+              ) : (
+                <ChevronDown className="h-3 w-3" />
+              )}
+            </Button>
+          )}
+          {hasError && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => onToggle("error")}
+              className="h-7 px-2 text-xs gap-1 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+            >
+              {t(
+                "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.error.label",
+              )}
+              {expandedSection === "error" ? (
+                <ChevronUp className="h-3 w-3" />
+              ) : (
+                <ChevronDown className="h-3 w-3" />
+              )}
+            </Button>
           )}
         </Div>
       </Div>
 
-      {/* Expanded error detail */}
-      {isExpanded && hasError && execution.error && (
-        <Div className="border border-red-200 dark:border-red-800 rounded-md mx-2 mb-2 p-3 bg-red-50 dark:bg-red-950/30">
-          <Div className="flex items-center gap-2 mb-2">
-            <XCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
-            <Span className="text-xs font-semibold text-red-700 dark:text-red-300">
-              {execution.error.errorType}
-            </Span>
-          </Div>
-          <Span className="text-sm text-red-800 dark:text-red-200 whitespace-pre-wrap break-words block">
-            {execution.error.message}
-          </Span>
-          {execution.error.messageParams &&
-            Object.keys(execution.error.messageParams).length > 0 && (
-              <Div className="mt-2 text-xs text-red-600 dark:text-red-400 font-mono bg-red-100 dark:bg-red-900/40 rounded p-2">
-                {JSON.stringify(execution.error.messageParams, null, 2)}
-              </Div>
-            )}
+      {/* Error preview inline when collapsed */}
+      {hasError && expandedSection !== "error" && execution.error && (
+        <Div
+          className="px-3 pb-2 text-xs text-red-500 dark:text-red-400 truncate cursor-pointer"
+          onClick={() => onToggle("error")}
+        >
+          {execution.error.message}
         </Div>
       )}
-    </>
+
+      {/* Expanded: error */}
+      {expandedSection === "error" && hasError && (
+        <Div className="border-t border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30 p-3 flex flex-col gap-2">
+          {execution.error && (
+            <>
+              <Div className="flex items-center gap-2">
+                <XCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
+                <Span className="text-xs font-semibold text-red-700 dark:text-red-300">
+                  {execution.error.errorType}
+                </Span>
+              </Div>
+              <Span className="text-sm text-red-800 dark:text-red-200 whitespace-pre-wrap break-words">
+                {execution.error.message}
+              </Span>
+              {execution.error.messageParams &&
+                Object.keys(execution.error.messageParams).length > 0 && (
+                  <Pre className="text-xs text-red-600 dark:text-red-400 font-mono bg-red-100 dark:bg-red-900/40 rounded p-2 overflow-auto">
+                    {JSON.stringify(execution.error.messageParams, null, 2)}
+                  </Pre>
+                )}
+            </>
+          )}
+          {execution.errorStack && (
+            <Pre className="text-xs text-red-600 dark:text-red-400 font-mono bg-red-100 dark:bg-red-900/40 rounded p-2 overflow-auto max-h-48 whitespace-pre-wrap break-words">
+              {execution.errorStack}
+            </Pre>
+          )}
+        </Div>
+      )}
+
+      {/* Expanded: result */}
+      {expandedSection === "result" && hasResult && (
+        <Div className="border-t bg-muted/40 p-3">
+          <Pre className="text-xs font-mono text-foreground overflow-auto max-h-48 whitespace-pre-wrap break-words">
+            {JSON.stringify(execution.result, null, 2)}
+          </Pre>
+        </Div>
+      )}
+    </Div>
   );
 }
 
@@ -324,6 +358,7 @@ export function CronHistoryContainer({
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
 
+  // expandedId: "<executionId>:<section>"
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const statusFilter: string = form?.watch("status") ?? "ALL";
@@ -335,13 +370,11 @@ export function CronHistoryContainer({
 
   const isLoading = endpointMutations?.read?.isLoading;
 
-  // Stable reference for executions array
   const executions = useMemo(
     () => value?.executions ?? [],
     [value?.executions],
   );
 
-  // Counts per status chip (from current page executions)
   const statusCounts = useMemo((): Record<StatusFilter, number> => {
     const counts: Record<StatusFilter, number> = {
       ALL: executions.length,
@@ -372,10 +405,6 @@ export function CronHistoryContainer({
     return counts;
   }, [executions]);
 
-  // ---------------------------------------------------------------------------
-  // Pagination
-  // ---------------------------------------------------------------------------
-
   const currentPage = Math.floor(offset / LIMIT) + 1;
   const totalPages = Math.ceil(totalCount / LIMIT) || 1;
 
@@ -391,10 +420,6 @@ export function CronHistoryContainer({
     [form, onSubmit, endpointMutations],
   );
 
-  // ---------------------------------------------------------------------------
-  // Navigation handlers
-  // ---------------------------------------------------------------------------
-
   const handleRefresh = useCallback((): void => {
     endpointMutations?.read?.refetch?.();
   }, [endpointMutations]);
@@ -407,6 +432,10 @@ export function CronHistoryContainer({
     router.push(`/${locale}/admin/cron/stats`);
   }, [router, locale]);
 
+  const handleViewPulse = useCallback((): void => {
+    router.push(`/${locale}/admin/cron/pulse`);
+  }, [router, locale]);
+
   const handleStatusFilterChange = useCallback(
     (filter: StatusFilter): void => {
       const statusValue = filter === "ALL" ? "" : CronTaskStatus[filter];
@@ -417,13 +446,13 @@ export function CronHistoryContainer({
     [form, endpointMutations],
   );
 
-  const handleToggleExpand = useCallback((id: string): void => {
-    setExpandedId((prev) => (prev === id ? null : id));
-  }, []);
-
-  // ---------------------------------------------------------------------------
-  // Render
-  // ---------------------------------------------------------------------------
+  const handleToggle = useCallback(
+    (executionId: string, section: "error" | "result"): void => {
+      const key = `${executionId}:${section}`;
+      setExpandedId((prev) => (prev === key ? null : key));
+    },
+    [],
+  );
 
   return (
     <Div className="flex flex-col gap-0">
@@ -468,6 +497,21 @@ export function CronHistoryContainer({
           <Span className="hidden sm:inline">
             {t(
               "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.header.stats",
+            )}
+          </Span>
+        </Button>
+
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={handleViewPulse}
+          className="gap-1.5"
+        >
+          <Activity className="h-4 w-4" />
+          <Span className="hidden sm:inline">
+            {t(
+              "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.header.pulse",
             )}
           </Span>
         </Button>
@@ -529,13 +573,25 @@ export function CronHistoryContainer({
         </Div>
       )}
 
-      {/* ── Search + filter chips row ── */}
+      {/* ── Filters ── */}
       <Div className="flex flex-col gap-2 px-4 py-3 border-b">
-        {/* Text search bound to request field */}
+        {/* Task name search */}
         <TextFieldWidget
           fieldName={`${fieldName}.taskName`}
           field={children.taskName}
         />
+
+        {/* Date range */}
+        <Div className="grid grid-cols-2 gap-2">
+          <DateFieldWidget
+            fieldName={`${fieldName}.startDate`}
+            field={children.startDate}
+          />
+          <DateFieldWidget
+            fieldName={`${fieldName}.endDate`}
+            field={children.endDate}
+          />
+        </Div>
 
         {/* Status filter chips */}
         <Div className="flex items-center gap-1.5 flex-wrap">
@@ -564,50 +620,10 @@ export function CronHistoryContainer({
         </Div>
       )}
 
-      {/* ── Execution table ── */}
+      {/* ── Card list ── */}
       {!isLoading && (
-        <Div className="flex flex-col px-4 py-2">
+        <Div className="flex flex-col gap-2 px-4 py-3">
           <FormAlertWidget field={{}} />
-          {/* Table header */}
-          <Div className="grid grid-cols-7 gap-2 py-2 border-b text-xs font-medium text-muted-foreground">
-            <Span>
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.col.taskName",
-              )}
-            </Span>
-            <Span>
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.col.status",
-              )}
-            </Span>
-            <Span>
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.col.duration",
-              )}
-            </Span>
-            <Span>
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.col.started",
-              )}
-            </Span>
-            <Span>
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.col.completed",
-              )}
-            </Span>
-            <Span>
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.col.environment",
-              )}
-            </Span>
-            <Span>
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.col.error",
-              )}
-            </Span>
-          </Div>
-
-          {/* Table body */}
           {executions.length === 0 ? (
             <Div className="flex flex-col items-center justify-center py-14 gap-3 text-center">
               <RefreshCw className="h-8 w-8 text-muted-foreground" />
@@ -618,17 +634,20 @@ export function CronHistoryContainer({
               </Span>
             </Div>
           ) : (
-            <Div className="flex flex-col">
-              {executions.map((execution) => (
-                <ExecutionRow
+            executions.map((execution) => {
+              const key = expandedId?.startsWith(execution.id)
+                ? (expandedId.split(":")[1] as "error" | "result")
+                : null;
+              return (
+                <ExecutionCard
                   key={execution.id}
                   execution={execution}
-                  isExpanded={expandedId === execution.id}
-                  onToggleExpand={() => handleToggleExpand(execution.id)}
+                  expandedSection={key}
+                  onToggle={(section) => handleToggle(execution.id, section)}
                   t={t}
                 />
-              ))}
-            </Div>
+              );
+            })
           )}
         </Div>
       )}

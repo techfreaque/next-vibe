@@ -22,6 +22,7 @@ import React, { useCallback } from "react";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
+  useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -61,6 +62,7 @@ export function LeadsBatchUpdateContainer({
   const locale = useWidgetLocale();
   const router = useRouter();
   const t = useWidgetTranslation();
+  const form = useWidgetForm<typeof definition.PATCH>();
   const isSubmitting = endpointMutations?.update?.isSubmitting;
 
   const response = data?.response;
@@ -73,6 +75,18 @@ export function LeadsBatchUpdateContainer({
     Boolean(response) && totalProcessed < totalMatched && totalProcessed > 0;
   const isHighVolume =
     Boolean(response) && preview.length > 0 && totalMatched > 100;
+
+  // Read active filters from the hidden prefilled fields
+  const activeSearch = form?.watch("search") ?? "";
+  const activeStatus: string[] = form?.watch("status") ?? [];
+  const activeCampaignStage: string[] =
+    form?.watch("currentCampaignStage") ?? [];
+  const activeSource: string[] = form?.watch("source") ?? [];
+  const hasActiveFilters =
+    Boolean(activeSearch) ||
+    activeStatus.length > 0 ||
+    activeCampaignStage.length > 0 ||
+    activeSource.length > 0;
 
   const handleViewLead = useCallback(
     (lead: { id?: string | null }): void => {
@@ -101,29 +115,46 @@ export function LeadsBatchUpdateContainer({
         )}
       </Div>
 
-      {/* Filter Criteria Section */}
-      <Div className="rounded-lg border bg-card p-4 flex flex-col gap-3">
-        <Span className="font-medium text-sm text-muted-foreground">
-          {t("app.api.leads.batch.widget.update.sectionFilter")}
-        </Span>
-        <Div className="grid grid-cols-2 gap-3">
-          <Div className="col-span-2">
-            <TextFieldWidget field={children.search} fieldName="search" />
+      {/* Active Filter Summary (prefilled from list, read-only display) */}
+      {hasActiveFilters && (
+        <Div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30 p-3 flex flex-col gap-2">
+          <Span className="text-xs font-medium text-blue-700 dark:text-blue-300">
+            {t("app.api.leads.batch.widget.update.activeFiltersLabel")}
+          </Span>
+          <Div className="flex flex-wrap gap-1.5">
+            {activeSearch && (
+              <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">
+                {t("app.api.leads.batch.widget.update.filterSearch")}:{" "}
+                {activeSearch}
+              </Span>
+            )}
+            {activeStatus.map((s) => (
+              <Span
+                key={s}
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200"
+              >
+                {t(s)}
+              </Span>
+            ))}
+            {activeCampaignStage.map((s) => (
+              <Span
+                key={s}
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200"
+              >
+                {t(s)}
+              </Span>
+            ))}
+            {activeSource.map((s) => (
+              <Span
+                key={s}
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200"
+              >
+                {t(s)}
+              </Span>
+            ))}
           </Div>
-          <SelectFieldWidget field={children.status} fieldName="status" />
-          <SelectFieldWidget
-            field={children.currentCampaignStage}
-            fieldName="currentCampaignStage"
-          />
-          <SelectFieldWidget field={children.source} fieldName="source" />
-          <SelectFieldWidget field={children.scope} fieldName="scope" />
-          <NumberFieldWidget
-            field={children.maxRecords}
-            fieldName="maxRecords"
-          />
-          <BooleanFieldWidget field={children.dryRun} fieldName="dryRun" />
         </Div>
-      </Div>
+      )}
 
       {/* Updates Section */}
       <Div className="rounded-lg border bg-card p-4 flex flex-col gap-3">
@@ -149,6 +180,21 @@ export function LeadsBatchUpdateContainer({
               fieldName="updates.notes"
             />
           </Div>
+        </Div>
+      </Div>
+
+      {/* Operation Settings Section */}
+      <Div className="rounded-lg border bg-card p-4 flex flex-col gap-3">
+        <Span className="font-medium text-sm text-muted-foreground">
+          {t("app.api.leads.batch.widget.update.sectionSettings")}
+        </Span>
+        <Div className="grid grid-cols-2 gap-3">
+          <SelectFieldWidget field={children.scope} fieldName="scope" />
+          <NumberFieldWidget
+            field={children.maxRecords}
+            fieldName="maxRecords"
+          />
+          <BooleanFieldWidget field={children.dryRun} fieldName="dryRun" />
         </Div>
       </Div>
 
@@ -346,12 +392,25 @@ export function LeadsBatchDeleteContainer({
   const locale = useWidgetLocale();
   const router = useRouter();
   const t = useWidgetTranslation();
+  const form = useWidgetForm<typeof definition.DELETE>();
 
   const response = data?.response;
   const preview = response?.preview ?? [];
   const errors = response?.errors ?? [];
 
   const totalMatched = response?.totalMatched ?? 0;
+
+  // Read active filters from the hidden prefilled fields
+  const activeSearch = form?.watch("search") ?? "";
+  const activeStatus: string[] = form?.watch("status") ?? [];
+  const activeCampaignStage: string[] =
+    form?.watch("currentCampaignStage") ?? [];
+  const activeSource: string[] = form?.watch("source") ?? [];
+  const hasActiveFilters =
+    Boolean(activeSearch) ||
+    activeStatus.length > 0 ||
+    activeCampaignStage.length > 0 ||
+    activeSource.length > 0;
 
   const handleViewLead = useCallback(
     (lead: { id?: string | null }): void => {
@@ -376,14 +435,53 @@ export function LeadsBatchDeleteContainer({
         </Span>
       </Div>
 
-      {/* Filter Criteria Section */}
+      {/* Active Filter Summary (prefilled from list, read-only display) */}
+      {hasActiveFilters && (
+        <Div className="rounded-lg border border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950/30 p-3 flex flex-col gap-2">
+          <Span className="text-xs font-medium text-orange-700 dark:text-orange-300">
+            {t("app.api.leads.batch.widget.delete.activeFiltersLabel")}
+          </Span>
+          <Div className="flex flex-wrap gap-1.5">
+            {activeSearch && (
+              <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200">
+                {t("app.api.leads.batch.widget.delete.filterSearch")}:{" "}
+                {activeSearch}
+              </Span>
+            )}
+            {activeStatus.map((s) => (
+              <Span
+                key={s}
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200"
+              >
+                {t(s)}
+              </Span>
+            ))}
+            {activeCampaignStage.map((s) => (
+              <Span
+                key={s}
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200"
+              >
+                {t(s)}
+              </Span>
+            ))}
+            {activeSource.map((s) => (
+              <Span
+                key={s}
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200"
+              >
+                {t(s)}
+              </Span>
+            ))}
+          </Div>
+        </Div>
+      )}
+
+      {/* Operation Settings Section */}
       <Div className="rounded-lg border bg-card p-4 flex flex-col gap-3">
         <Span className="font-medium text-sm text-muted-foreground">
-          {t("app.api.leads.batch.widget.delete.sectionFilter")}
+          {t("app.api.leads.batch.widget.delete.sectionSettings")}
         </Span>
         <Div className="flex flex-col gap-3">
-          <TextFieldWidget field={children.search} fieldName="search" />
-          <SelectFieldWidget field={children.status} fieldName="status" />
           <NumberFieldWidget
             field={children.maxRecords}
             fieldName="maxRecords"

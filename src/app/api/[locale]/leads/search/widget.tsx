@@ -31,7 +31,10 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import type definition from "./definition";
@@ -306,8 +309,24 @@ export function LeadsSearchContainer({
         )}
       </Div>
 
+      {/* ── Search form ── */}
+      <Div className="px-4 pt-3 pb-2 flex items-center gap-2">
+        <Div className="flex-1">
+          <TextFieldWidget fieldName="search" field={children.search} />
+        </Div>
+        <SubmitButtonWidget
+          field={{
+            text: "app.api.leads.search.get.search.label",
+            loadingText: "app.api.leads.search.get.search.label",
+            icon: "search",
+            variant: "primary",
+          }}
+        />
+      </Div>
+      <FormAlertWidget field={{}} />
+
       {/* ── Results ── */}
-      <Div className="px-4 pb-2 overflow-y-auto max-h-[min(700px,calc(100dvh-200px))]">
+      <Div className="px-4 pb-2 overflow-y-auto max-h-[min(700px,calc(100dvh-260px))]">
         {/* Status filter chips – only shown when results are present */}
         {presentStatuses.length > 1 && (
           <Div className="flex flex-wrap items-center gap-1.5 pt-3 pb-1">

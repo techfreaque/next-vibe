@@ -65,7 +65,7 @@ export function ImapMessagesSyncContainer({
         {result !== null && result !== undefined && (
           <Div className="rounded-lg border p-4 flex flex-col gap-2">
             <Span className="text-sm font-semibold">
-              {t("app.api.emails.imapClient.messages.sync.result")}
+              {t("app.api.emails.imapClient.messages.sync.widget.result")}
             </Span>
             <Span className="text-sm">{result.message}</Span>
             <Div className="flex flex-col gap-1 mt-2">
@@ -112,8 +112,9 @@ export function ImapMessagesSyncContainer({
         <Div className="flex items-center justify-end pt-2">
           <SubmitButtonWidget
             field={{
-              text: "app.api.emails.imapClient.messages.sync.submit",
-              loadingText: "app.api.emails.imapClient.messages.sync.submitting",
+              text: "app.api.emails.imapClient.messages.sync.widget.submit",
+              loadingText:
+                "app.api.emails.imapClient.messages.sync.widget.submitting",
               icon: "refresh-cw",
               variant: "primary",
               size: "sm",

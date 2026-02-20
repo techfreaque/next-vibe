@@ -39,7 +39,7 @@ export function ImapFoldersSyncContainer({
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <NavigateButtonWidget field={children.backButton} />
         <Span className="font-semibold text-base">
-          {t("app.api.emails.imapClient.folders.sync.title")}
+          {t("app.api.emails.imapClient.folders.sync.widget.title")}
         </Span>
       </Div>
 
@@ -65,7 +65,7 @@ export function ImapFoldersSyncContainer({
         {result !== null && result !== undefined && (
           <Div className="rounded-lg border p-4 flex flex-col gap-2">
             <Span className="text-sm font-semibold">
-              {t("app.api.emails.imapClient.folders.sync.result")}
+              {t("app.api.emails.imapClient.folders.sync.widget.result")}
             </Span>
             {[
               ["foldersProcessed", result.foldersProcessed],
@@ -78,14 +78,16 @@ export function ImapFoldersSyncContainer({
                 className="flex items-center justify-between text-sm"
               >
                 <Span className="text-muted-foreground">
-                  {t(`app.api.emails.imapClient.folders.sync.${String(key)}`)}
+                  {t(
+                    `app.api.emails.imapClient.folders.sync.widget.${String(key)}`,
+                  )}
                 </Span>
                 <Span className="font-semibold">{String(val)}</Span>
               </Div>
             ))}
             <Div className="flex items-center justify-between text-sm">
               <Span className="text-muted-foreground">
-                {t("app.api.emails.imapClient.folders.sync.duration")}
+                {t("app.api.emails.imapClient.folders.sync.widget.duration")}
               </Span>
               <Span className="font-semibold">
                 {result.duration}
@@ -98,8 +100,9 @@ export function ImapFoldersSyncContainer({
         <Div className="flex items-center justify-end pt-2">
           <SubmitButtonWidget
             field={{
-              text: "app.api.emails.imapClient.folders.sync.submit",
-              loadingText: "app.api.emails.imapClient.folders.sync.submitting",
+              text: "app.api.emails.imapClient.folders.sync.widget.submit",
+              loadingText:
+                "app.api.emails.imapClient.folders.sync.widget.submitting",
               icon: "refresh-cw",
               variant: "primary",
               size: "sm",

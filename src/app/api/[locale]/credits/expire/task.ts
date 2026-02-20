@@ -20,7 +20,7 @@ import {
   CronTaskPriority,
   TaskCategory,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/types/repository";
+import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 
 import { CreditRepository } from "../repository";
 

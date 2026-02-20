@@ -9,4 +9,6 @@ export enum SmsProviders {
   AWS_SNS = "aws-sns",
   MESSAGEBIRD = "messagebird",
   HTTP = "http",
+  WHATSAPP = "whatsapp",
+  TELEGRAM = "telegram",
 }

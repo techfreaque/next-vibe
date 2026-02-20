@@ -10,6 +10,7 @@ import {
   backButton,
   customWidgetObject,
   objectField,
+  requestDataArrayOptionalField,
   requestField,
   requestUrlPathParamsField,
   responseField,
@@ -442,15 +443,24 @@ const { PUT } = createEndpoint({
         schema: z.coerce.number().min(1).optional(),
       }),
 
-      syncFolders: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXTAREA,
-        label:
-          "app.api.emails.imapClient.accounts.id.post.form.syncFolders.label",
-        description:
-          "app.api.emails.imapClient.accounts.id.post.form.syncFolders.description",
-        schema: z.array(z.string()).optional(),
-      }),
+      syncFolders: requestDataArrayOptionalField(
+        {
+          type: WidgetType.CONTAINER,
+          title:
+            "app.api.emails.imapClient.accounts.id.post.form.syncFolders.label",
+          description:
+            "app.api.emails.imapClient.accounts.id.post.form.syncFolders.description",
+        },
+        requestField({
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXTAREA,
+          label:
+            "app.api.emails.imapClient.accounts.id.post.form.syncFolders.label",
+          description:
+            "app.api.emails.imapClient.accounts.id.post.form.syncFolders.description",
+          schema: z.string().optional(),
+        }),
+      ),
 
       // === RESPONSE FIELDS ===
       account: objectField(

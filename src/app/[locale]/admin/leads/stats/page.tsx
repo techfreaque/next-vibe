@@ -6,10 +6,11 @@
 import type { Metadata } from "next";
 import type React from "react";
 
-import { LeadsStatsClient } from "@/app/api/[locale]/leads/stats/_components/leads-stats-client";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+
+import { LeadsStatsClient } from "./leads-stats-client";
 
 interface LeadsStatsPageProps {
   params: Promise<{

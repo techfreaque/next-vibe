@@ -28,18 +28,14 @@ import {
   BatchOperationScope,
   BatchOperationScopeOptions,
   EmailCampaignStage,
-  EmailCampaignStageFilter,
-  EmailCampaignStageFilterOptions,
   EmailCampaignStageOptions,
   LeadSource,
-  LeadSourceFilter,
-  LeadSourceFilterOptions,
   LeadSourceOptions,
   LeadStatus,
   LeadStatusFilter,
-  LeadStatusFilterOptions,
   LeadStatusOptions,
 } from "../enum";
+import { leadsBatchFilterFields } from "../shared-filter-fields";
 import { LeadsBatchDeleteContainer, LeadsBatchUpdateContainer } from "./widget";
 
 /**
@@ -64,42 +60,8 @@ const { PATCH } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       backButton: backButton({ usage: { response: true } }),
-      // Filter criteria
-      search: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "app.api.leads.batch.patch.search.label" as const,
-        description: "app.api.leads.batch.patch.search.description" as const,
-        placeholder: "app.api.leads.batch.patch.search.placeholder" as const,
-        schema: z.string().optional(),
-      }),
-      status: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.batch.patch.status.label" as const,
-        description: "app.api.leads.batch.patch.status.description" as const,
-        options: LeadStatusFilterOptions,
-        schema: z.enum(LeadStatusFilter).default(LeadStatusFilter.ALL),
-      }),
-      currentCampaignStage: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.batch.patch.currentCampaignStage.label" as const,
-        description:
-          "app.api.leads.batch.patch.currentCampaignStage.description" as const,
-        options: EmailCampaignStageFilterOptions,
-        schema: z
-          .enum(EmailCampaignStageFilter)
-          .default(EmailCampaignStageFilter.ALL),
-      }),
-      source: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.batch.patch.source.label" as const,
-        description: "app.api.leads.batch.patch.source.description" as const,
-        options: LeadSourceFilterOptions,
-        schema: z.enum(LeadSourceFilter).default(LeadSourceFilter.ALL),
-      }),
+      // Filter criteria — hidden fields prefilled from list widget
+      ...leadsBatchFilterFields,
       scope: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
@@ -341,9 +303,9 @@ const { PATCH } = createEndpoint({
     requests: {
       default: {
         search: "",
-        status: LeadStatusFilter.ALL,
-        currentCampaignStage: EmailCampaignStageFilter.ALL,
-        source: LeadSourceFilter.ALL,
+        status: [],
+        currentCampaignStage: [],
+        source: [],
         scope: BatchOperationScope.ALL_PAGES,
         dryRun: true,
         maxRecords: 100,
@@ -392,22 +354,8 @@ const { DELETE } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       backButton: backButton({ usage: { response: true } }),
-      // Filter criteria (same as PATCH)
-      search: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "app.api.leads.batch.delete.search.label" as const,
-        description: "app.api.leads.batch.delete.search.description" as const,
-        schema: z.string().optional(),
-      }),
-      status: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.batch.delete.status.label" as const,
-        description: "app.api.leads.batch.delete.status.description" as const,
-        options: LeadStatusFilterOptions,
-        schema: z.enum(LeadStatusFilter).default(LeadStatusFilter.ALL),
-      }),
+      // Filter criteria — hidden fields prefilled from list widget
+      ...leadsBatchFilterFields,
       confirmDelete: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
@@ -606,7 +554,9 @@ const { DELETE } = createEndpoint({
     requests: {
       default: {
         search: "",
-        status: LeadStatusFilter.INVALID,
+        status: [LeadStatusFilter.INVALID],
+        currentCampaignStage: [],
+        source: [],
         confirmDelete: true,
         dryRun: true,
         maxRecords: 50,
@@ -637,10 +587,6 @@ export type BatchDeleteRequestInput = typeof DELETE.types.RequestInput;
 export type BatchDeleteRequestOutput = typeof DELETE.types.RequestOutput;
 export type BatchDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type BatchDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
-
-// Extract nested response types for repository use (unwrapped from endpoint response structure)
-export type BatchUpdateResponseData = BatchUpdateResponseOutput["response"];
-export type BatchDeleteResponseData = BatchDeleteResponseOutput["response"];
 
 /**
  * Export definitions

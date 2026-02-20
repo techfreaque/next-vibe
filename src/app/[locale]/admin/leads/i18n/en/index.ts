@@ -243,6 +243,8 @@ export const translations = {
         subject: "Subject",
         email_preview: "Email Preview",
         preview_title: "Email Preview",
+        stage_of: "of",
+        stages: "stages",
         preview: {
           actions: {
             title: "Email Actions",

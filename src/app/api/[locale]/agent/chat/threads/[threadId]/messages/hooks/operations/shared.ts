@@ -182,12 +182,12 @@ export async function createAndSendUserMessage(
 
       chatStore.addMessage(createdUserMessage);
 
-      // For incognito mode, clear input immediately since messages are stored locally
-      // No need to wait for server confirmation
-      if (
-        currentRootFolderId === DefaultFolderId.INCOGNITO &&
-        operation === "send"
-      ) {
+      // Clear input immediately after the message is created in the local store.
+      // The user message is created client-side before the stream starts, so we
+      // don't need to wait for any server confirmation. This also avoids the input
+      // remaining filled during compacting (which can take several seconds before
+      // the main stream response begins).
+      if (operation === "send") {
         setInput?.("");
         setAttachments?.([]);
       }
@@ -263,21 +263,6 @@ export async function createAndSendUserMessage(
         timezone,
       },
       {
-        onMessageCreated: (data) => {
-          // Clear input when USER message is confirmed by server (for server threads only)
-          // This means the message was successfully stored in the database
-          if (
-            data.role === ChatMessageRole.USER &&
-            operation === "send" &&
-            currentRootFolderId !== DefaultFolderId.INCOGNITO
-          ) {
-            logger.debug("[Message] User message created, clearing input", {
-              messageId: data.messageId,
-            });
-            setInput?.("");
-            setAttachments?.([]);
-          }
-        },
         onCreditsDeducted: (data) => {
           // Optimistically deduct credits when server emits CREDITS_DEDUCTED event
           logger.debug("[Credits] Deducting credits from SSE event", {

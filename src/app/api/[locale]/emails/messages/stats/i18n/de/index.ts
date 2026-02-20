@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
     custom: "Benutzerdefinierter Bereich",
   },
   get: {
-    title: "E-Mail-Statistiken Abrufen",
+    title: "E-Mail-Statistiken",
     description: "Umfassende E-Mail-Statistiken und Metriken abrufen",
     form: {
       title: "E-Mail-Statistiken Anfrage",
@@ -248,5 +248,7 @@ export const translations: typeof enTranslations = {
     avgRetries: "Ø Wiederholungen",
     avgDeliveryMs: "Ø Zustellungszeit",
     viewList: "Liste anzeigen",
+    refresh: "Aktualisieren",
+    search: "E-Mails suchen...",
   },
 };

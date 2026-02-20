@@ -17,6 +17,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CronTaskPriority, CronTaskStatus } from "../../enum";
 import { cronTaskExecutions, cronTasks } from "../db";
@@ -34,6 +35,14 @@ export interface ICronStatsRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronStatsGetResponseOutput>>;
+}
+
+// eslint-disable-next-line i18next/no-literal-string
+function formatUptime(seconds: number): string {
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  return `${days}d ${hours}h ${minutes}m`;
 }
 
 /**
@@ -68,6 +77,10 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
         userId: user.isPublic ? "public" : user.id,
       });
 
+      const isAdmin =
+        !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+      const userId = !user.isPublic ? user.id : null;
+
       const { period = "day", type = "overview", taskId, limit = 100 } = data;
       const cutoff = getPeriodCutoff(period);
 
@@ -76,6 +89,10 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
       const taskCondition = taskId
         ? eq(cronTaskExecutions.taskId, taskId)
         : undefined;
+
+      // User ownership filter for task table
+      const taskUserCondition =
+        !isAdmin && userId ? eq(cronTasks.userId, userId) : undefined;
 
       const execConditions = [
         periodCondition,
@@ -86,10 +103,14 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
       const [taskCountRow] = await db
         .select({
           totalTasks: count(cronTasks.id),
+          activeTasks: count(
+            sql`CASE WHEN ${cronTasks.enabled} = true THEN 1 END`,
+          ),
         })
-        .from(cronTasks);
+        .from(cronTasks)
+        .where(taskUserCondition);
 
-      const [execSummary] = await db
+      const execSummaryQuery = db
         .select({
           totalExecutions: count(cronTaskExecutions.id),
           successfulExecutions: count(
@@ -109,9 +130,20 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
           maxDuration: max(cronTaskExecutions.durationMs),
         })
         .from(cronTaskExecutions)
-        .where(and(...execConditions));
+        .leftJoin(cronTasks, eq(cronTaskExecutions.taskId, cronTasks.id))
+        .where(
+          and(
+            ...execConditions,
+            ...(taskUserCondition ? [taskUserCondition] : []),
+          ),
+        );
+      const [execSummary] = await execSummaryQuery;
 
       const totalTasks = taskCountRow?.totalTasks ?? 0;
+      const activeTasks = Number(taskCountRow?.activeTasks ?? 0);
+      const systemStatus: CronStatsGetResponseOutput["systemStatus"] =
+        totalTasks === 0 || activeTasks === 0 ? "warning" : "healthy";
+      const uptime = formatUptime(Math.floor(process.uptime()));
       const totalExecutions = Number(execSummary?.totalExecutions ?? 0);
       const successfulExecutions = Number(
         execSummary?.successfulExecutions ?? 0,
@@ -132,6 +164,9 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
       // Build the base response
       const responseData: CronStatsGetResponseOutput = {
         totalTasks,
+        activeTasks,
+        systemStatus,
+        uptime,
         executedTasks: totalExecutions,
         successfulTasks: successfulExecutions,
         failedTasks: failedExecutions,
@@ -174,6 +209,7 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
               ...(taskCondition ? [taskCondition] : []),
             ),
           )
+          .where(taskUserCondition)
           .groupBy(
             cronTasks.id,
             cronTasks.name,
@@ -283,7 +319,13 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
             uniqueTasks: sql<number>`count(DISTINCT ${cronTaskExecutions.taskId})::int`,
           })
           .from(cronTaskExecutions)
-          .where(and(...execConditions))
+          .leftJoin(cronTasks, eq(cronTaskExecutions.taskId, cronTasks.id))
+          .where(
+            and(
+              ...execConditions,
+              ...(taskUserCondition ? [taskUserCondition] : []),
+            ),
+          )
           .groupBy(
             sql`date_trunc('day', ${cronTaskExecutions.startedAt})::date`,
           )
@@ -312,7 +354,12 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
         })
         .from(cronTaskExecutions)
         .leftJoin(cronTasks, eq(cronTaskExecutions.taskId, cronTasks.id))
-        .where(and(...execConditions))
+        .where(
+          and(
+            ...execConditions,
+            ...(taskUserCondition ? [taskUserCondition] : []),
+          ),
+        )
         .orderBy(desc(cronTaskExecutions.startedAt))
         .limit(20);
 

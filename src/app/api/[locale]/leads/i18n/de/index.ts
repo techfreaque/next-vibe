@@ -82,6 +82,60 @@ export const translations: typeof enTranslations = {
     cannotLinkLeadToItself: "Lead kann nicht mit sich selbst verknüpft werden",
     linkFailed: "Fehler beim Verknüpfen der Leads",
   },
+  filters: {
+    search: {
+      label: "Suche",
+      description: "Leads nach E-Mail oder Firmenname suchen",
+      placeholder: "E-Mail oder Firmenname eingeben...",
+    },
+    status: {
+      label: "Status",
+      description: "Nach Lead-Status filtern",
+      placeholder: "Alle Status",
+    },
+    currentCampaignStage: {
+      label: "Kampagnenphase",
+      description: "Nach E-Mail-Kampagnenphase filtern",
+      placeholder: "Alle Phasen",
+    },
+    source: {
+      label: "Quelle",
+      description: "Nach Lead-Quelle filtern",
+      placeholder: "Alle Quellen",
+    },
+    country: {
+      label: "Land",
+      description: "Nach Land filtern",
+      placeholder: "Alle Länder",
+    },
+    language: {
+      label: "Sprache",
+      description: "Nach Sprache filtern",
+      placeholder: "Alle Sprachen",
+    },
+    sortBy: {
+      label: "Sortieren nach",
+      description: "Feld auswählen, nach dem sortiert werden soll",
+      placeholder: "Sortierfeld",
+    },
+    sortOrder: {
+      label: "Sortierreihenfolge",
+      description: "Aufsteigend oder absteigend sortieren",
+      placeholder: "Reihenfolge",
+    },
+    statusFilters: {
+      title: "Status- & Kampagnenfilter",
+      description: "Nach Status, Kampagnenphase und Quelle filtern",
+    },
+    locationFilters: {
+      title: "Standortfilter",
+      description: "Nach Land und Sprache filtern",
+    },
+    sortingOptions: {
+      title: "Sortieroptionen",
+      description: "Sortierreihenfolge konfigurieren",
+    },
+  },
   batch: batchTranslations,
   campaigns: campaignsTranslations,
   create: createTranslations,
@@ -183,7 +237,6 @@ export const translations: typeof enTranslations = {
       emailCampaign: "E-Mail-Kampagne",
       referral: "Empfehlung",
       csvImport: "CSV-Import",
-      api: "API",
     },
     leadStatusFilter: {
       all: "Alle",
@@ -216,7 +269,6 @@ export const translations: typeof enTranslations = {
       emailCampaign: "E-Mail-Kampagne",
       referral: "Empfehlung",
       csvImport: "CSV-Import",
-      api: "API",
     },
     batchOperationScope: {
       currentPage: "Aktuelle Seite",

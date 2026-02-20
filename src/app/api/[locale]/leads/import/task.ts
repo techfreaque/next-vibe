@@ -6,7 +6,7 @@
  */
 import "server-only";
 
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -21,6 +21,7 @@ import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
 } from "@/app/api/[locale]/system/unified-interface/tasks/constants";
+import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import {
   CronTaskPriority,
   TaskCategory,
@@ -28,7 +29,7 @@ import {
 import type {
   Task,
   TaskExecutionContext,
-} from "@/app/api/[locale]/system/unified-interface/tasks/types/repository";
+} from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 
 import { csvImportJobs } from "./db";
 import { CsvImportJobStatus } from "./enum";
@@ -225,6 +226,25 @@ async function executeCsvProcessor(
       },
     };
 
+    // Self-disable when no pending or processing jobs remain
+    const hasActiveJobs =
+      (summaryStats?.pending || 0) > 0 || (summaryStats?.processing || 0) > 0;
+
+    if (!hasActiveJobs) {
+      await db
+        .update(cronTasks)
+        .set({ enabled: false, updatedAt: new Date() })
+        .where(
+          and(
+            eq(cronTasks.name, "csv-processor"),
+            ne(cronTasks.enabled, false),
+          ),
+        );
+      logger.info("tasks.csv_processor.self_disabled", {
+        reason: "no_pending_jobs",
+      });
+    }
+
     logger.info("tasks.csv_processor.completed", result.summary);
     return success(result);
   } catch (error) {
@@ -248,7 +268,7 @@ async function executeCsvProcessor(
 const csvProcessorTask: Task = {
   type: "cron",
   name: "csv-processor",
-  description: "tasks.csv_processor.description",
+  description: "app.api.system.unifiedInterface.tasks.csvProcessor.description",
   schedule: CRON_SCHEDULES.EVERY_MINUTE, // Every minute
   category: TaskCategory.MAINTENANCE,
   enabled: false,
@@ -279,7 +299,10 @@ const csvProcessorTask: Task = {
         cause: result,
       });
     }
-    // Returns void implicitly on success
+
+    if (result.data.jobsProcessed > 0) {
+      return success(result.data);
+    }
   },
 
   onError: ({ error, logger }) => {

@@ -2,7 +2,7 @@
 
 import type { JSX } from "react";
 
-import cronTaskDefinition from "@/app/api/[locale]/system/unified-interface/tasks/cron/task/[id]/definition";
+import cronTaskDefinition from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";

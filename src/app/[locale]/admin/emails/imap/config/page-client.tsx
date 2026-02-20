@@ -19,6 +19,15 @@ export function ImapConfigPageClient({
       endpoint={imapConfigDefinition}
       locale={locale}
       user={user}
+      forceMethod="POST"
+      endpointOptions={{
+        read: {
+          queryOptions: {
+            enabled: true,
+            staleTime: 30 * 1000,
+          },
+        },
+      }}
     />
   );
 }

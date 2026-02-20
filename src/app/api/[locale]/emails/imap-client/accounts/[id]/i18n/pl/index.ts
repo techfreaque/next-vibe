@@ -256,6 +256,15 @@ export const translations: typeof enTranslations = {
       description: "Konto zostało pomyślnie usunięte",
     },
   },
+  put: {
+    title: "Edytuj konto IMAP",
+    basicInfo: "Podstawowe informacje",
+    server: "Połączenie z serwerem",
+    auth: "Uwierzytelnianie",
+    sync: "Konfiguracja synchronizacji",
+    submit: "Zapisz zmiany",
+    submitting: "Zapisywanie...",
+  },
   widget: {
     put: {
       title: "Edytuj konto IMAP",

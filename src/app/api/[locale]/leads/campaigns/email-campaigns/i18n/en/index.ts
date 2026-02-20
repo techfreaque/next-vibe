@@ -1,4 +1,8 @@
 export const translations = {
+  task: {
+    description:
+      "Send automated email campaigns to leads based on their stage and timing",
+  },
   post: {
     title: "Email Campaigns",
     description: "Email Campaigns endpoint",

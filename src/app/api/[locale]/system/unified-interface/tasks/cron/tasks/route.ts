@@ -13,13 +13,13 @@ import { cronTasksListRepository } from "./repository";
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: async ({ data, logger }) => {
-      return await cronTasksListRepository.getTasks(data, logger);
+    handler: async ({ data, user, logger }) => {
+      return await cronTasksListRepository.getTasks(data, user, logger);
     },
   },
   [Methods.POST]: {
-    handler: async ({ data, logger }) => {
-      return await cronTasksListRepository.createTask(data, logger);
+    handler: async ({ data, user, logger }) => {
+      return await cronTasksListRepository.createTask(data, user, logger);
     },
   },
 });

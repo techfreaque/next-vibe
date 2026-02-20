@@ -20,6 +20,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { dateSchema } from "../../shared/types/common.schema";
 import { UserRole, UserRoleDB, UserRoleOptions } from "../user-roles/enum";
 import { UserSearchStatus, UserSearchStatusOptions } from "./enum";
 
@@ -310,13 +311,13 @@ const { GET } = createEndpoint({
                   type: WidgetType.TEXT,
                   content:
                     "app.api.user.search.response.users.createdAt" as const,
-                  schema: z.string(),
+                  schema: dateSchema,
                 }),
                 updatedAt: responseField({
                   type: WidgetType.TEXT,
                   content:
                     "app.api.user.search.response.users.updatedAt" as const,
-                  schema: z.string(),
+                  schema: dateSchema,
                 }),
               },
             ),

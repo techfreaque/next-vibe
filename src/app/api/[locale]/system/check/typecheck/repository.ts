@@ -35,6 +35,7 @@ import {
   createTypecheckConfig,
   getDisplayPath,
   PathType,
+  resolvePathsToIncludes,
   shouldIncludeFile,
   type TypecheckConfig,
 } from "./utils";
@@ -215,7 +216,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
   private static parseTypecheckOutput(
     output: string,
     useTsgo: boolean,
-    targetPath: string | undefined,
+    targetPath: string | string[] | undefined,
     disableFilter: boolean,
   ): { errors: ParsedIssue[]; warnings: ParsedIssue[] } {
     const errors: ParsedIssue[] = [];
@@ -229,7 +230,12 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
 
       if (issue) {
         // Apply filtering based on target path and disableFilter setting
-        if (!shouldIncludeFile(issue.file, targetPath, disableFilter)) {
+        const included = Array.isArray(targetPath)
+          ? targetPath.some((p) =>
+              shouldIncludeFile(issue.file, p, disableFilter),
+            )
+          : shouldIncludeFile(issue.file, targetPath, disableFilter);
+        if (!included) {
           continue;
         }
 
@@ -602,10 +608,12 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       output = execResult.output;
 
       // Parse the output into structured issues
+      // For multiple paths use targetPaths array for filtering, otherwise single targetPath
+      const filterTarget = config.targetPaths ?? config.targetPath;
       const { errors, warnings } = TypecheckRepositoryImpl.parseTypecheckOutput(
         output,
         useTsgo,
-        config.targetPath,
+        filterTarget,
         effectiveData.disableFilter,
       );
 
@@ -805,6 +813,14 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         config.tempConfigFile,
         cachePath,
       );
+    } else if (config.pathType === PathType.MULTIPLE_PATHS) {
+      // Multiple paths - combine all into one tsconfig to avoid parallel checks
+      const includes = resolvePathsToIncludes(config.targetPaths ?? []);
+      TypecheckRepositoryImpl.createTempTsConfig(
+        includes,
+        config.tempConfigFile,
+        cachePath,
+      );
     } else {
       // Folder - create temporary tsconfig with folder glob pattern
       const folderPath = config.targetPath || ".";
@@ -890,7 +906,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
   ): ApiResponseType<TypecheckResponseOutput> {
     const duration = Date.now() - startTime;
     const parsedError = parseError(error);
-    const targetPath = config?.targetPath ?? data.path;
+    const targetPath = config?.targetPaths ?? config?.targetPath ?? data.path;
 
     logger.warn(
       `[TYPESCRIPT] Execution error: ${parsedError.message} (duration: ${duration}ms)`,

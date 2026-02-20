@@ -384,6 +384,8 @@ export const translations = {
     topSources: "Top Sources",
     viewAll: "View all",
     recentActivity: "Recent Activity",
+    filters: "Filters",
+    applyFilters: "Apply Filters",
     openRateSuffix: "% open",
     conversionRateSuffix: "% cvr",
     emDash: "—",

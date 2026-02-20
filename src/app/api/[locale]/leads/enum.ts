@@ -210,7 +210,6 @@ export const {
   EMAIL_CAMPAIGN: "app.api.leads.enums.leadSource.emailCampaign",
   REFERRAL: "app.api.leads.enums.leadSource.referral",
   CSV_IMPORT: "app.api.leads.enums.leadSource.csvImport",
-  API: "app.api.leads.enums.leadSource.api",
 });
 
 /**
@@ -277,7 +276,6 @@ export const {
   EMAIL_CAMPAIGN: "app.api.leads.enums.leadSource.emailCampaign",
   REFERRAL: "app.api.leads.enums.leadSource.referral",
   CSV_IMPORT: "app.api.leads.enums.leadSource.csvImport",
-  API: "app.api.leads.enums.leadSource.api",
 });
 
 /**
@@ -344,8 +342,6 @@ export function mapSourceFilter(
       return LeadSource.REFERRAL;
     case LeadSourceFilter.CSV_IMPORT:
       return LeadSource.CSV_IMPORT;
-    case LeadSourceFilter.API:
-      return LeadSource.API;
     default:
       return null;
   }
@@ -618,5 +614,4 @@ export const LeadSourceDB = [
   LeadSource.EMAIL_CAMPAIGN,
   LeadSource.REFERRAL,
   LeadSource.CSV_IMPORT,
-  LeadSource.API,
 ] as const;

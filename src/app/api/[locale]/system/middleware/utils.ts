@@ -22,7 +22,9 @@ export function shouldSkipPath(path: string): boolean {
     path === "/sitemap.xml" ||
     // Skip webhook routes - they handle their own authentication
     path.includes("/payment/providers/stripe/webhook") ||
-    path.includes("/payment/providers/nowpayments/webhook")
+    path.includes("/payment/providers/nowpayments/webhook") ||
+    // Skip AI skill manifests - public read-only docs, no identity required
+    (path.includes("/ai/skills/") && path.endsWith(".md"))
   );
 }
 

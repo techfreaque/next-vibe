@@ -100,6 +100,8 @@ export const translations = {
           duration: "Duration",
           completed: "Completed",
           errorDetails: "Error Details",
+          stackTrace: "Stack Trace",
+          result: "Result",
         },
       },
     },

@@ -93,9 +93,12 @@ export const translations = {
     title: "Sync Completed",
     description: "IMAP message synchronization completed successfully",
   },
+  duration: "Duration",
   widget: {
     title: "Sync Messages",
     result: "Sync Result",
+    submit: "Start Sync",
+    submitting: "Syncing...",
     duration: "Duration",
   },
 };

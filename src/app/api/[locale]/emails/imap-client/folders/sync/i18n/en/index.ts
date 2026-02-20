@@ -84,5 +84,11 @@ export const translations = {
     title: "Sync Folders",
     result: "Sync Result",
     duration: "Duration",
+    foldersProcessed: "Folders Processed",
+    foldersAdded: "Folders Added",
+    foldersUpdated: "Folders Updated",
+    foldersDeleted: "Folders Deleted",
+    submit: "Start Sync",
+    submitting: "Syncing...",
   },
 };

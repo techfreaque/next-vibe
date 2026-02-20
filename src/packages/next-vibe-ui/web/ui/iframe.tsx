@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { forwardRef } from "react";
 
 import type { StyleType } from "../utils/style-type";
 
@@ -13,15 +14,19 @@ export type IframeProps = {
   sandbox?: string;
   loading?: "eager" | "lazy";
   srcDoc?: string;
+  onLoad?: React.ReactEventHandler<HTMLIFrameElement>;
+  style?: React.CSSProperties;
 } & StyleType;
 
-export function Iframe(props: IframeProps): React.JSX.Element {
-  // Ensure title and sandbox are provided for accessibility and security
-  const {
-    title = "",
-    sandbox = "allow-scripts allow-same-origin",
-    ...restProps
-  } = props;
+export const Iframe = forwardRef<HTMLIFrameElement, IframeProps>(
+  function Iframe(props, ref): React.JSX.Element {
+    // Ensure title and sandbox are provided for accessibility and security
+    const {
+      title = "",
+      sandbox = "allow-scripts allow-same-origin",
+      ...restProps
+    } = props;
 
-  return <iframe title={title} sandbox={sandbox} {...restProps} />;
-}
+    return <iframe ref={ref} title={title} sandbox={sandbox} {...restProps} />;
+  },
+);

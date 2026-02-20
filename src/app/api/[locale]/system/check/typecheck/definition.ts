@@ -66,7 +66,7 @@ const { POST } = createEndpoint({
         description: "app.api.system.check.typecheck.fields.path.description",
         placeholder: "app.api.system.check.typecheck.fields.path.placeholder",
         columns: 6,
-        schema: z.string().optional(),
+        schema: z.union([z.string(), z.array(z.string())]).optional(),
       }),
 
       disableFilter: requestField({

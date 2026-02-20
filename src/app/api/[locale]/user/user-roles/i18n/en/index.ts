@@ -78,6 +78,7 @@ export const translations = {
       webOff: "Web Disabled",
       mcpOn: "MCP Enabled",
       productionOff: "Production Disabled",
+      remoteSkill: "Remote Skill",
     },
   },
 };

@@ -121,7 +121,10 @@ export const translations = {
     server: "Server Settings",
     connection: "Connection Settings",
     sync: "Sync Settings",
+    cache: "Cache Settings",
     resilience: "Resilience Settings",
     monitoring: "Monitoring Settings",
+    submit: "Save Configuration",
+    submitting: "Saving...",
   },
 };

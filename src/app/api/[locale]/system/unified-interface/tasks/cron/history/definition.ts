@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -35,7 +36,12 @@ export const { GET } = createEndpoint({
     "app.api.system.unifiedInterface.tasks.cronSystem.history.get.description",
   icon: "clock",
   category: "app.api.system.unifiedInterface.tasks.category",
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [
+    UserRole.CUSTOMER,
+    UserRole.PARTNER_ADMIN,
+    UserRole.PARTNER_EMPLOYEE,
+    UserRole.ADMIN,
+  ],
   tags: ["app.api.system.unifiedInterface.tasks.type.cron"],
 
   fields: customWidgetObject({
@@ -98,7 +104,8 @@ export const { GET } = createEndpoint({
           "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.startDate.label",
         description:
           "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.startDate.description",
-        schema: z.string().optional(),
+        columns: 6,
+        schema: dateSchema.optional(),
       }),
       endDate: requestField({
         type: WidgetType.FORM_FIELD,
@@ -107,7 +114,8 @@ export const { GET } = createEndpoint({
           "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.endDate.label",
         description:
           "app.api.system.unifiedInterface.tasks.cronSystem.history.get.fields.endDate.description",
-        schema: z.string().optional(),
+        columns: 6,
+        schema: dateSchema.optional(),
       }),
       limit: requestField({
         type: WidgetType.FORM_FIELD,
@@ -154,6 +162,8 @@ export const { GET } = createEndpoint({
                 errorType: z.string(),
               })
               .nullable(),
+            errorStack: z.string().nullable(),
+            result: z.record(z.string(), z.unknown()).nullable(),
             environment: z.string().nullable(),
             createdAt: z.string(),
           }),

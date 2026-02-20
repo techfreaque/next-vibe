@@ -5,15 +5,17 @@
 
 import type { JSX } from "react";
 
+import type { CampaignTypeValue } from "@/app/api/[locale]/emails/smtp-client/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { TrackingContext } from "../../../emails/smtp-client/components/tracking_context.email";
 import type {
   EmailCampaignStage,
-  EmailJourneyVariant,
-  LeadSource,
-  LeadStatus,
+  EmailCampaignStageValues,
+  EmailJourneyVariantValues,
+  LeadSourceValues,
+  LeadStatusValues,
 } from "../../enum";
 
 // Local type definition to avoid deprecated schema.ts imports
@@ -26,17 +28,15 @@ interface LeadWithEmailType {
   website?: string | null;
   country: string;
   language: string;
-  status: (typeof LeadStatus)[keyof typeof LeadStatus];
-  source: (typeof LeadSource)[keyof typeof LeadSource] | null;
+  status: typeof LeadStatusValues;
+  source: typeof LeadSourceValues | null;
   notes?: string | null;
   convertedUserId?: string | null;
   convertedAt?: Date | null;
   signedUpAt?: Date | null;
   subscriptionConfirmedAt?: Date | null;
   currentCampaignStage?: string | null;
-  emailJourneyVariant?:
-    | (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant]
-    | null;
+  emailJourneyVariant?: typeof EmailJourneyVariantValues | null;
   emailsSent: number;
   lastEmailSentAt?: Date | null;
   unsubscribedAt?: Date | null;
@@ -61,8 +61,8 @@ export interface EmailTemplateData {
   companyEmail: string;
   campaign: {
     id: string;
-    stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
-    journeyVariant: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant];
+    stage: typeof EmailCampaignStageValues;
+    journeyVariant: typeof EmailJourneyVariantValues;
   };
 }
 
@@ -98,7 +98,7 @@ export type EmailTemplateFunction = (
  * Maps campaign stages to template functions for each journey
  */
 export type JourneyTemplateMap = {
-  [K in (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]]?: EmailTemplateFunction;
+  [K in typeof EmailCampaignStageValues]?: EmailTemplateFunction;
 } & {
   [K in typeof EmailCampaignStage.INITIAL]: EmailTemplateFunction;
 };
@@ -114,7 +114,7 @@ export interface ABTestConfig {
   endDate?: Date;
   variants: Partial<
     Record<
-      (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
+      typeof EmailJourneyVariantValues,
       {
         weight: number;
         description: string;
@@ -130,8 +130,8 @@ export interface ABTestConfig {
  * Email Performance Metrics
  */
 export interface EmailPerformanceMetrics {
-  journeyVariant: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant];
-  stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
+  journeyVariant: typeof EmailJourneyVariantValues;
+  stage: typeof EmailCampaignStageValues;
   sent: number;
   delivered: number;
   opened: number;
@@ -151,8 +151,9 @@ export interface EmailPerformanceMetrics {
  */
 export interface CampaignSchedulingOptions {
   leadId: string;
-  journeyVariant: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant];
-  stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
+  campaignType: typeof CampaignTypeValue;
+  journeyVariant: typeof EmailJourneyVariantValues;
+  stage: typeof EmailCampaignStageValues;
   scheduledAt: Date;
   metadata?: Record<string, string | number | boolean>;
 }

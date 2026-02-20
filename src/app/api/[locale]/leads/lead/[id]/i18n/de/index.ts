@@ -1,7 +1,7 @@
 export const translations = {
   get: {
-    title: "Get Lead Details",
-    description: "Retrieve detailed information about a specific lead",
+    title: "Lead-Details abrufen",
+    description: "Detaillierte Informationen zu einem bestimmten Lead laden",
     backButton: {
       label: "Zurück zu Leads",
     },
@@ -12,163 +12,164 @@ export const translations = {
       label: "Lead löschen",
     },
     id: {
-      label: "Lead ID",
-      description: "Unique identifier for the lead",
+      label: "Lead-ID",
+      description: "Eindeutige Kennung des Leads",
     },
     form: {
-      title: "Lead Details Request",
-      description: "Request parameters for retrieving lead information",
+      title: "Lead-Details Anfrage",
+      description: "Anfrageparameter für Lead-Informationen",
     },
     response: {
-      title: "Lead Information",
-      description: "Complete lead details and history",
+      title: "Lead-Informationen",
+      description: "Vollständige Lead-Details und Verlauf",
       basicInfo: {
-        title: "Basic Information",
-        description: "Core lead identification and status",
+        title: "Grundlegende Informationen",
+        description: "Kern-Lead-Identifikation und Status",
       },
       id: {
-        content: "Lead ID",
+        content: "Lead-ID",
       },
       email: {
-        content: "Email Address",
+        content: "E-Mail-Adresse",
       },
       businessName: {
-        content: "Business Name",
+        content: "Firmenname",
       },
       contactName: {
-        content: "Contact Name",
+        content: "Kontaktname",
       },
       status: {
-        content: "Lead Status",
+        content: "Lead-Status",
       },
       contactDetails: {
-        title: "Contact Details",
-        description: "Contact information and preferences",
+        title: "Kontaktdaten",
+        description: "Kontaktinformationen und Präferenzen",
       },
       phone: {
-        content: "Phone Number",
+        content: "Telefonnummer",
       },
       website: {
-        content: "Website URL",
+        content: "Website-URL",
       },
       country: {
-        content: "Country",
+        content: "Land",
       },
       language: {
-        content: "Language",
+        content: "Sprache",
       },
       campaignTracking: {
-        title: "Campaign Tracking",
-        description: "Email campaign and tracking information",
+        title: "Kampagnenverfolgung",
+        description: "E-Mail-Kampagnen- und Tracking-Informationen",
       },
       source: {
-        content: "Lead Source",
+        content: "Lead-Quelle",
       },
       currentCampaignStage: {
-        content: "Current Campaign Stage",
+        content: "Aktuelle Kampagnenphase",
       },
       emailJourneyVariant: {
-        content: "Email Journey Variant",
+        content: "E-Mail-Journey-Variante",
       },
       emailsSent: {
-        content: "Emails Sent",
+        content: "E-Mails gesendet",
       },
       lastEmailSentAt: {
-        content: "Last Email Sent",
+        content: "Letzte E-Mail gesendet",
       },
       engagement: {
-        title: "Engagement Metrics",
-        description: "Email engagement and interaction data",
+        title: "Engagement-Metriken",
+        description: "E-Mail-Engagement- und Interaktionsdaten",
       },
       emailsOpened: {
-        content: "Emails Opened",
+        content: "E-Mails geöffnet",
       },
       emailsClicked: {
-        content: "Emails Clicked",
+        content: "E-Mails geklickt",
       },
       lastEngagementAt: {
-        content: "Last Engagement",
+        content: "Letztes Engagement",
       },
       unsubscribedAt: {
-        content: "Unsubscribed At",
+        content: "Abgemeldet am",
       },
       conversion: {
-        title: "Conversion Tracking",
-        description: "Lead conversion and milestone tracking",
+        title: "Konversionsverfolgung",
+        description: "Lead-Konversion und Meilensteinverfolgung",
       },
       convertedUserId: {
-        content: "Converted User ID",
+        content: "Konvertierte Benutzer-ID",
       },
       convertedAt: {
-        content: "Converted At",
+        content: "Konvertiert am",
       },
       signedUpAt: {
-        content: "Signed Up At",
+        content: "Registriert am",
       },
       subscriptionConfirmedAt: {
-        content: "Subscription Confirmed At",
+        content: "Abonnement bestätigt am",
       },
       metadata: {
-        title: "Additional Information",
-        description: "Notes and metadata",
-        content: "Metadata",
+        title: "Zusätzliche Informationen",
+        description: "Notizen und Metadaten",
+        content: "Metadaten",
       },
       notes: {
-        content: "Notes",
+        content: "Notizen",
       },
       createdAt: {
-        content: "Created At",
+        content: "Erstellt am",
       },
       updatedAt: {
-        content: "Updated At",
+        content: "Aktualisiert am",
       },
     },
     errors: {
       validation: {
-        title: "Validation Error",
-        description: "The provided lead ID is invalid",
+        title: "Validierungsfehler",
+        description: "Die angegebene Lead-ID ist ungültig",
       },
       unauthorized: {
-        title: "Unauthorized",
-        description: "Authentication required to access lead details",
+        title: "Nicht autorisiert",
+        description:
+          "Authentifizierung erforderlich zum Zugriff auf Lead-Details",
       },
       forbidden: {
-        title: "Access Denied",
-        description: "You don't have permission to view this lead",
+        title: "Zugriff verweigert",
+        description: "Sie haben keine Berechtigung, diesen Lead anzuzeigen",
       },
       notFound: {
-        title: "Lead Not Found",
-        description: "No lead found with the provided ID",
+        title: "Lead nicht gefunden",
+        description: "Kein Lead mit der angegebenen ID gefunden",
       },
       server: {
-        title: "Server Error",
-        description: "An error occurred while retrieving lead details",
+        title: "Serverfehler",
+        description: "Beim Abrufen der Lead-Details ist ein Fehler aufgetreten",
       },
       unknown: {
-        title: "Unknown Error",
-        description: "An unexpected error occurred",
+        title: "Unbekannter Fehler",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
       },
       network: {
-        title: "Network Error",
-        description: "Unable to connect to the server",
+        title: "Netzwerkfehler",
+        description: "Verbindung zum Server nicht möglich",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
-        description: "You have unsaved changes",
+        title: "Nicht gespeicherte Änderungen",
+        description: "Sie haben nicht gespeicherte Änderungen",
       },
       conflict: {
-        title: "Data Conflict",
-        description: "The lead data has been modified",
+        title: "Datenkonflikt",
+        description: "Die Lead-Daten wurden geändert",
       },
     },
     success: {
-      title: "Success",
-      description: "Lead details retrieved successfully",
+      title: "Erfolgreich",
+      description: "Lead-Details erfolgreich geladen",
     },
   },
   patch: {
-    title: "Update Lead",
-    description: "Update lead information and status",
+    title: "Lead aktualisieren",
+    description: "Lead-Informationen und Status aktualisieren",
     backButton: {
       label: "Zurück zum Lead",
     },
@@ -180,248 +181,250 @@ export const translations = {
       loadingText: "Lead wird aktualisiert...",
     },
     id: {
-      label: "Lead ID",
-      description: "Unique identifier for the lead to update",
+      label: "Lead-ID",
+      description: "Eindeutige Kennung des zu aktualisierenden Leads",
     },
     form: {
-      title: "Update Lead",
-      description: "Modify lead information",
+      title: "Lead aktualisieren",
+      description: "Lead-Informationen bearbeiten",
     },
     updates: {
-      title: "Lead Updates",
-      description: "Fields to update",
+      title: "Lead-Aktualisierungen",
+      description: "Zu aktualisierende Felder",
     },
     basicInfo: {
-      title: "Basic Information",
-      description: "Update core lead information",
+      title: "Grundlegende Informationen",
+      description: "Kern-Lead-Informationen aktualisieren",
     },
     email: {
-      label: "Email Address",
-      description: "Lead's email address",
+      label: "E-Mail-Adresse",
+      description: "E-Mail-Adresse des Leads",
       placeholder: "email@example.com",
     },
     businessName: {
-      label: "Business Name",
-      description: "Name of the business",
-      placeholder: "Acme Corporation",
+      label: "Firmenname",
+      description: "Name des Unternehmens",
+      placeholder: "Muster GmbH",
     },
     contactName: {
-      label: "Contact Name",
-      description: "Primary contact person",
-      placeholder: "John Doe",
+      label: "Kontaktname",
+      description: "Hauptansprechpartner",
+      placeholder: "Max Mustermann",
     },
     status: {
-      label: "Lead Status",
-      description: "Current status of the lead",
-      placeholder: "Select status",
+      label: "Lead-Status",
+      description: "Aktueller Status des Leads",
+      placeholder: "Status wählen",
     },
     contactDetails: {
-      title: "Contact Details",
-      description: "Update contact information",
+      title: "Kontaktdaten",
+      description: "Kontaktinformationen aktualisieren",
     },
     phone: {
-      label: "Phone Number",
-      description: "Contact phone number",
-      placeholder: "+1234567890",
+      label: "Telefonnummer",
+      description: "Kontakttelefonnummer",
+      placeholder: "+491234567890",
     },
     website: {
       label: "Website",
-      description: "Business website URL",
-      placeholder: "https://example.com",
+      description: "Unternehmens-Website-URL",
+      placeholder: "https://example.de",
     },
     country: {
-      label: "Country",
-      description: "Business country",
-      placeholder: "Select country",
+      label: "Land",
+      description: "Land des Unternehmens",
+      placeholder: "Land wählen",
     },
     language: {
-      label: "Language",
-      description: "Preferred language",
-      placeholder: "Select language",
+      label: "Sprache",
+      description: "Bevorzugte Sprache",
+      placeholder: "Sprache wählen",
     },
     campaignManagement: {
-      title: "Campaign Management",
-      description: "Manage campaign settings",
+      title: "Kampagnenverwaltung",
+      description: "Kampagneneinstellungen verwalten",
     },
     source: {
-      label: "Lead Source",
-      description: "Origin of the lead",
-      placeholder: "Select source",
+      label: "Lead-Quelle",
+      description: "Herkunft des Leads",
+      placeholder: "Quelle wählen",
     },
     currentCampaignStage: {
-      label: "Campaign Stage",
-      description: "Current email campaign stage",
-      placeholder: "Select stage",
+      label: "Kampagnenphase",
+      description: "Aktuelle E-Mail-Kampagnenphase",
+      placeholder: "Phase wählen",
     },
     additionalDetails: {
-      title: "Additional Details",
-      description: "Notes and metadata",
+      title: "Weitere Details",
+      description: "Notizen und Metadaten",
     },
     notes: {
-      label: "Notes",
-      description: "Internal notes about the lead",
-      placeholder: "Add notes here",
+      label: "Notizen",
+      description: "Interne Notizen zum Lead",
+      placeholder: "Notizen hier eingeben",
     },
     metadata: {
-      label: "Metadata",
-      description: "Additional metadata (JSON)",
+      label: "Metadaten",
+      description: "Zusätzliche Metadaten (JSON)",
       placeholder: '{"key": "value"}',
     },
     convertedUserId: {
-      label: "Converted User ID",
-      description: "ID of the converted user account",
-      placeholder: "User ID",
+      label: "Konvertierte Benutzer-ID",
+      description: "ID des konvertierten Benutzerkontos",
+      placeholder: "Benutzer-ID",
     },
     subscriptionConfirmedAt: {
-      label: "Subscription Confirmed At",
-      description: "Date when subscription was confirmed",
-      placeholder: "Select date",
+      label: "Abonnement bestätigt am",
+      description: "Datum der Abonnementbestätigung",
+      placeholder: "Datum wählen",
     },
     response: {
-      title: "Updated Lead",
-      description: "Updated lead information",
+      title: "Aktualisierter Lead",
+      description: "Aktualisierte Lead-Informationen",
       basicInfo: {
-        title: "Basic Information",
-        description: "Updated core lead information",
+        title: "Grundlegende Informationen",
+        description: "Aktualisierte Kern-Lead-Informationen",
       },
       id: {
-        content: "Lead ID",
+        content: "Lead-ID",
       },
       email: {
-        content: "Email Address",
+        content: "E-Mail-Adresse",
       },
       businessName: {
-        content: "Business Name",
+        content: "Firmenname",
       },
       contactName: {
-        content: "Contact Name",
+        content: "Kontaktname",
       },
       status: {
-        content: "Lead Status",
+        content: "Lead-Status",
       },
       contactDetails: {
-        title: "Contact Details",
-        description: "Updated contact information",
+        title: "Kontaktdaten",
+        description: "Aktualisierte Kontaktinformationen",
       },
       phone: {
-        content: "Phone Number",
+        content: "Telefonnummer",
       },
       website: {
-        content: "Website URL",
+        content: "Website-URL",
       },
       country: {
-        content: "Country",
+        content: "Land",
       },
       language: {
-        content: "Language",
+        content: "Sprache",
       },
       campaignTracking: {
-        title: "Campaign Tracking",
-        description: "Updated campaign information",
+        title: "Kampagnenverfolgung",
+        description: "Aktualisierte Kampagneninformationen",
       },
       source: {
-        content: "Lead Source",
+        content: "Lead-Quelle",
       },
       currentCampaignStage: {
-        content: "Current Campaign Stage",
+        content: "Aktuelle Kampagnenphase",
       },
       emailJourneyVariant: {
-        content: "Email Journey Variant",
+        content: "E-Mail-Journey-Variante",
       },
       emailsSent: {
-        content: "Emails Sent",
+        content: "E-Mails gesendet",
       },
       lastEmailSentAt: {
-        content: "Last Email Sent",
+        content: "Letzte E-Mail gesendet",
       },
       engagement: {
-        title: "Engagement Metrics",
-        description: "Email engagement data",
+        title: "Engagement-Metriken",
+        description: "E-Mail-Engagement-Daten",
       },
       emailsOpened: {
-        content: "Emails Opened",
+        content: "E-Mails geöffnet",
       },
       emailsClicked: {
-        content: "Emails Clicked",
+        content: "E-Mails geklickt",
       },
       lastEngagementAt: {
-        content: "Last Engagement",
+        content: "Letztes Engagement",
       },
       unsubscribedAt: {
-        content: "Unsubscribed At",
+        content: "Abgemeldet am",
       },
       conversion: {
-        title: "Conversion Tracking",
-        description: "Conversion milestone tracking",
+        title: "Konversionsverfolgung",
+        description: "Konversionsmeilensteinverfolgung",
       },
       convertedUserId: {
-        content: "Converted User ID",
+        content: "Konvertierte Benutzer-ID",
       },
       convertedAt: {
-        content: "Converted At",
+        content: "Konvertiert am",
       },
       signedUpAt: {
-        content: "Signed Up At",
+        content: "Registriert am",
       },
       subscriptionConfirmedAt: {
-        content: "Subscription Confirmed At",
+        content: "Abonnement bestätigt am",
       },
       metadata: {
-        title: "Additional Information",
-        description: "Notes and metadata",
-        content: "Metadata",
+        title: "Zusätzliche Informationen",
+        description: "Notizen und Metadaten",
+        content: "Metadaten",
       },
       notes: {
-        content: "Notes",
+        content: "Notizen",
       },
       createdAt: {
-        content: "Created At",
+        content: "Erstellt am",
       },
       updatedAt: {
-        content: "Updated At",
+        content: "Aktualisiert am",
       },
     },
     errors: {
       validation: {
-        title: "Validation Error",
-        description: "The provided data is invalid",
+        title: "Validierungsfehler",
+        description: "Die angegebenen Daten sind ungültig",
       },
       unauthorized: {
-        title: "Unauthorized",
-        description: "Authentication required to update leads",
+        title: "Nicht autorisiert",
+        description:
+          "Authentifizierung erforderlich zum Aktualisieren von Leads",
       },
       forbidden: {
-        title: "Access Denied",
-        description: "You don't have permission to update this lead",
+        title: "Zugriff verweigert",
+        description:
+          "Sie haben keine Berechtigung, diesen Lead zu aktualisieren",
       },
       notFound: {
-        title: "Lead Not Found",
-        description: "No lead found with the provided ID",
+        title: "Lead nicht gefunden",
+        description: "Kein Lead mit der angegebenen ID gefunden",
       },
       conflict: {
-        title: "Update Conflict",
-        description: "The lead was modified by another user",
+        title: "Aktualisierungskonflikt",
+        description: "Der Lead wurde von einem anderen Benutzer geändert",
       },
       server: {
-        title: "Server Error",
-        description: "An error occurred while updating the lead",
+        title: "Serverfehler",
+        description: "Beim Aktualisieren des Leads ist ein Fehler aufgetreten",
       },
       unknown: {
-        title: "Unknown Error",
-        description: "An unexpected error occurred",
+        title: "Unbekannter Fehler",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
       },
       network: {
-        title: "Network Error",
-        description: "Unable to connect to the server",
+        title: "Netzwerkfehler",
+        description: "Verbindung zum Server nicht möglich",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
-        description: "You have unsaved changes",
+        title: "Nicht gespeicherte Änderungen",
+        description: "Sie haben nicht gespeicherte Änderungen",
       },
     },
     success: {
-      title: "Success",
-      description: "Lead updated successfully",
+      title: "Erfolgreich",
+      description: "Lead erfolgreich aktualisiert",
     },
   },
   post: {

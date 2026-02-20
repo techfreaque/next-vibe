@@ -12,6 +12,7 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { Countries } from "@/i18n/core/config";
+import type { TFunction } from "@/i18n/core/static-types";
 
 import { EmailJourneyVariant } from "../../../enum";
 import type { ABTestConfig } from "../types";
@@ -43,61 +44,55 @@ const AB_TEST_CONSTANTS = {
 } as const;
 
 /**
- * Journey Variant Metadata
+ * Journey Variant Static Metadata (non-translatable parts)
  */
-const JOURNEY_VARIANT_METADATA: Partial<
+const JOURNEY_VARIANT_STATIC_METADATA: Partial<
   Record<
     (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
     {
-      name: string;
-      description: string;
       color: string;
       icon: IconKey;
-      characteristics: readonly string[];
+      characteristicKeys: readonly string[];
     }
   >
 > = {
   [EmailJourneyVariant.UNCENSORED_CONVERT]: {
-    name: "Uncensored Convert",
-    description:
-      "Enthusiast persona sharing a genuine discovery with affiliate transparency",
     color: "#F59E0B", // Amber
     icon: "zap",
-    characteristics: [
-      "Casual, conspiratorial tone",
-      "Genuine personal story",
-      "Affiliate transparency",
-      "Anti-censorship angle",
-      "Enthusiast energy",
+    characteristicKeys: [
+      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.uncensoredConvert.characteristics.tone",
+      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.uncensoredConvert.characteristics.story",
+      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.uncensoredConvert.characteristics.transparency",
+      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.uncensoredConvert.characteristics.angle",
+      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.uncensoredConvert.characteristics.energy",
     ] as const,
   },
   [EmailJourneyVariant.SIDE_HUSTLE]: {
-    name: "Side Hustle",
-    description: "Transparent affiliate marketer sharing real weekly use cases",
     color: "#10B981", // Emerald
     icon: "trending-up",
-    characteristics: [
-      "Full affiliate disclosure upfront",
-      "Weekly use-case updates",
-      "Passive income story",
-      "Practical proof, not hype",
-      "Honest hustle energy",
+    characteristicKeys: [
+      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.sideHustle.characteristics.disclosure",
+      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.sideHustle.characteristics.updates",
+      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.sideHustle.characteristics.income",
+      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.sideHustle.characteristics.proof",
+      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.sideHustle.characteristics.energy",
     ] as const,
   },
   [EmailJourneyVariant.QUIET_RECOMMENDATION]: {
-    name: "Quiet Recommendation",
-    description: "Low-key professional passing along a tool tested for weeks",
     color: "#6B7280", // Gray
     icon: "user",
-    characteristics: [
-      "Short, high signal-to-noise",
-      "No hype, just specifics",
-      "3-week testing backstory",
-      "Honest comparison to ChatGPT",
-      "Minimal affiliate mention",
+    characteristicKeys: [
+      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.quietRecommendation.characteristics.signal",
+      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.quietRecommendation.characteristics.specifics",
+      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.quietRecommendation.characteristics.testing",
+      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.quietRecommendation.characteristics.comparison",
+      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.quietRecommendation.characteristics.affiliate",
     ] as const,
   },
 };
+
+// Keep old metadata export for backwards compat (used in external exports)
+const JOURNEY_VARIANT_METADATA = JOURNEY_VARIANT_STATIC_METADATA;
 
 /**
  * Default A/B Test Configuration
@@ -296,6 +291,7 @@ export function validateABTestConfig(config: ABTestConfig): {
  * Get A/B Test Summary (standalone function)
  */
 export function getABTestSummary(
+  t: TFunction,
   config: ABTestConfig = DEFAULT_AB_TEST_CONFIG,
 ): {
   enabled: boolean;
@@ -323,21 +319,47 @@ export function getABTestSummary(
     ]
   >;
 
+  const base =
+    "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo";
+
   return {
     enabled: config.isActive,
     totalVariants: Object.keys(config.variants).length,
-    variants: variants.map(([key, variant]) => ({
-      id: key,
-      name: variant.description,
-      weight: variant.weight,
-      metadata: JOURNEY_VARIANT_METADATA[key] ?? {
-        name: key,
-        description: variant.description,
-        color: "#6B7280",
-        icon: "user",
-        characteristics: [] as const,
-      },
-    })),
+    variants: variants.map(([key, variant]) => {
+      const staticMeta = JOURNEY_VARIANT_STATIC_METADATA[key];
+      // Map enum key to camelCase journey info key
+      const journeyKey =
+        key === EmailJourneyVariant.UNCENSORED_CONVERT
+          ? "uncensoredConvert"
+          : key === EmailJourneyVariant.SIDE_HUSTLE
+            ? "sideHustle"
+            : key === EmailJourneyVariant.QUIET_RECOMMENDATION
+              ? "quietRecommendation"
+              : null;
+
+      const name = journeyKey
+        ? t(`${base}.${journeyKey}.name`)
+        : variant.description;
+      const description = journeyKey
+        ? t(`${base}.${journeyKey}.longDescription`)
+        : variant.description;
+      const characteristics = staticMeta
+        ? staticMeta.characteristicKeys.map((k) => t(k))
+        : [];
+
+      return {
+        id: key,
+        name: variant.description,
+        weight: variant.weight,
+        metadata: {
+          name,
+          description,
+          color: staticMeta?.color ?? "#6B7280",
+          icon: staticMeta?.icon ?? "user",
+          characteristics,
+        },
+      };
+    }),
     isValid: validation.isValid,
   };
 }

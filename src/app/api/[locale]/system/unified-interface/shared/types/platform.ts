@@ -11,6 +11,8 @@ export enum Platform {
   AI = "ai",
   /** MCP (Model Context Protocol) execution */
   MCP = "mcp",
+  /** Remote skill discovery - endpoints exposed in AI skill markdown files (AGENT.md, etc.) */
+  REMOTE_SKILL = "remote-skill",
   /** tRPC API calls */
   TRPC = "trpc",
   /** Next.js page context */

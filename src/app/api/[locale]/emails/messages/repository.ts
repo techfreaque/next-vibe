@@ -19,6 +19,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { db } from "../../system/db";
 import { SortOrder } from "../imap-client/enum";
+import { MessageChannel, MessageChannelFilter } from "../messaging/enum";
 import type {
   EmailGetGETResponseOutput,
   EmailGetGETUrlVariablesOutput,
@@ -77,7 +78,7 @@ class EmailsRepositoryImpl implements EmailsRepository {
       });
 
       // Extract filters and display options from nested structure
-      const { search, status, type } = data.filters || {};
+      const { search, status, type, channel } = data.filters || {};
       const dateRange = (
         data.filters as {
           dateRange?: { dateFrom?: string; dateTo?: string } | null | undefined;
@@ -97,6 +98,26 @@ class EmailsRepositoryImpl implements EmailsRepository {
 
       // Build where conditions
       const whereConditions = [];
+
+      // Channel filter
+      if (channel && channel !== MessageChannelFilter.ANY) {
+        // Map MessageChannelFilter value to MessageChannel value
+        const channelMap: Record<string, string> = {
+          [MessageChannelFilter.EMAIL]: MessageChannel.EMAIL,
+          [MessageChannelFilter.SMS]: MessageChannel.SMS,
+          [MessageChannelFilter.WHATSAPP]: MessageChannel.WHATSAPP,
+          [MessageChannelFilter.TELEGRAM]: MessageChannel.TELEGRAM,
+        };
+        const emailChannel = channelMap[channel];
+        if (emailChannel) {
+          whereConditions.push(
+            eq(
+              emails.channel,
+              emailChannel as (typeof emails.channel)["_"]["data"],
+            ),
+          );
+        }
+      }
 
       // Status filter
       if (status && status !== EmailStatusFilter.ANY) {
@@ -193,6 +214,7 @@ class EmailsRepositoryImpl implements EmailsRepository {
           id: email.id,
           subject: email.subject,
           status: email.status,
+          channel: email.channel,
         },
         emailParties: {
           recipient: {
@@ -211,10 +233,10 @@ class EmailsRepositoryImpl implements EmailsRepository {
           externalId: email.externalId,
         },
         emailEngagement: {
-          sentAt: email.sentAt?.toISOString() || null,
-          deliveredAt: email.deliveredAt?.toISOString() || null,
-          openedAt: email.openedAt?.toISOString() || null,
-          clickedAt: email.clickedAt?.toISOString() || null,
+          sentAt: email.sentAt ?? null,
+          deliveredAt: email.deliveredAt ?? null,
+          openedAt: email.openedAt ?? null,
+          clickedAt: email.clickedAt ?? null,
         },
         technicalDetails: {
           retryCount: Number(email.retryCount || 0),
@@ -224,8 +246,8 @@ class EmailsRepositoryImpl implements EmailsRepository {
             leadId: email.leadId,
           },
           timestamps: {
-            createdAt: email.createdAt.toISOString(),
-            updatedAt: email.updatedAt.toISOString(),
+            createdAt: email.createdAt,
+            updatedAt: email.updatedAt,
           },
         },
       }));
@@ -297,19 +319,19 @@ class EmailsRepositoryImpl implements EmailsRepository {
         status: emailResult.status,
         emailProvider: emailResult.emailProvider,
         externalId: emailResult.externalId,
-        sentAt: emailResult.sentAt?.toISOString() || null,
-        deliveredAt: emailResult.deliveredAt?.toISOString() || null,
-        openedAt: emailResult.openedAt?.toISOString() || null,
-        clickedAt: emailResult.clickedAt?.toISOString() || null,
-        bouncedAt: emailResult.bouncedAt?.toISOString() || null,
-        unsubscribedAt: emailResult.unsubscribedAt?.toISOString() || null,
+        sentAt: emailResult.sentAt ?? null,
+        deliveredAt: emailResult.deliveredAt ?? null,
+        openedAt: emailResult.openedAt ?? null,
+        clickedAt: emailResult.clickedAt ?? null,
+        bouncedAt: emailResult.bouncedAt ?? null,
+        unsubscribedAt: emailResult.unsubscribedAt ?? null,
         error: emailResult.error,
         retryCount: Number(emailResult.retryCount || 0),
         userId: emailResult.userId,
         leadId: emailResult.leadId,
         metadata: emailResult.metadata || {},
-        createdAt: emailResult.createdAt.toISOString(),
-        updatedAt: emailResult.updatedAt.toISOString(),
+        createdAt: emailResult.createdAt,
+        updatedAt: emailResult.updatedAt,
       };
 
       return success({ email });

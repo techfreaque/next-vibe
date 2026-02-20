@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type {
   ErrorResponseType,
   ResponseType,
@@ -145,6 +145,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
                 syncStatus: ImapSyncStatus.SYNCED,
                 lastSyncAt: new Date(),
                 syncError: null,
+                isConnected: true,
               })
               .where(eq(imapAccounts.id, account.id));
 
@@ -165,6 +166,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
               .set({
                 syncStatus: ImapSyncStatus.ERROR,
                 syncError: accountResult.message,
+                isConnected: false,
               })
               .where(eq(imapAccounts.id, account.id));
 
@@ -190,6 +192,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
             .set({
               syncStatus: ImapSyncStatus.ERROR,
               syncError: errorMessage,
+              isConnected: false,
             })
             .where(eq(imapAccounts.id, account.id));
 
@@ -561,15 +564,21 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
         try {
           messagesProcessed++;
 
-          // Check if message exists in database
+          // Check if message exists by UID + account (more reliable than message-id)
           const [existingMessage] = await db
             .select()
             .from(emails)
-            .where(eq(emails.imapMessageId, remoteMessage.messageId))
+            .where(
+              and(
+                eq(emails.imapUid, remoteMessage.uid),
+                eq(emails.imapAccountId, data.account.id),
+                eq(emails.imapFolderId, data.folder.id),
+              ),
+            )
             .limit(1);
 
           if (existingMessage) {
-            // Update existing message
+            // Update existing message flags and body if now available
             await db
               .update(emails)
               .set({
@@ -582,6 +591,12 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
                 messageSize: remoteMessage.size,
                 hasAttachments: remoteMessage.hasAttachments,
                 attachmentCount: remoteMessage.attachmentCount,
+                ...(remoteMessage.bodyText && {
+                  bodyText: remoteMessage.bodyText,
+                }),
+                ...(remoteMessage.bodyHtml && {
+                  bodyHtml: remoteMessage.bodyHtml,
+                }),
                 syncStatus: ImapSyncStatus.SYNCED,
                 lastSyncAt: new Date(),
                 updatedAt: new Date(),

@@ -8,6 +8,7 @@ import { z } from "zod";
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
@@ -26,6 +27,7 @@ import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 import { dateSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../config";
 import { ThreadStatus, ThreadStatusDB, ThreadStatusOptions } from "../enum";
+import { ThreadsListContainer } from "./widget";
 
 /**
  * Get Threads List Endpoint (GET)
@@ -37,7 +39,12 @@ import { ThreadStatus, ThreadStatusDB, ThreadStatusOptions } from "../enum";
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "chat", "threads"],
-  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.REMOTE_SKILL,
+  ] as const,
 
   title: "app.api.agent.chat.threads.get.title" as const,
   description: "app.api.agent.chat.threads.get.description" as const,
@@ -45,16 +52,10 @@ const { GET } = createEndpoint({
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.threads" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.agent.chat.threads.get.container.title" as const,
-      description:
-        "app.api.agent.chat.threads.get.container.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: ThreadsListContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
       // === PAGINATION ===
       page: requestField({
         type: WidgetType.FORM_FIELD,
@@ -367,7 +368,7 @@ const { GET } = createEndpoint({
         },
       ),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
@@ -446,7 +447,11 @@ const { GET } = createEndpoint({
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["agent", "chat", "threads"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.REMOTE_SKILL,
+  ] as const,
 
   title: "app.api.agent.chat.threads.post.title" as const,
   description: "app.api.agent.chat.threads.post.description" as const,

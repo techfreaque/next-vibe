@@ -179,6 +179,23 @@ const { PATCH } = createEndpoint({
     },
     { request: "data&urlPathParams", response: true },
     {
+      // Navigation - back to previous screen
+      backButton: backButton({
+        label: "app.api.leads.lead.id.patch.backButton.label",
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "urlPathParams" },
+      }),
+
+      // Submit button
+      submitButton: submitButton({
+        label: "app.api.leads.lead.id.patch.submitButton.label",
+        loadingText: "app.api.leads.lead.id.patch.submitButton.loadingText",
+        icon: "save",
+        variant: "default",
+        usage: { request: "urlPathParams" },
+      }),
+
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField({
         type: WidgetType.FORM_FIELD,
@@ -230,7 +247,10 @@ const { PATCH } = createEndpoint({
                   "app.api.leads.lead.id.patch.businessName.placeholder",
                 columns: 6,
 
-                schema: z.string().min(1).max(255).optional(),
+                schema: z
+                  .union([z.string().min(1).max(255), z.literal("")])
+                  .optional()
+                  .transform((v) => (v === "" ? undefined : v)),
               }),
               contactName: requestField({
                 type: WidgetType.FORM_FIELD,
@@ -400,7 +420,11 @@ const { PATCH } = createEndpoint({
                   "app.api.leads.lead.id.patch.convertedUserId.placeholder",
                 columns: 12,
 
-                schema: z.uuid().nullable().optional(),
+                schema: z
+                  .union([z.uuid(), z.literal("")])
+                  .nullable()
+                  .optional()
+                  .transform((v) => (v === "" ? undefined : v)),
               }),
               subscriptionConfirmedAt: requestField({
                 type: WidgetType.FORM_FIELD,

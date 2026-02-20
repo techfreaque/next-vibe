@@ -3,6 +3,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   campaignStarterConfig: campaignStarterConfigTranslations,
+  task: {
+    description:
+      "Uruchamia kampanie dla nowych leadów, przenosząc je do statusu OCZEKUJĄCE",
+  },
   errors: {
     server: {
       title: "Błąd serwera",

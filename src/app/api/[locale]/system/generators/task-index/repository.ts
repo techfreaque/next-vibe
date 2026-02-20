@@ -70,11 +70,8 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
       logger.debug("Discovering task runner files");
       const taskRunnerFiles = findFilesRecursively(startDir, "task-runner.ts");
 
-      logger.debug("Discovering side task configs");
-      const sideTaskFiles = await this.discoverSideTaskConfigs(startDir);
-
       logger.debug(
-        `Found ${taskFiles.length} task.ts files, ${taskRunnerFiles.length} task-runner.ts files, and ${sideTaskFiles.length} side-task config files`,
+        `Found ${taskFiles.length} task.ts files, ${taskRunnerFiles.length} task-runner.ts files`,
       );
 
       // Validate files
@@ -98,7 +95,6 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
       const content = this.generateContent(
         taskFiles,
         taskRunnerFiles,
-        sideTaskFiles,
         outputFile,
       );
 
@@ -137,30 +133,6 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
         },
       });
     }
-  }
-
-  /**
-   * Discover side task configuration files
-   */
-  private async discoverSideTaskConfigs(startDir: string): Promise<string[]> {
-    const candidateFiles = findFilesRecursively(startDir, "side-tasks.ts");
-    const sideTaskFiles: string[] = [];
-
-    for (const file of candidateFiles) {
-      try {
-        const content = await readFile(file, "utf-8");
-        if (
-          content.includes("export const sideTaskConfigs") ||
-          content.includes("export { sideTaskConfigs }")
-        ) {
-          sideTaskFiles.push(file);
-        }
-      } catch {
-        continue;
-      }
-    }
-
-    return sideTaskFiles;
   }
 
   /**
@@ -241,7 +213,6 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
   private generateContent(
     taskFiles: string[],
     taskRunnerFiles: string[],
-    sideTaskFiles: string[],
     outputFile: string,
   ): string {
     const imports: string[] = [];
@@ -270,16 +241,6 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
       moduleIndex++;
     }
 
-    // Process side-task configuration files
-    for (const sideTaskFile of sideTaskFiles) {
-      const relativePath = getRelativeImportPath(sideTaskFile, outputFile);
-      imports.push(
-        `import { sideTaskConfigs as sideTaskModule${moduleIndex} } from "${relativePath}";`,
-      );
-      taskExports.push(`  ...sideTaskModule${moduleIndex},`);
-      moduleIndex++;
-    }
-
     const header = generateFileHeader(
       "AUTO-GENERATED TASK INDEX",
       "Task Index Generator",
@@ -287,7 +248,6 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
         Implements: "spec.md unified task registry requirements",
         "Task files": taskFiles.length,
         "Task runner files": taskRunnerFiles.length,
-        "Side task config files": sideTaskFiles.length,
       },
     );
 
@@ -299,9 +259,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
 import type {
   Task,
   TaskRegistry,
-  TaskRunnerManager,
-} from "../unified-interface/tasks/types/repository";
-import { UnifiedTaskRunnerRepositoryImpl } from "../unified-interface/tasks/unified-runner/repository";
+ } from "../unified-interface/tasks/unified-runner/types";
 
 ${imports.join("\n")}
 
@@ -312,9 +270,6 @@ ${taskRunnerExports.join("\n")}
 
 const cronTasks = allTasks.filter(
   (task): task is Task & { type: "cron" } => task.type === "cron",
-);
-const sideTasks = allTasks.filter(
-  (task): task is Task & { type: "side" } => task.type === "side",
 );
 const taskRunners = allTasks.filter(
   (task): task is Task & { type: "task-runner" } => task.type === "task-runner",
@@ -339,28 +294,21 @@ const tasksByName: Record<string, Task> = allTasks.reduce<Record<string, Task>>(
   {},
 );
 
-// Create single unified task runner instance as per spec.md
-const taskRunner: TaskRunnerManager = new UnifiedTaskRunnerRepositoryImpl();
-
 export const taskRegistry: TaskRegistry = {
   cronTasks,
-  sideTasks,
   taskRunners,
   allTasks,
   tasksByCategory,
   tasksByName,
-  taskRunner, // Single unified task runner instance
-};
+ };
 
 export {
   allTasks,
   cronTasks,
-  sideTasks,
-  taskRunner,
   taskRunners,
   tasksByCategory,
   tasksByName,
-};
+ };
 export default allTasks;
 `;
   }

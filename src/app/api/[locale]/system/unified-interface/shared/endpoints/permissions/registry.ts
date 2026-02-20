@@ -138,6 +138,18 @@ class PermissionsRegistry implements IPermissionsRegistry {
         }
         break;
 
+      case Platform.REMOTE_SKILL:
+        // REMOTE_SKILL uses opt-in model: only endpoints with REMOTE_SKILL marker are accessible
+        // These endpoints appear in AI-ready skill markdown files (AGENT.md, PUBLIC_USER_SKILL.md, etc.)
+        if (!platformMarkers.includes(PlatformMarker.REMOTE_SKILL)) {
+          return {
+            allowed: false,
+            reason: `Endpoint is not accessible via ${Platform.REMOTE_SKILL} platform (requires REMOTE_SKILL marker)`,
+            blockedByRole: PlatformMarker.REMOTE_SKILL,
+          };
+        }
+        break;
+
       case Platform.CLI_PACKAGE:
         // CLI_PACKAGE can only access endpoints with CLI_AUTH_BYPASS marker
         // This restricts npm package users to unauthenticated endpoints only
@@ -184,10 +196,11 @@ class PermissionsRegistry implements IPermissionsRegistry {
           };
         }
         break;
-      default:
+      default: {
         const _exhaustiveCheck: never = platform;
         void _exhaustiveCheck;
         break;
+      }
     }
 
     return { allowed: true };
@@ -244,94 +257,6 @@ class PermissionsRegistry implements IPermissionsRegistry {
   }
 
   /**
-   * Full access check combining platform and user role checks (PRIVATE - used internally)
-   */
-  private async checkFullAccess(
-    allowedRoles: readonly UserRoleValue[],
-    platform: Platform | string,
-    user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
-    userRoles: (typeof UserPermissionRoleValue)[],
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<true>> {
-    // Separate concerns: filter platform markers and permission roles
-    const platformMarkers = filterPlatformMarkers(allowedRoles);
-    const permissionRoles = filterUserPermissionRoles(allowedRoles);
-
-    logger.debug("Access check - separated concerns", {
-      platformMarkers,
-      permissionRoles,
-      platform,
-    });
-
-    // 1. Check platform access first
-    const platformAccess = this.checkPlatformAccess(
-      allowedRoles,
-      platform as Platform,
-    );
-    if (!platformAccess.allowed) {
-      logger.warn("Platform access denied", {
-        platform,
-        reason: platformAccess.reason,
-        blockedByRole: platformAccess.blockedByRole,
-      });
-
-      return {
-        success: false,
-        message:
-          "app.api.system.unifiedInterface.shared.permissions.errors.platformAccessDenied",
-        errorType: ErrorResponseTypes.FORBIDDEN,
-        messageParams: {
-          platform: String(platform),
-          reason: platformAccess.reason || "Platform not allowed",
-        },
-      };
-    }
-
-    // 2. Check if CLI auth bypass is allowed (skip role check if true)
-    if (this.allowsCliAuthBypass(platformMarkers)) {
-      logger.debug("CLI auth bypass enabled for endpoint", {
-        userId: user.isPublic ? "public" : user.id,
-        platformMarkers,
-      });
-      return { success: true, data: true };
-    }
-
-    // 3. Check user role permissions
-    const roleAccess = this.checkUserRoles(user, permissionRoles, userRoles);
-    if (!roleAccess.allowed) {
-      logger.warn("User role access denied", {
-        userId: user.isPublic ? "public" : user.id,
-        reason: roleAccess.reason,
-        userRoles: roleAccess.userRoles
-          ? (roleAccess.userRoles as string[]).join(", ")
-          : undefined,
-        requiredRoles: roleAccess.requiredRoles
-          ? (roleAccess.requiredRoles as string[]).join(", ")
-          : undefined,
-      });
-
-      const { t } = simpleT(locale);
-      return {
-        success: false,
-        message:
-          "app.api.system.unifiedInterface.shared.permissions.errors.insufficientRoles",
-        errorType: ErrorResponseTypes.FORBIDDEN,
-        messageParams: {
-          userRoles: roleAccess.userRoles?.length
-            ? roleAccess.userRoles.map((role) => t(role)).join(", ")
-            : "none",
-          requiredRoles: roleAccess.requiredRoles
-            ? roleAccess.requiredRoles.map((role) => t(role)).join(", ")
-            : "",
-        },
-      };
-    }
-
-    return { success: true, data: true };
-  }
-
-  /**
    * Validate endpoint access - consolidated platform and permission checking
    * Returns ResponseType with detailed error information
    * Used by handler.ts and loader.ts for consistent access validation
@@ -353,6 +278,64 @@ class PermissionsRegistry implements IPermissionsRegistry {
           error: "Endpoint allowedRoles is not properly configured",
         },
       };
+    }
+
+    // In local mode, determine effective roles for this endpoint.
+    // If allowedLocalModeRoles is explicitly set, use it as an override.
+    // Otherwise fall back to allowedRoles but strip UserRole.PUBLIC — except for
+    // login and password-reset endpoints which remain publicly accessible.
+    if (envClient.NEXT_PUBLIC_LOCAL_MODE) {
+      let localModeRoles: readonly UserRoleValue[];
+
+      if (endpoint.allowedLocalModeRoles !== undefined) {
+        // Explicit override — use as-is (empty array means nobody is allowed)
+        localModeRoles = endpoint.allowedLocalModeRoles;
+      } else {
+        // Fall back to allowedRoles, stripping PUBLIC unless this is a login/reset-password endpoint
+        const isPublicAuthEndpoint = this.isPublicAuthEndpoint(endpoint.path);
+        localModeRoles = isPublicAuthEndpoint
+          ? endpoint.allowedRoles
+          : endpoint.allowedRoles.filter((role) => role !== UserRole.PUBLIC);
+      }
+
+      // Also enforce platform access (CLI_OFF, WEB_OFF, etc.) in local mode
+      const platformAccess = this.checkPlatformAccess(localModeRoles, platform);
+      if (!platformAccess.allowed) {
+        return {
+          success: false,
+          message:
+            "app.api.system.unifiedInterface.shared.permissions.errors.platformAccessDenied",
+          errorType: ErrorResponseTypes.FORBIDDEN,
+          messageParams: {
+            platform: String(platform),
+            reason: platformAccess.reason || "Platform not allowed",
+          },
+        };
+      }
+
+      // Check user permissions against effective local mode roles
+      const hasPermission = this.hasEndpointPermissionForRoles(
+        localModeRoles,
+        user,
+      );
+      if (!hasPermission) {
+        const { t } = simpleT(locale);
+        return {
+          success: false,
+          message:
+            "app.api.system.unifiedInterface.shared.permissions.errors.insufficientRoles",
+          errorType: ErrorResponseTypes.FORBIDDEN,
+          messageParams: {
+            userId: user.isPublic ? "public" : user.id,
+            requiredRoles: localModeRoles.map((role) => t(role)).join(", "),
+            userRoles: user.roles?.length
+              ? user.roles.map((role) => t(role)).join(", ")
+              : "none",
+          },
+        };
+      }
+
+      return { success: true, data: true };
     }
 
     // 1. Check platform access first
@@ -398,6 +381,56 @@ class PermissionsRegistry implements IPermissionsRegistry {
       success: true,
       data: true,
     };
+  }
+
+  /**
+   * Returns true for login and password-reset endpoints that must remain
+   * publicly accessible even in local mode (no-signup, admin-managed users).
+   */
+  private isPublicAuthEndpoint(path: readonly string[]): boolean {
+    // Paths: ["user","public","login"], ["user","public","reset-password","request"],
+    //        ["user","public","reset-password","confirm"], ["user","public","reset-password","validate"]
+    if (path.length < 3) {
+      return false;
+    }
+    if (path[0] !== "user" || path[1] !== "public") {
+      return false;
+    }
+    if (path[2] === "login") {
+      return true;
+    }
+    if (path[2] === "reset-password") {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Check if user has permission given an explicit roles array (used for local mode).
+   * Reuses the same role-matching logic as hasEndpointPermission but against a supplied list.
+   */
+  private hasEndpointPermissionForRoles(
+    roles: readonly UserRoleValue[],
+    user: JwtPayloadType,
+  ): boolean {
+    // Check for CLI auth bypass - if enabled, allow access without role check
+    const platformMarkers = filterPlatformMarkers(roles);
+    if (this.allowsCliAuthBypass(platformMarkers)) {
+      return true;
+    }
+
+    const permissionRoles = filterUserPermissionRoles(roles);
+    if (permissionRoles.length === 0) {
+      return true;
+    }
+    if (permissionRoles.includes(UserPermissionRole.PUBLIC)) {
+      return true;
+    }
+    if (user.isPublic) {
+      return false;
+    }
+    const userRoles: readonly UserRoleValue[] = user.roles;
+    return roles.some((r) => userRoles.includes(r));
   }
 
   /**
@@ -573,6 +606,9 @@ class PermissionsRegistry implements IPermissionsRegistry {
     }
     if (!endpoint.allowedRoles.includes(UserRole.AI_TOOL_OFF)) {
       platforms.push(Platform.AI);
+    }
+    if (endpoint.allowedRoles.includes(PlatformMarker.REMOTE_SKILL)) {
+      platforms.push(Platform.REMOTE_SKILL);
     }
     if (!endpoint.allowedRoles.includes(UserRole.WEB_OFF)) {
       // WEB_OFF disables all web platforms (TRPC, NEXT_PAGE, NEXT_API)

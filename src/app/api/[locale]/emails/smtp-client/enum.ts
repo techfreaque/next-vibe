@@ -153,6 +153,9 @@ export const {
 } = createEnumOptions({
   LEAD_CAMPAIGN: "app.api.emails.enums.smtpCampaignType.leadCampaign",
   NEWSLETTER: "app.api.emails.enums.smtpCampaignType.newsletter",
+  SIGNUP_NURTURE: "app.api.emails.enums.smtpCampaignType.signupNurture",
+  RETENTION: "app.api.emails.enums.smtpCampaignType.retention",
+  WINBACK: "app.api.emails.enums.smtpCampaignType.winback",
   TRANSACTIONAL: "app.api.emails.enums.smtpCampaignType.transactional",
   NOTIFICATION: "app.api.emails.enums.smtpCampaignType.notification",
   SYSTEM: "app.api.emails.enums.smtpCampaignType.system",
@@ -170,6 +173,9 @@ export const {
   ANY: "app.api.emails.enums.smtpCampaignTypeFilter.any",
   LEAD_CAMPAIGN: "app.api.emails.enums.smtpCampaignType.leadCampaign",
   NEWSLETTER: "app.api.emails.enums.smtpCampaignType.newsletter",
+  SIGNUP_NURTURE: "app.api.emails.enums.smtpCampaignType.signupNurture",
+  RETENTION: "app.api.emails.enums.smtpCampaignType.retention",
+  WINBACK: "app.api.emails.enums.smtpCampaignType.winback",
   TRANSACTIONAL: "app.api.emails.enums.smtpCampaignType.transactional",
   NOTIFICATION: "app.api.emails.enums.smtpCampaignType.notification",
   SYSTEM: "app.api.emails.enums.smtpCampaignType.system",
@@ -227,6 +233,12 @@ export function mapCampaignTypeFilter(
       return CampaignType.LEAD_CAMPAIGN;
     case CampaignTypeFilter.NEWSLETTER:
       return CampaignType.NEWSLETTER;
+    case CampaignTypeFilter.SIGNUP_NURTURE:
+      return CampaignType.SIGNUP_NURTURE;
+    case CampaignTypeFilter.RETENTION:
+      return CampaignType.RETENTION;
+    case CampaignTypeFilter.WINBACK:
+      return CampaignType.WINBACK;
     case CampaignTypeFilter.TRANSACTIONAL:
       return CampaignType.TRANSACTIONAL;
     case CampaignTypeFilter.NOTIFICATION:
@@ -309,6 +321,9 @@ export const SmtpAccountSortFieldDB = [
 export const CampaignTypeDB = [
   CampaignType.LEAD_CAMPAIGN,
   CampaignType.NEWSLETTER,
+  CampaignType.SIGNUP_NURTURE,
+  CampaignType.RETENTION,
+  CampaignType.WINBACK,
   CampaignType.TRANSACTIONAL,
   CampaignType.NOTIFICATION,
   CampaignType.SYSTEM,
@@ -318,6 +333,9 @@ export const CampaignTypeFilterDB = [
   CampaignTypeFilter.ANY,
   CampaignTypeFilter.LEAD_CAMPAIGN,
   CampaignTypeFilter.NEWSLETTER,
+  CampaignTypeFilter.SIGNUP_NURTURE,
+  CampaignTypeFilter.RETENTION,
+  CampaignTypeFilter.WINBACK,
   CampaignTypeFilter.TRANSACTIONAL,
   CampaignTypeFilter.NOTIFICATION,
   CampaignTypeFilter.SYSTEM,

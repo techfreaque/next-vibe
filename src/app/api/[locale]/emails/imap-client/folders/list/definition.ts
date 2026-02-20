@@ -83,7 +83,10 @@ const { GET } = createEndpoint({
           "app.api.emails.imapClient.folders.list.accountId.description",
         placeholder:
           "app.api.emails.imapClient.folders.list.accountId.placeholder",
-        schema: z.uuid(),
+        schema: z.preprocess(
+          (v) => (v === "" ? undefined : v),
+          z.uuid().optional(),
+        ),
       }),
 
       search: requestField({
@@ -123,28 +126,26 @@ const { GET } = createEndpoint({
 
       sortBy: requestField({
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.MULTISELECT,
+        fieldType: FieldDataType.SELECT,
         label: "app.api.emails.imapClient.folders.list.sortBy.label",
         description:
           "app.api.emails.imapClient.folders.list.sortBy.description",
         placeholder:
           "app.api.emails.imapClient.folders.list.sortBy.placeholder",
         options: ImapFolderSortFieldOptions,
-        schema: z
-          .array(z.enum(ImapFolderSortField))
-          .default([ImapFolderSortField.NAME]),
+        schema: z.enum(ImapFolderSortField).default(ImapFolderSortField.NAME),
       }),
 
       sortOrder: requestField({
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.MULTISELECT,
+        fieldType: FieldDataType.SELECT,
         label: "app.api.emails.imapClient.folders.list.sortOrder.label",
         description:
           "app.api.emails.imapClient.folders.list.sortOrder.description",
         placeholder:
           "app.api.emails.imapClient.folders.list.sortOrder.placeholder",
         options: SortOrderOptions,
-        schema: z.array(z.enum(SortOrder)).default([SortOrder.ASC]),
+        schema: z.enum(SortOrder).default(SortOrder.ASC),
       }),
 
       // === RESPONSE FIELDS ===

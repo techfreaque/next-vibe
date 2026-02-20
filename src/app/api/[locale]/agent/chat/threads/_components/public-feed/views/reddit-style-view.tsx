@@ -118,8 +118,8 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
       const firstMessage = (
         messages.filter((msg) => msg.role === "user") || []
       ).toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime())[0];
-      const authorName = firstMessage?.authorName
-        ? `u/${firstMessage.authorName}`
+      const authorName = firstMessage?.authorId
+        ? `u/${firstMessage.authorId.slice(-8)}`
         : "u/anonymous";
 
       return {

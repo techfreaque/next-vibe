@@ -579,8 +579,8 @@ export class ThreadsRepository {
             canModerate: canModerateFlag,
             canDelete: canDeleteFlag,
             canManagePermissions: canManagePermsFlag,
-            createdAt: thread.createdAt.toISOString(),
-            updatedAt: thread.updatedAt.toISOString(),
+            createdAt: thread.createdAt,
+            updatedAt: thread.updatedAt,
           };
         }),
       );
@@ -753,8 +753,8 @@ export class ThreadsRepository {
         rootFolderId: dbThread.rootFolderId, // Already typed as DefaultFolderId from DB schema
         subFolderId: dbThread.folderId,
         status: dbThread.status,
-        createdAt: dbThread.createdAt.toISOString(),
-        updatedAt: dbThread.updatedAt.toISOString(),
+        createdAt: dbThread.createdAt,
+        updatedAt: dbThread.updatedAt,
       };
 
       logger.debug("Thread created successfully", { threadId: thread.id });

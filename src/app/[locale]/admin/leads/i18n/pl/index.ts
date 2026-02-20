@@ -250,6 +250,8 @@ export const translations: typeof enTranslations = {
         subject: "Temat",
         email_preview: "Podgląd E-maila",
         preview_title: "Podgląd E-maila",
+        stage_of: "z",
+        stages: "etapów",
         preview: {
           actions: {
             title: "Akcje E-mailowe",

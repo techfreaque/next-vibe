@@ -10,8 +10,6 @@ import {
   backButton,
   customWidgetObject,
   objectField,
-  objectOptionalField,
-  requestField,
   responseArrayField,
   responseField,
   widgetField,
@@ -35,22 +33,19 @@ import { paginationField } from "../../system/unified-interface/unified-ui/widge
 import { UserRole } from "../../user/user-roles/enum";
 import {
   EmailCampaignStage,
-  EmailCampaignStageFilter,
-  EmailCampaignStageFilterOptions,
   EmailCampaignStageOptions,
   LeadSortField,
-  LeadSortFieldOptions,
   LeadSource,
-  LeadSourceFilter,
-  LeadSourceFilterOptions,
   LeadSourceOptions,
   LeadStatus,
-  LeadStatusFilter,
-  LeadStatusFilterOptions,
   LeadStatusOptions,
   SortOrder,
-  SortOrderOptions,
 } from "../enum";
+import {
+  leadsLocationFiltersContainer,
+  leadsSortingOptionsContainer,
+  leadsStatusFiltersContainer,
+} from "../shared-filter-fields";
 import { LeadsListContainer } from "./widget";
 
 /**
@@ -111,137 +106,13 @@ const { GET } = createEndpoint({
       }),
 
       // === STATUS & CAMPAIGN FILTERS (with Search) ===
-      statusFilters: objectOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.list.get.statusFilters.title" as const,
-          description:
-            "app.api.leads.list.get.statusFilters.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 6,
-          order: 1,
-          showSubmitButton: false,
-        },
-        { request: "data" },
-        {
-          search: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "app.api.leads.list.get.search.label" as const,
-            description: "app.api.leads.list.get.search.description" as const,
-            placeholder: "app.api.leads.list.get.search.placeholder" as const,
-            columns: 6,
-            schema: z.string().optional(),
-          }),
-          status: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.MULTISELECT,
-            label: "app.api.leads.list.get.status.label" as const,
-            description: "app.api.leads.list.get.status.description" as const,
-            placeholder: "app.api.leads.list.get.status.placeholder" as const,
-            options: LeadStatusFilterOptions,
-            columns: 3,
-            schema: z.array(z.enum(LeadStatusFilter)).optional(),
-          }),
-          currentCampaignStage: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.MULTISELECT,
-            label: "app.api.leads.list.get.currentCampaignStage.label" as const,
-            description:
-              "app.api.leads.list.get.currentCampaignStage.description" as const,
-            placeholder:
-              "app.api.leads.list.get.currentCampaignStage.placeholder" as const,
-            options: EmailCampaignStageFilterOptions,
-            columns: 3,
-            schema: z.array(z.enum(EmailCampaignStageFilter)).optional(),
-          }),
-          source: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.MULTISELECT,
-            label: "app.api.leads.list.get.source.label" as const,
-            description: "app.api.leads.list.get.source.description" as const,
-            placeholder: "app.api.leads.list.get.source.placeholder" as const,
-            options: LeadSourceFilterOptions,
-            columns: 6,
-            schema: z.array(z.enum(LeadSourceFilter)).optional(),
-          }),
-        },
-      ),
+      statusFilters: leadsStatusFiltersContainer,
 
       // === LOCATION FILTERS ===
-      locationFilters: objectOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.list.get.locationFilters.title" as const,
-          description:
-            "app.api.leads.list.get.locationFilters.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-          order: 2,
-          showSubmitButton: false,
-        },
-        { request: "data" },
-        {
-          country: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.MULTISELECT,
-            label: "app.api.leads.list.get.country.label" as const,
-            description: "app.api.leads.list.get.country.description" as const,
-            placeholder: "app.api.leads.list.get.country.placeholder" as const,
-            options: CountriesOptions,
-            schema: z.array(z.enum(Countries)).optional(),
-          }),
-          language: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.MULTISELECT,
-            label: "app.api.leads.list.get.language.label" as const,
-            description: "app.api.leads.list.get.language.description" as const,
-            placeholder: "app.api.leads.list.get.language.placeholder" as const,
-            options: LanguagesOptions,
-            schema: z.array(z.enum(Languages)).optional(),
-          }),
-        },
-      ),
+      locationFilters: leadsLocationFiltersContainer,
 
       // === SORTING OPTIONS ===
-      sortingOptions: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.list.get.sortingOptions.title" as const,
-          description:
-            "app.api.leads.list.get.sortingOptions.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-          order: 3,
-          showSubmitButton: false,
-        },
-        { request: "data" },
-        {
-          sortBy: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "app.api.leads.list.get.sortBy.label" as const,
-            description: "app.api.leads.list.get.sortBy.description" as const,
-            placeholder: "app.api.leads.list.get.sortBy.placeholder" as const,
-            options: LeadSortFieldOptions,
-            schema: z
-              .enum(LeadSortField)
-              .optional()
-              .default(LeadSortField.CREATED_AT),
-          }),
-          sortOrder: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "app.api.leads.list.get.sortOrder.label" as const,
-            description:
-              "app.api.leads.list.get.sortOrder.description" as const,
-            placeholder:
-              "app.api.leads.list.get.sortOrder.placeholder" as const,
-            options: SortOrderOptions,
-            schema: z.enum(SortOrder).optional().default(SortOrder.DESC),
-          }),
-        },
-      ),
+      sortingOptions: leadsSortingOptionsContainer,
 
       // === FORM ALERT (shows validation and API errors) ===
       formAlert: widgetField({

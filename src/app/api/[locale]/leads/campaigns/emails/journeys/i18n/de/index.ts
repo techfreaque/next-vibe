@@ -22,15 +22,42 @@ export const translations: typeof enTranslations = {
           name: "Unzensierter Konverter",
           description:
             "Ein Begeisterter teilt seine Entdeckung von unbottled.ai",
+          longDescription:
+            "Begeisterter teilt eine echte Entdeckung mit Affiliate-Transparenz",
+          characteristics: {
+            tone: "Lockerer, verschwörerischer Ton",
+            story: "Echte persönliche Geschichte",
+            transparency: "Affiliate-Transparenz",
+            angle: "Anti-Zensur-Winkel",
+            energy: "Begeisterte Energie",
+          },
         },
         sideHustle: {
           name: "Nebenverdienst",
           description:
             "Ein transparenter Affiliate teilt echte Anwendungsfälle",
+          longDescription:
+            "Transparenter Affiliate-Vermarkter teilt echte wöchentliche Anwendungsfälle",
+          characteristics: {
+            disclosure: "Vollständige Affiliate-Offenlegung von Anfang an",
+            updates: "Wöchentliche Anwendungsfalls-Updates",
+            income: "Passives Einkommens-Story",
+            proof: "Praktischer Beweis, kein Hype",
+            energy: "Ehrliche Hustle-Energie",
+          },
         },
         quietRecommendation: {
           name: "Stille Empfehlung",
           description: "Ein sachlicher Profi gibt ein getestetes Tool weiter",
+          longDescription:
+            "Zurückhaltender Profi gibt ein wochenlang getestetes Tool weiter",
+          characteristics: {
+            signal: "Kurz, hohes Signal-Rausch-Verhältnis",
+            specifics: "Kein Hype, nur Fakten",
+            testing: "3-Wochen-Test-Geschichte",
+            comparison: "Ehrlicher Vergleich mit ChatGPT",
+            affiliate: "Minimale Affiliate-Erwähnung",
+          },
         },
       },
     },

@@ -37,7 +37,7 @@ import { DEFAULT_TTS_VOICE, TtsVoice } from "../text-to-speech/enum";
 
 /**
  * AI Stream Endpoint (POST)
- * Streams AI responses using OpenAI GPT-4o model
+ * Streams AI responses
  */
 const { POST } = createEndpoint({
   method: Methods.POST,

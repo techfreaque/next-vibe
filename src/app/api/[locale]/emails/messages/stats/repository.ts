@@ -99,8 +99,8 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
     const status = (data.status ??
       EmailStatusFilter.ANY) as (typeof EmailStatusFilter)[keyof typeof EmailStatusFilter];
     const search = data.search;
-    const dateFrom = data.dateFrom;
-    const dateTo = data.dateTo;
+    const dateFrom = data.dateFrom ? new Date(data.dateFrom) : undefined;
+    const dateTo = data.dateTo ? new Date(data.dateTo) : undefined;
 
     try {
       // Build date range for filtering
@@ -383,7 +383,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
     field: string,
   ): HistoricalDataPointType[] {
     return results.map((item) => ({
-      date: item.period,
+      date: new Date(item.period),
       value: (item[field] as number) || 0,
       label: undefined,
     }));
@@ -508,7 +508,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           name: "app.api.emails.messages.stats.get.response.metrics.deliveryRate" as const satisfies TranslationKey,
           data: historicalResults.map(
             (item): HistoricalDataPointType => ({
-              date: item.period,
+              date: new Date(item.period),
               value:
                 item.sentEmails > 0
                   ? item.deliveredEmails / item.sentEmails
@@ -523,7 +523,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           name: "app.api.emails.messages.stats.get.response.metrics.openRate" as const satisfies TranslationKey,
           data: historicalResults.map(
             (item): HistoricalDataPointType => ({
-              date: item.period,
+              date: new Date(item.period),
               value:
                 item.deliveredEmails > 0
                   ? item.openedEmails / item.deliveredEmails
@@ -538,7 +538,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           name: "app.api.emails.messages.stats.get.response.metrics.clickRate" as const satisfies TranslationKey,
           data: historicalResults.map(
             (item): HistoricalDataPointType => ({
-              date: item.period,
+              date: new Date(item.period),
               value:
                 item.openedEmails > 0
                   ? item.clickedEmails / item.openedEmails
@@ -553,7 +553,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           name: "app.api.emails.messages.stats.get.response.metrics.bounceRate" as const satisfies TranslationKey,
           data: historicalResults.map(
             (item): HistoricalDataPointType => ({
-              date: item.period,
+              date: new Date(item.period),
               value:
                 item.sentEmails > 0 ? item.bouncedEmails / item.sentEmails : 0,
               label: undefined,
@@ -566,7 +566,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           name: "app.api.emails.messages.stats.get.response.metrics.failureRate" as const satisfies TranslationKey,
           data: historicalResults.map(
             (item): HistoricalDataPointType => ({
-              date: item.period,
+              date: new Date(item.period),
               value:
                 item.totalEmails > 0 ? item.failedEmails / item.totalEmails : 0,
               label: undefined,

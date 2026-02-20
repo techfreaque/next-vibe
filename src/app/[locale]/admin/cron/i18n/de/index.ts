@@ -103,6 +103,8 @@ export const translations: typeof enTranslations = {
           duration: "Dauer",
           completed: "Abgeschlossen",
           errorDetails: "Fehlerdetails",
+          stackTrace: "Stack-Trace",
+          result: "Ergebnis",
         },
       },
     },

@@ -101,6 +101,8 @@ export const translations: typeof enTranslations = {
           duration: "Czas trwania",
           completed: "Zakończono",
           errorDetails: "Szczegóły błędu",
+          stackTrace: "Stos wywołań",
+          result: "Wynik",
         },
       },
     },

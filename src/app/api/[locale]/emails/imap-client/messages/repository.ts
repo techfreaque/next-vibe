@@ -19,7 +19,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import { imapAccounts } from "../db";
+import { imapAccounts, imapFolders } from "../db";
 import {
   ImapAccountFilter,
   ImapMessageSortField,
@@ -47,6 +47,7 @@ interface ImapMessageQueryType {
   sortOrder?: string;
   dateFrom?: string;
   dateTo?: string;
+  threadId?: string;
 }
 
 interface ImapMessageSyncType {
@@ -105,7 +106,10 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
   /**
    * Format IMAP message for response
    */
-  private formatMessageResponse(message: Email): ImapMessageResponseType {
+  private formatMessageResponse(
+    message: Email,
+    folderName = "",
+  ): ImapMessageResponseType {
     return {
       id: message.id,
       subject: message.subject || "",
@@ -118,8 +122,8 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
       isRead: message.isRead || false,
       isFlagged: message.isFlagged || false,
       hasAttachments: message.hasAttachments || false,
-      folderName: "",
-      accountId: message.imapAccountId || "",
+      folderName,
+      accountId: message.imapAccountId ?? undefined,
       size: message.messageSize ?? undefined,
       imapMessageId: message.imapMessageId ?? undefined,
       imapUid: message.imapUid ?? undefined,
@@ -168,6 +172,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         search,
         dateFrom,
         dateTo,
+        threadId,
       } = data;
 
       const safeLimit = Math.min(limit, 100);
@@ -233,6 +238,11 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
           default:
             break;
         }
+      }
+
+      // Thread filter
+      if (threadId) {
+        whereConditions.push(eq(emails.threadId, threadId));
       }
 
       // Date range filter
@@ -328,20 +338,24 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
               : desc(emails.sentAt);
       }
 
-      // Get messages with pagination
-      const messages = await db
-        .select()
+      // Get messages with pagination (join folder for folderName)
+      const messagesWithFolders = await db
+        .select({
+          email: emails,
+          folderName: imapFolders.name,
+        })
         .from(emails)
+        .leftJoin(imapFolders, eq(emails.imapFolderId, imapFolders.id))
         .where(whereClause)
         .orderBy(orderByClause)
-        .limit(limit)
+        .limit(safeLimit)
         .offset(offset);
 
-      const totalPages = Math.ceil(totalCount / limit);
+      const totalPages = Math.ceil(totalCount / safeLimit);
 
       return success({
-        messages: messages.map((message) =>
-          this.formatMessageResponse(message),
+        messages: messagesWithFolders.map(({ email: message, folderName }) =>
+          this.formatMessageResponse(message, folderName ?? ""),
         ),
         total: totalCount,
         pageNumber: page,
@@ -373,13 +387,14 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     try {
       logger.debug("Getting IMAP message by ID", { id: data.id });
 
-      const [message] = await db
-        .select()
+      const [row] = await db
+        .select({ email: emails, folderName: imapFolders.name })
         .from(emails)
+        .leftJoin(imapFolders, eq(emails.imapFolderId, imapFolders.id))
         .where(eq(emails.id, data.id))
         .limit(1);
 
-      if (!message) {
+      if (!row) {
         return fail({
           message:
             "app.api.emails.imapClient.imapErrors.messages.get.error.not_found.title",
@@ -387,7 +402,9 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         });
       }
 
-      return success(this.formatMessageResponse(message));
+      return success(
+        this.formatMessageResponse(row.email, row.folderName ?? ""),
+      );
     } catch (error) {
       logger.error("Error getting IMAP message by ID", parseError(error));
       return fail({

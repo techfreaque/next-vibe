@@ -16,7 +16,10 @@ import { Environment } from "next-vibe/shared/utils/env-util";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import { CronTaskPriority } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import {
+  CronTaskPriority,
+  type CronTaskPriorityValue,
+} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -27,7 +30,10 @@ import {
   getDefaultConfigWithCron,
   getDefaultCronSettings,
 } from "./default-config";
-import type { CampaignStarterConfigType as CampaignStarterConfigWithCronType } from "./definition";
+import type {
+  CampaignStarterConfigGetResponseOutput,
+  CampaignStarterConfigPutResponseOutput,
+} from "./definition";
 
 /**
  * Campaign Starter Configuration Repository Implementation
@@ -77,11 +83,9 @@ export class CampaignStarterConfigRepository {
     // Validate priority is one of the valid CronTaskPriority values
     // The database constraint ensures this, but TypeScript doesn't know that
     const priorityValue = cronTask.priority;
-    const priority =
-      priorityValue &&
-      CampaignStarterConfigRepository.isValidPriority(priorityValue)
-        ? priorityValue
-        : defaults.priority;
+    const priority: typeof CronTaskPriorityValue = priorityValue
+      ? priorityValue
+      : defaults.priority;
 
     return {
       schedule: cronTask.schedule,
@@ -99,7 +103,7 @@ export class CampaignStarterConfigRepository {
    */
   private static async formatConfigResponse(
     dbConfig: CampaignStarterConfig,
-  ): Promise<CampaignStarterConfigWithCronType> {
+  ): Promise<CampaignStarterConfigGetResponseOutput> {
     // Get cron task settings
     const cronTask =
       await CampaignStarterConfigRepository.getCronTaskSettings();
@@ -168,7 +172,7 @@ export class CampaignStarterConfigRepository {
    * Convert API config to database format (campaign settings only)
    */
   private static formatConfigForDb(
-    config: CampaignStarterConfigWithCronType,
+    config: CampaignStarterConfigGetResponseOutput,
     environment: string,
   ): CampaignStarterConfig {
     return {
@@ -191,7 +195,7 @@ export class CampaignStarterConfigRepository {
   static async getConfig(
     user: JwtPayloadType,
     logger: EndpointLogger,
-  ): Promise<ResponseType<CampaignStarterConfigWithCronType>> {
+  ): Promise<ResponseType<CampaignStarterConfigGetResponseOutput>> {
     try {
       const environment =
         CampaignStarterConfigRepository.getCurrentEnvironment();
@@ -235,11 +239,11 @@ export class CampaignStarterConfigRepository {
    * Handles both campaign settings and cron settings
    */
   static async updateConfig(
-    data: CampaignStarterConfigWithCronType,
+    data: CampaignStarterConfigGetResponseOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<CampaignStarterConfigWithCronType>> {
+  ): Promise<ResponseType<CampaignStarterConfigPutResponseOutput>> {
     try {
       const environment =
         CampaignStarterConfigRepository.getCurrentEnvironment();
@@ -295,7 +299,7 @@ export class CampaignStarterConfigRepository {
       };
       await CampaignStarterConfigRepository.saveCronTaskSettings(cronSettings);
 
-      return success(data);
+      return success();
     } catch (error) {
       logger.error("Error updating campaign starter config", parseError(error));
       return fail({
@@ -313,7 +317,7 @@ export class CampaignStarterConfigRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<CampaignStarterConfigWithCronType>> {
+  ): Promise<ResponseType<CampaignStarterConfigGetResponseOutput>> {
     try {
       const environment =
         CampaignStarterConfigRepository.getCurrentEnvironment();

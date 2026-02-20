@@ -90,6 +90,7 @@ const { POST } = createEndpoint({
     UserRole.ADMIN,
     UserRole.AI_TOOL_OFF,
   ] as const,
+  allowedLocalModeRoles: [] as const,
   aliases: ["record-engagement", "track-engagement"] as const,
 
   cli: {
@@ -384,6 +385,7 @@ const { GET } = createEndpoint({
     UserRole.ADMIN,
     UserRole.AI_TOOL_OFF,
   ] as const,
+  allowedLocalModeRoles: [] as const,
   aliases: ["track-click", "click-tracking"] as const,
 
   cli: {

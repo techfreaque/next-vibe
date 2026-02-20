@@ -81,8 +81,8 @@ export class FolderRepository {
             rolesPost: folder.rolesPost,
             rolesModerate: folder.rolesModerate,
             rolesAdmin: folder.rolesAdmin,
-            createdAt: folder.createdAt.toISOString(),
-            updatedAt: folder.updatedAt.toISOString(),
+            createdAt: folder.createdAt,
+            updatedAt: folder.updatedAt,
           },
         },
       });
@@ -217,8 +217,8 @@ export class FolderRepository {
             rolesPost: updatedFolder.rolesPost,
             rolesModerate: updatedFolder.rolesModerate,
             rolesAdmin: updatedFolder.rolesAdmin,
-            createdAt: updatedFolder.createdAt.toISOString(),
-            updatedAt: updatedFolder.updatedAt.toISOString(),
+            createdAt: updatedFolder.createdAt,
+            updatedAt: updatedFolder.updatedAt,
           },
         },
       });

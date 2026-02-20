@@ -6,7 +6,7 @@ import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unifie
 
 export const dateSchema = z
   .union([z.string(), z.date(), z.coerce.number()])
-  .transform((val): string | Date | number => {
+  .transform((val): Date => {
     if (val instanceof Date) {
       return val;
     }

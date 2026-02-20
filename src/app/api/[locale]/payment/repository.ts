@@ -57,6 +57,17 @@ export class PaymentRepository {
   ): Promise<ResponseType<PaymentPostResponseOutput>> {
     const { t } = simpleT(locale);
 
+    if (env.NEXT_PUBLIC_LOCAL_MODE) {
+      logger.info("Payment disabled in local mode");
+      return fail({
+        message: "app.api.payment.errors.localMode",
+        errorType: ErrorResponseTypes.FORBIDDEN,
+        messageParams: {
+          error: t("app.api.payment.errors.unauthorized.description"),
+        },
+      });
+    }
+
     try {
       // Payment endpoints require authenticated users with ID
       if (user.isPublic) {

@@ -599,7 +599,7 @@ export class UserRepository {
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
-      users: Array<StandardUserType & { createdAt: string; updatedAt: string }>;
+      users: Array<StandardUserType & { createdAt: Date; updatedAt: Date }>;
       pagination: {
         currentPage: number;
         totalPages: number;
@@ -647,16 +647,12 @@ export class UserRepository {
       ...user,
       createdAt:
         user.createdAt instanceof Date
-          ? user.createdAt.toISOString()
-          : typeof user.createdAt === "string"
-            ? user.createdAt
-            : new Date(user.createdAt).toISOString(),
+          ? user.createdAt
+          : new Date(user.createdAt),
       updatedAt:
         user.updatedAt instanceof Date
-          ? user.updatedAt.toISOString()
-          : typeof user.updatedAt === "string"
-            ? user.updatedAt
-            : new Date(user.updatedAt).toISOString(),
+          ? user.updatedAt
+          : new Date(user.updatedAt),
     }));
 
     return success({

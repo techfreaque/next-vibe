@@ -18,6 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
@@ -78,6 +79,7 @@ export function ChatInput({
   const { canPost, noPermissionReason } = useChatPermissions(chat, locale);
   const { t } = simpleT(locale);
   const voiceRuntime = useVoiceRuntimeState();
+  const voiceUnconfigured = !chat.envAvailability.voice;
 
   const currentModel = getModelById(selectedModel);
   const modelSupportsTools = currentModel?.supportsTools ?? false;
@@ -244,22 +246,42 @@ export function ChatInput({
                 <Button
                   type="button"
                   size="icon"
-                  variant={ttsAutoplay ? "default" : "ghost"}
-                  onClick={() => setTTSAutoplay(!ttsAutoplay)}
+                  variant={
+                    ttsAutoplay && !voiceUnconfigured ? "default" : "ghost"
+                  }
+                  onClick={() =>
+                    !voiceUnconfigured && setTTSAutoplay(!ttsAutoplay)
+                  }
                   className={cn(
                     "h-8 w-8 @sm:h-9 @sm:w-9",
-                    ttsAutoplay &&
+                    !voiceUnconfigured &&
+                      ttsAutoplay &&
                       "bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500",
+                    voiceUnconfigured && "opacity-50 cursor-not-allowed",
                   )}
                   data-tour={TOUR_DATA_ATTRS.CALL_MODE_BUTTON}
                 >
                   <Phone className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>
-                {ttsAutoplay
-                  ? t("app.chat.voiceMode.callModeDescription")
-                  : t("app.chat.voiceMode.callMode")}
+              <TooltipContent
+                className={voiceUnconfigured ? "max-w-xs text-xs" : undefined}
+              >
+                {voiceUnconfigured ? (
+                  <>
+                    <P className="font-semibold mb-1">
+                      {t("app.chat.voiceMode.unconfiguredTitle")}
+                    </P>
+                    <P>{t("app.chat.voiceMode.unconfiguredDescription")}</P>
+                    <P className="mt-1 font-mono text-[10px] opacity-80">
+                      EDEN_AI_API_KEY
+                    </P>
+                  </>
+                ) : ttsAutoplay ? (
+                  t("app.chat.voiceMode.callModeDescription")
+                ) : (
+                  t("app.chat.voiceMode.callMode")
+                )}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -273,16 +295,35 @@ export function ChatInput({
                     type="button"
                     size="icon"
                     variant="ghost"
-                    disabled={!canPost}
-                    onClick={() => void voice.startRecording()}
-                    className="h-8 w-8 @sm:h-9 @sm:w-9"
+                    disabled={!canPost || voiceUnconfigured}
+                    onClick={() =>
+                      !voiceUnconfigured && void voice.startRecording()
+                    }
+                    className={cn(
+                      "h-8 w-8 @sm:h-9 @sm:w-9",
+                      voiceUnconfigured && "opacity-50 cursor-not-allowed",
+                    )}
                     data-tour={TOUR_DATA_ATTRS.SPEECH_INPUT}
                   >
                     <Mic className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>
-                  {t("app.chat.voiceMode.tapToRecord")}
+                <TooltipContent
+                  className={voiceUnconfigured ? "max-w-xs text-xs" : undefined}
+                >
+                  {voiceUnconfigured ? (
+                    <>
+                      <P className="font-semibold mb-1">
+                        {t("app.chat.voiceMode.unconfiguredTitle")}
+                      </P>
+                      <P>{t("app.chat.voiceMode.unconfiguredDescription")}</P>
+                      <P className="mt-1 font-mono text-[10px] opacity-80">
+                        EDEN_AI_API_KEY
+                      </P>
+                    </>
+                  ) : (
+                    t("app.chat.voiceMode.tapToRecord")
+                  )}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

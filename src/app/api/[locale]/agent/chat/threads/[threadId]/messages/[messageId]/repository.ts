@@ -152,8 +152,8 @@ export class MessageRepository {
           authorId: message.authorId,
           isAI: message.isAI,
           model: message.model,
-          createdAt: message.createdAt.toISOString(),
-          updatedAt: message.updatedAt.toISOString(),
+          createdAt: message.createdAt,
+          updatedAt: message.updatedAt,
         },
       });
     } catch (error) {
@@ -275,7 +275,7 @@ export class MessageRepository {
           id: updatedMessage.id,
           content: updatedMessage.content,
           role: updatedMessage.role,
-          updatedAt: updatedMessage.updatedAt.toISOString(),
+          updatedAt: updatedMessage.updatedAt,
         },
       });
     } catch (error) {

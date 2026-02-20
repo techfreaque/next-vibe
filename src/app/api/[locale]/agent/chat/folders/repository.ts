@@ -167,8 +167,8 @@ export class ChatFoldersRepository {
             canModerate: canModerateFlag,
             canDelete: canDeleteFlag,
             canManagePermissions: canManagePermsFlag,
-            createdAt: folder.createdAt.toISOString(),
-            updatedAt: folder.updatedAt.toISOString(),
+            createdAt: folder.createdAt,
+            updatedAt: folder.updatedAt,
           };
         }),
       );
@@ -356,8 +356,8 @@ export class ChatFoldersRepository {
             rolesPost: newFolder.rolesPost || [],
             rolesModerate: newFolder.rolesModerate || [],
             rolesAdmin: newFolder.rolesAdmin || [],
-            createdAt: newFolder.createdAt.toISOString(),
-            updatedAt: newFolder.updatedAt.toISOString(),
+            createdAt: newFolder.createdAt,
+            updatedAt: newFolder.updatedAt,
           },
         },
       });

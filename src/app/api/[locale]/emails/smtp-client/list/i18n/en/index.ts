@@ -115,5 +115,6 @@ export const translations = {
     emptyState: "No SMTP accounts configured",
     priority: "Priority",
     sent: "Sent",
+    searchPlaceholder: "Search accounts...",
   },
 };

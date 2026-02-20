@@ -205,8 +205,6 @@ export class AiStreamRepository {
                   user,
                   model: data.model,
                   character: data.character,
-                  systemPrompt,
-                  tools,
                   providerModel: provider.chat(modelConfig.openRouterModel),
                   abortSignal: streamAbortController.signal,
                   logger,
@@ -328,12 +326,13 @@ export class AiStreamRepository {
           }
         },
 
-        // Handle client disconnect - abort the stream
-        cancel(reason): void {
-          logger.info("[AI Stream] Stream cancelled by client", {
-            reason: String(reason),
-          });
-          streamAbortController.abort(new Error("Client disconnected"));
+        // Client disconnect is intentionally ignored — the stream continues
+        // writing to DB so messages are fully persisted even if the user
+        // navigates away. The client can re-fetch from DB on return.
+        cancel(): void {
+          logger.info(
+            "[AI Stream] Client disconnected — stream continues server-side",
+          );
         },
       });
 

@@ -26,7 +26,7 @@ import {
 import type {
   Task,
   TaskExecutionContext,
-} from "@/app/api/[locale]/system/unified-interface/tasks/types/repository";
+} from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 
 import { imapSyncTaskRepository } from "../sync-task/repository";
 
@@ -120,7 +120,7 @@ async function executeImapSync(
 const imapSyncTask: Task = {
   type: "cron",
   name: "imap-sync",
-  description: "tasks.imap_sync.description",
+  description: "app.api.system.unifiedInterface.tasks.imapSync.description",
   schedule: CRON_SCHEDULES.EVERY_15_MINUTES, // Every 15 minutes
   category: TaskCategory.SYSTEM,
   enabled: false,

@@ -172,6 +172,15 @@ export interface ApiEndpoint<
   readonly allowedRoles: TUserRoleValue;
 
   /**
+   * Roles allowed to access this endpoint in local mode (NEXT_PUBLIC_LOCAL_MODE=true).
+   * - undefined (not set): falls back to allowedRoles with UserRole.PUBLIC stripped
+   *   (except login and reset-password endpoints which keep PUBLIC)
+   * - [] (empty array): endpoint is disabled for everyone in local mode
+   * - [UserRole.ADMIN, ...]: explicit override — only those roles are allowed
+   */
+  readonly allowedLocalModeRoles?: readonly UserRoleValue[];
+
+  /**
    * Roles allowed to use client-side route (localStorage/IndexedDB)
    * If not specified, only allowedRoles can access (must use server route)
    * Use [UserRole.PUBLIC] to allow unauthenticated access via client route
@@ -542,6 +551,7 @@ export function createEndpoint<
     tags: config.tags,
     fields: config.fields,
     allowedRoles: config.allowedRoles,
+    allowedLocalModeRoles: config.allowedLocalModeRoles,
     allowedClientRoles: config.allowedClientRoles,
     examples: config.examples,
     errorTypes: config.errorTypes,

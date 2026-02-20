@@ -6,6 +6,7 @@
 import { chartDataSchema } from "next-vibe/shared/types/stats-filtering.schema";
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -97,7 +98,7 @@ const { GET } = createEndpoint({
         label: "app.api.emails.messages.stats.get.dateFrom.label",
         description: "app.api.emails.messages.stats.get.dateFrom.description",
         columns: 6,
-        schema: z.coerce.date().optional(),
+        schema: dateSchema.optional(),
       }),
 
       dateTo: requestField({
@@ -106,7 +107,7 @@ const { GET } = createEndpoint({
         label: "app.api.emails.messages.stats.get.dateTo.label",
         description: "app.api.emails.messages.stats.get.dateTo.description",
         columns: 6,
-        schema: z.coerce.date().optional(),
+        schema: dateSchema.optional(),
       }),
 
       chartType: requestField({

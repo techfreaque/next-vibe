@@ -25,6 +25,7 @@ export function CampaignStarterPageClient({
       endpoint={campaignStarterDefinitions}
       locale={locale}
       user={user}
+      forceMethod="PUT"
       endpointOptions={{
         read: {
           queryOptions: {

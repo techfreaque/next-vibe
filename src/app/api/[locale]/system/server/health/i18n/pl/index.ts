@@ -52,8 +52,8 @@ export const translations: typeof enTranslations = {
         platform: {
           title: "Platforma",
         },
-        supportsSideTasks: {
-          title: "Obsługuje zadania poboczne",
+        supportsTaskRunners: {
+          title: "Obsługuje task-runnery",
         },
       },
       database: {

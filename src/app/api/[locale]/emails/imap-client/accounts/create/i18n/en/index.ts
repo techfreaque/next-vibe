@@ -204,6 +204,12 @@ export const translations = {
     title: "Success",
     description: "IMAP account created successfully",
   },
+  basicInfo: "Basic Info",
+  serverConnection: "Server Connection",
+  authentication: "Authentication",
+  syncConfiguration: "Sync Configuration",
+  submit: "Create Account",
+  submitting: "Creating...",
   widget: {
     title: "Create IMAP Account",
     basicInfo: "Basic Info",

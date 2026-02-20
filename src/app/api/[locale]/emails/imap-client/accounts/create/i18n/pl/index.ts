@@ -206,6 +206,12 @@ export const translations: typeof enTranslations = {
     title: "Sukces",
     description: "Konto IMAP zostało pomyślnie utworzone",
   },
+  basicInfo: "Podstawowe informacje",
+  serverConnection: "Połączenie z serwerem",
+  authentication: "Uwierzytelnianie",
+  syncConfiguration: "Konfiguracja synchronizacji",
+  submit: "Utwórz konto",
+  submitting: "Tworzenie...",
   widget: {
     title: "Utwórz konto IMAP",
     basicInfo: "Informacje podstawowe",

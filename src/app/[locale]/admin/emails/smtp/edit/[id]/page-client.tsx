@@ -10,11 +10,30 @@ import type { CountryLanguage } from "@/i18n/core/config";
 export function SmtpEditPageClient({
   locale,
   user,
+  id,
 }: {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  id: string;
 }): JSX.Element {
   return (
-    <EndpointsPage endpoint={smtpEditDefinition} locale={locale} user={user} />
+    <EndpointsPage
+      endpoint={smtpEditDefinition}
+      locale={locale}
+      user={user}
+      forceMethod="PUT"
+      endpointOptions={{
+        create: {
+          urlPathParams: { id },
+        },
+        read: {
+          urlPathParams: { id },
+          queryOptions: {
+            enabled: true,
+            staleTime: 30 * 1000,
+          },
+        },
+      }}
+    />
   );
 }

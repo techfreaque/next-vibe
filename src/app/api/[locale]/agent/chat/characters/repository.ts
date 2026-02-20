@@ -310,7 +310,7 @@ export class CharactersRepository {
 
       // Return only response fields (exclude database fields like userId, createdAt, updatedAt)
       // Flattened response
-      return success({
+      return success<CharacterGetResponseOutput>({
         icon: customCharacter.icon,
         name: customCharacter.name,
         tagline: customCharacter.tagline,

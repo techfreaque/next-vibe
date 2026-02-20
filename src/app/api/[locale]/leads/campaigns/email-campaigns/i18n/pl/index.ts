@@ -1,6 +1,10 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  task: {
+    description:
+      "Wysyła automatyczne kampanie e-mailowe do leadów na podstawie ich etapu i harmonogramu",
+  },
   post: {
     title: "Tytuł",
     description: "Opis endpointu",

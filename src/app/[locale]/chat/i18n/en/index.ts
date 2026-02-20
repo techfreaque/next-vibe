@@ -461,6 +461,9 @@ export const translations = {
     enabledTitle: "Brave Search enabled (+0.65 credits per search)",
     disabledTitle: "Brave Search disabled (+0.65 credits per search)",
     creditIndicator: "+0.65",
+    unconfiguredTitle: "Web search not configured",
+    unconfiguredBrave: "For Brave Search, add to your .env:",
+    unconfiguredKagi: "For Kagi Search, add to your .env:",
   },
   toolsButton: {
     title: "Configure AI Tools",
@@ -601,6 +604,9 @@ export const translations = {
     manualSelect: "Pick manually...",
     best: "BEST",
     bestForFilter: "Best for this filter",
+    setupRequired: "Setup required",
+    providerUnconfigured: "Provider API key not configured",
+    addEnvKey: "Add to .env",
     noMatchingModels: "No models match your filters",
     noModelsWarning:
       "No models match these filters. Adjust your settings to continue.",
@@ -984,6 +990,10 @@ export const translations = {
     },
   },
   voiceMode: {
+    // Setup required
+    unconfiguredTitle: "Voice not configured",
+    unconfiguredDescription:
+      "Add EDEN_AI_API_KEY to your .env to enable voice. Get your key at app.edenai.run",
     // Input modes
     inputMode: "Voice Input Mode",
     transcribeMode: "Transcribe",

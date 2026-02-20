@@ -89,8 +89,8 @@ export class UserByIdRepository {
           userRoles: userRoles,
         },
         timestamps: {
-          createdAt: foundUser.createdAt.toISOString(),
-          updatedAt: foundUser.updatedAt.toISOString(),
+          createdAt: foundUser.createdAt,
+          updatedAt: foundUser.updatedAt,
         },
         leadId: null,
         email: foundUser.email,
@@ -100,8 +100,8 @@ export class UserByIdRepository {
         isActive: foundUser.isActive,
         stripeCustomerId: foundUser.stripeCustomerId,
         userRoles: userRoles,
-        createdAt: foundUser.createdAt.toISOString(),
-        updatedAt: foundUser.updatedAt.toISOString(),
+        createdAt: foundUser.createdAt,
+        updatedAt: foundUser.updatedAt,
       });
     } catch (error) {
       logger.error("Error getting user by ID", parseError(error));
@@ -206,8 +206,8 @@ export class UserByIdRepository {
         isActive: updatedUser.isActive,
         stripeCustomerId: updatedUser.stripeCustomerId,
         userRoles: userRoles,
-        createdAt: updatedUser.createdAt.toISOString(),
-        updatedAt: updatedUser.updatedAt.toISOString(),
+        createdAt: updatedUser.createdAt,
+        updatedAt: updatedUser.updatedAt,
       });
     } catch (error) {
       logger.error("Error updating user", parseError(error));
@@ -254,7 +254,7 @@ export class UserByIdRepository {
       return success({
         success: true,
         message: "app.api.users.user.delete.success.title",
-        deletedAt: new Date().toISOString(),
+        deletedAt: new Date(),
       });
     } catch (error) {
       logger.error("Error deleting user", parseError(error));

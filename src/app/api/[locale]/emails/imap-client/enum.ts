@@ -225,6 +225,21 @@ export const {
   ERROR: "app.api.emails.enums.imapPerformanceStatus.error",
 });
 
+/**
+ * Bulk Message Action Enum
+ */
+export const {
+  enum: BulkMessageAction,
+  options: BulkMessageActionOptions,
+  Value: BulkMessageActionValue,
+} = createEnumOptions({
+  MARK_READ: "app.api.emails.enums.bulkMessageAction.markRead",
+  MARK_UNREAD: "app.api.emails.enums.bulkMessageAction.markUnread",
+  FLAG: "app.api.emails.enums.bulkMessageAction.flag",
+  UNFLAG: "app.api.emails.enums.bulkMessageAction.unflag",
+  DELETE: "app.api.emails.enums.bulkMessageAction.delete",
+});
+
 // DB enum exports for Drizzle
 export const ImapSyncStatusDB = [
   ImapSyncStatus.PENDING,

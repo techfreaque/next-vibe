@@ -14,7 +14,9 @@ import { smsEnv } from "./env";
 import { getAwsSnsProvider } from "./providers/aws-sns";
 import { getHttpProvider } from "./providers/http";
 import { getMessageBirdProvider } from "./providers/messagebird";
+import { getTelegramProvider } from "./providers/telegram";
 import { getTwilioProvider } from "./providers/twilio";
+import { getWhatsAppProvider } from "./providers/whatsapp";
 import type { SendSmsParams, SmsProvider, SmsResult } from "./utils";
 import { SmsProviders, validateE164PhoneNumber } from "./utils";
 
@@ -51,6 +53,12 @@ export function getSmsProvider(providerName?: SmsProviders): SmsProvider {
       break;
     case "http":
       provider = getHttpProvider();
+      break;
+    case "whatsapp":
+      provider = getWhatsAppProvider();
+      break;
+    case "telegram":
+      provider = getTelegramProvider();
       break;
     default:
       // Fallback to Twilio for unsupported providers

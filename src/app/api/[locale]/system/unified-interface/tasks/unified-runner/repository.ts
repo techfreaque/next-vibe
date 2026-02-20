@@ -24,21 +24,14 @@ import type {
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { CronTaskExecution } from "../cron/db";
 import { CronTasksRepository } from "../cron/repository";
-import { parseCronExpression } from "../cron-formatter";
 import { CronTaskStatus } from "../enum";
-import type {
-  CronTask,
-  SideTask,
-  Task,
-  TaskRunner,
-  TaskRunnerManager,
-  TaskStatus,
-} from "../types/repository";
 import type {
   UnifiedRunnerRequestOutput,
   UnifiedRunnerResponseOutput,
 } from "./definition";
+import type { CronTask, Task, TaskRunner, TaskStatus } from "./types";
 
 // System user for cron task execution
 const CRON_SYSTEM_USER: JwtPrivatePayloadType = {
@@ -49,10 +42,45 @@ const CRON_SYSTEM_USER: JwtPrivatePayloadType = {
 };
 
 /**
- * Unified Task Runner Repository Interface
- * Enhanced to match spec.md requirements
+ * Task Runner Manager Interface
+ * Enhanced to match spec.md unified task runner requirements
  */
-export interface UnifiedTaskRunnerRepository extends TaskRunnerManager {
+export interface TaskRunnerManager {
+  name: "unified-task-runner";
+  description: string;
+
+  // Environment-specific behavior
+  environment: "development" | "production" | "serverless";
+
+  // Task execution with overlap prevention
+  executeCronTask: (
+    task: CronTask,
+  ) => Promise<ResponseType<{ status: string; message: string }>>;
+  startTaskRunner: (
+    task: TaskRunner,
+    signal: AbortSignal,
+  ) => Promise<ResponseType<void>>;
+  stopTaskRunner: (taskName: string) => void;
+
+  // Task state management
+  getTaskStatus: (taskName: string) => TaskStatus;
+  isTaskRunning: (taskName: string) => boolean;
+  getRunningTasks: () => string[];
+
+  // Core lifecycle methods
+  start(
+    tasks: Task[],
+    signal: AbortSignal,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): ResponseType<void>;
+  stop(locale: CountryLanguage): Promise<ResponseType<void>>;
+  getStatus(): {
+    running: boolean;
+    activeTasks: string[];
+    errors: Array<{ taskName: string; error: string; timestamp: Date }>;
+  };
+
   manageRunner(
     data: UnifiedRunnerRequestOutput,
     user: JwtPayloadType,
@@ -65,12 +93,11 @@ export interface UnifiedTaskRunnerRepository extends TaskRunnerManager {
  * Unified Task Runner Repository Implementation
  * Implements the complete unified task runner as per spec.md
  */
-export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerRepository {
+export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
   name = "unified-task-runner" as const;
   description =
     "app.api.system.unifiedInterface.tasks.unifiedRunner.description" as const;
   environment: "development" | "production" | "serverless" = "development";
-  supportsSideTasks = true;
 
   private runningTasks = new Map<string, TaskStatus>();
   private runningProcesses = new Map<string, AbortController>();
@@ -243,10 +270,17 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
 
       const durationMs = Date.now() - startTime;
 
-      // Check if task returned an error
-      if (result && typeof result === "object" && "error" in result) {
+      // Check if task returned an error (success: false from fail())
+      if (
+        result &&
+        typeof result === "object" &&
+        "success" in result &&
+        !result.success
+      ) {
         const errorMsg =
-          typeof result.error === "string" ? result.error : "Task failed";
+          "message" in result && typeof result.message === "string"
+            ? result.message
+            : "Task failed";
         this.markTaskAsFailed(taskName, errorMsg);
 
         // Persist failure
@@ -258,6 +292,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
               completedAt: new Date(),
               durationMs,
               error: { message: errorMsg },
+              errorStack: null,
             },
             this.logger,
           );
@@ -271,6 +306,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
               executionCount: dbTask.executionCount + 1,
               errorCount: dbTask.errorCount + 1,
             },
+            null,
             this.logger,
           );
         }
@@ -287,12 +323,18 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
 
       // Persist success
       if (dbTask && executionDbId) {
+        // Extract .data from ResponseType wrapper if present (success: true, data: T)
+        const resultPayload: CronTaskExecution["result"] =
+          result && typeof result === "object" && "data" in result
+            ? (result.data as CronTaskExecution["result"])
+            : null;
         await CronTasksRepository.updateExecution(
           executionDbId,
           {
             status: CronTaskStatus.COMPLETED,
             completedAt: new Date(),
             durationMs,
+            result: resultPayload,
           },
           this.logger,
         );
@@ -306,6 +348,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
             executionCount: dbTask.executionCount + 1,
             successCount: dbTask.successCount + 1,
           },
+          null,
           this.logger,
         );
       }
@@ -329,6 +372,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
             completedAt: new Date(),
             durationMs,
             error: { message: errorMsg },
+            errorStack: error instanceof Error ? (error.stack ?? null) : null,
           },
           this.logger,
         );
@@ -342,6 +386,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
             executionCount: dbTask.executionCount + 1,
             errorCount: dbTask.errorCount + 1,
           },
+          null,
           this.logger,
         );
       }
@@ -355,8 +400,8 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
     }
   }
 
-  async startSideTask(
-    task: SideTask,
+  async startTaskRunner(
+    task: TaskRunner,
     signal: AbortSignal,
   ): Promise<ResponseType<void>> {
     const taskName = task.name;
@@ -370,7 +415,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
       });
     }
 
-    this.markTaskAsRunning(taskName, "side");
+    this.markTaskAsRunning(taskName, "task-runner");
 
     try {
       await task.run({
@@ -401,7 +446,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
     }
   }
 
-  stopSideTask(taskName: string): void {
+  stopTaskRunner(taskName: string): void {
     const controller = this.runningProcesses.get(taskName);
     if (controller) {
       controller.abort();
@@ -448,7 +493,6 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
       this.logger.debug("Starting unified task runner", {
         taskCount: tasks.length,
         environment: this.environment,
-        supportsSideTasks: this.supportsSideTasks,
       });
 
       this.isRunning = true;
@@ -487,38 +531,34 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
     locale: CountryLanguage,
   ): void {
     try {
-      // Start all side tasks and task runners
-      const sideTasks = tasks.filter(
-        (task): task is SideTask | TaskRunner =>
-          task.type === "side" || task.type === "task-runner",
+      // Start all task runners
+      const taskRunners = tasks.filter(
+        (task): task is TaskRunner => task.type === "task-runner",
       );
 
-      this.logger.debug("Starting side tasks and task runners", {
-        sideTaskCount: sideTasks.length,
-        taskNames: sideTasks.map((t) => t.name),
+      this.logger.debug("Starting task runners", {
+        taskRunnerCount: taskRunners.length,
+        taskNames: taskRunners.map((t) => t.name),
       });
 
-      // Start each side task in parallel
-      const sideTaskPromises = sideTasks.map(async (task) => {
+      // Start each task runner in parallel
+      const taskRunnerPromises = taskRunners.map(async (task) => {
         if (!task.enabled) {
-          this.logger.debug(`Skipping disabled task: ${task.name}`);
+          this.logger.debug(`Skipping disabled task runner: ${task.name}`);
           return;
         }
 
-        this.logger.debug(`Starting side task: ${task.name}`);
+        this.logger.debug(`Starting task runner: ${task.name}`);
 
         try {
-          // Create abort controller for this specific task
+          // Create abort controller for this specific task runner
           const taskController = new AbortController();
           this.runningProcesses.set(task.name, taskController);
 
-          // Mark task as running
-          this.markTaskAsRunning(
-            task.name,
-            task.type === "task-runner" ? "side" : "side",
-          );
+          // Mark task runner as running
+          this.markTaskAsRunning(task.name, "task-runner");
 
-          // Start the task
+          // Start the task runner
           await task.run({
             signal: taskController.signal,
             logger: this.logger,
@@ -526,11 +566,11 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
             cronUser: this.cronUser,
           });
 
-          this.logger.debug(`Side task completed: ${task.name}`);
+          this.logger.debug(`Task runner completed: ${task.name}`);
           this.markTaskAsCompleted(task.name);
         } catch (error) {
           const errorObj = parseError(error);
-          this.logger.error(`Side task failed: ${task.name}`, errorObj);
+          this.logger.error(`Task runner failed: ${task.name}`, errorObj);
           this.markTaskAsFailed(task.name, errorObj.message);
 
           if (task.onError) {
@@ -545,37 +585,28 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
       });
 
       // Don't await all promises - let them run in background
-      void Promise.allSettled(sideTaskPromises)
+      void Promise.allSettled(taskRunnerPromises)
         .then(() => {
-          this.logger.debug("All side tasks have completed or failed");
+          this.logger.debug("All task runners have completed or failed");
           return;
         })
         .catch((error) => {
-          this.logger.error("Error in side task promises", parseError(error));
+          this.logger.error("Error in task runner promises", parseError(error));
         });
 
-      // Set up cron task scheduler for cron tasks
+      // Cron tasks are executed by the pulse runner (task-runner.ts),
+      // not scheduled here — pulse fires every minute and uses isCronTaskDue()
       const cronTasks = tasks.filter(
         (task): task is CronTask => task.type === "cron",
       );
-      if (cronTasks.length > 0) {
-        this.logger.debug("Setting up cron task scheduler", {
-          cronTaskCount: cronTasks.length,
-          taskNames: cronTasks.map((t) => t.name),
-        });
-
-        cronTasks.forEach((task) => {
-          if (!task.enabled) {
-            this.logger.debug(`Skipping disabled cron task: ${task.name}`);
-            return;
-          }
-          this.scheduleCronTask(task, signal);
-        });
-      }
+      this.logger.debug("Cron tasks registered (executed via pulse runner)", {
+        cronTaskCount: cronTasks.length,
+        taskNames: cronTasks.map((t) => t.name),
+      });
 
       this.logger.debug("Task runner startup completed", {
         totalTasks: tasks.length,
-        sideTasksStarted: sideTasks.filter((t) => t.enabled).length,
+        taskRunnersStarted: taskRunners.filter((t) => t.enabled).length,
         cronTasksScheduled: cronTasks.filter((t) => t.enabled).length,
         locale,
         signal: signal.aborted ? "aborted" : "active",
@@ -601,15 +632,12 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
       await import("@/app/api/[locale]/system/generated/tasks-index");
 
     // Upsert task definitions into DB so they appear in the UI
-    const { dev: seedTasks } =
+    const { prod: seedTasks } =
       await import("@/app/api/[locale]/system/unified-interface/tasks/seeds");
     await seedTasks(logger);
 
     const abortController = new AbortController();
     const { signal } = abortController;
-
-    this.environment = "production";
-    this.supportsSideTasks = true;
 
     const startResult = this.start(
       taskRegistry.allTasks,
@@ -647,94 +675,15 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
     return Promise.reject<never>(new Error("unreachable"));
   }
 
-  /**
-   * Schedule a cron task using setTimeout loops driven by cron-parser.
-   * Calculates next execution time, waits, executes, then reschedules.
-   */
-  private scheduleCronTask(task: CronTask, signal: AbortSignal): void {
-    const scheduleNext = (): void => {
-      if (signal.aborted || !this.isRunning) {
-        this.logger.debug(`Cron task stopped scheduling: ${task.name}`);
-        return;
-      }
-
-      const interval = parseCronExpression(this.logger, task.schedule);
-      if (!interval) {
-        this.logger.error(
-          `Invalid cron schedule for task ${task.name}: ${task.schedule}`,
-        );
-        return;
-      }
-
-      const nextRun = interval.next().toDate();
-      const now = new Date();
-      const delayMs = Math.max(0, nextRun.getTime() - now.getTime());
-
-      this.logger.debug(
-        `Next run for ${task.name} in ${Math.round(delayMs / 1000)}s`,
-        {
-          schedule: task.schedule,
-          nextRun: nextRun.toISOString(),
-        },
-      );
-
-      const timeoutId = setTimeout(() => {
-        if (signal.aborted || !this.isRunning) {
-          return;
-        }
-
-        this.logger.debug(`Executing cron task: ${task.name}`);
-        void this.executeCronTask(task)
-          .then((result) => {
-            if (!result.success) {
-              this.logger.error(`Cron task failed: ${task.name}`, {
-                message: result.message,
-              });
-              if (task.onError) {
-                void task.onError({
-                  error: new Error(result.message),
-                  logger: this.logger,
-                  locale: this.locale,
-                  cronUser: this.cronUser,
-                });
-              }
-            } else {
-              this.logger.debug(`Cron task completed: ${task.name}`);
-            }
-            return undefined;
-          })
-          .catch((error) => {
-            this.logger.error(
-              `Cron task threw: ${task.name}`,
-              parseError(error),
-            );
-          })
-          .finally(() => {
-            // Reschedule for next run
-            scheduleNext();
-          });
-      }, delayMs);
-
-      // Store timeout handle so we can cancel on stop
-      const controller = new AbortController();
-      this.runningProcesses.set(`cron-timer:${task.name}`, controller);
-      signal.addEventListener("abort", () => {
-        clearTimeout(timeoutId);
-      });
-    };
-
-    scheduleNext();
-  }
-
   async stop(locale: CountryLanguage): Promise<ResponseType<void>> {
     // Mark parameter as used for now
     void locale;
 
     this.isRunning = false;
 
-    // Stop all running side tasks
+    // Stop all running task runners
     for (const [taskName] of this.runningProcesses) {
-      this.stopSideTask(taskName);
+      this.stopTaskRunner(taskName);
     }
 
     this.runningTasks.clear();
@@ -761,7 +710,10 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
   }
 
   // Helper methods
-  private markTaskAsRunning(taskName: string, type: "cron" | "side"): void {
+  private markTaskAsRunning(
+    taskName: string,
+    type: "cron" | "task-runner",
+  ): void {
     const controller = new AbortController();
     this.runningProcesses.set(taskName, controller);
 
@@ -807,6 +759,11 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
       error,
       timestamp: new Date(),
     });
+
+    // Keep only the most recent 100 errors to prevent unbounded memory growth
+    if (this.errors.length > 100) {
+      this.errors.splice(0, this.errors.length - 100);
+    }
 
     this.runningProcesses.delete(taskName);
   }

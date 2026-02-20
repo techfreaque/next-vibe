@@ -14,9 +14,8 @@ import { env } from "@/config/env";
 
 import { Environment } from "../../../../shared/utils";
 import { generateAllRepository } from "../../../generators/generate-all/repository";
-import { formatDatabase } from "../../shared/logger/formatters";
 import { CronTaskPriority, TaskCategory } from "../enum";
-import type { TaskRunner } from "../types/repository";
+import type { TaskRunner } from "../unified-runner/types";
 
 /**
  * Determine if a file change should trigger generator execution
@@ -202,36 +201,38 @@ const startSmartFileWatcher = async (
   logger.debug("🚀 Running initial generator scan...");
   await runGenerators(false);
 
-  // Wait for abort signal
-  return await new Promise<void>((resolve) => {
-    let resolved = false;
-    const safeResolve = (): void => {
-      if (!resolved) {
-        resolved = true;
-        resolve();
+  // Wait for abort signal (resolves exactly once)
+  await new Promise<void>((resolve) => {
+    let done = false;
+    const finish = (): void => {
+      if (done) {
+        return;
       }
+      done = true;
+      resolve();
     };
+    signal.addEventListener(
+      "abort",
+      () => {
+        logger.debug("🛑 Stopping file watchers...");
 
-    signal.addEventListener("abort", () => {
-      logger.debug("🛑 Stopping file watchers...");
-
-      // Clean up debounce timer
-      if (debounceTimer) {
-        clearTimeout(debounceTimer);
-      }
-
-      // Close all watchers
-      watchers.forEach((watcher) => {
-        try {
-          watcher.close();
-        } catch (error) {
-          logger.debug("Error closing watcher:", { error: String(error) });
+        if (debounceTimer) {
+          clearTimeout(debounceTimer);
         }
-      });
 
-      logger.debug("✅ File watchers stopped");
-      safeResolve();
-    });
+        watchers.forEach((watcher) => {
+          try {
+            watcher.close();
+          } catch (error) {
+            logger.debug("Error closing watcher:", { error: String(error) });
+          }
+        });
+
+        logger.debug("✅ File watchers stopped");
+        finish();
+      },
+      { once: true },
+    );
   });
 };
 
@@ -250,10 +251,6 @@ const startPollingWatcher = async (
   while (!signal.aborted) {
     try {
       watchCount++;
-
-      // Import generators dynamically
-      const { generateAllRepository } =
-        await import("@/app/api/[locale]/system/generators/generate-all/repository");
 
       const action = watchCount === 1 ? "Initial startup" : "Polling cycle";
       logger.info(`⏰ ${action} #${watchCount} - Running generators...`);
@@ -278,20 +275,23 @@ const startPollingWatcher = async (
 
     // Wait for next cycle or abort signal
     await new Promise<void>((resolve) => {
-      let resolved = false;
-      const safeResolve = (): void => {
-        if (!resolved) {
-          resolved = true;
-          resolve();
+      let done = false;
+      const finish = (): void => {
+        if (done) {
+          return;
         }
+        done = true;
+        resolve();
       };
-
-      const timeout = setTimeout(safeResolve, WATCH_INTERVAL);
-
-      signal.addEventListener("abort", () => {
-        clearTimeout(timeout);
-        safeResolve();
-      });
+      const timeout = setTimeout(finish, WATCH_INTERVAL);
+      signal.addEventListener(
+        "abort",
+        () => {
+          clearTimeout(timeout);
+          finish();
+        },
+        { once: true },
+      );
     });
   }
 
@@ -299,114 +299,8 @@ const startPollingWatcher = async (
 };
 
 /**
- * Database Health Monitor Task Runner
- * Monitors database connection and health
- */
-const dbHealthMonitorTaskRunner: TaskRunner = {
-  type: "task-runner",
-  name: "db-health-monitor",
-  description:
-    "app.api.system.unifiedInterface.tasks.dbHealthMonitor.description",
-  category: TaskCategory.MONITORING,
-  enabled: true,
-  priority: CronTaskPriority.LOW,
-
-  async run({
-    logger,
-    signal,
-  }: {
-    logger: EndpointLogger;
-    signal: AbortSignal;
-  }): Promise<void> {
-    logger.debug("Starting database health monitor...");
-
-    const HEALTH_CHECK_INTERVAL = 30000; // 30 seconds
-    let checkCount = 0;
-    let consecutiveFailures = 0;
-    const MAX_FAILURES_TO_LOG = 3;
-
-    // Import database once at the start
-    const { rawPool } = await import("@/app/api/[locale]/system/db");
-
-    while (!signal.aborted) {
-      try {
-        checkCount++;
-
-        // Simple health check using raw pool
-        // eslint-disable-next-line i18next/no-literal-string
-        await rawPool.query("SELECT 1");
-
-        // Reset failure count on success
-        if (consecutiveFailures > 0) {
-          logger.info("Database health check recovered");
-          consecutiveFailures = 0;
-        }
-
-        if (checkCount % 10 === 0) {
-          // Log every 10th check (5 minutes)
-          logger.info(
-            formatDatabase(`Database health check #${checkCount} - OK`, "🗄️ "),
-          );
-        }
-      } catch (error) {
-        consecutiveFailures++;
-        // Only log first few failures to avoid spam
-        if (consecutiveFailures <= MAX_FAILURES_TO_LOG) {
-          const errorMsg = parseError(error).message;
-          logger.error("Database health check failed", new Error(errorMsg));
-          if (consecutiveFailures === MAX_FAILURES_TO_LOG) {
-            logger.warn(
-              "Suppressing further database health check errors until recovery",
-            );
-          }
-        }
-      }
-
-      // Wait for next check or abort signal
-      await new Promise<void>((resolve) => {
-        let resolved = false;
-        const safeResolve = (): void => {
-          if (!resolved) {
-            resolved = true;
-            resolve();
-          }
-        };
-
-        const timeout = setTimeout(safeResolve, HEALTH_CHECK_INTERVAL);
-
-        signal.addEventListener("abort", () => {
-          clearTimeout(timeout);
-          safeResolve();
-        });
-      });
-    }
-
-    logger.info("Database health monitor stopped");
-  },
-
-  async onError({
-    error,
-    logger,
-  }: {
-    error: Error;
-    logger: EndpointLogger;
-  }): Promise<void> {
-    logger.error("Database health monitor error", parseError(error));
-    await Promise.resolve();
-  },
-
-  async onShutdown({ logger }: { logger: EndpointLogger }): Promise<void> {
-    logger.info("Database health monitor shutting down...");
-    await Promise.resolve();
-  },
-};
-
-/**
  * Export task runners for discovery
  */
-export const taskRunners: TaskRunner[] = [
-  devWatcherTaskRunner,
-  dbHealthMonitorTaskRunner,
-];
+export const taskRunners: TaskRunner[] = [devWatcherTaskRunner];
 
 export default taskRunners;

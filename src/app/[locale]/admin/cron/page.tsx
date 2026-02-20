@@ -3,7 +3,7 @@ import type { JSX } from "react";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { CronStatusPageClient } from "./status/page-client";
+import { CronStatsPageClient } from "./stats/page-client";
 
 export default async function CronAdminPage({
   params,
@@ -12,5 +12,5 @@ export default async function CronAdminPage({
 }): Promise<JSX.Element> {
   const { locale } = await params;
   const user = await requireAdminUser(locale, `/${locale}/admin/cron/tasks`);
-  return <CronStatusPageClient locale={locale} user={user} />;
+  return <CronStatsPageClient locale={locale} user={user} />;
 }

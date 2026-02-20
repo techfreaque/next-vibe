@@ -44,6 +44,7 @@ import {
   chatColors,
   chatTransitions,
 } from "@/app/[locale]/chat/lib/design-tokens";
+import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/hooks/store";
 import type { ChatFolder, ChatThread } from "@/app/api/[locale]/agent/chat/db";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -90,6 +91,9 @@ export function ThreadItem({
   const router = useRouter();
   const isTouch = useTouchDevice();
   const { t } = simpleT(locale);
+  const isThreadStreaming = useAIStreamStore(
+    (state) => !!state.activeStreams[thread.id],
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(thread.title);
   const [isHovered, setIsHovered] = useState(false);
@@ -449,6 +453,14 @@ export function ThreadItem({
             </Div>
           );
         })()}
+
+      {isThreadStreaming && (
+        <Div className="flex items-center gap-0.5 shrink-0">
+          <Div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:0ms]" />
+          <Div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:150ms]" />
+          <Div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:300ms]" />
+        </Div>
+      )}
 
       {thread.pinned && (
         <Div className="absolute top-1 right-1 w-1.5 h-1.5 bg-primary rounded-full" />

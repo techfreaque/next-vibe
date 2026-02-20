@@ -208,7 +208,7 @@ export class CampaignStarterRepository {
               .set({
                 status: LeadStatus.PENDING,
                 currentCampaignStage: EmailCampaignStage.NOT_STARTED,
-                campaignStartedAt: now, // Mark when campaign was started
+                campaignStartedAt: now,
                 updatedAt: now,
               })
               .where(eq(leads.id, lead.id));
@@ -376,6 +376,38 @@ export class CampaignStarterRepository {
           "app.api.leads.leadsErrors.campaigns.common.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
+    }
+  }
+
+  /**
+   * Count leads that have been started into campaigns this week for a given locale.
+   * Uses campaignStartedAt to track when campaign-starter transitioned a lead to PENDING.
+   */
+  static async getLeadsStartedThisWeek(
+    locale: CountryLanguage,
+    startOfWeek: Date,
+    logger: EndpointLogger,
+  ): Promise<number> {
+    try {
+      const languageCode = getLanguageFromLocale(locale);
+
+      const [result] = await db
+        .select({ count: sql<number>`COUNT(*)::int` })
+        .from(leads)
+        .where(
+          and(
+            eq(leads.language, languageCode),
+            gte(leads.campaignStartedAt, startOfWeek),
+          ),
+        );
+
+      return result?.count || 0;
+    } catch (error) {
+      logger.error("Failed to count leads started this week", {
+        error: parseError(error).message,
+        locale,
+      });
+      return 0;
     }
   }
 }

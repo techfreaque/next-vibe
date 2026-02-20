@@ -7,14 +7,41 @@
 
 /* eslint-disable i18next/no-literal-string */
 
-import { sql } from "drizzle-orm";
+import { eq, notInArray, sql } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { userRoles } from "@/app/api/[locale]/user/db";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { NewCronTask } from "./cron/db";
 import { cronTasks } from "./cron/db";
 import { CronTaskPriority } from "./enum";
+
+/**
+ * Find the admin user id to assign as owner of seeded system tasks.
+ * Returns null if no admin user exists yet (seeds run before user seeds in some envs).
+ */
+async function findAdminUserId(logger: EndpointLogger): Promise<string | null> {
+  try {
+    const [adminRole] = await db
+      .select({ userId: userRoles.userId })
+      .from(userRoles)
+      .where(eq(userRoles.role, UserPermissionRole.ADMIN))
+      .limit(1);
+
+    if (adminRole) {
+      logger.debug(`Found admin user for seeded tasks: ${adminRole.userId}`);
+      return adminRole.userId;
+    }
+
+    logger.debug("No admin user found yet, seeding tasks without userId");
+    return null;
+  } catch (error) {
+    logger.debug("Could not find admin user, seeding tasks without userId");
+    return null;
+  }
+}
 
 /**
  * Upsert all cron tasks from the task registry into the DB.
@@ -38,6 +65,9 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
     `Upserting ${cronTaskDefs.length} cron task definitions into DB`,
   );
 
+  // Find admin user to assign as owner of system tasks
+  const adminUserId = await findAdminUserId(logger);
+
   const taskRows: NewCronTask[] = cronTaskDefs.map((task) => ({
     name: task.name,
     description: task.description,
@@ -48,9 +78,12 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
     priority: task.priority ?? CronTaskPriority.MEDIUM,
     timeout: task.timeout ?? 300000,
     defaultConfig: {},
+    userId: adminUserId,
   }));
 
-  // Upsert: insert or update on name conflict to keep definitions in sync
+  // Upsert: on name conflict only update non-user-configurable metadata.
+  // Do NOT overwrite enabled/schedule/priority/timeout — those are user-overridable
+  // via the UI and must survive restarts.
   await db
     .insert(cronTasks)
     .values(taskRows)
@@ -59,10 +92,6 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
       set: {
         description: sql`excluded.description`,
         category: sql`excluded.category`,
-        schedule: sql`excluded.schedule`,
-        enabled: sql`excluded.enabled`,
-        priority: sql`excluded.priority`,
-        timeout: sql`excluded.timeout`,
         updatedAt: new Date(),
       },
     });
@@ -70,6 +99,19 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
   logger.debug(
     `Successfully upserted ${taskRows.length} cron task definitions`,
   );
+
+  // Remove stale tasks (renamed or deleted from the registry)
+  const activeNames = taskRows.map((t) => t.name);
+  const deleted = await db
+    .delete(cronTasks)
+    .where(notInArray(cronTasks.name, activeNames))
+    .returning({ name: cronTasks.name });
+
+  if (deleted.length > 0) {
+    logger.debug(
+      `Removed ${deleted.length} stale cron task(s): ${deleted.map((t) => t.name).join(", ")}`,
+    );
+  }
 }
 
 export async function dev(logger: EndpointLogger): Promise<void> {

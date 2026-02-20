@@ -14,6 +14,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
+import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
@@ -95,12 +96,12 @@ export class TextToSpeechRepository {
       textLength: data.text.length,
     });
 
-    // Check API key
+    // Check API key - show setup instructions in LOCAL_MODE
     if (!agentEnv.EDEN_AI_API_KEY) {
-      logger.error("Eden AI API key not configured");
+      logger.warn("Eden AI API key not configured (voice/TTS unavailable)");
       return fail({
-        message: "app.api.agent.textToSpeech.post.errors.apiKeyMissing",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        message: buildMissingKeyMessage("voice"),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
 

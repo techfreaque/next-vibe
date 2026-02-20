@@ -297,7 +297,7 @@ export function ImportStatusContainer({
   const router = useRouter();
   const t = useWidgetTranslation();
 
-  const form = useWidgetForm();
+  const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
 
   const isLoading = endpointMutations?.read?.isLoading;

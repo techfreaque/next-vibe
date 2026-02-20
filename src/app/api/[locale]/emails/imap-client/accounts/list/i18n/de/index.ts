@@ -1,7 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "IMAP-Konten auflisten",
+  title: "Konten",
   description: "Eine paginierte Liste von IMAP-Konten mit Filterung abrufen",
   container: {
     title: "IMAP-Konten-Liste",
@@ -129,6 +129,13 @@ export const translations: typeof enTranslations = {
     title: "Erfolg",
     description: "IMAP-Konten erfolgreich abgerufen",
   },
+  create: "Konto hinzufügen",
+  refresh: "Aktualisieren",
+  empty: "Keine IMAP-Konten konfiguriert",
+  disabled: "Deaktiviert",
+  lastSync: "Letzte Synchronisierung",
+  enabledOnly: "Nur aktive",
+  searchPlaceholder: "Konten suchen...",
   widget: {
     title: "IMAP-Konten",
     create: "Konto hinzufügen",

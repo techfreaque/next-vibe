@@ -120,8 +120,8 @@ export class SmtpAccountsListRepository {
         healthCheckStatus: account.healthCheckStatus,
         priority: account.priority || 0,
         totalEmailsSent: account.totalEmailsSent || 0,
-        lastUsedAt: account.lastUsedAt?.toISOString() || null,
-        createdAt: account.createdAt.toISOString(),
+        lastUsedAt: account.lastUsedAt ?? null,
+        createdAt: account.createdAt,
       }));
 
       logger.info("SMTP accounts retrieved successfully", {

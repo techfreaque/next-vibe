@@ -1,51 +1,51 @@
 /**
- * Custom Widget for IMAP Folders List
+ * Gmail-style Sidebar Widget for IMAP Folders List
+ * Compact folder tree with unread counts, clickable to filter messages
  */
 
 "use client";
 
+import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import {
-  ChevronLeft,
+  Archive,
+  ChevronDown,
   ChevronRight,
+  Edit,
+  FolderOpen,
+  Inbox,
   Loader2,
   RefreshCw,
+  Send,
+  Settings,
+  Star,
+  Trash2,
 } from "next-vibe-ui/ui/icons";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
-  useWidgetForm,
-  useWidgetNavigation,
-  useWidgetOnSubmit,
+  useWidgetLocale,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 
-import {
-  ImapFolderSortField,
-  ImapFolderSortFieldOptions,
-  ImapSpecialUseTypeOptions,
-  ImapSyncStatus,
-  ImapSyncStatusOptions,
-  SortOrder,
-  SortOrderOptions,
-} from "../../enum";
+import { ImapSpecialUseType } from "../../enum";
 import type definition from "./definition";
 import type { ImapFoldersListResponseOutput } from "./definition";
 
 type ImapFolder = NonNullable<ImapFoldersListResponseOutput["folders"]>[number];
+
+const SPECIAL_USE_ORDER: Record<string, number> = {
+  [ImapSpecialUseType.INBOX]: 0,
+  [ImapSpecialUseType.SENT]: 1,
+  [ImapSpecialUseType.DRAFTS]: 2,
+  [ImapSpecialUseType.ARCHIVE]: 3,
+  [ImapSpecialUseType.JUNK]: 4,
+  [ImapSpecialUseType.TRASH]: 5,
+};
 
 interface CustomWidgetProps {
   field: {
@@ -54,151 +54,119 @@ interface CustomWidgetProps {
   fieldName: string;
 }
 
-const SYNC_COLORS: Record<string, string> = {
-  [ImapSyncStatus.SYNCED]:
-    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  [ImapSyncStatus.SYNCING]:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  [ImapSyncStatus.PENDING]:
-    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  [ImapSyncStatus.ERROR]:
-    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-};
+function getFolderIcon(
+  specialUseType: string | null | undefined,
+): React.ComponentType<{ className?: string }> {
+  switch (specialUseType) {
+    case ImapSpecialUseType.INBOX:
+      return Inbox;
+    case ImapSpecialUseType.SENT:
+      return Send;
+    case ImapSpecialUseType.DRAFTS:
+      return Edit;
+    case ImapSpecialUseType.TRASH:
+      return Trash2;
+    case ImapSpecialUseType.ARCHIVE:
+      return Archive;
+    case ImapSpecialUseType.JUNK:
+      return Star;
+    default:
+      return FolderOpen;
+  }
+}
 
-function FolderRow({
+function FolderItem({
   folder,
-  t,
+  isActive,
+  onSelect,
 }: {
   folder: ImapFolder;
-  t: (key: string) => string;
+  isActive: boolean;
+  onSelect: (folder: ImapFolder) => void;
 }): React.JSX.Element {
-  const syncColor =
-    SYNC_COLORS[folder.syncStatus] ??
-    "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
+  const Icon = getFolderIcon(folder.specialUseType);
+  const displayName = folder.displayName ?? folder.name;
+  const hasUnread = folder.unseenCount > 0;
 
   return (
-    <Div className="flex items-center gap-3 p-3 rounded-lg border">
-      <Div className="flex-1 min-w-0">
-        <Div className="flex items-center gap-2 flex-wrap">
-          <Span className="font-semibold text-sm">
-            {folder.displayName ?? folder.name}
-          </Span>
-          {folder.specialUseType !== null &&
-            folder.specialUseType !== undefined && (
-              <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
-                {t(folder.specialUseType)}
-              </Span>
-            )}
-          <Span
-            className={cn(
-              "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-              syncColor,
-            )}
-          >
-            {t(folder.syncStatus)}
-          </Span>
-        </Div>
-        <Div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
-          <Span>
-            {t("app.api.emails.imapClient.folders.list.messages")}:{" "}
-            {folder.messageCount}
-          </Span>
-          <Span>
-            {t("app.api.emails.imapClient.folders.list.unseen")}:{" "}
-            {folder.unseenCount}
-          </Span>
-          <Span className="text-muted-foreground/60">{folder.path}</Span>
-        </Div>
-      </Div>
+    <Div
+      className={cn(
+        "group flex items-center gap-3 mx-2 px-3 py-1.5 rounded-full cursor-pointer transition-colors text-sm",
+        isActive
+          ? "bg-primary/15 text-primary font-semibold"
+          : "text-muted-foreground hover:bg-accent hover:text-foreground",
+      )}
+      onClick={() => onSelect(folder)}
+    >
+      <Icon className="h-4 w-4 flex-shrink-0" />
+      <Span
+        className={cn(
+          "flex-1 truncate",
+          hasUnread && "font-semibold text-foreground",
+        )}
+      >
+        {displayName}
+      </Span>
+      {hasUnread && (
+        <Span
+          className={cn(
+            "flex-shrink-0 text-xs font-semibold min-w-[18px] text-right",
+            isActive ? "text-primary" : "text-blue-600 dark:text-blue-400",
+          )}
+        >
+          {folder.unseenCount > 99 ? "99+" : folder.unseenCount}
+        </Span>
+      )}
     </Div>
   );
 }
 
 export function ImapFoldersListContainer({
   field,
-  fieldName,
 }: CustomWidgetProps): React.JSX.Element {
-  const children = field.children;
-  const { push: navigate } = useWidgetNavigation();
   const { endpointMutations } = useWidgetContext();
+  const locale = useWidgetLocale();
   const t = useWidgetTranslation();
-  const form = useWidgetForm();
-  const onSubmit = useWidgetOnSubmit();
+  const router = useRouter();
 
-  const sortBy: string = form?.watch("sortBy")?.[0] ?? ImapFolderSortField.NAME;
-  const sortOrder: string = form?.watch("sortOrder")?.[0] ?? SortOrder.ASC;
-  const activeSyncStatuses: string[] = form?.watch("syncStatus") ?? [];
-  const activeSpecialUseTypes: string[] = form?.watch("specialUseType") ?? [];
-  const currentPage: number = form?.watch("page") ?? 1;
-  const limit: number = form?.watch("limit") ?? 20;
+  const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
 
   const folders = useMemo(
     () => field.value?.folders ?? [],
     [field.value?.folders],
   );
   const isLoading = field.value === null || field.value === undefined;
-  const total = field.value?.pagination?.total ?? 0;
-  const totalPages =
-    field.value?.pagination?.totalPages ?? (Math.ceil(total / limit) || 1);
 
-  const handleSortByChange = useCallback(
-    (value: string): void => {
-      form?.setValue("sortBy", [value]);
-      if (onSubmit) {
-        onSubmit();
+  const sortedFolders = useMemo(() => {
+    return [...folders].toSorted((a, b) => {
+      const aOrder =
+        a.specialUseType !== null && a.specialUseType !== undefined
+          ? (SPECIAL_USE_ORDER[a.specialUseType] ?? 10)
+          : 10;
+      const bOrder =
+        b.specialUseType !== null && b.specialUseType !== undefined
+          ? (SPECIAL_USE_ORDER[b.specialUseType] ?? 10)
+          : 10;
+      if (aOrder !== bOrder) {
+        return aOrder - bOrder;
       }
-    },
-    [form, onSubmit],
-  );
+      return (a.displayName ?? a.name).localeCompare(b.displayName ?? b.name);
+    });
+  }, [folders]);
 
-  const handleSortOrderChange = useCallback(
-    (value: string): void => {
-      form?.setValue("sortOrder", [value]);
-      if (onSubmit) {
-        onSubmit();
-      }
-    },
-    [form, onSubmit],
-  );
+  const visibleFolders = showAll ? sortedFolders : sortedFolders.slice(0, 8);
+  const hasMore = sortedFolders.length > 8;
 
-  const handlePageChange = useCallback(
-    (page: number): void => {
-      form?.setValue("page", page);
-      if (onSubmit) {
-        onSubmit();
-      } else {
-        endpointMutations?.read?.refetch?.();
-      }
+  const handleSelectFolder = useCallback(
+    (folder: ImapFolder): void => {
+      setActiveFolderId(folder.id);
+      // Navigate to messages filtered by this folder
+      router.push(
+        `/${locale}/admin/emails/imap/messages?folderId=${folder.id}`,
+      );
     },
-    [form, onSubmit, endpointMutations],
-  );
-
-  const toggleSyncStatus = useCallback(
-    (value: string): void => {
-      const current: string[] = form?.watch("syncStatus") ?? [];
-      const next = current.includes(value)
-        ? current.filter((v) => v !== value)
-        : [...current, value];
-      form?.setValue("syncStatus", next);
-      if (onSubmit) {
-        onSubmit();
-      }
-    },
-    [form, onSubmit],
-  );
-
-  const toggleSpecialUseType = useCallback(
-    (value: string): void => {
-      const current: string[] = form?.watch("specialUseType") ?? [];
-      const next = current.includes(value)
-        ? current.filter((v) => v !== value)
-        : [...current, value];
-      form?.setValue("specialUseType", next);
-      if (onSubmit) {
-        onSubmit();
-      }
-    },
-    [form, onSubmit],
+    [router, locale],
   );
 
   const handleRefresh = useCallback((): void => {
@@ -206,176 +174,74 @@ export function ImapFoldersListContainer({
   }, [endpointMutations]);
 
   const handleSync = useCallback((): void => {
-    void (async (): Promise<void> => {
-      const syncDef = await import("../sync/definition");
-      navigate(syncDef.default.POST, {});
-    })();
-  }, [navigate]);
+    router.push(`/${locale}/admin/emails/imap/sync`);
+  }, [router, locale]);
 
   return (
     <Div className="flex flex-col gap-0">
-      {/* Header */}
-      <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
-        <NavigateButtonWidget field={children.backButton} />
-        <Span className="font-semibold text-base">
+      {/* Section header */}
+      <Div className="flex items-center gap-1 px-5 py-2">
+        <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex-1">
           {t("app.api.emails.imapClient.folders.list.title")}
-          {total > 0 && (
-            <Span className="ml-2 text-sm text-muted-foreground font-normal">
-              ({total})
-            </Span>
-          )}
         </Span>
-        <Div className="flex-1" />
         <Button
           type="button"
           variant="ghost"
           size="sm"
+          className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
           onClick={handleRefresh}
           title={t("app.api.emails.imapClient.folders.list.refresh")}
         >
-          <RefreshCw className="h-4 w-4" />
+          <RefreshCw className="h-3 w-3" />
         </Button>
         <Button
           type="button"
-          variant="outline"
+          variant="ghost"
           size="sm"
+          className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
           onClick={handleSync}
-          className="gap-1"
+          title={t("app.api.emails.imapClient.folders.list.sync")}
         >
-          <RefreshCw className="h-4 w-4" />
-          {t("app.api.emails.imapClient.folders.list.sync")}
+          <Settings className="h-3 w-3" />
         </Button>
       </Div>
 
-      {/* Search + sort */}
-      <Div className="px-4 pt-3 pb-2 flex items-center gap-2 flex-wrap">
-        <Div className="flex-1 min-w-[160px]">
-          <TextFieldWidget
-            fieldName={`${fieldName}.search`}
-            field={children.search}
-          />
-        </Div>
-        <Select value={sortBy} onValueChange={handleSortByChange}>
-          <SelectTrigger className="h-9 min-w-[140px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {ImapFolderSortFieldOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {t(opt.label)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={sortOrder} onValueChange={handleSortOrderChange}>
-          <SelectTrigger className="h-9 min-w-[80px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {SortOrderOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {t(opt.label)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </Div>
-
-      {/* Sync status filter chips */}
-      <Div className="px-4 pb-1 flex items-center gap-1.5 flex-wrap">
-        {ImapSyncStatusOptions.map((opt) => {
-          const isActive = activeSyncStatuses.includes(opt.value);
-          return (
-            <Button
-              key={opt.value}
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                toggleSyncStatus(opt.value);
-              }}
-              className={
-                isActive
-                  ? "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-primary text-primary-foreground border-primary"
-                  : "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
-              }
-            >
-              {t(opt.label)}
-            </Button>
-          );
-        })}
-      </Div>
-
-      {/* Special use type filter chips */}
-      <Div className="px-4 pb-2 flex items-center gap-1.5 flex-wrap">
-        {ImapSpecialUseTypeOptions.map((opt) => {
-          const isActive = activeSpecialUseTypes.includes(opt.value);
-          return (
-            <Button
-              key={opt.value}
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                toggleSpecialUseType(opt.value);
-              }}
-              className={
-                isActive
-                  ? "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-primary text-primary-foreground border-primary"
-                  : "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
-              }
-            >
-              {t(opt.label)}
-            </Button>
-          );
-        })}
-      </Div>
-
       {/* Folder list */}
-      <Div className="px-4 py-3">
-        {isLoading ? (
-          <Div className="h-[300px] flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </Div>
-        ) : folders.length > 0 ? (
-          <Div className="flex flex-col gap-2">
-            {folders.map((folder) => (
-              <FolderRow key={folder.id} folder={folder} t={t} />
-            ))}
-          </Div>
-        ) : (
-          <Div className="text-center text-muted-foreground py-12">
-            {t("app.api.emails.imapClient.folders.list.empty")}
-          </Div>
-        )}
-      </Div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <Div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
-          <Span>
-            {currentPage} / {totalPages}
-          </Span>
-          <Div className="flex gap-1">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              disabled={currentPage <= 1}
-              onClick={() => handlePageChange(currentPage - 1)}
+      {isLoading ? (
+        <Div className="flex items-center justify-center py-4">
+          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        </Div>
+      ) : folders.length === 0 ? (
+        <Div className="px-5 py-2 text-xs text-muted-foreground">
+          {t("app.api.emails.imapClient.folders.list.empty")}
+        </Div>
+      ) : (
+        <Div className="flex flex-col gap-0.5 pb-2">
+          {visibleFolders.map((folder) => (
+            <FolderItem
+              key={folder.id}
+              folder={folder}
+              isActive={activeFolderId === folder.id}
+              onSelect={handleSelectFolder}
+            />
+          ))}
+          {hasMore && (
+            <Div
+              className="flex items-center gap-2 mx-2 px-3 py-1.5 rounded-full cursor-pointer text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+              onClick={() => setShowAll((v) => !v)}
             >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              disabled={currentPage >= totalPages}
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </Div>
+              {showAll ? (
+                <ChevronDown className="h-4 w-4 flex-shrink-0" />
+              ) : (
+                <ChevronRight className="h-4 w-4 flex-shrink-0" />
+              )}
+              <Span>
+                {showAll
+                  ? t("app.api.emails.imapClient.folders.list.showLess")
+                  : `${String(sortedFolders.length - 8)} ${t("app.api.emails.imapClient.folders.list.more")}`}
+              </Span>
+            </Div>
+          )}
         </Div>
       )}
     </Div>

@@ -12,8 +12,8 @@ import { BatchRepository } from "./repository";
 export const { PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.PATCH]: {
-    handler: ({ data, logger }) =>
-      BatchRepository.batchUpdateLeads(data, logger),
+    handler: ({ data, logger, locale }) =>
+      BatchRepository.batchUpdateLeads(data, logger, locale),
   },
   [Methods.DELETE]: {
     handler: ({ data, logger }) =>

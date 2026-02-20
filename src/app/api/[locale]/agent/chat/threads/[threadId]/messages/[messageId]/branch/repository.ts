@@ -148,8 +148,8 @@ export const branchRepository = {
           authorId: newMessage.authorId,
           isAI: newMessage.isAI,
           model: newMessage.model,
-          createdAt: newMessage.createdAt.toISOString(),
-          updatedAt: newMessage.updatedAt.toISOString(),
+          createdAt: newMessage.createdAt,
+          updatedAt: newMessage.updatedAt,
         },
       });
     } catch (error) {

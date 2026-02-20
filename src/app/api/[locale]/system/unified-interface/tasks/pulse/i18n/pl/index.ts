@@ -1,4 +1,5 @@
 import { translations as executeTranslations } from "../../execute/i18n/pl";
+import { translations as historyTranslations } from "../../history/i18n/pl";
 import { translations as statusTranslations } from "../../status/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
@@ -13,6 +14,7 @@ export const translations: typeof enTranslations = {
     tags: statusTranslations.tags,
     get: statusTranslations.get,
   },
+  history: historyTranslations,
   success: {
     title: "Sukces",
     description: "Puls wykonany pomyślnie",

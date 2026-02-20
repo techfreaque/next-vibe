@@ -14,7 +14,6 @@ import type { ReactNode } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { ImportStatusAlert } from "./import-status-alert";
 import { LeadsNavigation } from "./leads-navigation";
 
 interface AdminLeadsLayoutClientProps {
@@ -72,9 +71,6 @@ export function AdminLeadsLayoutClient({
 
         <LeadsNavigation locale={locale} currentPage={currentPage} />
       </Div>
-
-      {/* Import Status Alert */}
-      <ImportStatusAlert />
 
       {/* Page Content */}
       {children}

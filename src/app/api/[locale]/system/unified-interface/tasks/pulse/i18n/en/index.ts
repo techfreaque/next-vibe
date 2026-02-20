@@ -1,4 +1,5 @@
 import { translations as executeTranslations } from "../../execute/i18n/en";
+import { translations as historyTranslations } from "../../history/i18n/en";
 import { translations as statusTranslations } from "../../status/i18n/en";
 
 export const translations = {
@@ -12,6 +13,7 @@ export const translations = {
     tags: statusTranslations.tags,
     get: statusTranslations.get,
   },
+  history: historyTranslations,
   success: {
     title: "Success",
     description: "Pulse executed successfully",

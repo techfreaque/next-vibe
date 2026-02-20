@@ -5,9 +5,10 @@
 
 import type { JSX } from "react";
 
-import { LeadsListClient } from "@/app/api/[locale]/leads/list/_components/leads-list-client";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+import { LeadsListClient } from "./leads-list-client";
 
 export default async function LeadsListPage({
   params,

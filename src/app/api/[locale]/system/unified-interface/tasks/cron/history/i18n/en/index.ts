@@ -144,6 +144,7 @@ export const translations = {
     header: {
       tasks: "Tasks",
       stats: "Stats",
+      pulse: "Pulse",
       refresh: "Refresh",
     },
     summary: {
@@ -174,8 +175,10 @@ export const translations = {
       error: "Error",
     },
     empty: "No execution history found",
+    result: "Result",
     error: {
       collapse: "Collapse error",
+      label: "Error",
     },
     pagination: {
       info: "Page {{page}} of {{totalPages}} ({{total}} total)",

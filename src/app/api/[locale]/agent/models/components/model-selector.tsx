@@ -23,7 +23,13 @@ import { Label } from "next-vibe-ui/ui/label";
 import { RangeSlider } from "next-vibe-ui/ui/range-slider";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
-import { TooltipProvider } from "next-vibe-ui/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "next-vibe-ui/ui/tooltip";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -38,8 +44,11 @@ import {
   SPEED_DISPLAY,
 } from "@/app/api/[locale]/agent/chat/characters/enum";
 import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
 import {
+  ApiProvider,
   getCreditCostFromModel,
   type ModelId,
   type ModelOption,
@@ -61,6 +70,7 @@ interface ModelCardProps {
   onClick: () => void;
   dimmed?: boolean;
   disabled?: boolean;
+  setupRequired?: string | null;
   t: (key: string, params?: Record<string, string | number>) => string;
   locale: CountryLanguage;
 }
@@ -72,18 +82,25 @@ function ModelCard({
   onClick,
   dimmed = false,
   disabled = false,
+  setupRequired = null,
   t,
   locale,
 }: ModelCardProps): JSX.Element {
-  return (
+  const isUnavailable = disabled || Boolean(setupRequired);
+
+  const card = (
     <Div
-      onClick={disabled ? undefined : onClick}
+      onClick={isUnavailable ? undefined : onClick}
       className={cn(
         "flex items-center gap-2.5 p-2.5 rounded-lg border transition-all",
-        !disabled && "cursor-pointer hover:bg-muted/50 hover:border-primary/30",
-        disabled && "cursor-not-allowed opacity-60",
-        selected && "bg-primary/10 border-primary/40 shadow-sm",
+        !isUnavailable &&
+          "cursor-pointer hover:bg-muted/50 hover:border-primary/30",
+        isUnavailable && "cursor-not-allowed opacity-50",
+        selected &&
+          !setupRequired &&
+          "bg-primary/10 border-primary/40 shadow-sm",
         dimmed && !selected && "opacity-40 hover:opacity-70",
+        setupRequired && "border-dashed border-muted-foreground/30 bg-muted/20",
       )}
     >
       <Div
@@ -117,17 +134,44 @@ function ModelCard({
       </Div>
 
       <Div className="flex items-center gap-1.5 shrink-0">
-        <ModelCreditDisplay
-          modelId={model.id}
-          variant="badge"
-          badgeVariant={selected ? "outline" : "secondary"}
-          className="text-[10px] h-5"
-          t={t}
-          locale={locale}
-        />
-        {selected && <Check className="h-4 w-4 text-primary" />}
+        {setupRequired ? (
+          <Badge
+            variant="outline"
+            className="text-[9px] h-4 px-1.5 shrink-0 border-amber-400 text-amber-600"
+          >
+            {t("app.chat.selector.setupRequired")}
+          </Badge>
+        ) : (
+          <ModelCreditDisplay
+            modelId={model.id}
+            variant="badge"
+            badgeVariant={selected ? "outline" : "secondary"}
+            className="text-[10px] h-5"
+            t={t}
+            locale={locale}
+          />
+        )}
+        {selected && !setupRequired && (
+          <Check className="h-4 w-4 text-primary" />
+        )}
       </Div>
     </Div>
+  );
+
+  if (!setupRequired) {
+    return card;
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{card}</TooltipTrigger>
+      <TooltipContent className="max-w-xs text-xs">
+        <P className="font-semibold mb-1">
+          {t("app.chat.selector.providerUnconfigured")}
+        </P>
+        <P>{setupRequired}</P>
+      </TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -193,6 +237,11 @@ export interface ModelSelectorProps {
   readOnly?: boolean;
 
   /**
+   * Which AI providers have API keys configured (optional - if not provided all are assumed available)
+   */
+  envAvailability?: AgentEnvAvailability;
+
+  /**
    * Translation function
    */
   t: (key: string, params?: TParams) => string;
@@ -203,14 +252,53 @@ export interface ModelSelectorProps {
   locale: CountryLanguage;
 }
 
+/** Map ApiProvider to the availability key */
+function getSetupRequiredMessage(
+  model: ModelOption,
+  envAvailability: AgentEnvAvailability | undefined,
+  t: (key: string) => string,
+): string | null {
+  if (!envAvailability) {
+    return null;
+  }
+  switch (model.apiProvider) {
+    case ApiProvider.OPENROUTER:
+      return envAvailability.openRouter
+        ? null
+        : `${t("app.chat.selector.addEnvKey")}: OPENROUTER_API_KEY → openrouter.ai/keys`;
+    case ApiProvider.UNCENSORED_AI:
+      return envAvailability.uncensoredAI
+        ? null
+        : `${t("app.chat.selector.addEnvKey")}: UNCENSORED_AI_API_KEY`;
+    case ApiProvider.FREEDOMGPT:
+      return envAvailability.freedomGPT
+        ? null
+        : `${t("app.chat.selector.addEnvKey")}: FREEDOMGPT_API_KEY`;
+    case ApiProvider.GAB_AI:
+      return envAvailability.gabAI
+        ? null
+        : `${t("app.chat.selector.addEnvKey")}: GAB_AI_API_KEY`;
+    case ApiProvider.VENICE_AI:
+      return envAvailability.veniceAI
+        ? null
+        : `${t("app.chat.selector.addEnvKey")}: VENICE_AI_API_KEY → venice.ai`;
+    default:
+      return null;
+  }
+}
+
 export function ModelSelector({
   modelSelection,
   onChange,
   characterModelSelection,
   readOnly = false,
+  envAvailability: envAvailabilityProp,
   t,
   locale,
 }: ModelSelectorProps): JSX.Element {
+  // Prefer prop (for non-chat contexts), fall back to context (chat pages)
+  const envAvailabilityCtx = useEnvAvailability();
+  const envAvailability = envAvailabilityProp ?? envAvailabilityCtx;
   // UI state - initialize to CHARACTER_BASED if modelSelection is null and we have character defaults
   const [useCharacterBased, setUseCharacterBased] = useState(
     !modelSelection && !!characterModelSelection,
@@ -1000,6 +1088,11 @@ export function ModelSelector({
                   const isOutsideFilter =
                     showUnfilteredModels &&
                     !filteredModels.some((m: ModelOption) => m.id === model.id);
+                  const setupRequired = getSetupRequiredMessage(
+                    model,
+                    envAvailability,
+                    t,
+                  );
                   return (
                     <ModelCard
                       key={model.id}
@@ -1012,6 +1105,7 @@ export function ModelSelector({
                       onClick={() => handleModelSelect(model.id)}
                       dimmed={isOutsideFilter}
                       disabled={readOnly}
+                      setupRequired={setupRequired}
                       t={t}
                       locale={locale}
                     />
@@ -1083,6 +1177,11 @@ export function ModelSelector({
                             !filteredModels.some(
                               (m: ModelOption) => m.id === model.id,
                             );
+                          const setupRequired = getSetupRequiredMessage(
+                            model,
+                            envAvailability,
+                            t,
+                          );
                           return (
                             <ModelCard
                               key={model.id}
@@ -1095,6 +1194,7 @@ export function ModelSelector({
                               onClick={() => handleModelSelect(model.id)}
                               dimmed={isOutsideFilter}
                               disabled={readOnly}
+                              setupRequired={setupRequired}
                               t={t}
                               locale={locale}
                             />

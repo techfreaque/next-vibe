@@ -1,7 +1,5 @@
 import { translations as cronTranslations } from "../../cron/i18n/en";
 import { translations as pulseTranslations } from "../../pulse/i18n/en";
-import { translations as sideTasksTranslations } from "../../side-tasks/i18n/en";
-import { translations as typesTranslations } from "../../types/i18n/en";
 import { translations as unifiedRunnerTranslations } from "../../unified-runner/i18n/en";
 
 export const translations = {
@@ -162,22 +160,6 @@ export const translations = {
     },
   },
   errors: {
-    // Side Tasks errors
-    fetchSideTaskByName: "Failed to fetch side task by name",
-    updateSideTask: "Failed to update side task",
-    deleteSideTask: "Failed to delete side task",
-    createSideTaskExecution: "Failed to create side task execution",
-    updateSideTaskExecution: "Failed to update side task execution",
-    fetchSideTaskExecutions: "Failed to fetch side task executions",
-    fetchRecentSideTaskExecutions:
-      "Failed to fetch recent side task executions",
-    createSideTaskHealthCheck: "Failed to create side task health check",
-    fetchLatestHealthCheck: "Failed to fetch latest health check",
-    fetchHealthCheckHistory: "Failed to fetch health check history",
-    fetchSideTaskStatistics: "Failed to fetch side task statistics",
-    sideTaskNotFound: "Side task not found",
-    sideTaskExecutionNotFound: "Side task execution not found",
-
     // Cron Tasks errors
     fetchCronTasks: "Failed to fetch cron tasks",
     createCronTask: "Failed to create cron task",
@@ -188,18 +170,11 @@ export const translations = {
     fetchCronStatus: "Failed to fetch cron system status",
     cronTaskNotFound: "Cron task not found",
 
-    // Types errors
-    fetchTaskTypes: "Failed to fetch task types",
-    validateTaskTypes: "Failed to validate task types",
-    exportTaskTypes: "Failed to export task types",
-    unsupportedExportFormat: "Unsupported export format",
-
     // Unified Runner errors
     startTaskRunner: "Failed to start task runner",
     stopTaskRunner: "Failed to stop task runner",
     getTaskRunnerStatus: "Failed to get task runner status",
     executeCronTask: "Failed to execute cron task",
-    executeSideTask: "Failed to execute side task",
 
     // Pulse errors
     executePulse: "Failed to execute pulse",
@@ -218,9 +193,17 @@ export const translations = {
     cronRepositoryScheduleUpdateFailed: "Failed to update cron task schedule",
     cronRepositoryStatisticsFetchFailed: "Failed to fetch cron task statistics",
   },
+  csvProcessor: {
+    description: "Processes CSV import jobs in chunks",
+  },
+  imapSync: {
+    description:
+      "Synchronizes IMAP accounts, folders, and messages automatically",
+  },
+  newsletterUnsubscribeSync: {
+    description: "Synchronizes lead statuses for newsletter unsubscribes",
+  },
   cronSystem: cronTranslations,
   pulseSystem: pulseTranslations,
-  sideTasks: sideTasksTranslations,
-  types: typesTranslations,
   unifiedRunner: unifiedRunnerTranslations,
 };

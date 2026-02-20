@@ -2,7 +2,7 @@
 
 import type { JSX } from "react";
 
-import emailDetailDefinition from "@/app/api/[locale]/emails/messages/[id]/definition";
+import emailDetailDefinition from "@/app/api/[locale]/emails/imap-client/messages/[id]/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";

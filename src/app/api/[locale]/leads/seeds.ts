@@ -158,7 +158,6 @@ const SAMPLE_SOURCES = [
   LeadSource.SOCIAL_MEDIA,
   LeadSource.EMAIL_CAMPAIGN,
   LeadSource.CSV_IMPORT,
-  LeadSource.API,
 ] as const;
 
 const SAMPLE_COUNTRIES = [
@@ -605,16 +604,98 @@ async function generateEmailCampaigns(
 const ENABLED = false;
 
 /**
+ * Locales to seed campaign leads for
+ */
+const CAMPAIGN_SEED_LOCALES = [
+  { language: Languages.EN, country: Countries.GLOBAL },
+  { language: Languages.DE, country: Countries.DE },
+  { language: Languages.PL, country: Countries.PL },
+] as const;
+
+const CAMPAIGN_LEADS_PER_LOCALE = 500;
+
+/**
+ * Generate a campaign-ready imported lead (NEW status, NOT_STARTED stage)
+ */
+function generateImportedLead(
+  index: number,
+  language: (typeof Languages)[keyof typeof Languages],
+  country: (typeof Countries)[keyof typeof Countries],
+): NewLead {
+  const nameIndex = index % SAMPLE_NAMES.length;
+  const businessIndex = index % SAMPLE_BUSINESSES.length;
+  const industryIndex = index % SAMPLE_INDUSTRIES.length;
+  const contactName = SAMPLE_NAMES[nameIndex];
+  const businessName = `${SAMPLE_BUSINESSES[businessIndex]} ${index + 1}`;
+  const industry = SAMPLE_INDUSTRIES[industryIndex];
+  const baseEmail = contactName.toLowerCase().replaceAll(/\s+/g, ".");
+  const email = `${baseEmail}.${language}.${index}@nopepepepepepepepe.com`;
+
+  return {
+    email,
+    businessName,
+    contactName,
+    phone: generatePhoneNumber(country),
+    country,
+    language,
+    status: LeadStatus.NEW,
+    source: LeadSource.CSV_IMPORT,
+    currentCampaignStage: EmailCampaignStage.NOT_STARTED,
+    emailsSent: 0,
+    emailsOpened: 0,
+    emailsClicked: 0,
+    notes: `Imported ${language.toUpperCase()} lead for ${industry} - ${businessName}`,
+    metadata: {
+      industry,
+      imported: true,
+      generated: true,
+    },
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+}
+
+/**
  * Development seed data
  */
 export async function dev(logger: EndpointLogger): Promise<void> {
+  // Always seed campaign-ready imported leads for flow testing
+  logger.debug(
+    `🌱 Seeding ${CAMPAIGN_LEADS_PER_LOCALE} imported leads per locale...`,
+  );
+
+  // Clear previous imported seed leads to avoid duplicates on re-seed
+  await db
+    .delete(leads)
+    .where(
+      sql`${leads.metadata}->>'imported' = 'true' AND ${leads.metadata}->>'generated' = 'true'`,
+    );
+
+  for (const { language, country } of CAMPAIGN_SEED_LOCALES) {
+    const localeLeads: NewLead[] = [];
+    for (let i = 0; i < CAMPAIGN_LEADS_PER_LOCALE; i++) {
+      localeLeads.push(generateImportedLead(i, language, country));
+    }
+    // Insert in batches of 100 to avoid query size limits
+    for (let i = 0; i < localeLeads.length; i += 100) {
+      await db.insert(leads).values(localeLeads.slice(i, i + 100));
+    }
+    logger.debug(
+      `✅ Seeded ${CAMPAIGN_LEADS_PER_LOCALE} imported leads for ${language}-${country}`,
+    );
+  }
+
   if (!ENABLED) {
     return;
   }
-  logger.debug("🌱 Seeding development leads...");
+  logger.debug("🌱 Seeding random development leads...");
 
-  // Clear existing development leads to avoid duplicates
-  await db.delete(leads).where(sql`${leads.metadata}->>'generated' = 'true'`);
+  // Clear existing random development leads to avoid duplicates
+  await db
+    .delete(leads)
+    .where(
+      sql`${leads.metadata}->>'generated' = 'true' AND (${leads.metadata}->>'imported') IS NULL`,
+    );
 
   // Generate random leads using the defined constant
   const sampleLeads: NewLead[] = [];
@@ -629,7 +710,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     .returning({ id: leads.id });
   const leadIds = insertedLeads.map((lead) => lead.id);
 
-  logger.debug(`✅ Seeded ${sampleLeads.length} development leads`);
+  logger.debug(`✅ Seeded ${sampleLeads.length} random development leads`);
 
   // Generate related data
   await generateLeadEngagements(leadIds, logger);

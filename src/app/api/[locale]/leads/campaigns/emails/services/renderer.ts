@@ -394,19 +394,19 @@ export class EmailRendererService {
     // Create mock lead data for preview
     const mockLead: LeadWithEmailType = {
       id: context.t(
-        "app.api.leads.campaigns.emails.journeys.components.defaults.previewLeadId",
+        "app.api.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewLeadId",
       ),
       email: context.t(
-        "app.api.leads.campaigns.emails.journeys.components.defaults.previewEmail",
+        "app.api.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewEmail",
       ),
       businessName: context.t(
-        "app.api.leads.campaigns.emails.journeys.components.defaults.previewBusinessName",
+        "app.api.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewBusinessName",
       ),
       contactName: context.t(
-        "app.api.leads.campaigns.emails.journeys.components.defaults.previewContactName",
+        "app.api.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewContactName",
       ),
       phone: context.t(
-        "app.api.leads.campaigns.emails.journeys.components.defaults.previewPhone",
+        "app.api.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewPhone",
       ),
       website: env.NEXT_PUBLIC_APP_URL,
       country: country,
@@ -447,7 +447,7 @@ export class EmailRendererService {
       {
         ...context,
         campaignId: context.t(
-          "app.api.leads.campaigns.emails.journeys.components.defaults.previewCampaignId",
+          "app.api.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewCampaignId",
         ),
         unsubscribeUrl: `${env.NEXT_PUBLIC_APP_URL}/unsubscribe?preview=true`,
         trackingUrl: `${env.NEXT_PUBLIC_APP_URL}/track?preview=true`,

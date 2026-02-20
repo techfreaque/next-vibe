@@ -82,6 +82,60 @@ export const translations: typeof enTranslations = {
     cannotLinkLeadToItself: "Nie można powiązać leada z samym sobą",
     linkFailed: "Nie udało się powiązać leadów",
   },
+  filters: {
+    search: {
+      label: "Wyszukaj",
+      description: "Szukaj leadów po e-mailu lub nazwie firmy",
+      placeholder: "Wpisz e-mail lub nazwę firmy...",
+    },
+    status: {
+      label: "Status",
+      description: "Filtruj po statusie leada",
+      placeholder: "Wszystkie statusy",
+    },
+    currentCampaignStage: {
+      label: "Etap kampanii",
+      description: "Filtruj po etapie kampanii e-mailowej",
+      placeholder: "Wszystkie etapy",
+    },
+    source: {
+      label: "Źródło",
+      description: "Filtruj po źródle leada",
+      placeholder: "Wszystkie źródła",
+    },
+    country: {
+      label: "Kraj",
+      description: "Filtruj po kraju",
+      placeholder: "Wszystkie kraje",
+    },
+    language: {
+      label: "Język",
+      description: "Filtruj po języku",
+      placeholder: "Wszystkie języki",
+    },
+    sortBy: {
+      label: "Sortuj po",
+      description: "Wybierz pole do sortowania",
+      placeholder: "Pole sortowania",
+    },
+    sortOrder: {
+      label: "Kolejność sortowania",
+      description: "Sortuj rosnąco lub malejąco",
+      placeholder: "Kolejność",
+    },
+    statusFilters: {
+      title: "Filtry statusu i kampanii",
+      description: "Filtruj po statusie, etapie kampanii i źródle",
+    },
+    locationFilters: {
+      title: "Filtry lokalizacji",
+      description: "Filtruj po kraju i języku",
+    },
+    sortingOptions: {
+      title: "Opcje sortowania",
+      description: "Skonfiguruj kolejność sortowania",
+    },
+  },
   batch: batchTranslations,
   campaigns: campaignsTranslations,
   create: createTranslations,
@@ -183,7 +237,6 @@ export const translations: typeof enTranslations = {
       emailCampaign: "Kampania e-mailowa",
       referral: "Polecenie",
       csvImport: "Import CSV",
-      api: "API",
     },
     leadStatusFilter: {
       all: "Wszystkie",
@@ -216,7 +269,6 @@ export const translations: typeof enTranslations = {
       emailCampaign: "Kampania e-mailowa",
       referral: "Polecenie",
       csvImport: "Import CSV",
-      api: "API",
     },
     batchOperationScope: {
       currentPage: "Bieżąca strona",

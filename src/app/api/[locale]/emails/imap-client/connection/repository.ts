@@ -6,6 +6,7 @@
 import "server-only";
 
 import Imap from "imap";
+import { simpleParser } from "mailparser";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -249,6 +250,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
             host: config.host,
             port: config.port,
             tls: config.secure,
+            tlsOptions: { rejectUnauthorized: false },
             connTimeout: 10000,
             authTimeout: 5000,
           });
@@ -380,6 +382,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
             host: config.host,
             port: config.port,
             tls: config.secure || false,
+            tlsOptions: { rejectUnauthorized: false },
             connTimeout: 10000,
             authTimeout: 5000,
           });
@@ -486,6 +489,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
           host: data.account.host,
           port: data.account.port,
           tls: data.account.secure || false,
+          tlsOptions: { rejectUnauthorized: false },
           connTimeout: 10000,
           authTimeout: 5000,
         });
@@ -581,6 +585,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
             host: data.account.host,
             port: data.account.port,
             tls: data.account.secure || false,
+            tlsOptions: { rejectUnauthorized: false },
             connTimeout: 10000,
             authTimeout: 5000,
           });
@@ -614,42 +619,38 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
 
                 // Apply limit if specified
                 const limit = data.options?.limit || 50;
-                const limitedResults = results.slice(0, limit);
+                // Fetch newest messages: take last N from results (IMAP returns oldest-first)
+                const limitedResults = results.slice(-limit);
 
                 const fetch = imap.fetch(limitedResults, {
-                  bodies: "HEADER",
+                  bodies: "",
                   struct: true,
                 });
 
                 const messages: ImapMessageInfo[] = [];
+                let pendingCount = 0;
+                let fetchEnded = false;
+
+                const tryResolve = (): void => {
+                  if (fetchEnded && pendingCount === 0) {
+                    resolve(messages);
+                    imap.end();
+                  }
+                };
 
                 fetch.on("message", (msg) => {
-                  let headers: Record<string, string[]> = {};
+                  const chunks: Buffer[] = [];
                   let attributes: {
                     uid?: number;
                     size?: number;
                     flags?: string[];
                     struct?: ImapMessageStruct | ImapMessageStruct[];
                   } = {};
+                  pendingCount++;
 
                   msg.on("body", (stream) => {
-                    let buffer = "";
                     stream.on("data", (chunk: Buffer) => {
-                      buffer += chunk.toString("ascii");
-                    });
-                    stream.once("end", () => {
-                      // Simple header parsing - just extract basic fields
-                      const lines = buffer.split("\r\n");
-                      for (const line of lines) {
-                        const colonIndex = line.indexOf(":");
-                        if (colonIndex > 0) {
-                          const key = line.slice(0, colonIndex).toLowerCase();
-                          const value = line.slice(colonIndex + 1).trim();
-                          if (key && value) {
-                            headers[key] = [value];
-                          }
-                        }
-                      }
+                      chunks.push(chunk);
                     });
                   });
 
@@ -658,28 +659,52 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
                   });
 
                   msg.once("end", () => {
-                    const headerRecord: Record<string, string> = {};
-                    Object.entries(headers).forEach(([key, value]) => {
-                      headerRecord[key] = Array.isArray(value)
-                        ? value[0] || ""
-                        : value;
-                    });
+                    const rawEmail = Buffer.concat(chunks);
+                    void (async (): Promise<void> => {
+                      try {
+                        const parsed = await simpleParser(rawEmail);
+                        const rawMessageId = parsed.messageId || "";
+                        const messageId =
+                          rawMessageId ||
+                          `uid-${attributes.uid || 0}-${data.account.id}`;
 
-                    messages.push({
-                      uid: attributes.uid || 0,
-                      messageId: headers["message-id"]?.[0] || "",
-                      subject: headers.subject?.[0] || "",
-                      from: headers.from?.[0] || "",
-                      to: headers.to?.[0] || "",
-                      date: new Date(headers.date?.[0] || Date.now()),
-                      size: attributes.size || 0,
-                      flags: attributes.flags || [],
-                      headers: headerRecord,
-                      hasAttachments: this.checkHasAttachments(
-                        attributes.struct,
-                      ),
-                      attachmentCount: this.countAttachments(attributes.struct),
-                    });
+                        const headers: Record<string, string> = {};
+                        parsed.headers.forEach((value, key) => {
+                          headers[key] = Array.isArray(value)
+                            ? value.join(", ")
+                            : String(value);
+                        });
+
+                        messages.push({
+                          uid: attributes.uid || 0,
+                          messageId,
+                          subject: parsed.subject || "",
+                          from: parsed.from?.text || "",
+                          to: parsed.to
+                            ? Array.isArray(parsed.to)
+                              ? parsed.to.map((a) => a.text).join(", ")
+                              : parsed.to.text
+                            : "",
+                          date: parsed.date || new Date(),
+                          size: attributes.size || 0,
+                          flags: attributes.flags || [],
+                          headers,
+                          bodyText: parsed.text || undefined,
+                          bodyHtml: parsed.html || undefined,
+                          hasAttachments: this.checkHasAttachments(
+                            attributes.struct,
+                          ),
+                          attachmentCount: this.countAttachments(
+                            attributes.struct,
+                          ),
+                        });
+                      } catch {
+                        // ignore parse errors for individual messages
+                      } finally {
+                        pendingCount--;
+                        tryResolve();
+                      }
+                    })();
                   });
                 });
 
@@ -688,8 +713,8 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
                 });
 
                 fetch.once("end", () => {
-                  resolve(messages);
-                  imap.end();
+                  fetchEnded = true;
+                  tryResolve();
                 });
               });
             });

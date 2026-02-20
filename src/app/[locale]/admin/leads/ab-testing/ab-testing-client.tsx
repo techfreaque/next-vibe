@@ -22,7 +22,7 @@ interface ABTestingClientProps {
 
 export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
   const { t } = simpleT(locale);
-  const abTestSummary = getABTestSummary();
+  const abTestSummary = getABTestSummary(t);
 
   return (
     <Div className="flex flex-col gap-6">

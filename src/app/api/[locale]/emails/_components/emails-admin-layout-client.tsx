@@ -1,6 +1,6 @@
 /**
  * Emails Admin Layout Client
- * Client component for email admin layout with navigation
+ * Unified Gmail-style layout: persistent left sidebar covering IMAP + SMTP + all email management
  */
 
 "use client";
@@ -8,18 +8,25 @@
 import { cn } from "next-vibe/shared/utils";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import {
+  Archive,
   BarChart3,
-  Database,
+  Edit,
   FileText,
-  List,
+  Inbox,
+  Mail,
+  MessageCircle,
+  RefreshCw,
+  Send,
+  Server,
   Settings,
+  Star,
+  Trash2,
+  Users,
 } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
-import { H1, P } from "next-vibe-ui/ui/typography";
 import type { ComponentType, JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -30,13 +37,16 @@ interface EmailsAdminLayoutClientProps {
   locale: CountryLanguage;
 }
 
-interface NavigationItem {
+interface SidebarItem {
   key: string;
   href: string;
   icon: ComponentType<{ className?: string }>;
   label: string;
-  description: string;
   pattern: RegExp;
+}
+
+interface SidebarSection {
+  items: SidebarItem[];
 }
 
 export function EmailsAdminLayoutClient({
@@ -46,110 +56,208 @@ export function EmailsAdminLayoutClient({
   const pathname = usePathname();
   const { t } = simpleT(locale);
 
-  const navigationItems: NavigationItem[] = [
+  const sections: SidebarSection[] = [
     {
-      key: "stats",
-      href: `/${locale}/admin/emails/stats`,
-      icon: BarChart3,
-      label: t("app.admin.emails.components.nav.overview"),
-      description: t("app.admin.emails.components.admin.stats.title"),
-      pattern: new RegExp(`^/${locale}/admin/emails/stats`),
+      // IMAP inbox navigation
+      items: [
+        {
+          key: "inbox",
+          href: `/${locale}/admin/emails/imap/messages`,
+          icon: Inbox,
+          label: t("app.admin.emails.imap.nav.messages"),
+          pattern: new RegExp(`^/${locale}/admin/emails/imap/messages`),
+        },
+        {
+          key: "starred",
+          href: `/${locale}/admin/emails/imap/messages?status=flagged`,
+          icon: Star,
+          label: t("app.admin.emails.imap.nav.starred"),
+          pattern: new RegExp(
+            `^/${locale}/admin/emails/imap/messages.*status=flagged`,
+          ),
+        },
+        {
+          key: "sent",
+          href: `/${locale}/admin/emails/imap/messages?specialUse=sent`,
+          icon: Send,
+          label: t("app.admin.emails.imap.nav.sent"),
+          pattern: new RegExp(
+            `^/${locale}/admin/emails/imap/messages.*specialUse=sent`,
+          ),
+        },
+        {
+          key: "drafts",
+          href: `/${locale}/admin/emails/imap/messages?specialUse=drafts`,
+          icon: FileText,
+          label: t("app.admin.emails.imap.nav.drafts"),
+          pattern: new RegExp(
+            `^/${locale}/admin/emails/imap/messages.*specialUse=drafts`,
+          ),
+        },
+        {
+          key: "spam",
+          href: `/${locale}/admin/emails/imap/messages?specialUse=junk`,
+          icon: Archive,
+          label: t("app.admin.emails.imap.nav.spam"),
+          pattern: new RegExp(
+            `^/${locale}/admin/emails/imap/messages.*specialUse=junk`,
+          ),
+        },
+        {
+          key: "trash",
+          href: `/${locale}/admin/emails/imap/messages?specialUse=trash`,
+          icon: Trash2,
+          label: t("app.admin.emails.imap.nav.trash"),
+          pattern: new RegExp(
+            `^/${locale}/admin/emails/imap/messages.*specialUse=trash`,
+          ),
+        },
+      ],
     },
     {
-      key: "templates",
-      href: `/${locale}/admin/emails/templates`,
-      icon: FileText,
-      label: t("app.admin.emails.components.nav.templates"),
-      description: t("app.admin.emails.templates.overview.description"),
-      pattern: new RegExp(`^/${locale}/admin/emails/templates`),
+      items: [
+        {
+          key: "outbox",
+          href: `/${locale}/admin/emails/list`,
+          icon: Send,
+          label: t("app.admin.emails.components.nav.campaigns"),
+          pattern: new RegExp(`^/${locale}/admin/emails/list`),
+        },
+        {
+          key: "smtp-accounts",
+          href: `/${locale}/admin/emails/smtp/accounts`,
+          icon: Server,
+          label: t("app.admin.emails.smtp.list.title"),
+          pattern: new RegExp(`^/${locale}/admin/emails/smtp`),
+        },
+      ],
     },
     {
-      key: "list",
-      href: `/${locale}/admin/emails/list`,
-      icon: List,
-      label: t("app.admin.emails.components.nav.campaigns"),
-      description: t("app.admin.emails.components.admin.title"),
-      pattern: new RegExp(`^/${locale}/admin/emails/list`),
+      items: [
+        {
+          key: "stats",
+          href: `/${locale}/admin/emails/stats`,
+          icon: BarChart3,
+          label: t("app.admin.emails.components.nav.overview"),
+          pattern: new RegExp(`^/${locale}/admin/emails/stats`),
+        },
+        {
+          key: "templates",
+          href: `/${locale}/admin/emails/templates`,
+          icon: FileText,
+          label: t("app.admin.emails.components.nav.templates"),
+          pattern: new RegExp(`^/${locale}/admin/emails/templates`),
+        },
+      ],
     },
     {
-      key: "imap",
-      href: `/${locale}/admin/emails/imap`,
-      icon: Database,
-      label: t("app.admin.emails.components.nav.imap"),
-      description: t("app.admin.emails.imap.admin.overview.title"),
-      pattern: new RegExp(`^/${locale}/admin/emails/imap`),
+      // Messaging channels (SMS, WhatsApp, Telegram)
+      items: [
+        {
+          key: "messaging-accounts",
+          href: `/${locale}/admin/emails/messaging/accounts`,
+          icon: MessageCircle,
+          label: t("app.admin.emails.components.nav.messagingAccounts"),
+          pattern: new RegExp(`^/${locale}/admin/emails/messaging`),
+        },
+      ],
     },
     {
-      key: "smtp",
-      href: `/${locale}/admin/emails/smtp`,
-      icon: Settings,
-      label: t("app.admin.emails.smtp.list.title"),
-      description: t("app.admin.emails.smtp.list.description"),
-      pattern: new RegExp(`^/${locale}/admin/emails/smtp`),
+      items: [
+        {
+          key: "imap-accounts",
+          href: `/${locale}/admin/emails/imap/accounts`,
+          icon: Users,
+          label: t("app.admin.emails.imap.nav.accounts"),
+          pattern: new RegExp(`^/${locale}/admin/emails/imap/accounts`),
+        },
+        {
+          key: "imap-config",
+          href: `/${locale}/admin/emails/imap/config`,
+          icon: Settings,
+          label: t("app.admin.emails.imap.nav.config"),
+          pattern: new RegExp(`^/${locale}/admin/emails/imap/config`),
+        },
+        {
+          key: "imap-sync",
+          href: `/${locale}/admin/emails/imap/sync`,
+          icon: RefreshCw,
+          label: t("app.admin.emails.imap.nav.sync"),
+          pattern: new RegExp(`^/${locale}/admin/emails/imap/sync`),
+        },
+        {
+          key: "imap-overview",
+          href: `/${locale}/admin/emails/imap/overview`,
+          icon: BarChart3,
+          label: t("app.admin.emails.imap.nav.overview"),
+          pattern: new RegExp(`^/${locale}/admin/emails/imap/overview`),
+        },
+      ],
     },
   ];
 
-  const currentSection = navigationItems.find((item) =>
-    item.pattern.test(pathname),
-  );
-
   return (
-    <Div className="flex flex-col gap-6">
-      {/* Header */}
-      <Div className="flex flex-col gap-4">
-        <Div>
-          <H1 className="text-3xl font-bold text-gray-900 dark:text-white">
+    <Div className="flex h-full min-h-[600px]">
+      {/* ── Left Sidebar ── */}
+      <Div className="w-56 flex-shrink-0 border-r bg-muted/20 flex flex-col">
+        {/* Logo / header */}
+        <Div className="flex items-center gap-2 px-4 py-4 border-b">
+          <Mail className="h-5 w-5 text-primary" />
+          <Span className="font-semibold text-sm">
             {t("app.admin.emails.components.admin.title")}
-          </H1>
-          <P className="mt-2 text-gray-600 dark:text-gray-400">
-            {t("app.admin.emails.components.admin.description")}
-          </P>
+          </Span>
         </Div>
 
-        {/* Main Navigation */}
-        <Card>
-          <CardContent className="p-4">
-            <Div className="flex flex-wrap gap-2">
-              {navigationItems.map((item) => {
+        {/* Compose button */}
+        <Div className="px-3 py-3">
+          <Link href={`/${locale}/admin/emails/imap/compose`}>
+            <Button
+              type="button"
+              className="w-full gap-2 rounded-full shadow-sm"
+              size="sm"
+            >
+              <Edit className="h-4 w-4" />
+              <Span>{t("app.admin.emails.imap.nav.compose")}</Span>
+            </Button>
+          </Link>
+        </Div>
+
+        {/* Nav sections */}
+        <Div className="flex flex-col flex-1 overflow-y-auto py-1">
+          {sections.map((section, si) => (
+            <Div key={si}>
+              {/* Thin divider between sections */}
+              {si > 0 && (
+                <Div className="mx-3 my-2 border-t border-border/60" />
+              )}
+
+              {section.items.map((item) => {
                 const Icon = item.icon;
-                const isActive = currentSection?.key === item.key;
+                const isActive = item.pattern.test(pathname);
 
                 return (
-                  <Button
+                  <Link
                     key={item.key}
-                    asChild
-                    variant={isActive ? "default" : "outline"}
-                    size="sm"
+                    href={item.href}
                     className={cn(
-                      "flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-200",
+                      "flex items-center gap-3 mx-2 px-3 py-2 rounded-full text-sm transition-colors",
                       isActive
-                        ? "bg-blue-600 text-white shadow-md hover:bg-blue-700"
-                        : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-600",
+                        ? "bg-primary/15 text-primary font-semibold"
+                        : "text-muted-foreground hover:bg-accent hover:text-foreground",
                     )}
                   >
-                    <Link href={item.href} className="flex items-center gap-2">
-                      <Icon className="h-4 w-4" />
-                      <Span>{item.label}</Span>
-                    </Link>
-                  </Button>
+                    <Icon className="h-4 w-4 flex-shrink-0" />
+                    <Span className="truncate">{item.label}</Span>
+                  </Link>
                 );
               })}
             </Div>
-
-            {/* Current Section Description */}
-            {currentSection && (
-              <Div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                <P className="text-sm text-gray-600 dark:text-gray-400">
-                  {currentSection.description}
-                </P>
-              </Div>
-            )}
-          </CardContent>
-        </Card>
+          ))}
+        </Div>
       </Div>
 
-      {/* Page Content */}
-      <Div className="min-h-[600px]">{children}</Div>
+      {/* ── Main Content ── */}
+      <Div className="flex-1 min-w-0 overflow-auto">{children}</Div>
     </Div>
   );
 }

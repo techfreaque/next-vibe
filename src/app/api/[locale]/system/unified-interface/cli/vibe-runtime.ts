@@ -18,7 +18,11 @@ import {
   ErrorHandler,
   setupGlobalErrorHandlers,
 } from "./runtime/execution-errors";
-import { CliInputParser, type ParsedCliData } from "./runtime/parsing";
+import {
+  CliInputParser,
+  type CliRequestData,
+  type ParsedCliData,
+} from "./runtime/parsing";
 
 export const binaryStartTime = Date.now();
 
@@ -210,6 +214,16 @@ program
         const parsedArgs = rawArgs
           ? CliInputParser.parseCliArguments(args || [], rawArgs, logger)
           : CliInputParser.parseCliArgumentsSimple(args || []);
+        // Raw tokens after the command name — stored for endpoint-aware re-parsing.
+        // Find the command name itself (e.g. "check") in rawArgs, then take everything after it.
+        // This correctly includes unknown flags like --fix that commander passes through in args[].
+        const commandIndex = rawArgs
+          ? rawArgs.findIndex((a) => a === command)
+          : -1;
+        const rawTokens =
+          rawArgs && commandIndex >= 0
+            ? rawArgs.slice(commandIndex + 1)
+            : args || [];
 
         // Execute the command with schema-driven UI
         performanceMonitor.mark("parseStart");
@@ -236,11 +250,12 @@ program
         const result = await RouteDelegationHandler.executeRoute(
           command,
           {
-            data: parsedData,
+            data: parsedData as CliRequestData | undefined,
             urlPathParams: undefined,
             cliArgs: {
               positionalArgs: parsedArgs.positionalArgs,
               namedArgs: parsedArgs.namedArgs,
+              rawTokens,
             },
             locale: options.locale,
             platform: cliPlatform,

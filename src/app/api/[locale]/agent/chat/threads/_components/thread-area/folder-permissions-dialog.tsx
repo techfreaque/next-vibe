@@ -6,7 +6,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
-import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import folderPermissionsDefinitions from "@/app/api/[locale]/agent/chat/folders/[id]/permissions/definition";

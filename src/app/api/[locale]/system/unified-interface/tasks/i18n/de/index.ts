@@ -1,7 +1,5 @@
 import { translations as cronTranslations } from "../../cron/i18n/de";
 import { translations as pulseTranslations } from "../../pulse/i18n/de";
-import { translations as sideTasksTranslations } from "../../side-tasks/i18n/de";
-import { translations as typesTranslations } from "../../types/i18n/de";
 import { translations as unifiedRunnerTranslations } from "../../unified-runner/i18n/de";
 import type { translations as enTranslations } from "../en";
 
@@ -161,29 +159,6 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
-    // Side Tasks errors
-    fetchSideTaskByName:
-      "Fehler beim Abrufen der Hintergrund-Aufgabe nach Name",
-    updateSideTask: "Fehler beim Aktualisieren der Hintergrund-Aufgabe",
-    deleteSideTask: "Fehler beim Löschen der Hintergrund-Aufgabe",
-    createSideTaskExecution:
-      "Fehler beim Erstellen der Hintergrund-Aufgaben-Ausführung",
-    updateSideTaskExecution:
-      "Fehler beim Aktualisieren der Hintergrund-Aufgaben-Ausführung",
-    fetchSideTaskExecutions:
-      "Fehler beim Abrufen der Hintergrund-Aufgaben-Ausführungen",
-    fetchRecentSideTaskExecutions:
-      "Fehler beim Abrufen der letzten Hintergrund-Aufgaben-Ausführungen",
-    createSideTaskHealthCheck:
-      "Fehler beim Erstellen des Hintergrund-Aufgaben-Gesundheitschecks",
-    fetchLatestHealthCheck: "Fehler beim Abrufen des letzten Gesundheitschecks",
-    fetchHealthCheckHistory:
-      "Fehler beim Abrufen der Gesundheitscheck-Historie",
-    fetchSideTaskStatistics:
-      "Fehler beim Abrufen der Hintergrund-Aufgaben-Statistiken",
-    sideTaskNotFound: "Hintergrund-Aufgabe nicht gefunden",
-    sideTaskExecutionNotFound: "Hintergrund-Aufgaben-Ausführung nicht gefunden",
-
     // Cron Tasks errors
     fetchCronTasks: "Fehler beim Abrufen der Cron-Aufgaben",
     createCronTask: "Fehler beim Erstellen der Cron-Aufgabe",
@@ -194,18 +169,11 @@ export const translations: typeof enTranslations = {
     fetchCronStatus: "Fehler beim Abrufen des Cron-System-Status",
     cronTaskNotFound: "Cron-Aufgabe nicht gefunden",
 
-    // Types errors
-    fetchTaskTypes: "Fehler beim Abrufen der Aufgabentypen",
-    validateTaskTypes: "Fehler beim Validieren der Aufgabentypen",
-    exportTaskTypes: "Fehler beim Exportieren der Aufgabentypen",
-    unsupportedExportFormat: "Nicht unterstütztes Exportformat",
-
     // Unified Runner errors
     startTaskRunner: "Fehler beim Starten des Task Runners",
     stopTaskRunner: "Fehler beim Stoppen des Task Runners",
     getTaskRunnerStatus: "Fehler beim Abrufen des Task Runner Status",
     executeCronTask: "Fehler beim Ausführen der Cron-Aufgabe",
-    executeSideTask: "Fehler beim Ausführen der Hintergrund-Aufgabe",
 
     // Pulse errors
     executePulse: "Fehler beim Ausführen des Pulse",
@@ -231,9 +199,17 @@ export const translations: typeof enTranslations = {
     cronRepositoryStatisticsFetchFailed:
       "Fehler beim Abrufen der Cron-Aufgabenstatistiken",
   },
+  csvProcessor: {
+    description: "Verarbeitet CSV-Importaufträge in Blöcken",
+  },
+  imapSync: {
+    description:
+      "Synchronisiert IMAP-Konten, Ordner und Nachrichten automatisch",
+  },
+  newsletterUnsubscribeSync: {
+    description: "Synchronisiert Lead-Status für Newsletter-Abmeldungen",
+  },
   cronSystem: cronTranslations,
   pulseSystem: pulseTranslations,
-  sideTasks: sideTasksTranslations,
-  types: typesTranslations,
   unifiedRunner: unifiedRunnerTranslations,
 };

@@ -63,7 +63,6 @@ function formatFileSize(base64Length: number): string {
 
 export function LeadsExportContainer({
   field,
-  fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const data = field.value;
@@ -72,11 +71,11 @@ export function LeadsExportContainer({
   const locale = useWidgetLocale();
   const t = useWidgetTranslation();
   const onSubmit = useWidgetOnSubmit();
-  const form = useWidgetForm();
+  const form = useWidgetForm<typeof definition.GET>();
   const isLoading = endpointMutations?.read?.isLoading;
 
-  const dateFrom: string = form?.watch("dateFrom") ?? "";
-  const dateTo: string = form?.watch("dateTo") ?? "";
+  const dateFrom = String(form?.watch("dateFrom") ?? "");
+  const dateTo = String(form?.watch("dateTo") ?? "");
   const includeMetadata: boolean = form?.watch("includeMetadata") ?? true;
   const includeEngagementData: boolean =
     form?.watch("includeEngagementData") ?? false;
@@ -184,52 +183,34 @@ export function LeadsExportContainer({
           {t("app.api.leads.export.widget.configureExport")}
         </Span>
         <Div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <SelectFieldWidget
-            fieldName={`${fieldName}.format`}
-            field={children.format}
-          />
-          <SelectFieldWidget
-            fieldName={`${fieldName}.status`}
-            field={children.status}
-          />
-          <SelectFieldWidget
-            fieldName={`${fieldName}.source`}
-            field={children.source}
-          />
-          <SelectFieldWidget
-            fieldName={`${fieldName}.country`}
-            field={children.country}
-          />
-          <SelectFieldWidget
-            fieldName={`${fieldName}.language`}
-            field={children.language}
-          />
-          <TextFieldWidget
-            fieldName={`${fieldName}.search`}
-            field={children.search}
-          />
+          <SelectFieldWidget fieldName="format" field={children.format} />
+          <SelectFieldWidget fieldName="status" field={children.status} />
+          <SelectFieldWidget fieldName="source" field={children.source} />
+          <SelectFieldWidget fieldName="country" field={children.country} />
+          <SelectFieldWidget fieldName="language" field={children.language} />
+          <TextFieldWidget fieldName="search" field={children.search} />
           <Div className="flex flex-col gap-1">
             <Span className="text-xs text-muted-foreground">
-              {children.dateFrom.label}
+              {t(children.dateFrom.label)}
             </Span>
             <Input
               type="date"
               value={dateFrom}
               onChange={(e) => {
-                form?.setValue("dateFrom", e.target.value);
+                form?.setValue("dateFrom", new Date(e.target.value));
               }}
               className="h-9"
             />
           </Div>
           <Div className="flex flex-col gap-1">
             <Span className="text-xs text-muted-foreground">
-              {children.dateTo.label}
+              {t(children.dateTo.label)}
             </Span>
             <Input
               type="date"
               value={dateTo}
               onChange={(e) => {
-                form?.setValue("dateTo", e.target.value);
+                form?.setValue("dateTo", new Date(e.target.value));
               }}
               className="h-9"
             />
@@ -243,7 +224,7 @@ export function LeadsExportContainer({
                 form?.setValue("includeMetadata", checked === true);
               }}
             />
-            <Span className="text-sm">{children.includeMetadata.label}</Span>
+            <Span className="text-sm">{t(children.includeMetadata.label)}</Span>
           </Label>
           <Label className="flex items-center gap-2 cursor-pointer">
             <Checkbox
@@ -253,7 +234,7 @@ export function LeadsExportContainer({
               }}
             />
             <Span className="text-sm">
-              {children.includeEngagementData.label}
+              {t(children.includeEngagementData.label)}
             </Span>
           </Label>
         </Div>

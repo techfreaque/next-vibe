@@ -51,20 +51,28 @@ export interface StreamingThread {
 }
 
 /**
+ * Per-thread active stream state
+ */
+export interface ActiveStream {
+  streamId: string;
+}
+
+/**
  * AI Stream Store State
  */
 interface AIStreamState {
-  // Streaming state
-  activeStreamId: string | null;
+  // Streaming state — keyed by threadId
+  activeStreams: Record<string, ActiveStream>;
   streamingMessages: Record<string, StreamingMessage>;
   threads: Record<string, StreamingThread>;
 
-  // UI state
-  isStreaming: boolean;
+  // Derived helpers
+  isStreaming: boolean; // true if any thread is streaming
+  isStreamingThread: (threadId: string) => boolean;
 
   // Actions
-  startStream: (streamId: string) => void;
-  stopStream: () => void;
+  startStream: (threadId: string, streamId: string) => void;
+  stopStream: (threadId?: string) => void; // stops one thread or all
 
   // Thread actions
   addThread: (thread: StreamingThread) => void;
@@ -96,24 +104,39 @@ interface AIStreamState {
 /**
  * Create AI Stream Store
  */
-export const useAIStreamStore = create<AIStreamState>((set) => ({
+export const useAIStreamStore = create<AIStreamState>((set, get) => ({
   // Initial state
-  activeStreamId: null,
+  activeStreams: {},
   streamingMessages: {},
   threads: {},
   isStreaming: false,
 
-  // Stream control
-  startStream: (streamId: string): void =>
-    set({
-      activeStreamId: streamId,
-      isStreaming: true,
-    }),
+  isStreamingThread: (threadId: string): boolean =>
+    !!get().activeStreams[threadId],
 
-  stopStream: (): void =>
-    set({
-      activeStreamId: null,
-      isStreaming: false,
+  // Stream control
+  startStream: (threadId: string, streamId: string): void =>
+    set((state) => ({
+      activeStreams: {
+        ...state.activeStreams,
+        [threadId]: { streamId },
+      },
+      isStreaming: true,
+    })),
+
+  stopStream: (threadId?: string): void =>
+    set((state) => {
+      if (threadId) {
+        const rest = Object.fromEntries(
+          Object.entries(state.activeStreams).filter(([k]) => k !== threadId),
+        );
+        return {
+          activeStreams: rest,
+          isStreaming: Object.keys(rest).length > 0,
+        };
+      }
+      // Stop all
+      return { activeStreams: {}, isStreaming: false };
     }),
 
   // Thread actions
@@ -232,6 +255,9 @@ export const useAIStreamStore = create<AIStreamState>((set) => ({
         return state;
       }
 
+      const activeStreams = { ...state.activeStreams };
+      delete activeStreams[message.threadId];
+
       return {
         streamingMessages: {
           ...state.streamingMessages,
@@ -241,14 +267,15 @@ export const useAIStreamStore = create<AIStreamState>((set) => ({
             isStreaming: false,
           },
         },
-        isStreaming: false,
+        activeStreams,
+        isStreaming: Object.keys(activeStreams).length > 0,
       };
     }),
 
   // Reset
   reset: (): void =>
     set({
-      activeStreamId: null,
+      activeStreams: {},
       streamingMessages: {},
       threads: {},
       isStreaming: false,

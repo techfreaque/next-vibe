@@ -15,6 +15,9 @@ import {
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type {
   CronTask,
@@ -52,9 +55,16 @@ export class CronTasksRepository {
     }
   }
 
-  static async getTaskById(id: string, logger: EndpointLogger) {
+  static async getTaskById(
+    id: string,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ) {
     try {
-      logger.debug("Fetching cron task by ID", { id });
+      const isAdmin =
+        !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+      const userId = !user.isPublic ? user.id : null;
+
       const tasks = await db
         .select()
         .from(cronTasks)
@@ -67,6 +77,16 @@ export class CronTasksRepository {
           message:
             "app.api.system.unifiedInterface.tasks.cronSystem.task.get.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
+          messageParams: { taskId: id },
+        });
+      }
+
+      // Non-admins can only access their own tasks
+      if (!isAdmin && task.userId !== userId) {
+        return fail({
+          message:
+            "app.api.system.unifiedInterface.tasks.cronSystem.task.get.errors.forbidden.title",
+          errorType: ErrorResponseTypes.FORBIDDEN,
           messageParams: { taskId: id },
         });
       }
@@ -89,7 +109,13 @@ export class CronTasksRepository {
           lastExecutionStatus: task.lastExecutionStatus,
           lastExecutionError: task.lastExecutionError,
           lastExecutionDuration: task.lastExecutionDuration,
-          nextExecutionAt: task.nextExecutionAt?.toISOString() || null,
+          nextExecutionAt: task.enabled
+            ? (calculateNextExecutionTime(
+                task.schedule,
+                task.timezone ?? "UTC",
+                logger,
+              )?.toISOString() ?? null)
+            : null,
           executionCount: task.executionCount,
           successCount: task.successCount,
           errorCount: task.errorCount,
@@ -117,14 +143,12 @@ export class CronTasksRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTask | null>> {
     try {
-      logger.debug("Fetching cron task by name", { name });
       const task = await db
         .select()
         .from(cronTasks)
         .where(eq(cronTasks.name, name))
         .limit(1);
       const result: CronTask | null = (task[0] as CronTask) || null;
-      logger.info(`Cron task ${result ? "found" : "not found"}`, { name });
       return success<CronTask | null>(result);
     } catch (error) {
       const parsedError = parseError(error);
@@ -169,10 +193,43 @@ export class CronTasksRepository {
   static async updateTask(
     id: string,
     updates: Partial<CronTask>,
+    user: JwtPayloadType | null,
     logger: EndpointLogger,
   ) {
     try {
-      logger.debug("Updating cron task", { id, updates: Object.keys(updates) });
+      // null user = internal system call (e.g. task runner) — skip ownership check
+      if (user !== null) {
+        const isAdmin =
+          !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+        const userId = !user.isPublic ? user.id : null;
+
+        // Check ownership before updating
+        const existing = await db
+          .select({ userId: cronTasks.userId })
+          .from(cronTasks)
+          .where(eq(cronTasks.id, id))
+          .limit(1);
+
+        if (!existing[0]) {
+          return fail({
+            message: ErrorResponseTypes.NOT_FOUND.errorKey,
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+
+        if (!isAdmin && existing[0].userId !== userId) {
+          return fail({
+            message:
+              "app.api.system.unifiedInterface.tasks.cronSystem.task.put.errors.forbidden.title",
+            errorType: ErrorResponseTypes.FORBIDDEN,
+            messageParams: { taskId: id },
+          });
+        }
+      }
+
+      logger.debug(
+        `Updating task "${id}" (${Object.keys(updates).join(", ")})`,
+      );
       const [task] = await db
         .update(cronTasks)
         .set({ ...updates, updatedAt: new Date() })
@@ -204,7 +261,13 @@ export class CronTasksRepository {
           lastExecutionStatus: task.lastExecutionStatus,
           lastExecutionError: task.lastExecutionError,
           lastExecutionDuration: task.lastExecutionDuration,
-          nextExecutionAt: task.nextExecutionAt?.toISOString() || null,
+          nextExecutionAt: task.enabled
+            ? (calculateNextExecutionTime(
+                task.schedule,
+                task.timezone ?? "UTC",
+                logger,
+              )?.toISOString() ?? null)
+            : null,
           executionCount: task.executionCount,
           successCount: task.successCount,
           errorCount: task.errorCount,
@@ -231,9 +294,37 @@ export class CronTasksRepository {
 
   static async deleteTask(
     id: string,
+    user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean; message: string }>> {
     try {
+      const isAdmin =
+        !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+      const userId = !user.isPublic ? user.id : null;
+
+      // Check ownership before deleting
+      const existing = await db
+        .select({ userId: cronTasks.userId })
+        .from(cronTasks)
+        .where(eq(cronTasks.id, id))
+        .limit(1);
+
+      if (!existing[0]) {
+        return fail({
+          message: ErrorResponseTypes.NOT_FOUND.errorKey,
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      if (!isAdmin && existing[0].userId !== userId) {
+        return fail({
+          message:
+            "app.api.system.unifiedInterface.tasks.cronSystem.task.delete.errors.forbidden.title",
+          errorType: ErrorResponseTypes.FORBIDDEN,
+          messageParams: { taskId: id },
+        });
+      }
+
       logger.debug("Deleting cron task", { id });
       await db.delete(cronTasks).where(eq(cronTasks.id, id));
       logger.info("Successfully deleted cron task", { id });
@@ -258,9 +349,7 @@ export class CronTasksRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskExecution>> {
     try {
-      logger.debug("Creating cron task execution", {
-        taskId: execution.taskId,
-      });
+      logger.debug(`Creating execution for task "${execution.taskId}"`);
       const [newExecution] = await db
         .insert(cronTaskExecutions)
         .values(execution)
@@ -287,10 +376,9 @@ export class CronTasksRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskExecution>> {
     try {
-      logger.debug("Updating cron task execution", {
-        id,
-        updates: Object.keys(updates),
-      });
+      logger.debug(
+        `Updating execution "${id}" (${Object.keys(updates).join(", ")})`,
+      );
       const [updatedExecution] = await db
         .update(cronTaskExecutions)
         .set(updates)

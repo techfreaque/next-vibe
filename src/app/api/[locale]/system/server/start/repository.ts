@@ -94,7 +94,6 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
           // Set environment to production
           unifiedTaskRunnerRepository.environment = "production";
-          unifiedTaskRunnerRepository.supportsSideTasks = false; // Production: cron tasks only
 
           // Start the task runner in the background - manageRunner("start") blocks forever,
           // so we must NOT await it or Next.js will never start.
@@ -112,7 +111,9 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             });
 
           // Give the task runner a moment to initialize before proceeding
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          await new Promise<void>((resolve) => {
+            setTimeout(resolve, 500);
+          });
 
           const status = unifiedTaskRunnerRepository.getStatus();
           if (status.running) {
@@ -123,7 +124,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             );
             logger.info("Task runner started successfully", {
               environment: "production",
-              supportsSideTasks: false,
+              supportsTaskRunners: false,
             });
           } else {
             errors.push("Failed to start unified task runner");
@@ -229,7 +230,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
             logger.info("Task registry loaded successfully", {
               cronTasks: taskRegistry.cronTasks.length,
-              sideTasks: taskRegistry.sideTasks.length,
+              taskRunners: taskRegistry.taskRunners.length,
               totalTasks: taskRegistry.allTasks.length,
             });
 
@@ -250,7 +251,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
               environment: "production",
               running: status.running,
               activeTasks: status.activeTasks.length,
-              supportsSideTasks: false,
+              supportsTaskRunners: false,
             });
 
             output.push("   ✅ Production task runner system is operational");

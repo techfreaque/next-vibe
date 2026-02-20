@@ -70,6 +70,8 @@ export interface RouteExecutionContext extends Omit<
   cliArgs?: {
     positionalArgs: string[];
     namedArgs: CliObject;
+    /** Raw tokens after the command, for endpoint-aware re-parsing */
+    rawTokens?: string[];
   };
 
   /** More specific user type for CLI */
@@ -138,6 +140,7 @@ export interface CliExecutionOptions {
   cliArgs: {
     positionalArgs: string[];
     namedArgs: CliObject;
+    rawTokens?: string[];
   };
   locale: CountryLanguage;
   /** Platform identifier (CLI or CLI_PACKAGE) */
@@ -246,6 +249,7 @@ export class RouteDelegationHandler {
           urlPathParams: options.urlPathParams,
           positionalArgs: options.cliArgs?.positionalArgs ?? [],
           namedArgs: options.cliArgs?.namedArgs ?? [],
+          rawTokens: options.cliArgs?.rawTokens,
           interactive: false, // Non-interactive mode - args only
           dryRun: options.dryRun ?? false,
         },

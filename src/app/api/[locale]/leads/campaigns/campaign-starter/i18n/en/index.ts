@@ -2,6 +2,10 @@ import { translations as campaignStarterConfigTranslations } from "../../campaig
 
 export const translations = {
   campaignStarterConfig: campaignStarterConfigTranslations,
+  task: {
+    description:
+      "Start campaigns for new leads by transitioning them to PENDING status",
+  },
   errors: {
     server: {
       title: "Server Error",

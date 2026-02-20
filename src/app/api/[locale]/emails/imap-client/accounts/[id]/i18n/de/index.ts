@@ -258,6 +258,15 @@ export const translations = {
       description: "Konto erfolgreich gelöscht",
     },
   },
+  put: {
+    title: "IMAP-Konto bearbeiten",
+    basicInfo: "Grundlegende Informationen",
+    server: "Serververbindung",
+    auth: "Authentifizierung",
+    sync: "Synchronisierungskonfiguration",
+    submit: "Änderungen speichern",
+    submitting: "Speichern...",
+  },
   widget: {
     put: {
       title: "IMAP-Konto bearbeiten",

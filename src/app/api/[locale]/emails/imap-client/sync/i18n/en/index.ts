@@ -124,5 +124,13 @@ export const translations = {
     result: "Sync Result",
     duration: "Duration",
     errors: "Errors",
+    accountsProcessed: "Accounts Processed",
+    foldersProcessed: "Folders Processed",
+    messagesProcessed: "Messages Processed",
+    messagesAdded: "Messages Added",
+    messagesUpdated: "Messages Updated",
+    messagesDeleted: "Messages Deleted",
+    submit: "Start Sync",
+    submitting: "Syncing...",
   },
 };

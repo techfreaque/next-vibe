@@ -127,47 +127,93 @@ export class CliInputParser {
   }
 
   /**
-   * Simple CLI argument parser for when rawArgs is not available
-   * Supports nested object notation: --group.name=value
+   * Check whether an argument token looks like a flag (starts with - or --)
    */
-  static parseCliArgumentsSimple(args: string[]): {
+  private static isFlag(arg: string): boolean {
+    return arg.startsWith("-");
+  }
+
+  /**
+   * Peek at the next token: if it exists and doesn't look like a flag,
+   * consume it as the value for a named arg and return it.
+   * Returns undefined if no value token is available.
+   */
+  private static peekValue(
+    tokens: string[],
+    index: number,
+  ): { value: string; nextIndex: number } | undefined {
+    const next = tokens[index];
+    if (next && typeof next === "string" && !this.isFlag(next)) {
+      return { value: next, nextIndex: index + 1 };
+    }
+    return undefined;
+  }
+
+  /**
+   * Core token-loop shared by both simple and rawArgs parsers.
+   * Handles:
+   *   --key=value          explicit inline value
+   *   --key value          consumes one following non-flag token as value
+   *                        (unless the key is a known boolean field)
+   *   --key                boolean true (no following non-flag token)
+   *   -k                   single-dash short flags — always boolean, no lookahead
+   *   positional           collected into positionalArgs
+   *
+   * Multi-value arrays use positional args + firstCliArgKey (collects all positionals).
+   */
+  private static parseTokens(
+    tokens: string[],
+    booleanFields: Set<string> = new Set(),
+  ): {
     positionalArgs: string[];
     namedArgs: CliObject;
   } {
     const positionalArgs: string[] = [];
     const namedArgs: CliObject = {};
+    let i = 0;
 
-    for (let i = 0; i < args.length; i++) {
-      const arg = args[i];
+    while (i < tokens.length) {
+      const arg = tokens[i];
 
-      // Skip undefined, null, or empty arguments
       if (!arg || typeof arg !== "string") {
+        i++;
         continue;
       }
 
       if (arg.startsWith("--")) {
-        // Handle --key=value or --key (boolean flag)
         const sliced = arg.slice(2);
-        const [key, ...valueParts] = sliced.split("=");
-        let value: string | number | boolean;
+        const eqIndex = sliced.indexOf("=");
 
-        if (valueParts.length > 0) {
-          // --key=value format - use the explicit value
-          value = this.convertCliValue(valueParts.join("="));
+        if (eqIndex !== -1) {
+          // --key=value — explicit value, no lookahead
+          const key = this.kebabToCamelCase(sliced.slice(0, eqIndex));
+          const value = this.convertCliValue(sliced.slice(eqIndex + 1));
+          namedArgs[key] = value;
+          i++;
         } else {
-          // --key format without value - always boolean, never consume next argument
-          value = true;
+          // --key — lookahead only when not a known boolean field
+          const key = this.kebabToCamelCase(sliced);
+          const isBoolean = booleanFields.has(key) || booleanFields.has(sliced);
+          if (!isBoolean) {
+            const peeked = this.peekValue(tokens, i + 1);
+            if (peeked) {
+              namedArgs[key] = this.convertCliValue(peeked.value);
+              i = peeked.nextIndex;
+              continue;
+            }
+          }
+          namedArgs[key] = true;
+          i++;
         }
-
-        // Support nested object notation (e.g., --group.name=value)
-        this.setNestedValue(namedArgs, key, value);
-      } else if (arg.startsWith("-")) {
-        // Handle -k (single dash) - always boolean, never consume next argument
-        const key = arg.slice(1);
-        this.setNestedValue(namedArgs, key, true);
+      } else if (arg.startsWith("-") && arg.length > 1) {
+        // -k — single-dash short flags are always boolean, no lookahead
+        const key = this.kebabToCamelCase(arg.slice(1));
+        namedArgs[key] = true;
+        i++;
       } else {
         // Positional argument
         positionalArgs.push(arg);
+        i++;
       }
     }
 
@@ -175,86 +221,64 @@ export class CliInputParser {
   }
 
   /**
-   * Parse CLI arguments into structured data
+   * Simple CLI argument parser for when rawArgs is not available.
    * Supports nested object notation: --group.name=value
+   * Supports space-separated values: --key value
+   */
+  static parseCliArgumentsSimple(
+    args: string[],
+    endpoint?: CreateApiEndpointAny | null,
+  ): {
+    positionalArgs: string[];
+    namedArgs: CliObject;
+  } {
+    return this.parseTokens(
+      args,
+      this.buildBooleanFieldNames(endpoint ?? null),
+    );
+  }
+
+  /**
+   * Parse CLI arguments into structured data.
+   * Supports nested object notation: --group.name=value
+   * Supports space-separated values: --key value
    */
   static parseCliArguments(
     args: string[],
     rawArgs: string[],
     logger: EndpointLogger,
+    endpoint?: CreateApiEndpointAny | null,
   ): {
     positionalArgs: string[];
     namedArgs: CliObject;
   } {
-    const positionalArgs: string[] = [];
-    const namedArgs: CliObject = {};
-
     // Safety checks for input parameters
     if (!Array.isArray(args)) {
       logger.error("parseCliArguments: args is not an array", undefined, {
         argsType: typeof args,
       });
-      return { positionalArgs, namedArgs };
+      return { positionalArgs: [], namedArgs: {} };
     }
     if (!Array.isArray(rawArgs)) {
       logger.error("parseCliArguments: rawArgs is not an array", undefined, {
         rawArgsType: typeof rawArgs,
       });
-      return { positionalArgs, namedArgs };
+      return { positionalArgs: [], namedArgs: {} };
     }
 
-    // Find the command position in rawArgs to extract everything after it
-    const commandIndex = rawArgs.findIndex((arg) => arg && args.includes(arg));
+    // Find the command token (first non-flag positional) within rawArgs.
+    // Skip flag-like entries so unknown flags (e.g. --fix) in args[] don't
+    // accidentally match before the actual command name.
+    const commandIndex = rawArgs.findIndex(
+      (arg) => arg && !arg.startsWith("-") && args.includes(arg),
+    );
     const relevantArgs =
       commandIndex >= 0 ? rawArgs.slice(commandIndex + 1) : [];
 
-    for (let i = 0; i < relevantArgs.length; i++) {
-      const arg = relevantArgs[i];
-
-      // Skip undefined, null, or empty arguments
-      if (!arg || typeof arg !== "string") {
-        continue;
-      }
-
-      if (arg.startsWith("--")) {
-        // Handle --key=value or --key (boolean flag)
-        try {
-          const sliced = arg.slice(2);
-          if (typeof sliced !== "string") {
-            logger.error("parseCliArguments: sliced is not a string");
-            continue;
-          }
-          const [key, ...valueParts] = sliced.split("=");
-          let value: string | number | boolean;
-
-          if (valueParts.length > 0) {
-            // --key=value format - use the explicit value
-            value = this.convertCliValue(valueParts.join("="));
-          } else {
-            // --key format without value - always boolean, never consume next argument
-            value = true;
-          }
-
-          // Support nested object notation (e.g., --group.name=value)
-          this.setNestedValue(namedArgs, key, value);
-        } catch (parseError) {
-          logger.error(
-            "parseCliArguments: Error parsing double hyphen arg",
-            parseError as Error,
-          );
-          continue;
-        }
-      } else if (arg.startsWith("-")) {
-        // Handle -k (single dash) - always boolean, never consume next argument
-        const key = arg.slice(1);
-        this.setNestedValue(namedArgs, key, true);
-      } else {
-        // Positional argument
-        positionalArgs.push(arg);
-      }
-    }
-
-    return { positionalArgs, namedArgs };
+    return this.parseTokens(
+      relevantArgs,
+      this.buildBooleanFieldNames(endpoint ?? null),
+    );
   }
 
   /**
@@ -326,6 +350,101 @@ export class CliInputParser {
   }
 
   /**
+   * Resolve the core type string of a Zod field, unwrapping optional/default/nullable wrappers.
+   * Works with both Zod v3 (_def.typeName) and Zod v4 (.type / .def.type).
+   */
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Zod schema introspection requires opaque field type to support both v3 (_def.typeName) and v4 (.type/.def.type) APIs
+  private static resolveZodType(field: unknown): string | undefined {
+    if (!field || typeof field !== "object") {
+      return undefined;
+    }
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
+    const f = field as Record<string, unknown>;
+
+    // Zod v4: .type is the direct type string on the field itself
+    if (typeof f.type === "string" && f.type !== "object") {
+      if (
+        f.type === "optional" ||
+        f.type === "default" ||
+        f.type === "nullable"
+      ) {
+        // Unwrap to inner — check .def.innerType for v4
+        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
+        const def = f.def as Record<string, unknown> | undefined;
+        return this.resolveZodType(def?.innerType);
+      }
+      return f.type;
+    }
+
+    // Zod v4: .def.type
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
+    const def = f.def as Record<string, unknown> | undefined;
+    if (def && typeof def.type === "string") {
+      if (
+        def.type === "optional" ||
+        def.type === "default" ||
+        def.type === "nullable"
+      ) {
+        return this.resolveZodType(def.innerType);
+      }
+      return def.type;
+    }
+
+    // Zod v3: ._def.typeName
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
+    const _def = f._def as Record<string, unknown> | undefined;
+    if (_def && typeof _def.typeName === "string") {
+      const typeName = _def.typeName as string;
+      if (
+        typeName === "ZodDefault" ||
+        typeName === "ZodOptional" ||
+        typeName === "ZodNullable"
+      ) {
+        return this.resolveZodType(_def.innerType);
+      }
+      return typeName === "ZodBoolean" ? "boolean" : typeName;
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Collect the set of field names that are purely boolean in the endpoint schema.
+   * These flags must never consume the next token as their value.
+   * Works with both Zod v3 and Zod v4.
+   */
+  private static buildBooleanFieldNames(
+    endpointDefinition: CreateApiEndpointAny | null,
+  ): Set<string> {
+    const booleans = new Set<string>();
+    if (!endpointDefinition) {
+      return booleans;
+    }
+
+    const schema = endpointDefinition.requestSchema;
+    if (!schema) {
+      return booleans;
+    }
+
+    try {
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Zod internals are opaque; must use Record<string, unknown> to safely access .shape property
+      const shape = (schema as { shape?: Record<string, unknown> }).shape;
+      if (shape && typeof shape === "object") {
+        for (const [key, fieldSchema] of Object.entries(shape)) {
+          if (this.resolveZodType(fieldSchema) === "boolean") {
+            booleans.add(key);
+            booleans.add(this.kebabToCamelCase(key));
+          }
+        }
+      }
+    } catch {
+      // Best-effort — ignore errors
+    }
+
+    return booleans;
+  }
+
+  /**
    * Build a mapping of single-letter shortcuts to full field names
    */
   private static buildSingleLetterShortcuts(
@@ -384,29 +503,18 @@ export class CliInputParser {
   }
 
   /**
-   * Convert CLI string values to appropriate types
+   * Convert CLI string values to appropriate types.
+   * Arrays are passed through with each element normalized.
    */
   private static normalizeCliValue(
-    value:
-      | string
-      | number
-      | boolean
-      | null
-      | undefined
-      | CliRequestData
-      | CliRequestData[],
-  ):
-    | string
-    | number
-    | boolean
-    | null
-    | undefined
-    | CliRequestData
-    | CliRequestData[] {
+    value: CliValue | null | undefined,
+  ): CliValue | null | undefined {
+    if (Array.isArray(value)) {
+      return value.map((v) => this.normalizeCliValue(v) as CliValue);
+    }
     if (typeof value !== "string") {
       return value;
     }
-
     const lower = value.toLowerCase();
     if (lower === "true") {
       return true;
@@ -431,18 +539,10 @@ export class CliInputParser {
 
     const data: CliRequestData = {};
 
-    // Handle firstCliArgKey mapping
-    const firstCliArgKey = endpoint?.cli?.firstCliArgKey;
-
-    if (firstCliArgKey && positionalArgs.length > 0) {
-      data[firstCliArgKey] =
-        positionalArgs.length === 1 ? positionalArgs[0] : positionalArgs;
-    }
-
     // Build single-letter shortcuts for this endpoint
     const shortcuts = this.buildSingleLetterShortcuts(endpoint);
 
-    // Expand single-letter keys and process named arguments
+    // Expand single-letter keys and process named arguments first
     const expandedNamedArgs = this.expandNamedArgs(namedArgs, shortcuts);
 
     // Skip these CLI-level options (already in context.options)
@@ -463,14 +563,27 @@ export class CliInputParser {
         continue;
       }
 
-      // Convert kebab-case to camelCase
-      // eslint-disable-next-line no-unused-vars
-      const camelCaseKey = key.replaceAll(/-([a-z])/g, (_, letter: string) =>
-        letter.toUpperCase(),
-      );
+      // kebab-case → camelCase (assignValues already did this, but expandNamedArgs may not)
+      const camelCaseKey = this.kebabToCamelCase(key);
 
-      // Convert string boolean values to actual booleans
-      data[camelCaseKey] = this.normalizeCliValue(value);
+      // Convert string boolean values to actual booleans (arrays pass through).
+      // Cast is safe — Zod strips incompatible shapes at final parse.
+      data[camelCaseKey] = this.normalizeCliValue(
+        value,
+      ) as CliRequestData[string];
+    }
+
+    // Handle firstCliArgKey: merge positional args with any named value already set
+    const firstCliArgKey = endpoint?.cli?.firstCliArgKey;
+    if (firstCliArgKey && positionalArgs.length > 0) {
+      const existing = data[firstCliArgKey];
+      const existingArr: string[] = Array.isArray(existing)
+        ? (existing as string[])
+        : existing && typeof existing === "string"
+          ? [existing]
+          : [];
+      const merged = [...existingArr, ...positionalArgs];
+      data[firstCliArgKey] = merged.length === 1 ? merged[0] : merged;
     }
 
     return Object.keys(data).length > 0 ? data : null;
@@ -486,6 +599,8 @@ export class CliInputParser {
       urlPathParams?: CliUrlParams;
       positionalArgs: string[];
       namedArgs: CliObject;
+      /** Raw tokens after the command — used to re-parse with endpoint boolean field knowledge */
+      rawTokens?: string[];
       interactive: boolean;
       dryRun: boolean;
     },
@@ -497,11 +612,25 @@ export class CliInputParser {
     const interactive = params.interactive;
     const dryRun = params.dryRun;
 
+    // Re-parse tokens with endpoint boolean field awareness when raw tokens are available.
+    // The initial parse in vibe-runtime.ts didn't know the endpoint yet, so boolean flags
+    // may have incorrectly consumed the next token as their value. Re-parsing fixes that.
+    let positionalArgs = params.positionalArgs;
+    let namedArgs = params.namedArgs;
+    if (params.rawTokens && endpoint) {
+      const reparsed = CliInputParser.parseCliArgumentsSimple(
+        params.rawTokens,
+        endpoint,
+      );
+      positionalArgs = reparsed.positionalArgs;
+      namedArgs = reparsed.namedArgs;
+    }
+
     // Always try to build data from CLI arguments first
     const cliData = CliInputParser.buildDataFromCliArgs(
       endpoint,
-      params.positionalArgs,
-      params.namedArgs,
+      positionalArgs,
+      namedArgs,
     );
 
     if (contextData || (cliData && Object.keys(cliData).length > 0)) {
@@ -660,9 +789,9 @@ export interface CliObject {
 }
 
 /**
- * Type for CLI argument values - supports primitives and nested objects
+ * Type for CLI argument values - supports primitives, arrays, and nested objects
  */
-type CliValue = string | number | boolean | CliObject;
+type CliValue = string | number | boolean | CliObject | CliValue[];
 
 /**
  * Type for parsed CLI data - supports nested objects

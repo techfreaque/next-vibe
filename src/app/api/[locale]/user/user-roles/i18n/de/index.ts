@@ -80,6 +80,7 @@ export const translations: typeof enTranslations = {
       webOff: "Web Deaktiviert",
       mcpOn: "MCP Aktiviert",
       productionOff: "Produktion Deaktiviert",
+      remoteSkill: "Remote-Skill",
     },
   },
 };

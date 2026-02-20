@@ -12,8 +12,12 @@ import {
   ChevronRight,
   Loader2,
   Mail,
+  MessageCircle,
   RefreshCw,
+  Search,
+  Send,
 } from "next-vibe-ui/ui/icons";
+import { Input } from "next-vibe-ui/ui/input";
 import {
   Select,
   SelectContent,
@@ -32,9 +36,12 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 
+import {
+  MessageChannel,
+  MessageChannelFilter,
+  MessageChannelFilterOptions,
+} from "../../messaging/enum";
 import {
   EmailSortField,
   EmailSortFieldOptions,
@@ -101,6 +108,16 @@ const STATUS_TABS = [
   },
 ] as const;
 
+const CHANNEL_ICON: Record<
+  string,
+  React.ComponentType<{ className?: string }>
+> = {
+  [MessageChannel.EMAIL]: Mail,
+  [MessageChannel.SMS]: Send,
+  [MessageChannel.WHATSAPP]: MessageCircle,
+  [MessageChannel.TELEGRAM]: MessageCircle,
+};
+
 function EmailRow({
   email,
   onView,
@@ -111,9 +128,11 @@ function EmailRow({
   t: (key: string) => string;
 }): React.JSX.Element {
   const status = email.emailCore.status;
+  const channel = email.emailCore.channel ?? MessageChannel.EMAIL;
   const statusClassName =
     STATUS_STYLE[status] ??
     "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
+  const ChannelIcon = CHANNEL_ICON[channel] ?? Mail;
 
   return (
     <Div
@@ -121,7 +140,7 @@ function EmailRow({
       onClick={() => onView(email)}
     >
       <Div className="flex-shrink-0 w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
-        <Mail className="h-4 w-4 text-primary" />
+        <ChannelIcon className="h-4 w-4 text-primary" />
       </Div>
 
       <Div className="flex-1 min-w-0">
@@ -178,9 +197,7 @@ function EmailRow({
 
 export function EmailsListContainer({
   field,
-  fieldName,
 }: CustomWidgetProps): React.JSX.Element {
-  const children = field.children;
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const t = useWidgetTranslation();
@@ -275,6 +292,19 @@ export function EmailsListContainer({
     [form, onSubmit],
   );
 
+  const handleChannelFilter = useCallback(
+    (value: string): void => {
+      form?.setValue("filters.channel", value);
+      if (onSubmit) {
+        onSubmit();
+      }
+    },
+    [form, onSubmit],
+  );
+
+  const activeChannel: string =
+    form?.watch("filters.channel") ?? MessageChannelFilter.ANY;
+
   const sortBy: string =
     form?.watch("displayOptions.sortBy") ?? EmailSortField.CREATED_AT;
   const sortOrder: string =
@@ -289,7 +319,6 @@ export function EmailsListContainer({
     <Div className="flex flex-col gap-0">
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
-        <NavigateButtonWidget field={children.backButton} />
         <Span className="font-semibold text-base">
           {t("app.api.emails.messages.list.title")}
           {total > 0 && (
@@ -321,8 +350,8 @@ export function EmailsListContainer({
         </Button>
       </Div>
 
-      {/* Status filter tabs */}
-      <Div className="flex items-center gap-1 px-4 pt-3 pb-1 flex-wrap">
+      {/* Status filter tabs — scrollable */}
+      <Div className="flex items-center gap-1 px-4 pt-3 pb-1 overflow-x-auto scrollbar-none">
         {STATUS_TABS.map((tab) => {
           const isActive = activeStatus === tab.value;
           const count =
@@ -337,7 +366,7 @@ export function EmailsListContainer({
               size="sm"
               onClick={() => handleStatusTab(tab.value)}
               className={cn(
-                "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-colors border",
+                "flex-shrink-0 inline-flex items-center gap-1 px-3 py-1 h-7 rounded-full text-xs font-medium transition-colors border",
                 isActive
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-transparent text-muted-foreground border-border hover:bg-accent",
@@ -361,8 +390,8 @@ export function EmailsListContainer({
         })}
       </Div>
 
-      {/* Type filter chips */}
-      <Div className="flex items-center gap-1 px-4 pb-1 flex-wrap">
+      {/* Type filter chips — scrollable */}
+      <Div className="flex items-center gap-1 px-4 pb-1 overflow-x-auto scrollbar-none">
         {EmailTypeFilterOptions.map((tab) => {
           const isActive = activeType === tab.value;
           return (
@@ -373,7 +402,31 @@ export function EmailsListContainer({
               size="sm"
               onClick={() => handleTypeFilter(tab.value)}
               className={cn(
-                "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border transition-colors",
+                "flex-shrink-0 inline-flex items-center px-2.5 py-1 h-7 rounded-full text-xs font-medium border transition-colors",
+                isActive
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-transparent text-muted-foreground border-border hover:bg-accent",
+              )}
+            >
+              {t(tab.label)}
+            </Button>
+          );
+        })}
+      </Div>
+
+      {/* Channel filter chips — scrollable */}
+      <Div className="flex items-center gap-1 px-4 pb-1 overflow-x-auto scrollbar-none">
+        {MessageChannelFilterOptions.map((tab) => {
+          const isActive = activeChannel === tab.value;
+          return (
+            <Button
+              key={tab.value}
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => handleChannelFilter(tab.value)}
+              className={cn(
+                "flex-shrink-0 inline-flex items-center px-2.5 py-1 h-7 rounded-full text-xs font-medium border transition-colors",
                 isActive
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-transparent text-muted-foreground border-border hover:bg-accent",
@@ -386,15 +439,25 @@ export function EmailsListContainer({
       </Div>
 
       {/* Search + sort */}
-      <Div className="px-4 pt-2 pb-2 flex items-center gap-2 flex-wrap">
-        <Div className="flex-1 min-w-[160px]">
-          <TextFieldWidget
-            fieldName={`${fieldName}.filters.search`}
-            field={children.filters.children.search}
+      <Div className="px-4 pt-2 pb-2 flex items-center gap-2 border-b">
+        <Div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Input
+            value={form?.watch("filters.search") ?? ""}
+            onChange={(e) => {
+              form?.setValue("filters.search", e.target.value);
+              if (onSubmit) {
+                onSubmit();
+              }
+            }}
+            placeholder={t(
+              "app.api.emails.messages.list.widget.searchPlaceholder",
+            )}
+            className="pl-9 h-9"
           />
         </Div>
         <Select value={sortBy} onValueChange={handleSortByChange}>
-          <SelectTrigger className="h-9 min-w-[140px]">
+          <SelectTrigger className="h-9 w-[140px] flex-shrink-0">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -406,7 +469,7 @@ export function EmailsListContainer({
           </SelectContent>
         </Select>
         <Select value={sortOrder} onValueChange={handleSortOrderChange}>
-          <SelectTrigger className="h-9 min-w-[80px]">
+          <SelectTrigger className="h-9 w-[110px] flex-shrink-0">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

@@ -1,5 +1,5 @@
 export const translations = {
-  title: "List IMAP Folders",
+  title: "Folders",
   description: "Retrieve a list of IMAP folders",
   category: "API Endpoint",
   tag: "Folders",
@@ -99,6 +99,13 @@ export const translations = {
     title: "Success",
     description: "Folders retrieved successfully",
   },
+  empty: "No folders found",
+  refresh: "Refresh",
+  sync: "Sync Folders",
+  messages: "Messages",
+  unseen: "Unseen",
+  more: "more",
+  showLess: "Show less",
   widget: {
     title: "IMAP Folders",
     refresh: "Refresh",
@@ -106,5 +113,7 @@ export const translations = {
     empty: "No folders found",
     messages: "Messages",
     unseen: "Unseen",
+    more: "more",
+    showLess: "Show less",
   },
 };

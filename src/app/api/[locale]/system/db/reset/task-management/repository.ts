@@ -24,7 +24,7 @@ import type {
  * Task interface for internal operations
  */
 interface Task {
-  type: "cron" | "manual" | "side";
+  type: "cron" | "manual" | "task-runner";
   name: string;
   description: string;
   schedule?: string;
@@ -500,7 +500,8 @@ export class ResetTaskManagementRepositoryImpl implements ResetTaskManagementRep
         data: {
           taskCount: taskList.length,
           cronTaskCount: taskList.filter((t) => t.type === "cron").length,
-          sideTaskCount: taskList.filter((t) => t.type === "side").length,
+          taskRunnerCount: taskList.filter((t) => t.type === "task-runner")
+            .length,
           enabledCount: taskList.filter((t) => t.enabled).length,
         },
       };
@@ -552,9 +553,9 @@ export class ResetTaskManagementRepositoryImpl implements ResetTaskManagementRep
       },
     });
 
-    // Database Backup Verification Side Task
+    // Database Backup Verification Task Runner
     this.tasks.set("db-backup-verification", {
-      type: "side",
+      type: "task-runner",
       name: "db-backup-verification",
       description: "Description",
       category: "backup",

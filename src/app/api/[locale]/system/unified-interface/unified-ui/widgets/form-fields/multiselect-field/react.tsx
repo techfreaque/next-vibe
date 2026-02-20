@@ -92,7 +92,7 @@ export function MultiSelectFieldWidget<
         const { style } = theme;
 
         const multiselectValue: string[] = Array.isArray(formField.value)
-          ? formField.value
+          ? formField.value.map(String)
           : [];
 
         return (
@@ -167,7 +167,14 @@ export function MultiSelectFieldWidget<
                   }),
                 )}
                 value={multiselectValue}
-                onChange={(newValue) => formField.onChange(newValue)}
+                onChange={(newValue) => {
+                  const hasNumericOptions = field.options.some(
+                    (opt) => typeof opt.value === "number",
+                  );
+                  formField.onChange(
+                    hasNumericOptions ? newValue.map(Number) : newValue,
+                  );
+                }}
                 placeholder={
                   field.placeholder ? t(field.placeholder) : undefined
                 }

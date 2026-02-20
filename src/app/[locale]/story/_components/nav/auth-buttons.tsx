@@ -3,6 +3,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
+import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -11,6 +12,10 @@ interface AuthButtonsProps {
 }
 
 export function AuthButtons({ locale }: AuthButtonsProps): JSX.Element {
+  if (envClient.NEXT_PUBLIC_LOCAL_MODE) {
+    return <></>;
+  }
+
   const { t } = simpleT(locale);
 
   return (
@@ -33,6 +38,10 @@ export function AuthButtons({ locale }: AuthButtonsProps): JSX.Element {
 }
 
 export function MobileAuthButtons({ locale }: AuthButtonsProps): JSX.Element {
+  if (envClient.NEXT_PUBLIC_LOCAL_MODE) {
+    return <></>;
+  }
+
   const { t } = simpleT(locale);
 
   return (

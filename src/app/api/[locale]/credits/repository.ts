@@ -123,7 +123,7 @@ export interface CreditTransactionOutput {
   balanceAfter: number;
   type: string;
   messageId: string | null;
-  createdAt: string;
+  createdAt: Date;
 }
 
 /**
@@ -698,7 +698,7 @@ export class CreditRepository {
       expiring: totalExpiring,
       permanent: totalPermanent,
       earned: totalEarned,
-      expiresAt: earliestExpiry?.toISOString() || null,
+      expiresAt: earliestExpiry ?? null,
     };
   }
 
@@ -900,7 +900,7 @@ export class CreditRepository {
             },
           });
 
-          logger.info("Created new lead wallet", {
+          logger.debug("Created new lead wallet", {
             leadId,
             walletId: wallet.id,
             initialCredits,
@@ -2201,7 +2201,7 @@ export class CreditRepository {
               : transaction.type,
             modelId: transaction.modelId,
             messageId: transaction.messageId,
-            createdAt: transaction.createdAt.toISOString(),
+            createdAt: transaction.createdAt,
           };
         },
       );
@@ -2214,7 +2214,7 @@ export class CreditRepository {
           balanceAfter: updatedPool.userWallet.balance,
           type: t(CreditTransactionType.OTHER_DEVICES),
           messageId: null,
-          createdAt: new Date().toISOString(),
+          createdAt: new Date(),
         });
       }
 
@@ -2433,7 +2433,7 @@ export class CreditRepository {
               ? `${t(transaction.type)} (${featureLabel})`
               : transaction.type,
             messageId: transaction.messageId,
-            createdAt: transaction.createdAt.toISOString(),
+            createdAt: transaction.createdAt,
           };
         },
       );
@@ -2447,7 +2447,7 @@ export class CreditRepository {
           balanceAfter: currentWallet.balance,
           type: t("app.api.credits.enums.transactionType.otherDevices"),
           messageId: null,
-          createdAt: new Date().toISOString(),
+          createdAt: new Date(),
         });
       }
 
@@ -3390,9 +3390,8 @@ export class CreditRepository {
         amount: t.amount,
         balanceAfter: t.balanceAfter,
         type: t.type,
-        modelId: t.modelId,
         messageId: t.messageId,
-        createdAt: t.createdAt.toISOString(),
+        createdAt: t.createdAt,
       }));
 
       return success({

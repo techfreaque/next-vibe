@@ -10,6 +10,7 @@ import {
 } from "next-vibe/shared/types/stats-filtering.schema";
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -292,7 +293,7 @@ const { GET } = createEndpoint({
         label: "app.api.leads.stats.dateFrom.label",
         description: "app.api.leads.stats.dateFrom.description",
         columns: 6,
-        schema: z.coerce.date().optional(),
+        schema: dateSchema.optional(),
       }),
 
       dateTo: requestField({
@@ -301,7 +302,7 @@ const { GET } = createEndpoint({
         label: "app.api.leads.stats.dateTo.label",
         description: "app.api.leads.stats.dateTo.description",
         columns: 6,
-        schema: z.coerce.date().optional(),
+        schema: dateSchema.optional(),
       }),
 
       chartType: requestField({
@@ -533,7 +534,7 @@ const { GET } = createEndpoint({
         label: "app.api.leads.stats.createdAfter.label",
         description: "app.api.leads.stats.createdAfter.description",
         columns: 6,
-        schema: z.coerce.date().optional(),
+        schema: dateSchema.optional(),
       }),
 
       createdBefore: requestField({
@@ -542,7 +543,7 @@ const { GET } = createEndpoint({
         label: "app.api.leads.stats.createdBefore.label",
         description: "app.api.leads.stats.createdBefore.description",
         columns: 6,
-        schema: z.coerce.date().optional(),
+        schema: dateSchema.optional(),
       }),
 
       updatedAfter: requestField({
@@ -551,7 +552,7 @@ const { GET } = createEndpoint({
         label: "app.api.leads.stats.updatedAfter.label",
         description: "app.api.leads.stats.updatedAfter.description",
         columns: 6,
-        schema: z.coerce.date().optional(),
+        schema: dateSchema.optional(),
       }),
 
       updatedBefore: requestField({
@@ -560,7 +561,7 @@ const { GET } = createEndpoint({
         label: "app.api.leads.stats.updatedBefore.label",
         description: "app.api.leads.stats.updatedBefore.description",
         columns: 6,
-        schema: z.coerce.date().optional(),
+        schema: dateSchema.optional(),
       }),
 
       // Search

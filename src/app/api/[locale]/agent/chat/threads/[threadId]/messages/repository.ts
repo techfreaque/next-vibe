@@ -734,7 +734,7 @@ export class MessagesRepository {
 
       return success({
         id: message.id,
-        createdAt: message.createdAt.toISOString(),
+        createdAt: message.createdAt,
       });
     } catch (error) {
       logger.error("Error creating message", parseError(error));

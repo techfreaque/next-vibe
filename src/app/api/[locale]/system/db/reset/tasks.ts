@@ -7,7 +7,7 @@ import {
   CronTaskPriority,
   TaskCategory,
 } from "../../unified-interface/tasks/enum";
-import type { Task } from "../../unified-interface/tasks/types/repository";
+import type { Task } from "../../unified-interface/tasks/unified-runner/types";
 
 /**
  * Database Reset Safety Check Cron Task
@@ -68,7 +68,7 @@ const devDbAutoResetTask: Task = {
  * Verifies database backups before allowing resets
  */
 const dbBackupVerificationTask: Task = {
-  type: "side",
+  type: "task-runner",
   name: "db-backup-verification",
   // eslint-disable-next-line i18next/no-literal-string
   description: "Verify database backups before allowing resets",
