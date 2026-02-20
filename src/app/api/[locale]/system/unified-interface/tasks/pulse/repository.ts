@@ -394,11 +394,11 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         candidateNames.length > 0
           ? await db
               .select({
-                name: cronTasksTable.name,
+                name: cronTasksTable.routeId,
                 enabled: cronTasksTable.enabled,
               })
               .from(cronTasksTable)
-              .where(inArray(cronTasksTable.name, candidateNames))
+              .where(inArray(cronTasksTable.routeId, candidateNames))
           : [];
       const dbEnabledMap = new Map(
         dbEnabledRows.map((r) => [r.name, r.enabled]),

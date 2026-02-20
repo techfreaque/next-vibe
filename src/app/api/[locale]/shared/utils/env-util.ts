@@ -16,19 +16,35 @@ export function validateEnv<TSchema extends z.ZodType>(
   envSchema: TSchema,
   logger: EndpointLogger,
 ): z.infer<TSchema> {
+  // Treat empty strings as undefined so optional schemas work correctly
+  // when Docker passes unset build args as empty strings
+  const normalizedEnv = Object.fromEntries(
+    Object.entries(env).map(([k, v]) => [k, v === "" ? undefined : v]),
+  );
+
   const validationResult = validateData<TSchema>(
-    env as z.input<TSchema>,
+    normalizedEnv as z.input<TSchema>,
     envSchema,
     logger,
   );
   if (!validationResult.success) {
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Environment validation must throw on startup to prevent invalid configuration
-    throw new Error(
-      // eslint-disable-next-line i18next/no-literal-string
-      `Environment validation error: ${validationResult.message} ${JSON.stringify(
-        validationResult,
-      )}`,
-    );
+    const errors = validationResult.messageParams?.["error"] as
+      | string
+      | undefined;
+    // eslint-disable-next-line i18next/no-literal-string
+    const message = [
+      "──────────────────────────────────────────",
+      "  Environment variable validation failed",
+      "──────────────────────────────────────────",
+      ...(errors ? errors.split(", ").map((e) => `  ✗ ${e}`) : []),
+      "",
+      "  Check your .env file or docker build args.",
+      "──────────────────────────────────────────",
+    ].join("\n");
+    // eslint-disable-next-line no-console -- intentional: env errors must be visible even without a logger
+    logger.error(message);
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Clean exit on env misconfiguration, no stack trace needed
+    process.exit(1);
   }
   return validationResult.data as z.infer<TSchema>;
 }

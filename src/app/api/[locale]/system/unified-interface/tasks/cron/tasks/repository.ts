@@ -1,6 +1,5 @@
 /**
  * Cron Tasks Repository
- * Migrated from side-tasks-old/cron/tasks/repository.ts
  * Data access layer for cron tasks listing and management functionality
  */
 
@@ -26,6 +25,7 @@ import {
   CronTaskEnabledFilter,
   CronTaskPriority,
   TaskCategory,
+  TaskOutputMode,
 } from "../../enum";
 import type {
   CronTaskCreateRequestOutput,
@@ -57,26 +57,33 @@ function formatTaskResponse(
 
   const formatted: CronTaskResponseType = {
     id: task.id,
-    name: task.name,
-    description: task.description,
+    routeId: task.routeId,
+    displayName: task.displayName,
+    description: task.description ?? null,
     version: task.version,
     category: task.category,
     schedule: task.schedule,
-    timezone: task.timezone,
+    timezone: task.timezone ?? null,
     enabled: task.enabled,
     priority: task.priority,
-    timeout: task.timeout,
-    retries: task.retries,
-    retryDelay: task.retryDelay,
-    lastExecutedAt: task.lastExecutedAt?.toISOString() || null,
-    lastExecutionStatus: task.lastExecutionStatus,
-    lastExecutionError: task.lastExecutionError,
-    lastExecutionDuration: task.lastExecutionDuration,
+    timeout: task.timeout ?? null,
+    retries: task.retries ?? null,
+    retryDelay: task.retryDelay ?? null,
+    defaultConfig: task.defaultConfig as CronTaskResponseType["defaultConfig"],
+    outputMode: task.outputMode,
+    notificationTargets:
+      task.notificationTargets as CronTaskResponseType["notificationTargets"],
+    lastExecutedAt: task.lastExecutedAt?.toISOString() ?? null,
+    lastExecutionStatus: task.lastExecutionStatus ?? null,
+    lastExecutionError: task.lastExecutionError ?? null,
+    lastExecutionDuration: task.lastExecutionDuration ?? null,
     nextExecutionAt,
     executionCount: task.executionCount,
     successCount: task.successCount,
     errorCount: task.errorCount,
-    averageExecutionTime: task.averageExecutionTime,
+    averageExecutionTime: task.averageExecutionTime ?? null,
+    tags: task.tags as CronTaskResponseType["tags"],
+    userId: task.userId ?? null,
     createdAt: task.createdAt.toISOString(),
     updatedAt: task.updatedAt.toISOString(),
   };
@@ -204,31 +211,14 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskCreateResponseOutput>> {
     try {
-      logger.info("Starting cron task creation");
-
-      // Check if task with same name already exists
-      const existingTask = await db
-        .select()
-        .from(cronTasks)
-        .where(eq(cronTasks.name, data.name))
-        .limit(1);
-
-      if (existingTask.length > 0) {
-        logger.warn("Task with same name already exists", {
-          name: data.name,
-        });
-        return fail({
-          message:
-            "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.conflict.title",
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
+      logger.info("Starting cron task creation", { routeId: data.routeId });
 
       const userId = !user.isPublic ? user.id : null;
 
       // Prepare task data for insertion
       const taskData = {
-        name: data.name,
+        routeId: data.routeId,
+        displayName: data.displayName,
         description: data.description || null,
         schedule: data.schedule,
         enabled: data.enabled ?? true,
@@ -238,14 +228,23 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         retries: data.retries ?? 3,
         retryDelay: data.retryDelay ?? 5000,
         version: "1.0.0",
-        defaultConfig: {},
+        defaultConfig:
+          (data.defaultConfig as Record<
+            string,
+            string | number | boolean | null
+          >) ?? {},
+        outputMode: data.outputMode ?? TaskOutputMode.STORE_ONLY,
+        notificationTargets: [],
         executionCount: 0,
         successCount: 0,
         errorCount: 0,
         userId,
       };
 
-      logger.debug("Inserting task into database", taskData);
+      logger.debug("Inserting task into database", {
+        routeId: taskData.routeId,
+        displayName: taskData.displayName,
+      });
 
       // Insert the task into the database
       const [createdTask] = await db
@@ -264,47 +263,21 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
 
       logger.info("Task created successfully", {
         id: createdTask.id,
-        name: createdTask.name,
+        routeId: createdTask.routeId,
       });
 
       // Format the response
       const response: CronTaskCreateResponseOutput = {
-        task: {
-          id: createdTask.id,
-          name: createdTask.name,
-          description: createdTask.description,
-          version: createdTask.version,
-          category: createdTask.category,
-          schedule: createdTask.schedule,
-          timezone: createdTask.timezone,
-          enabled: createdTask.enabled,
-          priority: createdTask.priority,
-          timeout: createdTask.timeout,
-          retries: createdTask.retries,
-          retryDelay: createdTask.retryDelay,
-          lastExecutedAt: createdTask.lastExecutedAt?.toISOString() || null,
-          lastExecutionStatus: createdTask.lastExecutionStatus,
-          lastExecutionError: createdTask.lastExecutionError,
-          lastExecutionDuration: createdTask.lastExecutionDuration,
-          nextExecutionAt: createdTask.nextExecutionAt?.toISOString() || null,
-          executionCount: createdTask.executionCount,
-          successCount: createdTask.successCount,
-          errorCount: createdTask.errorCount,
-          averageExecutionTime: createdTask.averageExecutionTime,
-          createdAt: createdTask.createdAt.toISOString(),
-          updatedAt: createdTask.updatedAt.toISOString(),
-        },
+        task: formatTaskResponse(createdTask, logger),
       };
 
       logger.vibe("🚀 Successfully created cron task");
-      logger.debug("Created task response", response);
-
       return success(response);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to create cron task", parsedError);
 
-      // Check for unique constraint violation
+      // Check for unique constraint violation (system tasks with same routeId)
       if (parsedError.message?.includes(UNIQUE_CONSTRAINT_ERROR)) {
         return fail({
           message:

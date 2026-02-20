@@ -15,13 +15,30 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPrivatePayloadType } from "../../../../user/auth/types";
-import type { CronTaskPriority, TaskCategory } from "../enum";
+import type {
+  AiAgentThreadMode,
+  CronStepType,
+  CronTaskPriority,
+  TaskCategory,
+  TaskOutputMode,
+} from "../enum";
+
+/**
+ * JSON-serializable scalar value
+ */
+export type TaskConfigValue =
+  | string
+  | number
+  | boolean
+  | null
+  | TaskConfigValue[]
+  | { [key: string]: TaskConfigValue };
 
 /**
  * Task Configuration
  */
 export interface TaskConfig {
-  [key: string]: string | number | boolean | string[] | number[];
+  [key: string]: TaskConfigValue;
 }
 
 /**
@@ -115,6 +132,77 @@ export type TaskRollbackFunction<TConfig = TaskConfig> = (
   context: TaskExecutionContext<TConfig>,
 ) => Promise<ResponseType<boolean>>;
 
+// ─── Cron Steps Types ─────────────────────────────────────────────────────────
+
+/** A pre-seeded tool call for ai_agent steps */
+export interface PreSeededToolCall {
+  toolId: string;
+  args: Record<string, TaskConfigValue>;
+  /** Static value or "$step_N_result" template reference */
+  result: TaskConfigValue;
+}
+
+/** A "call" step — invokes a route or task handler by routeId */
+export interface CronCallStep {
+  type: (typeof CronStepType)[keyof typeof CronStepType];
+  /** Endpoint alias, full path, or task name — resolved via resolveRouteId() */
+  routeId: string;
+  args: Record<string, TaskConfigValue>;
+  parallel?: boolean;
+}
+
+/** An "ai_agent" step — runs an AI agent with optional pre-seeded tool calls */
+export interface CronAiAgentStep {
+  type: (typeof CronStepType)[keyof typeof CronStepType];
+  model: string;
+  character: string;
+  prompt: string;
+  preSeededToolCalls?: PreSeededToolCall[];
+  /** Optional whitelist of tool routeIds; defaults to all owner-accessible tools */
+  availableTools?: string[];
+  maxTurns?: number;
+  threadMode: (typeof AiAgentThreadMode)[keyof typeof AiAgentThreadMode];
+  /** For "append" mode — the thread to continue */
+  threadId?: string;
+  /** For "new" mode — folder to place the thread in */
+  folderId?: string;
+  /** After first run, stores threadId and switches to "append" mode */
+  autoAppendAfterFirst?: boolean;
+}
+
+export type CronStep = CronCallStep | CronAiAgentStep;
+
+/** Config for "cron-steps" routeId tasks */
+export interface CronStepsConfig {
+  steps: CronStep[];
+}
+
+/** Notification target for outputMode notifications */
+export interface NotificationTarget {
+  type: "email" | "sms" | "webhook";
+  target: string;
+}
+
+/** Result of a single step execution */
+export interface StepResult {
+  stepIndex: number;
+  stepType: string;
+  success: boolean;
+  result?: CronTaskRunResult | null;
+  error?: string;
+  durationMs?: number;
+  threadId?: string;
+  tokenCount?: number;
+}
+
+// ─── Route Resolution ─────────────────────────────────────────────────────────
+
+export type ResolveRouteIdResult =
+  | { kind: "endpoint"; path: string }
+  | { kind: "task"; task: CronTask }
+  | { kind: "steps" }
+  | { kind: "unknown" };
+
 /** Structured result data returned by a cron task's run() function */
 export interface CronTaskRunResult {
   [key: string]:
@@ -128,10 +216,14 @@ export interface CronTaskRunResult {
 }
 
 /**
- * Cron Task — scheduled task driven by the pulse runner
+ * Cron Task — scheduled task driven by the pulse runner.
+ * Use the generic TConfig to narrow the config type in individual task files,
+ * while the base type (TConfig = TaskConfig) is the structural contract used
+ * when storing tasks in registries / Task[] arrays.
  */
-export interface CronTask {
+export interface CronTask<TConfig extends TaskConfig = TaskConfig> {
   type: "cron";
+  /** Unique task name — used as routeId in DB for system tasks */
   name: string;
   description: string;
   schedule: string;
@@ -139,21 +231,29 @@ export interface CronTask {
   enabled: boolean;
   priority?: (typeof CronTaskPriority)[keyof typeof CronTaskPriority];
   timeout?: number;
-  run: (props: {
+  /** Output notification mode */
+  outputMode?: (typeof TaskOutputMode)[keyof typeof TaskOutputMode];
+  /** Zod schema for validating defaultConfig — used by executor for central validation */
+  configSchema?: z.ZodSchema<TaskConfig>;
+  /** Default configuration values — validated against configSchema at runtime */
+  defaultConfig?: TaskConfig;
+  run(props: {
     logger: EndpointLogger;
     locale: CountryLanguage;
     cronUser: JwtPrivatePayloadType;
-  }) =>
+    /** Config loaded from DB (validated against configSchema) */
+    config: TConfig;
+  }):
     | Promise<void | ErrorResponseType | ResponseType<CronTaskRunResult>>
     | void
     | ErrorResponseType
     | ResponseType<CronTaskRunResult>;
-  onError?: (props: {
+  onError?(props: {
     error: Error;
     logger: EndpointLogger;
     locale: CountryLanguage;
     cronUser: JwtPrivatePayloadType;
-  }) => Promise<void> | void;
+  }): Promise<void> | void;
 }
 
 /**
@@ -186,7 +286,7 @@ export interface TaskRunner {
   }) => Promise<void>;
 }
 
-export type Task = CronTask | TaskRunner;
+export type Task = CronTask<TaskConfig> | TaskRunner;
 
 /**
  * Task Discovery and Registration

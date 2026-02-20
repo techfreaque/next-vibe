@@ -217,7 +217,32 @@ function TaskRow({
       {/* Main content */}
       <Div className="flex-1 min-w-0">
         <Div className="flex flex-wrap items-center gap-2 mb-0.5">
-          <Span className="font-semibold text-sm truncate">{task.name}</Span>
+          <Span className="font-semibold text-sm truncate">
+            {task.displayName}
+          </Span>
+          {/* routeId badge */}
+          <Span
+            className={cn(
+              "px-1.5 py-0.5 rounded text-xs font-mono",
+              "bg-muted text-muted-foreground",
+            )}
+          >
+            {task.routeId}
+          </Span>
+          {/* System vs user owner chip */}
+          {task.userId === null ? (
+            <Span className="px-1.5 py-0.5 rounded text-xs font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300">
+              {t(
+                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.owner.system",
+              )}
+            </Span>
+          ) : (
+            <Span className="px-1.5 py-0.5 rounded text-xs font-medium bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300">
+              {t(
+                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.owner.user",
+              )}
+            </Span>
+          )}
           <Span
             className={cn(
               "px-1.5 py-0.5 rounded text-xs font-medium",
@@ -496,7 +521,8 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
       const q = search.toLowerCase();
       result = result.filter(
         (t) =>
-          t.name.toLowerCase().includes(q) ||
+          t.displayName.toLowerCase().includes(q) ||
+          t.routeId.toLowerCase().includes(q) ||
           (t.description?.toLowerCase().includes(q) ?? false) ||
           t.category.toLowerCase().includes(q),
       );
@@ -504,9 +530,9 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
 
     const sorted = [...result];
     if (sort === "name_asc") {
-      sorted.sort((a, b) => a.name.localeCompare(b.name));
+      sorted.sort((a, b) => a.displayName.localeCompare(b.displayName));
     } else if (sort === "name_desc") {
-      sorted.sort((a, b) => b.name.localeCompare(a.name));
+      sorted.sort((a, b) => b.displayName.localeCompare(a.displayName));
     } else if (sort === "schedule") {
       sorted.sort((a, b) => a.schedule.localeCompare(b.schedule));
     } else if (sort === "last_run_desc") {
@@ -655,11 +681,12 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         navigate(m.default.PUT, {
           urlPathParams: { id: task.id },
           data: {
-            name: task.name,
+            displayName: task.displayName,
             description: task.description ?? undefined,
             schedule: task.schedule,
             enabled: task.enabled,
             priority: task.priority,
+            outputMode: task.outputMode,
             timeout: task.timeout ?? undefined,
             retries: task.retries ?? undefined,
           },
