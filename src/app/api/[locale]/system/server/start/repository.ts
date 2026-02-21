@@ -12,10 +12,6 @@ import type { ChildProcess } from "node:child_process";
 import { execSync, spawn } from "node:child_process";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -87,8 +83,8 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       output.push(`   🌐 Target port: ${port}`);
 
       // Database setup FIRST — must happen before task runner so all DB
-      // connections (migrations, seeds, pulse) use the preview postgres.
-      if (!data.skipDbSetup) {
+      // connections (seeds, pulse) use the preview postgres.
+      if (data.dbSetup) {
         output.push("");
         output.push("🗄️  Database Setup");
 
@@ -149,14 +145,14 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       } else {
         output.push("");
         output.push("🗄️  Database Setup");
-        output.push("   ⏭️ Database setup skipped (--skip-db-setup flag used)");
+        output.push("   ⏭️ Database setup skipped (--db-setup=false)");
       }
 
       output.push("");
       output.push("📋 Task Runner Setup");
 
       // Initialize single unified task runner for production environment
-      if (!data.skipTaskRunner) {
+      if (data.taskRunner) {
         logger.info("Starting unified task runner for production");
         output.push(
           "   🔄 Initializing unified task runner for production environment...",
@@ -217,65 +213,13 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           });
         }
       } else {
-        output.push("   ⏭️ Task runner skipped (--skip-task-runner flag used)");
+        output.push("   ⏭️ Task runner skipped (--task-runner=false)");
       }
 
-      if (!data.skipPre) {
+      if (data.seed) {
         output.push("");
-        output.push("🔄 Pre-Start Tasks");
-        output.push("   🚀 Running production pre-start tasks...");
+        output.push("🌱 Database Seeding");
 
-        // Run migrations (dynamic import — DB modules must load after DATABASE_URL is set)
-        output.push("   📊 Running database migrations...");
-        try {
-          const { databaseMigrationRepository } =
-            await import("../../db/migrate/repository");
-          const migrateResult = await databaseMigrationRepository.runMigrations(
-            {
-              generate: false,
-              dryRun: false,
-              redo: false,
-              schema: "public",
-            },
-            locale,
-            logger,
-          );
-
-          if (migrateResult.success) {
-            output.push("   ✅ Database migrations completed");
-          } else {
-            const errorMsg = `Failed to run migrations: ${migrateResult.messageParams?.error || "Unknown error"}`;
-            errors.push(errorMsg);
-            output.push(`   ❌ ${errorMsg}`);
-            logger.error("Migration failed, cannot start server", {
-              error: migrateResult.messageParams,
-            });
-            return fail({
-              message: "app.api.system.server.start.post.errors.server.title",
-              errorType: ErrorResponseTypes.INTERNAL_ERROR,
-              messageParams: {
-                error: errorMsg,
-              },
-            });
-          }
-        } catch (error) {
-          const errorMsg = `Failed to run migrations: ${parseError(error).message}`;
-          errors.push(errorMsg);
-          output.push(`   ❌ ${errorMsg}`);
-          logger.error("Migration error, cannot start server", {
-            error: errorMsg,
-          });
-          return fail({
-            message: "app.api.system.server.start.post.errors.server.title",
-            errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: {
-              error: errorMsg,
-            },
-          });
-        }
-
-        // Seed database (dynamic import — DB modules must load after DATABASE_URL is set)
-        output.push("   🌱 Seeding production database...");
         try {
           const { seedDatabase } =
             await import("@/app/api/[locale]/system/db/seed/seed-manager");
@@ -286,16 +230,14 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           errors.push(errorMsg);
           output.push(`   ❌ ${errorMsg}`);
         }
-
-        output.push("   🎯 Pre-start tasks completed");
       } else {
         output.push("");
-        output.push("🔄 Pre-Start Tasks");
-        output.push("   ⏭️ Pre-start tasks skipped (--skip-pre flag used)");
+        output.push("🌱 Database Seeding");
+        output.push("   ⏭️ Seeding skipped (--seed=false)");
       }
 
       // Load task registry and verify task runner system
-      if (!data.skipTaskRunner && this.taskRunnerStarted) {
+      if (data.taskRunner && this.taskRunnerStarted) {
         output.push("");
         output.push("📋 Task Registry & Runner System");
 
@@ -352,10 +294,10 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           errors.push(errorMsg);
           output.push(`   ❌ Task runner system failed: ${errorMsg}`);
         }
-      } else if (data.skipTaskRunner) {
+      } else if (!data.taskRunner) {
         output.push("");
         output.push("📋 Task Registry & Runner System");
-        output.push("   ⏭️ Task runner skipped (--skip-task-runner flag used)");
+        output.push("   ⏭️ Task runner skipped (--task-runner=false)");
       } else {
         output.push("");
         output.push("📋 Task Registry & Runner System");
@@ -365,12 +307,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       output.push("");
       output.push("⚡ Next.js Production Server");
 
-      // Check if we should skip running Next.js commands
-      if (data.skipNextCommand) {
-        output.push(
-          "   ⏭️ Next.js server startup skipped (--skip-next-command flag used)",
-        );
-      } else {
+      if (data.nextServer) {
         output.push("   🚀 Starting Next.js production server in parallel...");
         output.push(`   🌐 Target port: ${port}`);
 
@@ -395,6 +332,8 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           output.push(`   ❌ Next.js server startup failed: ${errorMsg}`);
           logger.error("Next.js server startup failed", { error: errorMsg });
         }
+      } else {
+        output.push("   ⏭️ Next.js server skipped (--next-server=false)");
       }
 
       const duration = Date.now() - startTime;
@@ -412,7 +351,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       if (this.taskRunnerStarted) {
         runningServices.push("unified-task-runner");
       }
-      if (!data.skipNextCommand && this.nextServerProcess) {
+      if (data.nextServer && this.nextServerProcess) {
         runningServices.push(`next-start (PID: ${this.nextServerProcess.pid})`);
       }
 

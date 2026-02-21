@@ -56,31 +56,58 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      skipNextCommand: requestField({
+      generate: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.build.post.fields.skipNextCommand.title",
+        label: "app.api.system.server.build.post.fields.generate.title",
         description:
-          "app.api.system.server.build.post.fields.skipNextCommand.description",
-        schema: z.boolean().default(false),
+          "app.api.system.server.build.post.fields.generate.description",
+        schema: z.boolean().default(true),
       }),
 
-      target: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "app.api.system.server.build.post.fields.target.title",
-        description:
-          "app.api.system.server.build.post.fields.target.description",
-        schema: z.string().optional(),
-      }),
-
-      skipGeneration: requestField({
+      generateEndpoints: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.build.post.fields.skipGeneration.title",
+        label:
+          "app.api.system.server.build.post.fields.generateEndpoints.title",
         description:
-          "app.api.system.server.build.post.fields.skipGeneration.description",
-        schema: z.boolean().default(false),
+          "app.api.system.server.build.post.fields.generateEndpoints.description",
+        schema: z.boolean().default(true),
+      }),
+
+      generateSeeds: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.build.post.fields.generateSeeds.title",
+        description:
+          "app.api.system.server.build.post.fields.generateSeeds.description",
+        schema: z.boolean().default(true),
+      }),
+
+      nextBuild: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.build.post.fields.nextBuild.title",
+        description:
+          "app.api.system.server.build.post.fields.nextBuild.description",
+        schema: z.boolean().default(true),
+      }),
+
+      migrate: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.build.post.fields.migrate.title",
+        description:
+          "app.api.system.server.build.post.fields.migrate.description",
+        schema: z.boolean().default(true),
+      }),
+
+      seed: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.build.post.fields.seed.title",
+        description: "app.api.system.server.build.post.fields.seed.description",
+        schema: z.boolean().default(true),
       }),
 
       force: requestField({
@@ -89,52 +116,6 @@ const { POST } = createEndpoint({
         label: "app.api.system.server.build.post.fields.force.title",
         description:
           "app.api.system.server.build.post.fields.force.description",
-        schema: z.boolean().default(false),
-      }),
-
-      skipEndpoints: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.build.post.fields.skipEndpoints.title",
-        description:
-          "app.api.system.server.build.post.fields.skipEndpoints.description",
-        schema: z.boolean().default(false),
-      }),
-
-      skipSeeds: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.build.post.fields.skipSeeds.title",
-        description:
-          "app.api.system.server.build.post.fields.skipSeeds.description",
-        schema: z.boolean().default(false),
-      }),
-
-      skipProdMigrations: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.server.build.post.fields.skipProdMigrations.title",
-        description:
-          "app.api.system.server.build.post.fields.skipProdMigrations.description",
-        schema: z.boolean().default(true),
-      }),
-
-      skipProdSeeding: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.build.post.fields.skipProdSeeding.title",
-        description:
-          "app.api.system.server.build.post.fields.skipProdSeeding.description",
-        schema: z.boolean().default(true),
-      }),
-
-      runProdDatabase: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.build.post.fields.runProdDatabase.title",
-        description:
-          "app.api.system.server.build.post.fields.runProdDatabase.description",
         schema: z.boolean().default(false),
       }),
 
@@ -224,36 +205,33 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         package: false,
-        skipNextCommand: false,
-        skipGeneration: false,
+        generate: true,
+        generateEndpoints: true,
+        generateSeeds: true,
+        nextBuild: true,
+        migrate: true,
+        seed: true,
         force: false,
-        skipEndpoints: false,
-        skipSeeds: false,
-        skipProdMigrations: true,
-        skipProdSeeding: true,
-        runProdDatabase: false,
       },
-      withMigrations: {
+      noDb: {
         package: false,
-        skipNextCommand: false,
-        skipGeneration: false,
+        generate: true,
+        generateEndpoints: true,
+        generateSeeds: true,
+        nextBuild: true,
+        migrate: false,
+        seed: false,
         force: false,
-        skipEndpoints: false,
-        skipSeeds: false,
-        skipProdMigrations: false,
-        skipProdSeeding: false,
-        runProdDatabase: true,
       },
-      packageBuild: {
+      packageOnly: {
         package: true,
-        skipNextCommand: true,
-        skipGeneration: true,
+        generate: false,
+        generateEndpoints: false,
+        generateSeeds: false,
+        nextBuild: false,
+        migrate: false,
+        seed: false,
         force: false,
-        skipEndpoints: true,
-        skipSeeds: true,
-        skipProdMigrations: true,
-        skipProdSeeding: true,
-        runProdDatabase: false,
       },
     },
     responses: {
@@ -263,13 +241,12 @@ const { POST } = createEndpoint({
           "✅ Application build completed successfully\n🚀 Your application is ready for production deployment!",
         duration: 30000,
       },
-      withMigrations: {
+      noDb: {
         success: true,
-        output:
-          "✅ Application build completed successfully\n📦 Running production migrations...\n🌱 Running production seeding...\n🎉 Production database operations completed successfully\n🚀 Your application is ready for production deployment!",
-        duration: 45000,
+        output: "✅ Application build completed successfully",
+        duration: 25000,
       },
-      packageBuild: {
+      packageOnly: {
         success: true,
         output: "✅ Package build completed successfully",
         duration: 15000,

@@ -12,6 +12,7 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import {
+  ArrowRight,
   Check,
   ChevronDown,
   ChevronRight,
@@ -355,11 +356,8 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     }
   };
 
-  const handleToolRowClick = async (toolName: string): Promise<void> => {
-    const helpDef = await import("./definition");
-    navigate(helpDef.default.GET, {
-      data: { toolName },
-    });
+  const handleOpenTool = async (toolName: string): Promise<void> => {
+    await navigateToTool(toolName, navigate);
   };
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -448,7 +446,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
 
   // Full list mode (web)
   return (
-    <Div className="flex flex-col gap-0">
+    <Div className="flex flex-col gap-0 max-h-[65dvh] overflow-hidden">
       {/* Stats Bar */}
       <Div className="flex gap-3 text-xs px-4 pt-4">
         <TooltipProvider>
@@ -500,7 +498,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         )}
       </Div>
 
-      <Div className="flex gap-4 flex-1 flex-col px-4 pb-4 pt-3">
+      <Div className="flex gap-3 flex-1 flex-col px-4 pb-4 pt-3 min-h-0">
         {/* Search + Controls */}
         <Div className="flex flex-col gap-2 shrink-0">
           <Div className="relative">
@@ -575,7 +573,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         </Div>
 
         {/* Tools List */}
-        <ScrollArea className="flex-1 pr-4">
+        <ScrollArea className="flex-1 min-h-0 pr-4">
           {filteredTools.length === 0 ? (
             <Div className="text-center py-8 text-muted-foreground text-sm">
               {searchQuery.length > 0
@@ -668,7 +666,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
                                       onToggleConfirmation={
                                         handleToggleConfirmation
                                       }
-                                      onRowClick={handleToolRowClick}
+                                      onOpenTool={handleOpenTool}
                                       t={t}
                                     />
                                   ))}
@@ -687,7 +685,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
                                   onToggleConfirmation={
                                     handleToggleConfirmation
                                   }
-                                  onRowClick={handleToolRowClick}
+                                  onOpenTool={handleOpenTool}
                                   t={t}
                                 />
                               ))}
@@ -741,7 +739,7 @@ function ToolRow({
   onToggleEnabled,
   onToggleActive,
   onToggleConfirmation,
-  onRowClick,
+  onOpenTool,
   t,
 }: {
   tool: HelpToolMetadataSerialized;
@@ -749,7 +747,7 @@ function ToolRow({
   onToggleEnabled: (toolName: string) => void;
   onToggleActive: (toolName: string) => void;
   onToggleConfirmation: (toolName: string) => void;
-  onRowClick: (toolName: string) => Promise<void>;
+  onOpenTool: (toolName: string) => Promise<void>;
   t: (key: string, params?: Record<string, string | number>) => string;
 }): JSX.Element {
   const enabledTool = effectiveEnabledTools.find(
@@ -762,25 +760,17 @@ function ToolRow({
   return (
     <Div
       className={cn(
-        "px-4 py-2.5 transition-colors hover:bg-accent/30 cursor-pointer",
+        "px-4 py-2.5 transition-colors",
         isEnabled && isActive && "bg-primary/5",
         isEnabled && !isActive && "bg-muted/30",
       )}
-      onClick={() => void onRowClick(tool.toolName)}
     >
       <Div className="flex items-center gap-3">
-        <Div
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleEnabled(tool.toolName);
-          }}
-        >
-          <Switch
-            checked={isEnabled}
-            onCheckedChange={() => onToggleEnabled(tool.toolName)}
-            className="h-4 w-7 shrink-0"
-          />
-        </Div>
+        <Switch
+          checked={isEnabled}
+          onCheckedChange={() => onToggleEnabled(tool.toolName)}
+          className="h-4 w-7 shrink-0"
+        />
         <Div className="flex-1 min-w-0">
           <Div className="flex items-center gap-2">
             <P className="text-sm font-medium truncate">{getToolLabel(tool)}</P>
@@ -861,6 +851,28 @@ function ToolRow({
             </Tooltip>
           </TooltipProvider>
         )}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 shrink-0 text-muted-foreground/40 hover:text-primary hover:bg-primary/10"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  void onOpenTool(tool.toolName);
+                }}
+              >
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="left">
+              <P className="text-xs">
+                {t("app.api.system.help.get.fields.openTool.label")}
+              </P>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </Div>
     </Div>
   );

@@ -116,7 +116,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
       }
 
       // Generate API endpoints
-      if (data.skipGeneration) {
+      if (!data.generate) {
         output.push(MESSAGES.SKIP_GENERATION);
       } else {
         output.push(MESSAGES.GENERATING_ENDPOINTS);
@@ -125,8 +125,8 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
             {
               outputDir: "src/app/api/[locale]/v1",
               verbose: false,
-              skipEndpoints: data.skipEndpoints,
-              skipSeeds: data.skipSeeds,
+              skipEndpoints: !data.generateEndpoints,
+              skipSeeds: !data.generateSeeds,
               skipTaskIndex: false,
               skipTrpc: false,
             },
@@ -162,8 +162,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
         }
       }
 
-      // Check if we should skip running Next.js commands
-      if (data.skipNextCommand) {
+      if (!data.nextBuild) {
         output.push(MESSAGES.SKIP_NEXT_BUILD);
       } else {
         // Build Next.js application with proper NODE_ENV
@@ -200,10 +199,10 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
       }
 
       // Run production database operations after successful build
-      if (data.runProdDatabase) {
+      if (data.migrate || data.seed) {
         output.push(MESSAGES.PROD_DB_START);
         try {
-          if (!data.skipProdMigrations) {
+          if (data.migrate) {
             const migrateResult =
               await databaseMigrationRepository.runMigrations(
                 {
@@ -229,7 +228,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
             }
           }
 
-          if (!data.skipProdSeeding) {
+          if (data.seed) {
             await seedDatabase("prod", logger, locale);
           }
 
@@ -238,7 +237,6 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
           const parsedError = parseError(dbError);
           let errorMsg = `${MESSAGES.PROD_DB_FAILED}: ${parsedError.message}`;
 
-          // Check if this is a database connection error
           if (
             parsedError.message.includes("ECONNREFUSED") ||
             parsedError.message.includes("connect")

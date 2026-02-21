@@ -76,7 +76,7 @@ import { default as endpointDefinition_POST_63 } from "../guard/destroy/definiti
 import { default as endpointDefinition_POST_64 } from "../translations/reorganize/definition";
 import { default as endpointDefinition_POST_65 } from "../translations/restore-backup/definition";
 import { default as endpointDefinition_GET_66 } from "../translations/stats/definition";
-import { default as endpointDefinition_GET_67 } from "../help/definition";
+import { default as endpointDefinition_POST_67 } from "../help/definition";
 import { default as endpointDefinition_POST_68 } from "../db/schema-verify/definition";
 import { default as endpointDefinition_GET_69 } from "../db/utils/definition";
 import { default as endpointDefinition_POST_70 } from "../db/utils/docker-operations/definition";
@@ -681,8 +681,8 @@ function initializeEndpoints(): Record<string, ApiSection> {
   );
   setNestedPath(
     endpoints,
-    ["system", "help", "GET"],
-    endpointDefinition_GET_67.GET,
+    ["system", "help", "POST"],
+    endpointDefinition_POST_67.POST,
   );
   setNestedPath(
     endpoints,

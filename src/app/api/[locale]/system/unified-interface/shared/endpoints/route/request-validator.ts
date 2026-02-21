@@ -20,6 +20,7 @@ import { CountryLanguageValues } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { Methods } from "../../types/enums";
+import type { WidgetData } from "../../widgets/widget-data";
 
 /**
  * Validate locale using the standard schema
@@ -77,6 +78,39 @@ export interface ValidatedRequestData<TRequestOutput, TUrlVariablesOutput> {
 }
 
 /**
+ * Recursively parse JSON strings in request data.
+ * AI models sometimes send object/array fields as JSON-stringified strings.
+ * This normalizes them so Zod validation succeeds.
+ */
+function deepParseJsonStrings(value: WidgetData): WidgetData {
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (
+      (trimmed.startsWith("{") && trimmed.endsWith("}")) ||
+      (trimmed.startsWith("[") && trimmed.endsWith("]"))
+    ) {
+      try {
+        return JSON.parse(trimmed) as WidgetData;
+      } catch {
+        // not valid JSON, return as-is
+      }
+    }
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value.map(deepParseJsonStrings);
+  }
+  if (value !== null && typeof value === "object") {
+    const result: Record<string, WidgetData> = {};
+    for (const [k, v] of Object.entries(value)) {
+      result[k] = deepParseJsonStrings(v);
+    }
+    return result;
+  }
+  return value;
+}
+
+/**
  * Validate CLI request data
  * Types flow naturally from schemas - no explicit type parameters needed
  */
@@ -118,9 +152,15 @@ export function validateHandlerRequestData<
       return urlValidation;
     }
 
+    // Normalize: AI models sometimes send object fields as JSON strings — parse them
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Request data from AI tools is WidgetData at runtime despite generic typing
+    const normalizedRequestData = deepParseJsonStrings(
+      context.requestData as WidgetData,
+    );
+
     // Now validate the final merged data
     const requestValidation = validateData(
-      context.requestData,
+      normalizedRequestData,
       endpoint.requestSchema,
       logger,
     );

@@ -232,7 +232,7 @@ export class ToolErrorHandler {
       logger,
     });
 
-    if (fallbackResult) {
+    if (fallbackResult && "data" in fallbackResult) {
       logger.info(
         "[AI Stream] Tool fallback execution succeeded (discovered via tool-help)",
         {
@@ -244,7 +244,7 @@ export class ToolErrorHandler {
 
       const toolCallWithResult: ToolCall = {
         ...toolCallData.toolCall,
-        result: fallbackResult as ToolCallResult,
+        result: fallbackResult.data as ToolCallResult,
         creditsUsed: endpoint.credits ?? 0,
       };
 
@@ -259,7 +259,7 @@ export class ToolErrorHandler {
         sequenceId,
         toolCall: toolCallWithResult,
         toolName: part.toolName,
-        result: fallbackResult as ToolCallResult,
+        result: fallbackResult.data as ToolCallResult,
         error: undefined,
         skipSseEmit: false,
         user,
@@ -277,7 +277,45 @@ export class ToolErrorHandler {
       };
     }
 
-    // Fallback execution failed — emit error result
+    // Execution failed with a known error — emit it as a tool result so the model can retry
+    if (fallbackResult && "error" in fallbackResult) {
+      logger.warn("[AI Stream] Emitting tool error result to model", {
+        toolName: part.toolName,
+        error: fallbackResult.error,
+      });
+
+      const toolCallWithError: ToolCall = {
+        ...toolCallData.toolCall,
+        error: {
+          message: fallbackResult.error,
+          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+        } as ErrorResponseType,
+      };
+
+      await dbWriter.emitToolResult({
+        toolMessageId,
+        threadId,
+        parentId: toolCallData.parentId,
+        depth: toolCallData.depth,
+        userId,
+        model,
+        character,
+        sequenceId,
+        toolCall: toolCallWithError,
+        toolName: part.toolName,
+        result: undefined,
+        error: toolCallWithError.error,
+        skipSseEmit: false,
+        user,
+      });
+
+      return {
+        currentParentId: toolMessageId,
+        currentDepth: toolCallData.depth,
+      };
+    }
+
+    // Unknown failure — emit original SDK error
     return this.emitOriginalError({
       part,
       toolMessageId,
@@ -296,7 +334,7 @@ export class ToolErrorHandler {
 
   /**
    * Execute a tool via RouteExecutionExecutor.
-   * Returns the result data on success, or null on failure.
+   * Returns { data } on success, { error } on failure so callers can forward errors to the model.
    */
   private static async executeTool(params: {
     toolName: string;
@@ -304,7 +342,7 @@ export class ToolErrorHandler {
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
-  }): Promise<JSONValue | null> {
+  }): Promise<{ data: JSONValue } | { error: string } | null> {
     const { toolName, args, user, locale, logger } = params;
 
     try {
@@ -330,11 +368,16 @@ export class ToolErrorHandler {
         logger.warn("[AI Stream] Fallback tool execution failed", {
           toolName,
           error: result.message,
+          params: result.messageParams,
         });
-        return null;
+        // Return the error so the model can see it and retry with correct params
+        const errorMsg = result.messageParams?.error
+          ? `${result.message}: ${result.messageParams.error}`
+          : result.message;
+        return { error: errorMsg };
       }
 
-      return result.data as JSONValue;
+      return { data: result.data as JSONValue };
     } catch (error) {
       logger.warn("[AI Stream] Fallback tool execution threw", {
         toolName,

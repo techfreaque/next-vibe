@@ -142,16 +142,12 @@ export class ProviderFactory {
                 ttl: "1h" as const,
               };
 
-              // Marker 1: Position 0 (system prompt) - ALWAYS
-              if (messages[0] && typeof messages[0] === "object") {
-                messages[0].cache_control = cacheControl;
-                logger.info(
-                  "[CACHE DEBUG] Injected cache_control at position 0 (system)",
-                  {},
-                );
-              }
+              // Anthropic allows max 4 cache_control blocks total.
+              // The system prompt already gets one via providerOptions (stream-execution-handler).
+              // Plus the last tool gets one above. That's 2 already.
+              // We add at most 2 more on messages here.
 
-              // Marker 2: Position ~20 (bridge for 20-block lookback)
+              // Marker 1: Position ~20 (bridge for 20-block lookback)
               // Only add if we have 30+ messages
               if (
                 messages.length > 30 &&
@@ -159,27 +155,9 @@ export class ProviderFactory {
                 typeof messages[20] === "object"
               ) {
                 messages[20].cache_control = cacheControl;
-                logger.info(
-                  "[CACHE DEBUG] Injected cache_control at position 20 (bridge)",
-                  {},
-                );
               }
 
-              // Marker 3: Position ~40 (bridge for longer conversations)
-              // Only add if we have 50+ messages
-              if (
-                messages.length > 50 &&
-                messages[40] &&
-                typeof messages[40] === "object"
-              ) {
-                messages[40].cache_control = cacheControl;
-                logger.info(
-                  "[CACHE DEBUG] Injected cache_control at position 40 (bridge)",
-                  {},
-                );
-              }
-
-              // Marker 4: LAST message (moving marker) - ALWAYS
+              // Marker 2: LAST message (moving marker) - ALWAYS
               const lastIdx = messages.length - 1;
               const lastMessage = messages[lastIdx];
               if (lastMessage && typeof lastMessage === "object") {

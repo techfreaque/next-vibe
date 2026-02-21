@@ -48,24 +48,43 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      skipPre: requestField({
+      seed: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.start.post.fields.skipPre.title",
-        description:
-          "app.api.system.server.start.post.fields.skipPre.description",
+        label: "app.api.system.server.start.post.fields.seed.title",
+        description: "app.api.system.server.start.post.fields.seed.description",
         columns: 6,
-        schema: z.boolean().optional().default(false),
+        schema: z.boolean().optional().default(true),
       }),
 
-      skipNextCommand: requestField({
+      dbSetup: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.start.post.fields.skipNextCommand.title",
+        label: "app.api.system.server.start.post.fields.dbSetup.title",
         description:
-          "app.api.system.server.start.post.fields.skipNextCommand.description",
+          "app.api.system.server.start.post.fields.dbSetup.description",
         columns: 6,
-        schema: z.boolean().optional().default(false),
+        schema: z.boolean().optional().default(true),
+      }),
+
+      taskRunner: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.start.post.fields.taskRunner.title",
+        description:
+          "app.api.system.server.start.post.fields.taskRunner.description",
+        columns: 6,
+        schema: z.boolean().optional().default(true),
+      }),
+
+      nextServer: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.start.post.fields.nextServer.title",
+        description:
+          "app.api.system.server.start.post.fields.nextServer.description",
+        columns: 6,
+        schema: z.boolean().optional().default(true),
       }),
 
       port: requestField({
@@ -75,26 +94,6 @@ const { POST } = createEndpoint({
         description: "app.api.system.server.start.post.fields.port.description",
         columns: 12,
         schema: z.coerce.number().optional(),
-      }),
-
-      skipTaskRunner: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.start.post.fields.skipTaskRunner.title",
-        description:
-          "app.api.system.server.start.post.fields.skipTaskRunner.description",
-        columns: 6,
-        schema: z.boolean().optional().default(false),
-      }),
-
-      skipDbSetup: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.start.post.fields.skipDbSetup.title",
-        description:
-          "app.api.system.server.start.post.fields.skipDbSetup.description",
-        columns: 6,
-        schema: z.boolean().optional().default(false),
       }),
 
       // === RESPONSE FIELDS ===
@@ -165,47 +164,42 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        skipPre: false,
-        skipNextCommand: false,
+        seed: true,
+        dbSetup: true,
+        taskRunner: true,
+        nextServer: true,
       },
       withPort: {
-        skipPre: false,
-        skipNextCommand: false,
+        seed: true,
+        dbSetup: true,
+        taskRunner: true,
+        nextServer: true,
+        port: 3000,
       },
-      withMigrations: {
-        skipPre: false,
-        skipNextCommand: false,
+      noDb: {
+        seed: false,
+        dbSetup: false,
+        taskRunner: true,
+        nextServer: true,
       },
-      skipPreTasks: {
-        skipPre: true,
-        skipNextCommand: false,
-      },
-      skipNext: {
-        skipPre: false,
-        skipNextCommand: true,
-      },
-      success: {
-        skipPre: false,
-        skipNextCommand: false,
+      nextOnly: {
+        seed: false,
+        dbSetup: false,
+        taskRunner: false,
+        nextServer: true,
       },
     },
     responses: {
       default: {
         responseMessage: "app.api.system.server.start.post.fields.output.title",
       },
-      success: {
-        responseMessage: "app.api.system.server.start.post.fields.output.title",
-      },
       withPort: {
         responseMessage: "app.api.system.server.start.post.fields.output.title",
       },
-      withMigrations: {
+      noDb: {
         responseMessage: "app.api.system.server.start.post.fields.output.title",
       },
-      skipPreTasks: {
-        responseMessage: "app.api.system.server.start.post.fields.output.title",
-      },
-      skipNext: {
+      nextOnly: {
         responseMessage: "app.api.system.server.start.post.fields.output.title",
       },
     },

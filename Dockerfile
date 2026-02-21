@@ -217,11 +217,14 @@ ENV NEXT_TELEMETRY_DISABLED=1
 
 COPY . .
 
-# Install dependencies (skip prepare scripts that may fail in Docker)
-RUN bun install --frozen-lockfile
+# Install dependencies — cache bun's package download cache between builds
+RUN --mount=type=cache,target=/root/.bun/install/cache,id=next-vibe-bun-cache,sharing=locked \
+    bun install --frozen-lockfile
 
-# Build using vibe CLI
-RUN bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts build
+# Build using vibe CLI — cache .next/cache (webpack/RSC incremental cache) between builds
+# Runs migrations on success by default (runProdDatabase=true); skips if DB unavailable at build time
+RUN --mount=type=cache,target=/app/.next/cache,id=next-vibe-next-cache,sharing=locked \
+    bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts build
 
 ENV NODE_ENV=production
 
@@ -231,5 +234,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Start the application using vibe CLI
+# Start the application using vibe CLI (skipPre=true by default: migrations ran at build time)
 CMD ["bun", "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts", "start"]
