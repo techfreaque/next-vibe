@@ -25,7 +25,6 @@ import {
 } from "next-vibe-ui/ui/icons";
 import { Input } from "next-vibe-ui/ui/input";
 import { Pre } from "next-vibe-ui/ui/pre";
-import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Span } from "next-vibe-ui/ui/span";
 import { Switch } from "next-vibe-ui/ui/switch";
 import {
@@ -446,7 +445,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
 
   // Full list mode (web)
   return (
-    <Div className="flex flex-col gap-0 max-h-[65dvh] overflow-hidden">
+    <Div className="flex flex-col gap-0">
       {/* Stats Bar */}
       <Div className="flex gap-3 text-xs px-4 pt-4">
         <TooltipProvider>
@@ -498,7 +497,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         )}
       </Div>
 
-      <Div className="flex gap-3 flex-1 flex-col px-4 pb-4 pt-3 min-h-0">
+      <Div className="flex gap-3 flex-col px-4 pb-4 pt-3">
         {/* Search + Controls */}
         <Div className="flex flex-col gap-2 shrink-0">
           <Div className="relative">
@@ -573,7 +572,9 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         </Div>
 
         {/* Tools List */}
-        <ScrollArea className="flex-1 min-h-0 pr-4">
+        <Div
+          style={{ maxHeight: "45dvh", overflowY: "auto", paddingRight: "4px" }}
+        >
           {filteredTools.length === 0 ? (
             <Div className="text-center py-8 text-muted-foreground text-sm">
               {searchQuery.length > 0
@@ -699,7 +700,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
               )}
             </Div>
           )}
-        </ScrollArea>
+        </Div>
 
         {hint && (
           <P className="text-xs text-muted-foreground text-center shrink-0">

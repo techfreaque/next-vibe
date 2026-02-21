@@ -1,4 +1,5 @@
 import { endpoints } from "@/app/api/[locale]/system/generated/endpoints";
+import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -27,6 +28,8 @@ export interface SerializableToolMetadata {
   allowedRoles: UserRoleValue[];
   aliases?: string[];
   requiresConfirmation?: boolean;
+  /** Raw examples from the endpoint definition (requests + responses keyed by example name) */
+  examples?: CliRequestData;
 }
 
 export interface IDefinitionsRegistry {
@@ -202,6 +205,9 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
           : [],
         aliases: definition.aliases ? [...definition.aliases] : undefined,
         requiresConfirmation: definition.requiresConfirmation,
+        examples: definition.examples
+          ? (definition.examples as CliRequestData)
+          : undefined,
       };
     });
   }

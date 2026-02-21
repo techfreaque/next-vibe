@@ -15,8 +15,6 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
-  isFileResponse,
-  isStreamingResponse,
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -25,11 +23,8 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { db } from "@/app/api/[locale]/system/db";
-import {
-  getEndpoint,
-  getFullPath,
-} from "@/app/api/[locale]/system/generated/endpoint";
-import { getRouteHandler } from "@/app/api/[locale]/system/generated/route-handlers";
+import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
+import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -54,111 +49,37 @@ function stripThinkTags(content: string): string {
   return result.trim();
 }
 
-interface JsonRecord {
-  [key: string]:
-    | string
-    | number
-    | boolean
-    | null
-    | JsonRecord
-    | Array<string | number | boolean | null | JsonRecord>;
-}
-
-/**
- * Split flat merged args into urlPathParams + data using the endpoint's
- * requestUrlPathParamsSchema. Keys that the schema recognises go to urlPathParams;
- * everything else goes to data.
- */
-async function splitArgs(
-  path: string,
-  mergedArgs: JsonRecord,
-): Promise<{ urlPathParams: JsonRecord; data: JsonRecord }> {
-  const definition = await getEndpoint(path);
-  if (!definition) {
-    return { urlPathParams: {}, data: mergedArgs };
-  }
-
-  // Parse mergedArgs against the urlPathParams schema to extract matching keys
-  const urlParseResult =
-    definition.requestUrlPathParamsSchema.safeParse(mergedArgs);
-  const urlPathParams: JsonRecord = urlParseResult.success
-    ? (urlParseResult.data as JsonRecord)
-    : {};
-
-  // All known urlPathParam key names (from schema shape if it's a ZodObject)
-  const urlKeySet = new Set(Object.keys(urlPathParams));
-
-  // data = everything not claimed by urlPathParams
-  const data: JsonRecord = {};
-  for (const [key, value] of Object.entries(mergedArgs)) {
-    if (!urlKeySet.has(key)) {
-      data[key] = value as JsonRecord[string];
-    }
-  }
-
-  return { urlPathParams, data };
-}
-
 interface PreCallResult {
   routeId: string;
-  args: JsonRecord;
+  args: CliRequestData;
   success: boolean;
-  data?: JsonRecord;
+  data?: CliRequestData;
   error?: string;
   executionTimeMs?: number;
 }
 
 /**
  * Execute a single pre-call and return its result.
+ * Args are passed as flat merged data — RouteExecutionExecutor auto-splits
+ * urlPathParams from data using the endpoint's requestUrlPathParamsSchema.
  */
 async function executePreCall(
   routeId: string,
-  mergedArgs: JsonRecord,
+  mergedArgs: CliRequestData,
   user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<PreCallResult> {
-  const path = getFullPath(routeId);
-  if (path === null) {
-    return {
-      routeId,
-      args: mergedArgs,
-      success: false,
-      error: `Unknown routeId: ${routeId}`,
-    };
-  }
+  logger.debug("[AiStreamRun] Executing pre-call", { routeId });
 
-  const handler = await getRouteHandler(path);
-  if (!handler) {
-    return {
-      routeId,
-      args: mergedArgs,
-      success: false,
-      error: `No route handler found for: ${routeId}`,
-    };
-  }
-
-  const { urlPathParams, data } = await splitArgs(path, mergedArgs);
-
-  logger.debug("[AiStreamRun] Executing pre-call", { routeId, path });
-
-  const result = await handler({
-    data,
-    urlPathParams,
+  const result = await RouteExecutionExecutor.executeGenericHandler({
+    toolName: routeId,
+    data: mergedArgs,
     user,
     locale,
     logger,
     platform: Platform.CLI,
   });
-
-  if (isStreamingResponse(result) || isFileResponse(result)) {
-    return {
-      routeId,
-      args: mergedArgs,
-      success: false,
-      error: "Pre-call returned streaming/file response — not supported",
-    };
-  }
 
   if (!result.success) {
     return {
@@ -173,7 +94,7 @@ async function executePreCall(
     routeId,
     args: mergedArgs,
     success: true,
-    data: result.data as JsonRecord,
+    data: result.data as CliRequestData,
   };
 }
 
@@ -216,7 +137,7 @@ export class AiStreamRunRepository {
           const startTime = Date.now();
           const result = await executePreCall(
             call.routeId,
-            call.args as JsonRecord,
+            call.args as CliRequestData,
             user,
             locale,
             logger,

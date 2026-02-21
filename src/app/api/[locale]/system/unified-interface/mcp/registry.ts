@@ -184,7 +184,6 @@ export class MCPRegistry implements IMCPRegistry {
       const result = await RouteExecutionExecutor.executeGenericHandler({
         toolName: context.toolName,
         data: context.data,
-        urlPathParams: context.data,
         user: context.user,
         locale: context.locale,
         logger,

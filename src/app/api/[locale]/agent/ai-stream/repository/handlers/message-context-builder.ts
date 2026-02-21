@@ -518,15 +518,37 @@ export class MessageContextBuilder {
 
     // Message tokens - different calculation based on content type
     const messageTokens = messages.reduce((sum, msg) => {
-      const content = msg.content || "";
+      // Text content (may be null for tool messages and some assistant messages)
+      const textContent = msg.content ?? "";
 
-      // Tool messages with JSON results - use char/2.5
-      if (msg.role === "tool" && content.includes("{")) {
-        return sum + Math.ceil(content.length / 2.5);
+      // Tool messages: content is null — actual data is in metadata.toolCall
+      // Count both the args and result as JSON (dense, use char/2.5)
+      if (msg.role === "tool") {
+        const toolCall = msg.metadata?.toolCall;
+        if (toolCall) {
+          const toolJson = JSON.stringify({
+            args: toolCall.args,
+            result: toolCall.result,
+          });
+          return sum + Math.ceil(toolJson.length / 2.5);
+        }
+        // Fallback: if content was somehow stored as text
+        return sum + Math.ceil(textContent.length / 2.5);
       }
 
-      // Regular messages - use char/4
-      return sum + Math.ceil(content.length / 4);
+      // Assistant messages may have tool calls in metadata even when content is null
+      // (pure tool-call messages with no text)
+      if (msg.role === "assistant" && msg.metadata?.toolCall) {
+        const toolJson = JSON.stringify(msg.metadata.toolCall);
+        return (
+          sum +
+          Math.ceil(textContent.length / 4) +
+          Math.ceil(toolJson.length / 2.5)
+        );
+      }
+
+      // Regular messages (user, assistant text, system, compacting summary)
+      return sum + Math.ceil(textContent.length / 4);
     }, 0);
 
     return systemTokens + toolsTokens + messageTokens;

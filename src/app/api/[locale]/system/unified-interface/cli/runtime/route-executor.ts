@@ -208,19 +208,16 @@ export class RouteDelegationHandler {
           debug: options.verbose || false,
           onSubmit: async (data: WidgetData) => {
             // Execute the endpoint when user submits
-            const result = await RouteExecutionExecutor.executeGenericHandler<
-              CliRequestData,
-              CliUrlParams,
-              WidgetData
-            >({
-              toolName: resolvedCommand,
-              data: data as CliRequestData,
-              urlPathParams: options.urlPathParams || {},
-              user: cliUser,
-              locale: options.locale,
-              logger,
-              platform: options.platform,
-            });
+            const result =
+              await RouteExecutionExecutor.executeGenericHandler<WidgetData>({
+                toolName: resolvedCommand,
+                data: data as CliRequestData,
+                urlPathParams: options.urlPathParams || {},
+                user: cliUser,
+                locale: options.locale,
+                logger,
+                platform: options.platform,
+              });
 
             return result;
           },
@@ -299,19 +296,16 @@ export class RouteDelegationHandler {
       }
 
       // Delegate to shared generic handler executor
-      const result = await RouteExecutionExecutor.executeGenericHandler<
-        CliRequestData,
-        CliUrlParams,
-        CliResponseData
-      >({
-        toolName: resolvedCommand,
-        data: inputData.data || {},
-        urlPathParams: inputData.urlPathParams || {},
-        user: cliUser,
-        locale: options.locale,
-        logger,
-        platform: options.platform,
-      });
+      const result =
+        await RouteExecutionExecutor.executeGenericHandler<CliResponseData>({
+          toolName: resolvedCommand,
+          data: inputData.data || {},
+          urlPathParams: inputData.urlPathParams || {},
+          user: cliUser,
+          locale: options.locale,
+          logger,
+          platform: options.platform,
+        });
 
       // 7. Convert ResponseType to RouteExecutionResult
       const routeResult: RouteExecutionResult = {

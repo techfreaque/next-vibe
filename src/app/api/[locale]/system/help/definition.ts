@@ -41,6 +41,8 @@ const aiToolMetadataSchema = z.object({
   requiresConfirmation: z.boolean().optional(),
   // Only present in detail mode (toolName param)
   parameters: z.record(z.string(), z.unknown()).optional(),
+  // Only present in detail mode (toolName param)
+  examples: z.record(z.string(), z.unknown()).optional(),
 });
 
 const { GET } = createEndpoint({

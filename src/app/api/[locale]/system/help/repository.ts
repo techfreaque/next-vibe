@@ -128,6 +128,7 @@ function serializeTool(
     typeof definitionsRegistry.getSerializedToolsForUser
   >[number],
   parameters?: ToolItem["parameters"],
+  includeExamples = false,
 ): ToolItem {
   return {
     name: tool.name,
@@ -140,6 +141,7 @@ function serializeTool(
     aliases: tool.aliases,
     requiresConfirmation: tool.requiresConfirmation,
     parameters,
+    examples: includeExamples ? tool.examples : undefined,
   };
 }
 
@@ -1115,7 +1117,7 @@ export class HelpRepository {
         ? (getParameterSchema(endpoint) ?? undefined)
         : undefined;
       return success({
-        tools: [serializeTool(matchedTool, parameters)],
+        tools: [serializeTool(matchedTool, parameters, true)],
         totalCount,
         matchedCount: 1,
       });

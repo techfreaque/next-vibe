@@ -10,6 +10,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { z } from "zod";
 
+import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -99,24 +100,16 @@ export async function sendTestRequest<
     // Execute using the shared route execution executor
     // This is the same infrastructure used by CLI, MCP, and AI tools
     const result = await RouteExecutionExecutor.executeGenericHandler<
-      typeof endpoint.types.RequestOutput,
-      typeof endpoint.types.UrlVariablesOutput,
       typeof endpoint.types.ResponseOutput
     >({
       toolName,
-      data,
-      urlPathParams,
+      data: data as CliRequestData,
+      urlPathParams: urlPathParams as CliRequestData | undefined,
       user: testUser,
       locale: defaultLocale,
       logger,
       platform: Platform.CLI, // Use CLI platform for testing
-    } as Parameters<
-      typeof RouteExecutionExecutor.executeGenericHandler<
-        typeof endpoint.types.RequestOutput,
-        typeof endpoint.types.UrlVariablesOutput,
-        typeof endpoint.types.ResponseOutput
-      >
-    >[0]);
+    });
 
     // Handle streaming responses (convert to error for tests)
     if (isStreamingResponse(result)) {

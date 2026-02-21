@@ -17,6 +17,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
 import { definitionsRegistry } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definitions/registry";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -356,8 +357,7 @@ export class ToolErrorHandler {
 
       const result = await RouteExecutionExecutor.executeGenericHandler({
         toolName,
-        data: (args ?? {}) as Record<string, never>,
-        urlPathParams: {} as Record<string, never>,
+        data: (args ?? {}) as CliRequestData,
         user,
         locale,
         logger,

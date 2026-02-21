@@ -21,9 +21,11 @@ import { getRouteHandler } from "@/app/api/[locale]/system/generated/route-handl
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { CliRequestData } from "../../../cli/runtime/parsing";
 import type { CliCompatiblePlatform } from "../../../cli/runtime/route-executor";
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { Platform } from "../../types/platform";
+import { splitArgs } from "../../utils/split-args";
 
 /**
  * Base execution context
@@ -44,15 +46,16 @@ export class RouteExecutionExecutor {
    * toolName is the full path with method or alias - no parsing needed
    *
    * Standard handler signature: { data, urlPathParams, user, locale, logger, platform }
+   *
+   * urlPathParams is optional. When omitted (AI / MCP / run paths), args are
+   * automatically split from `data` using the endpoint's requestUrlPathParamsSchema.
+   * Callers that already have pre-split params (CLI) can pass urlPathParams directly.
    */
-  public static async executeGenericHandler<
-    TData,
-    TUrlPathParams,
-    TResult,
-  >(params: {
+  public static async executeGenericHandler<TResult>(params: {
     toolName: string;
-    data: TData;
-    urlPathParams: TUrlPathParams;
+    data: CliRequestData;
+    /** Pre-split URL path params. If omitted, auto-split from data. */
+    urlPathParams?: CliRequestData;
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
@@ -69,10 +72,21 @@ export class RouteExecutionExecutor {
         });
       }
 
+      // Split args: if urlPathParams was not provided by the caller, derive it
+      // automatically from data using the endpoint schema.
+      let resolvedData: CliRequestData = params.data;
+      let resolvedUrlPathParams: CliRequestData = params.urlPathParams ?? {};
+
+      if (params.urlPathParams === undefined) {
+        const split = await splitArgs(params.toolName, params.data);
+        resolvedData = split.data;
+        resolvedUrlPathParams = split.urlPathParams;
+      }
+
       // Execute handler
       const result = await handlerResult({
-        data: params.data,
-        urlPathParams: params.urlPathParams ?? {},
+        data: resolvedData,
+        urlPathParams: resolvedUrlPathParams,
         user: params.user,
         locale: params.locale,
         logger: params.logger,

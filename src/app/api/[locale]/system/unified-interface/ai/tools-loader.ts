@@ -17,6 +17,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import type { CliRequestData } from "../cli/runtime/parsing";
 import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
@@ -100,33 +101,6 @@ function createToolFromEndpoint(
   // Preferred name (alias if available): Used for AI SDK, execution, and all lookups
   const toolName = getPreferredToolName(endpoint);
 
-  // Generate schemas for splitting params
-  const requestDataSchema = endpoint.fields
-    ? (generateSchemaForUsage<typeof endpoint.fields, FieldUsage.RequestData>(
-        endpoint.fields,
-        FieldUsage.RequestData,
-      ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever)
-    : z.never();
-
-  const urlPathParamsSchema = endpoint.fields
-    ? (generateSchemaForUsage<
-        typeof endpoint.fields,
-        FieldUsage.RequestUrlParams
-      >(endpoint.fields, FieldUsage.RequestUrlParams) as
-        | z.ZodObject<Record<string, z.ZodTypeAny>>
-        | z.ZodNever)
-    : z.never();
-
-  // Get field names for each schema
-  const requestFields =
-    requestDataSchema instanceof z.ZodObject
-      ? Object.keys(requestDataSchema.shape)
-      : [];
-  const urlPathParamsFields =
-    urlPathParamsSchema instanceof z.ZodObject
-      ? Object.keys(urlPathParamsSchema.shape)
-      : [];
-
   return tool({
     description,
     inputSchema,
@@ -137,30 +111,12 @@ function createToolFromEndpoint(
         requiresConfirmation,
       });
 
-      // Params are already validated and transformed by the validate function above
-      const transformedParams = params;
-
-      // Split combined params into data and urlPathParams
-      const data: Record<string, never> = {};
-      const urlPathParams: Record<string, never> = {};
-
-      for (const [key, value] of Object.entries(transformedParams)) {
-        if (urlPathParamsFields.includes(key)) {
-          urlPathParams[key] = value as never;
-        } else if (requestFields.includes(key)) {
-          data[key] = value as never;
-        }
-      }
-
-      // Execute using shared generic handler
-      // toolName must be in full path format: "agent.brave-search.GET"
-      // Platform.AI is valid for tool execution, type restriction is overly specific
+      // Execute using shared generic handler — it auto-splits urlPathParams from data
       const { RouteExecutionExecutor } =
         await import("@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor");
       const result = await RouteExecutionExecutor.executeGenericHandler({
         toolName,
-        data,
-        urlPathParams,
+        data: params as CliRequestData,
         user: context.user,
         locale: context.locale,
         logger: context.logger,

@@ -9,6 +9,7 @@ import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type { CliRequestData } from "../cli/runtime/parsing";
 import type { BaseExecutionContext } from "../shared/endpoints/route/executor";
 import type { WidgetData } from "../shared/widgets/widget-data";
 
@@ -172,9 +173,10 @@ export type MCPContent =
  * MCP Execution Context
  * Extends BaseExecutionContext with MCP-specific fields
  */
-export interface MCPExecutionContext<
-  TData = { [key: string]: WidgetData },
-> extends Omit<BaseExecutionContext<TData>, "user" | "requestId"> {
+export interface MCPExecutionContext<TData = CliRequestData> extends Omit<
+  BaseExecutionContext<TData>,
+  "user" | "requestId"
+> {
   /** More specific user type for MCP */
   user: JwtPayloadType;
 
