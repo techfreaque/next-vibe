@@ -222,9 +222,9 @@ RUN --mount=type=cache,target=/root/.bun/install/cache,id=next-vibe-bun-cache,sh
     bun install --frozen-lockfile
 
 # Build using vibe CLI — cache .next/cache (webpack/RSC incremental cache) between builds
-# Runs migrations on success by default (runProdDatabase=true); skips if DB unavailable at build time
+# DB unreachable at build time (docker network only); migrations run via docker compose run in install-docker.sh
 RUN --mount=type=cache,target=/app/.next/cache,id=next-vibe-next-cache,sharing=locked \
-    bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts build
+    bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts build --migrate=false --seed=false
 
 ENV NODE_ENV=production
 
