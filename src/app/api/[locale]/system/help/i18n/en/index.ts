@@ -4,7 +4,7 @@ export const translations = {
   get: {
     title: "Tool Help — Discover Available Tools",
     description:
-      "Search and discover all tools available to you. Use query to search by name, description, or alias. Use category to filter by category. Returns tool names, descriptions, aliases, and metadata.",
+      "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.",
     tags: {
       tools: "tools",
     },
@@ -17,12 +17,13 @@ export const translations = {
       },
       category: {
         label: "Category Filter",
-        description: "Filter tools by category name (case-insensitive)",
+        description:
+          "Filter tools by category name (case-insensitive). Call with no params first to see available categories.",
       },
       toolName: {
         label: "Tool Name (Detail)",
         description:
-          "Get full details for a specific tool by name or alias. Returns parameter schema.",
+          "Get full parameter schema for a specific tool by its exact toolName (e.g. agent_search_brave_GET) or alias. Use this before calling an unfamiliar tool.",
       },
       page: {
         label: "Page",

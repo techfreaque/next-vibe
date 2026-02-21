@@ -3,6 +3,7 @@
  * Database tables specific to cron task functionality
  */
 
+import { isNull } from "drizzle-orm";
 import {
   boolean,
   integer,
@@ -10,6 +11,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
@@ -29,75 +31,84 @@ import type { JsonValue, NotificationTarget } from "../unified-runner/types";
  * Cron Tasks Table
  * Stores cron task definitions and metadata
  */
-export const cronTasks = pgTable("cron_tasks", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  /**
-   * routeId — which handler to call (was: name)
-   * Accepts: task name (e.g. "lead-email-campaigns"), endpoint alias (e.g. "cron:stats"),
-   * or full endpoint path.
-   */
-  routeId: text("route_id").notNull(),
-  /** Human-readable label — separate from routeId for display */
-  displayName: text("display_name").notNull(),
-  description: text("description"),
-  version: text("version").notNull().default("1.0.0"),
-  category: text("category").notNull(),
-  schedule: text("schedule").notNull(), // Cron expression
-  timezone: text("timezone").default("UTC"),
-  enabled: boolean("enabled").notNull().default(true),
-  priority: text("priority", { enum: CronTaskPriorityDB }).notNull(),
-  timeout: integer("timeout").default(300000), // 5 minutes default
-  retries: integer("retries").default(3),
-  retryDelay: integer("retry_delay").default(30000), // 30 seconds default
-  /**
-   * taskInput — the input the task executes with (body + URL path params merged flat).
-   * Can be overridden per DB instance. splitTaskArgs() splits by schema at execution time.
-   */
-  taskInput: jsonb("task_input")
-    .$type<Record<string, JsonValue>>()
-    .notNull()
-    .default({}),
-  /**
-   * runOnce — when true, the task disables itself after the first execution
-   * (success or failure). Re-enable by setting enabled=true again.
-   */
-  runOnce: boolean("run_once").notNull().default(false),
+export const cronTasks = pgTable(
+  "cron_tasks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /**
+     * routeId — which handler to call (was: name)
+     * Accepts: task name (e.g. "lead-email-campaigns"), endpoint alias (e.g. "cron:stats"),
+     * or full endpoint path.
+     */
+    routeId: text("route_id").notNull(),
+    /** Human-readable label — separate from routeId for display */
+    displayName: text("display_name").notNull(),
+    description: text("description"),
+    version: text("version").notNull().default("1.0.0"),
+    category: text("category").notNull(),
+    schedule: text("schedule").notNull(), // Cron expression
+    timezone: text("timezone").default("UTC"),
+    enabled: boolean("enabled").notNull().default(true),
+    priority: text("priority", { enum: CronTaskPriorityDB }).notNull(),
+    timeout: integer("timeout").default(300000), // 5 minutes default
+    retries: integer("retries").default(3),
+    retryDelay: integer("retry_delay").default(30000), // 30 seconds default
+    /**
+     * taskInput — the input the task executes with (body + URL path params merged flat).
+     * Can be overridden per DB instance. splitTaskArgs() splits by schema at execution time.
+     */
+    taskInput: jsonb("task_input")
+      .$type<Record<string, JsonValue>>()
+      .notNull()
+      .default({}),
+    /**
+     * runOnce — when true, the task disables itself after the first execution
+     * (success or failure). Re-enable by setting enabled=true again.
+     */
+    runOnce: boolean("run_once").notNull().default(false),
 
-  /** Output mode after execution */
-  outputMode: text("output_mode", { enum: TaskOutputModeDB })
-    .notNull()
-    .default(TaskOutputModeDB[0]),
-  /** Notification targets (email/sms/webhook) for non-store-only modes */
-  notificationTargets: jsonb("notification_targets")
-    .$type<NotificationTarget[]>()
-    .notNull()
-    .default([]),
+    /** Output mode after execution */
+    outputMode: text("output_mode", { enum: TaskOutputModeDB })
+      .notNull()
+      .default(TaskOutputModeDB[0]),
+    /** Notification targets (email/sms/webhook) for non-store-only modes */
+    notificationTargets: jsonb("notification_targets")
+      .$type<NotificationTarget[]>()
+      .notNull()
+      .default([]),
 
-  // Execution tracking
-  lastExecutedAt: timestamp("last_executed_at"),
-  lastExecutionStatus: text("last_execution_status", {
-    enum: CronTaskStatusDB,
-  }),
-  lastExecutionError: text("last_execution_error"),
-  lastExecutionDuration: integer("last_execution_duration"),
-  nextExecutionAt: timestamp("next_execution_at"),
+    // Execution tracking
+    lastExecutedAt: timestamp("last_executed_at"),
+    lastExecutionStatus: text("last_execution_status", {
+      enum: CronTaskStatusDB,
+    }),
+    lastExecutionError: text("last_execution_error"),
+    lastExecutionDuration: integer("last_execution_duration"),
+    nextExecutionAt: timestamp("next_execution_at"),
 
-  // Statistics
-  executionCount: integer("execution_count").notNull().default(0),
-  successCount: integer("success_count").notNull().default(0),
-  errorCount: integer("error_count").notNull().default(0),
-  averageExecutionTime: integer("average_execution_time").default(0),
+    // Statistics
+    executionCount: integer("execution_count").notNull().default(0),
+    successCount: integer("success_count").notNull().default(0),
+    errorCount: integer("error_count").notNull().default(0),
+    averageExecutionTime: integer("average_execution_time").default(0),
 
-  // Metadata
-  tags: jsonb("tags").$type<string[]>().notNull().default([]),
+    // Metadata
+    tags: jsonb("tags").$type<string[]>().notNull().default([]),
 
-  // Ownership - null means system task (admin-seeded), otherwise user who created it
-  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+    // Ownership - null means system task (admin-seeded), otherwise user who created it
+    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
 
-  // Timestamps
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+    // Timestamps
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    // Partial unique index: system tasks (userId IS NULL) are unique by routeId
+    uniqueIndex("cron_tasks_route_id_system_idx")
+      .on(table.routeId)
+      .where(isNull(table.userId)),
+  ],
+);
 
 /**
  * Cron Task Executions Table

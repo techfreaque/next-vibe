@@ -77,23 +77,10 @@ const ALL_SEARCH_LOCALES: CountryLanguage[] = [
 const COMPACT_DEFAULT_PAGE_SIZE = 25;
 const HUMAN_DEFAULT_PAGE_SIZE = 200;
 
-const CLI_COMPATIBLE_PLATFORMS: readonly Platform[] = [
-  Platform.CLI,
-  Platform.CLI_PACKAGE,
-  Platform.AI,
-  Platform.MCP,
-];
-
 // ─── Tool discovery helpers ─────────────────────────────────────────────────
 
 function isCompactPlatform(platform: Platform): boolean {
   return platform === Platform.AI || platform === Platform.MCP;
-}
-
-function isCliCompatiblePlatform(
-  platform: Platform,
-): platform is CliCompatiblePlatform {
-  return CLI_COMPATIBLE_PLATFORMS.includes(platform);
 }
 
 function getParameterSchema(
@@ -1046,14 +1033,14 @@ export class HelpRepository {
     platform: Platform,
     logger: EndpointLogger,
   ): Promise<ResponseType<HelpGetResponseOutput>> {
-    // Interactive mode — CLI terminal explorer
-    if (data.interactive) {
-      if (!isCliCompatiblePlatform(platform)) {
-        return fail({
-          message: "app.api.system.help.interactive.errors.cliOnly.title",
-          errorType: ErrorResponseTypes.BAD_REQUEST,
-        });
-      }
+    // Interactive mode — CLI only, not exposed via MCP/AI/Web
+    if (
+      Platform.CLI === platform ||
+      Platform.CLI_PACKAGE === platform
+      // TODO handle and make it work - we should not add this prop to not polute the schema for other platforms. this needs custom platform tool defs which we need anyways at one point
+      // &&
+      // data.interactive
+    ) {
       const result = await InteractiveSession.start(
         user,
         locale,

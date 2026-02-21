@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "cron_tasks_route_id_system_idx" ON "cron_tasks" USING btree ("route_id") WHERE "cron_tasks"."user_id" is null;

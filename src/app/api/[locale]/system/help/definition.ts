@@ -115,7 +115,11 @@ const { GET } = createEndpoint({
         label: "app.api.system.help.get.fields.page.label" as const,
         description: "app.api.system.help.get.fields.page.description" as const,
         columns: 3,
-        schema: z.number().int().min(1).optional(),
+        schema: z
+          .number()
+          .int()
+          .optional()
+          .transform((v) => (v && v >= 1 ? v : undefined)),
       }),
 
       pageSize: requestField({
@@ -125,18 +129,12 @@ const { GET } = createEndpoint({
         description:
           "app.api.system.help.get.fields.pageSize.description" as const,
         columns: 3,
-        schema: z.number().int().min(1).max(500).optional(),
-      }),
-
-      // CLI: launch interactive mode instead of returning JSON response
-      interactive: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.help.get.fields.interactive.label" as const,
-        description:
-          "app.api.system.help.get.fields.interactive.description" as const,
-        columns: 2,
-        schema: z.boolean().optional(),
+        schema: z
+          .number()
+          .int()
+          .max(500)
+          .optional()
+          .transform((v) => (v && v >= 1 ? v : undefined)),
       }),
 
       // === RESPONSE FIELDS ===
@@ -251,7 +249,6 @@ const { GET } = createEndpoint({
       searchByName: { query: "search", page: 1 },
       filterByCategory: { category: "chat", page: 1, pageSize: 50 },
       toolDetail: { toolName: "agent_search_brave_GET" },
-      interactive: { interactive: true },
     },
     responses: {
       default: {
@@ -262,7 +259,7 @@ const { GET } = createEndpoint({
           { name: "Chat", count: 42 },
           { name: "System", count: 18 },
         ],
-        hint: "Use query to search, category to browse, or toolName to get full parameter schema. Pass --interactive for interactive CLI mode.",
+        hint: "No params = list all tools + categories. Use query to search, category to filter, toolName to get full parameter schema.",
         currentPage: 1,
         effectivePageSize: 200,
         totalPages: 1,
