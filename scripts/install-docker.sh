@@ -4,7 +4,7 @@ git pull
 set -e
 
 # Build image (no DB access during build)
-docker compose -f docker-compose.prod.yml build --no-cache
+docker compose -f docker-compose.prod.yml build
 
 # Ensure postgres is running and healthy
 docker compose -f docker-compose.prod.yml up -d postgres

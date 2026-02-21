@@ -217,11 +217,14 @@ ENV NEXT_TELEMETRY_DISABLED=1
 
 COPY . .
 
-# Install dependencies — cache bun's package download cache between builds
+# Install dependencies
+# Bun download cache avoids re-fetching tarballs; bun install with warm cache ~10-20s vs cold ~2min
+# node_modules not cache-mounted: at 1.9GB/183k files, cp-in+cp-out costs ~3min, more than install itself
 RUN --mount=type=cache,target=/root/.bun/install/cache,id=next-vibe-bun-cache,sharing=locked \
     bun install --frozen-lockfile
 
-# Build using vibe CLI — cache .next/cache (webpack/RSC incremental cache) between builds
+# Build
+# /app/.next/cache mounted directly — Next.js webpack/RSC incremental cache persisted across builds
 # DB unreachable at build time (docker network only); migrations run via docker compose run in install-docker.sh
 RUN --mount=type=cache,target=/app/.next/cache,id=next-vibe-next-cache,sharing=locked \
     bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts build --migrate=false --seed=false
