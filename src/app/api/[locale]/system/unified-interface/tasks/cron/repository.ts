@@ -19,7 +19,6 @@ import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-in
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type { NotificationTarget } from "../unified-runner/types";
 import type {
   CronTaskExecution,
   CronTaskRow,
@@ -49,12 +48,10 @@ function serializeTask(
     timeout: task.timeout ?? null,
     retries: task.retries ?? null,
     retryDelay: task.retryDelay ?? null,
-    defaultConfig: task.defaultConfig as Record<
-      string,
-      string | number | boolean | null
-    >,
+    taskInput: task.taskInput,
+    runOnce: task.runOnce,
     outputMode: task.outputMode,
-    notificationTargets: task.notificationTargets as NotificationTarget[],
+    notificationTargets: task.notificationTargets,
     lastExecutedAt: task.lastExecutedAt?.toISOString() ?? null,
     lastExecutionStatus: task.lastExecutionStatus ?? null,
     lastExecutionError: task.lastExecutionError ?? null,
@@ -70,7 +67,7 @@ function serializeTask(
     successCount: task.successCount,
     errorCount: task.errorCount,
     averageExecutionTime: task.averageExecutionTime ?? null,
-    tags: task.tags as string[],
+    tags: task.tags,
     userId: task.userId ?? null,
     createdAt: task.createdAt.toISOString(),
     updatedAt: task.updatedAt.toISOString(),

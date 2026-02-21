@@ -11,7 +11,7 @@ import { translations as trackingTranslations } from "../../tracking/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  category: "Zarządzanie Leadami",
+  category: "Leads",
   tags: {
     leads: "Leady",
     batch: "Wsadowe",

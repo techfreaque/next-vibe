@@ -61,7 +61,7 @@ export const { POST } = createEndpoint({
   title: "app.api.system.generators.generateTrpcRouter.validation.title",
   description:
     "app.api.system.generators.generateTrpcRouter.validation.description",
-  category: "app.api.system.generators.generateTrpcRouter.validation.category",
+  category: "app.api.system.category",
   tags: [
     "app.api.system.generators.generateTrpcRouter.validation.tags.trpc",
     "app.api.system.generators.generateTrpcRouter.validation.tags.validation",

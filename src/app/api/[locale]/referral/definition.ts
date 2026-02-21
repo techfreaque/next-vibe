@@ -34,7 +34,7 @@ export const { POST } = createEndpoint({
   path: ["referral"],
   title: "app.api.referral.post.title",
   description: "app.api.referral.post.description",
-  category: "app.api.referral.category",
+  category: "app.api.payment.category",
   tags: ["app.api.referral.tags.referral", "app.api.referral.tags.create"],
   icon: "share",
   allowedRoles: [

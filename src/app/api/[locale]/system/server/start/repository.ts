@@ -9,7 +9,7 @@
 // Process environment access is required for server configuration
 
 import type { ChildProcess } from "node:child_process";
-import { spawn } from "node:child_process";
+import { execSync, spawn } from "node:child_process";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -18,16 +18,28 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { seedDatabase } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { databaseMigrationRepository } from "../../db/migrate/repository";
 import type {
   ServerStartRequestOutput,
   ServerStartResponseOutput,
 } from "./definition";
+
+/** Extract port number from a URL string, returns undefined if not parseable */
+function portFromUrl(url: string | undefined): number | undefined {
+  if (!url) {
+    return undefined;
+  }
+  try {
+    const parsed = new URL(url);
+    return parsed.port ? parseInt(parsed.port, 10) : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 /**
  * Server Start Repository Interface
@@ -59,11 +71,8 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
     const output: string[] = [];
     const errors: string[] = [];
 
-    // Convert string port to number if needed (CLI compatibility)
-    const port =
-      typeof data.port === "string"
-        ? parseInt(data.port, 10)
-        : data.port || 3000;
+    // Derive port: explicit --port > NEXT_PUBLIC_APP_URL port > default 3000
+    const port = data.port ?? portFromUrl(env.NEXT_PUBLIC_APP_URL) ?? 3000;
 
     try {
       output.push("🚀 Starting Vibe Production Server");
@@ -76,6 +85,72 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       output.push("🌍 Environment Setup");
       output.push(`   ✅ Environment: ${currentEnv}`);
       output.push(`   🌐 Target port: ${port}`);
+
+      // Database setup FIRST — must happen before task runner so all DB
+      // connections (migrations, seeds, pulse) use the preview postgres.
+      if (!data.skipDbSetup) {
+        output.push("");
+        output.push("🗄️  Database Setup");
+
+        // DATABASE_URL was already set to LOCAL_MODE_DATABASE_URL by the CLI
+        // environment loader (runtime/environment.ts) before any module loaded.
+        output.push(
+          `   🔗 Using LOCAL_MODE_DATABASE_URL: ${process.env["DATABASE_URL"]}`,
+        );
+
+        try {
+          // Dynamic import: must happen AFTER DATABASE_URL is set
+          const { dbUtilsRepository } =
+            await import("../../db/utils/repository");
+          const dockerCheckResult =
+            await dbUtilsRepository.isDockerAvailable(logger);
+
+          if (dockerCheckResult.success && dockerCheckResult.data) {
+            output.push(
+              "   🐘 Starting preview PostgreSQL (docker-compose.preview.yml)...",
+            );
+
+            const { dockerOperationsRepository } =
+              await import("../../db/utils/docker-operations/repository");
+            const dbStartResult =
+              await dockerOperationsRepository.dockerComposeUp(
+                logger,
+                locale,
+                "docker-compose.preview.yml",
+                60000,
+                "vibe-preview",
+              );
+
+            if (dbStartResult.success) {
+              output.push("   ✅ Preview PostgreSQL started (port 5433)");
+            } else {
+              output.push(
+                "   ⚠️ Failed to start preview PostgreSQL, continuing anyway",
+              );
+              logger.warn("Failed to start preview postgres", {
+                error: dbStartResult.message,
+              });
+            }
+
+            // Wait for database to be ready
+            await this.waitForDatabaseConnection(logger);
+          } else {
+            output.push(
+              "   ⚠️ Docker unavailable (continuing without managed DB)",
+            );
+          }
+        } catch (error) {
+          const errorMsg = parseError(error).message;
+          output.push(`   ⚠️ Database setup failed: ${errorMsg}`);
+          logger.warn("Database setup failed, continuing anyway", {
+            error: errorMsg,
+          });
+        }
+      } else {
+        output.push("");
+        output.push("🗄️  Database Setup");
+        output.push("   ⏭️ Database setup skipped (--skip-db-setup flag used)");
+      }
 
       output.push("");
       output.push("📋 Task Runner Setup");
@@ -150,9 +225,11 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
         output.push("🔄 Pre-Start Tasks");
         output.push("   🚀 Running production pre-start tasks...");
 
-        // Run migrations
+        // Run migrations (dynamic import — DB modules must load after DATABASE_URL is set)
         output.push("   📊 Running database migrations...");
         try {
+          const { databaseMigrationRepository } =
+            await import("../../db/migrate/repository");
           const migrateResult = await databaseMigrationRepository.runMigrations(
             {
               generate: false,
@@ -197,9 +274,11 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           });
         }
 
-        // Seed database
+        // Seed database (dynamic import — DB modules must load after DATABASE_URL is set)
         output.push("   🌱 Seeding production database...");
         try {
+          const { seedDatabase } =
+            await import("@/app/api/[locale]/system/db/seed/seed-manager");
           await seedDatabase("prod", logger, locale);
           output.push("   ✅ Database seeding completed");
         } catch (error) {
@@ -441,8 +520,71 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
   }
 
   /**
+   * Wait for database connection to be ready
+   */
+  private async waitForDatabaseConnection(
+    logger: EndpointLogger,
+  ): Promise<void> {
+    const maxAttempts = 60;
+    const delayMs = 500;
+
+    logger.debug("Waiting for database to be ready...");
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, delayMs);
+      });
+
+      try {
+        const { Pool } = await import("pg");
+        const pool = new Pool({
+          connectionString: process.env["DATABASE_URL"],
+          connectionTimeoutMillis: 5000,
+        });
+
+        try {
+          await pool.query("SELECT 1");
+          await pool.end();
+          logger.debug(
+            `Database connection ready after ${attempt} attempts (${(attempt * delayMs) / 1000}s)`,
+          );
+          return;
+        } catch {
+          // oxlint-disable-next-line no-empty-function
+          await pool.end().catch(() => {});
+          if (attempt % 10 === 0) {
+            logger.debug(
+              `Still waiting for database... (${attempt}/${maxAttempts})`,
+            );
+          }
+        }
+      } catch {
+        if (attempt === maxAttempts) {
+          logger.warn("Database connection timeout — continuing anyway");
+          return;
+        }
+      }
+    }
+  }
+
+  /**
    * Start Next.js production server as a child process
    */
+  /**
+   * Kill any process occupying the given port
+   */
+  private killProcessOnPort(port: number, logger: EndpointLogger): void {
+    try {
+      // fuser is more reliable than lsof for finding processes on a port
+      execSync(`fuser -k ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
+      logger.info(`Killed stale process on port ${port}`);
+      // Brief wait for process to exit
+      execSync("sleep 0.5");
+    } catch {
+      // No process on port or kill failed — both are fine
+    }
+  }
+
   private async startNextServer(
     port: number,
     logger: EndpointLogger,
@@ -450,6 +592,9 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
     return await new Promise((resolve) => {
       try {
         logger.info("Starting Next.js production server", { port });
+
+        // Kill any stale process on the target port
+        this.killProcessOnPort(port, logger);
 
         // Spawn Next.js production server using bun
         const nextProcess = spawn(

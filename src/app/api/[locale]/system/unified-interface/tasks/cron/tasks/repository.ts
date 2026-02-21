@@ -17,6 +17,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
+import type { NotificationTarget } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
@@ -69,10 +70,10 @@ function formatTaskResponse(
     timeout: task.timeout ?? null,
     retries: task.retries ?? null,
     retryDelay: task.retryDelay ?? null,
-    defaultConfig: task.defaultConfig as CronTaskResponseType["defaultConfig"],
+    taskInput: task.taskInput,
+    runOnce: task.runOnce,
     outputMode: task.outputMode,
-    notificationTargets:
-      task.notificationTargets as CronTaskResponseType["notificationTargets"],
+    notificationTargets: task.notificationTargets,
     lastExecutedAt: task.lastExecutedAt?.toISOString() ?? null,
     lastExecutionStatus: task.lastExecutionStatus ?? null,
     lastExecutionError: task.lastExecutionError ?? null,
@@ -82,7 +83,7 @@ function formatTaskResponse(
     successCount: task.successCount,
     errorCount: task.errorCount,
     averageExecutionTime: task.averageExecutionTime ?? null,
-    tags: task.tags as CronTaskResponseType["tags"],
+    tags: task.tags,
     userId: task.userId ?? null,
     createdAt: task.createdAt.toISOString(),
     updatedAt: task.updatedAt.toISOString(),
@@ -228,13 +229,10 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         retries: data.retries ?? 3,
         retryDelay: data.retryDelay ?? 5000,
         version: "1.0.0",
-        defaultConfig:
-          (data.defaultConfig as Record<
-            string,
-            string | number | boolean | null
-          >) ?? {},
+        taskInput: data.taskInput,
+        runOnce: data.runOnce ?? false,
         outputMode: data.outputMode ?? TaskOutputMode.STORE_ONLY,
-        notificationTargets: [],
+        notificationTargets: [] as NotificationTarget[],
         executionCount: 0,
         successCount: 0,
         errorCount: 0,

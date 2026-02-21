@@ -57,6 +57,11 @@ const COLOR_MAP: Record<string, { active: string; hover: string }> = {
       "bg-zinc-500/15 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-500/20",
     hover: "hover:bg-zinc-500/10 hover:text-zinc-600",
   },
+  green: {
+    active:
+      "bg-green-500/15 text-green-700 dark:text-green-300 hover:bg-green-500/20",
+    hover: "hover:bg-green-500/10 hover:text-green-600",
+  },
 };
 
 function getColorClasses(color: string | null, isActive: boolean): string {

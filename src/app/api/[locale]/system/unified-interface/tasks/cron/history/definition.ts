@@ -6,6 +6,7 @@
 import { z } from "zod";
 
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
+import { errorResponseSchema } from "@/app/api/[locale]/shared/types/response.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -35,7 +36,7 @@ export const { GET } = createEndpoint({
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.history.get.description",
   icon: "clock",
-  category: "app.api.system.unifiedInterface.tasks.category",
+  category: "app.api.system.category",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
@@ -155,14 +156,7 @@ export const { GET } = createEndpoint({
             startedAt: z.string(),
             completedAt: z.string().nullable(),
             durationMs: z.coerce.number().nullable(),
-            error: z
-              .object({
-                message: z.string(),
-                messageParams: z.record(z.string(), z.unknown()).optional(),
-                errorType: z.string(),
-              })
-              .nullable(),
-            errorStack: z.string().nullable(),
+            error: errorResponseSchema.nullable(),
             result: z.record(z.string(), z.unknown()).nullable(),
             environment: z.string().nullable(),
             createdAt: z.string(),

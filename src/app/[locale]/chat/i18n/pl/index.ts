@@ -25,6 +25,7 @@ export const translations: typeof enTranslations = {
     sharedChats: "Udostępnione czaty",
     publicChats: "Publiczne czaty",
     incognitoChats: "Czaty incognito",
+    cronChats: "Wątki cron",
     search: "Szukaj",
     delete: "Usuń",
     cancel: "Anuluj",
@@ -107,23 +108,37 @@ export const translations: typeof enTranslations = {
 
   aiTools: {
     modal: {
-      title: "Konfiguracja narzędzi AI",
+      title: "Narzędzia AI",
       description:
-        "Wybierz, które narzędzia AI asystent może używać podczas rozmowy. Narzędzia zapewniają funkcje takie jak wyszukiwanie w sieci, obliczenia i dostęp do danych.",
+        "Zazwyczaj nie musisz zarządzać narzędziami. Gdy pomoc jest włączona, AI może wywołać dowolne narzędzie na żądanie. Przypnij narzędzia tutaj tylko jeśli chcesz mieć je zawsze w kontekście.",
       searchPlaceholder: "Szukaj narzędzi...",
       loading: "Ładowanie narzędzi...",
       noToolsFound: "Brak narzędzi pasujących do wyszukiwania",
-      noToolsAvailable:
-        "Nie znaleziono jeszcze narzędzi AI. Narzędzia pojawią się tutaj automatycznie, gdy zostaną zarejestrowane w systemie.",
+      noToolsAvailable: "Brak dostępnych narzędzi AI",
       expandAll: "Rozwiń wszystkie",
       collapseAll: "Zwiń wszystkie",
       selectAll: "Zaznacz wszystkie",
       deselectAll: "Odznacz wszystkie",
       enableAll: "Włącz wszystkie",
       resetToDefault: "Przywróć domyślne",
-      stats: "{{enabled}} z {{total}} narzędzi włączonych",
+      stats: "{{enabled}} z {{total}} narzędzi przypiętych",
       aliases: "Aliasy",
       requireConfirmation: "Wymagaj potwierdzenia przed użyciem",
+      activeLabel: "przypięte",
+      enabledLabel: "dozwolone",
+      totalLabel: "łącznie",
+      activeTooltip:
+        "Przypięte narzędzia są zawsze w kontekście — AI widzi je przy każdym zapytaniu",
+      enabledTooltip:
+        "Dozwolone narzędzia mogą być wywoływane na żądanie, gdy pomoc jest włączona",
+      legendActive: "Zawsze w kontekście (przypięte)",
+      legendConfirm: "Pyta przed uruchomieniem",
+      activeOn: "Przypięte — zawsze w kontekście. Kliknij, aby odpiąć",
+      activeOff:
+        "Nieprzypięte — AI może nadal wywoływać na żądanie. Kliknij, aby przypiąć",
+      confirmOn: "Wymaga potwierdzenia — kliknij, aby wyłączyć",
+      confirmOff:
+        "Uruchamia się automatycznie — kliknij, aby wymagać potwierdzenia",
     },
   },
 
@@ -286,6 +301,9 @@ export const translations: typeof enTranslations = {
       toSend: "aby wysłać",
       shiftEnter: "Shift+Enter",
       forNewLine: "dla nowej linii",
+      ctrlV: "Ctrl+V",
+      pasteFilesSeparator: "·",
+      orPasteFiles: "aby wkleić pliki",
     },
     speechInput: {
       stopRecording: "Zatrzymaj nagrywanie",
@@ -861,6 +879,8 @@ export const translations: typeof enTranslations = {
     sharedDescription: "Rozmowy udostępnione innym",
     publicDescription: "Rozmowy publiczne",
     incognitoDescription: "Rozmowy w trybie prywatnym",
+    cronDescription:
+      "Automatyczne rozmowy tworzone przez zaplanowane zadania cron.",
     accessModal: {
       title: "Wymagane konto",
       privateTitle: "Wątki prywatne",

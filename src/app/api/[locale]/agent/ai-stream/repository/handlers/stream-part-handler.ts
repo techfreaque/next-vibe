@@ -8,6 +8,7 @@ import type { JSONValue, TextStreamPart, ToolSet } from "ai";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ModelId } from "../../../models/models";
 import type { StreamContext } from "../core/stream-context";
@@ -32,7 +33,10 @@ export class StreamPartHandler {
     isIncognito: boolean;
     userId: string | undefined;
     user: JwtPayloadType;
+    locale: CountryLanguage;
     toolsConfig: Map<string, { requiresConfirmation: boolean }>;
+    /** Set of tool names the model is allowed to execute. null = all allowed. */
+    activeToolNames: Set<string> | null;
     streamAbortController: AbortController;
     emittedToolResultIds: Set<string> | undefined;
     ttsHandler: StreamingTTSHandler | null;
@@ -47,7 +51,9 @@ export class StreamPartHandler {
       isIncognito,
       userId,
       user,
+      locale,
       toolsConfig,
+      activeToolNames,
       streamAbortController,
       emittedToolResultIds,
       ttsHandler,
@@ -238,6 +244,9 @@ export class StreamPartHandler {
           isIncognito,
           userId,
           user,
+          locale,
+          activeToolNames,
+          toolsConfig,
           dbWriter: ctx.dbWriter,
           logger,
         });

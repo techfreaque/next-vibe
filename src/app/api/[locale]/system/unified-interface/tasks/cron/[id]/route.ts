@@ -49,6 +49,12 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
       if (data.retries !== undefined) {
         updates.retries = data.retries;
       }
+      if (data.taskInput !== undefined) {
+        updates.taskInput = data.taskInput;
+      }
+      if (data.runOnce !== undefined) {
+        updates.runOnce = data.runOnce;
+      }
       return await CronTasksRepository.updateTask(
         urlPathParams.id,
         updates,

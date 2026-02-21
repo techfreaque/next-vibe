@@ -17,7 +17,7 @@ export const translations = {
   },
 
   // Main payment domain
-  category: "Payment",
+  category: "Billing",
 
   // Main form configuration
   form: {

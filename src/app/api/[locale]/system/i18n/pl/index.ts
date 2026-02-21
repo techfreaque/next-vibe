@@ -12,6 +12,7 @@ import { translations as unifiedInterfaceTranslations } from "../../unified-inte
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "System",
   builder: builderTranslations,
   check: checkTranslations,
   db: dbTranslations,

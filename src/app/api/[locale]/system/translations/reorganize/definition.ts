@@ -25,8 +25,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { UserRole } from "../../../user/user-roles/enum";
-
 /**
  * Translation Reorganization POST Endpoint
  * Reorganizes translation files and removes unused keys
@@ -36,12 +34,11 @@ const { POST } = createEndpoint({
   path: ["system", "translations", "reorganize"],
   allowedRoles: [
     // still a bit buggy - disabled to prevent AI from calling it
-    UserRole.ADMIN,
   ],
 
   title: "app.api.system.translations.reorganize.post.title",
   description: "app.api.system.translations.reorganize.post.description",
-  category: "app.api.system.translations.category",
+  category: "app.api.system.category",
   tags: [
     "app.api.system.translations.tags.reorganize",
     "app.api.system.translations.tags.maintenance",

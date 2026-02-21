@@ -27,7 +27,7 @@ const { POST } = createEndpoint({
   path: ["system", "check", "oxlint"],
   title: "app.api.system.check.oxlint.title",
   description: "app.api.system.check.oxlint.description",
-  category: "app.api.system.check.oxlint.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.check.oxlint.tag"],
   icon: "shield",
   allowedRoles: [

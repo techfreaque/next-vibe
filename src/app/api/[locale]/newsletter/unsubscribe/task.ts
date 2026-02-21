@@ -12,21 +12,29 @@ import {
   CronTaskPriority,
   TaskCategory,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import {
+  createCronTask,
+  type Task,
+} from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 
-const newsletterUnsubscribeSyncTask: Task = {
-  type: "cron",
-  name: "newsletter-unsubscribe-sync",
-  routeId: "newsletter_unsubscribe_sync_POST",
-  description:
-    "app.api.system.unifiedInterface.tasks.newsletterUnsubscribeSync.description",
-  schedule: CRON_SCHEDULES.EVERY_6_HOURS,
-  category: TaskCategory.MAINTENANCE,
-  enabled: false,
-  priority: CronTaskPriority.LOW,
-  timeout: TASK_TIMEOUTS.MEDIUM,
-  defaultConfig: { batchSize: 500, dryRun: false },
-};
+import definitions from "./sync/definition";
+import { tools } from "./sync/route";
+
+const newsletterUnsubscribeSyncTask = createCronTask(
+  definitions.POST,
+  tools.POST,
+  {
+    name: "newsletter-unsubscribe-sync",
+    description:
+      "app.api.system.unifiedInterface.tasks.newsletterUnsubscribeSync.description",
+    schedule: CRON_SCHEDULES.EVERY_6_HOURS,
+    category: TaskCategory.MAINTENANCE,
+    enabled: false,
+    priority: CronTaskPriority.LOW,
+    timeout: TASK_TIMEOUTS.MEDIUM,
+    defaultInput: { batchSize: 500, dryRun: false },
+  },
+);
 
 export const tasks: Task[] = [newsletterUnsubscribeSyncTask];
 

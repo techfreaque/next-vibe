@@ -59,7 +59,7 @@ export const translations = {
   title: "Chrome DevTools MCP Tools",
   description:
     "Execute Chrome DevTools MCP tools for browser automation and debugging",
-  category: "Core API",
+  category: "Browser",
   summary:
     "Access Chrome DevTools Protocol tools through MCP for web automation",
   tags: {

@@ -44,6 +44,7 @@ const { POST } = createEndpoint({
   category: "category",
   icon: "mail",
   aliases: [CONTACT_FORM_ALIAS] as const,
+  requiresConfirmation: true,
   tags: [
     "tags.contactForm",
     "tags.contactUs",

@@ -161,10 +161,7 @@ export class ToolCallHandler {
       );
     }
 
-    const toolConfig = toolsConfig.get(part.toolName);
-    const requiresConfirmation = toolConfig?.requiresConfirmation ?? false;
-
-    // Look up endpoint to get credit cost
+    // Look up endpoint to get credit cost and definition-level requiresConfirmation
     const allEndpoints = definitionsRegistry.getEndpointsForUser(
       Platform.AI,
       user,
@@ -174,6 +171,13 @@ export class ToolCallHandler {
       return preferredName === part.toolName;
     });
     const creditCost = endpoint?.credits ?? 0;
+
+    // Confirmation: client config overrides definition, definition is fallback
+    const toolConfig = toolsConfig.get(part.toolName);
+    const requiresConfirmation =
+      toolConfig?.requiresConfirmation ??
+      endpoint?.requiresConfirmation ??
+      false;
 
     const newCurrentParentId = currentParentId;
     const newCurrentDepth = currentDepth + 1;

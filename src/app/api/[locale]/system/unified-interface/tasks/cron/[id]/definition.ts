@@ -32,6 +32,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { taskInputSchema } from "../db";
 import { cronTaskResponseSchema } from "../tasks/definition";
 import { CronTaskDetailContainer } from "./widget";
 
@@ -45,7 +46,7 @@ const { GET } = createEndpoint({
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.task.get.description",
   icon: "clock",
-  category: "app.api.system.unifiedInterface.tasks.category",
+  category: "app.api.system.category",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
@@ -152,7 +153,7 @@ const { GET } = createEndpoint({
       default: {
         task: {
           id: "task-123",
-          routeId: "cron-steps",
+          routeId: "system_unified-interface_tasks_cron_stats_GET",
           displayName: "Example Task",
           description: "An example cron task",
           version: "1.0.0",
@@ -164,7 +165,8 @@ const { GET } = createEndpoint({
           timeout: 3600,
           retries: 3,
           retryDelay: 5000,
-          defaultConfig: {},
+          taskInput: {},
+          runOnce: false,
           outputMode: TaskOutputModeDB[0],
           notificationTargets: [],
           lastExecutedAt: null,
@@ -196,7 +198,7 @@ const { PUT } = createEndpoint({
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.task.put.description",
   icon: "clock",
-  category: "app.api.system.unifiedInterface.tasks.category",
+  category: "app.api.system.category",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
@@ -355,15 +357,25 @@ const { PUT } = createEndpoint({
         schema: z.coerce.number().optional(),
       }),
 
-      defaultConfig: requestField({
+      taskInput: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.defaultConfig.label",
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.taskInput.label",
         description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.defaultConfig.description",
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.taskInput.description",
         columns: 12,
-        schema: z.unknown().optional(),
+        schema: taskInputSchema.optional(),
+      }),
+      runOnce: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.runOnce.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.runOnce.description",
+        columns: 6,
+        schema: z.boolean().optional(),
       }),
 
       // Response fields
@@ -467,7 +479,7 @@ const { PUT } = createEndpoint({
       default: {
         task: {
           id: "task-123",
-          routeId: "cron-steps",
+          routeId: "system_unified-interface_tasks_cron_stats_GET",
           displayName: "Updated Task",
           description: "An updated cron task",
           version: "1.0.0",
@@ -479,7 +491,8 @@ const { PUT } = createEndpoint({
           timeout: 7200,
           retries: 5,
           retryDelay: 5000,
-          defaultConfig: {},
+          taskInput: {},
+          runOnce: false,
           outputMode: TaskOutputModeDB[0],
           notificationTargets: [],
           lastExecutedAt: null,
@@ -512,7 +525,7 @@ const { DELETE } = createEndpoint({
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.task.delete.description",
   icon: "clock",
-  category: "app.api.system.unifiedInterface.tasks.category",
+  category: "app.api.system.category",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,

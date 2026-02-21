@@ -12,11 +12,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { DefaultFolderId } from "../../../chat/config";
 import type { ToolCall } from "../../../chat/db";
-import type { ChatMessageRole } from "../../../chat/enum";
 import type { TtsVoiceValue } from "../../../text-to-speech/enum";
-import type { AiStreamOperation } from "../../definition";
 import type { StreamContext } from "../core/stream-context";
 import { StreamContextInitializer } from "../core/stream-context-initializer";
 import {
@@ -28,13 +25,18 @@ import { InitialEventsHandler } from "./initial-events-handler";
 
 export class StreamStartHandler {
   /**
-   * Initialize stream context, TTS handler, and emit initial events
+   * Initialize stream context, TTS handler, and emit tool confirmation events.
+   *
+   * User MESSAGE_CREATED is NOT emitted here — it happens in index.ts after
+   * the compacting check so event ordering is always correct:
+   *   [compacting →] user → AI
    */
   static initializeStream(params: {
     userMessageId: string | null;
     aiMessageId: string;
     effectiveParentMessageId: string | null | undefined;
     messageDepth: number;
+    isHeadless?: boolean;
     toolConfirmationResults: Array<{
       messageId: string;
       sequenceId: string;
@@ -46,26 +48,6 @@ export class StreamStartHandler {
           voice: typeof TtsVoiceValue;
         }
       | null
-      | undefined;
-    voiceTranscription:
-      | {
-          wasTranscribed: boolean;
-          confidence: number | null;
-          durationSeconds: number | null;
-        }
-      | null
-      | undefined;
-    userMessageMetadata:
-      | {
-          attachments?: Array<{
-            id: string;
-            url: string;
-            filename: string;
-            mimeType: string;
-            size: number;
-            data?: string;
-          }>;
-        }
       | undefined;
     fileUploadPromise:
       | Promise<{
@@ -83,11 +65,6 @@ export class StreamStartHandler {
     isNewThread: boolean;
     isIncognito: boolean;
     threadId: string;
-    rootFolderId: DefaultFolderId;
-    subFolderId: string | null;
-    effectiveContent: string;
-    operation: AiStreamOperation;
-    effectiveRole: ChatMessageRole;
     messages: ModelMessage[];
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
@@ -104,19 +81,13 @@ export class StreamStartHandler {
       aiMessageId,
       effectiveParentMessageId,
       messageDepth,
+      isHeadless,
       toolConfirmationResults,
       voiceMode,
-      voiceTranscription,
-      userMessageMetadata,
       fileUploadPromise,
       isNewThread,
       isIncognito,
       threadId,
-      rootFolderId,
-      subFolderId,
-      effectiveContent,
-      operation,
-      effectiveRole,
       messages,
       controller,
       encoder,
@@ -133,6 +104,7 @@ export class StreamStartHandler {
       toolConfirmationResults,
       aiMessageId,
       isIncognito,
+      isHeadless,
       logger,
       controller,
       encoder,
@@ -156,22 +128,12 @@ export class StreamStartHandler {
       });
     }
 
-    // Emit initial events via dbWriter (no direct controller access)
-    const emittedToolResultIds = InitialEventsHandler.emitInitialEvents({
-      isNewThread,
+    // Emit tool confirmation results immediately (before compacting check).
+    // User MESSAGE_CREATED is emitted in index.ts after shouldTriggerCompacting().
+    const emittedToolResultIds = InitialEventsHandler.emitToolConfirmations({
       threadId,
-      rootFolderId,
-      subFolderId: subFolderId || null,
-      content: effectiveContent,
-      operation,
-      userMessageId,
-      effectiveRole,
-      effectiveParentMessageId,
-      messageDepth,
-      effectiveContent,
+      isNewThread,
       toolConfirmationResults,
-      voiceTranscription,
-      userMessageMetadata,
       dbWriter: ctx.dbWriter,
       logger,
     });

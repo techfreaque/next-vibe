@@ -11,7 +11,7 @@ export const translations: typeof enTranslations = {
   _components: componentsTranslations,
   title: "Przesłanie formularza kontaktowego",
   description: "Prześlij formularz kontaktowy i obsługuj powiadomienia e-mail",
-  category: "Podstawowe API",
+  category: "System",
   summary: "Przetwarzaj przesłania formularzy kontaktowych z śledzeniem leadów",
   tags: {
     contactForm: "Formularz kontaktowy",

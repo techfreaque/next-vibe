@@ -8,6 +8,7 @@
 
 import "server-only";
 
+import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -16,12 +17,18 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import {
+  isFileResponse,
+  isStreamingResponse,
+} from "@/app/api/[locale]/shared/types/response.schema";
+import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
 } from "@/app/api/[locale]/user/auth/types";
+import { users as usersTable } from "@/app/api/[locale]/user/db";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -33,29 +40,23 @@ import type {
   UnifiedRunnerResponseOutput,
 } from "./definition";
 import type {
-  CronTask,
+  CronTaskAny,
+  JsonValue,
   ResolveRouteIdResult,
   Task,
-  TaskConfig,
   TaskRunner,
   TaskStatus,
 } from "./types";
 
 /**
- * Resolve a routeId to determine how to execute it.
+ * Resolve a routeId to its full endpoint path.
  * Resolution order:
- *  1. "cron-steps" literal → { kind: "steps" }
- *  2. aliasToPathMap (endpoint aliases/paths) → { kind: "endpoint" }
- *  3. unknown → { kind: "unknown" }
+ *  1. aliasToPathMap (endpoint aliases/paths) → { kind: "endpoint" }
+ *  2. unknown → { kind: "unknown" }
  */
 export async function resolveRouteId(
   routeId: string,
 ): Promise<ResolveRouteIdResult> {
-  if (routeId === "cron-steps") {
-    return { kind: "steps" };
-  }
-
-  // Check endpoint aliases/paths
   const { getFullPath } =
     await import("@/app/api/[locale]/system/generated/endpoint");
   const path = getFullPath(routeId);
@@ -87,7 +88,7 @@ export interface TaskRunnerManager {
 
   // Task execution with overlap prevention
   executeCronTask: (
-    task: CronTask,
+    task: CronTaskAny,
   ) => Promise<ResponseType<{ status: string; message: string }>>;
   startTaskRunner: (
     task: TaskRunner,
@@ -104,10 +105,10 @@ export interface TaskRunnerManager {
   start(
     tasks: Task[],
     signal: AbortSignal,
-    locale: CountryLanguage,
+    systemLocale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<void>;
-  stop(locale: CountryLanguage): Promise<ResponseType<void>>;
+  stop(systemLocale: CountryLanguage): Promise<ResponseType<void>>;
   getStatus(): {
     running: boolean;
     activeTasks: string[];
@@ -117,7 +118,7 @@ export interface TaskRunnerManager {
   manageRunner(
     data: UnifiedRunnerRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    systemLocale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UnifiedRunnerResponseOutput>>;
 }
@@ -142,14 +143,14 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
   }> = [];
 
   // Execution context stored when runner starts
-  locale!: CountryLanguage;
+  systemLocale!: CountryLanguage;
   logger!: EndpointLogger;
   private cronUser: JwtPrivatePayloadType = CRON_SYSTEM_USER;
 
   async manageRunner(
     data: UnifiedRunnerRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    systemLocale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UnifiedRunnerResponseOutput>> {
     try {
@@ -174,7 +175,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
 
         case "start":
           // Load task registry and start the runner for real
-          await this.startAndBlock(locale, logger);
+          await this.startAndBlock(systemLocale, logger);
           // Never reached when blocking - but needed for restart case
           return success({
             success: true,
@@ -185,7 +186,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
           });
 
         case "stop":
-          await this.stop(locale);
+          await this.stop(systemLocale);
           return success({
             success: true,
             actionResult: data.action,
@@ -195,8 +196,8 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
           });
 
         case "restart":
-          await this.stop(locale);
-          await this.startAndBlock(locale, logger);
+          await this.stop(systemLocale);
+          await this.startAndBlock(systemLocale, logger);
           return success({
             success: true,
             actionResult: data.action,
@@ -230,7 +231,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
 
   // TaskRunnerManager interface implementation
   async executeCronTask(
-    task: CronTask,
+    task: CronTaskAny,
   ): Promise<ResponseType<{ status: string; message: string }>> {
     const taskName = task.name;
 
@@ -267,15 +268,10 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
     );
     const dbTask = dbTaskResponse.success ? dbTaskResponse.data : null;
 
-    // Resolve config: prefer DB defaultConfig, fall back to task's own default
-    // dbTask.defaultConfig is jsonb (unknown) — treat as TaskConfig only if it's a plain object
-    const dbConfig =
-      dbTask?.defaultConfig !== null &&
-      typeof dbTask?.defaultConfig === "object" &&
-      !Array.isArray(dbTask.defaultConfig)
-        ? (dbTask.defaultConfig as TaskConfig)
-        : undefined;
-    const config: TaskConfig = dbConfig ?? task.defaultConfig ?? {};
+    // taskInput: DB value overrides file-task default.
+    // splitTaskArgs() splits the flat merged input by URL-param schema at execution time.
+    const resolvedInput: Record<string, JsonValue> =
+      dbTask?.taskInput ?? task.taskInput ?? {};
 
     const executionId = crypto.randomUUID();
     const startedAt = new Date();
@@ -291,7 +287,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
           status: CronTaskStatus.RUNNING,
           priority: dbTask.priority,
           startedAt,
-          config,
+          config: resolvedInput,
           triggeredBy: "schedule",
         },
         this.logger,
@@ -303,21 +299,45 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
 
     const startTime = Date.now();
 
+    // Resolve user locale: if task has a userId, use their locale; otherwise fall back to systemLocale
+    let userLocale: CountryLanguage = this.systemLocale;
+    if (dbTask?.userId) {
+      const ownerRow = await db
+        .select({ locale: usersTable.locale })
+        .from(usersTable)
+        .where(eq(usersTable.id, dbTask.userId))
+        .limit(1);
+      if (ownerRow[0]?.locale) {
+        userLocale = ownerRow[0].locale;
+      }
+    }
+
     try {
-      // Dispatch to the route identified by task.routeId
-      const { RouteExecutionExecutor } =
-        await import("@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor");
-      const result = await RouteExecutionExecutor.executeGenericHandler({
-        toolName: task.routeId,
-        data: config,
-        urlPathParams: {},
+      // Split flat taskInput into { data, urlPathParams } using the endpoint's URL-param schema.
+      const { splitTaskArgs } = await import("../cron/arg-splitter");
+      const path = `${task.definition.path.join("_")}_${task.definition.method}`;
+      const { data, urlPathParams } = await splitTaskArgs(path, resolvedInput);
+
+      // Call the route handler directly — no more string-based resolution
+      const result = await task.route({
+        data,
+        urlPathParams,
         user: this.cronUser,
-        locale: this.locale,
+        locale: userLocale,
         logger: this.logger,
         platform: Platform.CLI,
       });
 
       const durationMs = Date.now() - startTime;
+
+      // Cron tasks should not return streaming/file responses
+      if (isStreamingResponse(result) || isFileResponse(result)) {
+        this.markTaskAsCompleted(taskName);
+        return success({
+          status: CronTaskStatus.COMPLETED,
+          message: `Task ${taskName} returned a non-standard response`,
+        });
+      }
 
       if (!result.success) {
         const errorMsg =
@@ -334,8 +354,10 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
               status: CronTaskStatus.FAILED,
               completedAt: new Date(),
               durationMs,
-              error: { message: errorMsg },
-              errorStack: null,
+              error: fail({
+                message: errorMsg,
+                errorType: ErrorResponseTypes.INTERNAL_ERROR,
+              }),
             },
             this.logger,
           );
@@ -352,6 +374,19 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
             null,
             this.logger,
           );
+
+          // Run-once: disable task after first execution (success or failure)
+          if (dbTask.runOnce) {
+            await CronTasksRepository.updateTask(
+              dbTask.id,
+              { enabled: false },
+              null,
+              this.logger,
+            );
+            this.logger.info(
+              `[run-once] Task "${taskName}" disabled after single execution`,
+            );
+          }
         }
 
         return fail({
@@ -393,6 +428,19 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
           null,
           this.logger,
         );
+
+        // Run-once: disable task after first execution (success or failure)
+        if (dbTask.runOnce) {
+          await CronTasksRepository.updateTask(
+            dbTask.id,
+            { enabled: false },
+            null,
+            this.logger,
+          );
+          this.logger.info(
+            `[run-once] Task "${taskName}" disabled after single execution`,
+          );
+        }
       }
 
       return success({
@@ -413,8 +461,10 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
             status: CronTaskStatus.FAILED,
             completedAt: new Date(),
             durationMs,
-            error: { message: errorMsg },
-            errorStack: error instanceof Error ? (error.stack ?? null) : null,
+            error: fail({
+              message: errorMsg,
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            }),
           },
           this.logger,
         );
@@ -431,6 +481,19 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
           null,
           this.logger,
         );
+
+        // Run-once: disable task after first execution (success or failure)
+        if (dbTask.runOnce) {
+          await CronTasksRepository.updateTask(
+            dbTask.id,
+            { enabled: false },
+            null,
+            this.logger,
+          );
+          this.logger.info(
+            `[run-once] Task "${taskName}" disabled after single execution`,
+          );
+        }
       }
 
       return fail({
@@ -463,7 +526,8 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
       await task.run({
         signal,
         logger: this.logger,
-        locale: this.locale,
+        systemLocale: this.systemLocale,
+        userLocale: this.systemLocale,
         cronUser: this.cronUser,
       });
       this.markTaskAsCompleted(taskName);
@@ -475,7 +539,8 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
         await task.onError({
           error: errorObj,
           logger: this.logger,
-          locale: this.locale,
+          systemLocale: this.systemLocale,
+          userLocale: this.systemLocale,
           cronUser: this.cronUser,
         });
       }
@@ -524,12 +589,12 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
   start(
     tasks: Task[],
     signal: AbortSignal,
-    locale: CountryLanguage,
+    systemLocale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<void> {
     try {
       // Store execution context
-      this.locale = locale;
+      this.systemLocale = systemLocale;
       this.logger = logger;
 
       this.logger.debug("Starting unified task runner", {
@@ -540,7 +605,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
       this.isRunning = true;
 
       // Start all side tasks and task runners in background
-      void this.startTasksInBackground(tasks, signal, locale);
+      void this.startTasksInBackground(tasks, signal, systemLocale);
 
       this.logger.debug("Task runner startup initiated");
 
@@ -570,7 +635,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
   private startTasksInBackground(
     tasks: Task[],
     signal: AbortSignal,
-    locale: CountryLanguage,
+    systemLocale: CountryLanguage,
   ): void {
     try {
       // Start all task runners
@@ -604,7 +669,8 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
           await task.run({
             signal: taskController.signal,
             logger: this.logger,
-            locale: this.locale,
+            systemLocale: this.systemLocale,
+            userLocale: this.systemLocale,
             cronUser: this.cronUser,
           });
 
@@ -619,7 +685,8 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
             await task.onError({
               error: errorObj,
               logger: this.logger,
-              locale: this.locale,
+              systemLocale: this.systemLocale,
+              userLocale: this.systemLocale,
               cronUser: this.cronUser,
             });
           }
@@ -639,7 +706,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
       // Cron tasks are executed by the pulse runner (task-runner.ts),
       // not scheduled here — pulse fires every minute and uses isCronTaskDue()
       const cronTasks = tasks.filter(
-        (task): task is CronTask => task.type === "cron",
+        (task): task is CronTaskAny => task.type === "cron",
       );
       this.logger.debug("Cron tasks registered (executed via pulse runner)", {
         cronTaskCount: cronTasks.length,
@@ -650,7 +717,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
         totalTasks: tasks.length,
         taskRunnersStarted: taskRunners.filter((t) => t.enabled).length,
         cronTasksScheduled: cronTasks.filter((t) => t.enabled).length,
-        locale,
+        systemLocale,
         signal: signal.aborted ? "aborted" : "active",
       });
     } catch (error) {
@@ -667,7 +734,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
    * Exits cleanly on SIGINT/SIGTERM.
    */
   private async startAndBlock(
-    locale: CountryLanguage,
+    systemLocale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<never> {
     const { taskRegistry } =
@@ -684,7 +751,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
     const startResult = this.start(
       taskRegistry.allTasks,
       signal,
-      locale,
+      systemLocale,
       logger,
     );
     if (!startResult.success) {
@@ -703,7 +770,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
       const shutdown = (): void => {
         logger.info("Shutting down task runner...");
         abortController.abort();
-        void this.stop(locale).then(() => {
+        void this.stop(systemLocale).then(() => {
           resolve();
           return undefined;
         });
@@ -717,9 +784,9 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
     return Promise.reject<never>(new Error("unreachable"));
   }
 
-  async stop(locale: CountryLanguage): Promise<ResponseType<void>> {
+  async stop(systemLocale: CountryLanguage): Promise<ResponseType<void>> {
     // Mark parameter as used for now
-    void locale;
+    void systemLocale;
 
     this.isRunning = false;
 

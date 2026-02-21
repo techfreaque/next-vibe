@@ -2,17 +2,55 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   get: {
-    title: "Verfügbare KI-Tools abrufen",
+    title: "Tool-Hilfe — Verfügbare KI-Tools entdecken",
     description:
-      "Liste der für den aktuellen Benutzer verfügbaren KI-Tools abrufen",
+      "Suche und entdecke alle verfügbaren KI-Tools. Verwende query zum Suchen nach Name, Beschreibung oder Alias. Verwende category zum Filtern nach Tool-Kategorie. Gibt Toolnamen, Beschreibungen, Aliase und Metadaten zurück.",
     response: {
       title: "KI-Tools Antwort",
       description: "Liste der verfügbaren KI-Tools",
     },
     fields: {
+      query: {
+        label: "Suchanfrage",
+        description:
+          "Tools nach Name, Beschreibung, Alias oder Tag durchsuchen (ohne Beachtung der Groß-/Kleinschreibung)",
+        placeholder: "z.B. Suche, Speicher, Abruf...",
+      },
+      category: {
+        label: "Kategoriefilter",
+        description:
+          "Tools nach Kategoriename filtern (ohne Beachtung der Groß-/Kleinschreibung)",
+      },
+      toolName: {
+        label: "Tool-Name (Detail)",
+        description:
+          "Vollständige Details für ein bestimmtes Tool nach Name oder Alias. Gibt Parameterschema zurück.",
+      },
       tools: {
         title: "Verfügbare Tools",
       },
+      totalCount: {
+        title: "Gesamtzahl der Tools",
+      },
+      matchedCount: {
+        title: "Anzahl der Treffer",
+      },
+      categories: {
+        title: "Tool-Kategorien",
+      },
+      hint: {
+        title: "Nutzungshinweis",
+      },
+    },
+    submitButton: {
+      label: "Tools suchen",
+      loadingText: "Suche...",
+    },
+    widget: {
+      totalTools: "{{count}} Tools verfügbar",
+      matchedOf: "{{matched}} von {{total}} Tools",
+      categories: "{{count}} Kategorien",
+      noToolsFound: "Keine Tools gefunden, die Ihrer Suche entsprechen",
     },
     success: {
       title: "Tools erfolgreich abgerufen",

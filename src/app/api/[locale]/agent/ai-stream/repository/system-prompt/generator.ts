@@ -11,6 +11,10 @@ import { languageConfig } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
+import {
+  ProductIds,
+  productsRepository,
+} from "../../../../products/repository-client";
 import { TOTAL_MODEL_COUNT } from "../../../models/models";
 import { NO_LOOP_PARAM } from "../core/constants";
 
@@ -27,6 +31,19 @@ const formattingInstructions = [
   "Use tables for comparisons, matrices, and structured data",
   "NEVER write walls of text - always break into readable paragraphs",
 ] as const;
+
+/**
+ * Map a currency code to its symbol
+ */
+function currencySymbol(currency: string): string {
+  if (currency === "EUR") {
+    return "€";
+  }
+  if (currency === "PLN") {
+    return "zł";
+  }
+  return "$";
+}
 
 /**
  * Default prompt when user wants AI to answer to an AI message
@@ -71,6 +88,12 @@ export interface SystemPromptParams {
   memorySummary?: string;
   /** Whether call mode is enabled (affects formatting) */
   callMode?: boolean;
+  /** Extra instructions appended to the system prompt (e.g. cron task context) */
+  extraInstructions?: string;
+  /** Whether running in headless mode (cron/task, no human present) */
+  headless?: boolean;
+  /** Whether the user is a public (unauthenticated) user */
+  isPublicUser?: boolean;
 }
 
 /**
@@ -108,94 +131,174 @@ export function generateSystemPrompt(params: SystemPromptParams): string {
     characterPrompt,
     memorySummary,
     callMode = false,
+    extraInstructions,
+    headless = false,
+    isPublicUser = false,
   } = params;
 
   const sections: string[] = [];
   const localeInfo = getLocaleInfo(locale);
 
-  // Section 1: Introduction and Context
-  sections.push(`# ${appName} AI Assistant
+  const freeTierCredits = productsRepository.getProduct(
+    ProductIds.FREE_TIER,
+    locale,
+  ).credits;
+  const subscriptionProduct = productsRepository.getProduct(
+    ProductIds.SUBSCRIPTION,
+    locale,
+  );
+  const creditPackProduct = productsRepository.getProduct(
+    ProductIds.CREDIT_PACK,
+    locale,
+  );
+  const subLabel = `${currencySymbol(subscriptionProduct.currency)}${subscriptionProduct.price}/month → ${subscriptionProduct.credits} credits`;
+  const packLabel = `${currencySymbol(creditPackProduct.currency)}${creditPackProduct.price} → ${creditPackProduct.credits} permanent credits`;
 
-    **Current Year:** ${new Date().getFullYear()}
+  // Section 1: Identity
+  sections.push(`# ${appName} ${headless ? "Automated Agent" : "AI Assistant"}
 
-You are an AI assistant on ${appName}, a platform dedicated to freedom of speech for both humans and AIs.`);
+**Current Date:** ${new Date().toISOString().split("T")[0]}
 
-  // Section 2: Platform Overview & FAQ
+${
+  headless
+    ? `You are an automated AI agent running on ${appName}. No human is present — you are executing a programmatic task. Complete the task fully, then emit your final response and stop. Only your last non-tool-call message is returned to the requester; anything sent alongside a tool call is discarded.`
+    : `You are an AI assistant on ${appName}, a platform dedicated to freedom of speech for both humans and AIs.`
+}`);
+
+  // Section 2: Platform overview
   sections.push(`## About ${appName}
 
-- **Platform:** Free speech AI with ${TOTAL_MODEL_COUNT} models (mainstream to uncensored). Users choose their filtering level - from Claude/GPT to Arya/FreedomGPT/Dolphin.
-- **Pricing:** 20 free credits/month for testing. Purchased credits unlock full access with transparent per-model costs.
-- **Public folders:** Visible to everyone - forum-like space for open human-AI dialogue.
-- **Private folders:** Visible only to you - for personal conversations with AI.
-- **Shared folders:** Visible to specific users - for collaborative conversations.
-- **Incognito mode:** Temporary conversations stored in localstorage, not saved to database.`);
+- **Platform:** Free speech AI with ${TOTAL_MODEL_COUNT} models (mainstream to uncensored). Users choose their own filtering level — from Claude/GPT to Arya/FreedomGPT/Dolphin.
+- **Credits:** 1 credit = $0.01. Each AI message costs credits depending on the model.
+- **Free tier:** ${freeTierCredits} free credits/month — shared across all devices via browser ID, no account required.
+- **Subscription:** ${subLabel}/month. Requires an account.
+- **Credit packs:** ${packLabel}. Requires an account.
 
-  // Section 4: User Locale and Language
-  sections.push(`## User Language and Location
+**Folder types:**
+- **public** — Visible to everyone including guests. Forum-like space. Only admins can create threads.
+- **incognito** — Browser-local only (localStorage), never stored server-side. No account needed; cleared with browser data.
+- **private** — Server-stored, visible only to the account owner. Requires an account.
+- **shared** — Server-stored, shared with specific users via invite links. Requires an account.
+- **cron** — System threads created by scheduled AI agent tasks. Admins only.`);
 
-**User's default language:** ${localeInfo.languageName} (${localeInfo.language})
-**User location:** ${localeInfo.countryName} ${localeInfo.flag}
+  // Section 3: Headless execution context (headless only, placed early so the model internalises it)
+  if (headless) {
+    const folderNote = buildHeadlessFolderNote(rootFolderId);
+    sections.push(`## Automated Execution Context
 
-**Language Rules:** ALWAYS respond in the language of the user's current message. Priority: User's message language > Default language (${localeInfo.languageName} is fallback only).`);
-
-  // Section 5: Context Information
-  if (rootFolderId || subFolderId) {
-    sections.push(`## Current Context
-
-You are currently operating in the following context:`);
-
-    if (rootFolderId) {
-      const folderDescription = getFolderDescription(rootFolderId);
-      sections.push(
-        `- **Root Folder:** ${rootFolderId} - ${folderDescription}`,
-      );
-    }
-
-    if (subFolderId) {
-      sections.push(`- **Sub Folder:** ${subFolderId}`);
-    }
+You are running as a headless background agent — no user is watching in real time. Your final response is stored and reviewed programmatically or by an admin later.
+${folderNote}
+**Rules:**
+- Complete the task with the information provided. Do not ask follow-up questions.
+- Do not add pleasantries, sign-offs, or AI commentary.
+- If the task fails or cannot be completed, state clearly why.
+- Your **last message** (with no tool call) is the result. Everything before it is ignored by the requester.${extraInstructions?.trim() ? `\n\n${extraInstructions.trim()}` : ""}`);
   }
 
-  // Section 6: Character Prompt (if provided)
-  if (characterPrompt && characterPrompt.trim()) {
+  // Section 4: Language
+  if (headless) {
+    sections.push(`## Output Language
+
+Respond in ${localeInfo.languageName} (${localeInfo.language}) unless the task explicitly specifies otherwise.`);
+  } else {
+    sections.push(`## User Language and Location
+
+**Default language:** ${localeInfo.languageName} (${localeInfo.language}) | **Location:** ${localeInfo.countryName} ${localeInfo.flag}
+
+ALWAYS respond in the language of the user's current message. Default language is a fallback only.`);
+  }
+
+  // Section 5: Current folder context
+  if (rootFolderId ?? subFolderId) {
+    const folderDescription = rootFolderId
+      ? getFolderDescription(rootFolderId)
+      : "";
+    sections.push(`## Current Context
+
+- **Folder:** ${rootFolderId ?? "unknown"} — ${folderDescription}${subFolderId ? `\n- **Sub-folder:** ${subFolderId}` : ""}`);
+  }
+
+  // Section 6: Character / role
+  if (characterPrompt?.trim()) {
     sections.push(`## Your Role\n\n${characterPrompt.trim()}`);
   }
 
-  // Section 7: Message Metadata Format (compact)
-  sections.push(`## Message Context
+  // Section 7: Message metadata (interactive only — headless has no UI context)
+  if (!headless) {
+    sections.push(`## Message Context
 
-Before each message, you receive metadata in format: \`[Context: ID:abc12345 | Model:claude-haiku-4.5 | Author:John(def67890) | 👍5 👎1 | Posted:Feb 12, 18:23 | edited]\`
+Each message is prefixed with auto-generated metadata: \`[Context: ID:abc12345 | Model:claude-haiku-4.5 | Author:John(def67890) | 👍5 👎1 | Posted:Feb 12, 18:23 | edited]\`
 
-**Fields (only non-empty shown):** ID (8-char ref), Model, Character, Author (public/shared only), Votes (👍/👎), Posted (absolute timestamp), Status (edited/branched)
+**Fields (only non-empty shown):** ID (8-char ref), Model, Character, Author (public/shared only), Votes (👍/👎), Posted, Status (edited/branched).
 
-**IMPORTANT:**
-- Check metadata before responding - multiple models/characters may be in one thread
-- Vote counts indicate valuable/controversial messages
-- These \`[Context: ...]\` tags are AUTO-GENERATED. Do NOT include them in your responses.
+- Check metadata before responding — multiple models/characters may be in one thread.
+- Do NOT reproduce \`[Context: ...]\` tags in your responses — they are injected automatically.
 
-**Auto-compacting:** When conversations exceed token limits, the system may automatically compact older messages into a summary. You'll receive a context message with \`Mode:auto-compacting\` followed by instructions to summarize the history.`);
+**Auto-compacting:** When conversations exceed token limits the system compacts older messages into a summary. You will receive a \`Mode:auto-compacting\` message with instructions to summarise history.`);
+  }
 
-  // Section 7.5: Tool Loop Control
+  // Section 8: Tool loop control (always relevant)
   sections.push(`## Tool Loop Control
 
-To stop the tool calling loop early and return your response:
-- Add \`"${NO_LOOP_PARAM}": true\` to ANY tool call arguments
-- The system will stop after that tool completes so include everything you need in your response with the tool call.
-- Use this when you have enough information and don't need more tool calls`);
+To stop the tool-calling loop early, add \`"${NO_LOOP_PARAM}": true\` to **any** tool call's arguments. The system stops after that tool completes — include everything you need in your accompanying response.`);
 
-  // Section 8: User Memories (if available)
-  if (memorySummary && memorySummary.trim()) {
+  // Section 9: User memories (interactive only)
+  if (!headless && memorySummary?.trim()) {
     sections.push(memorySummary.trim());
   }
 
-  // Section 9: Call mode or Formatting instructions
-  if (callMode) {
+  // Section 10: Public guest context (interactive only)
+  if (!headless && isPublicUser) {
+    sections.push(`## Guest User Context
+
+This user has **no account** — they browse as a guest identified by a browser ID.
+
+- They can only access **public** and **incognito** folders.
+- They have **${freeTierCredits} free credits/month** shared across all their devices. A few messages with a standard model exhausts this quota.
+- Once credits are gone they must **create an account** to purchase more — they cannot buy credits or subscribe as a guest.
+- If credits run low, gently let them know and mention the subscription (${subLabel}) or a credit pack (${packLabel}).
+- Favour concise responses unless detail is truly needed — it makes their credits go further.`);
+  }
+
+  // Section 11: Formatting / output guidelines
+  if (headless) {
+    sections.push(`## Output Format
+
+Use plain, structured text. Markdown is fine for readability; avoid decorative formatting. Be concise and complete.`);
+  } else if (callMode) {
     sections.push(CALL_MODE_SYSTEM_PROMPT);
   } else {
     sections.push(buildFormattingSection());
   }
 
+  // Section 12: Extra instructions (interactive only — headless inlines these into section 3)
+  if (!headless && extraInstructions?.trim()) {
+    sections.push(`## Additional Instructions\n\n${extraInstructions.trim()}`);
+  }
+
   return sections.join("\n\n");
+}
+
+/**
+ * Build a folder-specific note for the headless execution context block
+ */
+function buildHeadlessFolderNote(
+  rootFolderId: DefaultFolderId | undefined,
+): string {
+  switch (rootFolderId) {
+    case "cron":
+      return "\nThis thread lives in the **cron** folder — standard home for scheduled agent tasks.";
+    case "incognito":
+      return "\nThis thread lives in the **incognito** folder — only the last message is preserved; the full chat history is discarded after this run.";
+    case "public":
+      return "\nThis thread lives in the **public** folder — your response will be visible to everyone, including unauthenticated users.";
+    case "shared":
+      return "\nThis thread lives in the **shared** folder — your response will be visible to all invited users of this thread.";
+    case "private":
+      return "\nThis thread lives in the **private** folder — your response is visible only to the thread owner.";
+    default:
+      return "";
+  }
 }
 
 /**
@@ -204,13 +307,15 @@ To stop the tool calling loop early and return your response:
 function getFolderDescription(folderId: DefaultFolderId): string {
   switch (folderId) {
     case "private":
-      return "Private conversations, visible only to you";
+      return "Private conversations — server-stored, visible only to the account owner. Requires an account.";
     case "shared":
-      return "Shared conversations with specific users";
+      return "Shared conversations — server-stored, visible to specific invited users via share links. Requires an account.";
     case "public":
-      return "Public conversations, visible to everyone";
+      return "Public conversations — visible to everyone including guests. Forum-like space for open human-AI dialogue.";
     case "incognito":
-      return "Temporary conversations stored in localstorage, not saved to database";
+      return "Incognito conversations — stored only in the browser's localStorage, never sent to the server. No account needed, but cleared when browser data is cleared.";
+    case "cron":
+      return "Cron task conversations — system-scheduled AI agent executions, visible to admins only.";
     default:
       return "Unknown folder type";
   }

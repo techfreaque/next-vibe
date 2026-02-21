@@ -36,7 +36,7 @@ const { PUT } = createEndpoint({
   title: "app.api.subscription.put.title" as const,
   description: "app.api.subscription.put.description" as const,
   icon: "package-check" as const,
-  category: "app.api.subscription.category" as const,
+  category: "app.api.payment.category" as const,
   tags: [
     "app.api.subscription.tags.subscription" as const,
     "app.api.subscription.tags.update" as const,

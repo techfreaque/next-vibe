@@ -26,7 +26,7 @@ const { POST } = createEndpoint({
   path: ["system", "db", "migrate-prod"],
   title: "app.api.system.db.migrateProd.post.title",
   description: "app.api.system.db.migrateProd.post.description",
-  category: "app.api.system.db.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.db.migrateProd.tag"],
   icon: "git-branch",
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],

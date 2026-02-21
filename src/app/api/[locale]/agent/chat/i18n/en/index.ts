@@ -35,12 +35,14 @@ export const translations = {
       shared: "Shared",
       public: "Public",
       incognito: "Incognito",
+      cron: "Cron",
     },
     foldersShort: {
       private: "Private",
       shared: "Shared",
       public: "Public",
       incognito: "Incognito",
+      cron: "Cron",
     },
   },
   enums: {

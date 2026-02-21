@@ -26,7 +26,7 @@ const { POST } = createEndpoint({
   path: ["system", "guard", "destroy"],
   title: "app.api.system.guard.destroy.title",
   description: "app.api.system.guard.destroy.description",
-  category: "app.api.system.guard.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.guard.destroy.tag"],
   icon: "shield",
   allowedRoles: [

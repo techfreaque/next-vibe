@@ -26,7 +26,7 @@ const { POST } = createEndpoint({
   title: "app.api.system.sideTasks.generators.generateTrpcRouter.title",
   description:
     "app.api.system.sideTasks.generators.generateTrpcRouter.description",
-  category: "app.api.system.sideTasks.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.sideTasks.generators.generateTrpcRouter.tag"],
   icon: "code",
   allowedRoles: [

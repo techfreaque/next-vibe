@@ -57,7 +57,7 @@ const { GET } = createEndpoint({
   title: "app.api.users.stats.title" as const,
   description: "app.api.users.stats.description" as const,
   icon: "bar-chart-3",
-  category: "app.api.users.stats.category" as const,
+  category: "app.api.user.category" as const,
   tags: ["app.api.users.stats.tag" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 

@@ -63,7 +63,7 @@ export const {
 const { POST } = createEndpoint({
   title: "app.api.system.db.migrate.taskManagement.title",
   description: "app.api.system.db.migrate.taskManagement.description",
-  category: "app.api.system.db.migrate.taskManagement.category",
+  category: "app.api.system.category",
   tags: [
     "app.api.system.db.migrate.taskManagement.tags.migration",
     "app.api.system.db.migrate.taskManagement.tags.tasks",

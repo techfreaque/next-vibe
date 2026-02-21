@@ -31,10 +31,9 @@ export class PulseExecuteRepository {
    */
   static async executePulse(
     data: PulseExecuteRequestOutput,
-    locale: CountryLanguage,
+    systemLocale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<PulseExecuteResponseOutput>> {
-    void locale;
     try {
       logger.debug("Executing pulse health check cycle", {
         dryRun: data.dryRun,
@@ -47,6 +46,7 @@ export class PulseExecuteRepository {
           dryRun: data.dryRun ?? false,
           taskNames: data.taskNames,
           force: data.force ?? false,
+          systemLocale,
         },
         logger,
       );

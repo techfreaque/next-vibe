@@ -23,7 +23,7 @@ const { POST } = createEndpoint({
   path: ["system", "generators", "client-routes-index"],
   title: "app.api.system.generators.clientRoutesIndex.post.title",
   description: "app.api.system.generators.clientRoutesIndex.post.description",
-  category: "app.api.system.generators.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.generators.clientRoutesIndex.post.title"],
   icon: "file-code",
   allowedRoles: [

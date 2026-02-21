@@ -7,7 +7,7 @@
 
 /* eslint-disable i18next/no-literal-string */
 
-import { and, isNull, notInArray, sql } from "drizzle-orm";
+import { isNull, sql } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -39,8 +39,8 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
   );
 
   const taskRows: NewCronTask[] = cronTaskDefs.map((task) => ({
-    // System tasks: routeId points to the route, displayName uses the task name
-    routeId: task.routeId,
+    // System tasks: routeId stores the task name as unique identifier
+    routeId: task.name,
     displayName: task.name,
     description: task.description,
     category: String(task.category),
@@ -48,15 +48,17 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
     enabled: task.enabled,
     priority: task.priority ?? CronTaskPriority.MEDIUM,
     timeout: task.timeout ?? 300000,
-    defaultConfig: task.defaultConfig ?? {},
+    // taskInput is a flat merge of all inputs the task executes with.
+    // splitTaskArgs() splits by schema at execution time.
+    taskInput: task.taskInput ?? {},
+    runOnce: task.runOnce ?? false,
     // System tasks have no user owner (null userId)
     userId: null,
   }));
 
   // Upsert using the partial unique index on routeId WHERE userId IS NULL.
-  // We use raw SQL for the conflict target since Drizzle doesn't natively support
-  // partial index conflict targets.
-  // Do NOT overwrite enabled/schedule/priority/timeout — those are user-overridable.
+  // Do NOT overwrite enabled/schedule/priority/timeout/taskInput — those are user-overridable.
+  // Preserve displayName if DB already has one (may be a translated string vs code's translation key).
   for (const row of taskRows) {
     await db
       .insert(cronTasks)
@@ -65,7 +67,7 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
         target: [cronTasks.routeId],
         targetWhere: isNull(cronTasks.userId),
         set: {
-          displayName: sql`excluded.display_name`,
+          displayName: sql`COALESCE(NULLIF(${cronTasks.displayName}, ''), excluded.display_name)`,
           description: sql`excluded.description`,
           category: sql`excluded.category`,
           updatedAt: new Date(),
@@ -76,24 +78,6 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
   logger.debug(
     `Successfully upserted ${taskRows.length} cron task definitions`,
   );
-
-  // Remove stale system tasks (renamed or deleted from the registry)
-  const activeRouteIds = taskRows.map((t) => t.routeId);
-  const deleted = await db
-    .delete(cronTasks)
-    .where(
-      and(
-        notInArray(cronTasks.routeId, activeRouteIds),
-        isNull(cronTasks.userId),
-      ),
-    )
-    .returning({ routeId: cronTasks.routeId });
-
-  if (deleted.length > 0) {
-    logger.debug(
-      `Removed ${deleted.length} stale system cron task(s): ${deleted.map((t) => t.routeId).join(", ")}`,
-    );
-  }
 }
 
 export async function dev(logger: EndpointLogger): Promise<void> {

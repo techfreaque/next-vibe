@@ -8,7 +8,7 @@ export const translations = {
   _components: componentsTranslations,
   title: "Contact Form Submission",
   description: "Submit contact form and handle email notifications",
-  category: "Core API",
+  category: "System",
   summary: "Process contact form submissions with lead tracking",
   tags: {
     contactForm: "Contact Form",

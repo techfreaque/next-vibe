@@ -29,7 +29,7 @@ import { UserRole } from "../../../user/user-roles/enum";
 const { GET } = createEndpoint({
   title: "app.api.system.db.utils.title",
   description: "app.api.system.db.utils.description",
-  category: "app.api.system.db.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.db.utils.tag"],
   icon: "database",
   allowedRoles: [

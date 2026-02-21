@@ -9,7 +9,6 @@ export const NEW_MESSAGE_ID = "new";
 
 /**
  * Chat Message Role enum
- * IMPORTANT: Using regular TypeScript enum to be compatible with AI SDK
  */
 export enum ChatMessageRole {
   USER = "user",

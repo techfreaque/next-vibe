@@ -36,12 +36,14 @@ export const translations: typeof enTranslations = {
       shared: "Udostępniony",
       public: "Publiczny",
       incognito: "Incognito",
+      cron: "Cron",
     },
     foldersShort: {
       private: "Prywatny",
       shared: "Udostępniony",
       public: "Publiczny",
       incognito: "Incognito",
+      cron: "Cron",
     },
   },
   enums: {

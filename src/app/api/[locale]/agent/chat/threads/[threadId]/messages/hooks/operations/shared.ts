@@ -11,8 +11,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
 import type { TtsVoiceValue } from "../../../../../../text-to-speech/enum";
 import { DefaultFolderId } from "../../../../../config";
+import { DEFAULT_TOOL_IDS } from "../../../../../constants";
 import type { ChatMessage } from "../../../../../db";
 import { ChatMessageRole } from "../../../../../enum";
+import type { EnabledTool } from "../../../../../hooks/store";
 import { useChatStore } from "../../../../../hooks/store";
 
 export interface CreateMessageParams {
@@ -39,7 +41,7 @@ export interface MessageOperationDeps {
   settings: {
     selectedModel: ModelId;
     selectedCharacter: string;
-    enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
+    enabledTools: EnabledTool[] | null;
     ttsAutoplay: boolean;
     ttsVoice: typeof TtsVoiceValue;
   };
@@ -102,9 +104,6 @@ export async function createAndSendUserMessage(
       threadMessages = chatStore.getThreadMessages(threadId);
     }
 
-    const parentDepth =
-      threadMessages.find((msg) => msg.id === parentMessageId)?.depth ?? -1;
-
     // Build message history (incognito only - server fetches from DB)
     // Use provided messageHistory if available (e.g., from send operation)
     let messageHistory: ChatMessage[] | null = params.messageHistory ?? null;
@@ -131,30 +130,21 @@ export async function createAndSendUserMessage(
       messageHistory.reverse();
     }
 
-    // Skip user message creation for tool confirmations
+    // Optimistically add user message to store for immediate UI feedback.
+    // The server will emit USER MESSAGE_CREATED with the correct parentId/depth,
+    // which will update (replace) this optimistic entry in the store.
     if (!hasToolConfirmations) {
-      // Set loading state metadata (unified for both modes)
       let messageMetadata: ChatMessage["metadata"] = {};
       if (audioInput) {
-        // Voice input: Show transcribing state until VOICE_TRANSCRIBED event arrives
         messageMetadata = { isTranscribing: true };
       } else if (attachments && attachments.length > 0) {
-        // File attachments: Show uploading state
-        // Server mode: FILES_UPLOADED event will update with storage URLs
-        // Incognito mode: Client updates after API processes files
         messageMetadata = { isUploadingAttachments: true };
-
-        logger.debug(`${operation} will process attachments via API`, {
-          attachmentCount: attachments.length,
-          mode:
-            currentRootFolderId === DefaultFolderId.INCOGNITO
-              ? "incognito"
-              : "server",
-        });
       }
 
-      // Create user message
-      const createdUserMessage: ChatMessage = {
+      const parentDepth =
+        threadMessages.find((msg) => msg.id === parentMessageId)?.depth ?? -1;
+
+      const optimisticUserMessage: ChatMessage = {
         id: newMessageId!,
         threadId,
         role: ChatMessageRole.USER,
@@ -180,46 +170,7 @@ export async function createAndSendUserMessage(
         searchVector: null,
       };
 
-      chatStore.addMessage(createdUserMessage);
-
-      // Clear input immediately after the message is created in the local store.
-      // The user message is created client-side before the stream starts, so we
-      // don't need to wait for any server confirmation. This also avoids the input
-      // remaining filled during compacting (which can take several seconds before
-      // the main stream response begins).
-      if (operation === "send") {
-        setInput?.("");
-        setAttachments?.([]);
-      }
-
-      // Save to localStorage (incognito only - server saves via API)
-      if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
-        // If there are attachments, use saveMessageWithAttachments to convert files to base64
-        if (attachments && attachments.length > 0) {
-          const { saveMessageWithAttachments } =
-            await import("../../../../../incognito/storage");
-          const { convertFilesToIncognitoAttachments } =
-            await import("../../../../../incognito/file-utils");
-
-          // Convert files to base64 attachments
-          const incognitoAttachments =
-            await convertFilesToIncognitoAttachments(attachments);
-
-          // Save to localStorage
-          await saveMessageWithAttachments(createdUserMessage, attachments);
-
-          // Update chatStore with actual attachments (so UI shows them immediately)
-          chatStore.updateMessage(createdUserMessage.id, {
-            metadata: {
-              attachments: incognitoAttachments,
-            },
-          });
-        } else {
-          const { saveMessage } =
-            await import("../../../../../incognito/storage");
-          await saveMessage(createdUserMessage);
-        }
-      }
+      chatStore.addMessage(optimisticUserMessage);
     } else {
       logger.debug("Skipping user message creation for tool confirmations", {
         count: params.toolConfirmations?.length ?? 0,
@@ -237,6 +188,29 @@ export async function createAndSendUserMessage(
     // Get user's timezone from browser
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+    // Build tool arrays from settings:
+    // activeTools = permission layer (null = all tools allowed)
+    // tools = visibility layer (tools loaded into AI SDK context window)
+    const activeToolsPayload = settings.enabledTools
+      ? settings.enabledTools.map((tool) => ({
+          toolId: tool.id,
+          requiresConfirmation: tool.requiresConfirmation,
+        }))
+      : null; // null = all tools allowed
+
+    const toolsPayload = settings.enabledTools
+      ? settings.enabledTools
+          .filter((tool) => tool.active)
+          .map((tool) => ({
+            toolId: tool.id,
+            requiresConfirmation: tool.requiresConfirmation,
+          }))
+      : // null enabledTools = default: core 8 visible, server reads requiresConfirmation from definitions
+        DEFAULT_TOOL_IDS.map((id) => ({
+          toolId: id,
+          requiresConfirmation: false,
+        }));
+
     // Start AI stream (same for all operations)
     await aiStream.startStream(
       {
@@ -250,11 +224,8 @@ export async function createAndSendUserMessage(
         role: ChatMessageRole.USER,
         model: settings.selectedModel,
         character: settings.selectedCharacter ?? null,
-        tools:
-          settings.enabledTools?.map((tool) => ({
-            toolId: tool.id,
-            requiresConfirmation: tool.requiresConfirmation,
-          })) ?? null,
+        activeTools: activeToolsPayload,
+        tools: toolsPayload,
         toolConfirmations: params.toolConfirmations ?? null,
         messageHistory: messageHistory ?? [],
         attachments: attachments && attachments.length > 0 ? attachments : null,
@@ -273,6 +244,22 @@ export async function createAndSendUserMessage(
           });
           deductCredits(data.amount, data.feature);
         },
+        // Clear input when the user message arrives via SSE.
+        // The user message is emitted before the AI response starts streaming,
+        // so clearing here feels immediate while ensuring the server accepted the message.
+        onMessageCreated:
+          operation === "send"
+            ? (() => {
+                let cleared = false;
+                return (data: { role: string }): void => {
+                  if (!cleared && data.role === ChatMessageRole.USER) {
+                    cleared = true;
+                    setInput?.("");
+                    setAttachments?.([]);
+                  }
+                };
+              })()
+            : undefined,
       },
     );
   } catch (error) {

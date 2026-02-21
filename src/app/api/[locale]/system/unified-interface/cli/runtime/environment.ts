@@ -132,6 +132,26 @@ export function loadEnvironment(): EnvironmentResult {
     config({ quiet: true });
   }
 
+  // For `vibe start`, override DATABASE_URL with LOCAL_MODE_DATABASE_URL
+  // so it never conflicts with dev postgres.
+  // Must happen BEFORE the env singleton is created by defineEnv().
+  const args = process.argv.slice(2);
+  if (args.includes("start") || args.includes("server:start")) {
+    const skipDbSetup = args.includes("--skip-db-setup");
+    const localDbUrl = process.env["LOCAL_MODE_DATABASE_URL"];
+    if (!skipDbSetup && localDbUrl) {
+      process.env["DATABASE_URL"] = localDbUrl;
+    }
+
+    // Override NEXT_PUBLIC_APP_URL with LOCAL_MODE_APP_URL so local mode
+    // uses its own URL (different port than dev). Must happen before Next.js
+    // server spawns so it picks up the correct value for SSR + client hydration.
+    const localAppUrl = process.env["LOCAL_MODE_APP_URL"];
+    if (localAppUrl) {
+      process.env["NEXT_PUBLIC_APP_URL"] = localAppUrl;
+    }
+  }
+
   // Determine platform based on detection
   const platform = isPackage ? Platform.CLI_PACKAGE : Platform.CLI;
 
@@ -153,3 +173,9 @@ export function loadEnvironment(): EnvironmentResult {
 export function getEnvironmentResult(): EnvironmentResult | null {
   return cachedEnvironmentResult;
 }
+
+// Auto-load environment as a module side effect.
+// This ensures process.env is populated (including DATABASE_URL overrides
+// for `vibe start`) BEFORE @/config/env evaluates the env singleton,
+// since ES module imports are evaluated in dependency order.
+loadEnvironment();

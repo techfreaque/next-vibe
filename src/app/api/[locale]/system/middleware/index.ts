@@ -11,7 +11,13 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { LanguageMiddlewareOptions } from "./language";
 import { detectLocale } from "./language";
-import { checkLeadId, createLeadId, LeadIdCheckResult } from "./lead-id";
+import {
+  checkLeadId,
+  createLeadId,
+  getLeadIdFromRequest,
+  LeadIdCheckResult,
+  updateLeadLocale,
+} from "./lead-id";
 import { extractLocaleFromPath, shouldSkipPath } from "./utils";
 
 /**
@@ -86,6 +92,25 @@ export async function middleware(
 
     // For page routes, create a new leadId and set it in the cookie
     return await createLeadId(request, locale);
+  }
+
+  // Valid leadId — sync lead locale if it changed
+  const leadLocale = request.cookies.get("lead_locale")?.value;
+  if (leadLocale !== locale) {
+    const leadId = getLeadIdFromRequest(request);
+    if (leadId) {
+      // Fire-and-forget DB update — don't block the request
+      // eslint-disable-next-line no-empty-function -- Fire-and-forget: best-effort locale sync
+      void updateLeadLocale(leadId, locale).catch(() => {});
+    }
+    const response = NextResponseClass.next();
+    response.cookies.set("lead_locale", locale, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax" as const,
+      maxAge: 365 * 24 * 60 * 60 * 10, // 10 years
+    });
+    return response;
   }
 
   // Valid leadId and session, continue

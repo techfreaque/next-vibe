@@ -47,7 +47,7 @@ const { POST: ImportCsvPost } = createEndpoint({
   title: "app.api.import.csv.post.title",
   description: "app.api.import.csv.post.description",
   icon: "upload" as const,
-  category: "app.api.import.category",
+  category: "app.api.system.category",
   tags: [
     "app.api.import.tags.csv",
     "app.api.import.tags.upload",
@@ -463,7 +463,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
   title: "app.api.import.jobs.get.title",
   description: "app.api.import.jobs.get.description",
   icon: "file-text" as const,
-  category: "app.api.import.category",
+  category: "app.api.system.category",
   tags: [
     "app.api.import.tags.jobs",
     "app.api.import.tags.status",

@@ -12,7 +12,7 @@ export const translations: typeof enTranslations = {
   title: "Kontaktformular-Einreichung",
   description:
     "Kontaktformular senden und E-Mail-Benachrichtigungen verarbeiten",
-  category: "Kern-API",
+  category: "System",
   summary: "Kontaktformular-Einreichungen mit Lead-Tracking verarbeiten",
   tags: {
     contactForm: "Kontaktformular",

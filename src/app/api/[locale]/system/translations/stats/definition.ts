@@ -40,7 +40,7 @@ const { GET } = createEndpoint({
 
   title: "app.api.system.translations.stats.get.title",
   description: "app.api.system.translations.stats.get.description",
-  category: "app.api.system.translations.category",
+  category: "app.api.system.category",
   tags: [
     "app.api.system.translations.tags.stats",
     "app.api.system.translations.tags.analytics",

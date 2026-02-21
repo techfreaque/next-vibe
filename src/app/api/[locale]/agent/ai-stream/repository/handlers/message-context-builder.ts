@@ -30,6 +30,8 @@ export interface CompactingCheckResult {
   messagesToCompact: ChatMessage[]; // Messages after last compacting that need compacting
   currentUserMessage: ChatMessage | null;
   lastCompactingMessage: ChatMessage | null;
+  /** Set when the most recent compacting message in the branch failed or was interrupted. */
+  failedCompactingMessage: ChatMessage | null;
 }
 
 export class MessageContextBuilder {
@@ -677,18 +679,35 @@ export class MessageContextBuilder {
       isIncognito,
     });
 
-    // Step 2: Find last compacting message in the branch
+    // Step 2: Find last compacting message in the branch (successful or failed)
     const lastCompactingMessage =
       branchMessages
         .toReversed()
         .find((m) => m.metadata?.isCompacting === true) ?? null;
 
-    // Step 3: Get messages to compact (everything after last compacting, excluding current user message)
+    // Detect if the most recent compacting message failed (stream error or interruption).
+    // A failed compacting has isCompacting=true but compactingFailed=true and no content.
+    const failedCompactingMessage =
+      lastCompactingMessage?.metadata?.compactingFailed === true
+        ? lastCompactingMessage
+        : null;
+
+    // Step 3: Get messages to compact (everything after last SUCCESSFUL compacting, excluding current user message).
+    // If the last compacting failed, treat it as if it doesn't exist — use the previous successful one.
+    const lastSuccessfulCompactingMessage = failedCompactingMessage
+      ? (branchMessages
+          .toReversed()
+          .find(
+            (m) =>
+              m.metadata?.isCompacting === true && !m.metadata.compactingFailed,
+          ) ?? null)
+      : lastCompactingMessage;
+
     let messagesToCompact: ChatMessage[];
-    if (lastCompactingMessage) {
+    if (lastSuccessfulCompactingMessage) {
       messagesToCompact = branchMessages.filter(
         (m) =>
-          m.createdAt > lastCompactingMessage.createdAt &&
+          m.createdAt > lastSuccessfulCompactingMessage.createdAt &&
           !m.metadata?.isCompacting &&
           m.id !== currentUserMessageId,
       );
@@ -737,9 +756,9 @@ export class MessageContextBuilder {
     // This includes: system prompt + tools + last compacting message + messages to compact + current user message
     const messagesForTokenCount: ChatMessage[] = [];
 
-    // Add last compacting message (if exists) - this is the context baseline
-    if (lastCompactingMessage) {
-      messagesForTokenCount.push(lastCompactingMessage);
+    // Add last SUCCESSFUL compacting message (if exists) - this is the context baseline
+    if (lastSuccessfulCompactingMessage) {
+      messagesForTokenCount.push(lastSuccessfulCompactingMessage);
     }
 
     // Add messages to compact
@@ -791,7 +810,8 @@ export class MessageContextBuilder {
       branchMessages,
       messagesToCompact,
       currentUserMessage,
-      lastCompactingMessage,
+      lastCompactingMessage: lastSuccessfulCompactingMessage,
+      failedCompactingMessage,
     };
   }
 

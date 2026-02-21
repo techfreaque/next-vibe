@@ -27,7 +27,7 @@ const { POST } = createEndpoint({
   path: ["system", "check", "typecheck"],
   title: "app.api.system.check.typecheck.title",
   description: "app.api.system.check.typecheck.description",
-  category: "app.api.system.check.typecheck.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.check.typecheck.tag"],
   icon: "check-circle",
   allowedRoles: [

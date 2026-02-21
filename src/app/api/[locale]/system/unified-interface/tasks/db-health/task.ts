@@ -14,12 +14,16 @@ import {
   CronTaskPriority,
   TaskCategory,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import {
+  createCronTask,
+  type Task,
+} from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 
-const dbHealthTask: Task = {
-  type: "cron",
+import definitions from "./definition";
+import { tools } from "./route";
+
+const dbHealthTask = createCronTask(definitions.POST, tools.POST, {
   name: "db-health-check",
-  routeId: "system_unified-interface_tasks_db-health_POST",
   description:
     "app.api.system.unifiedInterface.tasks.dbHealthCheck.description",
   schedule: CRON_SCHEDULES.EVERY_MINUTE,
@@ -27,7 +31,7 @@ const dbHealthTask: Task = {
   enabled: true,
   priority: CronTaskPriority.LOW,
   timeout: TASK_TIMEOUTS.SHORT,
-};
+});
 
 export const tasks: Task[] = [dbHealthTask];
 export default tasks;

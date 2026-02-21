@@ -87,6 +87,13 @@ const ROOT_FOLDER_COLOR_MAP: Record<
     button:
       "bg-zinc-500/15 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-500/20 border-zinc-500/30",
   },
+  green: {
+    active:
+      "bg-green-500/15 text-green-700 dark:text-green-300 hover:bg-green-500/20",
+    hover: "hover:bg-green-500/10 hover:text-green-600",
+    button:
+      "bg-green-500/15 text-green-700 dark:text-green-300 hover:bg-green-500/20 border-green-500/30",
+  },
 };
 /* eslint-enable i18next/no-literal-string */
 

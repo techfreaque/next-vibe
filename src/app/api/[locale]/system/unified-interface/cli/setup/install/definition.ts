@@ -30,7 +30,7 @@ const { POST } = createEndpoint({
   description:
     "app.api.system.unifiedInterface.cli.setup.install.post.description",
   icon: "download",
-  category: "app.api.system.unifiedInterface.cli.setup.install.post.title",
+  category: "app.api.system.category",
   tags: ["app.api.system.unifiedInterface.cli.setup.install.post.title"],
   allowedRoles: [
     UserRole.ADMIN,

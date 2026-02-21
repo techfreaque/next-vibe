@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
   checkout: checkoutTranslations,
 
   // Main subscription domain
-  category: "Abonnement",
+  category: "Abrechnung",
 
   // Tags
   tags: {

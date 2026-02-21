@@ -27,7 +27,6 @@ import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { CallModeIndicator } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/call-mode-indicator";
 import { FileUploadButton } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/file-upload-button";
 import { useVoiceRecording } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/hooks/use-voice-recording";
-import { SearchToggle } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/search-toggle";
 import { Selector } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/selector";
 import { ToolsButton } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/tools-button";
 import { getModelById } from "@/app/api/[locale]/agent/models/models";
@@ -186,10 +185,7 @@ export function MessageEditor({
             />
 
             {modelSupportsTools && (
-              <>
-                <SearchToggle disabled={editor.isLoading} locale={locale} />
-                <ToolsButton disabled={editor.isLoading} locale={locale} />
-              </>
+              <ToolsButton disabled={editor.isLoading} locale={locale} />
             )}
 
             <FileUploadButton

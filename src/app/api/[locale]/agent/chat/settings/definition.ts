@@ -83,12 +83,15 @@ const { GET } = createEndpoint({
       enabledTools: responseField({
         type: WidgetType.TEXT,
         hidden: true,
-        schema: z.array(
-          z.object({
-            id: z.string(),
-            requiresConfirmation: z.boolean(),
-          }),
-        ),
+        schema: z
+          .array(
+            z.object({
+              id: z.string(),
+              requiresConfirmation: z.boolean(),
+              active: z.boolean(),
+            }),
+          )
+          .nullable(),
       }),
     },
   ),
@@ -157,16 +160,7 @@ const { GET } = createEndpoint({
         ttsAutoplay: false,
         ttsVoice: TtsVoiceDB[0],
         viewMode: ViewMode.LINEAR,
-        enabledTools: [
-          {
-            id: "search",
-            requiresConfirmation: false,
-          },
-          {
-            id: "contact-form",
-            requiresConfirmation: true,
-          },
-        ],
+        enabledTools: null,
       },
     },
   },
@@ -253,8 +247,10 @@ const { POST } = createEndpoint({
             z.object({
               id: z.string(),
               requiresConfirmation: z.boolean(),
+              active: z.boolean(),
             }),
           )
+          .nullable()
           .optional(),
       }),
     },

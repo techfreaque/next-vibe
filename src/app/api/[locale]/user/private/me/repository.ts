@@ -17,8 +17,10 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 import { simpleT } from "@/i18n/core/shared";
 
+import { leads } from "../../../leads/db";
 import type { JwtPayloadType, JwtPrivatePayloadType } from "../../auth/types";
 import { users } from "../../db";
 import { UserDetailLevel } from "../../enum";
@@ -114,13 +116,52 @@ export class UserProfileRepository {
    */
   static async updateProfile(
     data: MePostRequestOutput,
-    user: JwtPrivatePayloadType,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<MePostResponseOutput>> {
     const { t } = simpleT(locale);
 
     try {
+      // Public users: sync lead locale only
+      if (user.isPublic) {
+        logger.debug("Syncing lead locale", { leadId: user.leadId, locale });
+        const { language, country } = getLanguageAndCountryFromLocale(locale);
+        await db
+          .update(leads)
+          .set({ language, country, updatedAt: new Date() })
+          .where(eq(leads.id, user.leadId));
+        const now = new Date().toISOString();
+        return success<MePostResponseOutput>({
+          response: {
+            success: true,
+            message: t("app.api.user.private.me.update.success.message"),
+            id: user.leadId,
+            leadId: user.leadId,
+            isPublic: false as const,
+            email: "",
+            privateName: "",
+            publicName: "",
+            locale,
+            isActive: true,
+            emailVerified: false,
+            requireTwoFactor: false,
+            marketingConsent: false,
+            userRoles: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            stripeCustomerId: null,
+            changesSummary: {
+              totalChanges: 1,
+              changedFields: ["locale"],
+              verificationRequired: false,
+              lastUpdated: now,
+            },
+            nextSteps: [t("app.api.user.private.me.update.success.nextSteps")],
+          },
+        });
+      }
+
       if (!user.id) {
         return fail({
           message: "app.api.user.private.me.update.errors.unauthorized.title",
@@ -169,11 +210,13 @@ export class UserProfileRepository {
       }
 
       // Flatten the nested data structure for database update
+      // Always sync locale from URL path to keep user locale in sync
       const updateData: Record<
         string,
         string | boolean | Date | null | undefined
       > = {
         updatedAt: new Date(),
+        locale,
       };
 
       // Flatten basicInfo fields

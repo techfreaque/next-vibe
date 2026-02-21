@@ -6,7 +6,7 @@ import { translations as sessionCleanupTranslations } from "../../session-cleanu
 import { translations as userRolesTranslations } from "../../user-roles/i18n/en";
 
 export const translations = {
-  category: "User Management",
+  category: "Users",
   auth: authTranslations,
   private: privateTranslations,
   public: publicTranslations,

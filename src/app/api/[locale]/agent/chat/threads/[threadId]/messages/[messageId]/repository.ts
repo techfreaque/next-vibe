@@ -364,6 +364,18 @@ export class MessageRepository {
         });
       }
 
+      // Re-parent children to the deleted message's parent so they
+      // remain reachable in the conversation tree (e.g. when a compacting
+      // message is deleted, its child AI response stays visible).
+      await db
+        .update(chatMessages)
+        .set({
+          parentId: existingMessage.parentId,
+          depth: existingMessage.depth,
+          updatedAt: new Date(),
+        })
+        .where(eq(chatMessages.parentId, urlPathParams.messageId));
+
       // Delete message
       await db
         .delete(chatMessages)

@@ -25,7 +25,7 @@ const { POST } = createEndpoint({
   title: "app.api.system.generators.emailTemplates.post.title" as const,
   description:
     "app.api.system.generators.emailTemplates.post.description" as const,
-  category: "app.api.system.generators.category" as const,
+  category: "app.api.system.category" as const,
   tags: ["app.api.system.generators.emailTemplates.post.title" as const],
   icon: "mail",
   allowedRoles: [

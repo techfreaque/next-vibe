@@ -183,7 +183,6 @@ export class ToolConfirmationHandler {
         logger.error("[Tool Confirmation] Tool execution failed", {
           toolName: toolCall.toolName,
           error: error instanceof Error ? error.message : String(error),
-          errorStack: error instanceof Error ? error.stack : undefined,
         });
         toolError = fail({
           message:

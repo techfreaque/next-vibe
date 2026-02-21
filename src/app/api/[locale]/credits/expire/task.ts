@@ -12,19 +12,27 @@ import {
   CronTaskPriority,
   TaskCategory,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import {
+  createCronTask,
+  type Task,
+} from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 
-const creditExpirationTask: Task = {
-  type: "cron",
-  name: "credit-expiration",
-  routeId: "credits_expire_POST",
-  description: "app.api.agent.chat.credits.expire.task.description",
-  schedule: CRON_SCHEDULES.DAILY_MIDNIGHT,
-  category: TaskCategory.MAINTENANCE,
-  enabled: true,
-  priority: CronTaskPriority.MEDIUM,
-  timeout: TASK_TIMEOUTS.SHORT,
-};
+import creditExpirationTaskDefinition from "./definition";
+import { tools } from "./route";
+
+const creditExpirationTask = createCronTask(
+  creditExpirationTaskDefinition.POST,
+  tools.POST,
+  {
+    name: "credit-expiration",
+    description: "app.api.agent.chat.credits.expire.task.description",
+    schedule: CRON_SCHEDULES.DAILY_MIDNIGHT,
+    category: TaskCategory.MAINTENANCE,
+    enabled: true,
+    priority: CronTaskPriority.MEDIUM,
+    timeout: TASK_TIMEOUTS.SHORT,
+  },
+);
 
 export const tasks: Task[] = [creditExpirationTask];
 export default tasks;

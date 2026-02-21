@@ -7,7 +7,7 @@
 // CLI output messages don't need internationalization
 
 import type { ChildProcess } from "node:child_process";
-import { spawn } from "node:child_process";
+import { execSync, spawn } from "node:child_process";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
@@ -28,7 +28,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import { unifiedTaskRunnerRepository } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/repository";
 import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
-import { useTurbopack } from "@/config/constants";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -38,12 +37,26 @@ import { dbUtilsRepository } from "../../db/utils/repository";
 import { DEV_WATCHER_TASK_NAME } from "../../unified-interface/tasks/dev-watcher/task-runner";
 import type endpoints from "./definition";
 
+/** Extract port number from a URL string, returns undefined if not parseable */
+function portFromUrl(url: string | undefined): number | undefined {
+  if (!url) {
+    return undefined;
+  }
+  try {
+    const parsed = new URL(url);
+    return parsed.port ? parseInt(parsed.port, 10) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 type RequestType = typeof endpoints.POST.types.RequestOutput;
 
 // Constants to avoid literal strings
-const DOCKER_VOLUME_NAME = "next-vibe_postgres_data";
+const DEV_PROJECT_NAME = "vibe-dev";
+const DEV_CONTAINER_NAME = "dev-postgres";
+const DOCKER_VOLUME_SUFFIX = "postgres_data";
 const DATABASE_TEST_QUERY = "SELECT 1";
-const DOCKER_VOLUME_RM_COMMAND = `docker volume rm ${DOCKER_VOLUME_NAME} 2>/dev/null || true`;
 const DATABASE_TIMEOUT_PREFIX = "Database connection timeout after";
 const DATABASE_TIMEOUT_SUFFIX = "attempts";
 
@@ -148,6 +161,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<void> {
+    const { exec } = await import("node:child_process");
+    const { promisify } = await import("node:util");
+    const execAsync = promisify(exec);
+
     // 1. Stop Docker containers
     logger.debug("Stopping Docker containers...");
     const downResult = await dockerOperationsRepository.dockerComposeDown(
@@ -155,22 +172,33 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       locale,
       "docker-compose-dev.yml",
       30000,
+      DEV_PROJECT_NAME,
     );
 
     if (!downResult.success) {
       logger.warn("Failed to stop Docker containers, continuing anyway");
     }
 
-    // 2. Delete postgres data volume
+    // 2. Force-remove the container (hardcoded container_name in compose
+    //    means `docker compose down` may not clean it up properly)
+    try {
+      await execAsync(`docker rm -f ${DEV_CONTAINER_NAME} 2>/dev/null || true`);
+      logger.debug("Removed dev-postgres container");
+    } catch {
+      logger.debug("No dev-postgres container to remove");
+    }
+
+    // 3. Delete postgres data volume
     await this.deletePostgresDataVolume(logger);
 
-    // 3. Start Docker containers
+    // 4. Start Docker containers
     logger.debug("Starting Docker containers...");
     const upResult = await dockerOperationsRepository.dockerComposeUp(
       logger,
       locale,
       "docker-compose-dev.yml",
       60000,
+      DEV_PROJECT_NAME,
     );
 
     if (!upResult.success) {
@@ -182,7 +210,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         formatError("Database startup failed, continuing without database"),
       );
     }
-    // 4. Wait for database to be ready
+    // 5. Wait for database to be ready
     await this.waitForDatabaseConnection(logger);
   }
 
@@ -197,11 +225,12 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       const { promisify } = await import("node:util");
       const execAsync = promisify(exec);
 
-      logger.debug("Deleting postgres data volume...");
+      const volumeName = `${DEV_PROJECT_NAME}_${DOCKER_VOLUME_SUFFIX}`;
+      logger.debug(`Deleting postgres data volume: ${volumeName}...`);
 
       try {
         // Remove the Docker volume (this is much cleaner than dealing with file permissions)
-        await execAsync(DOCKER_VOLUME_RM_COMMAND);
+        await execAsync(`docker volume rm ${volumeName} 2>/dev/null || true`);
         logger.debug("Postgres data volume deleted");
       } catch {
         logger.debug("Postgres data volume not found or already deleted");
@@ -282,9 +311,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<never> {
-    // Convert string port to number if needed (CLI compatibility)
-    const port =
-      typeof data.port === "string" ? parseInt(data.port, 10) : data.port;
+    // Derive port: explicit --port > NEXT_PUBLIC_APP_URL port > default 3000
+    const port = data.port ?? portFromUrl(env.NEXT_PUBLIC_APP_URL) ?? 3000;
 
     this.logStartupInfo(port, logger, data);
 
@@ -501,6 +529,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       locale,
       "docker-compose-dev.yml",
       60000,
+      "vibe-dev",
     );
 
     if (!dbStartResult.success) {
@@ -574,7 +603,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   ): Promise<never> {
     logger.info(`🌐 Starting Next.js on port ${port}...`);
 
-    const nextProcess = this.startNextJsProcess(port);
+    // Kill any stale process on the target port before starting
+    this.killProcessOnPort(port, logger);
+
+    const nextProcess = this.startNextJsProcess(port, logger);
 
     // Set up SIGINT handler to prevent parent from exiting before child
     // Both parent and child receive SIGINT from terminal, but we want to wait
@@ -720,20 +752,34 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   }
 
   /**
+   * Kill any process occupying the given port
+   */
+  private killProcessOnPort(port: number, logger: EndpointLogger): void {
+    try {
+      // fuser is more reliable than lsof for finding processes on a port
+      execSync(`fuser -k ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
+      logger.info(`Killed stale process on port ${port}`);
+      execSync("sleep 0.5");
+    } catch {
+      // No process on port or kill failed — both are fine
+    }
+  }
+
+  /**
    * Start Next.js development server using spawn
    */
-  private startNextJsProcess(port: number): ChildProcess {
-    const turbo = useTurbopack ? ["--turbo"] : [];
-    const nextProcess = spawn(
-      "bun",
-      ["run", "next", "dev", ...turbo, "--port", port.toString()],
-      {
-        stdio: "inherit", // Pass output directly to stdout/stderr
-        // Keep in same process group (default) so Ctrl+C propagates naturally
-        // When terminal sends SIGINT, both parent and child receive it
-        detached: false,
-      },
-    );
+  private startNextJsProcess(
+    port: number,
+    logger: EndpointLogger,
+  ): ChildProcess {
+    const args = ["run", "next", "dev", "--port", port.toString()];
+    logger.debug(`Starting Next.js with args: ${args.join(" ")}`);
+    const nextProcess = spawn("bun", args, {
+      stdio: "inherit", // Pass output directly to stdout/stderr
+      // Keep in same process group (default) so Ctrl+C propagates naturally
+      // When terminal sends SIGINT, both parent and child receive it
+      detached: false,
+    });
 
     // Store the process for cleanup
     this.runningProcesses.set("next-dev", nextProcess);

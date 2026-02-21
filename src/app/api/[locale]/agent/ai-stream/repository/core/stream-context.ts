@@ -66,6 +66,7 @@ export class StreamContext {
     initialDepth: number;
     initialAssistantMessageId: string;
     isIncognito: boolean;
+    isHeadless?: boolean;
     logger: EndpointLogger;
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
@@ -82,6 +83,7 @@ export class StreamContext {
       params.logger,
       params.controller,
       params.encoder,
+      params.isHeadless ?? false,
     );
   }
 

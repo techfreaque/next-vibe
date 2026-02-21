@@ -26,9 +26,13 @@ export function ToolsButton({
   disabled = false,
   locale,
 }: ToolsButtonProps): JSX.Element {
-  const { enabledTools } = useChatContext();
+  const { enabledTools, totalToolCount } = useChatContext();
   const openToolsModal = useToolsModalStore((state) => state.open);
-  const activeToolCount = enabledTools.length;
+  // null = default (all tools enabled), show total count
+  // customized = show count of enabled tools
+  const activeToolCount = enabledTools
+    ? enabledTools.filter((t) => t.active).length
+    : totalToolCount;
   const { t } = simpleT(locale);
 
   return (

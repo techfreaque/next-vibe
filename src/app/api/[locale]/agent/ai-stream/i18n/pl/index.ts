@@ -111,9 +111,19 @@ export const translations: typeof enTranslations = {
       description:
         "Zezwól AI na przeszukiwanie sieci w poszukiwaniu aktualnych informacji",
     },
+    activeTool: {
+      label: "Aktywne narzędzia",
+      description:
+        "Narzędzia, które model może wykonywać. Null oznacza, że wszystkie narzędzia są dozwolone.",
+      toolId: {
+        label: "ID narzędzia",
+        description: "Unikalny identyfikator narzędzia AI",
+      },
+    },
     tools: {
-      label: "Narzędzia AI",
-      description: "Lista ID narzędzi AI do włączenia dla tej konwersacji",
+      label: "Widoczne narzędzia",
+      description:
+        "Narzędzia załadowane do okna kontekstu AI. Model może je bezpośrednio wywoływać.",
       toolId: {
         label: "ID narzędzia",
         description: "Unikalny identyfikator narzędzia AI",
@@ -289,6 +299,8 @@ export const translations: typeof enTranslations = {
       "Narzędzie nie zostało poprawnie wykonane. Spróbuj ponownie.",
     toolExecutionFailed:
       "Wykonanie narzędzia nie powiodło się. Spróbuj ponownie.",
+    toolDisabledByUser:
+      "To narzędzie zostało wyłączone przez użytkownika. Nie próbuj go ponownie wywoływać.",
     userDeclinedTool: "Wykonanie narzędzia zostało anulowane.",
     streamError: "Odpowiedź AI nie mogła zostać ukończona. Spróbuj ponownie.",
     streamProcessingError:

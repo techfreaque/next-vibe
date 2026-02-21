@@ -25,7 +25,7 @@ const { POST } = createEndpoint({
   path: ["leads", "import", "process"],
   title: "app.api.leads.import.process.post.title",
   description: "app.api.leads.import.process.post.description",
-  category: "app.api.leads.import.category",
+  category: "app.api.leads.category",
   icon: "upload",
   tags: ["app.api.leads.import.process.tag"],
   allowedRoles: [UserRole.ADMIN],

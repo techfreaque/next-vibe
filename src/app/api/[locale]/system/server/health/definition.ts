@@ -30,7 +30,7 @@ const { GET } = createEndpoint({
   aliases: ["health", "status"],
   title: "app.api.system.server.health.get.title",
   description: "app.api.system.server.health.get.description",
-  category: "app.api.system.server.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.server.health.tag"],
   icon: "activity",
   allowedRoles: [UserRole.ADMIN],

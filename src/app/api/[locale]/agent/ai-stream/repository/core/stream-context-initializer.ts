@@ -26,6 +26,7 @@ export class StreamContextInitializer {
     }>;
     aiMessageId: string;
     isIncognito: boolean;
+    isHeadless?: boolean;
     logger: EndpointLogger;
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
@@ -37,6 +38,7 @@ export class StreamContextInitializer {
       toolConfirmationResults,
       aiMessageId,
       isIncognito,
+      isHeadless,
       logger,
       controller,
       encoder,
@@ -63,6 +65,7 @@ export class StreamContextInitializer {
       initialDepth: initialDepthForContext,
       initialAssistantMessageId: aiMessageId,
       isIncognito,
+      isHeadless,
       logger,
       controller,
       encoder,

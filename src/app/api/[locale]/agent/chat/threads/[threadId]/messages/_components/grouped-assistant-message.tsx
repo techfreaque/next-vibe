@@ -165,7 +165,8 @@ const ToolMessage = memo(
         nextProps.message.metadata?.toolCall &&
       prevProps.decision === nextProps.decision &&
       prevProps.onConfirm === nextProps.onConfirm &&
-      prevProps.onCancel === nextProps.onCancel
+      prevProps.onCancel === nextProps.onCancel &&
+      prevProps.collapseState === nextProps.collapseState
     );
   },
 );
@@ -219,7 +220,8 @@ const AssistantContentMessage = memo(
       prevProps.message.metadata?.compactedMessageCount ===
         nextProps.message.metadata?.compactedMessageCount &&
       prevProps.hasContentAfter === nextProps.hasContentAfter &&
-      prevProps.locale === nextProps.locale
+      prevProps.locale === nextProps.locale &&
+      prevProps.collapseState === nextProps.collapseState
     );
   },
 );
@@ -489,11 +491,16 @@ const MessagesList = memo(function MessagesList({
         if (message.role === "assistant") {
           // Check if this is a compacting message
           if (message.metadata?.isCompacting) {
+            const isFailed = message.metadata.compactingFailed === true;
+            // Derive streaming state from content presence — never rely on metadata.isStreaming
+            // which is not persisted to DB (would show stuck loading on refresh).
+            const isStreaming = !isFailed && !message.content;
             return (
               <CompactingMessage
                 key={message.id}
                 content={message.content ?? ""}
-                isStreaming={message.metadata.isStreaming ?? false}
+                isStreaming={isStreaming}
+                isFailed={isFailed}
                 compactedMessageCount={message.metadata.compactedMessageCount}
                 locale={locale}
               />
@@ -513,8 +520,11 @@ const MessagesList = memo(function MessagesList({
         return null;
       })}
 
-      {/* Show streaming placeholder when no content yet */}
-      <LoadingIndicator sequenceId={sequenceId} />
+      {/* Show streaming placeholder when no content yet — skip for compacting groups
+          since the compacting card already renders its own spinner */}
+      {!allMessages.some((m) => m.metadata?.isCompacting) && (
+        <LoadingIndicator sequenceId={sequenceId} />
+      )}
     </>
   );
 });

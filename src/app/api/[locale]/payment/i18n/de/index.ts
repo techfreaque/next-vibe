@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
   },
 
   // Main payment domain
-  category: "Zahlung",
+  category: "Abrechnung",
 
   // Main form configuration
   form: {

@@ -35,7 +35,7 @@ const { GET } = createEndpoint({
   path: ["agent", "search", "kagi"],
   title: "app.api.agent.search.kagi.get.title" as const,
   description: "app.api.agent.search.kagi.get.description" as const,
-  category: "app.api.agent.search.kagi.category" as const,
+  category: "app.api.agent.chat.category" as const,
   tags: [
     "app.api.agent.search.kagi.tags.search" as const,
     "app.api.agent.search.kagi.tags.web" as const,

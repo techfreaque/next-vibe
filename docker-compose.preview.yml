@@ -10,46 +10,13 @@ services:
     volumes:
       - postgres_preview_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
-    networks:
-      - preview-network
+      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
-
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile.preview
-    container_name: preview-app
-    restart: unless-stopped
-    environment:
-      NODE_ENV: development
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres?schema=public
-      NEXT_PUBLIC_APP_URL: http://localhost:3000
-      NEXT_PUBLIC_DEBUG_PRODUCTION: "false"
-      ENABLE_ANALYTICS: "false"
-      NODE_TLS_REJECT_UNAUTHORIZED: "0"
-      CHAT_STORAGE_TYPE: ${CHAT_STORAGE_TYPE:-filesystem}
-      CHAT_STORAGE_PATH: ${CHAT_STORAGE_PATH:-/app/uploads/chat}
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.next
-    ports:
-      - "3000:3000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - preview-network
-
-networks:
-  preview-network:
-    driver: bridge
 
 volumes:
   postgres_preview_data:

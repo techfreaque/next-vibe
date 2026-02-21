@@ -13,6 +13,7 @@ import { DefaultFolderId } from "../../../../../config";
 import { createCreditUpdateCallback } from "../../../../../credit-updater";
 import type { ChatMessage } from "../../../../../db";
 import { ChatMessageRole } from "../../../../../enum";
+import type { EnabledTool } from "../../../../../hooks/store";
 
 export interface AnswerAsAIDeps {
   logger: EndpointLogger;
@@ -27,7 +28,7 @@ export interface AnswerAsAIDeps {
   settings: {
     selectedModel: ModelId;
     selectedCharacter: string;
-    enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
+    enabledTools: EnabledTool[] | null;
   };
   deductCredits: (creditCost: number, feature: string) => void;
 }
@@ -105,6 +106,7 @@ export async function answerAsAI(
           settings.enabledTools?.map((tool) => ({
             toolId: tool.id,
             requiresConfirmation: tool.requiresConfirmation,
+            active: tool.active,
           })) ?? null,
         messageHistory: messageHistory ?? [],
         attachments: attachments && attachments.length > 0 ? attachments : null,

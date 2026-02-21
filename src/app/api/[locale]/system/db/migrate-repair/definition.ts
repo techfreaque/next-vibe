@@ -26,7 +26,7 @@ const { POST } = createEndpoint({
   path: ["system", "db", "migrate-repair"],
   title: "app.api.system.db.migrateRepair.post.title",
   description: "app.api.system.db.migrateRepair.post.description",
-  category: "app.api.system.db.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.db.migrateRepair.tag"],
   icon: "refresh-cw",
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],

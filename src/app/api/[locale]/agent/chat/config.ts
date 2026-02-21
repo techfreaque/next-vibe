@@ -27,6 +27,9 @@ export enum DefaultFolderId {
 
   /** Incognito folder - localStorage only, never sent to server */
   INCOGNITO = "incognito",
+
+  /** Cron folder - threads created by scheduled AI agent tasks */
+  CRON = "cron",
 }
 
 /**
@@ -128,6 +131,20 @@ export const DEFAULT_FOLDER_CONFIGS = {
     rolesPost: [UserRole.ADMIN], // Everyone can post
     rolesModerate: [UserRole.PARTNER_ADMIN, UserRole.ADMIN], // Moderators and admins can moderate
     rolesAdmin: [UserRole.ADMIN], // Only admins can delete
+  },
+  [DefaultFolderId.CRON]: {
+    id: DefaultFolderId.CRON,
+    translationKey: "app.chat.common.cronChats",
+    icon: "clock",
+    descriptionKey: "app.chat.folders.cronDescription",
+    order: 4,
+    color: "green", // Green for automated/cron tasks
+    rolesView: [UserRole.ADMIN], // Only admins can view
+    rolesManage: [UserRole.ADMIN], // Only admins can manage
+    rolesCreateThread: [UserRole.ADMIN], // Only admins can create threads
+    rolesPost: [UserRole.ADMIN], // Only admins can post
+    rolesModerate: [UserRole.ADMIN], // Only admins
+    rolesAdmin: [UserRole.ADMIN], // Only admins
   },
 } as const satisfies Record<DefaultFolderId, DefaultFolderConfig>;
 

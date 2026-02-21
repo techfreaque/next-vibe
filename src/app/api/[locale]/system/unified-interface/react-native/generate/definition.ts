@@ -27,7 +27,7 @@ const { POST } = createEndpoint({
   description:
     "app.api.system.unifiedInterface.reactNative.generate.post.description",
   icon: "mobile",
-  category: "app.api.system.unifiedInterface.reactNative.generate.post.title",
+  category: "app.api.system.category",
   tags: ["app.api.system.unifiedInterface.reactNative.generate.post.title"],
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF],
   aliases: ["generate:expo", "native:generate"],

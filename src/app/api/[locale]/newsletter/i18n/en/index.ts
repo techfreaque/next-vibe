@@ -3,6 +3,7 @@ import { translations as subscribeTranslations } from "../../subscribe/i18n/en";
 import { translations as unsubscribeTranslations } from "../../unsubscribe/i18n/en";
 
 export const translations = {
+  category: "Newsletter",
   status: statusTranslations,
   subscribe: subscribeTranslations,
   unsubscribe: unsubscribeTranslations,

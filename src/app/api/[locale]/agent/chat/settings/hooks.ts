@@ -15,6 +15,7 @@ import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/h
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import type { EnabledTool } from "../hooks/store";
 import type {
   ChatSettingsGetResponseOutput,
   ChatSettingsUpdateRequestOutput,
@@ -37,9 +38,7 @@ interface UseChatSettingsReturn {
   ) => void;
   setTTSAutoplay: (autoplay: boolean) => void;
   setViewMode: (mode: typeof ViewModeValue) => void;
-  setEnabledTools: (
-    tools: Array<{ id: string; requiresConfirmation: boolean }>,
-  ) => void;
+  setEnabledTools: (tools: EnabledTool[] | null) => void;
 }
 
 /**
@@ -148,7 +147,7 @@ export function useChatSettings(
   );
 
   const setEnabledTools = useCallback(
-    (tools: Array<{ id: string; requiresConfirmation: boolean }>) => {
+    (tools: EnabledTool[] | null) => {
       void updateSettings({ enabledTools: tools });
     },
     [updateSettings],

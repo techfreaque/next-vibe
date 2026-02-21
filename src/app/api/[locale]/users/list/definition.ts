@@ -49,7 +49,7 @@ const { GET } = createEndpoint({
   title: "app.api.users.list.get.title" as const,
   description: "app.api.users.list.get.description" as const,
   icon: "users",
-  category: "app.api.users.category" as const,
+  category: "app.api.user.category" as const,
   tags: ["app.api.users.list.tag" as const],
 
   fields: customWidgetObject({

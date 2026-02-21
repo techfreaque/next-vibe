@@ -29,7 +29,7 @@ import { UserRole } from "../../../user/user-roles/enum";
 const { POST } = createEndpoint({
   title: "app.api.system.db.reset.post.title",
   description: "app.api.system.db.reset.post.description",
-  category: "app.api.system.db.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.db.reset.tag"],
   icon: "rotate-ccw",
   allowedRoles: [

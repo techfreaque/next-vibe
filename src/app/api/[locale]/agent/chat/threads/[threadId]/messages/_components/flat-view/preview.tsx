@@ -65,7 +65,8 @@ export function MessagePreview({
             {isUser
               ? rootFolderId === "private" ||
                 rootFolderId === "shared" ||
-                rootFolderId === "public"
+                rootFolderId === "public" ||
+                rootFolderId === "cron"
                 ? t("app.chat.flatView.youLabel")
                 : t("app.chat.flatView.anonymous")
               : message.authorName || t("app.chat.flatView.assistantFallback")}

@@ -41,6 +41,7 @@ import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { useMessageOperations } from "../threads/[threadId]/messages/hooks/use-operations";
 import type { ThreadUpdate } from "../threads/hooks/use-operations";
 import { useThreadOperations } from "../threads/hooks/use-operations";
+import type { EnabledTool } from "./store";
 import { useChatStore } from "./store";
 import { useBranchManagement } from "./use-branch-management";
 import type { UseCollapseStateReturn } from "./use-collapse-state";
@@ -95,7 +96,7 @@ export interface UseChatReturn {
   ttsVoice: typeof TtsVoiceValue;
   sidebarCollapsed: boolean;
   viewMode: typeof ViewModeValue;
-  enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
+  enabledTools: EnabledTool[] | null;
   setActiveFavorite: (
     favoriteId: string,
     characterId: string,
@@ -105,9 +106,7 @@ export interface UseChatReturn {
   setTTSAutoplay: (autoplay: boolean) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   setViewMode: (mode: typeof ViewModeValue) => void;
-  setEnabledTools: (
-    tools: Array<{ id: string; requiresConfirmation: boolean }>,
-  ) => void;
+  setEnabledTools: (tools: EnabledTool[] | null) => void;
 
   // Credits
   initialCredits: CreditsGetResponseOutput;
@@ -251,6 +250,12 @@ export interface UseChatReturn {
 
   /** Which AI provider integrations are configured (passed from server) */
   envAvailability: AgentEnvAvailability;
+
+  /** Default active tool count (core 8, computed once at boot) */
+  defaultToolCount: number;
+
+  /** Total available tool count for this user's role (computed once at boot) */
+  totalToolCount: number;
 }
 
 /**
@@ -283,6 +288,8 @@ export function useChat(
   initialCredits: CreditsGetResponseOutput,
   rootFolderPermissions: RootFolderPermissions,
   envAvailability: AgentEnvAvailability,
+  defaultToolCount: number,
+  totalToolCount: number,
 ): UseChatReturn {
   // Get stores - subscribe to specific properties
   const threads = useChatStore((state) => state.threads);
@@ -714,5 +721,11 @@ export function useChat(
 
     // Env availability (which provider keys are configured)
     envAvailability,
+
+    // Default tool count for this user's role
+    defaultToolCount,
+
+    // Total available tool count for this user's role
+    totalToolCount,
   };
 }

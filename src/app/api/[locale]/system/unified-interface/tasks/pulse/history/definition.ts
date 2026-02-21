@@ -30,7 +30,7 @@ export const { GET } = createEndpoint({
   description:
     "app.api.system.unifiedInterface.tasks.pulseSystem.history.get.description",
   icon: "activity",
-  category: "app.api.system.unifiedInterface.tasks.category",
+  category: "app.api.system.category",
   allowedRoles: [UserRole.ADMIN],
   tags: ["app.api.system.unifiedInterface.tasks.type.cron"],
 

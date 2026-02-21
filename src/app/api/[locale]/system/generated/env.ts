@@ -13,6 +13,10 @@ import type { z } from "zod";
 import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
 
 // Import env modules
+import {
+  env as env_env,
+  envSchema as env_envSchema,
+} from "../../../../../config/env";
 import { agentEnv, agentEnvSchema } from "../../agent/env";
 import { emailEnv, emailEnvSchema } from "../../emails/env";
 import {
@@ -37,6 +41,7 @@ const platform = {
 
 // Module registry for introspection
 export const envModules = {
+  env: { env: env_env, schema: env_envSchema },
   agent: { env: agentEnv, schema: agentEnvSchema },
   email: { env: emailEnv, schema: emailEnvSchema },
   imap: { env: imapClientEnv, schema: imapClientEnvSchema },
@@ -48,7 +53,8 @@ export const envModules = {
 } as const;
 
 // Combined schema using merge
-export const envSchema = agentEnvSchema
+export const envSchema = env_envSchema
+  .merge(agentEnvSchema)
   .merge(emailEnvSchema)
   .merge(imapClientEnvSchema)
   .merge(leadsCampaignsEnvSchema)

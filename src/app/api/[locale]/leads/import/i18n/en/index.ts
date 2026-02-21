@@ -2,6 +2,7 @@ import { translations as jobsTranslations } from "../../jobs/i18n/en";
 import { translations as statusTranslations } from "../../status/i18n/en";
 
 export const translations = {
+  category: "Data Import",
   post: {
     title: "Import Leads",
     description: "Import leads from CSV file",

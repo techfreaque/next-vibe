@@ -141,7 +141,7 @@ export function NewsletterSignupFooter({
           {t("app.common.selector.language")}
         </H3>
         <Div className="inline-block">
-          <CountrySelector locale={locale} />
+          <CountrySelector locale={locale} user={user} />
         </Div>
       </Div>
     </Div>

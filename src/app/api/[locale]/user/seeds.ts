@@ -4,9 +4,11 @@
  */
 
 import { and, eq } from "drizzle-orm";
+import { hashPassword } from "next-vibe/shared/utils/password";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { env } from "@/config/env";
 import { translations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
@@ -18,6 +20,7 @@ import { parseError } from "../shared/utils";
 import { AuthRepository } from "./auth/repository";
 import type { NewUser } from "./db";
 import { users } from "./db";
+import { DEV_SEED_PASSWORD, DEV_SEED_USERS } from "./dev-seed-users";
 import { UserDetailLevel } from "./enum";
 import { SessionRepository } from "./private/session/repository";
 import { UserRepository } from "./repository";
@@ -31,7 +34,7 @@ import { UserRolesRepository } from "./user-roles/repository";
 function createUserSeed(overrides?: Partial<NewUser>): NewUser {
   return {
     email: `user${Math.floor(Math.random() * 1000)}@example.com`,
-    password: "password123", // Plain text password - will be hashed by createWithHashedPassword
+    password: env.VIBE_ADMIN_USER_PASSWORD ?? DEV_SEED_PASSWORD, // Plain text password - will be hashed by createWithHashedPassword
     privateName: `User${Math.floor(Math.random() * 1000)}`,
     publicName: `Company${Math.floor(Math.random() * 1000)}`,
     emailVerified: true,
@@ -50,44 +53,23 @@ export async function dev(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<void> {
-  // Create admin user
-  const adminUser = createUserSeed({
-    email: "admin@example.com",
-    privateName: "Admin User",
-    publicName: "Admin Corp",
-  });
-
-  // Create demo user
-  const demoUser = createUserSeed({
-    email: "demo@example.com",
-    privateName: "Demo User",
-    publicName: "Demo Company",
-  });
-
-  // Create regular users
-  const regularUsers = [
+  // Create all dev seed users from shared constants
+  const allUsers = DEV_SEED_USERS.map((seedUser, index) =>
     createUserSeed({
-      email: "user1@example.com",
-      privateName: "Regular User1",
-      publicName: "User1 Corp",
+      // Admin user (index 0): override email from env if set
+      email:
+        index === 0 && env.VIBE_ADMIN_USER_EMAIL
+          ? env.VIBE_ADMIN_USER_EMAIL
+          : seedUser.email,
+      privateName: seedUser.privateName,
+      publicName: seedUser.publicName,
     }),
-    createUserSeed({
-      email: "user2@example.com",
-      privateName: "Regular User2",
-      publicName: "User2 Corp",
-    }),
-    createUserSeed({
-      email: "lowcredits@example.com",
-      privateName: "Low Credits User",
-      publicName: "Low Credits Corp",
-    }),
-  ];
-
-  const allUsers = [adminUser, demoUser, ...regularUsers];
+  );
 
   // Create users with hashed passwords using the repository
   const createdUsers: StandardUserType[] = [];
-  for (const user of allUsers) {
+  for (let i = 0; i < allUsers.length; i++) {
+    const user = allUsers[i];
     try {
       // Check if user already exists using emailExists (doesn't fetch full user)
       const emailExistsResponse = await UserRepository.emailExists(
@@ -105,6 +87,18 @@ export async function dev(
           .where(eq(users.email, user.email))
           .limit(1);
         if (results.length > 0) {
+          // Admin user (index 0): sync password from env
+          if (i === 0 && env.VIBE_ADMIN_USER_PASSWORD) {
+            const hashed = await hashPassword(env.VIBE_ADMIN_USER_PASSWORD);
+            await db
+              .update(users)
+              .set({ password: hashed })
+              .where(eq(users.id, results[0].id));
+            logger.debug(
+              `Synced admin password from VIBE_ADMIN_USER_PASSWORD env`,
+            );
+          }
+
           // Create minimal user object for now
           const minimalUser: StandardUserType = {
             id: results[0].id,
@@ -517,9 +511,11 @@ export async function prod(
 ): Promise<void> {
   logger.debug("🌱 Seeding auth data for production environment");
 
-  // Create admin user
+  // Create admin user — use env email if set, fallback to support email
   const adminUser = createUserSeed({
-    email: contactClientRepository.getSupportEmail(locale),
+    email:
+      env.VIBE_ADMIN_USER_EMAIL ??
+      contactClientRepository.getSupportEmail(locale),
     privateName: "Admin User",
     publicName: translations.appName,
   });
@@ -535,10 +531,18 @@ export async function prod(
       logger,
     );
     if (existingAdmin.success && existingAdmin.data) {
-      logger.debug(
-        `Admin user with email ${adminUser.email} already exists, skipping creation`,
-      );
+      logger.debug(`Admin user with email ${adminUser.email} already exists`);
       createdAdmin = existingAdmin.data;
+
+      // Sync admin password from env if set
+      if (env.VIBE_ADMIN_USER_PASSWORD) {
+        const hashed = await hashPassword(env.VIBE_ADMIN_USER_PASSWORD);
+        await db
+          .update(users)
+          .set({ password: hashed })
+          .where(eq(users.id, createdAdmin.id));
+        logger.debug(`Synced admin password from VIBE_ADMIN_USER_PASSWORD env`);
+      }
     } else {
       // User doesn't exist, create new admin user
       logger.debug(

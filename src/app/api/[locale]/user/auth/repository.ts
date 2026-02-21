@@ -812,7 +812,7 @@ export class AuthRepository {
       if (!token) {
         if (isCliPlatform(context.platform)) {
           // Try CLI email auth if no token (works for both CLI and CLI_PACKAGE)
-          const cliEmail = env.VIBE_CLI_USER_EMAIL;
+          const cliEmail = env.VIBE_ADMIN_USER_EMAIL;
           if (cliEmail) {
             logger.debug("Attempting CLI email authentication");
             return await AuthRepository.authenticateUserByEmail(

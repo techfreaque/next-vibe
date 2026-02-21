@@ -4,7 +4,7 @@
  * Following interface + implementation pattern
  */
 
-import { count, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
@@ -19,6 +19,8 @@ import {
   PulseExecutionStatus,
   PulseHealthStatus,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import { users as usersTable } from "@/app/api/[locale]/user/db";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cronTasks as cronTasksTable } from "../cron/db";
 import type {
@@ -339,6 +341,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       dryRun?: boolean;
       taskNames?: string[];
       force?: boolean;
+      systemLocale: CountryLanguage;
     },
     logger: EndpointLogger,
   ): Promise<
@@ -424,9 +427,12 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
       // Execute due tasks (skip in dry run)
       if (!options.dryRun) {
-        // Ensure runner has a logger context for task execution
+        // Ensure runner has a logger and locale context for task execution
         if (!unifiedTaskRunnerRepository.logger) {
           unifiedTaskRunnerRepository.logger = logger;
+        }
+        if (!unifiedTaskRunnerRepository.systemLocale) {
+          unifiedTaskRunnerRepository.systemLocale = options.systemLocale;
         }
 
         for (const taskName of tasksDue) {
@@ -448,6 +454,147 @@ export class PulseHealthRepository implements IPulseHealthRepository {
               message: result.message,
             });
           }
+        }
+      }
+
+      // Phase 2: Execute user-created DB tasks
+      // These have userId set and call a routeId endpoint with defaultConfig + defaultUrlPathParams
+      if (!options.dryRun) {
+        try {
+          const userCreatedTasks = await db
+            .select()
+            .from(cronTasksTable)
+            .where(
+              and(
+                isNotNull(cronTasksTable.userId),
+                eq(cronTasksTable.enabled, true),
+              ),
+            );
+
+          if (userCreatedTasks.length > 0) {
+            const { isCronTaskDue: isCronDue } =
+              await import("../cron-formatter");
+            const { UserPermissionRole } =
+              await import("@/app/api/[locale]/user/user-roles/enum");
+            const { getFullPath } =
+              await import("@/app/api/[locale]/system/generated/endpoint");
+            const { getRouteHandler } =
+              await import("@/app/api/[locale]/system/generated/route-handlers");
+            const { splitTaskArgs } = await import("../cron/arg-splitter");
+            const { LeadAuthRepository } =
+              await import("@/app/api/[locale]/leads/auth/repository");
+            const { isStreamingResponse: isStreaming, isFileResponse: isFile } =
+              await import("@/app/api/[locale]/shared/types/response.schema");
+            const { Platform } =
+              await import("@/app/api/[locale]/system/unified-interface/shared/types/platform");
+            const { CronTasksRepository } = await import("../cron/repository");
+
+            for (const dbTask of userCreatedTasks) {
+              const isDue =
+                options.force || isCronDue(logger, dbTask.schedule, now);
+              if (!isDue) {
+                tasksSkipped.push(dbTask.displayName);
+                continue;
+              }
+
+              tasksDue.push(dbTask.displayName);
+              tasksExecuted.push(dbTask.displayName);
+              logger.debug(
+                `Pulse executing user task: ${dbTask.displayName} (routeId: ${dbTask.routeId})`,
+              );
+
+              // Resolve owner context
+              const taskOwnerId = dbTask.userId ?? "system-cron";
+              let userLocale: CountryLanguage = options.systemLocale;
+              if (dbTask.userId) {
+                const ownerRow = await db
+                  .select({ locale: usersTable.locale })
+                  .from(usersTable)
+                  .where(eq(usersTable.id, dbTask.userId))
+                  .limit(1);
+                if (ownerRow[0]?.locale) {
+                  userLocale = ownerRow[0].locale;
+                }
+              }
+
+              const { leadId: ownerLeadId } =
+                await LeadAuthRepository.getAuthenticatedUserLeadId(
+                  taskOwnerId,
+                  undefined,
+                  userLocale,
+                  logger,
+                );
+              const cronUser = {
+                id: taskOwnerId,
+                leadId: ownerLeadId,
+                isPublic: false as const,
+                roles: [UserPermissionRole.ADMIN],
+              };
+
+              // Resolve routeId → endpoint path → handler
+              const path = getFullPath(dbTask.routeId);
+              if (!path) {
+                tasksFailed.push(dbTask.displayName);
+                logger.error(
+                  `Pulse: unknown routeId "${dbTask.routeId}" for task "${dbTask.displayName}"`,
+                );
+              } else {
+                const handler = await getRouteHandler(path);
+                if (!handler) {
+                  tasksFailed.push(dbTask.displayName);
+                  logger.error(
+                    `Pulse: no handler for routeId "${dbTask.routeId}"`,
+                  );
+                } else {
+                  const taskInput = dbTask.taskInput ?? {};
+                  const { urlPathParams, data } = await splitTaskArgs(
+                    path,
+                    taskInput,
+                  );
+
+                  const result = await handler({
+                    data,
+                    urlPathParams,
+                    user: cronUser,
+                    locale: userLocale,
+                    logger,
+                    platform: Platform.CLI,
+                  });
+
+                  if (isStreaming(result) || isFile(result)) {
+                    tasksFailed.push(dbTask.displayName);
+                    logger.error(
+                      `Pulse: task "${dbTask.displayName}" returned streaming/file response`,
+                    );
+                  } else if (!result.success) {
+                    tasksFailed.push(dbTask.displayName);
+                    logger.error(`Pulse: task "${dbTask.displayName}" failed`, {
+                      message: result.message,
+                    });
+                  } else {
+                    tasksSucceeded.push(dbTask.displayName);
+                  }
+                }
+              }
+
+              // Run-once: disable after first execution regardless of outcome
+              if (dbTask.runOnce) {
+                await CronTasksRepository.updateTask(
+                  dbTask.id,
+                  { enabled: false },
+                  null,
+                  logger,
+                );
+                logger.info(
+                  `[run-once] User task "${dbTask.displayName}" disabled after single execution`,
+                );
+              }
+            }
+          }
+        } catch (userTaskError) {
+          logger.error("Failed to execute user-created tasks", {
+            error: parseError(userTaskError).message,
+          });
         }
       }
 

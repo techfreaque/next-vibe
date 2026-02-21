@@ -110,7 +110,8 @@ async function loadThreadsFromServer(
   rootFolderId:
     | DefaultFolderId.PRIVATE
     | DefaultFolderId.SHARED
-    | DefaultFolderId.PUBLIC,
+    | DefaultFolderId.PUBLIC
+    | DefaultFolderId.CRON,
   addThread: (thread: ChatThread) => void,
   user: JwtPayloadType,
 ): Promise<void> {
@@ -191,7 +192,8 @@ async function loadFoldersFromServer(
   rootFolderId:
     | DefaultFolderId.PRIVATE
     | DefaultFolderId.SHARED
-    | DefaultFolderId.PUBLIC,
+    | DefaultFolderId.PUBLIC
+    | DefaultFolderId.CRON,
   addFolder: (folder: ChatFolder) => void,
   user: JwtPayloadType,
 ): Promise<void> {
@@ -288,7 +290,7 @@ export function useDataLoader(
         return;
       }
 
-      // TypeScript now knows currentRootFolderId is PRIVATE | SHARED | PUBLIC
+      // TypeScript now knows currentRootFolderId is PRIVATE | SHARED | PUBLIC | CRON
       await Promise.all([
         loadThreadsFromServer(
           logger,

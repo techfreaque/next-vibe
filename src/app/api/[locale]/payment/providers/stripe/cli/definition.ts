@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   path: ["payment", "providers", "stripe", "cli"],
   title: "app.api.stripe.title" as const,
   description: "app.api.stripe.description" as const,
-  category: "app.api.stripe.category" as const,
+  category: "app.api.payment.category" as const,
   icon: "credit-card" as const,
   tags: [
     "app.api.stripe.tags.stripe" as const,

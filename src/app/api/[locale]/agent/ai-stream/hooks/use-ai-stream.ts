@@ -167,69 +167,80 @@ function handleMessageCreatedEvent(params: {
       const isIncognito =
         isIncognitoFromStream || chatThread?.rootFolderId === "incognito";
 
-      // CRITICAL: Always add TOOL and ASSISTANT messages to chat store (both incognito and non-incognito)
-      // - TOOL messages: allows TOOL_RESULT events to update them later
-      // - ASSISTANT messages: needed for real-time streaming display (maintains parent chain)
-      const shouldAddToStore =
-        isIncognito ||
-        eventData.role === ChatMessageRole.TOOL ||
-        eventData.role === ChatMessageRole.ASSISTANT;
+      const isUserRole = eventData.role === ChatMessageRole.USER;
+      const isAssistantOrTool =
+        eventData.role === ChatMessageRole.ASSISTANT ||
+        eventData.role === ChatMessageRole.TOOL;
+
+      // Always add USER, ASSISTANT, and TOOL messages to chat store.
+      // USER: an optimistic entry was added client-side for immediate feedback;
+      //       the server's event carries the authoritative parentId/depth so we
+      //       replace (updateMessage) the optimistic entry rather than add a duplicate.
+      // TOOL: allows TOOL_RESULT events to update them later.
+      // ASSISTANT: needed for real-time streaming display.
+      // Incognito: also add all messages (they're stored in localStorage).
+      const shouldAddToStore = isUserRole || isAssistantOrTool || isIncognito;
 
       if (shouldAddToStore) {
-        // Check if message already exists (created client-side for incognito text mode)
-        const existingMessage =
-          useChatStore.getState().messages[eventData.messageId];
-        if (existingMessage) {
-          logger.debug(
-            "[MESSAGE_CREATED] Message already exists, skipping (client-side created)",
-            {
-              messageId: eventData.messageId,
-              role: eventData.role,
-            },
-          );
-          return; // Skip - message was created client-side
-        }
-
         logger.debug("[MESSAGE_CREATED] Saving to chat store", {
           messageId: eventData.messageId,
           role: eventData.role,
           hasToolCall: !!toolCall,
           isIncognito,
-          isTool: eventData.role === ChatMessageRole.TOOL,
+          isUser: isUserRole,
         });
 
-        useChatStore.getState().addMessage({
-          id: eventData.messageId,
-          threadId: eventData.threadId,
-          role: eventData.role,
-          content: eventData.content || "",
-          parentId: eventData.parentId,
-          depth: eventData.depth,
-          sequenceId: eventData.sequenceId ?? null,
-          authorId: isIncognito ? "incognito" : "system", // Use "system" for non-incognito TOOL messages
-          isAI:
-            eventData.role === ChatMessageRole.ASSISTANT ||
-            eventData.role === ChatMessageRole.TOOL,
-          model: eventData.model ?? null,
-          character: eventData.character ?? null,
-          errorType:
-            eventData.role === ChatMessageRole.ERROR ? "STREAM_ERROR" : null,
-          errorMessage:
-            eventData.role === ChatMessageRole.ERROR ? eventData.content : null,
-          errorCode: null,
-          metadata: {
-            ...(eventData.metadata || {}),
-            ...(toolCall ? { toolCall } : {}),
-          },
-          upvotes: 0,
-          downvotes: 0,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          searchVector: null,
-        });
+        const serverMetadata = {
+          ...(eventData.metadata || {}),
+          ...(toolCall ? { toolCall } : {}),
+        };
 
-        // Only save to localStorage for incognito mode
-        if (isIncognito) {
+        // For USER messages: replace the optimistic entry with the server's
+        // authoritative parentId/depth. For all others: add fresh.
+        const existingOptimistic =
+          isUserRole && useChatStore.getState().messages[eventData.messageId];
+
+        if (existingOptimistic) {
+          useChatStore.getState().updateMessage(eventData.messageId, {
+            parentId: eventData.parentId,
+            depth: eventData.depth,
+            content: eventData.content || "",
+            metadata: serverMetadata,
+          });
+        } else {
+          useChatStore.getState().addMessage({
+            id: eventData.messageId,
+            threadId: eventData.threadId,
+            role: eventData.role,
+            content: eventData.content || "",
+            parentId: eventData.parentId,
+            depth: eventData.depth,
+            sequenceId: eventData.sequenceId ?? null,
+            authorId: isIncognito ? "incognito" : "system",
+            isAI: isAssistantOrTool,
+            model: eventData.model ?? null,
+            character: eventData.character ?? null,
+            errorType:
+              eventData.role === ChatMessageRole.ERROR ? "STREAM_ERROR" : null,
+            errorMessage:
+              eventData.role === ChatMessageRole.ERROR
+                ? eventData.content
+                : null,
+            errorCode: null,
+            metadata: serverMetadata,
+            upvotes: 0,
+            downvotes: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            searchVector: null,
+          });
+        }
+
+        // Save to localStorage for incognito mode — but NOT for USER messages yet.
+        // The user message will be saved to localStorage once the AI response
+        // MESSAGE_CREATED arrives, confirming the server accepted the request.
+        // This prevents saving partial/pending user messages.
+        if (isIncognito && !isUserRole) {
           void import("../../chat/incognito/storage")
             .then(({ saveMessage }) => {
               logger.debug("[MESSAGE_CREATED] Saving to localStorage", {
@@ -247,9 +258,7 @@ function handleMessageCreatedEvent(params: {
                 depth: eventData.depth,
                 sequenceId: eventData.sequenceId ?? null,
                 authorId: "incognito",
-                isAI:
-                  eventData.role === ChatMessageRole.ASSISTANT ||
-                  eventData.role === ChatMessageRole.TOOL,
+                isAI: isAssistantOrTool,
                 model: eventData.model ?? null,
                 character: eventData.character ?? null,
                 errorType:
@@ -279,6 +288,32 @@ function handleMessageCreatedEvent(params: {
                 error,
               });
             });
+        }
+
+        // When the first ASSISTANT message arrives in incognito mode,
+        // also save the pending user message to localStorage.
+        if (isIncognito && eventData.role === ChatMessageRole.ASSISTANT) {
+          void (async (): Promise<void> => {
+            try {
+              const { saveMessage } =
+                await import("../../chat/incognito/storage");
+              // Find the user message that is the parent of this assistant message
+              const userMsg =
+                useChatStore.getState().messages[eventData.parentId ?? ""];
+              if (userMsg && userMsg.role === ChatMessageRole.USER) {
+                saveMessage(userMsg);
+                logger.debug(
+                  "[MESSAGE_CREATED] Saved pending user message to localStorage",
+                  { messageId: userMsg.id },
+                );
+              }
+            } catch (error) {
+              logger.error(
+                "Failed to save pending user message to localStorage",
+                parseError(error),
+              );
+            }
+          })();
         }
       }
     } catch (error) {

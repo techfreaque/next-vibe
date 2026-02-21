@@ -57,7 +57,7 @@ export const { enum: TaskPriority, options: TaskPriorityOptions } =
 const { POST } = createEndpoint({
   title: "app.api.system.db.reset.taskManagement.title",
   description: "app.api.system.db.reset.taskManagement.description",
-  category: "app.api.system.db.reset.taskManagement.category",
+  category: "app.api.system.category",
   tags: [
     "app.api.system.db.reset.taskManagement.tags.tasks",
     "app.api.system.db.reset.taskManagement.tags.management",

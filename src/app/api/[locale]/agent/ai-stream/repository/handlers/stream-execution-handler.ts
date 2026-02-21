@@ -17,6 +17,7 @@ import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { MAX_TOOL_CALLS } from "../core/constants";
 import type { ProviderFactory } from "../core/provider-factory";
@@ -37,6 +38,8 @@ export class StreamExecutionHandler {
     systemPrompt: string;
     tools: Record<string, CoreTool> | undefined;
     toolsConfig: Map<string, { requiresConfirmation: boolean }>;
+    /** Set of tool names the model is allowed to execute. null = all allowed. */
+    activeToolNames: Set<string> | null;
     ctx: StreamContext;
     threadId: string;
     model: ModelId;
@@ -46,6 +49,7 @@ export class StreamExecutionHandler {
     emittedToolResultIds: Set<string> | undefined;
     ttsHandler: StreamingTTSHandler | null;
     user: JwtPayloadType;
+    locale: CountryLanguage;
     logger: EndpointLogger;
   }): Promise<void> {
     const {
@@ -56,6 +60,7 @@ export class StreamExecutionHandler {
       systemPrompt,
       tools,
       toolsConfig,
+      activeToolNames,
       ctx,
       threadId,
       model,
@@ -65,6 +70,7 @@ export class StreamExecutionHandler {
       emittedToolResultIds,
       ttsHandler,
       user,
+      locale,
       logger,
     } = params;
 
@@ -110,7 +116,9 @@ export class StreamExecutionHandler {
           isIncognito,
           userId,
           user,
+          locale,
           toolsConfig,
+          activeToolNames,
           streamAbortController,
           emittedToolResultIds,
           ttsHandler,

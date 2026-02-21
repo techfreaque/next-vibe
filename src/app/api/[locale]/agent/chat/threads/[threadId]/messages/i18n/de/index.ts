@@ -10,6 +10,7 @@ export const translations: typeof enTranslations = {
   compacting: {
     title: "Verlauf komprimiert",
     loading: "Verlauf wird komprimiert...",
+    failed: "Komprimierung fehlgeschlagen",
   },
   get: {
     title: "List Thread Messages",

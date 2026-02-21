@@ -29,7 +29,7 @@ const { GET } = createEndpoint({
   title: "app.api.subscription.get.title" as const,
   description: "app.api.subscription.get.description" as const,
   icon: "crown",
-  category: "app.api.subscription.category" as const,
+  category: "app.api.payment.category" as const,
   tags: [
     "app.api.subscription.tags.subscription" as const,
     "app.api.subscription.tags.billing" as const,

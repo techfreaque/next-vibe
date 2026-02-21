@@ -27,7 +27,7 @@ const { POST } = createEndpoint({
   aliases: ["start", "server:start"],
   title: "app.api.system.server.start.post.title",
   description: "app.api.system.server.start.post.description",
-  category: "app.api.system.server.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.server.start.tags.start"],
   icon: "zap",
   allowedRoles: [
@@ -74,7 +74,7 @@ const { POST } = createEndpoint({
         label: "app.api.system.server.start.post.fields.port.title",
         description: "app.api.system.server.start.post.fields.port.description",
         columns: 12,
-        schema: z.union([z.coerce.number(), z.string()]).optional(),
+        schema: z.coerce.number().optional(),
       }),
 
       skipTaskRunner: requestField({
@@ -83,6 +83,16 @@ const { POST } = createEndpoint({
         label: "app.api.system.server.start.post.fields.skipTaskRunner.title",
         description:
           "app.api.system.server.start.post.fields.skipTaskRunner.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
+
+      skipDbSetup: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.server.start.post.fields.skipDbSetup.title",
+        description:
+          "app.api.system.server.start.post.fields.skipDbSetup.description",
         columns: 6,
         schema: z.boolean().optional().default(false),
       }),
@@ -161,12 +171,10 @@ const { POST } = createEndpoint({
       withPort: {
         skipPre: false,
         skipNextCommand: false,
-        port: 3000,
       },
       withMigrations: {
         skipPre: false,
         skipNextCommand: false,
-        port: 3000,
       },
       skipPreTasks: {
         skipPre: true,
@@ -179,7 +187,6 @@ const { POST } = createEndpoint({
       success: {
         skipPre: false,
         skipNextCommand: false,
-        port: 3000,
       },
     },
     responses: {

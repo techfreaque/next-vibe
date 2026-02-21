@@ -25,6 +25,7 @@ export const translations: typeof enTranslations = {
     sharedChats: "Geteilte Threads",
     publicChats: "Öffentliche Threads",
     incognitoChats: "Inkognito-Threads",
+    cronChats: "Cron-Threads",
     search: "Suchen",
     delete: "Löschen",
     cancel: "Abbrechen",
@@ -107,23 +108,36 @@ export const translations: typeof enTranslations = {
 
   aiTools: {
     modal: {
-      title: "KI-Tools-Konfiguration",
+      title: "KI-Tools",
       description:
-        "Wählen Sie aus, welche KI-Tools der Assistent während der Konversation verwenden kann. Tools bieten Funktionen wie Websuche, Berechnungen und Datenzugriff.",
+        "Normalerweise müssen Sie keine Tools verwalten. Wenn Hilfe aktiviert ist, kann die KI jedes Tool bei Bedarf aufrufen. Pinnen Sie Tools hier nur, wenn Sie sie immer im Kontext haben möchten.",
       searchPlaceholder: "Tools durchsuchen...",
       loading: "Tools werden geladen...",
       noToolsFound: "Keine Tools entsprechen Ihrer Suche",
-      noToolsAvailable:
-        "Noch keine KI-Tools gefunden. Tools werden hier automatisch angezeigt, sobald sie im System registriert sind.",
+      noToolsAvailable: "Keine KI-Tools verfügbar",
       expandAll: "Alle erweitern",
       collapseAll: "Alle einklappen",
       selectAll: "Alle auswählen",
       deselectAll: "Alle abwählen",
       enableAll: "Alle aktivieren",
       resetToDefault: "Auf Standard zurücksetzen",
-      stats: "{{enabled}} von {{total}} Tools aktiviert",
+      stats: "{{enabled}} von {{total}} Tools angepinnt",
       aliases: "Aliase",
       requireConfirmation: "Bestätigung vor Verwendung erforderlich",
+      activeLabel: "angepinnt",
+      enabledLabel: "erlaubt",
+      totalLabel: "gesamt",
+      activeTooltip:
+        "Angepinnte Tools sind immer im Kontext — die KI sieht sie bei jeder Anfrage",
+      enabledTooltip:
+        "Erlaubte Tools können bei Bedarf aufgerufen werden, wenn Hilfe aktiviert ist",
+      legendActive: "Immer im Kontext (angepinnt)",
+      legendConfirm: "Fragt vor dem Ausführen",
+      activeOn: "Angepinnt — immer im Kontext. Klicken zum Lösen",
+      activeOff:
+        "Nicht angepinnt — KI kann trotzdem bei Bedarf aufrufen. Klicken zum Anpinnen",
+      confirmOn: "Fragt nach Bestätigung — klicken zum Deaktivieren",
+      confirmOff: "Läuft automatisch — klicken um Bestätigung zu verlangen",
     },
   },
 
@@ -287,6 +301,9 @@ export const translations: typeof enTranslations = {
       toSend: "zum Senden",
       shiftEnter: "Umschalt+Eingabe",
       forNewLine: "für neue Zeile",
+      ctrlV: "Strg+V",
+      pasteFilesSeparator: "·",
+      orPasteFiles: "zum Dateien einfügen",
     },
     speechInput: {
       stopRecording: "Aufnahme stoppen",
@@ -868,6 +885,8 @@ export const translations: typeof enTranslations = {
     sharedDescription: "Mit anderen geteilte Unterhaltungen",
     publicDescription: "Öffentliche Unterhaltungen",
     incognitoDescription: "Unterhaltungen im privaten Modus",
+    cronDescription:
+      "Automatisierte Unterhaltungen durch geplante Cron-Aufgaben.",
     accessModal: {
       title: "Konto erforderlich",
       privateTitle: "Private Threads",

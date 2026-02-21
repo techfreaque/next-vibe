@@ -114,6 +114,8 @@ export interface StreamSetupResult {
   tools: Record<string, CoreTool> | undefined;
   /** Tools metadata for confirmation checks */
   toolsConfig: Map<string, { requiresConfirmation: boolean }>;
+  /** Set of tool names the model is allowed to execute (permission layer). null = all allowed. */
+  activeToolNames: Set<string> | null;
   /** Provider for AI streaming */
   provider: ReturnType<typeof ProviderFactoryClass.getProviderForModel>;
   /** Text encoder for SSE stream */
@@ -133,6 +135,8 @@ export async function setupAiStream(params: {
   t: TFunction;
   maxDuration: number;
   request: NextRequest | undefined;
+  extraInstructions?: string;
+  headless?: boolean;
 }): Promise<ResponseType<StreamSetupResult>> {
   const { data, locale, logger, user, userId, leadId, ipAddress, t } = params;
   const isIncognito = data.rootFolderId === "incognito";
@@ -379,6 +383,8 @@ export async function setupAiStream(params: {
     rootFolderId: data.rootFolderId,
     subFolderId: data.subFolderId,
     callMode: data.voiceMode?.enabled,
+    extraInstructions: params.extraInstructions,
+    headless: params.headless,
   });
 
   logger.debug("System prompt built", {
@@ -423,10 +429,12 @@ export async function setupAiStream(params: {
   const {
     tools,
     toolsConfig,
+    activeToolNames,
     systemPrompt: updatedSystemPrompt,
   } = await ToolsSetupHandler.setupStreamingTools({
     modelConfig,
-    requestedTools: data.tools,
+    visibleTools: data.tools,
+    activeTools: data.activeTools,
     user,
     locale,
     logger,
@@ -443,7 +451,8 @@ export async function setupAiStream(params: {
     model: data.model,
     hasTools: !!tools,
     toolCount: tools ? Object.keys(tools).length : 0,
-    requestedTools: data.tools,
+    visibleTools: data.tools,
+    activeTools: data.activeTools,
     supportsTools: modelConfig?.supportsTools,
   });
 
@@ -489,6 +498,7 @@ export async function setupAiStream(params: {
       modelConfig,
       tools,
       toolsConfig,
+      activeToolNames,
       provider,
       encoder,
       streamAbortController,

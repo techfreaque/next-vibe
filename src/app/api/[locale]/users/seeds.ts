@@ -6,6 +6,7 @@
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -39,7 +40,7 @@ export async function dev(
   try {
     // Get admin user to act as creator
     const adminUserResponse = await UserRepository.getUserByEmail(
-      "admin@example.com",
+      env.VIBE_ADMIN_USER_EMAIL,
       UserDetailLevel.STANDARD,
       locale,
       logger,
@@ -186,7 +187,7 @@ export async function test(
   try {
     // Get admin user to act as creator
     const adminUserResponse = await UserRepository.getUserByEmail(
-      "admin@example.com",
+      env.VIBE_ADMIN_USER_EMAIL,
       UserDetailLevel.STANDARD,
       locale,
       logger,

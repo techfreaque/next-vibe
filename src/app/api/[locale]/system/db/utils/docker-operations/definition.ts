@@ -27,7 +27,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 const { POST } = createEndpoint({
   title: "app.api.system.db.utils.dockerOperations.title",
   description: "app.api.system.db.utils.dockerOperations.description",
-  category: "app.api.system.db.utils.dockerOperations.category",
+  category: "app.api.system.category",
   tags: [
     "app.api.system.db.utils.dockerOperations.tags.docker",
     "app.api.system.db.utils.dockerOperations.tags.utils",

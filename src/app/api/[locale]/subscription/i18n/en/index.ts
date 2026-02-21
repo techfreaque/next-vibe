@@ -5,7 +5,7 @@ export const translations = {
   checkout: checkoutTranslations,
 
   // Main subscription domain
-  category: "Subscription",
+  category: "Billing",
 
   // Tags
   tags: {

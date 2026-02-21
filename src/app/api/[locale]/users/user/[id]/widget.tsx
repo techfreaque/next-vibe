@@ -32,18 +32,32 @@ import {
   useWidgetLocale,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
+import { EmailFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/email-field/react";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
+import { UuidFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/uuid-field/react";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import type definition from "./definition";
 
 type GetResponseOutput = typeof definition.GET.types.ResponseOutput;
+type PutResponseOutput = typeof definition.PUT.types.ResponseOutput;
 type DeleteResponseOutput = typeof definition.DELETE.types.ResponseOutput;
 
 interface GetWidgetProps {
   field: {
     value: GetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
+  fieldName: string;
+}
+
+interface PutWidgetProps {
+  field: {
+    value: PutResponseOutput | null | undefined;
+  } & (typeof definition.PUT)["fields"];
   fieldName: string;
 }
 
@@ -403,6 +417,284 @@ export function UserDetailContainer({
           </Button>
         </Div>
       </Div>
+    </Div>
+  );
+}
+
+export function UserEditContainer({
+  field,
+  fieldName,
+}: PutWidgetProps): React.JSX.Element {
+  const children = field.children;
+  const data = field.value;
+  const locale = useWidgetLocale();
+  const t = useWidgetTranslation();
+  const router = useRouter();
+  const isLoading = data === null || data === undefined;
+  const [copiedId, setCopiedId] = useState(false);
+  const [copiedLeadId, setCopiedLeadId] = useState(false);
+
+  const userRoles = data?.userRoles ?? [];
+  const stripeCustomerId = data?.stripeCustomerId;
+  const createdAt = data?.createdAt;
+  const updatedAt = data?.updatedAt;
+  const leadId = data?.leadId;
+  const email = data?.email;
+  const privateName = data?.privateName;
+  const publicName = data?.publicName;
+  const userId = data?.id;
+
+  const initials = (privateName ?? email ?? "?")
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  const handleCopyUserId = useCallback((): void => {
+    if (!userId) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      await navigator.clipboard.writeText(userId);
+      setCopiedId(true);
+      setTimeout((): void => setCopiedId(false), 2000);
+    })();
+  }, [userId]);
+
+  const handleCopyLeadId = useCallback((): void => {
+    if (!leadId) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      await navigator.clipboard.writeText(leadId);
+      setCopiedLeadId(true);
+      setTimeout((): void => setCopiedLeadId(false), 2000);
+    })();
+  }, [leadId]);
+
+  const handleViewLead = useCallback((): void => {
+    if (!leadId) {
+      return;
+    }
+    router.push(`/${locale}/admin/leads/${leadId}/edit`);
+  }, [router, locale, leadId]);
+
+  return (
+    <Div className="flex flex-col gap-0">
+      {/* Header */}
+      <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
+        <NavigateButtonWidget field={children.backButton} />
+        <Span className="font-semibold text-base">
+          {t("app.api.users.user.id.id.put.title")}
+        </Span>
+      </Div>
+
+      {isLoading ? (
+        <Div className="h-[300px] flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </Div>
+      ) : (
+        <Div className="p-4 flex flex-col gap-6">
+          {/* User Profile Summary */}
+          <Div className="flex items-center gap-4">
+            <Div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-xl font-bold text-primary flex-shrink-0">
+              {initials}
+            </Div>
+            <Div className="flex-1 min-w-0">
+              <Div className="flex items-center gap-2 flex-wrap">
+                <Span className="font-semibold text-lg">
+                  {privateName ?? "—"}
+                </Span>
+                {publicName && publicName !== privateName && (
+                  <Span className="text-muted-foreground text-sm">
+                    ({publicName})
+                  </Span>
+                )}
+                <Div className="flex gap-1 flex-wrap">
+                  {data?.isActive ? (
+                    <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                      <CheckCircle className="h-3 w-3" />{" "}
+                      {t("app.api.users.user.id.widget.active")}
+                    </Span>
+                  ) : (
+                    <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                      <XCircle className="h-3 w-3" />{" "}
+                      {t("app.api.users.user.id.widget.inactive")}
+                    </Span>
+                  )}
+                </Div>
+              </Div>
+              <Div className="flex items-center gap-1 text-sm text-muted-foreground mt-0.5">
+                <Mail className="h-3.5 w-3.5 flex-shrink-0" />
+                <Span className="truncate">{email}</Span>
+                {data?.emailVerified ? (
+                  <CheckCircle className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
+                ) : (
+                  <XCircle className="h-3.5 w-3.5 text-yellow-500 flex-shrink-0" />
+                )}
+              </Div>
+              {userId && (
+                <Div className="flex items-center gap-1 mt-0.5">
+                  <Span className="font-mono text-xs text-muted-foreground truncate max-w-[200px]">
+                    {userId}
+                  </Span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-5 w-5 p-0 text-muted-foreground hover:text-foreground"
+                    onClick={handleCopyUserId}
+                    title="Copy User ID"
+                  >
+                    {copiedId ? (
+                      <CheckCircle className="h-3 w-3 text-green-500" />
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
+                  </Button>
+                </Div>
+              )}
+            </Div>
+          </Div>
+
+          {/* Roles */}
+          {userRoles.length > 0 && (
+            <Div className="flex items-center gap-2 flex-wrap">
+              <Shield className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              {userRoles.map((r) => (
+                <Span
+                  key={r.id}
+                  className={cn(
+                    "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
+                    ROLE_COLORS[r.role] ??
+                      "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300",
+                  )}
+                >
+                  {String(r.role).replace(/_/g, " ")}
+                </Span>
+              ))}
+            </Div>
+          )}
+
+          {/* Stripe + Lead + Timestamps info row */}
+          <Div className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-muted-foreground">
+            {stripeCustomerId && (
+              <Div className="flex items-center gap-1.5">
+                <CreditCard className="h-3.5 w-3.5 flex-shrink-0" />
+                <Span className="font-mono truncate">{stripeCustomerId}</Span>
+              </Div>
+            )}
+            {leadId && (
+              <Div className="flex items-center gap-1.5">
+                <User className="h-3.5 w-3.5 flex-shrink-0" />
+                <Span className="font-mono truncate max-w-[140px]">
+                  {leadId}
+                </Span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-5 w-5 p-0 text-muted-foreground hover:text-foreground"
+                  onClick={handleCopyLeadId}
+                  title="Copy Lead ID"
+                >
+                  {copiedLeadId ? (
+                    <CheckCircle className="h-3 w-3 text-green-500" />
+                  ) : (
+                    <Copy className="h-3 w-3" />
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-5 px-1 text-xs text-muted-foreground hover:text-foreground"
+                  onClick={handleViewLead}
+                >
+                  {t("app.api.users.user.id.widget.viewLead")}
+                </Button>
+              </Div>
+            )}
+            {createdAt && (
+              <Div className="flex items-center gap-1.5">
+                <Span className="font-medium text-foreground">
+                  {t("app.api.users.user.id.widget.created")}
+                </Span>
+                {formatSimpleDate(createdAt, locale)}
+              </Div>
+            )}
+            {updatedAt && (
+              <Div className="flex items-center gap-1.5">
+                <Span className="font-medium text-foreground">
+                  {t("app.api.users.user.id.widget.lastUpdated")}
+                </Span>
+                {formatSimpleDate(updatedAt, locale)}
+              </Div>
+            )}
+          </Div>
+
+          {/* Divider before edit form */}
+          <Div className="border-t" />
+
+          <FormAlertWidget field={{}} />
+
+          {/* Basic Information */}
+          <Div className="flex flex-col gap-3">
+            <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              {t("app.api.users.user.id.id.put.sections.basicInfo.title")}
+            </Span>
+            <EmailFieldWidget
+              fieldName={`${fieldName}.email`}
+              field={children.email}
+            />
+            <Div className="grid grid-cols-2 gap-3">
+              <TextFieldWidget
+                fieldName={`${fieldName}.privateName`}
+                field={children.privateName}
+              />
+              <TextFieldWidget
+                fieldName={`${fieldName}.publicName`}
+                field={children.publicName}
+              />
+            </Div>
+          </Div>
+
+          {/* Administrative Settings */}
+          <Div className="flex flex-col gap-3">
+            <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              {t("app.api.users.user.id.id.put.sections.adminSettings.title")}
+            </Span>
+            <Div className="grid grid-cols-2 gap-3">
+              <BooleanFieldWidget
+                fieldName={`${fieldName}.isActive`}
+                field={children.isActive}
+              />
+              <BooleanFieldWidget
+                fieldName={`${fieldName}.emailVerified`}
+                field={children.emailVerified}
+              />
+            </Div>
+            <UuidFieldWidget
+              fieldName={`${fieldName}.leadId`}
+              field={children.leadId}
+            />
+          </Div>
+
+          {/* Submit */}
+          <Div className="flex items-center justify-end pt-2">
+            <SubmitButtonWidget
+              field={{
+                text: "app.api.users.user.id.id.put.title",
+                loadingText: "app.api.users.user.id.id.put.title",
+                icon: "save",
+                variant: "primary",
+                size: "sm",
+              }}
+            />
+          </Div>
+        </Div>
+      )}
     </Div>
   );
 }

@@ -52,7 +52,7 @@ const { POST } = createEndpoint({
   title: "app.api.agent.chat.aiStream.post.title",
   description: "app.api.agent.chat.aiStream.post.description",
   icon: "sparkles",
-  category: "app.api.agent.category",
+  category: "app.api.agent.chat.category",
   tags: [
     "app.api.agent.tags.streaming",
     "app.api.agent.tags.chat",
@@ -125,6 +125,10 @@ const { POST } = createEndpoint({
           {
             value: DefaultFolderId.INCOGNITO,
             label: "app.api.agent.chat.config.folders.incognito" as const,
+          },
+          {
+            value: DefaultFolderId.CRON,
+            label: "app.api.agent.chat.config.folders.cron" as const,
           },
         ],
         schema: z.enum(DefaultFolderId),
@@ -204,6 +208,49 @@ const { POST } = createEndpoint({
         columns: 4,
         schema: z.string(),
       }),
+
+      // optional of active tools - null/undefined = all tools enabled
+      // active tool means the model can access it, visibility is managed by tools below
+      activeTools: requestDataArrayOptionalField(
+        {
+          type: WidgetType.CONTAINER,
+          title: "app.api.agent.chat.aiStream.post.activeTool.label",
+          description:
+            "app.api.agent.chat.aiStream.post.activeTool.description",
+        },
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.GRID,
+            columns: 2,
+          },
+          { request: "data" },
+          {
+            toolId: requestField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "app.api.agent.chat.aiStream.post.activeTool.toolId.label",
+              description:
+                "app.api.agent.chat.aiStream.post.activeTool.toolId.description",
+              columns: 6,
+              schema: z.string(),
+            }),
+            requiresConfirmation: requestField({
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.BOOLEAN,
+              label:
+                "app.api.agent.chat.aiStream.post.tools.requiresConfirmation.label",
+              description:
+                "app.api.agent.chat.aiStream.post.tools.requiresConfirmation.description",
+              columns: 6,
+              schema: z.boolean().default(false),
+            }),
+          },
+        ),
+      ),
+      // required array of tools - null/undefined = no tools enabled
+      // Enabled tools are the ones the model sees and is able to execute
+      // They are in the tools array and are part of the context window
       tools: requestDataArrayOptionalField(
         {
           type: WidgetType.CONTAINER,
@@ -509,6 +556,7 @@ const { POST } = createEndpoint({
         role: ChatMessageRole.USER,
         model: ModelId.GPT_5_MINI,
         character: "default",
+        activeTools: null,
         tools: null,
         toolConfirmations: null,
         messageHistory: [],
@@ -529,6 +577,7 @@ const { POST } = createEndpoint({
         role: ChatMessageRole.USER,
         model: ModelId.GPT_5,
         character: "professional",
+        activeTools: null,
         tools: null,
         toolConfirmations: null,
         messageHistory: [],
@@ -549,6 +598,7 @@ const { POST } = createEndpoint({
         role: ChatMessageRole.USER,
         model: ModelId.CLAUDE_SONNET_4_5,
         character: "default",
+        activeTools: null,
         tools: null,
         toolConfirmations: null,
         messageHistory: [],

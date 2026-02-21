@@ -145,6 +145,7 @@ export interface MessageMetadata {
 
   // Compacting metadata (for ASSISTANT messages that contain compacted history)
   isCompacting?: boolean;
+  compactingFailed?: boolean; // Set when compacting stream failed or was interrupted
   compactedMessageCount?: number;
   compactedTokenCount?: number;
   compactedTimeRange?: {

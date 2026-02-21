@@ -25,7 +25,7 @@ const { POST } = createEndpoint({
   path: ["leads", "campaigns", "campaign-starter"],
   title: "app.api.leads.campaigns.campaignStarter.post.title",
   description: "app.api.leads.campaigns.campaignStarter.post.description",
-  category: "app.api.leads.campaigns.category",
+  category: "app.api.leads.category",
   icon: "play",
   tags: ["app.api.leads.campaigns.campaignStarter.tag"],
   allowedRoles: [UserRole.ADMIN],

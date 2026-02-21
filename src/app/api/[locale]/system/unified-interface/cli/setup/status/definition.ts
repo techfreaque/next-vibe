@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   description:
     "app.api.system.unifiedInterface.cli.setup.status.post.description",
   icon: "terminal",
-  category: "app.api.system.unifiedInterface.cli.setup.status.post.title",
+  category: "app.api.system.category",
   tags: ["app.api.system.unifiedInterface.cli.setup.status.post.title"],
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
   aliases: ["status", "setup:status"],

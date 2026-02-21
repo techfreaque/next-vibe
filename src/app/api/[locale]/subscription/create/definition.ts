@@ -36,7 +36,7 @@ const { POST } = createEndpoint({
   title: "app.api.subscription.post.title" as const,
   description: "app.api.subscription.post.description" as const,
   icon: "package-plus" as const,
-  category: "app.api.subscription.category" as const,
+  category: "app.api.payment.category" as const,
   tags: [
     "app.api.subscription.tags.subscription" as const,
     "app.api.subscription.tags.create" as const,

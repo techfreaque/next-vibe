@@ -1,18 +1,7 @@
-import path from "node:path";
-
 import type { NextConfig } from "next";
-import type { Configuration } from "webpack";
 
-import { useTurbopack } from "./src/config/constants";
-
-// Configuration flags
-const useTypedRoutes = true; // Set to true to enable typed routes
-const useNextQueryPortalPackage = false;
-
-// once react native is supported, we can use withExpo
-// const nextConfig: NextConfig = withExpo({
 const nextConfig: NextConfig = {
-  typedRoutes: useTypedRoutes,
+  typedRoutes: true,
   experimental: {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,
@@ -21,121 +10,58 @@ const nextConfig: NextConfig = {
   },
 
   // Conditionally enable Turbopack
-  turbopack: useTurbopack
-    ? {
-        resolveAlias: {
-          "react-native": "react-native-web",
-          "next-vibe": "./src/app/api/[locale]/v1/core",
-          "next-vibe-ui": "./src/packages/next-vibe-ui/web",
-          "@": "./src",
-          "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter":
-            "./src/app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter.stub.ts",
-          "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer":
-            "./src/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer.stub.tsx",
-          "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointPage":
-            "./src/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointPage.stub.tsx",
-        },
-        rules: {
-          "*.native.tsx": {
-            loaders: ["ignore-loader"],
-          },
-          "*.native.ts": {
-            loaders: ["ignore-loader"],
-          },
-          "**/native/**": {
-            loaders: ["ignore-loader"],
-          },
-          // Ignore standalone package source files and routes in API routes
-          // These are CLI tools that use dynamic imports with process.cwd() which Turbopack can't resolve
-          "src/app/api/**/builder/**": {
-            loaders: ["ignore-loader"],
-          },
-          "src/app/api/**/launchpad/**": {
-            loaders: ["ignore-loader"],
-          },
-          "src/app/api/**/release-tool/**": {
-            loaders: ["ignore-loader"],
-          },
-          "src/app/api/**/guard/**": {
-            loaders: ["ignore-loader"],
-          },
-          "src/app/api/**/check/**": {
-            loaders: ["ignore-loader"],
-          },
-          "src/app/api/**/translations/reorganize/**": {
-            loaders: ["ignore-loader"],
-          },
-          "src/app-native/**": {
-            loaders: ["ignore-loader"],
-          },
-        },
-      }
-    : undefined,
+  turbopack: {
+    resolveAlias: {
+      "react-native": "react-native-web",
+      "next-vibe": "./src/app/api/[locale]/v1/core",
+      "next-vibe-ui": "./src/packages/next-vibe-ui/web",
+      "@": "./src",
+      "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter":
+        "./src/app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter.stub.ts",
+      "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer":
+        "./src/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer.stub.tsx",
+      "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointPage":
+        "./src/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointPage.stub.tsx",
+    },
+    rules: {
+      "*.native.tsx": {
+        loaders: ["ignore-loader"],
+      },
+      "*.native.ts": {
+        loaders: ["ignore-loader"],
+      },
+      "**/native/**": {
+        loaders: ["ignore-loader"],
+      },
+      // Ignore standalone package source files and routes in API routes
+      // These are CLI tools that use dynamic imports with process.cwd() which Turbopack can't resolve
+      "src/app/api/**/builder/**": {
+        loaders: ["ignore-loader"],
+      },
+      "src/app/api/**/launchpad/**": {
+        loaders: ["ignore-loader"],
+      },
+      "src/app/api/**/release-tool/**": {
+        loaders: ["ignore-loader"],
+      },
+      "src/app/api/**/guard/**": {
+        loaders: ["ignore-loader"],
+      },
+      "src/app/api/**/check/**": {
+        loaders: ["ignore-loader"],
+      },
+      "src/app/api/**/translations/reorganize/**": {
+        loaders: ["ignore-loader"],
+      },
+      "src/app-native/**": {
+        loaders: ["ignore-loader"],
+      },
+    },
+  },
 
   typescript: {
     ignoreBuildErrors: true,
   },
-
-  // Webpack configuration - only when not using Turbopack
-  webpack: useTurbopack
-    ? undefined
-    : (config: Configuration, { isServer }): Configuration => {
-        if (!isServer) {
-          config.module = config.module ?? {};
-          config.module.rules = config.module.rules ?? [];
-          config.module.rules.push({
-            test: /\.native\.tsx$/,
-            use: "ignore-loader",
-          });
-        }
-
-        // Set up path aliases for the next-vibe package
-        config.resolve = config.resolve ?? {};
-        if (!config.resolve.alias || Array.isArray(config.resolve.alias)) {
-          config.resolve.alias = {};
-        }
-        config.resolve.alias["react-native"] = "react-native-web";
-        const sourcePath = path.resolve(__dirname, "./src");
-        if (!useNextQueryPortalPackage) {
-          // Use absolute paths for better compatibility with Vercel
-          config.resolve.alias["next-vibe"] = path.resolve(
-            sourcePath,
-            "./app/api/[locale]/v1/core",
-          );
-        }
-        // Use absolute paths for better compatibility with Vercel
-        config.resolve.alias["next-vibe-ui"] = path.resolve(
-          sourcePath,
-          "./packages/next-vibe-ui/web",
-        );
-
-        // Use absolute paths for better compatibility with Vercel
-        config.resolve.alias["@"] = sourcePath;
-
-        // Stub out CLI/MCP renderers to prevent bundling ink dependencies
-        if (isServer) {
-          config.resolve.alias[
-            "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter"
-          ] = path.resolve(
-            sourcePath,
-            "./app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter.stub.ts",
-          );
-          config.resolve.alias[
-            "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer"
-          ] = path.resolve(
-            sourcePath,
-            "./app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer.stub.tsx",
-          );
-          config.resolve.alias[
-            "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointPage"
-          ] = path.resolve(
-            sourcePath,
-            "./app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointPage.stub.tsx",
-          );
-        }
-
-        return config;
-      },
 
   // Support for WebSockets and build tools in server components
   serverExternalPackages: [
@@ -192,9 +118,6 @@ const nextConfig: NextConfig = {
   },
 
   distDir: ".next",
-
-  // Enable standalone output for Docker production builds
-  // output: "standalone",
-} as NextConfig;
+};
 
 export default nextConfig;

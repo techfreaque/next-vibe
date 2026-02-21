@@ -40,7 +40,11 @@ export default async function AdminLayout({
 
   return (
     <PageLayout scrollable={true}>
-      <AdminLayoutClient locale={locale} user={userResponse.data}>
+      <AdminLayoutClient
+        locale={locale}
+        user={minimalUser}
+        userData={userResponse.data}
+      >
         {children}
       </AdminLayoutClient>
     </PageLayout>

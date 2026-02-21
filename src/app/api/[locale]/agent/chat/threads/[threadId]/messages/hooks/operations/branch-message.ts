@@ -10,6 +10,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
 import type { DefaultFolderId } from "../../../../../config";
 import type { ChatMessage } from "../../../../../db";
+import type { EnabledTool } from "../../../../../hooks/store";
 import { createAndSendUserMessage } from "./shared";
 
 export interface BranchMessageDeps {
@@ -25,7 +26,7 @@ export interface BranchMessageDeps {
   settings: {
     selectedModel: ModelId;
     selectedCharacter: string;
-    enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
+    enabledTools: EnabledTool[] | null;
     ttsAutoplay: boolean;
     ttsVoice: typeof TtsVoiceValue;
   };

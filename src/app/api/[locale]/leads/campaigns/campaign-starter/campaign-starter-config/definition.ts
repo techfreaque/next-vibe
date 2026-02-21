@@ -41,7 +41,7 @@ const { GET } = createEndpoint({
     "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.title" as const,
   description:
     "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.description" as const,
-  category: "app.api.leads.campaigns.category" as const,
+  category: "app.api.leads.category" as const,
   tags: [
     "app.api.leads.tags.leads" as const,
     "app.api.leads.tags.campaigns" as const,
@@ -255,7 +255,7 @@ const { PUT } = createEndpoint({
     "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.title" as const,
   description:
     "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.description" as const,
-  category: "app.api.leads.campaigns.category" as const,
+  category: "app.api.leads.category" as const,
   tags: [
     "app.api.leads.tags.leads" as const,
     "app.api.leads.tags.campaigns" as const,

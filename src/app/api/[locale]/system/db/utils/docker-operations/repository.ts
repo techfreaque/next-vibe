@@ -34,12 +34,16 @@ const DOCKER_CMD_FLAG_DETACH = "-d";
  * Docker log patterns to hide in development mode
  */
 const HIDDEN_DOCKER_LOG_PATTERNS = [
-  // Match raw Docker output: Container dev-postgres {action}
-  /^\s*Container\s+dev-postgres\s+(Stopping|Stopped|Removing|Removed|Creating|Created|Starting|Started|Running)\s*$/,
+  // Match raw Docker output: Container {name} {action}
+  /^\s*Container\s+[\w-]+\s+(Stopping|Stopped|Removing|Removed|Creating|Created|Starting|Started|Running)\s*$/,
   // Match raw Docker output: Network {any}_default {action}
   /^\s*Network\s+[a-zA-Z0-9_-]+_default\s+(Removing|Removed|Creating|Created)\s*$/,
   // Match raw Docker output: Volume {any} {action}
   /^\s*Volume\s+[a-zA-Z0-9_-]+\s+(Removing|Removed|Creating|Created)\s*$/,
+  // Container name already in use — not a real error, container is already running
+  /already in use by container/,
+  /You have to remove \(or rename\) that container/,
+  /Error response from daemon: Conflict/,
 ];
 
 /**
@@ -66,6 +70,7 @@ export interface DockerOperationsRepository {
     locale: CountryLanguage,
     composeFile?: string,
     timeout?: number,
+    projectName?: string,
   ): Promise<ResponseType<boolean>>;
 
   dockerComposeDown(
@@ -73,6 +78,7 @@ export interface DockerOperationsRepository {
     locale: CountryLanguage,
     composeFile?: string,
     timeout?: number,
+    projectName?: string,
   ): Promise<ResponseType<boolean>>;
 }
 
@@ -138,6 +144,7 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
     locale: CountryLanguage,
     composeFile = "docker-compose-dev.yml",
     timeout = 30000,
+    projectName?: string,
   ): Promise<ResponseType<boolean>> {
     try {
       const startTime = Date.now();
@@ -145,6 +152,10 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
       const commandParts = [];
       commandParts.push("docker");
       commandParts.push("compose");
+      if (projectName) {
+        commandParts.push("--project-name");
+        commandParts.push(projectName);
+      }
       commandParts.push(DOCKER_CMD_FLAG_FILE);
       commandParts.push(composeFile);
       commandParts.push("down");
@@ -184,6 +195,7 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
     locale: CountryLanguage,
     composeFile = "docker-compose-dev.yml",
     timeout = 60000,
+    projectName?: string,
   ): Promise<ResponseType<boolean>> {
     try {
       const startTime = Date.now();
@@ -191,6 +203,10 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
       const commandParts = [];
       commandParts.push("docker");
       commandParts.push("compose");
+      if (projectName) {
+        commandParts.push("--project-name");
+        commandParts.push(projectName);
+      }
       commandParts.push(DOCKER_CMD_FLAG_FILE);
       commandParts.push(composeFile);
       commandParts.push("up");
@@ -333,7 +349,11 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
         }
         resolved = true;
         clearTimeout(timeoutId);
-        const success = code === 0;
+
+        // Container "already in use" is not a real failure — the container is already running
+        const isContainerAlreadyRunning =
+          error.includes("already in use") && error.includes("container name");
+        const success = code === 0 || isContainerAlreadyRunning;
 
         if (!success && error) {
           logger.error(

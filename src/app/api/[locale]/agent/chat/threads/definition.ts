@@ -96,12 +96,17 @@ const { GET } = createEndpoint({
             value: DefaultFolderId.PUBLIC,
             label: "app.api.agent.chat.config.folders.public" as const,
           },
+          {
+            value: DefaultFolderId.CRON,
+            label: "app.chat.common.cronChats" as const,
+          },
         ],
         schema: z
           .enum([
             DefaultFolderId.PRIVATE,
             DefaultFolderId.SHARED,
             DefaultFolderId.PUBLIC,
+            DefaultFolderId.CRON,
           ])
           .describe(
             "Root folder to filter threads (incognito not allowed - local-only)",

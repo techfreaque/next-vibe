@@ -164,6 +164,7 @@ export function TranslationProvider({
     const newLocale = `${countryInfo.language}-${newCountry}`;
     await setCookie(LOCALE_COOKIE_NAME, newLocale);
     await storage.setItem(LOCALE_COOKIE_NAME, newLocale);
+
     router.push(`/${newLocale}${pathname.replace(`/${currentLocale}`, "")}`);
   };
 

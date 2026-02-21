@@ -151,17 +151,17 @@ vibe create-user --email=john@example.com --output=json
 CLI authentication flow:
 
 1. Check `.vibe.session` file (from login/signup)
-2. If no session, check `VIBE_CLI_USER_EMAIL` env var and authenticate from DB
-3. If `VIBE_CLI_USER_EMAIL` is empty, create public user with new lead
+2. If no session, check `VIBE_ADMIN_USER_EMAIL` env var and authenticate from DB
+3. If `VIBE_ADMIN_USER_EMAIL` is empty, create public user with new lead
 4. If email is set but user not found in DB, return error
 
 ```bash
 # Use authenticated user from DB
-export VIBE_CLI_USER_EMAIL=admin@example.com
+export VIBE_ADMIN_USER_EMAIL=admin@example.com
 vibe create-user --email=john@example.com
 
 # Use public user (no env var set)
-unset VIBE_CLI_USER_EMAIL
+unset VIBE_ADMIN_USER_EMAIL
 vibe create-user --email=john@example.com
 ```
 
@@ -333,7 +333,7 @@ npx vibe <command>
 
 - Check CLI user's role in database
 - Verify endpoint's allowedRoles
-- Use correct VIBE_CLI_USER_EMAIL
+- Use correct VIBE_ADMIN_USER_EMAIL
 
 **"Invalid arguments"**
 

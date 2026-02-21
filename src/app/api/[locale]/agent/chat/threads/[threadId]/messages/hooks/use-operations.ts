@@ -15,6 +15,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { UseAIStreamReturn } from "../../../../../ai-stream/hooks/use-ai-stream";
 import { DefaultFolderId } from "../../../../config";
 import type { ChatMessage } from "../../../../db";
+import type { EnabledTool } from "../../../../hooks/store";
 import { answerAsAI as answerAsAIOp } from "./operations/answer-as-ai";
 import { branchMessage as branchMessageOp } from "./operations/branch-message";
 import { retryMessage as retryMessageOp } from "./operations/retry-message";
@@ -97,7 +98,7 @@ interface MessageOperationsDeps {
   settings: {
     selectedModel: ModelId;
     selectedCharacter: string;
-    enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
+    enabledTools: EnabledTool[] | null;
     ttsAutoplay: boolean;
     ttsVoice: typeof TtsVoiceValue;
   };

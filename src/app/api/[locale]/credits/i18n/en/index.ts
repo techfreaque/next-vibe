@@ -3,6 +3,7 @@
  */
 
 export const translations = {
+  category: "Credits",
   repository: {
     tts: "Text-to-Speech",
     stt: "Speech-to-Text",

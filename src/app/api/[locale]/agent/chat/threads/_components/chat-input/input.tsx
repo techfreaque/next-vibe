@@ -11,6 +11,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { Mic, Phone, Send, Square } from "next-vibe-ui/ui/icons";
 import { Kbd } from "next-vibe-ui/ui/kbd";
+import { Span } from "next-vibe-ui/ui/span";
 import { Textarea } from "next-vibe-ui/ui/textarea";
 import {
   Tooltip,
@@ -37,7 +38,6 @@ import { CallModeIndicator } from "./call-mode-indicator";
 import { FileUploadButton } from "./file-upload-button";
 import { useVoiceRecording } from "./hooks/use-voice-recording";
 import { RecordingInputArea } from "./recording-input-area";
-import { SearchToggle } from "./search-toggle";
 import { Selector } from "./selector";
 import { ToolsButton } from "./tools-button";
 
@@ -178,18 +178,34 @@ export function ChatInput({
             title={canPost ? undefined : noPermissionReason}
           />
 
-          {/* Hint text */}
+          {/* Hint overlay */}
           {!input && canPost && (
-            <Div className="absolute pl-3 top-2 left-0 pointer-events-none text-sm text-muted-foreground hidden @sm:block">
-              {t("app.chat.input.keyboardShortcuts.press")}{" "}
-              <Kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
-                {t("app.chat.input.keyboardShortcuts.enter")}
-              </Kbd>{" "}
-              {t("app.chat.input.keyboardShortcuts.toSend")},{" "}
-              <Kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
-                {t("app.chat.input.keyboardShortcuts.shiftEnter")}
-              </Kbd>{" "}
-              {t("app.chat.input.keyboardShortcuts.forNewLine")}
+            <Div className="absolute inset-0 pl-3 pr-3 pointer-events-none hidden @sm:flex flex-col justify-between pb-1">
+              <Div className="text-sm text-muted-foreground/70 pt-2">
+                {t("app.chat.input.placeholder")}
+              </Div>
+              <Div className="flex items-center gap-2 text-[11px] text-muted-foreground/40">
+                <Span>
+                  <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
+                    {t("app.chat.input.keyboardShortcuts.enter")}
+                  </Kbd>{" "}
+                  {t("app.chat.input.keyboardShortcuts.toSend")}
+                </Span>
+                <Span className="opacity-30">{"/"}</Span>
+                <Span>
+                  <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
+                    {t("app.chat.input.keyboardShortcuts.shiftEnter")}
+                  </Kbd>{" "}
+                  {t("app.chat.input.keyboardShortcuts.forNewLine")}
+                </Span>
+                <Span className="opacity-30">{"/"}</Span>
+                <Span>
+                  <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
+                    {t("app.chat.input.keyboardShortcuts.ctrlV")}
+                  </Kbd>{" "}
+                  {t("app.chat.input.keyboardShortcuts.orPasteFiles")}
+                </Span>
+              </Div>
             </Div>
           )}
 
@@ -216,10 +232,7 @@ export function ChatInput({
           />
 
           {modelSupportsTools && (
-            <>
-              <SearchToggle disabled={isLoading} locale={locale} />
-              <ToolsButton disabled={isLoading} locale={locale} />
-            </>
+            <ToolsButton disabled={isLoading} locale={locale} />
           )}
 
           <FileUploadButton

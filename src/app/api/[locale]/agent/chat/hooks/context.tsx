@@ -7,7 +7,7 @@
  */
 
 import type { JSX, ReactNode } from "react";
-import React, { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useMemo } from "react";
 
 import {
   useChat,
@@ -58,6 +58,10 @@ interface ChatProviderProps {
   rootFolderPermissions: RootFolderPermissions;
   /** Which AI provider keys are configured (computed server-side) */
   envAvailability: AgentEnvAvailability;
+  /** Default active tool count (core 8, computed once at boot, server-side) */
+  defaultToolCount: number;
+  /** Total available tool count for this user's role (computed once at boot, server-side) */
+  totalToolCount: number;
 }
 
 /**
@@ -75,6 +79,8 @@ export function ChatProvider({
   initialCredits,
   rootFolderPermissions,
   envAvailability,
+  defaultToolCount,
+  totalToolCount,
 }: ChatProviderProps): JSX.Element {
   // Create logger once - memoize to prevent infinite re-renders
   // The timestamp is only used for logging context, not for identity
@@ -94,6 +100,8 @@ export function ChatProvider({
     initialCredits,
     rootFolderPermissions,
     envAvailability,
+    defaultToolCount,
+    totalToolCount,
   );
 
   return <ChatContext.Provider value={chat}>{children}</ChatContext.Provider>;

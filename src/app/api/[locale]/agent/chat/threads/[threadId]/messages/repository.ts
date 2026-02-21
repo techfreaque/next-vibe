@@ -212,6 +212,28 @@ export async function createUserMessage(params: {
   });
 }
 
+/**
+ * Re-parent a user message to a new parent (used after compacting inserts itself before the user message).
+ * Updates both parentId and depth in the DB.
+ */
+export async function reparentUserMessage(params: {
+  messageId: string;
+  newParentId: string;
+  newDepth: number;
+  logger: EndpointLogger;
+}): Promise<void> {
+  await db
+    .update(chatMessages)
+    .set({ parentId: params.newParentId, depth: params.newDepth })
+    .where(eq(chatMessages.id, params.messageId));
+
+  params.logger.debug("Re-parented user message after compacting", {
+    messageId: params.messageId,
+    newParentId: params.newParentId,
+    newDepth: params.newDepth,
+  });
+}
+
 export async function createAiMessagePlaceholder(params: {
   messageId: string;
   threadId: string;

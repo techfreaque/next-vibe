@@ -128,9 +128,19 @@ export const translations = {
       label: "Enable Web Search",
       description: "Allow AI to search the web for current information",
     },
+    activeTool: {
+      label: "Active Tools",
+      description:
+        "Tools the model is allowed to execute. Null means all tools are allowed.",
+      toolId: {
+        label: "Tool ID",
+        description: "Unique identifier for the AI tool",
+      },
+    },
     tools: {
-      label: "AI Tools",
-      description: "List of AI tool IDs to enable for this conversation",
+      label: "Visible Tools",
+      description:
+        "Tools loaded into the AI context window. The model can see and directly call these.",
       toolId: {
         label: "Tool ID",
         description: "Unique identifier for the AI tool",
@@ -283,6 +293,8 @@ export const translations = {
   errors: {
     toolExecutionError: "A tool failed to execute properly. Please try again.",
     toolExecutionFailed: "Tool execution failed. Please try again.",
+    toolDisabledByUser:
+      "This tool has been disabled by the user. Do not attempt to call it again.",
     userDeclinedTool: "Tool execution was cancelled.",
     streamError: "The AI response failed to complete. Please try again.",
     streamProcessingError:

@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   path: ["system", "generators", "endpoints"],
   title: "app.api.system.dev.category",
   description: "app.api.system.dev.typecheck.description",
-  category: "app.api.system.dev.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.dev.category"],
   icon: "sparkles",
 

@@ -18,6 +18,10 @@ import type { JSX } from "react";
 import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
 import { ChatInterface } from "@/app/api/[locale]/agent/chat/_components/chat-interface";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  getDefaultActiveToolCount,
+  getTotalToolCount,
+} from "@/app/api/[locale]/agent/chat/default-tool-counts";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { FolderRepository } from "@/app/api/[locale]/agent/chat/folders/[id]/repository";
 import { RootFolderPermissionsRepository } from "@/app/api/[locale]/agent/chat/folders/root-permissions/repository";
@@ -158,6 +162,8 @@ export default async function ThreadsPathPage({
   }
 
   const envAvailability = getAgentEnvAvailability();
+  const defaultToolCount = getDefaultActiveToolCount();
+  const totalToolCount = getTotalToolCount(user);
 
   return (
     <EnvAvailabilityProvider availability={envAvailability}>
@@ -170,6 +176,8 @@ export default async function ThreadsPathPage({
         initialCredits={creditsToUse}
         rootFolderPermissions={rootFolderPermissions}
         envAvailability={envAvailability}
+        defaultToolCount={defaultToolCount}
+        totalToolCount={totalToolCount}
       >
         <ChatInterface user={user} />
       </ChatProvider>

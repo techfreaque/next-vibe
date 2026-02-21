@@ -47,7 +47,7 @@ const { POST } = createEndpoint({
   title: "app.api.users.create.post.title" as const,
   description: "app.api.users.create.post.description" as const,
   icon: "user-plus",
-  category: "app.api.users.category" as const,
+  category: "app.api.user.category" as const,
   tags: [
     "app.api.users.tags.create" as const,
     "app.api.users.tags.admin" as const,

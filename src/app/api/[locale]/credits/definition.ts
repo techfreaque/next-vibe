@@ -29,7 +29,7 @@ const { GET } = createEndpoint({
   path: ["credits"],
   title: "app.api.agent.chat.credits.get.title",
   description: "app.api.agent.chat.credits.get.description",
-  category: "app.api.agent.chat.category",
+  category: "app.api.payment.category",
   tags: ["app.api.agent.chat.tags.credits", "app.api.agent.chat.tags.balance"],
   icon: "coins",
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,

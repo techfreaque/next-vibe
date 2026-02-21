@@ -13,8 +13,9 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { z } from "zod";
+import { z } from "zod";
 
+import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import { users } from "@/app/api/[locale]/user/db";
 
 import {
@@ -22,6 +23,7 @@ import {
   CronTaskStatusDB,
   TaskOutputModeDB,
 } from "../enum";
+import type { JsonValue, NotificationTarget } from "../unified-runner/types";
 
 /**
  * Cron Tasks Table
@@ -32,7 +34,7 @@ export const cronTasks = pgTable("cron_tasks", {
   /**
    * routeId — which handler to call (was: name)
    * Accepts: task name (e.g. "lead-email-campaigns"), endpoint alias (e.g. "cron:stats"),
-   * full endpoint path, or "cron-steps" for dynamic step tasks.
+   * or full endpoint path.
    */
   routeId: text("route_id").notNull(),
   /** Human-readable label — separate from routeId for display */
@@ -48,18 +50,28 @@ export const cronTasks = pgTable("cron_tasks", {
   retries: integer("retries").default(3),
   retryDelay: integer("retry_delay").default(30000), // 30 seconds default
   /**
-   * defaultConfig — validated by the resolved route's/task's configSchema
-   * For "cron-steps" tasks: { steps: CronStep[] }
-   * For system tasks: whatever the task's configSchema defines
+   * taskInput — the input the task executes with (body + URL path params merged flat).
+   * Can be overridden per DB instance. splitTaskArgs() splits by schema at execution time.
    */
-  defaultConfig: jsonb("default_config").notNull().default({}),
+  taskInput: jsonb("task_input")
+    .$type<Record<string, JsonValue>>()
+    .notNull()
+    .default({}),
+  /**
+   * runOnce — when true, the task disables itself after the first execution
+   * (success or failure). Re-enable by setting enabled=true again.
+   */
+  runOnce: boolean("run_once").notNull().default(false),
 
   /** Output mode after execution */
   outputMode: text("output_mode", { enum: TaskOutputModeDB })
     .notNull()
     .default(TaskOutputModeDB[0]),
   /** Notification targets (email/sms/webhook) for non-store-only modes */
-  notificationTargets: jsonb("notification_targets").notNull().default([]),
+  notificationTargets: jsonb("notification_targets")
+    .$type<NotificationTarget[]>()
+    .notNull()
+    .default([]),
 
   // Execution tracking
   lastExecutedAt: timestamp("last_executed_at"),
@@ -77,7 +89,7 @@ export const cronTasks = pgTable("cron_tasks", {
   averageExecutionTime: integer("average_execution_time").default(0),
 
   // Metadata
-  tags: jsonb("tags").notNull().default([]),
+  tags: jsonb("tags").$type<string[]>().notNull().default([]),
 
   // Ownership - null means system task (admin-seeded), otherwise user who created it
   userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
@@ -109,16 +121,8 @@ export const cronTaskExecutions = pgTable("cron_task_executions", {
 
   // Configuration and results
   config: jsonb("config").notNull(),
-  result: jsonb("result"),
-  error: jsonb("error"),
-  errorStack: text("error_stack"),
-
-  // Steps execution results (for cron-steps tasks)
-  stepResults: jsonb("step_results"),
-  /** Thread created/used by an ai_agent step */
-  threadId: uuid("thread_id"),
-  /** Total token count across all ai_agent steps */
-  tokenCount: integer("token_count"),
+  result: jsonb("result").$type<Record<string, string | number | boolean>>(),
+  error: jsonb("error").$type<ErrorResponseType>(),
 
   // Execution context
   isManual: boolean("is_manual").notNull().default(false),
@@ -136,8 +140,33 @@ export const cronTaskExecutions = pgTable("cron_task_executions", {
 /**
  * Zod schemas for validation
  */
-export const insertCronTaskSchema = createInsertSchema(cronTasks);
-export const selectCronTaskSchema = createSelectSchema(cronTasks);
+const jsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
+  z.union([
+    z.string(),
+    z.number(),
+    z.boolean(),
+    z.null(),
+    z.array(jsonValueSchema),
+    z.record(z.string(), jsonValueSchema),
+  ]),
+);
+
+export const taskInputSchema = z.record(z.string(), jsonValueSchema);
+const notificationTargetsSchema = z.array(
+  z.object({ type: z.enum(["email", "sms", "webhook"]), target: z.string() }),
+);
+const tagsSchema = z.array(z.string());
+
+export const insertCronTaskSchema = createInsertSchema(cronTasks, {
+  taskInput: taskInputSchema.optional(),
+  notificationTargets: notificationTargetsSchema.optional(),
+  tags: tagsSchema.optional(),
+});
+export const selectCronTaskSchema = createSelectSchema(cronTasks, {
+  taskInput: taskInputSchema,
+  notificationTargets: notificationTargetsSchema,
+  tags: tagsSchema,
+});
 
 export const insertCronTaskExecutionSchema =
   createInsertSchema(cronTaskExecutions);

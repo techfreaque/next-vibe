@@ -38,6 +38,7 @@ import {
   TaskCategoryOptions,
   TaskOutputModeDB,
 } from "../../enum";
+import { taskInputSchema } from "../db";
 import { CronTasksContainer } from "./widget";
 
 /** Reusable task response shape — keep in sync with CronTaskResponse in repository.ts */
@@ -55,7 +56,8 @@ export const cronTaskResponseSchema = z.object({
   timeout: z.number().nullable(),
   retries: z.number().nullable(),
   retryDelay: z.number().nullable(),
-  defaultConfig: z.record(z.string(), z.unknown()).optional().default({}),
+  taskInput: taskInputSchema.optional().default({}),
+  runOnce: z.boolean(),
   outputMode: z.enum(TaskOutputModeDB),
   notificationTargets: z
     .array(
@@ -91,7 +93,7 @@ const { GET } = createEndpoint({
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.description",
   icon: "clock",
-  category: "app.api.system.unifiedInterface.tasks.category",
+  category: "app.api.system.category",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
@@ -452,7 +454,7 @@ const { POST } = createEndpoint({
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.description",
   icon: "clock",
-  category: "app.api.system.unifiedInterface.tasks.category",
+  category: "app.api.system.category",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
@@ -593,15 +595,25 @@ const { POST } = createEndpoint({
         columns: 4,
         schema: z.coerce.number().default(5000),
       }),
-      defaultConfig: requestField({
+      taskInput: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.defaultConfig.label",
+          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.taskInput.label",
         description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.defaultConfig.description",
+          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.taskInput.description",
         columns: 12,
-        schema: z.unknown().optional(),
+        schema: taskInputSchema.optional(),
+      }),
+      runOnce: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label:
+          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.runOnce.label",
+        description:
+          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.runOnce.description",
+        columns: 6,
+        schema: z.boolean().default(false),
       }),
 
       // Response - return the created task
@@ -679,7 +691,7 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        routeId: "cron-steps",
+        routeId: "newsletter_unsubscribe_GET",
         displayName: "Daily Cleanup Task",
         description: "Cleans up old data",
         schedule: "0 0 * * *",
@@ -690,14 +702,14 @@ const { POST } = createEndpoint({
         timeout: 300000,
         retries: 3,
         retryDelay: 5000,
-        defaultConfig: { steps: [] },
+        taskInput: {},
       },
     },
     responses: {
       default: {
         task: {
           id: "task-123",
-          routeId: "cron-steps",
+          routeId: "newsletter_unsubscribe_GET",
           displayName: "Daily Cleanup Task",
           description: "Cleans up old data",
           version: "1.0.0",
@@ -709,7 +721,8 @@ const { POST } = createEndpoint({
           timeout: 300000,
           retries: 3,
           retryDelay: 5000,
-          defaultConfig: {},
+          taskInput: {},
+          runOnce: false,
           outputMode: TaskOutputModeDB[0],
           notificationTargets: [],
           lastExecutedAt: null,

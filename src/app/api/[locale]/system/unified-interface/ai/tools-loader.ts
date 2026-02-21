@@ -248,12 +248,12 @@ export async function loadTools(params: {
   tools: Record<string, CoreTool> | undefined;
   systemPrompt: string;
 }> {
+  // Empty array = explicitly no tools
   if (
-    params.requestedTools === null ||
-    params.requestedTools === undefined ||
+    Array.isArray(params.requestedTools) &&
     params.requestedTools.length === 0
   ) {
-    params.logger.debug("No tools requested, skipping tool loading");
+    params.logger.debug("Empty tools array, skipping tool loading");
     return { tools: undefined, systemPrompt: params.systemPrompt };
   }
 
@@ -264,24 +264,35 @@ export async function loadTools(params: {
       params.user,
     );
 
-    // Filter by requested toolNames (full path with underscores or alias)
-    params.logger.debug("[Tools Loader] === FILTERING TOOLS ===", {
-      requestedTools: params.requestedTools,
-      allEndpointsCount: allEndpoints.length,
-    });
+    // null/undefined = load ALL tools for user (agent mode / all-tools-enabled)
+    // string[] = load only specified tools
+    let enabledEndpoints: CreateApiEndpointAny[];
 
-    const enabledEndpoints = allEndpoints.filter((e) => {
-      const fullPath = endpointToToolName(e);
-      const matchesByFullPath = params.requestedTools!.includes(fullPath);
-      const matchesByAlias = e.aliases
-        ? e.aliases.some((alias) => params.requestedTools!.includes(alias))
-        : false;
-      const matched = matchesByFullPath || matchesByAlias;
-      return matched;
-    });
+    if (params.requestedTools === null || params.requestedTools === undefined) {
+      params.logger.debug("[Tools Loader] Loading ALL tools for user", {
+        allEndpointsCount: allEndpoints.length,
+      });
+      enabledEndpoints = allEndpoints;
+    } else {
+      // Filter by requested toolNames (full path with underscores or alias)
+      params.logger.debug("[Tools Loader] === FILTERING TOOLS ===", {
+        requestedTools: params.requestedTools,
+        allEndpointsCount: allEndpoints.length,
+      });
 
-    params.logger.debug("Loaded tools by toolNames", {
-      requestedCount: params.requestedTools.length,
+      enabledEndpoints = allEndpoints.filter((e) => {
+        const fullPath = endpointToToolName(e);
+        const matchesByFullPath = params.requestedTools!.includes(fullPath);
+        const matchesByAlias = e.aliases
+          ? e.aliases.some((alias) => params.requestedTools!.includes(alias))
+          : false;
+        const matched = matchesByFullPath || matchesByAlias;
+        return matched;
+      });
+    }
+
+    params.logger.debug("Loaded tools", {
+      requestedCount: params.requestedTools?.length ?? "all",
       loadedCount: enabledEndpoints.length,
       enabledPaths: enabledEndpoints.map((e) => endpointToToolName(e)),
     });

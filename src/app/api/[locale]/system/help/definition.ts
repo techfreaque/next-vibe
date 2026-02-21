@@ -27,7 +27,7 @@ const { POST } = createEndpoint({
   path: ["system", "help"],
   title: "app.api.system.help.post.title",
   description: "app.api.system.help.post.description",
-  category: "app.api.system.help.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.help.tag"],
   icon: "help-circle",
   allowedRoles: [

@@ -110,10 +110,19 @@ export const translations: typeof enTranslations = {
       description:
         "KI erlauben, das Web nach aktuellen Informationen zu durchsuchen",
     },
-    tools: {
-      label: "KI-Tools",
+    activeTool: {
+      label: "Aktive Tools",
       description:
-        "Liste der KI-Tool-IDs, die für diese Konversation aktiviert werden sollen",
+        "Tools, die das Modell ausführen darf. Null bedeutet alle Tools sind erlaubt.",
+      toolId: {
+        label: "Tool-ID",
+        description: "Eindeutige Kennung für das KI-Tool",
+      },
+    },
+    tools: {
+      label: "Sichtbare Tools",
+      description:
+        "Tools, die in das KI-Kontextfenster geladen werden. Das Modell kann diese direkt aufrufen.",
       toolId: {
         label: "Tool-ID",
         description: "Eindeutige Kennung für das KI-Tool",
@@ -289,6 +298,8 @@ export const translations: typeof enTranslations = {
       "Ein Werkzeug konnte nicht korrekt ausgeführt werden. Bitte versuchen Sie es erneut.",
     toolExecutionFailed:
       "Werkzeug-Ausführung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    toolDisabledByUser:
+      "Dieses Werkzeug wurde vom Benutzer deaktiviert. Versuche nicht, es erneut aufzurufen.",
     userDeclinedTool: "Werkzeug-Ausführung wurde abgebrochen.",
     streamError:
       "Die KI-Antwort konnte nicht vollständig verarbeitet werden. Bitte versuchen Sie es erneut.",

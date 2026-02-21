@@ -4,6 +4,7 @@
  * This middleware ensures that every visitor has a leadId cookie set.
  */
 
+import { eq } from "drizzle-orm";
 import type { NextRequest, NextResponse } from "next/server";
 import { NextResponse as NextResponseClass } from "next/server";
 import { Environment } from "next-vibe/shared/utils";
@@ -11,8 +12,11 @@ import { Environment } from "next-vibe/shared/utils";
 import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { LeadAuthRepository } from "../../../leads/auth/repository";
+import { leads } from "../../../leads/db";
+import { db } from "../../db";
 import { createEndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import { shouldSkipPath } from "../utils";
 
@@ -142,4 +146,21 @@ export async function createLeadId(
   });
 
   return response;
+}
+
+/**
+ * Update a lead's language and country from a locale string
+ * Used by middleware to keep lead locale in sync when user changes language
+ * @param leadId - The lead ID to update
+ * @param locale - The new locale (e.g., "en-GLOBAL", "de-DE")
+ */
+export async function updateLeadLocale(
+  leadId: string,
+  locale: CountryLanguage,
+): Promise<void> {
+  const { language, country } = getLanguageAndCountryFromLocale(locale);
+  await db
+    .update(leads)
+    .set({ language, country, updatedAt: new Date() })
+    .where(eq(leads.id, leadId));
 }

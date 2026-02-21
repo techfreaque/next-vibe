@@ -22,6 +22,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage } from "../../../chat/db";
+import { reparentUserMessage } from "../../../chat/threads/[threadId]/messages/repository";
 import type { StreamContext } from "../core/stream-context";
 import { MessageConverter } from "./message-converter";
 
@@ -86,7 +87,6 @@ export class CompactingHandler {
         success: true;
         compactedSummary: string;
         compactingMessageId: string;
-        newParentId: string;
         newDepth: number;
       }
     | {
@@ -164,6 +164,32 @@ export class CompactingHandler {
       createdAt: compactingMessageCreatedAt,
     });
 
+    // Re-parent user message: compacting inserted itself before the user message,
+    // so update the user message's parentId → compactingMessageId and depth → depth+1.
+    // This fixes both the DB record and the client SSE event so the chain is:
+    //   effectiveParentMessage → compacting → user → AI
+    const { currentUserMessage } = params;
+    if (currentUserMessage && !params.isIncognito) {
+      await reparentUserMessage({
+        messageId: currentUserMessage.id,
+        newParentId: compactingMessageId,
+        newDepth: depth + 1,
+        logger,
+      });
+    }
+    if (currentUserMessage) {
+      ctx.dbWriter.emitUserMessageCreated({
+        messageId: currentUserMessage.id,
+        threadId,
+        content: currentUserMessage.content ?? "",
+        parentId: compactingMessageId,
+        depth: depth + 1,
+        model,
+        character,
+        metadata: currentUserMessage.metadata ?? undefined,
+      });
+    }
+
     let compactedSummary = "";
 
     try {
@@ -225,6 +251,11 @@ export class CompactingHandler {
               : new Error(String(part.error));
           logger.error("[Compacting] Stream error", errorObj);
 
+          await ctx.dbWriter.emitCompactingFailed({
+            messageId: compactingMessageId,
+            errorMessage: errorObj.message,
+          });
+
           ctx.dbWriter.emitError(
             fail({
               message:
@@ -242,6 +273,11 @@ export class CompactingHandler {
         error instanceof Error ? error : new Error(String(error));
       logger.error("[Compacting] Failed to compact history", errorObj);
 
+      await ctx.dbWriter.emitCompactingFailed({
+        messageId: compactingMessageId,
+        errorMessage: errorObj.message,
+      });
+
       ctx.dbWriter.emitError(
         fail({
           message:
@@ -258,7 +294,6 @@ export class CompactingHandler {
       success: true,
       compactedSummary,
       compactingMessageId,
-      newParentId: compactingMessageId,
       newDepth: depth + 1,
     };
   }

@@ -7,7 +7,7 @@ import { translations as userRolesTranslations } from "../../user-roles/i18n/pl"
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  category: "Zarządzanie Użytkownikami",
+  category: "Użytkownicy",
   auth: authTranslations,
   private: privateTranslations,
   public: publicTranslations,

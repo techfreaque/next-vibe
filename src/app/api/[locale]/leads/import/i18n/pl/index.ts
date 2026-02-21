@@ -3,6 +3,7 @@ import { translations as statusTranslations } from "../../status/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Import danych",
   post: {
     title: "Importuj leady",
     description: "Importuj leady z pliku CSV",

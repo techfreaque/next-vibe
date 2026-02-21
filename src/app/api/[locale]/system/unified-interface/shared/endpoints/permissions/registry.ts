@@ -280,23 +280,11 @@ class PermissionsRegistry implements IPermissionsRegistry {
       };
     }
 
-    // In local mode, determine effective roles for this endpoint.
-    // If allowedLocalModeRoles is explicitly set, use it as an override.
-    // Otherwise fall back to allowedRoles but strip UserRole.PUBLIC — except for
-    // login and password-reset endpoints which remain publicly accessible.
+    // In local mode, use explicit roles from definition.
+    // If allowedLocalModeRoles is set, use it as an override; otherwise use allowedRoles as-is.
     if (envClient.NEXT_PUBLIC_LOCAL_MODE) {
-      let localModeRoles: readonly UserRoleValue[];
-
-      if (endpoint.allowedLocalModeRoles !== undefined) {
-        // Explicit override — use as-is (empty array means nobody is allowed)
-        localModeRoles = endpoint.allowedLocalModeRoles;
-      } else {
-        // Fall back to allowedRoles, stripping PUBLIC unless this is a login/reset-password endpoint
-        const isPublicAuthEndpoint = this.isPublicAuthEndpoint(endpoint.path);
-        localModeRoles = isPublicAuthEndpoint
-          ? endpoint.allowedRoles
-          : endpoint.allowedRoles.filter((role) => role !== UserRole.PUBLIC);
-      }
+      const localModeRoles: readonly UserRoleValue[] =
+        endpoint.allowedLocalModeRoles ?? endpoint.allowedRoles;
 
       // Also enforce platform access (CLI_OFF, WEB_OFF, etc.) in local mode
       const platformAccess = this.checkPlatformAccess(localModeRoles, platform);

@@ -23,6 +23,7 @@ export const translations = {
     sharedChats: "Shared Threads",
     publicChats: "Public 1A Threads",
     incognitoChats: "Incognito Threads",
+    cronChats: "Cron Threads",
     search: "Search",
     delete: "Delete",
     cancel: "Cancel",
@@ -105,9 +106,9 @@ export const translations = {
 
   aiTools: {
     modal: {
-      title: "AI Tools Configuration",
+      title: "AI Tools",
       description:
-        "Select which AI tools the assistant can use during conversation. Search is available as a quick toggle and also appears in this list.",
+        "You usually don't need to manage tools. When help is enabled, the AI can call any tool on demand. Pin tools here only if you want them always in context.",
       searchPlaceholder: "Search tools...",
       loading: "Loading tools...",
       noToolsFound: "No tools match your search",
@@ -118,9 +119,22 @@ export const translations = {
       deselectAll: "Deselect All",
       enableAll: "Enable All",
       resetToDefault: "Reset to Default",
-      stats: "{{enabled}} of {{total}} tools enabled",
+      stats: "{{enabled}} of {{total}} tools pinned",
       aliases: "Aliases",
       requireConfirmation: "Require confirmation before use",
+      activeLabel: "pinned",
+      enabledLabel: "allowed",
+      totalLabel: "total",
+      activeTooltip:
+        "Pinned tools are always in context — the AI sees them every turn",
+      enabledTooltip:
+        "Allowed tools can be called on demand when help is enabled",
+      legendActive: "Always in context (pinned)",
+      legendConfirm: "Asks before running",
+      activeOn: "Pinned — always in context. Click to unpin",
+      activeOff: "Not pinned — AI can still call on demand. Click to pin",
+      confirmOn: "Asks for confirmation — click to disable",
+      confirmOff: "Runs automatically — click to require confirmation",
     },
   },
 
@@ -283,6 +297,9 @@ export const translations = {
       toSend: "to send",
       shiftEnter: "Shift+Enter",
       forNewLine: "for new line",
+      ctrlV: "Ctrl+V",
+      pasteFilesSeparator: "·",
+      orPasteFiles: "to paste files",
     },
     speechInput: {
       stopRecording: "Stop recording",
@@ -861,6 +878,7 @@ export const translations = {
     publicDescription:
       "Public US First Amendment protected forum for people and AI.",
     incognitoDescription: "Conversations are only stored in your browser.",
+    cronDescription: "Automated conversations created by scheduled cron tasks.",
     accessModal: {
       title: "Account Required",
       privateTitle: "Private Threads",

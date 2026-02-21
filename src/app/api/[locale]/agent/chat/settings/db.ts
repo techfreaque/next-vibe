@@ -42,8 +42,8 @@ export const chatSettings = pgTable("chat_settings", {
   // UI preferences - only store if different from default
   viewMode: jsonb("view_mode").$type<typeof ViewModeValue>(),
 
-  // Tool configuration - only store if different from default
-  enabledTools: jsonb("enabled_tools").$type<EnabledTool[]>(),
+  // Tool configuration - null = all tools enabled (default), array = user customized
+  enabledTools: jsonb("enabled_tools").$type<EnabledTool[] | null>(),
 
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),

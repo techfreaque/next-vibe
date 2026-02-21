@@ -173,8 +173,8 @@ export const Markdown = memo(function Markdown({
         sectionType: "thinking" as const,
         sectionIndex: index,
       };
-      // Determine current state
-      const autoCollapsed = hasContent || hasContentAfter;
+      // Determine current state — must match the formula in isThinkingExpanded exactly
+      const autoCollapsed = !isStreaming && (hasContent || hasContentAfter);
       const currentState = collapseState.isCollapsed(key, autoCollapsed);
       collapseState.toggleCollapse(key, currentState);
     } else {
@@ -464,7 +464,7 @@ export const Markdown = memo(function Markdown({
                 <button
                   onClick={() => toggleThinking(thinkIndex)}
                   className={cn(
-                    "w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-primary",
+                    "w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-primary cursor-pointer",
                     "hover:bg-primary/5 transition-colors rounded-lg",
                   )}
                 >

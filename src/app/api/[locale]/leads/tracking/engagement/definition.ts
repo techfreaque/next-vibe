@@ -78,7 +78,7 @@ const { POST } = createEndpoint({
   path: ["leads", "tracking", "engagement"],
   title: "app.api.leads.tracking.engagement.post.title" as const,
   description: "app.api.leads.tracking.engagement.post.description" as const,
-  category: "app.api.leads.tracking.engagement.category" as const,
+  category: "app.api.leads.category" as const,
   icon: "activity" as const,
   tags: [
     "app.api.leads.tracking.engagement.tags.tracking" as const,
@@ -373,7 +373,7 @@ const { GET } = createEndpoint({
   path: ["leads", "tracking", "engagement"],
   title: "app.api.leads.tracking.engagement.get.title" as const,
   description: "app.api.leads.tracking.engagement.get.description" as const,
-  category: "app.api.leads.tracking.engagement.category" as const,
+  category: "app.api.leads.category" as const,
   icon: "bar-chart" as const,
   tags: [
     "app.api.leads.tracking.engagement.tags.tracking" as const,

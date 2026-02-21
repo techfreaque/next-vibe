@@ -144,15 +144,13 @@ export class ChatSettingsRepository {
                   ? null
                   : undefined,
             enabledTools:
-              data.enabledTools &&
-              JSON.stringify(data.enabledTools) !==
-                JSON.stringify(defaults.enabledTools)
-                ? data.enabledTools
-                : data.enabledTools &&
-                    JSON.stringify(data.enabledTools) ===
-                      JSON.stringify(defaults.enabledTools)
+              data.enabledTools !== undefined
+                ? data.enabledTools === null ||
+                  JSON.stringify(data.enabledTools) ===
+                    JSON.stringify(defaults.enabledTools)
                   ? null
-                  : undefined,
+                  : data.enabledTools
+                : undefined,
           })
           .where(eq(chatSettings.userId, userId))
           .returning();
@@ -191,7 +189,8 @@ export class ChatSettingsRepository {
                 ? data.viewMode
                 : null,
             enabledTools:
-              data.enabledTools &&
+              data.enabledTools !== undefined &&
+              data.enabledTools !== null &&
               JSON.stringify(data.enabledTools) !==
                 JSON.stringify(defaults.enabledTools)
                 ? data.enabledTools

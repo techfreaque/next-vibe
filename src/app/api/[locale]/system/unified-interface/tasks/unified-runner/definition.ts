@@ -32,7 +32,7 @@ const { POST } = createEndpoint({
   description:
     "app.api.system.unifiedInterface.tasks.unifiedRunner.post.description",
   icon: "check-circle",
-  category: "app.api.system.unifiedInterface.tasks.category",
+  category: "app.api.system.category",
   allowedRoles: [UserRole.ADMIN],
   tags: ["app.api.system.unifiedInterface.tasks.unifiedRunner.post.title"],
   cli: {

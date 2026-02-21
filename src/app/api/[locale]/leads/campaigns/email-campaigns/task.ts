@@ -14,15 +14,18 @@ import {
   CronTaskPriority,
   TaskCategory,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import {
+  createCronTask,
+  type Task,
+} from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import { env } from "@/config/env";
 
 import { getSchedule } from "./config";
+import definitions from "./definition";
+import { tools } from "./route";
 
-const emailCampaignsTask: Task = {
-  type: "cron",
+const emailCampaignsTask = createCronTask(definitions.POST, tools.POST, {
   name: "lead-email-campaigns",
-  routeId: "leads_campaigns_email-campaigns_POST",
   description: "app.api.leads.campaigns.emailCampaigns.task.description",
   schedule:
     env.NODE_ENV === Environment.PRODUCTION
@@ -32,8 +35,8 @@ const emailCampaignsTask: Task = {
   enabled: true,
   priority: CronTaskPriority.HIGH,
   timeout: TASK_TIMEOUTS.EXTENDED,
-  defaultConfig: { batchSize: 100, maxEmailsPerRun: 500, dryRun: false },
-};
+  defaultInput: { batchSize: 100, maxEmailsPerRun: 500, dryRun: false },
+});
 
 export const tasks: Task[] = [emailCampaignsTask];
 

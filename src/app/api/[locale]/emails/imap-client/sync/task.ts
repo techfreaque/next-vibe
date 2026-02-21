@@ -12,25 +12,28 @@ import {
   CronTaskPriority,
   TaskCategory,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import {
+  createCronTask,
+  type Task,
+} from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 
-const imapSyncTask: Task = {
-  type: "cron",
+import definitions from "./definition";
+import { tools } from "./route";
+
+const imapSyncTask = createCronTask(definitions.POST, tools.POST, {
   name: "imap-sync",
-  routeId: "emails_imap-client_sync_POST",
   description: "app.api.system.unifiedInterface.tasks.imapSync.description",
   schedule: CRON_SCHEDULES.EVERY_15_MINUTES,
   category: TaskCategory.SYSTEM,
   enabled: false,
   priority: CronTaskPriority.MEDIUM,
   timeout: TASK_TIMEOUTS.EXTENDED,
-  defaultConfig: {
-    maxAccountsPerRun: 10,
-    enableFolderSync: true,
-    enableMessageSync: true,
+  defaultInput: {
+    force: false,
     dryRun: false,
+    maxMessages: 100,
   },
-};
+});
 
 export const tasks: Task[] = [imapSyncTask];
 

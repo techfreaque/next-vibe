@@ -102,7 +102,7 @@ const { POST } = createEndpoint({
   path: ["system", "release-tool"],
   title: "app.api.system.releaseTool.title",
   description: "app.api.system.releaseTool.description",
-  category: "app.api.system.releaseTool.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.releaseTool.tags.release"],
   icon: "rocket",
   allowedRoles: [

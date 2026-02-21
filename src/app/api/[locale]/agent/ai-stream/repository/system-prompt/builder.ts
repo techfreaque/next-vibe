@@ -43,6 +43,8 @@ export async function buildSystemPrompt(params: {
   rootFolderId: DefaultFolderId;
   subFolderId: string | null;
   callMode: boolean | null | undefined;
+  extraInstructions?: string;
+  headless?: boolean;
 }): Promise<string> {
   const {
     characterId,
@@ -53,6 +55,8 @@ export async function buildSystemPrompt(params: {
     rootFolderId,
     subFolderId,
     callMode,
+    extraInstructions,
+    headless,
   } = params;
   const userId = user.id;
 
@@ -67,8 +71,8 @@ export async function buildSystemPrompt(params: {
   let characterPrompt = "";
   let memorySummary = "";
 
-  // Load user memories for persistent context (only for authenticated users)
-  if (userId) {
+  // Load user memories for persistent context (only for authenticated users, not in headless)
+  if (userId && !headless) {
     try {
       memorySummary = await generateMemorySummary({
         userId,
@@ -133,6 +137,9 @@ export async function buildSystemPrompt(params: {
     characterPrompt,
     memorySummary,
     callMode: callMode ?? false,
+    extraInstructions: extraInstructions || undefined,
+    headless: headless ?? false,
+    isPublicUser: user.isPublic,
   });
 
   return systemPrompt;

@@ -236,43 +236,6 @@ export const TaskOutputModeDB = [
 ] as const;
 
 /**
- * Cron Step Type
- * Supported step types for cron-steps tasks
- */
-export const {
-  enum: CronStepType,
-  options: CronStepTypeOptions,
-  Value: CronStepTypeValue,
-} = createEnumOptions({
-  CALL: "app.api.system.unifiedInterface.tasks.step.call" as const,
-  AI_AGENT: "app.api.system.unifiedInterface.tasks.step.aiAgent" as const,
-});
-export const CronStepTypeDB = [
-  CronStepType.CALL,
-  CronStepType.AI_AGENT,
-] as const;
-
-/**
- * AI Agent Thread Mode
- * How ai_agent steps manage chat threads
- */
-export const {
-  enum: AiAgentThreadMode,
-  options: AiAgentThreadModeOptions,
-  Value: AiAgentThreadModeValue,
-} = createEnumOptions({
-  NONE: "app.api.system.unifiedInterface.tasks.step.threadMode.none" as const,
-  NEW: "app.api.system.unifiedInterface.tasks.step.threadMode.new" as const,
-  APPEND:
-    "app.api.system.unifiedInterface.tasks.step.threadMode.append" as const,
-});
-export const AiAgentThreadModeDB = [
-  AiAgentThreadMode.NONE,
-  AiAgentThreadMode.NEW,
-  AiAgentThreadMode.APPEND,
-] as const;
-
-/**
  * Pulse Execution Status
  * For pulse execution tracking
  */

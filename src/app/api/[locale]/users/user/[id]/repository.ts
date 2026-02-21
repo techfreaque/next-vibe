@@ -146,23 +146,21 @@ export class UserByIdRepository {
         updatedBy: user.id,
       };
 
-      // Handle nested basicInfo structure
-      if (data.basicInfo?.privateName !== undefined) {
-        updateData.privateName = data.basicInfo.privateName;
+      // Handle flat field structure
+      if (data.privateName !== undefined) {
+        updateData.privateName = data.privateName;
       }
-      if (data.basicInfo?.publicName !== undefined) {
-        updateData.publicName = data.basicInfo.publicName;
+      if (data.publicName !== undefined) {
+        updateData.publicName = data.publicName;
       }
-      if (data.basicInfo?.email !== undefined) {
-        updateData.email = data.basicInfo.email;
+      if (data.email !== undefined) {
+        updateData.email = data.email;
       }
-
-      // Handle nested adminSettings structure
-      if (data.adminSettings?.isActive !== undefined) {
-        updateData.isActive = data.adminSettings.isActive;
+      if (data.isActive !== undefined) {
+        updateData.isActive = data.isActive;
       }
-      if (data.adminSettings?.emailVerified !== undefined) {
-        updateData.emailVerified = data.adminSettings.emailVerified;
+      if (data.emailVerified !== undefined) {
+        updateData.emailVerified = data.emailVerified;
       }
 
       // Update user

@@ -1,11 +1,10 @@
 /**
  * User Edit Page Client Component
- * Uses EndpointsPage to render user edit endpoint
+ * Uses EndpointsPage with customWidgetObject for the PUT endpoint
  */
 
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
@@ -25,17 +24,19 @@ export function UserEditPageClient({
   userId,
 }: UserEditPageProps): JSX.Element {
   return (
-    <Div className="w-full min-h-screen">
-      <EndpointsPage
-        endpoint={definitions}
-        locale={locale}
-        user={user}
-        endpointOptions={{
-          read: {
-            urlPathParams: { id: userId },
-          },
-        }}
-      />
-    </Div>
+    <EndpointsPage
+      endpoint={definitions}
+      locale={locale}
+      user={user}
+      endpointOptions={{
+        read: {
+          urlPathParams: { id: userId },
+        },
+        create: {
+          urlPathParams: { id: userId },
+        },
+      }}
+      forceMethod="PUT"
+    />
   );
 }

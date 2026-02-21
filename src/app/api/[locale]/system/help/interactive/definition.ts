@@ -26,7 +26,7 @@ const { POST } = createEndpoint({
   path: ["system", "help", "interactive"],
   title: "app.api.system.help.interactive.post.title",
   description: "app.api.system.help.interactive.post.description",
-  category: "app.api.system.help.interactive.post.category",
+  category: "app.api.system.category",
   tags: [
     "app.api.system.help.interactive.post.tags.system",
     "app.api.system.help.interactive.post.tags.help",

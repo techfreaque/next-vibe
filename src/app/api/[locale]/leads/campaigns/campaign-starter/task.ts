@@ -11,17 +11,20 @@ import {
   TASK_TIMEOUTS,
 } from "@/app/api/[locale]/system/unified-interface/tasks/constants";
 import { TaskCategory } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import {
+  createCronTask,
+  type Task,
+} from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import { env } from "@/config/env";
 
 import { getDefaultCronSettings } from "./campaign-starter-config/default-config";
+import definitions from "./definition";
+import { tools } from "./route";
 
 const cronSettings = getDefaultCronSettings();
 
-const campaignStarterTask: Task = {
-  type: "cron",
+const campaignStarterTask = createCronTask(definitions.POST, tools.POST, {
   name: "lead-campaign-starter",
-  routeId: "leads_campaigns_campaign-starter_POST",
   description: "app.api.leads.campaigns.campaignStarter.task.description",
   schedule:
     env.NODE_ENV === Environment.PRODUCTION
@@ -31,8 +34,8 @@ const campaignStarterTask: Task = {
   enabled: false,
   priority: cronSettings.priority,
   timeout: cronSettings.timeout ?? TASK_TIMEOUTS.MEDIUM,
-  defaultConfig: { dryRun: false },
-};
+  defaultInput: { dryRun: false },
+});
 
 export const tasks: Task[] = [campaignStarterTask];
 

@@ -42,7 +42,7 @@ const { POST } = createEndpoint({
 
   title: "app.api.system.translations.restoreBackup.post.title",
   description: "app.api.system.translations.restoreBackup.post.description",
-  category: "app.api.system.translations.category",
+  category: "app.api.system.category",
   tags: [
     "app.api.system.translations.tags.backup",
     "app.api.system.translations.tags.restore",

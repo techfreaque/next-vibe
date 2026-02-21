@@ -1,5 +1,5 @@
 export const translations = {
-  category: "Machine Access",
+  category: "SSH",
   type: "SSH",
   errors: {
     localModeOnly: {

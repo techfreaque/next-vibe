@@ -44,7 +44,7 @@ const { GET } = createEndpoint({
   path: ["emails", "smtp-client", "list"],
   title: "app.api.emails.smtpClient.list.title",
   description: "app.api.emails.smtpClient.list.description",
-  category: "app.api.emails.smtpClient.category",
+  category: "app.api.emails.category",
   icon: "server",
   tags: ["app.api.emails.smtpClient.tag"],
   allowedRoles: [UserRole.ADMIN],

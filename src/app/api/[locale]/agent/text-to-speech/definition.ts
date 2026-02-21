@@ -39,7 +39,7 @@ const { POST } = createEndpoint({
   title: "app.api.agent.textToSpeech.post.title",
   description: "app.api.agent.textToSpeech.post.description",
   icon: "volume-2",
-  category: "app.api.agent.category",
+  category: "app.api.agent.chat.category",
   tags: [
     "app.api.agent.tags.speech",
     "app.api.agent.tags.tts",

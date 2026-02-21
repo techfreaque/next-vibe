@@ -11,6 +11,7 @@ import { translations as translationsTranslations } from "../../translations/i18
 import { translations as unifiedInterfaceTranslations } from "../../unified-interface/i18n/en";
 
 export const translations = {
+  category: "System",
   builder: builderTranslations,
   check: checkTranslations,
   db: dbTranslations,

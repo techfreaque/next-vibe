@@ -25,7 +25,7 @@ const { POST } = createEndpoint({
   path: ["system", "server", "build"],
   title: "app.api.system.server.build.post.title",
   description: "app.api.system.server.build.post.description",
-  category: "app.api.system.server.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.server.build.tags.build"],
   icon: "package",
   allowedRoles: [

@@ -10,7 +10,7 @@ import {
   backButton,
   customWidgetObject,
   objectField,
-  requestField,
+  requestResponseField,
   requestUrlPathParamsField,
   requestUrlPathParamsResponseField,
   responseArrayField,
@@ -27,7 +27,11 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema } from "../../../shared/types/common.schema";
-import { UserDeleteContainer, UserDetailContainer } from "./widget";
+import {
+  UserDeleteContainer,
+  UserDetailContainer,
+  UserEditContainer,
+} from "./widget";
 
 /**
  * Get User Endpoint Definition
@@ -38,7 +42,7 @@ const { GET } = createEndpoint({
   title: "app.api.users.user.id.id.get.title" as const,
   description: "app.api.users.user.id.id.get.description" as const,
   icon: "user",
-  category: "app.api.users.user.category" as const,
+  category: "app.api.user.category" as const,
   tags: ["app.api.users.user.tag" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
@@ -389,20 +393,16 @@ const { PUT } = createEndpoint({
   title: "app.api.users.user.id.id.put.title" as const,
   description: "app.api.users.user.id.id.put.description" as const,
   icon: "user-check" as const,
-  category: "app.api.users.user.category" as const,
+  category: "app.api.user.category" as const,
   tags: ["app.api.users.user.tag" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.users.user.id.id.put.container.title" as const,
-      description:
-        "app.api.users.user.id.id.put.container.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data&urlPathParams", response: true },
-    {
+  fields: customWidgetObject({
+    render: UserEditContainer,
+    usage: { request: "data&urlPathParams", response: true } as const,
+    children: {
+      backButton: backButton({ usage: { request: "data", response: true } }),
+
       // === URL PARAMS ===
       id: requestUrlPathParamsResponseField({
         type: WidgetType.FORM_FIELD,
@@ -415,141 +415,77 @@ const { PUT } = createEndpoint({
       }),
 
       // === BASIC INFORMATION ===
-      basicInfo: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.users.user.id.id.put.sections.basicInfo.title" as const,
-          description:
-            "app.api.users.user.id.id.put.sections.basicInfo.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { request: "data" },
-        {
-          email: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.EMAIL,
-            label: "app.api.users.user.id.id.put.email.label" as const,
-            description:
-              "app.api.users.user.id.id.put.email.description" as const,
-            placeholder:
-              "app.api.users.user.id.id.put.email.placeholder" as const,
-            columns: 12,
-            schema: z
-              .string()
-              .email("usersErrors.validation.email.invalid")
-              .transform((val) => val.toLowerCase().trim())
-              .optional(),
-          }),
-          privateName: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "app.api.users.user.id.id.put.privateName.label" as const,
-            description:
-              "app.api.users.user.id.id.put.privateName.description" as const,
-            columns: 6,
-            schema: z
-              .string()
-              .min(1, "usersErrors.validation.privateName.required")
-              .max(255, "usersErrors.validation.privateName.tooLong")
-              .transform((val) => val.trim())
-              .optional(),
-          }),
-          publicName: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "app.api.users.user.id.id.put.publicName.label" as const,
-            description:
-              "app.api.users.user.id.id.put.publicName.description" as const,
-            columns: 6,
-            schema: z
-              .string()
-              .min(1, "usersErrors.validation.publicName.required")
-              .max(255, "usersErrors.validation.publicName.tooLong")
-              .transform((val) => val.trim())
-              .optional(),
-          }),
-        },
-      ),
+      email: requestResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label: "app.api.users.user.id.id.put.email.label" as const,
+        description: "app.api.users.user.id.id.put.email.description" as const,
+        placeholder: "app.api.users.user.id.id.put.email.placeholder" as const,
+        columns: 6,
+        schema: z
+          .string()
+          .email("usersErrors.validation.email.invalid")
+          .transform((val) => val.toLowerCase().trim())
+          .optional(),
+      }),
+      privateName: requestResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.users.user.id.id.put.privateName.label" as const,
+        description:
+          "app.api.users.user.id.id.put.privateName.description" as const,
+        columns: 6,
+        schema: z
+          .string()
+          .min(1, "usersErrors.validation.privateName.required")
+          .max(255, "usersErrors.validation.privateName.tooLong")
+          .transform((val) => val.trim())
+          .optional(),
+      }),
+      publicName: requestResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.users.user.id.id.put.publicName.label" as const,
+        description:
+          "app.api.users.user.id.id.put.publicName.description" as const,
+        columns: 6,
+        schema: z
+          .string()
+          .min(1, "usersErrors.validation.publicName.required")
+          .max(255, "usersErrors.validation.publicName.tooLong")
+          .transform((val) => val.trim())
+          .optional(),
+      }),
 
       // === ADMINISTRATIVE SETTINGS ===
-      adminSettings: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.users.user.id.id.put.sections.adminSettings.title" as const,
-          description:
-            "app.api.users.user.id.id.put.sections.adminSettings.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { request: "data" },
-        {
-          emailVerified: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.users.user.id.id.put.emailVerified.label" as const,
-            description:
-              "app.api.users.user.id.id.put.emailVerified.description" as const,
-            columns: 6,
-            schema: z.boolean().optional(),
-          }),
-          isActive: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.users.user.id.id.put.isActive.label" as const,
-            description:
-              "app.api.users.user.id.id.put.isActive.description" as const,
-            columns: 6,
-            schema: z.boolean().optional(),
-          }),
-          leadId: requestField({
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.UUID,
-            label: "app.api.users.user.id.id.put.leadId.label" as const,
-            description:
-              "app.api.users.user.id.id.put.leadId.description" as const,
-            columns: 6,
-            schema: z.uuid().nullable().optional(),
-          }),
-        },
-      ),
+      emailVerified: requestResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.users.user.id.id.put.emailVerified.label" as const,
+        description:
+          "app.api.users.user.id.id.put.emailVerified.description" as const,
+        columns: 6,
+        schema: z.boolean().optional(),
+      }),
+      isActive: requestResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.users.user.id.id.put.isActive.label" as const,
+        description:
+          "app.api.users.user.id.id.put.isActive.description" as const,
+        columns: 6,
+        schema: z.boolean().optional(),
+      }),
+      leadId: requestResponseField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "app.api.users.user.id.id.put.leadId.label" as const,
+        description: "app.api.users.user.id.id.put.leadId.description" as const,
+        columns: 6,
+        schema: z.uuid().nullable().optional(),
+      }),
 
-      // === RESPONSE FIELDS (same as GET) ===
-      leadId: responseField({
-        type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.id.put.response.leadId.content" as const,
-        schema: z.uuid().nullable(),
-      }),
-      email: responseField({
-        type: WidgetType.TEXT,
-        content: "app.api.users.user.id.id.put.response.email.content" as const,
-        schema: z.email(),
-      }),
-      privateName: responseField({
-        type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.id.put.response.privateName.content" as const,
-        schema: z.string(),
-      }),
-      publicName: responseField({
-        type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.id.put.response.publicName.content" as const,
-        schema: z.string(),
-      }),
-      emailVerified: responseField({
-        type: WidgetType.BADGE,
-        text: "app.api.users.user.id.id.put.response.emailVerified.content" as const,
-        schema: z.boolean(),
-      }),
-      isActive: responseField({
-        type: WidgetType.BADGE,
-        text: "app.api.users.user.id.id.put.response.isActive.content" as const,
-        schema: z.boolean(),
-      }),
+      // === RESPONSE-ONLY FIELDS ===
       stripeCustomerId: responseField({
         type: WidgetType.TEXT,
         content:
@@ -594,7 +530,7 @@ const { PUT } = createEndpoint({
         schema: dateSchema,
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
@@ -653,13 +589,9 @@ const { PUT } = createEndpoint({
     },
     requests: {
       default: {
-        basicInfo: {
-          privateName: "John Doe",
-          publicName: "John D.",
-        },
-        adminSettings: {
-          isActive: true,
-        },
+        privateName: "John Doe",
+        publicName: "John D.",
+        isActive: true,
       },
     },
     responses: {
@@ -698,7 +630,7 @@ const { DELETE } = createEndpoint({
   title: "app.api.users.user.id.id.delete.title" as const,
   description: "app.api.users.user.id.id.delete.description" as const,
   icon: "user-x" as const,
-  category: "app.api.users.user.category" as const,
+  category: "app.api.user.category" as const,
   tags: ["app.api.users.user.tag" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 

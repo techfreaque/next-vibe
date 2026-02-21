@@ -10,7 +10,7 @@ import { translations as statsTranslations } from "../../stats/i18n/en";
 import { translations as trackingTranslations } from "../../tracking/i18n/en";
 
 export const translations = {
-  category: "Lead Management",
+  category: "Leads",
   tags: {
     leads: "Leads",
     batch: "Batch",

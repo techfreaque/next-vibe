@@ -12,20 +12,24 @@ import {
   CronTaskPriority,
   TaskCategory,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import {
+  createCronTask,
+  type Task,
+} from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 
-const csvProcessorTask: Task = {
-  type: "cron",
+import definitions from "./process/definition";
+import { tools } from "./process/route";
+
+const csvProcessorTask = createCronTask(definitions.POST, tools.POST, {
   name: "csv-processor",
-  routeId: "leads_import_process_POST",
   description: "app.api.system.unifiedInterface.tasks.csvProcessor.description",
   schedule: CRON_SCHEDULES.EVERY_MINUTE,
   category: TaskCategory.MAINTENANCE,
   enabled: false,
   priority: CronTaskPriority.MEDIUM,
   timeout: TASK_TIMEOUTS.LONG,
-  defaultConfig: { maxJobsPerRun: 5, maxRetriesPerJob: 3, dryRun: false },
-};
+  defaultInput: { maxJobsPerRun: 5, maxRetriesPerJob: 3, dryRun: false },
+});
 
 export const tasks: Task[] = [csvProcessorTask];
 

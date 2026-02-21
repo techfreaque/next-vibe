@@ -8,35 +8,25 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import type { z } from "zod";
 
+import type {
+  GenericHandlerBase,
+  GenericHandlerReturnType,
+} from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPrivatePayloadType } from "../../../../user/auth/types";
-import type {
-  AiAgentThreadMode,
-  CronStepType,
-  CronTaskPriority,
-  TaskCategory,
-  TaskOutputMode,
-} from "../enum";
+import type { CronTaskPriority, TaskCategory, TaskOutputMode } from "../enum";
 
-/**
- * JSON-serializable scalar value
- */
-export type TaskConfigValue =
+/** JSON-serializable value */
+export type JsonValue =
   | string
   | number
   | boolean
   | null
-  | TaskConfigValue[]
-  | { [key: string]: TaskConfigValue };
-
-/**
- * Task Configuration
- */
-export interface TaskConfig {
-  [key: string]: TaskConfigValue;
-}
+  | JsonValue[]
+  | { [key: string]: JsonValue };
 
 /**
  * Task Result
@@ -53,13 +43,16 @@ export interface TaskResult {
 /**
  * Task Execution Context
  */
-export interface TaskExecutionContext<TConfig = TaskConfig> {
+export interface TaskExecutionContext<TConfig> {
   taskName: string;
   config: TConfig;
   signal: AbortSignal;
   startTime: number;
   logger: EndpointLogger;
-  locale: CountryLanguage;
+  /** Fallback locale for the task runner process (e.g. "en-GLOBAL") */
+  systemLocale: CountryLanguage;
+  /** The locale of the user who owns this task; falls back to systemLocale when no real user */
+  userLocale: CountryLanguage;
   cronUser: JwtPrivatePayloadType;
 }
 
@@ -91,10 +84,7 @@ export interface TaskDocumentation {
 /**
  * Cron Task Definition (advanced module format)
  */
-export interface CronTaskDefinition<
-  TConfig = TaskConfig,
-  TResult = TaskResult,
-> {
+export interface CronTaskDefinition<TConfig, TResult> {
   name: string;
   description: string;
   version?: string;
@@ -116,63 +106,17 @@ export interface CronTaskDefinition<
 /**
  * Task Execution Functions
  */
-export type CronTaskExecuteFunction<
-  TConfig = TaskConfig,
-  TResult = TaskResult,
-> = (context: TaskExecutionContext<TConfig>) => Promise<ResponseType<TResult>>;
+export type CronTaskExecuteFunction<TConfig, TResult> = (
+  context: TaskExecutionContext<TConfig>,
+) => Promise<ResponseType<TResult>>;
 
-export type TaskValidateFunction<TConfig = TaskConfig> = (
+export type TaskValidateFunction<TConfig> = (
   config: TConfig,
 ) => Promise<ResponseType<boolean>>;
 
-export type TaskRollbackFunction<TConfig = TaskConfig> = (
+export type TaskRollbackFunction<TConfig> = (
   context: TaskExecutionContext<TConfig>,
 ) => Promise<ResponseType<boolean>>;
-
-// ─── Cron Steps Types ─────────────────────────────────────────────────────────
-
-/** A pre-seeded tool call for ai_agent steps */
-export interface PreSeededToolCall {
-  toolId: string;
-  args: Record<string, TaskConfigValue>;
-  /** Static value or "$step_N_result" template reference */
-  result: TaskConfigValue;
-}
-
-/** A "call" step — invokes a route or task handler by routeId */
-export interface CronCallStep {
-  type: (typeof CronStepType)[keyof typeof CronStepType];
-  /** Endpoint alias, full path, or task name — resolved via resolveRouteId() */
-  routeId: string;
-  args: Record<string, TaskConfigValue>;
-  parallel?: boolean;
-}
-
-/** An "ai_agent" step — runs an AI agent with optional pre-seeded tool calls */
-export interface CronAiAgentStep {
-  type: (typeof CronStepType)[keyof typeof CronStepType];
-  model: string;
-  character: string;
-  prompt: string;
-  preSeededToolCalls?: PreSeededToolCall[];
-  /** Optional whitelist of tool routeIds; defaults to all owner-accessible tools */
-  availableTools?: string[];
-  maxTurns?: number;
-  threadMode: (typeof AiAgentThreadMode)[keyof typeof AiAgentThreadMode];
-  /** For "append" mode — the thread to continue */
-  threadId?: string;
-  /** For "new" mode — folder to place the thread in */
-  folderId?: string;
-  /** After first run, stores threadId and switches to "append" mode */
-  autoAppendAfterFirst?: boolean;
-}
-
-export type CronStep = CronCallStep | CronAiAgentStep;
-
-/** Config for "cron-steps" routeId tasks */
-export interface CronStepsConfig {
-  steps: CronStep[];
-}
 
 /** Notification target for outputMode notifications */
 export interface NotificationTarget {
@@ -180,23 +124,10 @@ export interface NotificationTarget {
   target: string;
 }
 
-/** Result of a single step execution */
-export interface StepResult {
-  stepIndex: number;
-  stepType: string;
-  success: boolean;
-  result?: CronTaskRunResult | null;
-  error?: string;
-  durationMs?: number;
-  threadId?: string;
-  tokenCount?: number;
-}
-
 // ─── Route Resolution ─────────────────────────────────────────────────────────
 
 export type ResolveRouteIdResult =
   | { kind: "endpoint"; path: string }
-  | { kind: "steps" }
   | { kind: "unknown" };
 
 /** Structured result data returned by a cron task run */
@@ -211,32 +142,70 @@ export interface CronTaskRunResult {
     | Array<string | number | boolean | null | Date | CronTaskRunResult>;
 }
 
+// ─── Core Task Types ─────────────────────────────────────────────────────────
+
 /**
- * Cron Task — scheduled task driven by the pulse runner.
- * Pure metadata object: the pulse runner dispatches execution to the route
- * identified by `routeId`, passing `defaultConfig` as the request data.
+ * Cron Task — fully generic, inferred from endpoint definition.
+ * Not used directly — use `createCronTask()` factory instead.
+ *
+ * `taskInput` is a flat merge of all default inputs (body + urlPathParams).
+ * At execution time, `splitTaskArgs()` splits them by schema into
+ * `{ data, urlPathParams }` — no need to track them separately at type level.
  */
-export interface CronTask {
+export interface CronTask<TEndpointDefinition extends CreateApiEndpointAny> {
   type: "cron";
-  /** Unique task identifier — stored in DB and used for scheduling */
   name: string;
-  /** Route to invoke when this task fires. Resolved via resolveRouteId(). */
-  routeId: string;
+  definition: TEndpointDefinition;
+  route: GenericHandlerReturnType<
+    TEndpointDefinition["types"]["RequestOutput"],
+    TEndpointDefinition["types"]["ResponseOutput"],
+    TEndpointDefinition["types"]["UrlVariablesOutput"],
+    TEndpointDefinition["allowedRoles"]
+  >;
   description: string;
   schedule: string;
   category: (typeof TaskCategory)[keyof typeof TaskCategory];
   enabled: boolean;
   priority?: (typeof CronTaskPriority)[keyof typeof CronTaskPriority];
   timeout?: number;
-  /** Output notification mode */
   outputMode?: (typeof TaskOutputMode)[keyof typeof TaskOutputMode];
-  /** Default request data passed to the route handler on each execution */
-  defaultConfig?: TaskConfig;
+  /**
+   * Flat merged default args (body data + urlPathParams combined).
+   * splitTaskArgs() splits these by schema at execution time.
+   */
+  taskInput?: Partial<TEndpointDefinition["types"]["RequestOutput"]> &
+    Partial<TEndpointDefinition["types"]["UrlVariablesOutput"]>;
+  /** When true, task disables itself after first execution (success or failure) */
+  runOnce?: boolean;
+}
+
+/**
+ * Type-erased CronTask for heterogeneous collections (registries, arrays).
+ * Uses GenericHandlerBase so tasks with different endpoint types can coexist.
+ */
+export interface CronTaskAny {
+  type: "cron";
+  name: string;
+  definition: CreateApiEndpointAny;
+  route: GenericHandlerBase;
+  description: string;
+  schedule: string;
+  category: (typeof TaskCategory)[keyof typeof TaskCategory];
+  enabled: boolean;
+  priority?: (typeof CronTaskPriority)[keyof typeof CronTaskPriority];
+  timeout?: number;
+  outputMode?: (typeof TaskOutputMode)[keyof typeof TaskOutputMode];
+  /**
+   * Flat merged default args (body data + urlPathParams combined).
+   * splitTaskArgs() splits these by schema at execution time.
+   */
+  taskInput?: Record<string, JsonValue>;
+  /** When true, task disables itself after first execution (success or failure) */
+  runOnce?: boolean;
 }
 
 /**
  * Task Runner — long-running background process with graceful shutdown support.
- * Used for infrastructure runners (pulse, dev-watcher, db-health) and any persistent background work.
  */
 export interface TaskRunner {
   type: "task-runner";
@@ -248,27 +217,89 @@ export interface TaskRunner {
   run: (props: {
     signal: AbortSignal;
     logger: EndpointLogger;
-    locale: CountryLanguage;
+    /** Fallback locale for the task runner process */
+    systemLocale: CountryLanguage;
+    /** The locale of the user who owns this runner; equals systemLocale for system runners */
+    userLocale: CountryLanguage;
     cronUser: JwtPrivatePayloadType;
   }) => Promise<void> | void;
   onError?: (props: {
     error: Error;
     logger: EndpointLogger;
-    locale: CountryLanguage;
+    systemLocale: CountryLanguage;
+    userLocale: CountryLanguage;
     cronUser: JwtPrivatePayloadType;
   }) => Promise<void> | void;
   onShutdown?: (props: {
     logger: EndpointLogger;
-    locale: CountryLanguage;
+    systemLocale: CountryLanguage;
+    userLocale: CountryLanguage;
     cronUser: JwtPrivatePayloadType;
   }) => Promise<void>;
 }
 
-export type Task = CronTask | TaskRunner;
+/** Union type for heterogeneous task collections */
+export type Task = CronTaskAny | TaskRunner;
+
+// ─── Factory Functions ───────────────────────────────────────────────────────
 
 /**
- * Task Discovery and Registration
+ * Create a type-safe cron task — types are fully inferred from definition + route.
+ * Returns Task (erased) for collection compatibility.
+ *
+ * Usage: `createCronTask(definitions.POST, tools.POST, { name: "...", ... })`
  */
+export function createCronTask<T extends CreateApiEndpointAny>(
+  definition: T,
+  route: GenericHandlerReturnType<
+    T["types"]["RequestOutput"],
+    T["types"]["ResponseOutput"],
+    T["types"]["UrlVariablesOutput"],
+    T["allowedRoles"]
+  >,
+  config: {
+    name: string;
+    description: string;
+    schedule: string;
+    category: (typeof TaskCategory)[keyof typeof TaskCategory];
+    enabled: boolean;
+    priority?: (typeof CronTaskPriority)[keyof typeof CronTaskPriority];
+    timeout?: number;
+    outputMode?: (typeof TaskOutputMode)[keyof typeof TaskOutputMode];
+    /**
+     * Flat merged default args — body fields + URL path params in one object.
+     * Types are fully inferred from the endpoint definition.
+     * splitTaskArgs() splits them by schema at execution time.
+     */
+    taskInput?: Partial<T["types"]["RequestOutput"]> &
+      Partial<T["types"]["UrlVariablesOutput"]>;
+    /** When true, task disables itself after first execution (success or failure) */
+    runOnce?: boolean;
+  },
+): CronTaskAny {
+  return {
+    type: "cron" as const,
+    definition,
+    route: route as GenericHandlerBase,
+    ...config,
+    taskInput: config.taskInput as Record<string, JsonValue> | undefined,
+  };
+}
+
+/**
+ * Create a task runner — long-running background process.
+ *
+ * Usage: `createTaskRunner({ name: "pulse", run: async ({ signal }) => { ... } })`
+ */
+export function createTaskRunner(config: Omit<TaskRunner, "type">): TaskRunner {
+  return {
+    type: "task-runner",
+    ...config,
+  };
+}
+
+// ─── Registry & Discovery ────────────────────────────────────────────────────
+
 export interface TaskModule {
   tasks: Task[];
   default?: Task[];
@@ -281,7 +312,7 @@ export interface TaskFile {
 }
 
 export interface TaskRegistry {
-  cronTasks: CronTask[];
+  cronTasks: CronTaskAny[];
   taskRunners: TaskRunner[];
   allTasks: Task[];
   tasksByCategory: Record<
@@ -291,9 +322,6 @@ export interface TaskRegistry {
   tasksByName: Record<string, Task>;
 }
 
-/**
- * Unified Task Execution Context
- */
 export interface UnifiedTaskExecutionContext {
   taskName: string;
   startTime: Date;
@@ -304,7 +332,7 @@ export interface UnifiedTaskExecutionContext {
 /**
  * Advanced Cron Task Module format
  */
-export interface CronTaskModule<TConfig = TaskConfig, TResult = TaskResult> {
+export interface CronTaskModule<TConfig, TResult> {
   taskDefinition: CronTaskDefinition<TConfig, TResult>;
   execute: CronTaskExecuteFunction<TConfig, TResult>;
   validate?: TaskValidateFunction<TConfig>;

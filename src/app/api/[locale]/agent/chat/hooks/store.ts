@@ -19,6 +19,7 @@ export type { ChatFolder, ChatMessage, ChatThread };
 export interface EnabledTool {
   id: string;
   requiresConfirmation: boolean;
+  active: boolean;
 }
 
 /**
@@ -219,10 +220,26 @@ export const useChatStore = create<ChatState>((set, get) => ({
         }
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { [messageId]: _deleted, ...remainingMessages } = state.messages;
+      // Re-parent children to the deleted message's parent so the
+      // conversation tree stays connected (e.g. deleting a compacting
+      // message keeps the AI response visible).
+      const updatedMessages = { ...state.messages };
+      delete updatedMessages[messageId];
+
+      if (message) {
+        for (const msg of Object.values(updatedMessages)) {
+          if (msg.parentId === messageId) {
+            updatedMessages[msg.id] = {
+              ...msg,
+              parentId: message.parentId,
+              depth: message.depth,
+            };
+          }
+        }
+      }
+
       return {
-        messages: remainingMessages,
+        messages: updatedMessages,
       };
     }),
 

@@ -9,6 +9,7 @@ export const translations = {
   compacting: {
     title: "History Compacted",
     loading: "Compacting history...",
+    failed: "Compacting failed",
   },
   get: {
     title: "List Thread Messages",

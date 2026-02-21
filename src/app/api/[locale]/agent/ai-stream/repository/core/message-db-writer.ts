@@ -13,7 +13,7 @@ import "server-only";
 
 import type { ReadableStreamDefaultController } from "node:stream/web";
 
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
@@ -49,18 +49,24 @@ interface PendingWrite {
 
 export class MessageDbWriter {
   private readonly isIncognito: boolean;
+  private readonly isHeadless: boolean;
   private readonly logger: EndpointLogger;
   private readonly controller: ReadableStreamDefaultController<Uint8Array>;
   private readonly encoder: TextEncoder;
   private readonly pending = new Map<string, PendingWrite>();
+
+  /** Tracks the last assistant message ID written — used by headless callers */
+  lastAssistantMessageId: string | null = null;
 
   constructor(
     isIncognito: boolean,
     logger: EndpointLogger,
     controller: ReadableStreamDefaultController<Uint8Array>,
     encoder: TextEncoder,
+    isHeadless = false,
   ) {
     this.isIncognito = isIncognito;
+    this.isHeadless = isHeadless;
     this.logger = logger;
     this.controller = controller;
     this.encoder = encoder;
@@ -93,6 +99,8 @@ export class MessageDbWriter {
       character,
       sequenceId,
     } = params;
+
+    this.lastAssistantMessageId = messageId;
 
     // Emit MESSAGE_CREATED (always - even incognito needs this for the UI)
     const messageEvent = createStreamEvent.messageCreated({
@@ -291,6 +299,8 @@ export class MessageDbWriter {
       character,
       sequenceId,
     } = params;
+
+    this.lastAssistantMessageId = messageId;
 
     // SSE: MESSAGE_CREATED with empty content
     const messageEvent = createStreamEvent.messageCreated({
@@ -609,6 +619,46 @@ export class MessageDbWriter {
   }
 
   /**
+   * Emit MESSAGE_CREATED (USER role) SSE so the frontend adds the user message
+   * to state with the correct parentId/depth. The DB record already exists
+   * (created in setupAiStream); this only emits the SSE event.
+   * For incognito the user message is also not in DB so nothing extra needed.
+   */
+  emitUserMessageCreated(params: {
+    messageId: string;
+    threadId: string;
+    content: string;
+    parentId: string | null;
+    depth: number;
+    model: ModelId;
+    character: string | null;
+    metadata?: MessageMetadata;
+  }): void {
+    const {
+      messageId,
+      threadId,
+      content,
+      parentId,
+      depth,
+      model,
+      character,
+      metadata,
+    } = params;
+    const event = createStreamEvent.messageCreated({
+      messageId,
+      threadId,
+      role: ChatMessageRole.USER,
+      content,
+      parentId,
+      depth,
+      model,
+      character,
+      metadata,
+    });
+    this.enqueue(event);
+  }
+
+  /**
    * Emit MESSAGE_CREATED SSE for a compacting message and insert to DB.
    */
   async emitCompactingMessageCreated(params: {
@@ -682,6 +732,28 @@ export class MessageDbWriter {
         createdAt,
       });
     }
+  }
+
+  /**
+   * Mark a compacting message as failed in the DB (no SSE — stream is already dead).
+   * Sets metadata.compactingFailed = true and errorMessage so the UI can show a failed state,
+   * and the next send can detect it and retry compacting as a sibling.
+   */
+  async emitCompactingFailed(params: {
+    messageId: string;
+    errorMessage: string;
+  }): Promise<void> {
+    if (this.isIncognito) {
+      return;
+    }
+    const { messageId, errorMessage } = params;
+    await db
+      .update(chatMessages)
+      .set({
+        metadata: sql`metadata || ${JSON.stringify({ isCompacting: true, compactingFailed: true })}::jsonb`,
+        errorMessage,
+      })
+      .where(eq(chatMessages.id, messageId));
   }
 
   /**
@@ -1062,6 +1134,9 @@ export class MessageDbWriter {
       (typeof createStreamEvent)[keyof typeof createStreamEvent]
     >,
   ): void {
+    if (this.isHeadless) {
+      return;
+    }
     try {
       this.controller.enqueue(this.encoder.encode(formatSSEEvent(event)));
     } catch (err) {

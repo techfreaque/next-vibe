@@ -6,10 +6,15 @@ import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import {
+  DEV_SEED_PASSWORD,
+  DEV_SEED_USERS,
+} from "@/app/api/[locale]/user/dev-seed-users";
 import { LoginForm } from "@/app/api/[locale]/user/public/login/_components/login-form";
 import { LoginRepository } from "@/app/api/[locale]/user/public/login/repository";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
@@ -114,6 +119,10 @@ export default async function LoginPage({
     );
   }
 
+  const devSeedPassword =
+    env.NODE_ENV === "development" ? DEV_SEED_PASSWORD : null;
+  const devSeedUsers = env.NODE_ENV === "development" ? DEV_SEED_USERS : null;
+
   return (
     <>
       <Link
@@ -127,6 +136,8 @@ export default async function LoginPage({
         locale={locale}
         callbackUrl={callbackUrl}
         user={verifiedUserResponse.data}
+        devSeedPassword={devSeedPassword}
+        devSeedUsers={devSeedUsers}
       />
     </>
   );

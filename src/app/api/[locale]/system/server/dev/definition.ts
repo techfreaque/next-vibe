@@ -31,7 +31,7 @@ const { POST } = createEndpoint({
   aliases: ["dev", "d"],
   title: "app.api.system.server.dev.post.title",
   description: "app.api.system.server.dev.post.description",
-  category: "app.api.system.server.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.server.enum.mode.development"],
   icon: "code",
   allowedRoles: [
@@ -94,7 +94,7 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.NUMBER,
         label: "app.api.system.server.dev.post.fields.port.title",
         description: "app.api.system.server.dev.post.fields.port.description",
-        schema: z.union([z.coerce.number(), z.string()]).default(3000),
+        schema: z.coerce.number().optional(),
       }),
 
       skipGeneratorWatcher: requestField({
@@ -218,7 +218,6 @@ const { POST } = createEndpoint({
         skipNextCommand: false,
         dbReset: false,
         r: false,
-        port: 3000,
         skipGeneratorWatcher: false,
         generatorWatcherInterval: 5000,
         skipTaskRunner: false,
@@ -231,7 +230,6 @@ const { POST } = createEndpoint({
         skipNextCommand: false,
         dbReset: true,
         r: true,
-        port: 3000,
         skipGeneratorWatcher: true,
         generatorWatcherInterval: 5000,
         skipTaskRunner: false,

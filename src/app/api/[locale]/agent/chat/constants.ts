@@ -5,6 +5,7 @@
 
 import { CONTACT_FORM_ALIAS } from "../../contact/definition";
 import { aliasToPathMap } from "../../system/generated/endpoint";
+import { TOOL_HELP_ALIAS } from "../../system/unified-interface/ai/tools/definition";
 import { FETCH_URL_ALIAS } from "../fetch-url-content/definition";
 import { SEARCH_ALIAS } from "../search/brave/definition";
 import {
@@ -45,19 +46,12 @@ export const AGENT_MESSAGE_LENGTH = 40000;
  * These tools are enabled by default when creating a new chat or resetting tools
  */
 export const DEFAULT_TOOL_IDS = [
+  aliasToPathMap[TOOL_HELP_ALIAS],
   aliasToPathMap[SEARCH_ALIAS],
   aliasToPathMap[FETCH_URL_ALIAS],
   aliasToPathMap[MEMORY_LIST_ALIAS],
   aliasToPathMap[MEMORY_ADD_ALIAS],
   aliasToPathMap[MEMORY_UPDATE_ALIAS],
   aliasToPathMap[MEMORY_DELETE_ALIAS],
-  aliasToPathMap[CONTACT_FORM_ALIAS],
-] as const;
-
-/**
- * Default AI tools that require confirmation
- * These tools will prompt the user before execution when called by the AI
- */
-export const DEFAULT_TOOL_CONFIRMATION_IDS = [
   aliasToPathMap[CONTACT_FORM_ALIAS],
 ] as const;

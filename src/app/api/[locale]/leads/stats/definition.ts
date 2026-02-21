@@ -250,7 +250,7 @@ const { GET } = createEndpoint({
   path: ["leads", "stats"],
   title: "app.api.leads.stats.title",
   description: "app.api.leads.stats.description",
-  category: "app.api.leads.stats.category",
+  category: "app.api.leads.category",
   tags: [
     "app.api.leads.stats.tags.leads",
     "app.api.leads.stats.tags.statistics",

@@ -4,6 +4,7 @@ import { translations as unsubscribeTranslations } from "../../unsubscribe/i18n/
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Newsletter",
   status: statusTranslations,
   subscribe: subscribeTranslations,
   unsubscribe: unsubscribeTranslations,

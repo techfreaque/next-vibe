@@ -211,7 +211,7 @@ function ExecutionCard({
   onToggle: (section: "error" | "result") => void;
   t: ReturnType<typeof useWidgetTranslation>;
 }): React.JSX.Element {
-  const hasError = Boolean(execution.error) || Boolean(execution.errorStack);
+  const hasError = Boolean(execution.error);
   const hasResult =
     execution.result && Object.keys(execution.result).length > 0;
 
@@ -308,7 +308,7 @@ function ExecutionCard({
               <Div className="flex items-center gap-2">
                 <XCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
                 <Span className="text-xs font-semibold text-red-700 dark:text-red-300">
-                  {execution.error.errorType}
+                  {execution.error.errorType.errorKey}
                 </Span>
               </Div>
               <Span className="text-sm text-red-800 dark:text-red-200 whitespace-pre-wrap break-words">
@@ -321,11 +321,6 @@ function ExecutionCard({
                   </Pre>
                 )}
             </>
-          )}
-          {execution.errorStack && (
-            <Pre className="text-xs text-red-600 dark:text-red-400 font-mono bg-red-100 dark:bg-red-900/40 rounded p-2 overflow-auto max-h-48 whitespace-pre-wrap break-words">
-              {execution.errorStack}
-            </Pre>
           )}
         </Div>
       )}

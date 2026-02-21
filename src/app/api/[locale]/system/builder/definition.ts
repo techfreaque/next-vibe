@@ -115,7 +115,7 @@ const { POST } = createEndpoint({
   path: ["system", "builder"],
   title: "app.api.system.builder.post.title",
   description: "app.api.system.builder.post.description",
-  category: "app.api.system.builder.category",
+  category: "app.api.system.category",
   tags: [
     "app.api.system.builder.tags.build",
     "app.api.system.builder.tags.npm",

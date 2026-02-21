@@ -29,6 +29,7 @@ import { useState } from "react";
 
 import CountrySelector from "@/app/[locale]/_components/country-selector";
 import { ThemeToggle } from "@/app/[locale]/_components/theme-toggle";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserGetResponseOutput } from "@/app/api/[locale]/users/user/[id]/definition";
 import { envClient } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
@@ -44,13 +45,15 @@ interface NavigationItem {
 interface AdminLayoutClientProps {
   children: ReactNode;
   locale: CountryLanguage;
-  user: UserGetResponseOutput;
+  user: JwtPayloadType;
+  userData: UserGetResponseOutput;
 }
 
 export function AdminLayoutClient({
   children,
   locale,
   user,
+  userData,
 }: AdminLayoutClientProps): React.JSX.Element {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -205,12 +208,12 @@ export function AdminLayoutClient({
             <Div className="flex items-center">
               <Div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
                 <Span className="text-sm font-medium text-white">
-                  {user.privateName.charAt(0)}
+                  {userData.privateName.charAt(0)}
                 </Span>
               </Div>
               <Div className="ml-3">
                 <Span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  {user.privateName}
+                  {userData.privateName}
                 </Span>
                 <Span className="text-xs text-gray-500 dark:text-gray-400">
                   {t("app.admin.components.navigation.administrator")}
@@ -246,7 +249,7 @@ export function AdminLayoutClient({
               <ThemeToggle locale={locale} />
 
               {/* Locale selector */}
-              <CountrySelector isNavBar locale={locale} />
+              <CountrySelector isNavBar locale={locale} user={user} />
 
               <Link
                 href={`/${locale}/`}

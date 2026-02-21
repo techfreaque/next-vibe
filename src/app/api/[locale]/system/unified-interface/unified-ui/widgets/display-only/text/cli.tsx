@@ -76,6 +76,26 @@ export function TextWidgetInk<
     const translatedContent = t(content);
     const displayText = formatText(translatedContent, maxLength);
 
+    // If there's also a data value, show content as label + value as data
+    if (field.value !== undefined && field.value !== null) {
+      const data = extractTextData(field.value, t);
+      if (data) {
+        return (
+          <Box flexDirection="column">
+            <Text bold>{displayText}</Text>
+            <Text
+              color={color}
+              bold={emphasis === "bold"}
+              italic={emphasis === "italic"}
+              underline={emphasis === "underline"}
+            >
+              {formatText(data.text, maxLength)}
+            </Text>
+          </Box>
+        );
+      }
+    }
+
     return (
       <Box flexDirection="column">
         {label && <Text bold>{label}</Text>}

@@ -30,7 +30,7 @@ const pulseStatusEndpoint = createEndpoint({
   description:
     "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.description",
   icon: "activity",
-  category: "app.api.system.unifiedInterface.tasks.pulseSystem.status.category",
+  category: "app.api.system.category",
   allowedRoles: [UserRole.ADMIN],
   aliases: ["pulse:status"],
   tags: [

@@ -14,7 +14,6 @@ import type { JwtPayloadType } from "../../../user/auth/types";
 import { defaultModel, type ModelId } from "../../models/models";
 import type { TtsVoiceValue } from "../../text-to-speech/enum";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
-import { DEFAULT_TOOL_CONFIRMATION_IDS, DEFAULT_TOOL_IDS } from "../constants";
 import { ViewMode } from "../enum";
 import type {
   ChatSettingsGetResponseOutput,
@@ -24,7 +23,7 @@ import type {
 /**
  * Storage key for chat settings
  */
-const STORAGE_KEY = "chat-settings-v3";
+const STORAGE_KEY = "chat-settings-v4";
 
 /**
  * Chat Settings Repository Client
@@ -80,12 +79,7 @@ export class ChatSettingsRepositoryClient {
       ttsAutoplay: false,
       ttsVoice: DEFAULT_TTS_VOICE,
       viewMode: ViewMode.LINEAR,
-      enabledTools: DEFAULT_TOOL_IDS.map((id) => ({
-        id,
-        requiresConfirmation: DEFAULT_TOOL_CONFIRMATION_IDS.some(
-          (confirmId) => confirmId === id,
-        ),
-      })),
+      enabledTools: null,
     };
   }
 
@@ -107,16 +101,22 @@ export class ChatSettingsRepositoryClient {
       const defaults = this.getDefaults();
 
       // Merge overrides with defaults
+      // Use 'in' check for nullable fields to distinguish "explicitly set to null" from "not set"
       return {
         selectedModel: overrides.selectedModel ?? defaults.selectedModel,
         selectedCharacter:
           overrides.selectedCharacter ?? defaults.selectedCharacter,
         activeFavoriteId:
-          overrides.activeFavoriteId ?? defaults.activeFavoriteId,
+          "activeFavoriteId" in overrides
+            ? overrides.activeFavoriteId
+            : defaults.activeFavoriteId,
         ttsAutoplay: overrides.ttsAutoplay ?? defaults.ttsAutoplay,
         ttsVoice: overrides.ttsVoice ?? defaults.ttsVoice,
         viewMode: overrides.viewMode ?? defaults.viewMode,
-        enabledTools: overrides.enabledTools ?? defaults.enabledTools,
+        enabledTools:
+          "enabledTools" in overrides
+            ? overrides.enabledTools
+            : defaults.enabledTools,
       };
     } catch {
       return this.getDefaults();
@@ -187,7 +187,10 @@ export class ChatSettingsRepositoryClient {
           : current.ttsAutoplay,
       ttsVoice: updates.ttsVoice ?? current.ttsVoice,
       viewMode: updates.viewMode ?? current.viewMode,
-      enabledTools: updates.enabledTools ?? current.enabledTools,
+      enabledTools:
+        updates.enabledTools !== undefined
+          ? updates.enabledTools
+          : current.enabledTools,
     };
 
     this.saveLocalSettings(updated);

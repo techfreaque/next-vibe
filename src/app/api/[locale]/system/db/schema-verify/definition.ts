@@ -26,7 +26,7 @@ const { POST } = createEndpoint({
   path: ["system", "db", "schema-verify"],
   title: "app.api.system.db.schemaVerify.post.title",
   description: "app.api.system.db.schemaVerify.post.description",
-  category: "app.api.system.db.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.db.schemaVerify.tag"],
   icon: "database",
   allowedRoles: [

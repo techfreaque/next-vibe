@@ -25,10 +25,10 @@ const DEFAULT_CLI_USER_ID = "00000000-0000-0000-0000-000000000001";
 
 /**
  * Get CLI user email from environment
- * Returns null if VIBE_CLI_USER_EMAIL is not set
+ * Returns null if VIBE_ADMIN_USER_EMAIL is not set
  */
 export function getCliUserEmail(): string | null {
-  return env.VIBE_CLI_USER_EMAIL ?? null;
+  return env.VIBE_ADMIN_USER_EMAIL ?? null;
 }
 
 /**
@@ -47,7 +47,7 @@ export function createDefaultCliUser(): InferJwtPayloadTypeFromRoles<
 
 /**
  * Create a public CLI user payload
- * Used when VIBE_CLI_USER_EMAIL is not configured
+ * Used when VIBE_ADMIN_USER_EMAIL is not configured
  */
 export function createPublicCliUser(): InferJwtPayloadTypeFromRoles<
   readonly UserRoleValue[]
@@ -95,8 +95,8 @@ export function createMockUser(): {
 /**
  * Get CLI user with proper authentication flow:
  * 1. Check for session user (from .vibe.session file)
- * 2. Check VIBE_CLI_USER_EMAIL from .env and authenticate from DB
- * 3. If VIBE_CLI_USER_EMAIL is empty → return public user
+ * 2. Check VIBE_ADMIN_USER_EMAIL from .env and authenticate from DB
+ * 3. If VIBE_ADMIN_USER_EMAIL is empty → return public user
  * 4. If email is set but not found in DB → return error
  *
  * @param logger - Logger instance for debugging
@@ -136,10 +136,10 @@ export async function getCliUser(
     // Session check failed, continue to email auth
   }
 
-  // Check VIBE_CLI_USER_EMAIL environment variable
+  // Check VIBE_ADMIN_USER_EMAIL environment variable
   const cliUserEmail = getCliUserEmail();
 
-  // If VIBE_CLI_USER_EMAIL is not set, return public user
+  // If VIBE_ADMIN_USER_EMAIL is not set, return public user
   if (!cliUserEmail) {
     // Create a public user with a new lead directly from database
     // We can't use getLeadIdFromDb() here because it tries to access cookies

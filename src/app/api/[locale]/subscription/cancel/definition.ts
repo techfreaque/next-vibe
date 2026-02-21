@@ -29,7 +29,7 @@ const { DELETE } = createEndpoint({
   title: "app.api.subscription.delete.title" as const,
   description: "app.api.subscription.delete.description" as const,
   icon: "package-x" as const,
-  category: "app.api.subscription.category" as const,
+  category: "app.api.payment.category" as const,
   tags: [
     "app.api.subscription.tags.subscription" as const,
     "app.api.subscription.tags.cancel" as const,

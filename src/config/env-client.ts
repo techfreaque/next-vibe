@@ -41,9 +41,13 @@ export const {
   },
   NEXT_PUBLIC_APP_URL: {
     schema: createSchema(z.string().url(), z.string().optional()),
-    value: process.env.NEXT_PUBLIC_APP_URL,
+
+    value: process.env.NEXT_PUBLIC_LOCAL_MODE
+      ? process.env.NEXT_PUBLIC_LOCAL_MODE_APP_URL
+      : process.env.NEXT_PUBLIC_APP_URL,
     example: "http://localhost:3000",
   },
+
   NEXT_PUBLIC_PROJECT_URL: {
     schema: z.string().url().default("https://unbottled.ai"),
     value: process.env.NEXT_PUBLIC_PROJECT_URL,
@@ -57,6 +61,12 @@ export const {
       .transform((v) => v !== "false"),
     value: process.env.NEXT_PUBLIC_LOCAL_MODE,
     example: "true",
+  },
+
+  NEXT_PUBLIC_LOCAL_MODE_APP_URL: {
+    schema: z.url().optional().default("http://localhost:3001"),
+    value: process.env.NEXT_PUBLIC_LOCAL_MODE_APP_URL,
+    example: "http://localhost:3001",
   },
   NEXT_PUBLIC_TEST_SERVER_URL: {
     schema: createSchema(z.string(), z.string().optional()),

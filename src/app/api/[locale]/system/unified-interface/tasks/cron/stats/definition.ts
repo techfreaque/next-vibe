@@ -43,7 +43,7 @@ const { GET } = createEndpoint({
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.description",
   icon: "clock",
-  category: "app.api.system.unifiedInterface.tasks.category",
+  category: "app.api.system.category",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,

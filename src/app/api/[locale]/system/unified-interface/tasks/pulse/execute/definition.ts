@@ -34,8 +34,7 @@ const { POST } = createEndpoint({
   description:
     "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.description",
   icon: "activity",
-  category:
-    "app.api.system.unifiedInterface.tasks.pulseSystem.execute.category",
+  category: "app.api.system.category",
   tags: [
     "app.api.system.unifiedInterface.tasks.pulseSystem.execute.tags.execute",
   ],

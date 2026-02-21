@@ -87,6 +87,7 @@ class ClientRoutesIndexGeneratorRepositoryImpl {
       const duration = Date.now() - startTime;
       const message = formatGenerator(
         `Generated client routes index in ${duration}ms`,
+        "⚙️ ",
       );
 
       logger.info(message);

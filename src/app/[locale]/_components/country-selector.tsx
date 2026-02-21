@@ -12,8 +12,16 @@ import { Check } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { FC } from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
+import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type {
+  JwtPayloadType,
+  JWTPublicPayloadType,
+} from "@/app/api/[locale]/user/auth/types";
+import meEndpoints from "@/app/api/[locale]/user/private/me/definition";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 import { getUniqueLanguages } from "@/i18n/core/language-utils";
@@ -21,6 +29,7 @@ import { getUniqueLanguages } from "@/i18n/core/language-utils";
 interface CountrySelectorProps {
   isNavBar?: boolean;
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 // Type guard for tab values
@@ -28,7 +37,11 @@ const isValidTab = (value: string): value is "country" | "language" => {
   return value === "country" || value === "language";
 };
 
-const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
+const CountrySelector: FC<CountrySelectorProps> = ({
+  isNavBar,
+  locale,
+  user,
+}) => {
   const {
     countries,
     currentCountry,
@@ -42,6 +55,33 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
   const [activeTab, setActiveTab] = useState<"country" | "language">("country");
   const [tabHover, setTabHover] = useState<"country" | "language" | null>(null);
 
+  // Logger for locale sync mutation
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
+
+  // Mutation to sync locale to DB (users and leads)
+  const localeSyncMutation = useApiMutation(
+    meEndpoints.POST,
+    logger,
+    user ??
+      ({
+        isPublic: true,
+        leadId: "00000000-0000-0000-0000-000000000000",
+        roles: [UserPermissionRole.PUBLIC],
+      } satisfies JWTPublicPayloadType),
+    {},
+  );
+
+  // Sync locale to DB for both logged-in users and leads (fire-and-forget)
+  const syncUserLocale = useCallback(() => {
+    // Submit empty body — the repository picks up locale from URL path
+    localeSyncMutation.mutate({
+      requestData: {} as typeof meEndpoints.POST.types.RequestOutput,
+    });
+  }, [localeSyncMutation]);
+
   // Memoize the tab change handler
   const handleTabChange = useCallback((value: string) => {
     if (isValidTab(value)) {
@@ -53,18 +93,20 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
   const handleLanguageChange = useCallback(
     (langCode: Languages) => {
       setLanguage(langCode);
+      syncUserLocale();
       setIsOpen(false);
     },
-    [setLanguage],
+    [setLanguage, syncUserLocale],
   );
 
   // Memoize the country change handler
   const handleCountryChange = useCallback(
     (countryCode: Countries) => {
       changeLocale(countryCode);
+      syncUserLocale();
       setIsOpen(false);
     },
-    [changeLocale],
+    [changeLocale, syncUserLocale],
   );
 
   const currentLanguageFlag = countries.find(

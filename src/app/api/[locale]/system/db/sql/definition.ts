@@ -26,7 +26,7 @@ const { POST } = createEndpoint({
   path: ["system", "db", "sql"],
   title: "app.api.system.db.sql.post.title",
   description: "app.api.system.db.sql.post.description",
-  category: "app.api.system.db.category",
+  category: "app.api.system.category",
   tags: ["app.api.system.db.sql.tag"],
   icon: "terminal",
   allowedRoles: [

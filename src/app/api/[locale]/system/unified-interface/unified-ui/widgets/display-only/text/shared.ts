@@ -9,6 +9,7 @@ import type z from "zod";
 import type { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
+import type { WidgetData } from "../../../../shared/widgets/widget-data";
 import type { BaseWidgetContext } from "../../_shared/types";
 import type { TextFormat, TextWidgetSchema } from "./types";
 
@@ -69,12 +70,33 @@ export function extractTextData(
     return null;
   }
 
-  // Handle array by converting to JSON
+  // Handle array — format as readable list
   if (Array.isArray(value)) {
-    return {
-      text: JSON.stringify(value),
-      format: "code",
-    };
+    if (value.length === 0) {
+      return { text: "(empty)", format: "plain" };
+    }
+    // If items are objects with name/toolName/description, format as table
+    const first = value[0];
+    if (first && typeof first === "object" && !Array.isArray(first)) {
+      const obj = first as Record<string, WidgetData>;
+      const nameKey =
+        "toolName" in obj ? "toolName" : "name" in obj ? "name" : undefined;
+      const descKey = "description" in obj ? "description" : undefined;
+      if (nameKey) {
+        const lines = value.map((item) => {
+          const row = item as Record<string, WidgetData>;
+          const name = String(row[nameKey] ?? "");
+          const desc = descKey ? String(row[descKey] ?? "") : "";
+          return desc ? `  ${name}  —  ${desc}` : `  ${name}`;
+        });
+        return { text: lines.join("\n"), format: "plain" };
+      }
+    }
+    // Fallback: one item per line
+    const lines = value.map((item) =>
+      typeof item === "string" ? `  ${item}` : `  ${JSON.stringify(item)}`,
+    );
+    return { text: lines.join("\n"), format: "plain" };
   }
 
   // Handle object value with text properties

@@ -6,7 +6,7 @@ import { translations as sendTranslations } from "../../send/i18n/en";
 import { translations as smtpClientTranslations } from "../../smtp-client/i18n/en";
 
 export const translations = {
-  category: "Email Management",
+  category: "Email",
   enums: {
     // SMTP Client Enums
     smtpSecurityType: {

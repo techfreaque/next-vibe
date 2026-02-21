@@ -2,6 +2,7 @@ import { translations as purchaseTranslations } from "../../purchase/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Guthaben",
   purchase: purchaseTranslations,
   repository: {
     tts: "Text-zu-Sprache",

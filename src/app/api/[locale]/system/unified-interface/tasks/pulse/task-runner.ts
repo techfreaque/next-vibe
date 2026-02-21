@@ -37,10 +37,11 @@ const pulseTaskRunner: TaskRunner = {
   async run(props: {
     signal: AbortSignal;
     logger: EndpointLogger;
-    locale: CountryLanguage;
+    systemLocale: CountryLanguage;
+    userLocale: CountryLanguage;
     cronUser: JwtPrivatePayloadType;
   }): Promise<void> {
-    const { signal, logger } = props;
+    const { signal, logger, systemLocale } = props;
     logger.info(formatTask("Starting pulse task runner...", "💓"));
 
     const PULSE_INTERVAL =
@@ -67,6 +68,7 @@ const pulseTaskRunner: TaskRunner = {
           {
             dryRun: false,
             force: false,
+            systemLocale,
           },
           logger,
         );
@@ -122,7 +124,8 @@ const pulseTaskRunner: TaskRunner = {
   async onError(props: {
     error: Error;
     logger: EndpointLogger;
-    locale: CountryLanguage;
+    systemLocale: CountryLanguage;
+    userLocale: CountryLanguage;
     cronUser: JwtPrivatePayloadType;
   }): Promise<void> {
     const { error, logger } = props;
@@ -133,7 +136,8 @@ const pulseTaskRunner: TaskRunner = {
 
   async onShutdown(props: {
     logger: EndpointLogger;
-    locale: CountryLanguage;
+    systemLocale: CountryLanguage;
+    userLocale: CountryLanguage;
     cronUser: JwtPrivatePayloadType;
   }): Promise<void> {
     const { logger } = props;

@@ -114,7 +114,6 @@ export class CronHistoryRepository {
           completedAt: cronTaskExecutions.completedAt,
           durationMs: cronTaskExecutions.durationMs,
           error: cronTaskExecutions.error,
-          errorStack: cronTaskExecutions.errorStack,
           result: cronTaskExecutions.result,
           environment: cronTaskExecutions.environment,
           createdAt: cronTaskExecutions.createdAt,
@@ -207,19 +206,16 @@ export class CronHistoryRepository {
             completedAt: exec.completedAt?.toISOString() ?? null,
             durationMs: exec.durationMs,
             error: exec.error
-              ? {
-                  message: (exec.error as { message: string }).message,
-                  messageParams: (
-                    exec.error as { messageParams?: Record<string, string> }
-                  ).messageParams,
-                  errorType: (exec.error as { errorType: { errorKey: string } })
-                    .errorType.errorKey,
-                }
+              ? fail({
+                  message:
+                    exec.error?.message ??
+                    "app.api.system.unifiedInterface.tasks.cronSystem.history.get.unknownError",
+                  messageParams: exec.error?.messageParams,
+                  errorType:
+                    exec.error?.errorType ?? ErrorResponseTypes.INTERNAL_ERROR,
+                })
               : null,
-            errorStack: exec.errorStack ?? null,
-            result:
-              (exec.result as CronHistoryResponseOutput["executions"][number]["result"]) ??
-              null,
+            result: exec.result ?? null,
             environment: exec.environment,
             createdAt: exec.createdAt.toISOString(),
           };

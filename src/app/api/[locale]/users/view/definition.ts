@@ -31,7 +31,7 @@ export const { GET } = createEndpoint({
   path: ["users", "view"],
   title: "app.api.users.view.get.title",
   description: "app.api.users.view.get.description",
-  category: "app.api.users.category",
+  category: "app.api.user.category",
   icon: "user" as const,
   tags: [
     "app.api.users.tags.user",
