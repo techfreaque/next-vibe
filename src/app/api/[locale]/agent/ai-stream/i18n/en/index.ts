@@ -318,6 +318,18 @@ export const translations = {
     unexpectedError:
       "An unexpected error occurred: {{error}}. Please try again.",
   },
+  headless: {
+    errors: {
+      /**
+       * Thrown when runHeadlessAiStream() is called without a resolvable model+character.
+       * Either pass model+character directly, or pass favoriteId pointing to a favorite
+       * that has a MANUAL or FILTERS modelSelection (not CHARACTER_BASED with no character).
+       */
+      missingModelOrCharacter:
+        "model and character are required — pass them directly or provide a favoriteId with a resolvable model selection",
+      favoriteNotFound: "Favorite not found or does not belong to this user",
+    },
+  },
   providers: {
     uncensoredHandler: {
       errors: {

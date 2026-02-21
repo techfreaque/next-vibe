@@ -7,6 +7,8 @@
 
 import "server-only";
 
+import { and, eq } from "drizzle-orm";
+
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
@@ -20,20 +22,17 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { and, eq } from "drizzle-orm";
-
-import { DefaultFolderId } from "../../chat/config";
 import { NO_CHARACTER_ID } from "../../chat/characters/config";
 import {
   isFiltersSelection,
   isManualSelection,
 } from "../../chat/characters/create/definition";
 import { CharactersRepositoryClient } from "../../chat/characters/repository-client";
+import { DefaultFolderId } from "../../chat/config";
 import type { MessageMetadata, ToolCallResult } from "../../chat/db";
 import { chatMessages } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
 import { chatFavorites } from "../../chat/favorites/db";
-import type { ModelId } from "../../models/models";
 import { ensureThread } from "../../chat/threads/repository";
 import type { AiStreamPostRequestOutput } from "../definition";
 import {
@@ -137,18 +136,14 @@ export interface HeadlessAiStreamResult {
 async function resolveFavorite(
   favoriteId: string,
   userId: string,
+  user: JwtPayloadType,
   logger: EndpointLogger,
 ): Promise<{ model: ModelId; character: string } | null> {
   const [favorite] = await db
     .select()
     .from(chatFavorites)
     .where(
-      // drizzle eq is imported in this file already via db
-      // Use raw sql-level check via drizzle
-      require("drizzle-orm").and(
-        require("drizzle-orm").eq(chatFavorites.id, favoriteId),
-        require("drizzle-orm").eq(chatFavorites.userId, userId),
-      ),
+      and(eq(chatFavorites.id, favoriteId), eq(chatFavorites.userId, userId)),
     )
     .limit(1);
 
@@ -162,7 +157,7 @@ async function resolveFavorite(
   // Resolve model from modelSelection
   const sel = favorite.modelSelection;
   if (sel && isManualSelection(sel)) {
-    return { model: sel.modelId as ModelId, character };
+    return { model: sel.manualModelId as ModelId, character };
   }
   if (sel && isFiltersSelection(sel)) {
     const best = CharactersRepositoryClient.getBestModelForCharacter(sel);
@@ -171,12 +166,34 @@ async function resolveFavorite(
     }
   }
 
-  // CHARACTER_BASED or no selection: we don't have the character's modelSelection here,
-  // so caller will need to pass model explicitly or we fall back to a sensible default.
-  logger.warn("[Headless AI] Favorite has no resolvable model — caller must provide model", {
-    favoriteId,
-    characterId: character,
-  });
+  // CHARACTER_BASED or no selection: load the character to get its modelSelection
+  if (character !== NO_CHARACTER_ID) {
+    const { CharactersRepository } =
+      await import("../../chat/characters/repository");
+    const characterResult = await CharactersRepository.getCharacterById(
+      { id: character },
+      user,
+      logger,
+    );
+    if (characterResult.success) {
+      const charSel = characterResult.data.modelSelection;
+      if (
+        charSel &&
+        (isManualSelection(charSel) || isFiltersSelection(charSel))
+      ) {
+        const best =
+          CharactersRepositoryClient.getBestModelForCharacter(charSel);
+        if (best) {
+          return { model: best.id as ModelId, character };
+        }
+      }
+    }
+  }
+
+  logger.warn(
+    "[Headless AI] Favorite has no resolvable model — pass model explicitly",
+    { favoriteId, characterId: character },
+  );
   return null;
 }
 
@@ -211,10 +228,15 @@ export async function runHeadlessAiStream(
     if (favoriteId) {
       const userId = "id" in user ? (user.id as string) : undefined;
       if (userId) {
-        const resolved = await resolveFavorite(favoriteId, userId, logger);
+        const resolved = await resolveFavorite(
+          favoriteId,
+          userId,
+          user,
+          logger,
+        );
         if (!resolved) {
           return fail({
-            message: "Favorite not found or has no resolvable model",
+            message: "app.api.agent.aiStream.headless.errors.favoriteNotFound",
             errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
@@ -226,7 +248,8 @@ export async function runHeadlessAiStream(
 
     if (!model || !character) {
       return fail({
-        message: "model and character are required (or provide a favoriteId with a resolved model)",
+        message:
+          "app.api.agent.aiStream.headless.errors.missingModelOrCharacter",
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
@@ -393,7 +416,8 @@ export async function runHeadlessAiStream(
   } catch (error) {
     const errorMsg = parseError(error).message;
     logger.error("[Headless AI] Execution failed", {
-      model,
+      model: modelOverride,
+      favoriteId,
       error: errorMsg,
     });
 

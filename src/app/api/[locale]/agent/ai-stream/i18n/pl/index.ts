@@ -330,6 +330,14 @@ export const translations: typeof enTranslations = {
     streamInterrupted:
       "Generowanie zostało zatrzymane. Częściowa odpowiedź została zapisana.",
   },
+  headless: {
+    errors: {
+      missingModelOrCharacter:
+        "Model i charakter są wymagane — podaj je bezpośrednio lub podaj favoriteId z rozwiązywalnym wyborem modelu",
+      favoriteNotFound:
+        "Ulubiony nie znaleziony lub nie należy do tego użytkownika",
+    },
+  },
   providers: {
     uncensoredHandler: {
       errors: {

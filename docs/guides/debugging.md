@@ -137,7 +137,7 @@ This enables debug logging and prints full request/response details.
 The CLI user is determined in this order:
 
 1. **Saved session** - from a previous `vibe user_public_login_POST` call (stored in `.vibe.session`)
-2. **`VIBE_CLI_USER_EMAIL` env variable** - set in `.env`, authenticated from the DB automatically
+2. **`VIBE_ADMIN_USER_EMAIL` env variable** - set in `.env`, authenticated from the DB automatically
 3. **Public/anonymous user** - if neither is set
 
 To log in and save a session:
@@ -153,6 +153,38 @@ vibe user_public_login_POST --email="you@example.com" --password="yourpassword"
 3. Check server terminal for `logger.debug()` output (needs debug mode enabled)
 4. If getting 401/403: check `allowedRoles` in `definition.ts` and your user's role
 5. If getting validation errors: check the Zod schemas in `definition.ts` fields
+
+---
+
+## Tool Discovery
+
+The platform exposes 180+ AI-callable tools. The `tool-help` endpoint (alias for `system_unified-interface_ai_tools_GET`) lets both humans and AI discover them efficiently.
+
+### CLI usage
+
+```bash
+vibe tool-help                        # overview: category summary
+vibe tool-help search                 # search by keyword (first arg = query)
+vibe tool-help --category=chat        # browse tools in a category
+vibe tool-help --tool-name=tool-help  # full detail + parameter schema
+```
+
+### How AI discovers tools
+
+`tool-help` is one of the default active tools (always visible to the AI). The AI calls it to discover what tools are available before using them.
+
+The endpoint has three response modes to minimize context usage:
+
+1. **Overview** (no params): Returns category names and counts only. No tool data.
+2. **Search/category** (query or category): Returns compact list (toolName + description + aliases), capped at 25 results.
+3. **Detail** (toolName): Returns full metadata including parameter JSON schema for a single tool.
+
+### Two-tier tool system
+
+- **Active tools**: Visible to the AI in its tool list. Default: 8 core tools.
+- **Enabled tools**: Allowed to run when called. Default: all tools enabled.
+
+The AI sees only active tools, but can discover and request activation of enabled tools via `tool-help`. Users configure both tiers in the tools modal (chat settings).
 
 ---
 
@@ -181,4 +213,4 @@ vibe sql "UPDATE users SET name='test' WHERE id=1" --dryRun=true
 
 The `sql` and `db:sql` aliases both work. The first positional argument maps to `query`. Use `--queryFile` to pass a path to a `.sql` file instead. Add `--dryRun=true` to preview without applying changes.
 
-Requires an authenticated admin user (session or `VIBE_CLI_USER_EMAIL`).
+Requires an authenticated admin user (session or `VIBE_ADMIN_USER_EMAIL`).

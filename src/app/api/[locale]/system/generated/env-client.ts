@@ -47,11 +47,9 @@ export const envClientModules = {
 export { platform };
 
 // Combined client schema
-export const envClientSchema = env_envClientSchema.merge(
-  contactClientEnvSchema,
-).merge(
-  paymentClientEnvSchema,
-);
+export const envClientSchema = env_envClientSchema
+  .merge(contactClientEnvSchema)
+  .merge(paymentClientEnvSchema);
 
 export type EnvClient = z.infer<typeof envClientSchema>;
 
