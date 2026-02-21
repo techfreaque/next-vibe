@@ -82,6 +82,9 @@ export function ChatSidebar({
     activeThreadId,
     rootFolderPermissions,
     handleCreateThread,
+    handleSelectThread,
+    handleDeleteThread,
+    updateThread,
     createFolder,
     searchThreads,
     user,
@@ -274,8 +277,15 @@ export function ChatSidebar({
                 </Div>
                 <ThreadList
                   threads={filteredSearchThreads}
+                  activeThreadId={activeThreadId}
                   locale={locale}
                   logger={logger}
+                  user={user}
+                  onSelect={handleSelectThread}
+                  onDelete={handleDeleteThread}
+                  onUpdateTitle={(threadId, title) => {
+                    void updateThread(threadId, { title });
+                  }}
                   compact
                 />
                 {searchResults.length === 0 && (

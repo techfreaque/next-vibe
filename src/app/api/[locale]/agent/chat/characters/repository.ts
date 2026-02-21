@@ -8,10 +8,7 @@ import "server-only";
 import { and, eq, ne, or } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
-import type {
-  FiltersModelSelection,
-  ManualModelSelection,
-} from "@/app/api/[locale]/agent/models/components/types";
+import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/components/types";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -589,7 +586,7 @@ export class CharactersRepository {
       tagline: TranslationKey | null;
       description: TranslationKey | null;
       category: typeof CharacterCategoryValue;
-      modelSelection: FiltersModelSelection | ManualModelSelection;
+      modelSelection: ModelSelectionSimple;
     },
     t: TFunction,
   ): CharacterListItem {

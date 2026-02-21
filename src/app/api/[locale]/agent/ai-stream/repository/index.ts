@@ -77,16 +77,34 @@ function extractUserIdentifiers(
  */
 export class AiStreamRepository {
   /**
-   * Create AI streaming response with SSE events, or run headless (no SSE).
-   *
-   * When `headless: true`:
-   * - All SSE events are suppressed (DB writes still happen normally)
-   * - Returns ResponseType<HeadlessAiStreamResult> with threadId + lastAiMessageId
-   * - Caller is responsible for reading the message content from DB
-   *
-   * When `headless: false` (default):
-   * - Returns StreamingResponse for SSE stream
+   * Headless overload — no SSE, returns structured result with threadId + lastAiMessageId.
+   * DB writes happen normally; caller reads message content from DB using lastAiMessageId.
    */
+  static createAiStream(params: {
+    data: AiStreamPostRequestOutput;
+    t: TFunction;
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+    user: JwtPayloadType;
+    request: NextRequest | undefined;
+    headless: true;
+    extraInstructions?: string;
+  }): Promise<ResponseType<HeadlessAiStreamResult>>;
+
+  /**
+   * Streaming overload — returns SSE StreamingResponse (or ResponseType on validation error).
+   */
+  static createAiStream(params: {
+    data: AiStreamPostRequestOutput;
+    t: TFunction;
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+    user: JwtPayloadType;
+    request: NextRequest | undefined;
+    headless?: false;
+    extraInstructions?: string;
+  }): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse>;
+
   static async createAiStream({
     data,
     t,
@@ -103,9 +121,7 @@ export class AiStreamRepository {
     logger: EndpointLogger;
     user: JwtPayloadType;
     request: NextRequest | undefined;
-    /** Run without SSE events — DB writes still happen, returns lastAiMessageId */
     headless?: boolean;
-    /** Extra instructions injected into the system prompt (headless: task context, cron schedule, etc.) */
     extraInstructions?: string;
   }): Promise<
     | ResponseType<AiStreamPostResponseOutput>

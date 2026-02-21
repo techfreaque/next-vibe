@@ -168,6 +168,7 @@ const {
   MoreVertical,
   Mountain,
   MousePointer,
+  MousePointerClick,
   Move,
   MoveLeft,
   Music,

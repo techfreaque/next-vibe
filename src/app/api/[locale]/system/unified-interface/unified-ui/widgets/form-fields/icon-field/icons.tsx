@@ -311,6 +311,8 @@ const ICON_LOADERS: Record<IconLibraryName, IconLoader> = {
     await import("@/packages/next-vibe-ui/web/ui/icons/Mountain"),
   MousePointer: async () =>
     await import("@/packages/next-vibe-ui/web/ui/icons/MousePointer"),
+  MousePointerClick: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/MousePointerClick"),
   Move: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Move"),
   MoveLeft: async () =>
     await import("@/packages/next-vibe-ui/web/ui/icons/MoveLeft"),
@@ -795,6 +797,7 @@ export const ICON_REGISTRY = {
   "more-horizontal": "MoreHorizontal",
   "more-vertical": "MoreVertical",
   "mouse-pointer": "MousePointer",
+  "mouse-pointer-click": "MousePointerClick",
   grip: "Grip",
   "grip-vertical": "GripVertical",
   "grid-3x3": "Grid3x3",

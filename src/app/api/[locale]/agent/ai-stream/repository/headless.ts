@@ -35,10 +35,7 @@ import { ChatMessageRole } from "../../chat/enum";
 import { chatFavorites } from "../../chat/favorites/db";
 import { ensureThread } from "../../chat/threads/repository";
 import type { AiStreamPostRequestOutput } from "../definition";
-import {
-  AiStreamRepository,
-  type HeadlessAiStreamResult as InternalHeadlessResult,
-} from "./index";
+import { AiStreamRepository } from "./index";
 
 /* eslint-disable i18next/no-literal-string */
 
@@ -384,20 +381,11 @@ export async function runHeadlessAiStream(
       extraInstructions: headlessInstructions,
     });
 
-    // headless: true never returns a StreamingResponse — guard for type narrowing only
-    if ("__isStreamingResponse" in result) {
-      return fail({
-        message: "Unexpected streaming response in headless mode",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-
     if (!result.success) {
       return result;
     }
 
-    // createAiStream with headless: true always returns InternalHeadlessResult data shape
-    const { threadId, lastAiMessageId } = result.data as InternalHeadlessResult;
+    const { threadId, lastAiMessageId } = result.data;
 
     logger.info("[Headless AI] Execution complete", {
       model,
