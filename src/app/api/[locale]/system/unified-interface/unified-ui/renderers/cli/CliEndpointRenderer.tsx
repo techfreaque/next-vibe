@@ -29,12 +29,15 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { InkFormState } from "../../widgets/_shared/cli-types";
 import {
   extractAllFields,
-  withValue,
+  withValueNonStrict,
 } from "../../widgets/_shared/field-helpers";
 import { InkWidgetContextProvider } from "../../widgets/_shared/InkWidgetContextProvider";
 import { isObject, isResponseField } from "../../widgets/_shared/type-guards";
 import type {
+  AnyChildrenConstrain,
   BaseWidgetConfig,
+  ConstrainedChildUsage,
+  DispatchField,
   FieldUsageConfig,
   SchemaTypes,
 } from "../../widgets/_shared/types";
@@ -174,7 +177,18 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
         <Box flexDirection="column">
           <InkWidgetRenderer
             fieldName={"root" as Path<TEndpoint["types"]["RequestOutput"]>}
-            field={withValue(endpoint.fields, data, null)}
+            field={
+              withValueNonStrict(endpoint.fields, data, null) as DispatchField<
+                string,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- heterogeneous field dispatch boundary
+                any,
+                FieldUsageConfig,
+                AnyChildrenConstrain<
+                  string,
+                  ConstrainedChildUsage<FieldUsageConfig>
+                >
+              >
+            }
           />
         </Box>
       </InkWidgetContextProvider>
@@ -278,7 +292,18 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
                 fieldName={
                   fieldName as Path<TEndpoint["types"]["RequestOutput"]>
                 }
-                field={withValue(field, fieldValue, data)}
+                field={
+                  withValueNonStrict(field, fieldValue, data) as DispatchField<
+                    string,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- heterogeneous field dispatch boundary
+                    any,
+                    FieldUsageConfig,
+                    AnyChildrenConstrain<
+                      string,
+                      ConstrainedChildUsage<FieldUsageConfig>
+                    >
+                  >
+                }
               />
             );
           })}

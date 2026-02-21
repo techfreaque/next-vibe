@@ -5,26 +5,51 @@
 
 import "server-only";
 
+import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
-  renderAdminSignupNotification,
-  renderRegisterMail,
+  renderAdminNotificationByEmail,
+  renderWelcomeEmailByEmail,
 } from "@/app/api/[locale]/user/public/signup/email";
 
+import type {
+  UserCreateRequestOutput,
+  UserCreateResponseOutput,
+} from "./definition";
 import definitions from "./definition";
 import { userCreateRepository } from "./repository";
+
+const renderWelcomeMail: EmailFunctionType<
+  UserCreateRequestOutput,
+  UserCreateResponseOutput,
+  never
+> = ({ requestData, locale, t, logger }) =>
+  renderWelcomeEmailByEmail(requestData.basicInfo.email, locale, t, logger);
+
+const renderAdminNotification: EmailFunctionType<
+  UserCreateRequestOutput,
+  UserCreateResponseOutput,
+  never
+> = ({ requestData, locale, t, logger }) =>
+  renderAdminNotificationByEmail(
+    requestData.basicInfo.email,
+    null,
+    locale,
+    t,
+    logger,
+  );
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: [
       {
-        render: renderRegisterMail,
+        render: renderWelcomeMail,
         ignoreErrors: false,
       },
       {
-        render: renderAdminSignupNotification,
+        render: renderAdminNotification,
         ignoreErrors: true, // Don't fail user creation if admin notification fails
       },
     ],

@@ -44,7 +44,8 @@ export function DescriptionWidgetInk<
 
   return (
     <Box>
-      <Text dimColor>{t(field.value)}</Text>
+      {/* field.value is typed as inferred schema output; TSchema extends StringWidgetSchema so it is a string */}
+      <Text dimColor>{t(field.value as string)}</Text>
     </Box>
   );
 }

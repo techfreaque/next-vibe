@@ -428,6 +428,58 @@ export function useChat(
   const effectiveSettings = useMemo(() => {
     return settingsOps.settings ?? ChatSettingsRepositoryClient.getDefaults();
   }, [settingsOps.settings]);
+
+  // Convert activeTools/visibleTools → EnabledTool[] for UI consumption
+  // A tool is "active" (in permission layer) if it's in activeTools (or activeTools is null = all)
+  // A tool is "visible" (in context window) if it's in visibleTools
+  const enabledTools = useMemo((): EnabledTool[] | null => {
+    const { activeTools, visibleTools } = effectiveSettings;
+    if (activeTools === null && visibleTools === null) {
+      return null; // null = all tools default
+    }
+    // Build union of all tool IDs across both arrays
+    const allIds = new Set([
+      ...(activeTools ?? []).map((t) => t.toolId),
+      ...(visibleTools ?? []).map((t) => t.toolId),
+    ]);
+    return [...allIds].map((id) => {
+      const active = activeTools?.find((t) => t.toolId === id);
+      const visible = visibleTools?.find((t) => t.toolId === id);
+      return {
+        id,
+        requiresConfirmation:
+          active?.requiresConfirmation ??
+          visible?.requiresConfirmation ??
+          false,
+        active:
+          visibleTools !== null
+            ? visibleTools.some((t) => t.toolId === id)
+            : true,
+      };
+    });
+  }, [effectiveSettings]);
+
+  // Convert EnabledTool[] → activeTools/visibleTools when saving
+  const setEnabledTools = useCallback(
+    (tools: EnabledTool[] | null) => {
+      if (tools === null) {
+        settingsOps.setTools(null, null);
+        return;
+      }
+      const activeTools = tools.map(({ id, requiresConfirmation }) => ({
+        toolId: id,
+        requiresConfirmation,
+      }));
+      const visibleTools = tools
+        .filter((t) => t.active)
+        .map(({ id, requiresConfirmation }) => ({
+          toolId: id,
+          requiresConfirmation,
+        }));
+      settingsOps.setTools(activeTools, visibleTools);
+    },
+    [settingsOps],
+  );
   useStreamSync({
     streamingMessages,
     streamThreads,
@@ -486,7 +538,14 @@ export function useChat(
       reset: streamReset,
       addMessage: streamAddMessage,
     },
-    settings: effectiveSettings,
+    settings: {
+      selectedModel: effectiveSettings.selectedModel,
+      selectedCharacter: effectiveSettings.selectedCharacter,
+      activeTools: effectiveSettings.activeTools,
+      visibleTools: effectiveSettings.visibleTools,
+      ttsAutoplay: effectiveSettings.ttsAutoplay,
+      ttsVoice: effectiveSettings.ttsVoice,
+    },
     setInput: setInputAndSaveDraft,
     setAttachments: setAttachmentsAndSaveDraft,
     deductCredits: creditsHook.deductCredits,
@@ -626,12 +685,12 @@ export function useChat(
     ttsVoice: effectiveSettings.ttsVoice,
     sidebarCollapsed,
     viewMode: effectiveSettings.viewMode,
-    enabledTools: effectiveSettings.enabledTools,
+    enabledTools,
     setActiveFavorite: settingsOps.setActiveFavorite,
     setTTSAutoplay: settingsOps.setTTSAutoplay,
     setSidebarCollapsed,
     setViewMode: settingsOps.setViewMode,
-    setEnabledTools: settingsOps.setEnabledTools,
+    setEnabledTools,
 
     // Message operations
     sendMessage: messageOps.sendMessage,

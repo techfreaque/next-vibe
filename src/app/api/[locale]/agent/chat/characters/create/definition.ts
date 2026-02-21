@@ -5,7 +5,10 @@
 
 import { z } from "zod";
 
-import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/components/types";
+import {
+  modelSelectionSchemaSimple,
+  type ModelSelectionSimple,
+} from "@/app/api/[locale]/agent/models/components/types";
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -465,9 +468,8 @@ export type CharacterCreateRequestOutput = typeof POST.types.RequestOutput;
 export type CharacterCreateResponseInput = typeof POST.types.ResponseInput;
 export type CharacterCreateResponseOutput = typeof POST.types.ResponseOutput;
 
-// Character field type aliases
-export type CharacterModelSelection =
-  CharacterCreateRequestOutput["modelSelection"];
+// Character field type aliases — anchored to ModelSelectionSimple for type identity
+export type CharacterModelSelection = ModelSelectionSimple;
 
 // Type for filter-based model selection
 export type FiltersModelSelection = Extract<

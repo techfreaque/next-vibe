@@ -17,7 +17,7 @@ export function PaginationWidgetInk<
   TUsage extends FieldUsageConfig,
 >(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- props not needed
-  _props: InkWidgetProps<TEndpoint, TUsage, PaginationWidgetConfig>,
+  _props: InkWidgetProps<TEndpoint, TUsage, PaginationWidgetConfig<TUsage>>,
 ): JSX.Element {
   const t = useInkWidgetTranslation();
   return (

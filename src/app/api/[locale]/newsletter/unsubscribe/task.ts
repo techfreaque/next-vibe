@@ -32,7 +32,7 @@ const newsletterUnsubscribeSyncTask = createCronTask(
     enabled: false,
     priority: CronTaskPriority.LOW,
     timeout: TASK_TIMEOUTS.MEDIUM,
-    defaultInput: { batchSize: 500, dryRun: false },
+    taskInput: { dryRun: false, batchSize: 100 },
   },
 );
 

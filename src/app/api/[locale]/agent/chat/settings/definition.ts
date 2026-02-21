@@ -80,15 +80,26 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.enum(ViewModeDB),
       }),
-      enabledTools: responseField({
+      activeTools: responseField({
         type: WidgetType.TEXT,
         hidden: true,
         schema: z
           .array(
             z.object({
-              id: z.string(),
-              requiresConfirmation: z.boolean(),
-              active: z.boolean(),
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().default(false),
+            }),
+          )
+          .nullable(),
+      }),
+      visibleTools: responseField({
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().default(false),
             }),
           )
           .nullable(),
@@ -160,7 +171,8 @@ const { GET } = createEndpoint({
         ttsAutoplay: false,
         ttsVoice: TtsVoiceDB[0],
         viewMode: ViewMode.LINEAR,
-        enabledTools: null,
+        activeTools: null,
+        visibleTools: null,
       },
     },
   },
@@ -237,17 +249,31 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.enum(ViewModeDB).optional(),
       }),
-      enabledTools: requestField({
+      activeTools: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.agent.chat.settings.post.enabledTools.label" as const,
+        label: "app.api.agent.chat.settings.post.activeTools.label" as const,
         columns: 12,
         schema: z
           .array(
             z.object({
-              id: z.string(),
-              requiresConfirmation: z.boolean(),
-              active: z.boolean(),
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().default(false),
+            }),
+          )
+          .nullable()
+          .optional(),
+      }),
+      visibleTools: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.agent.chat.settings.post.visibleTools.label" as const,
+        columns: 12,
+        schema: z
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().default(false),
             }),
           )
           .nullable()
@@ -330,6 +356,8 @@ export type ChatSettingsGetResponseOutput = typeof GET.types.ResponseOutput;
 export type ChatSettingsUpdateRequestInput = typeof POST.types.RequestInput;
 export type ChatSettingsUpdateRequestOutput = typeof POST.types.RequestOutput;
 export type ChatSettingsUpdateResponseOutput = typeof POST.types.ResponseOutput;
-
+export type ToolConfigItem = NonNullable<
+  ChatSettingsUpdateRequestInput["activeTools"]
+>[number];
 const definitions = { GET, POST };
 export default definitions;

@@ -14,8 +14,8 @@ import { DefaultFolderId } from "../../../../../config";
 import { DEFAULT_TOOL_IDS } from "../../../../../constants";
 import type { ChatMessage } from "../../../../../db";
 import { ChatMessageRole } from "../../../../../enum";
-import type { EnabledTool } from "../../../../../hooks/store";
 import { useChatStore } from "../../../../../hooks/store";
+import type { ToolConfigItem } from "../../../../../settings/definition";
 
 export interface CreateMessageParams {
   content: string;
@@ -41,7 +41,8 @@ export interface MessageOperationDeps {
   settings: {
     selectedModel: ModelId;
     selectedCharacter: string;
-    enabledTools: EnabledTool[] | null;
+    activeTools: ToolConfigItem[] | null;
+    visibleTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
     ttsVoice: typeof TtsVoiceValue;
   };
@@ -188,28 +189,16 @@ export async function createAndSendUserMessage(
     // Get user's timezone from browser
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    // Build tool arrays from settings:
     // activeTools = permission layer (null = all tools allowed)
-    // tools = visibility layer (tools loaded into AI SDK context window)
-    const activeToolsPayload = settings.enabledTools
-      ? settings.enabledTools.map((tool) => ({
-          toolId: tool.id,
-          requiresConfirmation: tool.requiresConfirmation,
-        }))
-      : null; // null = all tools allowed
-
-    const toolsPayload = settings.enabledTools
-      ? settings.enabledTools
-          .filter((tool) => tool.active)
-          .map((tool) => ({
-            toolId: tool.id,
-            requiresConfirmation: tool.requiresConfirmation,
-          }))
-      : // null enabledTools = default: core 8 visible, server reads requiresConfirmation from definitions
-        DEFAULT_TOOL_IDS.map((id) => ({
-          toolId: id,
-          requiresConfirmation: false,
-        }));
+    // visibleTools = visibility layer (tools loaded into AI SDK context window)
+    // Both stored in settings in the same format as ai-stream expects
+    const activeToolsPayload = settings.activeTools;
+    const toolsPayload =
+      settings.visibleTools ??
+      DEFAULT_TOOL_IDS.map((id) => ({
+        toolId: id,
+        requiresConfirmation: false,
+      }));
 
     // Start AI stream (same for all operations)
     await aiStream.startStream(

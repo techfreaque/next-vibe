@@ -1,8 +1,17 @@
-import { translations as toolsTranslations } from "../../tools/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tools: toolsTranslations,
+  tools: {
+    get: {
+      title: "Tool-Hilfe — Verfügbare Tools entdecken",
+      description:
+        "Durchsuchen und entdecken Sie alle verfügbaren KI-Tools. Verwenden Sie query für die Suche, category für die Filterung.",
+      category: "KI-Tools",
+      tags: {
+        tools: "tools",
+      },
+    },
+  },
   executor: {
     errors: {
       toolNotFound: "Tool nicht gefunden: {{toolName}}",

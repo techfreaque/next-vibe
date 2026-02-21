@@ -15,7 +15,6 @@ import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/h
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { EnabledTool } from "../hooks/store";
 import type {
   ChatSettingsGetResponseOutput,
   ChatSettingsUpdateRequestOutput,
@@ -38,7 +37,10 @@ interface UseChatSettingsReturn {
   ) => void;
   setTTSAutoplay: (autoplay: boolean) => void;
   setViewMode: (mode: typeof ViewModeValue) => void;
-  setEnabledTools: (tools: EnabledTool[] | null) => void;
+  setTools: (
+    activeTools: ChatSettingsUpdateRequestOutput["activeTools"],
+    visibleTools: ChatSettingsUpdateRequestOutput["visibleTools"],
+  ) => void;
 }
 
 /**
@@ -123,8 +125,11 @@ export function useChatSettings(
       if (updates.viewMode !== undefined) {
         endpoint.create?.setValue("viewMode", updates.viewMode);
       }
-      if (updates.enabledTools !== undefined) {
-        endpoint.create?.setValue("enabledTools", updates.enabledTools);
+      if (updates.activeTools !== undefined) {
+        endpoint.create?.setValue("activeTools", updates.activeTools);
+      }
+      if (updates.visibleTools !== undefined) {
+        endpoint.create?.setValue("visibleTools", updates.visibleTools);
       }
       // Submit through endpoint (endpoint handles API vs localStorage based on config)
       await endpoint.create?.onSubmit();
@@ -146,9 +151,12 @@ export function useChatSettings(
     [updateSettings],
   );
 
-  const setEnabledTools = useCallback(
-    (tools: EnabledTool[] | null) => {
-      void updateSettings({ enabledTools: tools });
+  const setTools = useCallback(
+    (
+      activeTools: ChatSettingsUpdateRequestOutput["activeTools"],
+      visibleTools: ChatSettingsUpdateRequestOutput["visibleTools"],
+    ) => {
+      void updateSettings({ activeTools, visibleTools });
     },
     [updateSettings],
   );
@@ -178,6 +186,6 @@ export function useChatSettings(
     setActiveFavorite,
     setTTSAutoplay,
     setViewMode,
-    setEnabledTools,
+    setTools,
   };
 }

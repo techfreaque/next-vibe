@@ -35,7 +35,7 @@ const emailCampaignsTask = createCronTask(definitions.POST, tools.POST, {
   enabled: true,
   priority: CronTaskPriority.HIGH,
   timeout: TASK_TIMEOUTS.EXTENDED,
-  defaultInput: { batchSize: 100, maxEmailsPerRun: 500, dryRun: false },
+  taskInput: { dryRun: true, batchSize: 10, maxEmailsPerRun: 10 },
 });
 
 export const tasks: Task[] = [emailCampaignsTask];

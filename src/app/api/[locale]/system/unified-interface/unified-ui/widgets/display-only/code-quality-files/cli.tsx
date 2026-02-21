@@ -37,8 +37,9 @@ export function CodeQualityFilesWidgetInk<
   TEndpoint,
   TUsage,
   CodeQualityFilesWidgetConfig<TSchema, TUsage, TSchemaType>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TSchema is constrained to CodeQualityFilesSchema but TypeScript cannot resolve the inferred output through the widget field chain
 >): JSX.Element {
-  const value = field.value;
+  const value = field.value as z.output<CodeQualityFilesSchema> | undefined;
   const locale = useInkWidgetLocale();
   const { t } = simpleT(locale);
   // Build file list output as ANSI-encoded strings

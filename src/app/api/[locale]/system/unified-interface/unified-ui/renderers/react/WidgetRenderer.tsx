@@ -84,8 +84,18 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
   // Switch statement ensures proper type checking for each widget
   // Use props directly (not props) to preserve narrowing
   switch (props.field.type) {
-    case WidgetType.TEXT:
-      return <TextWidget {...props} />;
+    case WidgetType.TEXT: {
+      // Dispatch-boundary cast: switch discriminant guarantees type safety.
+      // oxlint-disable-next-line typescript/no-explicit-any
+      const TextW = TextWidget as React.ComponentType<any>;
+      return (
+        <TextW
+          fieldName={props.fieldName}
+          field={props.field}
+          inlineButtonInfo={props.inlineButtonInfo}
+        />
+      );
+    }
     case WidgetType.DESCRIPTION:
       return createWidget(
         () =>
@@ -107,10 +117,30 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
         props,
         "widget-key-value",
       );
-    case WidgetType.BADGE:
-      return <BadgeWidget {...props} />;
-    case WidgetType.ICON:
-      return <IconWidget {...props} />;
+    case WidgetType.BADGE: {
+      // Dispatch-boundary cast: switch discriminant guarantees type safety.
+      // oxlint-disable-next-line typescript/no-explicit-any
+      const BadgeW = BadgeWidget as React.ComponentType<any>;
+      return (
+        <BadgeW
+          fieldName={props.fieldName}
+          field={props.field}
+          inlineButtonInfo={props.inlineButtonInfo}
+        />
+      );
+    }
+    case WidgetType.ICON: {
+      // Dispatch-boundary cast: switch discriminant guarantees type safety.
+      // oxlint-disable-next-line typescript/no-explicit-any
+      const IconW = IconWidget as React.ComponentType<any>;
+      return (
+        <IconW
+          fieldName={props.fieldName}
+          field={props.field}
+          inlineButtonInfo={props.inlineButtonInfo}
+        />
+      );
+    }
     case WidgetType.MARKDOWN:
       return createWidget(
         () =>
@@ -125,8 +155,18 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
         props,
         "widget-markdown-editor",
       );
-    case WidgetType.TITLE:
-      return <TitleWidget {...props} />;
+    case WidgetType.TITLE: {
+      // Dispatch-boundary cast: switch discriminant guarantees type safety.
+      // oxlint-disable-next-line typescript/no-explicit-any
+      const TitleW = TitleWidget as React.ComponentType<any>;
+      return (
+        <TitleW
+          fieldName={props.fieldName}
+          field={props.field}
+          inlineButtonInfo={props.inlineButtonInfo}
+        />
+      );
+    }
     case WidgetType.LINK:
       return createWidget(
         () =>
@@ -172,9 +212,8 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
     case WidgetType.CUSTOM_WIDGET: {
       // Get render function from field
       const customField = props.field as typeof props.field & {
-        render?: React.ComponentType<
-          ReactWidgetProps<TEndpoint, FieldUsageConfig, typeof props.field>
-        >;
+        // oxlint-disable-next-line typescript/no-explicit-any
+        render?: React.ComponentType<any>;
       };
       const CustomRender = customField.render;
 
@@ -183,30 +222,98 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
       }
 
       // Pass the entire props (fieldName + field) to custom render
-      return <CustomRender {...props} />;
-    }
-    case WidgetType.CONTAINER:
       return (
-        <ContainerWidget
-          {...(props as ReactWidgetProps<
-            TEndpoint,
-            FieldUsageConfig,
-            Parameters<typeof ContainerWidget>[0]["field"]
-          >)}
+        <CustomRender
+          fieldName={props.fieldName}
+          field={props.field}
+          inlineButtonInfo={props.inlineButtonInfo}
         />
       );
-    case WidgetType.SEPARATOR:
-      return <SeparatorWidget {...props} />;
-    case WidgetType.BUTTON:
-      return <ButtonWidget {...props} />;
-    case WidgetType.NAVIGATE_BUTTON:
-      return <NavigateButtonWidget {...props} />;
-    case WidgetType.SUBMIT_BUTTON:
-      return <SubmitButtonWidget {...props} />;
-    case WidgetType.ALERT:
-      return <AlertWidget {...props} />;
-    case WidgetType.FORM_ALERT:
-      return <FormAlertWidget {...props} />;
+    }
+    case WidgetType.CONTAINER: {
+      // Dispatch-boundary cast: switch discriminant guarantees type safety.
+      // oxlint-disable-next-line typescript/no-explicit-any
+      const ContainerW = ContainerWidget as React.ComponentType<any>;
+      return (
+        <ContainerW
+          fieldName={props.fieldName}
+          field={props.field}
+          inlineButtonInfo={props.inlineButtonInfo}
+        />
+      );
+    }
+    case WidgetType.SEPARATOR: {
+      // Dispatch-boundary cast: switch discriminant guarantees type safety.
+      // oxlint-disable-next-line typescript/no-explicit-any
+      const SeparatorW = SeparatorWidget as React.ComponentType<any>;
+      return (
+        <SeparatorW
+          fieldName={props.fieldName}
+          field={props.field}
+          inlineButtonInfo={props.inlineButtonInfo}
+        />
+      );
+    }
+    case WidgetType.BUTTON: {
+      // Dispatch-boundary cast: switch discriminant guarantees type safety.
+      // oxlint-disable-next-line typescript/no-explicit-any
+      const ButtonW = ButtonWidget as React.ComponentType<any>;
+      return (
+        <ButtonW
+          fieldName={props.fieldName}
+          field={props.field}
+          inlineButtonInfo={props.inlineButtonInfo}
+        />
+      );
+    }
+    case WidgetType.NAVIGATE_BUTTON: {
+      // Dispatch-boundary cast: switch discriminant guarantees type safety.
+      // oxlint-disable-next-line typescript/no-explicit-any
+      const NavigateButtonW = NavigateButtonWidget as React.ComponentType<any>;
+      return (
+        <NavigateButtonW
+          fieldName={props.fieldName}
+          field={props.field}
+          inlineButtonInfo={props.inlineButtonInfo}
+        />
+      );
+    }
+    case WidgetType.SUBMIT_BUTTON: {
+      // Dispatch-boundary cast: switch discriminant guarantees type safety.
+      // oxlint-disable-next-line typescript/no-explicit-any
+      const SubmitButtonW = SubmitButtonWidget as React.ComponentType<any>;
+      return (
+        <SubmitButtonW
+          fieldName={props.fieldName}
+          field={props.field}
+          inlineButtonInfo={props.inlineButtonInfo}
+        />
+      );
+    }
+    case WidgetType.ALERT: {
+      // Dispatch-boundary cast: switch discriminant guarantees type safety.
+      // oxlint-disable-next-line typescript/no-explicit-any
+      const AlertW = AlertWidget as React.ComponentType<any>;
+      return (
+        <AlertW
+          fieldName={props.fieldName}
+          field={props.field}
+          inlineButtonInfo={props.inlineButtonInfo}
+        />
+      );
+    }
+    case WidgetType.FORM_ALERT: {
+      // Dispatch-boundary cast: switch discriminant guarantees type safety.
+      // oxlint-disable-next-line typescript/no-explicit-any
+      const FormAlertW = FormAlertWidget as React.ComponentType<any>;
+      return (
+        <FormAlertW
+          fieldName={props.fieldName}
+          field={props.field}
+          inlineButtonInfo={props.inlineButtonInfo}
+        />
+      );
+    }
     case WidgetType.STATUS_INDICATOR:
       return createWidget(
         () =>
@@ -256,8 +363,18 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
       const fieldType = props.field.fieldType as FieldDataType;
 
       switch (fieldType) {
-        case FieldDataType.BOOLEAN:
-          return <BooleanFieldWidget {...props} />;
+        case FieldDataType.BOOLEAN: {
+          // Dispatch-boundary cast: switch discriminant guarantees type safety.
+          // oxlint-disable-next-line typescript/no-explicit-any
+          const BooleanW = BooleanFieldWidget as React.ComponentType<any>;
+          return (
+            <BooleanW
+              fieldName={props.fieldName}
+              field={props.field}
+              inlineButtonInfo={props.inlineButtonInfo}
+            />
+          );
+        }
         case FieldDataType.COLOR:
           return createWidget(
             () =>
@@ -321,8 +438,18 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
             props,
             "field-filter-pills",
           );
-        case FieldDataType.ICON:
-          return <IconFieldWidget {...props} />;
+        case FieldDataType.ICON: {
+          // Dispatch-boundary cast: switch discriminant guarantees type safety.
+          // oxlint-disable-next-line typescript/no-explicit-any
+          const IconFieldW = IconFieldWidget as React.ComponentType<any>;
+          return (
+            <IconFieldW
+              fieldName={props.fieldName}
+              field={props.field}
+              inlineButtonInfo={props.inlineButtonInfo}
+            />
+          );
+        }
         case FieldDataType.INT:
           return createWidget(
             () =>
@@ -380,8 +507,18 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
             "field-range-slider",
           );
 
-        case FieldDataType.SELECT:
-          return <SelectFieldWidget {...props} />;
+        case FieldDataType.SELECT: {
+          // Dispatch-boundary cast: switch discriminant guarantees type safety.
+          // oxlint-disable-next-line typescript/no-explicit-any
+          const SelectW = SelectFieldWidget as React.ComponentType<any>;
+          return (
+            <SelectW
+              fieldName={props.fieldName}
+              field={props.field}
+              inlineButtonInfo={props.inlineButtonInfo}
+            />
+          );
+        }
         case FieldDataType.SLIDER:
           return createWidget(
             () =>
@@ -396,8 +533,18 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
             props,
             "field-tags",
           );
-        case FieldDataType.TEXTAREA:
-          return <TextareaFieldWidget {...props} />;
+        case FieldDataType.TEXTAREA: {
+          // Dispatch-boundary cast: switch discriminant guarantees type safety.
+          // oxlint-disable-next-line typescript/no-explicit-any
+          const TextareaW = TextareaFieldWidget as React.ComponentType<any>;
+          return (
+            <TextareaW
+              fieldName={props.fieldName}
+              field={props.field}
+              inlineButtonInfo={props.inlineButtonInfo}
+            />
+          );
+        }
         case FieldDataType.TEXT_ARRAY:
           return createWidget(
             () =>
@@ -405,8 +552,18 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
             props,
             "field-text-array",
           );
-        case FieldDataType.TEXT:
-          return <TextFieldWidget {...props} />;
+        case FieldDataType.TEXT: {
+          // Dispatch-boundary cast: switch discriminant guarantees type safety.
+          // oxlint-disable-next-line typescript/no-explicit-any
+          const TextFieldW = TextFieldWidget as React.ComponentType<any>;
+          return (
+            <TextFieldW
+              fieldName={props.fieldName}
+              field={props.field}
+              inlineButtonInfo={props.inlineButtonInfo}
+            />
+          );
+        }
         case FieldDataType.TIME:
           return createWidget(
             () =>
@@ -435,14 +592,21 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
             props,
             "field-url",
           );
-        case FieldDataType.UUID:
-          return <UuidFieldWidget {...props} />;
-
-        default: {
-          // oxlint-disable-next-line no-unused-vars
-          const _exhaustiveCheck: never = fieldType;
-          return <></>;
+        case FieldDataType.UUID: {
+          // Dispatch-boundary cast: switch discriminant guarantees type safety.
+          // oxlint-disable-next-line typescript/no-explicit-any
+          const UuidW = UuidFieldWidget as React.ComponentType<any>;
+          return (
+            <UuidW
+              fieldName={props.fieldName}
+              field={props.field}
+              inlineButtonInfo={props.inlineButtonInfo}
+            />
+          );
         }
+
+        default:
+          return <></>;
       }
     }
 

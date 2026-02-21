@@ -14,7 +14,15 @@ import React from "react";
 import { z } from "zod";
 
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
-import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
+import type {
+  EmailFunctionType,
+  EmailTemplateReturnType,
+} from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
+import type {
+  ErrorResponseType,
+  SuccessResponseType,
+} from "next-vibe/shared/types/response.schema";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { env } from "@/config/env";
 import {
   FEATURED_MODELS,
@@ -22,6 +30,8 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
+
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { contactClientRepository } from "../../../contact/repository-client";
 import { UserDetailLevel } from "../../enum";
@@ -407,16 +417,18 @@ export default signupWelcomeTemplate;
 // ============================================================================
 
 /**
- * Signup Welcome Email Adapter
- * Maps signup request to welcome template props
+ * Core welcome email logic — looks up user by email and renders the welcome template.
+ * Export for use by other routes (e.g. admin user-create) that share the same template.
+ * Called by the typed wrappers below for signup and admin user-create contexts.
  */
-export const renderRegisterMail: EmailFunctionType<
-  SignupPostRequestOutput,
-  SignupPostResponseOutput,
-  Record<string, string>
-> = async ({ requestData, locale, t, logger }) => {
+export async function renderWelcomeEmailByEmail(
+  email: string,
+  locale: CountryLanguage,
+  t: TFunction,
+  logger: EndpointLogger,
+): Promise<SuccessResponseType<EmailTemplateReturnType> | ErrorResponseType> {
   const userResponse = await UserRepository.getUserByEmail(
-    requestData.email,
+    email,
     UserDetailLevel.STANDARD,
     locale,
     logger,
@@ -425,7 +437,7 @@ export const renderRegisterMail: EmailFunctionType<
     return fail({
       message: "app.api.user.errors.not_found",
       errorType: ErrorResponseTypes.NOT_FOUND,
-      messageParams: { email: requestData.email },
+      messageParams: { email },
       cause: userResponse,
     });
   }
@@ -451,7 +463,18 @@ export const renderRegisterMail: EmailFunctionType<
       tracking: createTrackingContext(locale, user.leadId, user.id),
     }),
   });
-};
+}
+
+/**
+ * Signup Welcome Email — typed for SignupPostRequestOutput.
+ * Used by the public signup route.
+ */
+export const renderRegisterMail: EmailFunctionType<
+  SignupPostRequestOutput,
+  SignupPostResponseOutput,
+  never
+> = ({ requestData, locale, t, logger }) =>
+  renderWelcomeEmailByEmail(requestData.email, locale, t, logger);
 
 function renderAdminNotificationEmailContent(
   t: TFunction,
@@ -462,7 +485,10 @@ function renderAdminNotificationEmailContent(
     publicName: string;
     email: string;
     id: string;
+    locale: CountryLanguage;
     createdAt: string | number | Date;
+    creditBalance?: number;
+    leadCreditBalance?: number;
   },
   requestData: {
     subscribeToNewsletter?: boolean | null;
@@ -601,6 +627,58 @@ function renderAdminNotificationEmailContent(
                 {user.email}
               </a>
             </Text>
+
+            <Text
+              style={{
+                fontSize: "14px",
+                marginBottom: "6px",
+                color: "#4b5563",
+                lineHeight: "1.5",
+              }}
+            >
+              <Text style={{ fontWeight: "700", color: "#1f2937" }}>
+                {t("app.api.user.public.signup.admin_notification.language")}:
+              </Text>{" "}
+              {user.locale}
+            </Text>
+
+            {user.creditBalance !== undefined && (
+              <Text
+                style={{
+                  fontSize: "14px",
+                  marginBottom: "6px",
+                  color: "#4b5563",
+                  lineHeight: "1.5",
+                }}
+              >
+                <Text style={{ fontWeight: "700", color: "#1f2937" }}>
+                  {t(
+                    "app.api.user.public.signup.admin_notification.creditBalance",
+                  )}
+                  :
+                </Text>{" "}
+                {user.creditBalance}
+              </Text>
+            )}
+
+            {user.leadCreditBalance !== undefined && (
+              <Text
+                style={{
+                  fontSize: "14px",
+                  marginBottom: "6px",
+                  color: "#4b5563",
+                  lineHeight: "1.5",
+                }}
+              >
+                <Text style={{ fontWeight: "700", color: "#1f2937" }}>
+                  {t(
+                    "app.api.user.public.signup.admin_notification.leadCreditBalance",
+                  )}
+                  :
+                </Text>{" "}
+                {user.leadCreditBalance}
+              </Text>
+            )}
           </div>
         </div>
 
@@ -827,6 +905,7 @@ export const adminSignupNotificationTemplate: EmailTemplateDefinition<AdminSignu
           publicName: props.publicName,
           email: props.email,
           id: props.userId,
+          locale,
           createdAt: new Date(),
         },
         { subscribeToNewsletter: props.subscribeToNewsletter },
@@ -841,17 +920,19 @@ export const adminSignupNotificationTemplate: EmailTemplateDefinition<AdminSignu
   };
 
 /**
- * Admin Notification Email Function
- * Sends notification to admin when a new user signs up
+ * Core admin notification logic — fetches full user + credit balance and renders the admin email.
+ * Called by the typed wrappers below for signup and admin user-create contexts.
  */
-export const renderAdminSignupNotification: EmailFunctionType<
-  SignupPostRequestOutput,
-  SignupPostResponseOutput,
-  Record<string, string>
-> = async ({ requestData, locale, t, logger }) => {
+export async function renderAdminNotificationByEmail(
+  email: string,
+  subscribeToNewsletter: boolean | null | undefined,
+  locale: CountryLanguage,
+  t: TFunction,
+  logger: EndpointLogger,
+): Promise<SuccessResponseType<EmailTemplateReturnType> | ErrorResponseType> {
   const userResponse = await UserRepository.getUserByEmail(
-    requestData.email,
-    UserDetailLevel.STANDARD,
+    email,
+    UserDetailLevel.COMPLETE,
     locale,
     logger,
   );
@@ -859,11 +940,19 @@ export const renderAdminSignupNotification: EmailFunctionType<
     return fail({
       message: "app.api.user.errors.not_found",
       errorType: ErrorResponseTypes.NOT_FOUND,
-      messageParams: { email: requestData.email },
+      messageParams: { email },
       cause: userResponse,
     });
   }
   const user = userResponse.data;
+
+  // Fetch credit balances (non-blocking — omit from email if unavailable)
+  const [userBalanceResult, leadBalanceResult] = await Promise.all([
+    CreditRepository.getBalance({ userId: user.id }, logger),
+    user.leadId
+      ? CreditRepository.getBalance({ leadId: user.leadId }, logger)
+      : Promise.resolve(null),
+  ]);
 
   return success({
     toEmail: contactClientRepository.getSupportEmail(locale),
@@ -875,10 +964,33 @@ export const renderAdminSignupNotification: EmailFunctionType<
       t,
       locale,
       contactClientRepository.getSupportEmail(locale),
-      user,
       {
-        subscribeToNewsletter: requestData.subscribeToNewsletter,
+        ...user,
+        creditBalance: userBalanceResult?.success
+          ? userBalanceResult.data.total
+          : undefined,
+        leadCreditBalance: leadBalanceResult?.success
+          ? leadBalanceResult.data.total
+          : undefined,
       },
+      { subscribeToNewsletter },
     ),
   });
-};
+}
+
+/**
+ * Admin Notification Email — typed for SignupPostRequestOutput.
+ * Used by the public signup route.
+ */
+export const renderAdminSignupNotification: EmailFunctionType<
+  SignupPostRequestOutput,
+  SignupPostResponseOutput,
+  never
+> = ({ requestData, locale, t, logger }) =>
+  renderAdminNotificationByEmail(
+    requestData.email,
+    requestData.subscribeToNewsletter,
+    locale,
+    t,
+    logger,
+  );

@@ -11,6 +11,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 
+import type { EndpointReadOptions } from "../../shared/endpoints/definition/create";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { executeQuery } from "./query-executor";
 import { buildKey } from "./query-key-builder";
@@ -142,9 +143,17 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
         options: {
           onSuccess: async (context) => {
             // Call endpoint-defined onSuccess first (from endpoint.options.queryOptions.onSuccess)
-            if (endpoint.options?.queryOptions?.onSuccess) {
+            const endpointReadOptions =
+              endpoint.options && "queryOptions" in endpoint.options
+                ? (endpoint.options as EndpointReadOptions<
+                    TEndpoint["types"]["RequestOutput"],
+                    TEndpoint["types"]["ResponseOutput"],
+                    TEndpoint["types"]["UrlVariablesOutput"]
+                  >)
+                : undefined;
+            if (endpointReadOptions?.queryOptions?.onSuccess) {
               const endpointResult =
-                await endpoint.options.queryOptions.onSuccess(
+                await endpointReadOptions.queryOptions.onSuccess(
                   {
                     responseData: context.responseData,
                     requestData: context.requestData,

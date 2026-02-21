@@ -108,15 +108,23 @@ export function deepMerge<T>(...sources: (T | null | undefined)[]): T {
         typeof resultValue === "function"
       ) {
         // Create a chained function that calls both
-        result[key] = (async (...args) => {
+        result[key] = (async (...args: DeepPartial<never>[]) => {
           // Call first function
-          const firstResult = await resultValue(...args);
+          const firstResult = await (
+            resultValue as (
+              ...a: DeepPartial<never>[]
+            ) => Promise<DeepPartial<never>>
+          )(...args);
           // If first function returned an error/truthy value, return it
           if (firstResult) {
             return firstResult;
           }
           // Otherwise call second function
-          return await sourceValue(...args);
+          return await (
+            sourceValue as (
+              ...a: DeepPartial<never>[]
+            ) => Promise<DeepPartial<never>>
+          )(...args);
         }) as DeepPartial<never>;
       } else if (isPlainObject(sourceValue) && isPlainObject(resultValue)) {
         // Recursively merge nested objects

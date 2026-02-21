@@ -9,6 +9,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import type { ReactElement } from "react";
 import { useMemo } from "react";
+import type { z } from "zod";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ReactRequestResponseWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
@@ -56,14 +57,17 @@ export default function CodeQualityListWidget<
   const { usage } = field;
 
   // Get value from form for request fields, otherwise from field.value
-  let value: CodeQualityListSchema | undefined;
+  // field.value is typed as the inferred schema output; cast to the concrete type
+  // since TSchema is constrained to CodeQualityListSchema (a ZodArray)
+  type CodeQualityListOutput = z.output<CodeQualityListSchema>;
+  let value: CodeQualityListOutput | undefined;
   if (usage.request && fieldName && form) {
-    value = form.watch(fieldName);
+    value = form.watch(fieldName) as CodeQualityListOutput | undefined;
     if (!value) {
-      value = field.value;
+      value = field.value as CodeQualityListOutput | undefined;
     }
   } else {
-    value = field.value;
+    value = field.value as CodeQualityListOutput | undefined;
   }
 
   const { t } = simpleT(locale);

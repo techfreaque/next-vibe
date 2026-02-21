@@ -52,6 +52,7 @@ export const buttonTextVariants = cva("text-sm font-medium text-foreground", {
     },
     size: {
       default: "",
+      xs: "text-xs",
       sm: "",
       lg: "",
       icon: "",

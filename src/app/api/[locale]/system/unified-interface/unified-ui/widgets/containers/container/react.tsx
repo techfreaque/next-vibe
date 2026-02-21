@@ -55,7 +55,11 @@ import {
   useWidgetSubmitButton,
   useWidgetTranslation,
 } from "../../_shared/use-widget-context";
-import type { ContainerWidgetConfig } from "./types";
+import type {
+  ContainerArrayWidgetConfig,
+  ContainerObjectWidgetConfig,
+  ContainerUnionWidgetConfig,
+} from "./types";
 
 /**
  * Container Widget - Displays container layouts with nested fields
@@ -102,7 +106,32 @@ export function ContainerWidget<
 }: ReactWidgetProps<
   TEndpoint,
   TUsage,
-  ContainerWidgetConfig<TKey, TUsage, TSchemaType, TChildren>
+  | ContainerObjectWidgetConfig<
+      TKey,
+      TUsage,
+      Extract<TSchemaType, "object" | "object-optional" | "widget-object">,
+      Extract<
+        TChildren,
+        ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
+      >
+    >
+  | ContainerArrayWidgetConfig<
+      TKey,
+      TUsage,
+      Extract<TSchemaType, "array" | "array-optional">,
+      Extract<
+        TChildren,
+        ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>
+      >
+    >
+  | ContainerUnionWidgetConfig<
+      TKey,
+      TUsage,
+      Extract<
+        TChildren,
+        UnionObjectWidgetConfigConstrain<TKey, ConstrainedChildUsage<TUsage>>
+      >
+    >
 >): JSX.Element {
   // Get context from hooks
   const locale = useWidgetLocale();
@@ -182,20 +211,20 @@ export function ContainerWidget<
   const { childrenForRenderer, discriminator, fieldValue } = extractFieldData();
 
   // Calculate count - extract separately to handle complex conditional types
+  // field.getCount is defined on ContainerObjectWidgetConfig / ContainerArrayWidgetConfig
+  // but TypeScript can't infer it through the complex intersection after type guard narrowing
   const countFromField = ((): number | undefined => {
-    if (hasChild(field)) {
-      if (!field.getCount) {
-        return undefined;
-      }
-      return field.getCount(field.value as never);
+    const fieldWithCount = field as {
+      getCount?: (data: never) => number | undefined;
+      value: WidgetData;
+    };
+    if (
+      !("getCount" in field) ||
+      typeof fieldWithCount.getCount !== "function"
+    ) {
+      return undefined;
     }
-    if (hasChildren(field)) {
-      if (!field.getCount) {
-        return undefined;
-      }
-      return field.getCount(field.value as never);
-    }
-    return undefined;
+    return fieldWithCount.getCount(fieldWithCount.value as never);
   })();
 
   // Call useWatch unconditionally (React hooks rule) - disabled when not needed
@@ -416,13 +445,7 @@ export function ContainerWidget<
         <Div className={cn(layoutClass, innerClassName)}>
           <MultiWidgetRenderer
             childrenSchema={childrenForRenderer}
-            value={
-              fieldValue as
-                | { [key: string]: WidgetData }
-                | WidgetData[]
-                | null
-                | undefined
-            }
+            value={fieldValue}
             fieldName={fieldName}
             discriminator={discriminator}
             watchedDiscriminatorValue={watchedDiscriminator}
@@ -578,13 +601,7 @@ export function ContainerWidget<
         <Div className={cn(layoutClass, innerClassName)}>
           <MultiWidgetRenderer
             childrenSchema={childrenForRenderer}
-            value={
-              fieldValue as
-                | { [key: string]: WidgetData }
-                | WidgetData[]
-                | null
-                | undefined
-            }
+            value={fieldValue}
             fieldName={fieldName}
             discriminator={discriminator}
             watchedDiscriminatorValue={watchedDiscriminator}

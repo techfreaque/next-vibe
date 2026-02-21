@@ -4,13 +4,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import helpEndpoints from "./definition";
-import { helpRepository } from "./repository";
+import { HelpRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { GET, tools } = endpointsHandler({
   endpoint: helpEndpoints,
-  [Methods.POST]: {
-    handler: ({ data, user, logger, platform, locale }) => {
-      return helpRepository.execute(data, user, logger, platform, locale);
-    },
+  [Methods.GET]: {
+    email: undefined,
+    handler: ({ data, user, logger, platform, locale }) =>
+      HelpRepository.getTools(data, user, locale, platform, logger),
   },
 });

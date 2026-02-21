@@ -1406,6 +1406,7 @@ export const ICON_CATEGORIES = {
       "navigation",
       "move-left",
       "mouse-pointer",
+      "mouse-pointer-click",
       "log-in",
       "log-out",
     ],

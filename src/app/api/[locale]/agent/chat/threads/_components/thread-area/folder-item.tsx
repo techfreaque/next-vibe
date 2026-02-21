@@ -94,6 +94,9 @@ export function FolderItem({
     folders,
     threads,
     handleCreateThreadInFolder,
+    handleSelectThread,
+    handleDeleteThread,
+    updateThread,
     createFolder,
     updateFolder,
     deleteFolder,
@@ -485,8 +488,15 @@ export function FolderItem({
                   </Div>
                   <ThreadList
                     threads={groupedThreads.today}
+                    activeThreadId={activeThreadId}
                     locale={locale}
                     logger={logger}
+                    user={user}
+                    onSelect={handleSelectThread}
+                    onDelete={handleDeleteThread}
+                    onUpdateTitle={(threadId, title) => {
+                      void updateThread(threadId, { title });
+                    }}
                   />
                 </Div>
               )}
@@ -498,8 +508,15 @@ export function FolderItem({
                   </Div>
                   <ThreadList
                     threads={groupedThreads.lastWeek}
+                    activeThreadId={activeThreadId}
                     locale={locale}
                     logger={logger}
+                    user={user}
+                    onSelect={handleSelectThread}
+                    onDelete={handleDeleteThread}
+                    onUpdateTitle={(threadId, title) => {
+                      void updateThread(threadId, { title });
+                    }}
                   />
                 </Div>
               )}
@@ -511,8 +528,15 @@ export function FolderItem({
                   </Div>
                   <ThreadList
                     threads={groupedThreads.lastMonth}
+                    activeThreadId={activeThreadId}
                     locale={locale}
                     logger={logger}
+                    user={user}
+                    onSelect={handleSelectThread}
+                    onDelete={handleDeleteThread}
+                    onUpdateTitle={(threadId, title) => {
+                      void updateThread(threadId, { title });
+                    }}
                   />
                 </Div>
               )}

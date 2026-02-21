@@ -31,6 +31,7 @@ const creditExpirationTask = createCronTask(
     enabled: true,
     priority: CronTaskPriority.MEDIUM,
     timeout: TASK_TIMEOUTS.SHORT,
+    taskInput: undefined,
   },
 );
 

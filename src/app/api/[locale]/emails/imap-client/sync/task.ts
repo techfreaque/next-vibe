@@ -28,10 +28,11 @@ const imapSyncTask = createCronTask(definitions.POST, tools.POST, {
   enabled: false,
   priority: CronTaskPriority.MEDIUM,
   timeout: TASK_TIMEOUTS.EXTENDED,
-  defaultInput: {
-    force: false,
+  taskInput: {
     dryRun: false,
+    force: false,
     maxMessages: 100,
+    accountIds: ["add-uuid-of-an-imap-account-here"],
   },
 });
 

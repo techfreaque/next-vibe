@@ -39,9 +39,19 @@ import type {
   CharacterListItem,
   CharacterListResponseOutput,
 } from "./definition";
-import { type CharacterCategoryValue, CharacterOwnershipType } from "./enum";
+import {
+  type CharacterCategoryValue,
+  CharacterOwnershipType,
+  ModelSelectionType,
+} from "./enum";
 import { CATEGORY_CONFIG } from "./enum";
 import { CharactersRepositoryClient } from "./repository-client";
+
+/** Default model selection used when none is provided */
+const DEFAULT_MODEL_SELECTION: ModelSelectionSimple = {
+  selectionType: ModelSelectionType.MANUAL,
+  manualModelId: defaultModel,
+};
 
 /**
  * Characters Repository - Static class pattern
@@ -364,7 +374,7 @@ export class CharactersRepository {
           systemPrompt: data.systemPrompt,
           category: data.category,
           voice: data.voice,
-          modelSelection: data.modelSelection,
+          modelSelection: data.modelSelection ?? DEFAULT_MODEL_SELECTION,
           ownershipType: data.isPublic
             ? CharacterOwnershipType.PUBLIC
             : CharacterOwnershipType.USER,
@@ -428,7 +438,7 @@ export class CharactersRepository {
             systemPrompt: data.systemPrompt,
             category: data.category,
             voice: data.voice,
-            modelSelection: data.modelSelection,
+            modelSelection: data.modelSelection ?? DEFAULT_MODEL_SELECTION,
             ownershipType: data.isPublic
               ? CharacterOwnershipType.PUBLIC
               : CharacterOwnershipType.USER,

@@ -154,6 +154,8 @@ function EndpointsPageInternal<
           requestData,
           pathParams,
           logger,
+          user: callUser,
+          locale: callLocale,
         }): Promise<void | ErrorResponseType> => {
           // Call caller's onSuccess if it exists
           const result = await callerOnSuccess?.({
@@ -161,6 +163,8 @@ function EndpointsPageInternal<
             requestData,
             pathParams,
             logger,
+            user: callUser,
+            locale: callLocale,
           });
 
           if (result) {
@@ -217,6 +221,8 @@ function EndpointsPageInternal<
         requestData,
         pathParams,
         logger,
+        user: callUser,
+        locale: callLocale,
       }): Promise<void | ErrorResponseType> => {
         // Call existing onSuccess first
         if (existingPatchOptions?.onSuccess) {
@@ -225,6 +231,8 @@ function EndpointsPageInternal<
             requestData,
             pathParams,
             logger,
+            user: callUser,
+            locale: callLocale,
           });
           if (result) {
             return result;
@@ -277,6 +285,8 @@ function EndpointsPageInternal<
         requestData,
         pathParams,
         logger,
+        user: callUser,
+        locale: callLocale,
       }): Promise<void | ErrorResponseType> => {
         // Call existing onSuccess first
         if (existingDeleteOptions?.onSuccess) {
@@ -285,6 +295,8 @@ function EndpointsPageInternal<
             requestData,
             pathParams,
             logger,
+            user: callUser,
+            locale: callLocale,
           });
           if (result) {
             return result;
@@ -805,14 +817,14 @@ function StackEntryLayer({
             create: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.data,
-              mutationOptions: entry.endpoint.options?.mutationOptions
+              mutationOptions: (entry.endpoint.options?.mutationOptions
                 ? (() => {
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     const { onSuccess, ...rest } =
                       entry.endpoint.options.mutationOptions;
                     return Object.keys(rest).length > 0 ? rest : undefined;
                   })()
-                : undefined,
+                : undefined) as never,
             },
           }}
           submitButton={submitButton}
@@ -824,12 +836,7 @@ function StackEntryLayer({
     );
   }
 
-  if (method === "PATCH") {
-    const endpointConfig =
-      entry.prefillFromGet && entry.getEndpoint
-        ? { GET: entry.getEndpoint, PATCH: entry.endpoint }
-        : { PATCH: entry.endpoint };
-
+  if (method === "PATCH" && entry.prefillFromGet && entry.getEndpoint) {
     return (
       <StackEntryRenderer
         entry={entry}
@@ -842,17 +849,52 @@ function StackEntryLayer({
       >
         <EndpointsPageInternal
           user={user}
-          endpoint={endpointConfig}
+          endpoint={{ GET: entry.getEndpoint, PATCH: entry.endpoint }}
           locale={locale}
           forceMethod={method}
           endpointOptions={{
-            ...(entry.prefillFromGet
-              ? {
-                  read: {
-                    urlPathParams: entry.params.urlPathParams as never,
-                  },
-                }
-              : {}),
+            read: {
+              urlPathParams: entry.params.urlPathParams as never,
+            },
+            update: {
+              urlPathParams: entry.params.urlPathParams,
+              autoPrefillData: entry.params.data,
+              mutationOptions: (entry.endpoint.options?.mutationOptions
+                ? (() => {
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    const { onSuccess, ...rest } =
+                      entry.endpoint.options.mutationOptions;
+                    return Object.keys(rest).length > 0 ? rest : undefined;
+                  })()
+                : undefined) as never,
+            },
+          }}
+          submitButton={submitButton}
+          debug={debug}
+          _disableNavigationStack={true}
+          navigationOverride={isModal ? modalNavigationOverride : undefined}
+        />
+      </StackEntryRenderer>
+    );
+  }
+
+  if (method === "PATCH") {
+    return (
+      <StackEntryRenderer
+        entry={entry}
+        isModal={isModal}
+        isVisible={isVisible}
+        className={className}
+        modalOpenState={modalOpenState}
+        setModalOpenState={setModalOpenState}
+        finalNavigation={finalNavigation}
+      >
+        <EndpointsPageInternal
+          user={user}
+          endpoint={{ PATCH: entry.endpoint }}
+          locale={locale}
+          forceMethod={method}
+          endpointOptions={{
             update: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.data,
@@ -894,14 +936,14 @@ function StackEntryLayer({
             delete: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.urlPathParams,
-              mutationOptions: entry.endpoint.options?.mutationOptions
+              mutationOptions: (entry.endpoint.options?.mutationOptions
                 ? (() => {
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     const { onSuccess, ...rest } =
                       entry.endpoint.options.mutationOptions;
                     return Object.keys(rest).length > 0 ? rest : undefined;
                   })()
-                : undefined,
+                : undefined) as never,
             },
           }}
           debug={debug}

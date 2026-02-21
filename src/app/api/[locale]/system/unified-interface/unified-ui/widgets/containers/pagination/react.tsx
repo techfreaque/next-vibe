@@ -40,7 +40,11 @@ export function PaginationWidget<
 >({
   field,
   fieldName,
-}: ReactWidgetProps<TEndpoint, TUsage, PaginationWidgetConfig>): JSX.Element {
+}: ReactWidgetProps<
+  TEndpoint,
+  TUsage,
+  PaginationWidgetConfig<TUsage>
+>): JSX.Element {
   const locale = useWidgetLocale();
   const form = useWidgetForm();
   const { t } = simpleT(locale);

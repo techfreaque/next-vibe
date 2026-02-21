@@ -12,6 +12,19 @@ import type { NavigationStackEntry } from "../../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
 
 /**
+ * Navigation options — mirrors NavigationOptions in use-navigation-stack.tsx
+ */
+interface NavigationOptions<TEndpoint extends CreateApiEndpointAny> {
+  urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
+  data?: Partial<TEndpoint["types"]["RequestOutput"]>;
+  prefillFromGet?: boolean;
+  getEndpoint?: CreateApiEndpointAny;
+  renderInModal?: boolean;
+  popNavigationOnSuccess?: number;
+  modalPosition?: { x: number; y: number };
+}
+
+/**
  * CLI Navigation Hook
  * Provides navigation stack management for terminal UI
  */
@@ -20,19 +33,21 @@ export function useCliNavigation(): UseNavigationStackReturn {
 
   const push = <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
-    params: {
-      urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
-      data?: Partial<TEndpoint["types"]["RequestOutput"]>;
-    },
-    prefillFromGet = false,
-    getEndpoint?: CreateApiEndpointAny,
-    renderInModal = false,
-    popNavigationOnSuccess?: number,
-    modalPosition?: { x: number; y: number },
+    options?: NavigationOptions<TEndpoint>,
   ): void => {
+    const {
+      urlPathParams,
+      data,
+      prefillFromGet = false,
+      getEndpoint,
+      renderInModal = false,
+      popNavigationOnSuccess,
+      modalPosition,
+    } = options ?? {};
+
     const entry: NavigationStackEntry<TEndpoint> = {
       endpoint,
-      params,
+      params: { urlPathParams, data },
       timestamp: Date.now(),
       getEndpoint,
       prefillFromGet,
@@ -46,19 +61,21 @@ export function useCliNavigation(): UseNavigationStackReturn {
 
   const replace = <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
-    params: {
-      urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
-      data?: Partial<TEndpoint["types"]["RequestOutput"]>;
-    },
-    prefillFromGet = false,
-    getEndpoint?: CreateApiEndpointAny,
-    renderInModal = false,
-    popNavigationOnSuccess?: number,
-    modalPosition?: { x: number; y: number },
+    options?: NavigationOptions<TEndpoint>,
   ): void => {
+    const {
+      urlPathParams,
+      data,
+      prefillFromGet = false,
+      getEndpoint,
+      renderInModal = false,
+      popNavigationOnSuccess,
+      modalPosition,
+    } = options ?? {};
+
     const entry: NavigationStackEntry<TEndpoint> = {
       endpoint,
-      params,
+      params: { urlPathParams, data },
       timestamp: Date.now(),
       getEndpoint,
       prefillFromGet,
@@ -75,12 +92,13 @@ export function useCliNavigation(): UseNavigationStackReturn {
     });
   };
 
-  const pop = (): void => {
+  const pop = (count = 1): void => {
     setStack((prev) => {
-      if (prev.length <= 1) {
-        return [];
+      if (prev.length === 0) {
+        return prev;
       }
-      return prev.slice(0, -1);
+      const newLength = Math.max(0, prev.length - count);
+      return prev.slice(0, newLength);
     });
   };
 

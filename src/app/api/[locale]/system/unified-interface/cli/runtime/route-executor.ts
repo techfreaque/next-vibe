@@ -18,7 +18,7 @@ import {
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
-import { INTERACTIVE_MODE_ALIAS } from "../../../help/interactive/definition";
+import { TOOL_HELP_ALIAS } from "../../../help/constants";
 import { definitionLoader } from "../../shared/endpoints/definition/loader";
 import {
   type BaseExecutionContext,
@@ -167,7 +167,7 @@ export class RouteDelegationHandler {
     const startTime = Date.now();
 
     // Default to interactive mode if no command provided
-    const resolvedCommand = command || INTERACTIVE_MODE_ALIAS;
+    const resolvedCommand = command || `${TOOL_HELP_ALIAS} --interactive`;
 
     try {
       // Get CLI user for authentication if not provided

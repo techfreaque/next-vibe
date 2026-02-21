@@ -24,6 +24,7 @@ import type {
   CustomWidgetObjectConfig,
   CustomWidgetPrimitiveConfig,
 } from "../../unified-ui/widgets/containers/custom/types";
+import type { PaginationWidgetConfig } from "../../unified-ui/widgets/containers/pagination/types";
 import type { AlertWidgetConfig } from "../../unified-ui/widgets/display-only/alert/types";
 import type { AvatarWidgetConfig } from "../../unified-ui/widgets/display-only/avatar/types";
 import type { BadgeWidgetConfig } from "../../unified-ui/widgets/display-only/badge/types";
@@ -510,4 +511,5 @@ export type UnifiedField<
       // @ts-expect-error - TChildren is only valid for object widgets
       TChildren
     >
-  | DisplayOnlyWidgetConfig<TKey, TUsage, "widget">;
+  | DisplayOnlyWidgetConfig<TKey, TUsage, "widget">
+  | PaginationWidgetConfig<TUsage>;

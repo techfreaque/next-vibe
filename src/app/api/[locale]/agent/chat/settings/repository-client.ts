@@ -79,7 +79,8 @@ export class ChatSettingsRepositoryClient {
       ttsAutoplay: false,
       ttsVoice: DEFAULT_TTS_VOICE,
       viewMode: ViewMode.LINEAR,
-      enabledTools: null,
+      activeTools: null,
+      visibleTools: null,
     };
   }
 
@@ -113,10 +114,14 @@ export class ChatSettingsRepositoryClient {
         ttsAutoplay: overrides.ttsAutoplay ?? defaults.ttsAutoplay,
         ttsVoice: overrides.ttsVoice ?? defaults.ttsVoice,
         viewMode: overrides.viewMode ?? defaults.viewMode,
-        enabledTools:
-          "enabledTools" in overrides
-            ? overrides.enabledTools
-            : defaults.enabledTools,
+        activeTools:
+          "activeTools" in overrides
+            ? overrides.activeTools
+            : defaults.activeTools,
+        visibleTools:
+          "visibleTools" in overrides
+            ? overrides.visibleTools
+            : defaults.visibleTools,
       };
     } catch {
       return this.getDefaults();
@@ -154,10 +159,16 @@ export class ChatSettingsRepositoryClient {
       overrides.viewMode = settings.viewMode;
     }
     if (
-      JSON.stringify(settings.enabledTools) !==
-      JSON.stringify(defaults.enabledTools)
+      JSON.stringify(settings.activeTools) !==
+      JSON.stringify(defaults.activeTools)
     ) {
-      overrides.enabledTools = settings.enabledTools;
+      overrides.activeTools = settings.activeTools;
+    }
+    if (
+      JSON.stringify(settings.visibleTools) !==
+      JSON.stringify(defaults.visibleTools)
+    ) {
+      overrides.visibleTools = settings.visibleTools;
     }
 
     if (Object.keys(overrides).length === 0) {
@@ -187,10 +198,14 @@ export class ChatSettingsRepositoryClient {
           : current.ttsAutoplay,
       ttsVoice: updates.ttsVoice ?? current.ttsVoice,
       viewMode: updates.viewMode ?? current.viewMode,
-      enabledTools:
-        updates.enabledTools !== undefined
-          ? updates.enabledTools
-          : current.enabledTools,
+      activeTools:
+        updates.activeTools !== undefined
+          ? updates.activeTools
+          : current.activeTools,
+      visibleTools:
+        updates.visibleTools !== undefined
+          ? updates.visibleTools
+          : current.visibleTools,
     };
 
     this.saveLocalSettings(updated);

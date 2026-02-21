@@ -68,7 +68,8 @@ export function MessageAuthorInfo({
     displayName =
       rootFolderId === "private" ||
       rootFolderId === "shared" ||
-      rootFolderId === "public"
+      rootFolderId === "public" ||
+      rootFolderId === "cron"
         ? t("app.chat.messages.anonymous")
         : t("app.chat.messages.user");
   }

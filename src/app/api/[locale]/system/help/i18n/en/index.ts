@@ -1,6 +1,117 @@
 export const translations = {
   category: "Help & Documentation",
   tag: "Help",
+  get: {
+    title: "Tool Help — Discover Available Tools",
+    description:
+      "Search and discover all tools available to you. Use query to search by name, description, or alias. Use category to filter by category. Returns tool names, descriptions, aliases, and metadata.",
+    tags: {
+      tools: "tools",
+    },
+    fields: {
+      query: {
+        label: "Search Query",
+        description:
+          "Search tools by name, description, alias, or tag (case-insensitive). Searches across all locales.",
+        placeholder: "e.g. search, memory, fetch...",
+      },
+      category: {
+        label: "Category Filter",
+        description: "Filter tools by category name (case-insensitive)",
+      },
+      toolName: {
+        label: "Tool Name (Detail)",
+        description:
+          "Get full details for a specific tool by name or alias. Returns parameter schema.",
+      },
+      page: {
+        label: "Page",
+        description: "Page number for paginated results (default: 1)",
+        title: "Current page number",
+      },
+      pageSize: {
+        label: "Page Size",
+        description:
+          "Number of results per page. AI/MCP default: 25. Web/CLI default: 200. Max: 500.",
+        title: "Effective page size",
+      },
+      tools: {
+        title: "Available Tools",
+      },
+      totalCount: {
+        title: "Total tool count",
+      },
+      matchedCount: {
+        title: "Matched tool count",
+      },
+      categories: {
+        title: "Tool categories",
+      },
+      hint: {
+        title: "Usage hint",
+      },
+      currentPage: {
+        title: "Current page",
+      },
+      effectivePageSize: {
+        title: "Effective page size",
+      },
+      totalPages: {
+        title: "Total pages",
+      },
+      parameters: {
+        title: "Parameters",
+      },
+      aliases: {
+        title: "Aliases",
+      },
+      openTool: {
+        label: "Open Tool",
+      },
+    },
+    success: {
+      title: "Tools fetched successfully",
+      description: "Available tools retrieved",
+    },
+    errors: {
+      validation: {
+        title: "Validation Error",
+        description: "Invalid request parameters",
+      },
+      network: {
+        title: "Network Error",
+        description: "Failed to connect to the server",
+      },
+      unauthorized: {
+        title: "Unauthorized",
+        description: "Authentication required",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "You don't have permission to access tools",
+      },
+      notFound: {
+        title: "Not Found",
+        description: "Tools endpoint not found",
+      },
+      server: {
+        title: "Server Error",
+        description: "Failed to fetch tools",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unexpected error occurred",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+      conflict: {
+        title: "Conflict",
+        description: "A conflict occurred while fetching tools",
+      },
+    },
+  },
   interactive: {
     post: {
       title: "Interactive Mode",

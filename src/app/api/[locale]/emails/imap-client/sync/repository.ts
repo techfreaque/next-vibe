@@ -47,10 +47,7 @@ export class ImapSyncRepository {
 
       // Validate account IDs if provided
       const accountIdList = data.accountIds
-        ? data.accountIds
-            .split(",")
-            .map((id) => id.trim())
-            .filter(Boolean)
+        ? data.accountIds.map((id) => id.trim()).filter(Boolean)
         : [];
       let accountsToSync = [];
       if (accountIdList.length > 0) {

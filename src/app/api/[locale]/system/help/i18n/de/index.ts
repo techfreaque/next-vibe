@@ -3,6 +3,116 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   category: "Hilfe & Dokumentation",
   tag: "Hilfe",
+  get: {
+    title: "Tool-Hilfe — Verfügbare Tools entdecken",
+    description:
+      "Durchsuchen und entdecken Sie alle verfügbaren Tools. Verwenden Sie query für die Suche, category für die Filterung.",
+    tags: {
+      tools: "tools",
+    },
+    fields: {
+      query: {
+        label: "Suchanfrage",
+        description:
+          "Tools nach Name, Beschreibung, Alias oder Tag durchsuchen. Sucht in allen Sprachen.",
+        placeholder: "z.B. Suche, Speicher, Abruf...",
+      },
+      category: {
+        label: "Kategoriefilter",
+        description: "Tools nach Kategoriename filtern",
+      },
+      toolName: {
+        label: "Tool-Name (Detail)",
+        description: "Vollständige Details für ein bestimmtes Tool abrufen.",
+      },
+      page: {
+        label: "Seite",
+        description: "Seitenzahl für paginierte Ergebnisse (Standard: 1)",
+        title: "Aktuelle Seitenzahl",
+      },
+      pageSize: {
+        label: "Seitengröße",
+        description:
+          "Anzahl der Ergebnisse pro Seite. KI/MCP Standard: 25. Web/CLI Standard: 200.",
+        title: "Effektive Seitengröße",
+      },
+      tools: {
+        title: "Verfügbare Tools",
+      },
+      totalCount: {
+        title: "Gesamtanzahl der Tools",
+      },
+      matchedCount: {
+        title: "Anzahl übereinstimmender Tools",
+      },
+      categories: {
+        title: "Tool-Kategorien",
+      },
+      hint: {
+        title: "Verwendungshinweis",
+      },
+      currentPage: {
+        title: "Aktuelle Seite",
+      },
+      effectivePageSize: {
+        title: "Effektive Seitengröße",
+      },
+      totalPages: {
+        title: "Gesamtanzahl Seiten",
+      },
+      parameters: {
+        title: "Parameter",
+      },
+      aliases: {
+        title: "Aliase",
+      },
+      openTool: {
+        label: "Tool öffnen",
+      },
+    },
+    success: {
+      title: "Tools erfolgreich abgerufen",
+      description: "Verfügbare Tools wurden abgerufen",
+    },
+    errors: {
+      validation: {
+        title: "Validierungsfehler",
+        description: "Ungültige Anfrageparameter",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Verbindung zum Server fehlgeschlagen",
+      },
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Authentifizierung erforderlich",
+      },
+      forbidden: {
+        title: "Verboten",
+        description: "Keine Berechtigung für Tools",
+      },
+      notFound: {
+        title: "Nicht gefunden",
+        description: "Tools-Endpunkt nicht gefunden",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Tools konnten nicht abgerufen werden",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
+      },
+      unsavedChanges: {
+        title: "Nicht gespeicherte Änderungen",
+        description: "Sie haben nicht gespeicherte Änderungen",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Beim Abrufen der Tools ist ein Konflikt aufgetreten",
+      },
+    },
+  },
   interactive: {
     post: {
       title: "Interaktiver Modus",

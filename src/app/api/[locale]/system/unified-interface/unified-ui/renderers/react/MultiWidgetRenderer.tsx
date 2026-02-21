@@ -11,7 +11,7 @@ import type { InferResponseOutput } from "@/app/api/[locale]/system/unified-inte
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 
-import { withValue } from "../../widgets/_shared/field-helpers";
+import { withValueNonStrict } from "../../widgets/_shared/field-helpers";
 import type {
   AnyChildrenConstrain,
   ArrayChildConstraint,
@@ -77,7 +77,7 @@ function renderInlineGroup<TEndpoint extends CreateApiEndpointAny>(
             fieldName={
               childFieldName as Path<TEndpoint["types"]["RequestOutput"]>
             }
-            field={withValue(field, data, undefined)}
+            field={withValueNonStrict(field, data, undefined) as never}
           />
         );
 
@@ -244,7 +244,13 @@ export function ObjectChildrenRenderer<
       <WidgetRenderer<TEndpoint>
         key={child.name}
         fieldName={childFieldName as Path<TEndpoint["types"]["RequestOutput"]>}
-        field={withValue(child.field, child.data, value ?? undefined)}
+        field={
+          withValueNonStrict(
+            child.field,
+            child.data,
+            value as WidgetData,
+          ) as never
+        }
       />
     );
 
@@ -316,7 +322,7 @@ export function ArrayChildRenderer<
             fieldName={
               itemFieldName as Path<TEndpoint["types"]["RequestOutput"]>
             }
-            field={withValue(childSchema, itemData, null)}
+            field={withValueNonStrict(childSchema, itemData, null) as never}
           />
         );
       })}
@@ -440,10 +446,20 @@ export function UnionObjectRenderer<
   }
 
   // Render using ObjectChildrenRenderer
+  // Cast: value is Record<string, WidgetData> which structurally matches at runtime
   return (
     <ObjectChildrenRenderer
       childrenSchema={childrenToRender}
-      value={value ?? undefined}
+      value={
+        value as
+          | {
+              [K in keyof typeof childrenToRender]: InferResponseOutput<
+                (typeof childrenToRender)[K]
+              >;
+            }
+          | null
+          | undefined
+      }
       fieldName={fieldName}
     />
   );
@@ -466,6 +482,7 @@ export interface MultiWidgetRendererProps<
         [K in keyof TChildren]: InferResponseOutput<TChildren[K]>;
       }
     | Array<InferResponseOutput<ArrayChildConstraint<TKey, TUsage>>>
+    | WidgetData
     | null
     | undefined;
   fieldName: string | undefined;
@@ -523,6 +540,11 @@ function isArrayChild<TKey extends string, TUsage extends FieldUsageConfig>(
 export function MultiWidgetRenderer<
   TKey extends string,
   TUsage extends FieldUsageConfig,
+  TChildren extends
+    | ObjectChildrenConstraint<TKey, TUsage>
+    | ArrayChildConstraint<TKey, TUsage>
+    | UnionObjectWidgetConfigConstrain<TKey, TUsage>
+    | undefined,
 >({
   childrenSchema,
   value,
@@ -530,16 +552,22 @@ export function MultiWidgetRenderer<
   discriminator,
   watchedDiscriminatorValue,
   renderItem,
-}: MultiWidgetRendererProps<TKey, TUsage>): JSX.Element {
+}: MultiWidgetRendererProps<TKey, TUsage, TChildren>): JSX.Element {
   if (!childrenSchema) {
     return <></>;
   }
+
+  // Cast value to WidgetData for dispatch boundary — sub-renderers use runtime type guards
+  // to determine the actual shape; the generic TChildren type cannot flow through.
+  const widgetValue = value as WidgetData;
 
   // Check for union variants first
   const isUnion = isUnionVariants<TKey, TUsage>(childrenSchema);
 
   if (isUnion) {
-    const objectValue = !Array.isArray(value) ? value : null;
+    const objectValue = !Array.isArray(widgetValue)
+      ? (widgetValue as Record<string, WidgetData> | null | undefined)
+      : null;
     return (
       <UnionObjectRenderer
         variantSchemas={childrenSchema}
@@ -553,20 +581,32 @@ export function MultiWidgetRenderer<
 
   // Check for array child constraint
   if (isArrayChild<TKey, TUsage>(childrenSchema)) {
-    const arrayValue = Array.isArray(value) ? value : null;
+    const arrayValue = Array.isArray(widgetValue)
+      ? (widgetValue as WidgetData[])
+      : null;
     return (
       <ArrayChildRenderer
         childSchema={childrenSchema}
         value={arrayValue}
         fieldName={fieldName}
-        renderItem={renderItem}
+        renderItem={renderItem as never}
       />
     );
   }
 
   // ObjectChildrenConstraint is a Record<string, ...>
   const objectChildren: ObjectChildrenConstraint<TKey, TUsage> = childrenSchema;
-  const objectValue = !Array.isArray(value) ? value : null;
+  const objectValue = !Array.isArray(widgetValue)
+    ? (widgetValue as
+        | {
+            [K in keyof ObjectChildrenConstraint<
+              TKey,
+              TUsage
+            >]: InferResponseOutput<ObjectChildrenConstraint<TKey, TUsage>[K]>;
+          }
+        | null
+        | undefined)
+    : null;
   return (
     <ObjectChildrenRenderer
       childrenSchema={objectChildren}

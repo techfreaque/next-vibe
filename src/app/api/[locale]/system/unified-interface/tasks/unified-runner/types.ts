@@ -19,6 +19,23 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { JwtPrivatePayloadType } from "../../../../user/auth/types";
 import type { CronTaskPriority, TaskCategory, TaskOutputMode } from "../enum";
 
+/**
+ * Derives the taskInput type for a cron task from its endpoint types.
+ * When both RequestOutput and UrlVariablesOutput are never (no-input endpoints),
+ * taskInput accepts undefined. Otherwise it accepts partial merged args.
+ */
+export type CronTaskInput<T extends CreateApiEndpointAny> = [
+  T["types"]["RequestOutput"],
+] extends [never]
+  ? [T["types"]["UrlVariablesOutput"]] extends [never]
+    ? undefined
+    : T["types"]["UrlVariablesOutput"]
+  : [T["types"]["UrlVariablesOutput"]] extends [never]
+    ? T["types"]["RequestOutput"] extends never
+      ? undefined
+      : T["types"]["RequestOutput"]
+    : T["types"]["RequestOutput"] & T["types"]["UrlVariablesOutput"];
+
 /** JSON-serializable value */
 export type JsonValue =
   | string
@@ -249,7 +266,7 @@ export type Task = CronTaskAny | TaskRunner;
  *
  * Usage: `createCronTask(definitions.POST, tools.POST, { name: "...", ... })`
  */
-export function createCronTask<T extends CreateApiEndpointAny>(
+export function createCronTask<const T extends CreateApiEndpointAny>(
   definition: T,
   route: GenericHandlerReturnType<
     T["types"]["RequestOutput"],
@@ -271,8 +288,8 @@ export function createCronTask<T extends CreateApiEndpointAny>(
      * Types are fully inferred from the endpoint definition.
      * splitTaskArgs() splits them by schema at execution time.
      */
-    taskInput?: Partial<T["types"]["RequestOutput"]> &
-      Partial<T["types"]["UrlVariablesOutput"]>;
+    // required — type inferred from endpoint; undefined for no-input endpoints
+    taskInput: CronTaskInput<T>;
     /** When true, task disables itself after first execution (success or failure) */
     runOnce?: boolean;
   },

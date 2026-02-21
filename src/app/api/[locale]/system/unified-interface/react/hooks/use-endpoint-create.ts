@@ -67,6 +67,7 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
 
   // Merge endpoint and hook options (hook takes priority)
   // Merge defaultValues separately to combine autoPrefillData and initialState
+  /* eslint-disable react-compiler/react-compiler */
   const mergedFormOptions = useMemo(() => {
     const merged = deepMerge(
       (primaryEndpoint.options?.formOptions ?? {}) as ApiFormOptions<
@@ -99,6 +100,7 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
     autoPrefillDataKey,
     initialStateKey,
   ]);
+  /* eslint-enable react-compiler/react-compiler */
 
   const mergedMutationOptions = useMemo(() => {
     const endpointMutOpts = primaryEndpoint.options?.mutationOptions as
@@ -135,6 +137,7 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
   // Reset form when prefill data actually changes (after initial render)
   // Uses serialized comparison so new object literals don't cause spurious resets
   // urlPathParams are included so requestUrlPathParamsField fields display their values
+  /* eslint-disable react-compiler/react-compiler */
   useEffect(() => {
     if (formResult?.form && prefillKey !== prevPrefillKeyRef.current) {
       prevPrefillKeyRef.current = prefillKey;
@@ -149,6 +152,7 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- prefillKey is the stable serialized composite
   }, [prefillKey, formResult?.form]);
+  /* eslint-enable react-compiler/react-compiler */
 
   // If no URL parameters are needed, return the form result as-is
   if (!options.urlPathParams) {

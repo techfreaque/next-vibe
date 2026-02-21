@@ -8,7 +8,10 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { SpacingSize } from "../../../../shared/types/enums";
 import { FieldDataType, WidgetType } from "../../../../shared/types/enums";
-import type { BaseObjectWidgetConfig } from "../../_shared/types";
+import type {
+  BaseObjectWidgetConfig,
+  FieldUsageConfig,
+} from "../../_shared/types";
 import type { TextWidgetConfig } from "../../display-only/text/types";
 import type { NumberFieldWidgetConfig } from "../../form-fields/number-field/types";
 
@@ -75,9 +78,11 @@ const pageCountSchema = z.coerce.number();
  * - pageCount: Total number of pages
  * - offset: Current offset
  */
-export interface PaginationWidgetConfig extends BaseObjectWidgetConfig<
+export interface PaginationWidgetConfig<
+  TUsage extends FieldUsageConfig = { request: "data"; response: true },
+> extends BaseObjectWidgetConfig<
   TranslationKey,
-  { request: "data"; response: true },
+  TUsage,
   "object",
   {
     page: NumberFieldWidgetConfig<

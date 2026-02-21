@@ -16,12 +16,8 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
 import type { JSX } from "react";
 import { useMemo } from "react";
-import type {
-  DefaultValues,
-  FieldValues,
-  Path,
-  UseFormReturn,
-} from "react-hook-form";
+import type { DefaultValues, Path, UseFormReturn } from "react-hook-form";
+import type { UseFormProps } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import type { ZodTypeAny } from "zod";
 
@@ -38,9 +34,12 @@ import type { WidgetData } from "../../../shared/widgets/widget-data";
 import {
   extractAllFields,
   scanForInlineButtons,
-  withValue,
+  withValueNonStrict,
 } from "../../widgets/_shared/field-helpers";
-import type { ReactWidgetContext } from "../../widgets/_shared/react-types";
+import type {
+  EndpointFormValues,
+  ReactWidgetContext,
+} from "../../widgets/_shared/react-types";
 import { isResponseField } from "../../widgets/_shared/type-guards";
 import { WidgetContextProvider } from "../../widgets/_shared/WidgetContextProvider";
 import { WidgetRenderer } from "./WidgetRenderer";
@@ -81,18 +80,15 @@ export interface CancelButtonConfig {
 /**
  * Endpoint Renderer Props
  */
-export interface EndpointRendererProps<
-  TEndpoint extends CreateApiEndpointAny,
-  TFieldValues extends FieldValues = FieldValues,
-> {
+export interface EndpointRendererProps<TEndpoint extends CreateApiEndpointAny> {
   /** The endpoint definition */
   endpoint: TEndpoint;
   /** Current locale */
   locale: CountryLanguage;
   /** React Hook Form instance */
-  form?: UseFormReturn<TFieldValues>;
+  form?: UseFormReturn<EndpointFormValues<TEndpoint>>;
   /** Form submit handler - receives form data */
-  onSubmit?: (data: TFieldValues) => void | Promise<void>;
+  onSubmit?: (data: EndpointFormValues<TEndpoint>) => void | Promise<void>;
   /** Cancel handler - when provided, shows Cancel button alongside Submit */
   onCancel?: () => void;
   /** Data to populate fields with (can be object for multiple fields or any WidgetData for single field) */
@@ -127,10 +123,7 @@ export interface EndpointRendererProps<
  * Endpoint Renderer Component
  * Renders ALL fields - widgets decide what to show based on data
  */
-export function EndpointRenderer<
-  TEndpoint extends CreateApiEndpointAny,
-  TFieldValues extends FieldValues = FieldValues,
->({
+export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   endpoint,
   locale,
   form: externalForm,
@@ -147,7 +140,7 @@ export function EndpointRenderer<
   cancelButton,
   logger,
   user,
-}: EndpointRendererProps<TEndpoint, TFieldValues>): JSX.Element {
+}: EndpointRendererProps<TEndpoint>): JSX.Element {
   // Initialize navigation stack for cross-definition navigation
   const navigation = useNavigationStack();
 
@@ -161,12 +154,22 @@ export function EndpointRenderer<
       endpoint.fields.schemaType === "widget-object");
 
   // Create internal form if none provided (for display-only mode like tool calls)
-  const internalForm = useForm<TFieldValues>({
-    resolver: zodResolver<TFieldValues, ZodTypeAny, TFieldValues>(
-      endpoint.requestSchema,
-    ),
-    defaultValues: (data ?? {}) as DefaultValues<TFieldValues>,
-  });
+  const internalFormConfig: UseFormProps<EndpointFormValues<TEndpoint>> =
+    useMemo(
+      () => ({
+        resolver: zodResolver<
+          EndpointFormValues<TEndpoint>,
+          ZodTypeAny,
+          EndpointFormValues<TEndpoint>
+        >(endpoint.requestSchema),
+        defaultValues: (data ?? {}) as DefaultValues<
+          EndpointFormValues<TEndpoint>
+        >,
+      }),
+      [endpoint.requestSchema, data],
+    );
+  const internalForm =
+    useForm<EndpointFormValues<TEndpoint>>(internalFormConfig);
 
   // Use external form if provided, otherwise use internal form
   const form = externalForm ?? internalForm;
@@ -233,7 +236,7 @@ export function EndpointRenderer<
     const rootWidget = (
       <WidgetRenderer
         fieldName={"" as Path<TEndpoint["types"]["RequestOutput"]>}
-        field={withValue(endpoint.fields, data, null)}
+        field={withValueNonStrict(endpoint.fields, data, null) as never}
         inlineButtonInfo={inlineButtonInfo}
       />
     );
@@ -318,7 +321,7 @@ export function EndpointRenderer<
       <WidgetRenderer
         key={fieldName}
         fieldName={fieldName as Path<TEndpoint["types"]["RequestOutput"]>}
-        field={withValue(field, fieldValue, data)}
+        field={withValueNonStrict(field, fieldValue, data) as never}
       />
     );
   });

@@ -240,6 +240,7 @@ export const CLI_ICONS: Record<IconKey, string> = {
   "more-horizontal": "⋯",
   "more-vertical": "⋮",
   "mouse-pointer": "🖱️",
+  "mouse-pointer-click": "🖱️",
   grip: "☰",
   "grip-vertical": "⋮",
   "grid-3x3": "▦",

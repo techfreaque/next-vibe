@@ -14,7 +14,7 @@ import {
 
 import { InkWidgetRenderer } from "../../../renderers/cli/CliWidgetRenderer";
 import type { FieldUsageConfig, InkWidgetProps } from "../../_shared/cli-types";
-import { withValue } from "../../_shared/field-helpers";
+import { withValueNonStrict } from "../../_shared/field-helpers";
 import {
   hasChildren,
   isObject,
@@ -144,7 +144,13 @@ export function ContainerWidgetInk<
     childElements.push(
       <Box key={childName}>
         <InkWidgetRenderer
-          field={withValue(childField, childData ?? null, field.value)}
+          field={
+            withValueNonStrict(
+              childField,
+              childData ?? null,
+              field.value,
+            ) as never
+          }
           fieldName={childFieldName}
         />
       </Box>,

@@ -5,12 +5,14 @@ import type z from "zod";
 
 import type { InferResponseOutput } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 
-import { withValue } from "../../widgets/_shared/field-helpers";
+import { withValueNonStrict } from "../../widgets/_shared/field-helpers";
 import type {
   AnyChildrenConstrain,
   ArrayChildConstraint,
   ConstrainedChildUsage,
+  DispatchField,
   FieldUsageConfig,
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
@@ -39,7 +41,18 @@ function renderInlineGroup<TEndpoint extends CreateApiEndpointAny>(
           <InkWidgetRenderer<TEndpoint>
             key={name}
             fieldName={childFieldName}
-            field={withValue(field, data, undefined)}
+            field={
+              withValueNonStrict(field, data, undefined) as DispatchField<
+                string,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- heterogeneous child dispatch boundary
+                any,
+                FieldUsageConfig,
+                AnyChildrenConstrain<
+                  string,
+                  ConstrainedChildUsage<FieldUsageConfig>
+                >
+              >
+            }
           />
         );
       })}
@@ -170,7 +183,22 @@ export function ObjectChildrenRenderer<
       <InkWidgetRenderer<TEndpoint>
         key={child.name}
         fieldName={childFieldName}
-        field={withValue(child.field, child.data, value ?? null)}
+        field={
+          withValueNonStrict(
+            child.field,
+            child.data,
+            (value ?? null) as WidgetData | null,
+          ) as DispatchField<
+            string,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- heterogeneous child dispatch boundary
+            any,
+            FieldUsageConfig,
+            AnyChildrenConstrain<
+              string,
+              ConstrainedChildUsage<FieldUsageConfig>
+            >
+          >
+        }
       />
     );
 
@@ -232,7 +260,18 @@ export function ArrayChildRenderer<
           <InkWidgetRenderer<TEndpoint>
             key={index}
             fieldName={itemFieldName}
-            field={withValue(childSchema, itemData, null)}
+            field={
+              withValueNonStrict(childSchema, itemData, null) as DispatchField<
+                string,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- heterogeneous child dispatch boundary
+                any,
+                FieldUsageConfig,
+                AnyChildrenConstrain<
+                  string,
+                  ConstrainedChildUsage<FieldUsageConfig>
+                >
+              >
+            }
           />
         );
       })}
@@ -454,9 +493,9 @@ export function MultiWidgetRenderer<
   TKey extends string,
   TUsage extends FieldUsageConfig,
   TChildrenSchema extends
-    | ObjectChildrenConstraint<TKey, ConstrainedChildUsage<TUsage>>
-    | ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>
-    | UnionObjectWidgetConfigConstrain<TKey, ConstrainedChildUsage<TUsage>>
+    | ObjectChildrenConstraint<TKey, TUsage>
+    | ArrayChildConstraint<TKey, TUsage>
+    | UnionObjectWidgetConfigConstrain<TKey, TUsage>
     | undefined = undefined,
   TEndpoint extends CreateApiEndpointAny = CreateApiEndpointAny,
 >({

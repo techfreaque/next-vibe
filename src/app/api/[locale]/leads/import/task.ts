@@ -28,7 +28,7 @@ const csvProcessorTask = createCronTask(definitions.POST, tools.POST, {
   enabled: false,
   priority: CronTaskPriority.MEDIUM,
   timeout: TASK_TIMEOUTS.LONG,
-  defaultInput: { maxJobsPerRun: 5, maxRetriesPerJob: 3, dryRun: false },
+  taskInput: { dryRun: false, maxJobsPerRun: 1, maxRetriesPerJob: 0 },
 });
 
 export const tasks: Task[] = [csvProcessorTask];

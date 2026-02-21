@@ -31,6 +31,7 @@ const dbHealthTask = createCronTask(definitions.POST, tools.POST, {
   enabled: true,
   priority: CronTaskPriority.LOW,
   timeout: TASK_TIMEOUTS.SHORT,
+  taskInput: undefined,
 });
 
 export const tasks: Task[] = [dbHealthTask];

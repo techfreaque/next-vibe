@@ -16,6 +16,10 @@ import {
   createCronTask,
   type Task,
 } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import {
+  AUTH_TOKEN_COOKIE_MAX_AGE_DAYS,
+  RESET_TOKEN_EXPIRY,
+} from "@/config/constants";
 
 import definitions from "./definition";
 import { tools } from "./route";
@@ -28,6 +32,12 @@ const sessionCleanupTask = createCronTask(definitions.POST, tools.POST, {
   enabled: true,
   priority: CronTaskPriority.MEDIUM,
   timeout: TASK_TIMEOUTS.MEDIUM,
+  taskInput: {
+    dryRun: false,
+    batchSize: 200,
+    sessionRetentionDays: AUTH_TOKEN_COOKIE_MAX_AGE_DAYS,
+    tokenRetentionDays: RESET_TOKEN_EXPIRY,
+  },
 });
 
 export const tasks: Task[] = [sessionCleanupTask];

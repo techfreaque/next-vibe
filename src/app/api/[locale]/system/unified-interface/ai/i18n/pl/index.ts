@@ -1,8 +1,17 @@
-import { translations as toolsTranslations } from "../../tools/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tools: toolsTranslations,
+  tools: {
+    get: {
+      title: "Pomoc narzędzi — odkryj dostępne narzędzia AI",
+      description:
+        "Wyszukuj i odkrywaj wszystkie dostępne narzędzia AI. Użyj query do wyszukiwania, category do filtrowania.",
+      category: "Narzędzia AI",
+      tags: {
+        tools: "narzędzia",
+      },
+    },
+  },
   executor: {
     errors: {
       toolNotFound: "Narzędzie nie znalezione: {{toolName}}",
@@ -28,7 +37,7 @@ export const translations: typeof enTranslations = {
       dollarTwo: "$2",
       space: " ",
       endpointForPrefix: "Punkt końcowy dla ",
-      hiddenPlaceholder: "[ukryte]",
+      hiddenPlaceholder: "[ukryty]",
     },
   },
   discovery: {

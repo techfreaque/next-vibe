@@ -6,6 +6,7 @@
 
 import { Box, Text } from "ink";
 import type { JSX } from "react";
+import type { z } from "zod";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -38,7 +39,9 @@ export function CodeQualitySummaryWidgetInk<
   TUsage,
   CodeQualitySummaryWidgetConfig<TSchema, TUsage, TSchemaType>
 >): JSX.Element {
-  const value = field.value;
+  // field.value is typed as the inferred schema output; cast to the concrete type
+  // since TSchema is constrained to CodeQualitySummarySchema (a ZodObject)
+  const value = field.value as z.output<CodeQualitySummarySchema> | undefined;
   const platform = useInkWidgetPlatform();
   const locale = useInkWidgetLocale();
   const { t: globalT } = simpleT(locale);

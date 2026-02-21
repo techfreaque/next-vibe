@@ -503,7 +503,7 @@ type Test3_19_ConditionalExamples =
   >
     ? "PASS"
     : "FAIL";
-const test3_19: Test3_19_ConditionalExamples = "PASS"; // We WANT the conditional examples structure to work
+const test3_19: Test3_19_ConditionalExamples = "PASS";
 
 // Test 3.20: Test with ONLY TExampleKey specific, all others generic
 type Test3_20_OnlyExampleKeySpecific =

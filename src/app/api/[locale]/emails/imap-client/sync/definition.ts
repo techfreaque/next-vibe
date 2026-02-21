@@ -10,6 +10,7 @@ import {
   backButton,
   customWidgetObject,
   objectField,
+  requestDataArrayField,
   requestField,
   responseArrayField,
   responseField,
@@ -46,15 +47,22 @@ const { POST } = createEndpoint({
       backButton: backButton({ usage: { request: "data", response: true } }),
 
       // === REQUEST FIELDS ===
-      accountIds: requestField({
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXTAREA,
-        label: "app.api.emails.imapClient.sync.accountIds.label",
-        description: "app.api.emails.imapClient.sync.accountIds.description",
-        placeholder: "app.api.emails.imapClient.sync.accountIds.placeholder",
-        columns: 12,
-        schema: z.string().optional(),
-      }),
+      accountIds: requestDataArrayField(
+        {
+          type: WidgetType.CONTAINER,
+          title: "app.api.emails.imapClient.sync.accountIds.label",
+          description: "app.api.emails.imapClient.sync.accountIds.description",
+          layoutType: LayoutType.GRID,
+          columns: 12,
+        },
+        requestField({
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.emails.imapClient.sync.accountId.label",
+          description: "app.api.emails.imapClient.sync.accountId.description",
+          schema: z.string(),
+        }),
+      ),
 
       force: requestField({
         type: WidgetType.FORM_FIELD,
@@ -216,7 +224,7 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        accountIds: "123e4567-e89b-12d3-a456-426614174000",
+        accountIds: ["123e4567-e89b-12d3-a456-426614174000"],
         force: false,
         dryRun: false,
         maxMessages: 1000,

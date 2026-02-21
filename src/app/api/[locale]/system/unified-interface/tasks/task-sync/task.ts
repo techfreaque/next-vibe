@@ -31,6 +31,7 @@ const syncTask = createCronTask(endpoints.POST, tools.POST, {
   enabled: true,
   priority: CronTaskPriority.HIGH,
   timeout: TASK_TIMEOUTS.MEDIUM,
+  taskInput: undefined,
 });
 
 export const tasks: Task[] = [syncTask];

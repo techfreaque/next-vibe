@@ -13,7 +13,7 @@ import { users } from "@/app/api/[locale]/user/db";
 import type { ModelId } from "../../models/models";
 import type { TtsVoiceValue } from "../../text-to-speech/enum";
 import type { ViewModeValue } from "../enum";
-import type { EnabledTool } from "../hooks/store";
+import type { ToolConfigItem } from "./definition";
 
 /**
  * Chat Settings Table
@@ -42,8 +42,10 @@ export const chatSettings = pgTable("chat_settings", {
   // UI preferences - only store if different from default
   viewMode: jsonb("view_mode").$type<typeof ViewModeValue>(),
 
-  // Tool configuration - null = all tools enabled (default), array = user customized
-  enabledTools: jsonb("enabled_tools").$type<EnabledTool[] | null>(),
+  // Tool configuration — mirrors ai-stream activeTools/visibleTools
+  // null = default (all active, default visible set); array = user customized
+  activeTools: jsonb("active_tools").$type<ToolConfigItem[] | null>(),
+  visibleTools: jsonb("visible_tools").$type<ToolConfigItem[] | null>(),
 
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),

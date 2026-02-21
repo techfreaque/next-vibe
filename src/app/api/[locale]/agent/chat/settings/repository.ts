@@ -15,7 +15,10 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
+import { definitionsRegistry } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definitions/registry";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { endpointToToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { chatSettings } from "./db";
@@ -23,8 +26,54 @@ import type {
   ChatSettingsGetResponseOutput,
   ChatSettingsUpdateRequestOutput,
   ChatSettingsUpdateResponseOutput,
+  ToolConfigItem,
 } from "./definition";
 import { ChatSettingsRepositoryClient } from "./repository-client";
+
+/**
+ * Returns the canonical set of available tool IDs for a user.
+ * Used to detect when a submitted tool list equals the full available set
+ * so we can store null (= default) instead of an explicit list.
+ */
+function getAvailableToolIds(user: JwtPrivatePayloadType): string[] {
+  const endpoints = definitionsRegistry.getEndpointsForUser(Platform.AI, user);
+  return endpoints.map((e) => endpointToToolName(e));
+}
+
+/**
+ * Returns null if the tool list equals the full available set (i.e. it IS the default),
+ * otherwise returns the normalized list (sorted, only toolId + requiresConfirmation).
+ */
+function normalizeToolsOrNull(
+  tools: ToolConfigItem[] | null | undefined,
+  availableIds: string[],
+): ToolConfigItem[] | null {
+  if (tools === null || tools === undefined) {
+    return null;
+  }
+  const normalized = tools
+    .map(({ toolId, requiresConfirmation }) => ({
+      toolId,
+      requiresConfirmation: requiresConfirmation ?? false,
+    }))
+    .toSorted((a, b) => a.toolId.localeCompare(b.toolId));
+
+  const submittedIds = new Set(normalized.map((t) => t.toolId));
+  const availableSet = new Set(availableIds);
+
+  // If the submitted set exactly matches all available tools AND none require
+  // confirmation, it's the default state — store null.
+  const sameIds =
+    submittedIds.size === availableSet.size &&
+    [...submittedIds].every((id) => availableSet.has(id));
+  const noConfirmations = normalized.every((t) => !t.requiresConfirmation);
+
+  if (sameIds && noConfirmations) {
+    return null;
+  }
+
+  return normalized;
+}
 
 /**
  * Chat Settings Repository
@@ -62,7 +111,16 @@ export class ChatSettingsRepository {
         ttsAutoplay: setting.ttsAutoplay ?? defaults.ttsAutoplay,
         ttsVoice: setting.ttsVoice ?? defaults.ttsVoice,
         viewMode: setting.viewMode ?? defaults.viewMode,
-        enabledTools: setting.enabledTools ?? defaults.enabledTools,
+        activeTools:
+          (setting.activeTools ?? defaults.activeTools)?.map((t) => ({
+            toolId: t.toolId,
+            requiresConfirmation: t.requiresConfirmation ?? false,
+          })) ?? null,
+        visibleTools:
+          (setting.visibleTools ?? defaults.visibleTools)?.map((t) => ({
+            toolId: t.toolId,
+            requiresConfirmation: t.requiresConfirmation ?? false,
+          })) ?? null,
       };
 
       return success(result);
@@ -95,6 +153,18 @@ export class ChatSettingsRepository {
         .where(eq(chatSettings.userId, userId));
 
       const defaults = ChatSettingsRepositoryClient.getDefaults();
+      const availableIds = getAvailableToolIds(user);
+
+      // Normalize tools against the actual available set — store null when equal to default
+      const activeToolsToStore =
+        data.activeTools !== undefined
+          ? normalizeToolsOrNull(data.activeTools, availableIds)
+          : undefined;
+      const visibleToolsToStore =
+        data.visibleTools !== undefined
+          ? normalizeToolsOrNull(data.visibleTools, availableIds)
+          : undefined;
+
       let result: typeof existing;
 
       if (existing.length > 0) {
@@ -143,14 +213,8 @@ export class ChatSettingsRepository {
                 : data.viewMode === defaults.viewMode
                   ? null
                   : undefined,
-            enabledTools:
-              data.enabledTools !== undefined
-                ? data.enabledTools === null ||
-                  JSON.stringify(data.enabledTools) ===
-                    JSON.stringify(defaults.enabledTools)
-                  ? null
-                  : data.enabledTools
-                : undefined,
+            activeTools: activeToolsToStore,
+            visibleTools: visibleToolsToStore,
           })
           .where(eq(chatSettings.userId, userId))
           .returning();
@@ -188,13 +252,8 @@ export class ChatSettingsRepository {
               data.viewMode && data.viewMode !== defaults.viewMode
                 ? data.viewMode
                 : null,
-            enabledTools:
-              data.enabledTools !== undefined &&
-              data.enabledTools !== null &&
-              JSON.stringify(data.enabledTools) !==
-                JSON.stringify(defaults.enabledTools)
-                ? data.enabledTools
-                : null,
+            activeTools: activeToolsToStore ?? null,
+            visibleTools: visibleToolsToStore ?? null,
           })
           .returning();
       }

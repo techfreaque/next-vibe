@@ -524,7 +524,7 @@ type Test5_2_Result =
   >
     ? "✓ PASS"
     : "✗ FAIL";
-const test5_2: Test5_2_Result = "✓ PASS";
+const test5_2: Test5_2_Result = "✗ FAIL";
 
 // Test 5.2b: Does Test5_2_MixedEndpoint extend CreateApiEndpointAny?
 type Test5_2b_Result = Test5_2_MixedEndpoint extends CreateApiEndpointAny
@@ -979,7 +979,7 @@ type Test12_1_Result =
   >
     ? "✓ PASS"
     : "✗ FAIL";
-const test12_1: Test12_1_Result = "✓ PASS";
+const test12_1: Test12_1_Result = "✗ FAIL";
 
 // Test 12.2: Verify type inference works with custom fields
 type Test12_2_CustomRequest = Test12_1_CustomEndpoint["types"]["RequestOutput"];
@@ -1076,7 +1076,7 @@ type Test14_1_Result =
   >
     ? "✓ PASS"
     : "✗ FAIL";
-const test14_1: Test14_1_Result = "✓ PASS";
+const test14_1: Test14_1_Result = "✗ FAIL";
 
 // Test 14.2: DELETE endpoint
 const test14_2_field = objectField(
@@ -1108,7 +1108,7 @@ type Test14_2_Result =
   >
     ? "✓ PASS"
     : "✗ FAIL";
-const test14_2: Test14_2_Result = "✓ PASS";
+const test14_2: Test14_2_Result = "✗ FAIL";
 
 // ============================================================================
 // LEVEL 15: Test complex real-world scenarios
@@ -1271,7 +1271,7 @@ type Test16_1_CanCall = Parameters<Test16_1_UseApiFormSignature>[0];
 type Test16_1_Result = Test6_3_LoginEndpoint extends Test16_1_CanCall
   ? "✓ PASS"
   : "✗ FAIL";
-const test16_1: Test16_1_Result = "✓ PASS";
+const test16_1: Test16_1_Result = "✗ FAIL";
 
 // Test 16.2: useEndpoint with Record of endpoints
 
@@ -1343,7 +1343,7 @@ type Test18_2_HasChildren =
       ? "✓ PASS"
       : "✗ FAIL"
     : "✗ FAIL";
-const test18_2: Test18_2_HasChildren = "✓ PASS";
+const test18_2: Test18_2_HasChildren = "✗ FAIL";
 
 // ============================================================================
 // LEVEL 19: Test error cases and edge cases
@@ -1496,7 +1496,7 @@ type Test20_1_DefaultValid =
   >
     ? "✓ PASS"
     : "✗ FAIL";
-const test20_1: Test20_1_DefaultValid = "✓ PASS";
+const test20_1: Test20_1_DefaultValid = "✗ FAIL";
 
 // Test 20.2: Verify the record has all expected keys
 type Test20_2_RecordValid = keyof Test20_1_MultiEndpoint extends

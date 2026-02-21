@@ -18,6 +18,7 @@ export function getPlatformAuthHandler(platform: Platform): BaseAuthHandler {
     case Platform.TRPC:
     case Platform.NEXT_PAGE:
     case Platform.NEXT_API:
+    case Platform.REMOTE_SKILL:
     case Platform.AI:
       return webAuthHandler;
 

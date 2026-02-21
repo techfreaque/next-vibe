@@ -22,19 +22,19 @@ import type {
  * React-specific widget context
  * Extends base context with React-specific form handlers
  */
+export type EndpointFormValues<TEndpoint extends CreateApiEndpointAny> =
+  TEndpoint["types"]["RequestOutput"] extends never
+    ? TEndpoint["types"]["UrlVariablesOutput"] extends never
+      ? Record<string, never>
+      : TEndpoint["types"]["UrlVariablesOutput"]
+    : TEndpoint["types"]["UrlVariablesOutput"] extends never
+      ? TEndpoint["types"]["RequestOutput"]
+      : TEndpoint["types"]["RequestOutput"] &
+          TEndpoint["types"]["UrlVariablesOutput"];
+
 export type ReactWidgetContext<TEndpoint extends CreateApiEndpointAny> =
   BaseWidgetContext<TEndpoint> & {
-    form: UseFormReturn<
-      TEndpoint["types"]["RequestOutput"] extends never
-        ? TEndpoint["types"]["UrlVariablesOutput"] extends never
-          ? // oxlint-disable-next-line typescript/no-empty-object-type
-            {}
-          : TEndpoint["types"]["UrlVariablesOutput"]
-        : TEndpoint["types"]["UrlVariablesOutput"] extends never
-          ? TEndpoint["types"]["RequestOutput"]
-          : TEndpoint["types"]["RequestOutput"] &
-              TEndpoint["types"]["UrlVariablesOutput"]
-    >;
+    form: UseFormReturn<EndpointFormValues<TEndpoint>>;
     onSubmit?: () => void;
     onCancel?: () => void;
     isSubmitting?: boolean;

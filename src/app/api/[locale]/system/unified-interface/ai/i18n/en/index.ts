@@ -1,7 +1,16 @@
-import { translations as toolsTranslations } from "../../tools/i18n/en";
-
 export const translations = {
-  tools: toolsTranslations,
+  tools: {
+    // Translations moved to system/help/get — see system/help/i18n/en/index.ts
+    get: {
+      title: "Tool Help — Discover Available Tools",
+      description:
+        "Search and discover all AI tools available to you. Use query to search by name, description, or alias. Use category to filter by tool category. Returns tool names, descriptions, aliases, and metadata.",
+      category: "AI Tools",
+      tags: {
+        tools: "tools",
+      },
+    },
+  },
   executor: {
     errors: {
       toolNotFound: "Tool not found: {{toolName}}",

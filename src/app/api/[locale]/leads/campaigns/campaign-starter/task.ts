@@ -34,7 +34,7 @@ const campaignStarterTask = createCronTask(definitions.POST, tools.POST, {
   enabled: false,
   priority: cronSettings.priority,
   timeout: cronSettings.timeout ?? TASK_TIMEOUTS.MEDIUM,
-  defaultInput: { dryRun: false },
+  taskInput: { dryRun: false },
 });
 
 export const tasks: Task[] = [campaignStarterTask];

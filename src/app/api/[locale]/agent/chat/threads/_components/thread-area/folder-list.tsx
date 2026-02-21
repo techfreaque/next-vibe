@@ -30,7 +30,15 @@ export function FolderList({
   const { t } = simpleT(locale);
 
   // Get data and callbacks from context
-  const { folders, threads } = useChatContext();
+  const {
+    folders,
+    threads,
+    activeThreadId,
+    user,
+    handleSelectThread,
+    handleDeleteThread,
+    updateThread,
+  } = useChatContext();
 
   // Memoize direct children folders of the active root folder
   const childFolders = useMemo(() => {
@@ -99,8 +107,15 @@ export function FolderList({
               </Div>
               <ThreadList
                 threads={groupedThreads.today}
+                activeThreadId={activeThreadId}
                 locale={locale}
                 logger={logger}
+                user={user}
+                onSelect={handleSelectThread}
+                onDelete={handleDeleteThread}
+                onUpdateTitle={(threadId, title) => {
+                  void updateThread(threadId, { title });
+                }}
               />
             </Div>
           )}
@@ -112,8 +127,15 @@ export function FolderList({
               </Div>
               <ThreadList
                 threads={groupedThreads.lastWeek}
+                activeThreadId={activeThreadId}
                 locale={locale}
                 logger={logger}
+                user={user}
+                onSelect={handleSelectThread}
+                onDelete={handleDeleteThread}
+                onUpdateTitle={(threadId, title) => {
+                  void updateThread(threadId, { title });
+                }}
               />
             </Div>
           )}
@@ -125,8 +147,15 @@ export function FolderList({
               </Div>
               <ThreadList
                 threads={groupedThreads.lastMonth}
+                activeThreadId={activeThreadId}
                 locale={locale}
                 logger={logger}
+                user={user}
+                onSelect={handleSelectThread}
+                onDelete={handleDeleteThread}
+                onUpdateTitle={(threadId, title) => {
+                  void updateThread(threadId, { title });
+                }}
               />
             </Div>
           )}

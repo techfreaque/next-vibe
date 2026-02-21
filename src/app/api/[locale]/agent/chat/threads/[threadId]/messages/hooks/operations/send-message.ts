@@ -14,8 +14,8 @@ import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai
 import { DefaultFolderId } from "../../../../../config";
 import type { ChatMessage, ChatThread } from "../../../../../db";
 import { ThreadStatus } from "../../../../../enum";
-import type { EnabledTool } from "../../../../../hooks/store";
 import { useChatStore } from "../../../../../hooks/store";
+import type { ToolConfigItem } from "../../../../../settings/definition";
 import { createAndSendUserMessage } from "./shared";
 
 export interface SendMessageParams {
@@ -47,7 +47,8 @@ export interface SendMessageDeps {
   settings: {
     selectedModel: ModelId;
     selectedCharacter: string;
-    enabledTools: EnabledTool[] | null;
+    activeTools: ToolConfigItem[] | null;
+    visibleTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
     ttsVoice: typeof TtsVoiceValue;
   };

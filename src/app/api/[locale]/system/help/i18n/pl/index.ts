@@ -3,6 +3,116 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   category: "Pomoc i Dokumentacja",
   tag: "Pomoc",
+  get: {
+    title: "Pomoc narzędzi — odkryj dostępne narzędzia",
+    description:
+      "Wyszukuj i odkrywaj wszystkie dostępne narzędzia. Użyj query do wyszukiwania, category do filtrowania.",
+    tags: {
+      tools: "narzędzia",
+    },
+    fields: {
+      query: {
+        label: "Zapytanie wyszukiwania",
+        description:
+          "Wyszukaj narzędzia po nazwie, opisie, aliasie lub tagu. Przeszukuje we wszystkich językach.",
+        placeholder: "np. wyszukiwanie, pamięć, pobierz...",
+      },
+      category: {
+        label: "Filtr kategorii",
+        description: "Filtruj narzędzia według nazwy kategorii",
+      },
+      toolName: {
+        label: "Nazwa narzędzia (szczegóły)",
+        description: "Pobierz pełne szczegóły dla konkretnego narzędzia.",
+      },
+      page: {
+        label: "Strona",
+        description: "Numer strony dla wyników stronicowanych (domyślnie: 1)",
+        title: "Bieżący numer strony",
+      },
+      pageSize: {
+        label: "Rozmiar strony",
+        description:
+          "Liczba wyników na stronie. AI/MCP domyślnie: 25. Web/CLI: 200.",
+        title: "Efektywny rozmiar strony",
+      },
+      tools: {
+        title: "Dostępne narzędzia",
+      },
+      totalCount: {
+        title: "Łączna liczba narzędzi",
+      },
+      matchedCount: {
+        title: "Liczba dopasowanych narzędzi",
+      },
+      categories: {
+        title: "Kategorie narzędzi",
+      },
+      hint: {
+        title: "Wskazówka użycia",
+      },
+      currentPage: {
+        title: "Bieżąca strona",
+      },
+      effectivePageSize: {
+        title: "Efektywny rozmiar strony",
+      },
+      totalPages: {
+        title: "Łączna liczba stron",
+      },
+      parameters: {
+        title: "Parametry",
+      },
+      aliases: {
+        title: "Aliasy",
+      },
+      openTool: {
+        label: "Otwórz narzędzie",
+      },
+    },
+    success: {
+      title: "Narzędzia pobrane pomyślnie",
+      description: "Dostępne narzędzia zostały pobrane",
+    },
+    errors: {
+      validation: {
+        title: "Błąd walidacji",
+        description: "Nieprawidłowe parametry żądania",
+      },
+      network: {
+        title: "Błąd sieci",
+        description: "Nie można połączyć się z serwerem",
+      },
+      unauthorized: {
+        title: "Brak autoryzacji",
+        description: "Wymagane uwierzytelnienie",
+      },
+      forbidden: {
+        title: "Zabroniony dostęp",
+        description: "Brak uprawnień do narzędzi",
+      },
+      notFound: {
+        title: "Nie znaleziono",
+        description: "Punkt końcowy narzędzi nie został znaleziony",
+      },
+      server: {
+        title: "Błąd serwera",
+        description: "Nie udało się pobrać narzędzi",
+      },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieoczekiwany błąd",
+      },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Masz niezapisane zmiany",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Wystąpił konflikt podczas pobierania narzędzi",
+      },
+    },
+  },
   interactive: {
     post: {
       title: "Tryb interaktywny",

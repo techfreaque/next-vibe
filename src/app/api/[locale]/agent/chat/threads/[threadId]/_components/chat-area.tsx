@@ -118,7 +118,7 @@ export function ChatArea({ locale, logger, user }: ChatAreaProps): JSX.Element {
 
           {/* AI Tools Modal */}
           <ErrorBoundary locale={locale}>
-            <AIToolsModal locale={locale} logger={logger} />
+            <AIToolsModal locale={locale} user={user} />
           </ErrorBoundary>
         </Div>
       </Div>

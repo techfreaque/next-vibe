@@ -1,420 +1,300 @@
 /**
- * Help Command Endpoint Definition
- * Production-ready endpoint for displaying help information
+ * Help Endpoint Definition
+ * One endpoint for all platforms — tool discovery, CLI help, interactive mode.
+ *
+ * Platforms:
+ *   Web   — full widget: search, categories, enable/disable toggles
+ *   AI    — compact tool list with pagination (low token usage)
+ *   MCP   — same as AI
+ *   CLI   — response mode (default) or interactive mode (--interactive flag)
  */
 
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  customWidgetObject,
   requestField,
-  responseArrayField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { UserRole } from "../../user/user-roles/enum";
+import { TOOL_HELP_ALIAS } from "./constants";
+import { HelpToolsWidget } from "./widget";
 
-const { POST } = createEndpoint({
-  method: Methods.POST,
+// Serializable tool metadata returned in response
+const aiToolMetadataSchema = z.object({
+  name: z.string(),
+  method: z.string(),
+  description: z.string(),
+  category: z.string().optional(),
+  tags: z.array(z.string()),
+  toolName: z.string(),
+  allowedRoles: z.array(z.string()).readonly(),
+  aliases: z.array(z.string()).optional(),
+  requiresConfirmation: z.boolean().optional(),
+  // Only present in detail mode (toolName param)
+  parameters: z.record(z.string(), z.unknown()).optional(),
+});
+
+const { GET } = createEndpoint({
+  method: Methods.GET,
   path: ["system", "help"],
-  title: "app.api.system.help.post.title",
-  description: "app.api.system.help.post.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.help.tag"],
-  icon: "help-circle",
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.AI_TOOL_OFF,
-    UserRole.PRODUCTION_OFF,
-    UserRole.CLI_AUTH_BYPASS,
+  aliases: [
+    TOOL_HELP_ALIAS,
+    "help",
+    "h",
+    "ai-tools",
+    "tools:list",
+    "list",
+    "ls",
   ],
-  aliases: ["help", "h"],
+  title: "app.api.system.help.get.title" as const,
+  description: "app.api.system.help.get.description" as const,
+  icon: "help-circle",
+  category: "app.api.system.category" as const,
+  tags: ["app.api.system.help.get.tags.tools" as const],
+  allowedRoles: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.MCP_ON,
+    UserRole.CLI_AUTH_BYPASS,
+  ] as const,
+
   cli: {
-    firstCliArgKey: "command",
+    firstCliArgKey: "query",
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: HelpToolsWidget,
+    usage: { request: "data", response: true } as const,
+    children: {
       // === REQUEST FIELDS ===
-      command: requestField({
+      query: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.help.fields.command.label",
-        description: "app.api.system.help.fields.command.description",
-        placeholder: "app.api.system.help.fields.command.placeholder",
-        columns: 12,
+        label: "app.api.system.help.get.fields.query.label" as const,
+        description:
+          "app.api.system.help.get.fields.query.description" as const,
+        placeholder:
+          "app.api.system.help.get.fields.query.placeholder" as const,
+        columns: 8,
         schema: z.string().optional(),
+      }),
+
+      category: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.help.get.fields.category.label" as const,
+        description:
+          "app.api.system.help.get.fields.category.description" as const,
+        columns: 4,
+        schema: z.string().optional(),
+      }),
+
+      toolName: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "app.api.system.help.get.fields.toolName.label" as const,
+        description:
+          "app.api.system.help.get.fields.toolName.description" as const,
+        columns: 4,
+        schema: z.string().optional(),
+      }),
+
+      page: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.system.help.get.fields.page.label" as const,
+        description: "app.api.system.help.get.fields.page.description" as const,
+        columns: 3,
+        schema: z.number().int().min(1).optional(),
+      }),
+
+      pageSize: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.system.help.get.fields.pageSize.label" as const,
+        description:
+          "app.api.system.help.get.fields.pageSize.description" as const,
+        columns: 3,
+        schema: z.number().int().min(1).max(500).optional(),
+      }),
+
+      // CLI: launch interactive mode instead of returning JSON response
+      interactive: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "app.api.system.help.get.fields.interactive.label" as const,
+        description:
+          "app.api.system.help.get.fields.interactive.description" as const,
+        columns: 2,
+        schema: z.boolean().optional(),
       }),
 
       // === RESPONSE FIELDS ===
-      // Pre-formatted CLI output (used by pretty renderer, ignored by JSON)
-      formatted: responseField({
-        type: WidgetType.MARKDOWN,
+      tools: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.help.get.fields.tools.title" as const,
+        schema: z.array(aiToolMetadataSchema),
+      }),
+
+      totalCount: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.help.get.fields.totalCount.title" as const,
+        schema: z.number(),
+      }),
+
+      matchedCount: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.help.get.fields.matchedCount.title" as const,
+        schema: z.number(),
+      }),
+
+      categories: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.help.get.fields.categories.title" as const,
+        schema: z
+          .array(z.object({ name: z.string(), count: z.number() }))
+          .optional(),
+      }),
+
+      hint: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.help.get.fields.hint.title" as const,
         schema: z.string().optional(),
       }),
 
-      // Header section
-      header: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          title: responseField({
-            type: WidgetType.TITLE,
-            content: "app.api.system.help.fields.header.title" as const,
-            schema: z.string(),
-          }),
-          description: responseField({
-            type: WidgetType.TEXT,
-            content: "app.api.system.help.fields.header.description" as const,
-            schema: z.string().optional(),
-          }),
-        },
-      ),
+      currentPage: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.help.get.fields.currentPage.title" as const,
+        schema: z.number().optional(),
+      }),
 
-      // Usage section
-      usage: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.help.fields.usage.title",
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          patterns: responseArrayField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.help.fields.usage.patterns.item" as const,
-              schema: z.string(),
-            }),
-          ),
-        },
-      ),
+      effectivePageSize: responseField({
+        type: WidgetType.TEXT,
+        content:
+          "app.api.system.help.get.fields.effectivePageSize.title" as const,
+        schema: z.number().optional(),
+      }),
 
-      // Options section
-      options: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.help.fields.options.title",
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          items: responseArrayField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                layoutType: LayoutType.HORIZONTAL,
-              },
-              { response: true },
-              {
-                flag: responseField({
-                  type: WidgetType.TEXT,
-                  content: "app.api.system.help.fields.options.flag" as const,
-                  schema: z.string(),
-                }),
-                description: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.system.help.fields.options.description" as const,
-                  schema: z.string(),
-                }),
-              },
-            ),
-          ),
-        },
-      ),
-
-      // Examples section
-      examples: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.help.fields.examples.title",
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          items: responseArrayField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                layoutType: LayoutType.HORIZONTAL,
-              },
-              { response: true },
-              {
-                command: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.system.help.fields.examples.command" as const,
-                  schema: z.string(),
-                }),
-                description: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.system.help.fields.examples.description" as const,
-                  schema: z.string().optional(),
-                }),
-              },
-            ),
-          ),
-        },
-      ),
-
-      // Common Commands section (only for general help)
-      commonCommands: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.help.fields.commonCommands.title",
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          items: responseArrayField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                layoutType: LayoutType.HORIZONTAL,
-              },
-              { response: true },
-              {
-                command: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.system.help.fields.examples.command" as const,
-                  schema: z.string(),
-                }),
-                description: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.system.help.fields.options.description" as const,
-                  schema: z.string(),
-                }),
-              },
-            ),
-          ),
-        },
-      ),
-
-      // Details section (only for specific command help)
-      details: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.help.fields.details.title",
-          layoutType: LayoutType.GRID,
-        },
-        { response: true },
-        {
-          category: responseField({
-            type: WidgetType.TEXT,
-            content:
-              "app.api.system.help.fields.details.category.content" as const,
-            label: "app.api.system.help.fields.details.category.content",
-            schema: z.string().optional(),
-          }),
-          path: responseField({
-            type: WidgetType.TEXT,
-            content: "app.api.system.help.fields.details.path.content" as const,
-            label: "app.api.system.help.fields.details.path.content",
-            schema: z.string().optional(),
-          }),
-          method: responseField({
-            type: WidgetType.TEXT,
-            content:
-              "app.api.system.help.fields.details.method.content" as const,
-            label: "app.api.system.help.fields.details.method.content",
-            schema: z.string().optional(),
-          }),
-          aliases: responseField({
-            type: WidgetType.TEXT,
-            content:
-              "app.api.system.help.fields.details.aliases.content" as const,
-            label: "app.api.system.help.fields.details.aliases.content",
-            schema: z.string().optional(),
-          }),
-        },
-      ),
+      totalPages: responseField({
+        type: WidgetType.TEXT,
+        content: "app.api.system.help.get.fields.totalPages.title" as const,
+        schema: z.number().optional(),
+      }),
     },
-  ),
+  }),
 
-  // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.help.post.errors.validation.title",
-      description: "app.api.system.help.post.errors.validation.description",
+      title: "app.api.system.help.get.errors.validation.title" as const,
+      description:
+        "app.api.system.help.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.help.post.errors.network.title",
-      description: "app.api.system.help.post.errors.network.description",
+      title: "app.api.system.help.get.errors.network.title" as const,
+      description:
+        "app.api.system.help.get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.help.post.errors.unauthorized.title",
-      description: "app.api.system.help.post.errors.unauthorized.description",
+      title: "app.api.system.help.get.errors.unauthorized.title" as const,
+      description:
+        "app.api.system.help.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.help.post.errors.forbidden.title",
-      description: "app.api.system.help.post.errors.forbidden.description",
+      title: "app.api.system.help.get.errors.forbidden.title" as const,
+      description:
+        "app.api.system.help.get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.help.post.errors.notFound.title",
-      description: "app.api.system.help.post.errors.notFound.description",
+      title: "app.api.system.help.get.errors.notFound.title" as const,
+      description:
+        "app.api.system.help.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.help.post.errors.server.title",
-      description: "app.api.system.help.post.errors.server.description",
+      title: "app.api.system.help.get.errors.server.title" as const,
+      description: "app.api.system.help.get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.help.post.errors.unknown.title",
-      description: "app.api.system.help.post.errors.unknown.description",
+      title: "app.api.system.help.get.errors.unknown.title" as const,
+      description:
+        "app.api.system.help.get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.help.post.errors.server.title",
-      description: "app.api.system.help.post.errors.server.description",
+      title: "app.api.system.help.get.errors.unsavedChanges.title" as const,
+      description:
+        "app.api.system.help.get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.help.post.errors.conflict.title",
-      description: "app.api.system.help.post.errors.conflict.description",
+      title: "app.api.system.help.get.errors.conflict.title" as const,
+      description:
+        "app.api.system.help.get.errors.conflict.description" as const,
     },
   },
 
-  // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.help.post.success.title",
-    description: "app.api.system.help.post.success.description",
+    title: "app.api.system.help.get.success.title" as const,
+    description: "app.api.system.help.get.success.description" as const,
   },
 
-  // === EXAMPLES ===
   examples: {
     requests: {
-      default: {
-        command: undefined,
-      },
-      specificCommand: {
-        command: "check",
-      },
+      default: {},
+      searchByName: { query: "search", page: 1 },
+      filterByCategory: { category: "chat", page: 1, pageSize: 50 },
+      toolDetail: { toolName: "agent_search_brave_GET" },
+      interactive: { interactive: true },
     },
     responses: {
       default: {
-        header: {
-          title: "Vibe CLI - Next-generation API execution tool",
-          description:
-            "Command-line interface for Next-Vibe API with real-time execution",
-        },
-        usage: {
-          patterns: ["vibe <command> [options]", "vibe <command> --help"],
-        },
-        commonCommands: {
-          items: [
-            { command: "list", description: "List all available commands" },
-            { command: "check", description: "Run code quality checks" },
-            { command: "db:migrate", description: "Run database migrations" },
-            { command: "test", description: "Run test suite" },
-          ],
-        },
-        options: {
-          items: [
-            { flag: "-d, --data <json>", description: "Pass JSON data" },
-            {
-              flag: "-o, --output <format>",
-              description: "Output format (pretty|json)",
-            },
-            { flag: "-v, --verbose", description: "Enable verbose output" },
-            {
-              flag: "-l, --locale <locale>",
-              description: "Set locale (en-GLOBAL|de-DE|pl-PL)",
-            },
-            { flag: "--help", description: "Show this help" },
-          ],
-        },
-        examples: {
-          items: [
-            { command: "vibe list", description: "List all commands" },
-            { command: "vibe check", description: "Run checks" },
-            { command: "vibe db:migrate", description: "Run migrations" },
-            { command: "vibe help check", description: "Get command help" },
-          ],
-        },
-        details: {
-          category: undefined,
-          path: undefined,
-          method: undefined,
-          aliases: undefined,
-        },
+        tools: [],
+        totalCount: 85,
+        matchedCount: 0,
+        categories: [
+          { name: "Chat", count: 42 },
+          { name: "System", count: 18 },
+        ],
+        hint: "Use query to search, category to browse, or toolName to get full parameter schema. Pass --interactive for interactive CLI mode.",
+        currentPage: 1,
+        effectivePageSize: 200,
+        totalPages: 1,
       },
-      specificCommand: {
-        header: {
-          title: "check - Run comprehensive code quality checks",
-          description:
-            "Runs linting, type checking, and other code quality tools",
-        },
-        usage: {
-          patterns: ["vibe check [paths] [options]"],
-        },
-        details: {
-          category: "system",
-          path: "/system/check",
-          method: "POST",
-          aliases: "check, c",
-        },
-        options: {
-          items: [
-            { flag: "--fix", description: "Automatically fix issues" },
-            { flag: "--skip-lint", description: "Skip linting" },
-            { flag: "--skip-types", description: "Skip type checking" },
-            { flag: "-v, --verbose", description: "Enable verbose output" },
-          ],
-        },
-        examples: {
-          items: [
-            { command: "vibe check", description: "Run all checks" },
-            { command: "vibe check --fix", description: "Fix issues" },
-            { command: "vibe c --skip-lint", description: "Skip linting" },
-          ],
-        },
-        commonCommands: {
-          items: [
-            { command: "list", description: "List all available commands" },
-            { command: "check", description: "Run code quality checks" },
-            { command: "db:migrate", description: "Run database migrations" },
-            { command: "test", description: "Run test suite" },
-          ],
-        },
+      searchResult: {
+        tools: [
+          {
+            name: "Brave Search",
+            method: "GET",
+            description: "Search the web using Brave Search API",
+            category: "Search",
+            tags: ["search", "web"],
+            toolName: "agent_search_brave_GET",
+            allowedRoles: ["CUSTOMER", "ADMIN"],
+            aliases: ["web-search"],
+          },
+        ],
+        totalCount: 85,
+        matchedCount: 1,
+        currentPage: 1,
+        effectivePageSize: 25,
+        totalPages: 1,
       },
     },
   },
 });
 
-export type HelpRequestInput = typeof POST.types.RequestInput;
-export type HelpRequestOutput = typeof POST.types.RequestOutput;
-export type HelpResponseInput = typeof POST.types.ResponseInput;
-export type HelpResponseOutput = typeof POST.types.ResponseOutput;
-
-const endpoints = { POST };
+const endpoints = { GET } as const;
 export default endpoints;
+
+export type HelpGetRequestInput = typeof GET.types.RequestInput;
+export type HelpGetRequestOutput = typeof GET.types.RequestOutput;
+export type HelpGetResponseInput = typeof GET.types.ResponseInput;
+export type HelpGetResponseOutput = typeof GET.types.ResponseOutput;
+export type HelpToolMetadataSerialized = HelpGetResponseOutput["tools"][0];

@@ -146,6 +146,20 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
 }): JSX.Element {
   const { fieldName, field } = props;
 
+  // PaginationWidgetConfig has type: WidgetType.PAGINATION but is not yet in the
+  // DispatchField union — handle it before the exhaustive switch to avoid a
+  // "not comparable" error while still rendering the widget correctly at runtime.
+  if ((field.type as WidgetType) === WidgetType.PAGINATION) {
+    return (
+      <PaginationWidgetInk
+        fieldName={fieldName}
+        field={asField<Parameters<typeof PaginationWidgetInk>[0]["field"]>(
+          field,
+        )}
+      />
+    );
+  }
+
   switch (field.type) {
     // === CONTAINER WIDGETS ===
     case WidgetType.CONTAINER:
@@ -212,15 +226,6 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
           field={asField<
             Parameters<typeof CodeQualityFilesWidgetInk>[0]["field"]
           >(field)}
-        />
-      );
-    case WidgetType.PAGINATION:
-      return (
-        <PaginationWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof PaginationWidgetInk>[0]["field"]>(
-            field,
-          )}
         />
       );
     case WidgetType.KEY_VALUE:
@@ -698,6 +703,9 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
       }
     }
 
+    case WidgetType.PAGINATION:
+      // Handled by guard before switch — unreachable here.
+      return <></>;
     default:
       // oxlint-disable-next-line no-unused-vars
       const _exhaustiveCheck: never = field;

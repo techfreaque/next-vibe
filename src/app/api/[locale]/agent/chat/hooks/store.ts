@@ -14,11 +14,13 @@ import {
 export type { ChatFolder, ChatMessage, ChatThread };
 
 /**
- * Enabled tool configuration
+ * UI tool model — used by the tool selection modal.
+ * Converted to/from activeTools/visibleTools when persisting to settings.
  */
 export interface EnabledTool {
   id: string;
   requiresConfirmation: boolean;
+  /** true = tool is visible to the AI (in context window) */
   active: boolean;
 }
 
