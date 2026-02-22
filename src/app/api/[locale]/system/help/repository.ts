@@ -144,6 +144,8 @@ function serializeTool(
 ): ToolItem {
   return {
     name: tool.name,
+    toolName: tool.toolName,
+    tags: tool.tags,
     method: tool.method,
     description: tool.description,
     category: tool.category,
@@ -164,6 +166,8 @@ function serializeToolMinimal(
     tool.aliases && tool.aliases.length > 0 ? tool.aliases[0] : tool.toolName;
   return {
     name: callName,
+    toolName: tool.toolName,
+    tags: tool.tags,
     description: tool.description,
   };
 }

@@ -11,7 +11,7 @@ import React from "react";
 import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
 import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
-import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
+import { TextArrayFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-array-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
@@ -50,7 +50,7 @@ export function ImapSyncContainer({
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
             {t("app.api.emails.imapClient.sync.widget.options")}
           </Span>
-          <TextareaFieldWidget
+          <TextArrayFieldWidget
             fieldName={`${fieldName}.accountIds`}
             field={children.accountIds}
           />

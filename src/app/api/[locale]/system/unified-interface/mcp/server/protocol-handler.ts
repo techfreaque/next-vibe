@@ -8,6 +8,7 @@ import "server-only";
 import { parseError } from "next-vibe/shared/utils";
 
 import { getCliUser } from "@/app/api/[locale]/system/unified-interface/cli/auth/cli-user";
+import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -274,7 +275,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     const result = await mcpRegistry.executeTool(
       {
         toolName: params.name,
-        data: params.arguments || {},
+        data: (params.arguments || {}) as CliRequestData,
         user: this.user,
         locale: this.locale,
         requestId: Date.now(),

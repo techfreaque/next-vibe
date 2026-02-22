@@ -817,14 +817,14 @@ function StackEntryLayer({
             create: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.data,
-              mutationOptions: (entry.endpoint.options?.mutationOptions
+              mutationOptions: entry.endpoint.options?.mutationOptions
                 ? (() => {
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     const { onSuccess, ...rest } =
                       entry.endpoint.options.mutationOptions;
                     return Object.keys(rest).length > 0 ? rest : undefined;
                   })()
-                : undefined) as never,
+                : undefined,
             },
           }}
           submitButton={submitButton}
@@ -859,14 +859,14 @@ function StackEntryLayer({
             update: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.data,
-              mutationOptions: (entry.endpoint.options?.mutationOptions
+              mutationOptions: entry.endpoint.options?.mutationOptions
                 ? (() => {
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     const { onSuccess, ...rest } =
                       entry.endpoint.options.mutationOptions;
                     return Object.keys(rest).length > 0 ? rest : undefined;
                   })()
-                : undefined) as never,
+                : undefined,
             },
           }}
           submitButton={submitButton}
@@ -936,14 +936,14 @@ function StackEntryLayer({
             delete: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.urlPathParams,
-              mutationOptions: (entry.endpoint.options?.mutationOptions
+              mutationOptions: entry.endpoint.options?.mutationOptions
                 ? (() => {
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     const { onSuccess, ...rest } =
                       entry.endpoint.options.mutationOptions;
                     return Object.keys(rest).length > 0 ? rest : undefined;
                   })()
-                : undefined) as never,
+                : undefined,
             },
           }}
           debug={debug}
