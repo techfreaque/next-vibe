@@ -9,6 +9,7 @@
 import { createContext, useContext } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
@@ -120,6 +121,15 @@ export function useInkWidgetPlatform(): BaseWidgetContext<CreateApiEndpointAny>[
       >,
     ) => state.context.platform,
   );
+}
+
+/**
+ * Hook to determine if field labels should be shown.
+ * MCP consumers are AI agents — labels add noise without value.
+ */
+export function useInkWidgetShowLabels(): boolean {
+  const platform = useInkWidgetPlatform();
+  return platform !== Platform.MCP;
 }
 
 /**

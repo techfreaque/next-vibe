@@ -814,7 +814,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         cachePath,
       );
     } else if (config.pathType === PathType.MULTIPLE_PATHS) {
-      // Multiple paths - combine all into one tsconfig to avoid parallel checks
+      // Multiple paths - combine all into one tsconfig
       const includes = resolvePathsToIncludes(config.targetPaths ?? []);
       TypecheckRepositoryImpl.createTempTsConfig(
         includes,

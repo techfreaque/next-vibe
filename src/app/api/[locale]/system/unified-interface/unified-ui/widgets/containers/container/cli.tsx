@@ -9,6 +9,7 @@ import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-int
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 import {
   useInkWidgetResponseOnly,
+  useInkWidgetShowLabels,
   useInkWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
@@ -96,11 +97,13 @@ export function ContainerWidgetInk<
 >): JSX.Element {
   const t = useInkWidgetTranslation();
   const responseOnly = useInkWidgetResponseOnly();
+  const showLabels = useInkWidgetShowLabels();
   const { title: titleKey, description: descriptionKey } = field;
 
   // Get translated title and description
-  const title = titleKey ? t(titleKey) : undefined;
-  const description = descriptionKey ? t(descriptionKey) : undefined;
+  const title = showLabels && titleKey ? t(titleKey) : undefined;
+  const description =
+    showLabels && descriptionKey ? t(descriptionKey) : undefined;
 
   // Container can have children (object), child (array), or variants (union)
   // Only object containers with children are rendered here

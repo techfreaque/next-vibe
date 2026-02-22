@@ -17,17 +17,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
 import { TerminalContainer } from "./widget";
 
 export const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["ssh", "terminal"],
-  title: "app.api.ssh.terminal.get.title",
-  description: "app.api.ssh.terminal.get.description",
+  title: "terminal.get.title",
+  description: "terminal.get.description",
   icon: "terminal",
-  category: "app.api.ssh.category",
+  category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["app.api.ssh.type"],
+  tags: ["type"],
 
   fields: customWidgetObject({
     render: TerminalContainer,
@@ -36,52 +38,52 @@ export const { GET } = createEndpoint({
       // No meaningful server fields — widget manages its own session
       ok: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.terminal.get.response.ok.title",
+        content: "terminal.get.response.ok.title",
         schema: z.boolean(),
       }),
     },
   }),
 
   successTypes: {
-    title: "app.api.ssh.terminal.get.success.title",
-    description: "app.api.ssh.terminal.get.success.description",
+    title: "terminal.get.success.title",
+    description: "terminal.get.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.ssh.terminal.get.errors.unauthorized.title",
-      description: "app.api.ssh.terminal.get.errors.unauthorized.description",
+      title: "terminal.get.errors.unauthorized.title",
+      description: "terminal.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.ssh.terminal.get.errors.server.title",
-      description: "app.api.ssh.terminal.get.errors.server.description",
+      title: "terminal.get.errors.server.title",
+      description: "terminal.get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.ssh.terminal.get.errors.unknown.title",
-      description: "app.api.ssh.terminal.get.errors.unknown.description",
+      title: "terminal.get.errors.unknown.title",
+      description: "terminal.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.ssh.terminal.get.errors.unsavedChanges.title",
-      description: "app.api.ssh.terminal.get.errors.unsavedChanges.description",
+      title: "terminal.get.errors.unsavedChanges.title",
+      description: "terminal.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.ssh.terminal.get.errors.notFound.title",
-      description: "app.api.ssh.terminal.get.errors.notFound.description",
+      title: "terminal.get.errors.notFound.title",
+      description: "terminal.get.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.ssh.terminal.get.errors.conflict.title",
-      description: "app.api.ssh.terminal.get.errors.conflict.description",
+      title: "terminal.get.errors.conflict.title",
+      description: "terminal.get.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.ssh.terminal.get.errors.network.title",
-      description: "app.api.ssh.terminal.get.errors.network.description",
+      title: "terminal.get.errors.network.title",
+      description: "terminal.get.errors.network.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.ssh.terminal.get.errors.validation.title",
-      description: "app.api.ssh.terminal.get.errors.validation.description",
+      title: "terminal.get.errors.validation.title",
+      description: "terminal.get.errors.validation.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.ssh.terminal.get.errors.forbidden.title",
-      description: "app.api.ssh.terminal.get.errors.forbidden.description",
+      title: "terminal.get.errors.forbidden.title",
+      description: "terminal.get.errors.forbidden.description",
     },
   },
 

@@ -29,6 +29,13 @@ export function isCliPlatform(platform: Platform): boolean {
 }
 
 /**
+ * Check if platform is an agent/AI caller (MCP server or AI tool execution)
+ */
+export function isAgentPlatform(platform: Platform): boolean {
+  return platform === Platform.MCP || platform === Platform.AI;
+}
+
+/**
  * Check if running from npm package (not local development)
  */
 export function isPackagePlatform(platform: Platform): boolean {

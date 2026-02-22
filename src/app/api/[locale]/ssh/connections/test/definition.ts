@@ -19,17 +19,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../../i18n";
 import { ConnectionTestContainer } from "./widget";
 
 export const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["ssh", "connections", "test"],
-  title: "app.api.ssh.connections.test.post.title",
-  description: "app.api.ssh.connections.test.post.description",
+  title: "connections.test.post.title",
+  description: "connections.test.post.description",
   icon: "wifi",
-  category: "app.api.ssh.category",
+  category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["app.api.ssh.type"],
+  tags: ["type"],
 
   fields: customWidgetObject({
     render: ConnectionTestContainer,
@@ -39,99 +41,86 @@ export const { POST } = createEndpoint({
       connectionId: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.ssh.connections.test.post.fields.connectionId.label",
-        description:
-          "app.api.ssh.connections.test.post.fields.connectionId.description",
-        placeholder:
-          "app.api.ssh.connections.test.post.fields.connectionId.placeholder",
+        label: "connections.test.post.fields.connectionId.label",
+        description: "connections.test.post.fields.connectionId.description",
+        placeholder: "connections.test.post.fields.connectionId.placeholder",
         schema: z.string().uuid(),
       }),
       acknowledgeNewFingerprint: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.ssh.connections.test.post.fields.acknowledgeNewFingerprint.label",
+        label: "connections.test.post.fields.acknowledgeNewFingerprint.label",
         description:
-          "app.api.ssh.connections.test.post.fields.acknowledgeNewFingerprint.description",
+          "connections.test.post.fields.acknowledgeNewFingerprint.description",
         placeholder:
-          "app.api.ssh.connections.test.post.fields.acknowledgeNewFingerprint.placeholder",
+          "connections.test.post.fields.acknowledgeNewFingerprint.placeholder",
         schema: z.boolean().optional(),
       }),
 
       // RESPONSE
       ok: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.connections.test.post.response.ok.title",
+        content: "connections.test.post.response.ok.title",
         schema: z.boolean(),
       }),
       latencyMs: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.connections.test.post.response.latencyMs.title",
+        content: "connections.test.post.response.latencyMs.title",
         schema: z.number(),
       }),
       fingerprint: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.connections.test.post.response.fingerprint.title",
+        content: "connections.test.post.response.fingerprint.title",
         schema: z.string().nullable(),
       }),
       fingerprintChanged: responseField({
         type: WidgetType.TEXT,
-        content:
-          "app.api.ssh.connections.test.post.response.fingerprintChanged.title",
+        content: "connections.test.post.response.fingerprintChanged.title",
         schema: z.boolean().optional(),
       }),
     },
   }),
 
   successTypes: {
-    title: "app.api.ssh.connections.test.post.success.title",
-    description: "app.api.ssh.connections.test.post.success.description",
+    title: "connections.test.post.success.title",
+    description: "connections.test.post.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.ssh.connections.test.post.errors.validation.title",
-      description:
-        "app.api.ssh.connections.test.post.errors.validation.description",
+      title: "connections.test.post.errors.validation.title",
+      description: "connections.test.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.ssh.connections.test.post.errors.unauthorized.title",
-      description:
-        "app.api.ssh.connections.test.post.errors.unauthorized.description",
+      title: "connections.test.post.errors.unauthorized.title",
+      description: "connections.test.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.ssh.connections.test.post.errors.forbidden.title",
-      description:
-        "app.api.ssh.connections.test.post.errors.forbidden.description",
+      title: "connections.test.post.errors.forbidden.title",
+      description: "connections.test.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.ssh.connections.test.post.errors.server.title",
-      description:
-        "app.api.ssh.connections.test.post.errors.server.description",
+      title: "connections.test.post.errors.server.title",
+      description: "connections.test.post.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.ssh.connections.test.post.errors.notFound.title",
-      description:
-        "app.api.ssh.connections.test.post.errors.notFound.description",
+      title: "connections.test.post.errors.notFound.title",
+      description: "connections.test.post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.ssh.connections.test.post.errors.unknown.title",
-      description:
-        "app.api.ssh.connections.test.post.errors.unknown.description",
+      title: "connections.test.post.errors.unknown.title",
+      description: "connections.test.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.ssh.connections.test.post.errors.unsavedChanges.title",
-      description:
-        "app.api.ssh.connections.test.post.errors.unsavedChanges.description",
+      title: "connections.test.post.errors.unsavedChanges.title",
+      description: "connections.test.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.ssh.connections.test.post.errors.conflict.title",
-      description:
-        "app.api.ssh.connections.test.post.errors.conflict.description",
+      title: "connections.test.post.errors.conflict.title",
+      description: "connections.test.post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.ssh.connections.test.post.errors.network.title",
-      description:
-        "app.api.ssh.connections.test.post.errors.network.description",
+      title: "connections.test.post.errors.network.title",
+      description: "connections.test.post.errors.network.description",
     },
   },
 

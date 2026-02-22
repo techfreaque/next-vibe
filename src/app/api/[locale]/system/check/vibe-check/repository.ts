@@ -95,7 +95,7 @@ export class VibeCheckRepository {
   }
 
   private static async runEslintCheck(
-    path: string,
+    path: string | string[],
     fix: boolean,
     timeout: number,
     config: CheckConfig,
@@ -296,30 +296,36 @@ export class VibeCheckRepository {
         );
       }
 
-      // ESLint: run separately for each path (required for proper file handling)
-      for (const path of pathsToCheck) {
-        if (!effectiveData.skipEslint && configResult.config.eslint.enabled) {
-          logger.info("Starting ESLint check...");
-          promises.push(
-            this.runEslintCheck(
-              path || baseDir,
-              effectiveData.fix,
-              effectiveData.timeout,
-              configResult.config,
-              logger,
-              platform,
-            ).then((result) => {
-              if (firstCheckStart === 0) {
-                firstCheckStart = Date.now();
-              }
-              lastCheckEnd = Date.now();
-              return result;
-            }),
-          );
-        }
+      // ESLint: single run for all paths
+      if (!effectiveData.skipEslint && configResult.config.eslint.enabled) {
+        const eslintPaths =
+          pathsToCheck.length === 0
+            ? baseDir
+            : pathsToCheck.map((p) => p || baseDir);
+        const eslintPath =
+          Array.isArray(eslintPaths) && eslintPaths.length === 1
+            ? eslintPaths[0]
+            : eslintPaths;
+        logger.info("Starting ESLint check...");
+        promises.push(
+          this.runEslintCheck(
+            eslintPath,
+            effectiveData.fix,
+            effectiveData.timeout,
+            configResult.config,
+            logger,
+            platform,
+          ).then((result) => {
+            if (firstCheckStart === 0) {
+              firstCheckStart = Date.now();
+            }
+            lastCheckEnd = Date.now();
+            return result;
+          }),
+        );
       }
 
-      // TypeScript: single run for all paths combined — avoids parallel tsgo instances
+      // TypeScript: single run for all paths combined
       if (
         !effectiveData.skipTypecheck &&
         configResult.config.typecheck.enabled

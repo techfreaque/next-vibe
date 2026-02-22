@@ -103,8 +103,16 @@ export async function answerAsAI(
         role: ChatMessageRole.ASSISTANT,
         model: settings.selectedModel,
         character: settings.selectedCharacter ?? null,
-        activeTools: settings.activeTools,
-        tools: settings.visibleTools,
+        activeTools:
+          settings.activeTools?.map((t) => ({
+            toolId: t.toolId,
+            requiresConfirmation: t.requiresConfirmation ?? false,
+          })) ?? null,
+        tools:
+          settings.visibleTools?.map((t) => ({
+            toolId: t.toolId,
+            requiresConfirmation: t.requiresConfirmation ?? false,
+          })) ?? null,
         messageHistory: messageHistory ?? [],
         attachments: attachments && attachments.length > 0 ? attachments : null,
         toolConfirmations: null,

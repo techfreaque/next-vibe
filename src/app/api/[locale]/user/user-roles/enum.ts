@@ -19,9 +19,19 @@ export const {
 /**
  * Platform Access Markers - Configuration markers for endpoint platform access
  * These are NEVER stored in database or assigned to users
- * They control which platforms can access an endpoint (_OFF) or bypass auth
- * MCP_ON is an opt-in marker - only endpoints with MCP_ON are accessible via MCP
- * REMOTE_SKILL is an opt-in marker - only endpoints with REMOTE_SKILL appear in AI skill markdown files (AGENT.md, PUBLIC_USER_SKILL.md, USER_WITH_ACCOUNT_SKILL.md)
+ *
+ * Opt-out markers (_OFF): block a specific platform. All endpoints are accessible
+ * by default; add the marker to exclude from that platform.
+ *   CLI_OFF       — not available on CLI / MCP (shared opt-out for agent platforms)
+ *   AI_TOOL_OFF   — not available as an AI tool
+ *   WEB_OFF       — not available on web (tRPC, Next.js pages/API)
+ *   MCP_OFF       — not available on MCP specifically (in addition to CLI_OFF)
+ *   PRODUCTION_OFF — disabled in production environment
+ *
+ * Opt-in markers: endpoint must explicitly include these to be accessible.
+ *   MCP_VISIBLE   — endpoint appears in the MCP server's tool *discovery* list
+ *   REMOTE_SKILL  — endpoint appears in AI skill markdown files (AGENT.md, etc.)
+ *   CLI_AUTH_BYPASS — endpoint is accessible without auth for basic routes like check, dev, etc.
  */
 export const {
   enum: PlatformMarker,
@@ -32,7 +42,8 @@ export const {
   CLI_AUTH_BYPASS: "app.api.user.userRoles.enums.userRole.cliAuthBypass",
   AI_TOOL_OFF: "app.api.user.userRoles.enums.userRole.aiToolOff",
   WEB_OFF: "app.api.user.userRoles.enums.userRole.webOff",
-  MCP_ON: "app.api.user.userRoles.enums.userRole.mcpOn",
+  MCP_OFF: "app.api.user.userRoles.enums.userRole.mcpOff",
+  MCP_VISIBLE: "app.api.user.userRoles.enums.userRole.mcpVisible",
   PRODUCTION_OFF: "app.api.user.userRoles.enums.userRole.productionOff",
   REMOTE_SKILL: "app.api.user.userRoles.enums.userRole.remoteSkill",
 });
@@ -78,7 +89,8 @@ export function isPlatformMarker(
     role === PlatformMarker.CLI_OFF ||
     role === PlatformMarker.WEB_OFF ||
     role === PlatformMarker.AI_TOOL_OFF ||
-    role === PlatformMarker.MCP_ON ||
+    role === PlatformMarker.MCP_OFF ||
+    role === PlatformMarker.MCP_VISIBLE ||
     role === PlatformMarker.PRODUCTION_OFF ||
     role === PlatformMarker.CLI_AUTH_BYPASS ||
     role === PlatformMarker.REMOTE_SKILL

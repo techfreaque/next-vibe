@@ -19,17 +19,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../../../i18n";
 import { LinuxUserDeleteContainer } from "./widget";
 
 export const { DELETE } = createEndpoint({
+  scopedTranslation,
   method: Methods.DELETE,
   path: ["ssh", "linux", "users", "[username]"],
-  title: "app.api.ssh.linux.users.username.delete.title",
-  description: "app.api.ssh.linux.users.username.delete.description",
+  title: "linux.users.username.delete.title",
+  description: "linux.users.username.delete.description",
   icon: "user",
-  category: "app.api.ssh.category",
+  category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["app.api.ssh.type"],
+  tags: ["type"],
 
   fields: customWidgetObject({
     render: LinuxUserDeleteContainer,
@@ -38,71 +40,61 @@ export const { DELETE } = createEndpoint({
       removeHome: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.ssh.linux.users.username.delete.fields.removeHome.label",
+        label: "linux.users.username.delete.fields.removeHome.label",
         description:
-          "app.api.ssh.linux.users.username.delete.fields.removeHome.description",
+          "linux.users.username.delete.fields.removeHome.description",
         schema: z.boolean().optional(),
       }),
       ok: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.linux.users.username.delete.response.ok.title",
+        content: "linux.users.username.delete.response.ok.title",
         schema: z.boolean(),
       }),
     },
   }),
 
   successTypes: {
-    title: "app.api.ssh.linux.users.username.delete.success.title",
-    description: "app.api.ssh.linux.users.username.delete.success.description",
+    title: "linux.users.username.delete.success.title",
+    description: "linux.users.username.delete.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.ssh.linux.users.username.delete.errors.validation.title",
-      description:
-        "app.api.ssh.linux.users.username.delete.errors.validation.description",
+      title: "linux.users.username.delete.errors.validation.title",
+      description: "linux.users.username.delete.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.ssh.linux.users.username.delete.errors.unauthorized.title",
+      title: "linux.users.username.delete.errors.unauthorized.title",
       description:
-        "app.api.ssh.linux.users.username.delete.errors.unauthorized.description",
+        "linux.users.username.delete.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.ssh.linux.users.username.delete.errors.forbidden.title",
-      description:
-        "app.api.ssh.linux.users.username.delete.errors.forbidden.description",
+      title: "linux.users.username.delete.errors.forbidden.title",
+      description: "linux.users.username.delete.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.ssh.linux.users.username.delete.errors.server.title",
-      description:
-        "app.api.ssh.linux.users.username.delete.errors.server.description",
+      title: "linux.users.username.delete.errors.server.title",
+      description: "linux.users.username.delete.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.ssh.linux.users.username.delete.errors.notFound.title",
-      description:
-        "app.api.ssh.linux.users.username.delete.errors.notFound.description",
+      title: "linux.users.username.delete.errors.notFound.title",
+      description: "linux.users.username.delete.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.ssh.linux.users.username.delete.errors.unknown.title",
-      description:
-        "app.api.ssh.linux.users.username.delete.errors.unknown.description",
+      title: "linux.users.username.delete.errors.unknown.title",
+      description: "linux.users.username.delete.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.ssh.linux.users.username.delete.errors.unsavedChanges.title",
+      title: "linux.users.username.delete.errors.unsavedChanges.title",
       description:
-        "app.api.ssh.linux.users.username.delete.errors.unsavedChanges.description",
+        "linux.users.username.delete.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.ssh.linux.users.username.delete.errors.conflict.title",
-      description:
-        "app.api.ssh.linux.users.username.delete.errors.conflict.description",
+      title: "linux.users.username.delete.errors.conflict.title",
+      description: "linux.users.username.delete.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.ssh.linux.users.username.delete.errors.network.title",
-      description:
-        "app.api.ssh.linux.users.username.delete.errors.network.description",
+      title: "linux.users.username.delete.errors.network.title",
+      description: "linux.users.username.delete.errors.network.description",
     },
   },
 

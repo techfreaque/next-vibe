@@ -30,18 +30,18 @@ import { HelpToolsWidget } from "./widget";
 
 // Serializable tool metadata returned in response
 const aiToolMetadataSchema = z.object({
+  // Always present
   name: z.string(),
-  method: z.string(),
   description: z.string(),
-  category: z.string().optional(),
-  tags: z.array(z.string()),
   toolName: z.string(),
-  allowedRoles: z.array(z.string()).readonly(),
+  tags: z.array(z.string()),
+  // Present in list mode with query/category
+  method: z.string().optional(),
+  category: z.string().optional(),
   aliases: z.array(z.string()).optional(),
+  // Only present in detail mode (toolName param)
   requiresConfirmation: z.boolean().optional(),
-  // Only present in detail mode (toolName param)
   parameters: z.record(z.string(), z.unknown()).optional(),
-  // Only present in detail mode (toolName param)
   examples: z
     .object({
       inputs: z
@@ -75,7 +75,7 @@ const { GET } = createEndpoint({
     UserRole.PUBLIC,
     UserRole.CUSTOMER,
     UserRole.ADMIN,
-    UserRole.MCP_ON,
+    UserRole.MCP_VISIBLE,
     UserRole.CLI_AUTH_BYPASS,
   ] as const,
 
@@ -284,7 +284,6 @@ const { GET } = createEndpoint({
             category: "Search",
             tags: ["search", "web"],
             toolName: "agent_search_brave_GET",
-            allowedRoles: ["CUSTOMER", "ADMIN"],
             aliases: ["web-search"],
           },
         ],

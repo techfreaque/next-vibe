@@ -104,7 +104,7 @@ type Test9 = InferJwtPayloadTypeFromRoles<
     typeof UserRole.CLI_AUTH_BYPASS,
     typeof UserRole.AI_TOOL_OFF,
     typeof UserRole.WEB_OFF,
-    typeof UserRole.MCP_ON,
+    typeof UserRole.MCP_VISIBLE,
     typeof UserRole.PRODUCTION_OFF,
   ]
 >;
@@ -117,7 +117,7 @@ type Test10 = InferJwtPayloadTypeFromRoles<
   readonly [
     typeof UserRole.ADMIN,
     typeof UserRole.CLI_OFF,
-    typeof UserRole.MCP_ON,
+    typeof UserRole.MCP_VISIBLE,
   ]
 >;
 type Test10Check = Expect<Equal<Test10, JwtPrivatePayloadType>>;

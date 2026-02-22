@@ -14,17 +14,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../../i18n";
 import { SessionWriteContainer } from "./widget";
 
 export const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["ssh", "session", "write"],
-  title: "app.api.ssh.session.write.post.title",
-  description: "app.api.ssh.session.write.post.description",
+  title: "session.write.post.title",
+  description: "session.write.post.description",
   icon: "terminal",
-  category: "app.api.ssh.category",
+  category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["app.api.ssh.type"],
+  tags: ["type"],
 
   fields: customWidgetObject({
     render: SessionWriteContainer,
@@ -33,77 +35,72 @@ export const { POST } = createEndpoint({
       sessionId: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.ssh.session.write.post.fields.sessionId.label",
-        description:
-          "app.api.ssh.session.write.post.fields.sessionId.description",
+        label: "session.write.post.fields.sessionId.label",
+        description: "session.write.post.fields.sessionId.description",
         schema: z.string(),
       }),
       input: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.ssh.session.write.post.fields.input.label",
-        description: "app.api.ssh.session.write.post.fields.input.description",
+        label: "session.write.post.fields.input.label",
+        description: "session.write.post.fields.input.description",
         schema: z.string(),
       }),
       raw: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.ssh.session.write.post.fields.raw.label",
-        description: "app.api.ssh.session.write.post.fields.raw.description",
+        label: "session.write.post.fields.raw.label",
+        description: "session.write.post.fields.raw.description",
         schema: z.boolean().optional(),
       }),
       ok: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.session.write.post.response.ok.title",
+        content: "session.write.post.response.ok.title",
         schema: z.boolean(),
       }),
     },
   }),
 
   successTypes: {
-    title: "app.api.ssh.session.write.post.success.title",
-    description: "app.api.ssh.session.write.post.success.description",
+    title: "session.write.post.success.title",
+    description: "session.write.post.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.ssh.session.write.post.errors.validation.title",
-      description:
-        "app.api.ssh.session.write.post.errors.validation.description",
+      title: "session.write.post.errors.validation.title",
+      description: "session.write.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.ssh.session.write.post.errors.unauthorized.title",
-      description:
-        "app.api.ssh.session.write.post.errors.unauthorized.description",
+      title: "session.write.post.errors.unauthorized.title",
+      description: "session.write.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.ssh.session.write.post.errors.forbidden.title",
-      description:
-        "app.api.ssh.session.write.post.errors.forbidden.description",
+      title: "session.write.post.errors.forbidden.title",
+      description: "session.write.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.ssh.session.write.post.errors.server.title",
-      description: "app.api.ssh.session.write.post.errors.server.description",
+      title: "session.write.post.errors.server.title",
+      description: "session.write.post.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.ssh.session.write.post.errors.notFound.title",
-      description: "app.api.ssh.session.write.post.errors.notFound.description",
+      title: "session.write.post.errors.notFound.title",
+      description: "session.write.post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.ssh.session.write.post.errors.unknown.title",
-      description: "app.api.ssh.session.write.post.errors.unknown.description",
+      title: "session.write.post.errors.unknown.title",
+      description: "session.write.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.ssh.session.write.post.errors.unsavedChanges.title",
-      description:
-        "app.api.ssh.session.write.post.errors.unsavedChanges.description",
+      title: "session.write.post.errors.unsavedChanges.title",
+      description: "session.write.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.ssh.session.write.post.errors.conflict.title",
-      description: "app.api.ssh.session.write.post.errors.conflict.description",
+      title: "session.write.post.errors.conflict.title",
+      description: "session.write.post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.ssh.session.write.post.errors.network.title",
-      description: "app.api.ssh.session.write.post.errors.network.description",
+      title: "session.write.post.errors.network.title",
+      description: "session.write.post.errors.network.description",
     },
   },
   examples: {

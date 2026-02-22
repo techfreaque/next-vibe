@@ -18,17 +18,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../../../i18n";
 import { LinuxUserCreateContainer } from "./widget";
 
 export const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["ssh", "linux", "users", "create"],
-  title: "app.api.ssh.linux.users.create.post.title",
-  description: "app.api.ssh.linux.users.create.post.description",
+  title: "linux.users.create.post.title",
+  description: "linux.users.create.post.description",
   icon: "user-plus",
-  category: "app.api.ssh.category",
+  category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["app.api.ssh.type"],
+  tags: ["type"],
 
   fields: customWidgetObject({
     render: LinuxUserCreateContainer,
@@ -37,11 +39,9 @@ export const { POST } = createEndpoint({
       username: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.ssh.linux.users.create.post.fields.username.label",
-        description:
-          "app.api.ssh.linux.users.create.post.fields.username.description",
-        placeholder:
-          "app.api.ssh.linux.users.create.post.fields.username.placeholder",
+        label: "linux.users.create.post.fields.username.label",
+        description: "linux.users.create.post.fields.username.description",
+        placeholder: "linux.users.create.post.fields.username.placeholder",
         schema: z
           .string()
           .min(1)
@@ -51,119 +51,102 @@ export const { POST } = createEndpoint({
       groups: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.ssh.linux.users.create.post.fields.groups.label",
-        description:
-          "app.api.ssh.linux.users.create.post.fields.groups.description",
-        placeholder:
-          "app.api.ssh.linux.users.create.post.fields.groups.placeholder",
+        label: "linux.users.create.post.fields.groups.label",
+        description: "linux.users.create.post.fields.groups.description",
+        placeholder: "linux.users.create.post.fields.groups.placeholder",
         schema: z.array(z.string()).optional(),
       }),
       loginShell: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.ssh.linux.users.create.post.fields.shell.label",
-        description:
-          "app.api.ssh.linux.users.create.post.fields.shell.description",
-        placeholder:
-          "app.api.ssh.linux.users.create.post.fields.shell.placeholder",
+        label: "linux.users.create.post.fields.shell.label",
+        description: "linux.users.create.post.fields.shell.description",
+        placeholder: "linux.users.create.post.fields.shell.placeholder",
         schema: z.string().optional(),
       }),
       homeDir: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.ssh.linux.users.create.post.fields.homeDir.label",
-        description:
-          "app.api.ssh.linux.users.create.post.fields.homeDir.description",
-        placeholder:
-          "app.api.ssh.linux.users.create.post.fields.homeDir.placeholder",
+        label: "linux.users.create.post.fields.homeDir.label",
+        description: "linux.users.create.post.fields.homeDir.description",
+        placeholder: "linux.users.create.post.fields.homeDir.placeholder",
         schema: z.string().optional(),
       }),
       sudoAccess: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.ssh.linux.users.create.post.fields.sudoAccess.label",
-        description:
-          "app.api.ssh.linux.users.create.post.fields.sudoAccess.description",
+        label: "linux.users.create.post.fields.sudoAccess.label",
+        description: "linux.users.create.post.fields.sudoAccess.description",
         schema: z.boolean().optional(),
       }),
       ok: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.linux.users.create.post.response.ok.title",
+        content: "linux.users.create.post.response.ok.title",
         schema: z.boolean(),
       }),
       uid: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.linux.users.create.post.response.uid.title",
+        content: "linux.users.create.post.response.uid.title",
         schema: z.number(),
       }),
       gid: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.linux.users.create.post.response.gid.title",
+        content: "linux.users.create.post.response.gid.title",
         schema: z.number(),
       }),
       homeDirectory: responseField({
         type: WidgetType.TEXT,
-        content:
-          "app.api.ssh.linux.users.create.post.response.homeDirectory.title",
+        content: "linux.users.create.post.response.homeDirectory.title",
         schema: z.string(),
       }),
       shellPath: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.linux.users.create.post.response.shell.title",
+        content: "linux.users.create.post.response.shell.title",
         schema: z.string(),
       }),
     },
   }),
 
   successTypes: {
-    title: "app.api.ssh.linux.users.create.post.success.title",
-    description: "app.api.ssh.linux.users.create.post.success.description",
+    title: "linux.users.create.post.success.title",
+    description: "linux.users.create.post.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.ssh.linux.users.create.post.errors.validation.title",
-      description:
-        "app.api.ssh.linux.users.create.post.errors.validation.description",
+      title: "linux.users.create.post.errors.validation.title",
+      description: "linux.users.create.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.ssh.linux.users.create.post.errors.unauthorized.title",
-      description:
-        "app.api.ssh.linux.users.create.post.errors.unauthorized.description",
+      title: "linux.users.create.post.errors.unauthorized.title",
+      description: "linux.users.create.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.ssh.linux.users.create.post.errors.forbidden.title",
-      description:
-        "app.api.ssh.linux.users.create.post.errors.forbidden.description",
+      title: "linux.users.create.post.errors.forbidden.title",
+      description: "linux.users.create.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.ssh.linux.users.create.post.errors.server.title",
-      description:
-        "app.api.ssh.linux.users.create.post.errors.server.description",
+      title: "linux.users.create.post.errors.server.title",
+      description: "linux.users.create.post.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.ssh.linux.users.create.post.errors.notFound.title",
-      description:
-        "app.api.ssh.linux.users.create.post.errors.notFound.description",
+      title: "linux.users.create.post.errors.notFound.title",
+      description: "linux.users.create.post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.ssh.linux.users.create.post.errors.unknown.title",
-      description:
-        "app.api.ssh.linux.users.create.post.errors.unknown.description",
+      title: "linux.users.create.post.errors.unknown.title",
+      description: "linux.users.create.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.ssh.linux.users.create.post.errors.unsavedChanges.title",
-      description:
-        "app.api.ssh.linux.users.create.post.errors.unsavedChanges.description",
+      title: "linux.users.create.post.errors.unsavedChanges.title",
+      description: "linux.users.create.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.ssh.linux.users.create.post.errors.conflict.title",
-      description:
-        "app.api.ssh.linux.users.create.post.errors.conflict.description",
+      title: "linux.users.create.post.errors.conflict.title",
+      description: "linux.users.create.post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.ssh.linux.users.create.post.errors.network.title",
-      description:
-        "app.api.ssh.linux.users.create.post.errors.network.description",
+      title: "linux.users.create.post.errors.network.title",
+      description: "linux.users.create.post.errors.network.description",
     },
   },
 

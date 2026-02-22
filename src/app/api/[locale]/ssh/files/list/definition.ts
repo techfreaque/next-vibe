@@ -19,17 +19,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../../i18n";
 import { FilesListContainer } from "./widget";
 
 export const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["ssh", "files", "list"],
-  title: "app.api.ssh.files.list.get.title",
-  description: "app.api.ssh.files.list.get.description",
+  title: "files.list.get.title",
+  description: "files.list.get.description",
   icon: "folder",
-  category: "app.api.ssh.category",
+  category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["app.api.ssh.type"],
+  tags: ["type"],
 
   fields: customWidgetObject({
     render: FilesListContainer,
@@ -38,24 +40,22 @@ export const { GET } = createEndpoint({
       connectionId: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.ssh.files.list.get.fields.connectionId.label",
-        description:
-          "app.api.ssh.files.list.get.fields.connectionId.description",
-        placeholder:
-          "app.api.ssh.files.list.get.fields.connectionId.placeholder",
+        label: "files.list.get.fields.connectionId.label",
+        description: "files.list.get.fields.connectionId.description",
+        placeholder: "files.list.get.fields.connectionId.placeholder",
         schema: z.string().uuid().optional(),
       }),
       path: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.ssh.files.list.get.fields.path.label",
-        description: "app.api.ssh.files.list.get.fields.path.description",
-        placeholder: "app.api.ssh.files.list.get.fields.path.placeholder",
+        label: "files.list.get.fields.path.label",
+        description: "files.list.get.fields.path.description",
+        placeholder: "files.list.get.fields.path.placeholder",
         schema: z.string().optional(),
       }),
       entries: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.files.list.get.response.entries.title",
+        content: "files.list.get.response.entries.title",
         schema: z.array(
           z.object({
             name: z.string(),
@@ -68,53 +68,52 @@ export const { GET } = createEndpoint({
       }),
       currentPath: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.files.list.get.response.currentPath.title",
+        content: "files.list.get.response.currentPath.title",
         schema: z.string(),
       }),
     },
   }),
 
   successTypes: {
-    title: "app.api.ssh.files.list.get.success.title",
-    description: "app.api.ssh.files.list.get.success.description",
+    title: "files.list.get.success.title",
+    description: "files.list.get.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.ssh.files.list.get.errors.validation.title",
-      description: "app.api.ssh.files.list.get.errors.validation.description",
+      title: "files.list.get.errors.validation.title",
+      description: "files.list.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.ssh.files.list.get.errors.unauthorized.title",
-      description: "app.api.ssh.files.list.get.errors.unauthorized.description",
+      title: "files.list.get.errors.unauthorized.title",
+      description: "files.list.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.ssh.files.list.get.errors.forbidden.title",
-      description: "app.api.ssh.files.list.get.errors.forbidden.description",
+      title: "files.list.get.errors.forbidden.title",
+      description: "files.list.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.ssh.files.list.get.errors.server.title",
-      description: "app.api.ssh.files.list.get.errors.server.description",
+      title: "files.list.get.errors.server.title",
+      description: "files.list.get.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.ssh.files.list.get.errors.notFound.title",
-      description: "app.api.ssh.files.list.get.errors.notFound.description",
+      title: "files.list.get.errors.notFound.title",
+      description: "files.list.get.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.ssh.files.list.get.errors.unknown.title",
-      description: "app.api.ssh.files.list.get.errors.unknown.description",
+      title: "files.list.get.errors.unknown.title",
+      description: "files.list.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.ssh.files.list.get.errors.unsavedChanges.title",
-      description:
-        "app.api.ssh.files.list.get.errors.unsavedChanges.description",
+      title: "files.list.get.errors.unsavedChanges.title",
+      description: "files.list.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.ssh.files.list.get.errors.conflict.title",
-      description: "app.api.ssh.files.list.get.errors.conflict.description",
+      title: "files.list.get.errors.conflict.title",
+      description: "files.list.get.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.ssh.files.list.get.errors.network.title",
-      description: "app.api.ssh.files.list.get.errors.network.description",
+      title: "files.list.get.errors.network.title",
+      description: "files.list.get.errors.network.description",
     },
   },
 

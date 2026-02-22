@@ -16,17 +16,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../../../i18n";
 import { LinuxUsersListContainer } from "./widget";
 
 export const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["ssh", "linux", "users", "list"],
-  title: "app.api.ssh.linux.users.list.get.title",
-  description: "app.api.ssh.linux.users.list.get.description",
+  title: "linux.users.list.get.title",
+  description: "linux.users.list.get.description",
   icon: "users",
-  category: "app.api.ssh.category",
+  category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["app.api.ssh.type"],
+  tags: ["type"],
 
   fields: customWidgetObject({
     render: LinuxUsersListContainer,
@@ -34,7 +36,7 @@ export const { GET } = createEndpoint({
     children: {
       users: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.linux.users.list.get.response.users.title",
+        content: "linux.users.list.get.response.users.title",
         schema: z.array(
           z.object({
             username: z.string(),
@@ -51,53 +53,45 @@ export const { GET } = createEndpoint({
   }),
 
   successTypes: {
-    title: "app.api.ssh.linux.users.list.get.success.title",
-    description: "app.api.ssh.linux.users.list.get.success.description",
+    title: "linux.users.list.get.success.title",
+    description: "linux.users.list.get.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.ssh.linux.users.list.get.errors.validation.title",
-      description:
-        "app.api.ssh.linux.users.list.get.errors.validation.description",
+      title: "linux.users.list.get.errors.validation.title",
+      description: "linux.users.list.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.ssh.linux.users.list.get.errors.unauthorized.title",
-      description:
-        "app.api.ssh.linux.users.list.get.errors.unauthorized.description",
+      title: "linux.users.list.get.errors.unauthorized.title",
+      description: "linux.users.list.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.ssh.linux.users.list.get.errors.forbidden.title",
-      description:
-        "app.api.ssh.linux.users.list.get.errors.forbidden.description",
+      title: "linux.users.list.get.errors.forbidden.title",
+      description: "linux.users.list.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.ssh.linux.users.list.get.errors.server.title",
-      description: "app.api.ssh.linux.users.list.get.errors.server.description",
+      title: "linux.users.list.get.errors.server.title",
+      description: "linux.users.list.get.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.ssh.linux.users.list.get.errors.notFound.title",
-      description:
-        "app.api.ssh.linux.users.list.get.errors.notFound.description",
+      title: "linux.users.list.get.errors.notFound.title",
+      description: "linux.users.list.get.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.ssh.linux.users.list.get.errors.unknown.title",
-      description:
-        "app.api.ssh.linux.users.list.get.errors.unknown.description",
+      title: "linux.users.list.get.errors.unknown.title",
+      description: "linux.users.list.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.ssh.linux.users.list.get.errors.unsavedChanges.title",
-      description:
-        "app.api.ssh.linux.users.list.get.errors.unsavedChanges.description",
+      title: "linux.users.list.get.errors.unsavedChanges.title",
+      description: "linux.users.list.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.ssh.linux.users.list.get.errors.conflict.title",
-      description:
-        "app.api.ssh.linux.users.list.get.errors.conflict.description",
+      title: "linux.users.list.get.errors.conflict.title",
+      description: "linux.users.list.get.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.ssh.linux.users.list.get.errors.network.title",
-      description:
-        "app.api.ssh.linux.users.list.get.errors.network.description",
+      title: "linux.users.list.get.errors.network.title",
+      description: "linux.users.list.get.errors.network.description",
     },
   },
 

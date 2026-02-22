@@ -76,6 +76,8 @@ const ALL_SEARCH_LOCALES: CountryLanguage[] = [
 ] as const;
 const COMPACT_DEFAULT_PAGE_SIZE = 25;
 const HUMAN_DEFAULT_PAGE_SIZE = 200;
+/** If a filtered result set is ≤ this many tools, auto-upgrade to full detail (params + examples) */
+const COMPACT_FULL_DETAIL_THRESHOLD = 5;
 
 // ─── Tool discovery helpers ─────────────────────────────────────────────────
 
@@ -108,7 +110,7 @@ function getParameterSchema(
     if (Object.keys(combinedShape).length === 0) {
       return null;
     }
-    return z.toJSONSchema(z.object(combinedShape), {
+    const schema = z.toJSONSchema(z.object(combinedShape), {
       target: "draft-7",
       io: "input",
       unrepresentable: "any",
@@ -118,6 +120,16 @@ function getParameterSchema(
         }
       },
     });
+    // Strip zod-internal ~standard field — not useful for AI consumers
+    if (schema && "~standard" in schema) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { "~standard": _std, ...clean } = schema as Record<
+        string,
+        ToolItem["parameters"]
+      >;
+      return clean as ToolItem["parameters"];
+    }
+    return schema;
   } catch {
     return null;
   }
@@ -135,9 +147,6 @@ function serializeTool(
     method: tool.method,
     description: tool.description,
     category: tool.category,
-    tags: tool.tags,
-    toolName: tool.toolName,
-    allowedRoles: tool.allowedRoles,
     aliases: tool.aliases,
     requiresConfirmation: tool.requiresConfirmation,
     parameters,
@@ -145,20 +154,17 @@ function serializeTool(
   };
 }
 
-function serializeToolCompact(
+/** Ultra-compact: just name + description for overview/list. One line per tool. */
+function serializeToolMinimal(
   tool: ReturnType<
     typeof definitionsRegistry.getSerializedToolsForUser
   >[number],
 ): ToolItem {
+  const callName =
+    tool.aliases && tool.aliases.length > 0 ? tool.aliases[0] : tool.toolName;
   return {
-    name: tool.toolName,
-    method: tool.method,
+    name: callName,
     description: tool.description,
-    category: tool.category,
-    tags: [],
-    toolName: tool.toolName,
-    allowedRoles: [],
-    aliases: tool.aliases,
   };
 }
 
@@ -1036,18 +1042,18 @@ export class HelpRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<HelpGetResponseOutput>> {
     // Interactive mode — CLI only, not exposed via MCP/AI/Web
+    // TODO handle and make it work - we should not add this prop to not polute the schema for other platforms. this needs custom platform tool defs which we need anyways at one point
+    // TODO re-enable interactive: && data.interactive
+    const interactiveEnabled = false;
     if (
-      Platform.CLI === platform ||
-      Platform.CLI_PACKAGE === platform
-      // TODO handle and make it work - we should not add this prop to not polute the schema for other platforms. this needs custom platform tool defs which we need anyways at one point
-      // &&
-      // data.interactive
+      interactiveEnabled &&
+      (Platform.CLI === platform || Platform.CLI_PACKAGE === platform)
     ) {
       const result = await InteractiveSession.start(
         user,
         locale,
         logger,
-        platform,
+        platform as Parameters<typeof InteractiveSession.start>[3],
       );
       if (!result.success) {
         return result as ResponseType<HelpGetResponseOutput>;
@@ -1066,8 +1072,13 @@ export class HelpRepository {
       (isCompact ? COMPACT_DEFAULT_PAGE_SIZE : HUMAN_DEFAULT_PAGE_SIZE);
     const currentPage = data.page ?? 1;
 
+    // Discovery platform: MCP callers see only MCP_VISIBLE tools (opt-in discovery).
+    // All other platforms (CLI, AI, web) use Platform.CLI to see the full tool set.
+    const discoveryPlatform =
+      platform === Platform.MCP ? Platform.MCP : Platform.CLI;
+
     const allTools = definitionsRegistry.getSerializedToolsForUser(
-      Platform.AI,
+      discoveryPlatform,
       user,
       locale,
     );
@@ -1101,7 +1112,7 @@ export class HelpRepository {
         });
       }
       const allEndpoints = definitionsRegistry.getEndpointsForUser(
-        Platform.AI,
+        discoveryPlatform,
         user,
       );
       const endpoint = allEndpoints.find((e) => {
@@ -1116,10 +1127,15 @@ export class HelpRepository {
       const parameters = endpoint
         ? (getParameterSchema(endpoint) ?? undefined)
         : undefined;
+      const aliases = matchedTool.aliases?.length
+        ? matchedTool.aliases
+        : undefined;
+      const callAs = aliases?.[0] ?? matchedTool.toolName;
       return success({
         tools: [serializeTool(matchedTool, parameters, true)],
         totalCount,
         matchedCount: 1,
+        hint: `Call as: execute-tool toolName="${callAs}"${aliases && aliases.length > 1 ? ` (aliases: ${aliases.join(", ")})` : ""}. CLI: vibe ${callAs} [--field=value].`,
       });
     }
 
@@ -1128,12 +1144,15 @@ export class HelpRepository {
 
     // AI/MCP overview — no params → categories + hint only
     if (isCompact && !query && !category) {
+      const categoryList = categories
+        .map((c) => `${c.name} (${c.count})`)
+        .join(", ");
       return success({
         tools: [] satisfies ToolItem[],
         totalCount,
         matchedCount: 0,
         categories,
-        hint: `Use query to search, category to filter, or toolName for full schema. Run via CLI: vibe <alias> [--field=value ...]. Page size: ${COMPACT_DEFAULT_PAGE_SIZE} (use page param to navigate).`,
+        hint: `${totalCount} tools available across categories: ${categoryList}. Next steps: use query="keyword" to search, category="Chat" to list a category, or toolName="agent_chat_characters_GET" for full schema + examples. CLI: vibe <toolName> [--field=value].`,
       });
     }
 
@@ -1141,7 +1160,7 @@ export class HelpRepository {
 
     if (query) {
       const allEndpoints = definitionsRegistry.getEndpointsForUser(
-        Platform.AI,
+        discoveryPlatform,
         user,
       );
       const searchIndexMap = new Map<string, string>();
@@ -1175,15 +1194,44 @@ export class HelpRepository {
     const pageSlice = filtered.slice(offset, offset + effectivePageSize);
 
     if (isCompact) {
+      // ≤ threshold → auto-upgrade to full detail (params + examples)
+      if (matchedCount <= COMPACT_FULL_DETAIL_THRESHOLD) {
+        const allEndpoints = definitionsRegistry.getEndpointsForUser(
+          discoveryPlatform,
+          user,
+        );
+        const tools: ToolItem[] = pageSlice.map((tool) => {
+          const needle = tool.toolName.toLowerCase();
+          const endpoint = allEndpoints.find(
+            (e) =>
+              endpointToToolName(e).toLowerCase() === needle ||
+              e.aliases?.some((a) => a.toLowerCase() === needle),
+          );
+          const parameters = endpoint
+            ? (getParameterSchema(endpoint) ?? undefined)
+            : undefined;
+          return serializeTool(tool, parameters, true);
+        });
+        return success({
+          tools,
+          totalCount,
+          matchedCount,
+          hint:
+            matchedCount === 0
+              ? `No tools matched. Try a broader query or call without params to see all categories.`
+              : `Showing full detail for ${matchedCount} tool${matchedCount === 1 ? "" : "s"}. Call as: execute-tool toolName="<name>" or CLI: vibe <alias>.`,
+        });
+      }
+      // > threshold → minimal list to preserve context
+      const paginationHint =
+        totalPages > 1
+          ? ` Page ${safePage}/${totalPages} — use page= to navigate.`
+          : "";
       return success({
-        tools: pageSlice.map(serializeToolCompact),
+        tools: pageSlice.map(serializeToolMinimal),
         totalCount,
         matchedCount,
-        categories: matchedCount > effectivePageSize ? categories : undefined,
-        hint:
-          matchedCount > effectivePageSize
-            ? `Page ${safePage}/${totalPages} (${effectivePageSize}/page, ${matchedCount} total). Use page param to navigate.`
-            : undefined,
+        hint: `${matchedCount} tools matched. Narrow your search or use toolName="<name>" for full schema + examples.${paginationHint}`,
         currentPage: safePage,
         effectivePageSize,
         totalPages,

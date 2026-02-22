@@ -5,7 +5,10 @@
 import { Box, Text } from "ink";
 import type { JSX } from "react";
 
-import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+import {
+  useInkWidgetShowLabels,
+  useInkWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { ArrayWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
@@ -25,6 +28,7 @@ export function MultiSelectFieldWidgetInk<
   MultiSelectFieldWidgetConfig<TKey, ArrayWidgetSchema, TUsage>
 >): JSX.Element {
   const t = useInkWidgetTranslation();
+  const showLabels = useInkWidgetShowLabels();
 
   // value is array of selected values
   const selectedValues = field.value;
@@ -54,7 +58,7 @@ export function MultiSelectFieldWidgetInk<
 
   return (
     <Box flexDirection="column" marginBottom={1}>
-      {field.label && (
+      {showLabels && field.label && (
         <Box marginBottom={0}>
           <Text bold>
             {t(field.label)}

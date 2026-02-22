@@ -94,8 +94,8 @@ createEndpoint({
 ## Authentication & Permissions
 
 - Uses same role-based access control as other interfaces
-- Auth flow: Session file (.vibe.session) → `VIBE_CLI_USER_EMAIL` env var → Public user with new lead
-- If `VIBE_CLI_USER_EMAIL` is set but user not found in DB, returns error
+- Auth flow: Session file (.vibe.session) → `VIBE_ADMIN_USER_EMAIL` env var → Public user with new lead
+- If `VIBE_ADMIN_USER_EMAIL` is set but user not found in DB, returns error
 - Public endpoints available without authentication
 
 ## Debug Mode

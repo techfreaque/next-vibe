@@ -11,6 +11,7 @@ import type { DateWidgetSchema } from "@/app/api/[locale]/system/unified-interfa
 import {
   useInkWidgetForm,
   useInkWidgetResponse,
+  useInkWidgetShowLabels,
   useInkWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
@@ -34,6 +35,7 @@ export function TimeFieldWidgetInk<
   const t = useInkWidgetTranslation();
   const form = useInkWidgetForm();
   const response = useInkWidgetResponse();
+  const showLabels = useInkWidgetShowLabels();
   const [inputValue, setInputValue] = useState(
     field.value instanceof Date
       ? `${String(field.value.getHours()).padStart(2, "0")}:${String(field.value.getMinutes()).padStart(2, "0")}`
@@ -48,7 +50,7 @@ export function TimeFieldWidgetInk<
         : "—";
     return (
       <Box flexDirection="column">
-        {field.label && (
+        {showLabels && field.label && (
           <Text bold>
             {t(field.label)}
             {!field.schema.isOptional() && <Text color="blue"> *</Text>}

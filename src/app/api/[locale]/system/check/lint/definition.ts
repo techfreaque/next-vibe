@@ -66,7 +66,10 @@ const { POST } = createEndpoint({
         description: "app.api.system.check.lint.fields.path.description",
         placeholder: "app.api.system.check.lint.fields.path.placeholder",
         columns: 6,
-        schema: z.string().optional().default("./"),
+        schema: z
+          .union([z.string(), z.array(z.string())])
+          .optional()
+          .default("./"),
       }),
 
       fix: requestField({

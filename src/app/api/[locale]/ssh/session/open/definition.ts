@@ -20,17 +20,19 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SshSessionStatus } from "../../enum";
+import { scopedTranslation } from "../../i18n";
 import { SessionOpenContainer } from "./widget";
 
 export const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["ssh", "session", "open"],
-  title: "app.api.ssh.session.open.post.title",
-  description: "app.api.ssh.session.open.post.description",
+  title: "session.open.post.title",
+  description: "session.open.post.description",
   icon: "terminal",
-  category: "app.api.ssh.category",
+  category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["app.api.ssh.type"],
+  tags: ["type"],
 
   fields: customWidgetObject({
     render: SessionOpenContainer,
@@ -39,93 +41,89 @@ export const { POST } = createEndpoint({
       connectionId: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.ssh.session.open.post.fields.connectionId.label",
-        description:
-          "app.api.ssh.session.open.post.fields.connectionId.description",
+        label: "session.open.post.fields.connectionId.label",
+        description: "session.open.post.fields.connectionId.description",
         schema: z.string().uuid().optional(),
       }),
       name: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.ssh.session.open.post.fields.name.label",
-        description: "app.api.ssh.session.open.post.fields.name.description",
+        label: "session.open.post.fields.name.label",
+        description: "session.open.post.fields.name.description",
         schema: z.string().optional(),
       }),
       cols: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.ssh.session.open.post.fields.cols.label",
-        description: "app.api.ssh.session.open.post.fields.cols.description",
+        label: "session.open.post.fields.cols.label",
+        description: "session.open.post.fields.cols.description",
         schema: z.coerce.number().min(40).max(500).optional(),
       }),
       rows: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.ssh.session.open.post.fields.rows.label",
-        description: "app.api.ssh.session.open.post.fields.rows.description",
+        label: "session.open.post.fields.rows.label",
+        description: "session.open.post.fields.rows.description",
         schema: z.coerce.number().min(10).max(200).optional(),
       }),
       sessionId: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.session.open.post.response.sessionId.title",
+        content: "session.open.post.response.sessionId.title",
         schema: z.string(),
       }),
       status: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.session.open.post.response.status.title",
+        content: "session.open.post.response.status.title",
         schema: z.nativeEnum(SshSessionStatus),
       }),
       shell: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.session.open.post.response.shell.title",
+        content: "session.open.post.response.shell.title",
         schema: z.string(),
       }),
     },
   }),
 
   successTypes: {
-    title: "app.api.ssh.session.open.post.success.title",
-    description: "app.api.ssh.session.open.post.success.description",
+    title: "session.open.post.success.title",
+    description: "session.open.post.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.ssh.session.open.post.errors.validation.title",
-      description:
-        "app.api.ssh.session.open.post.errors.validation.description",
+      title: "session.open.post.errors.validation.title",
+      description: "session.open.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.ssh.session.open.post.errors.unauthorized.title",
-      description:
-        "app.api.ssh.session.open.post.errors.unauthorized.description",
+      title: "session.open.post.errors.unauthorized.title",
+      description: "session.open.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.ssh.session.open.post.errors.forbidden.title",
-      description: "app.api.ssh.session.open.post.errors.forbidden.description",
+      title: "session.open.post.errors.forbidden.title",
+      description: "session.open.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.ssh.session.open.post.errors.server.title",
-      description: "app.api.ssh.session.open.post.errors.server.description",
+      title: "session.open.post.errors.server.title",
+      description: "session.open.post.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.ssh.session.open.post.errors.notFound.title",
-      description: "app.api.ssh.session.open.post.errors.notFound.description",
+      title: "session.open.post.errors.notFound.title",
+      description: "session.open.post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.ssh.session.open.post.errors.unknown.title",
-      description: "app.api.ssh.session.open.post.errors.unknown.description",
+      title: "session.open.post.errors.unknown.title",
+      description: "session.open.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.ssh.session.open.post.errors.unsavedChanges.title",
-      description:
-        "app.api.ssh.session.open.post.errors.unsavedChanges.description",
+      title: "session.open.post.errors.unsavedChanges.title",
+      description: "session.open.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.ssh.session.open.post.errors.conflict.title",
-      description: "app.api.ssh.session.open.post.errors.conflict.description",
+      title: "session.open.post.errors.conflict.title",
+      description: "session.open.post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.ssh.session.open.post.errors.network.title",
-      description: "app.api.ssh.session.open.post.errors.network.description",
+      title: "session.open.post.errors.network.title",
+      description: "session.open.post.errors.network.description",
     },
   },
 

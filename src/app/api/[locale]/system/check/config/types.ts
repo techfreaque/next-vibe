@@ -423,8 +423,6 @@ interface EslintConfigOptions {
   flatConfig?: EslintFlatConfigItem[];
   /** Patterns to ignore */
   ignores?: string[];
-  /** Enable parallel execution (default: true) */
-  parallel?: boolean;
 }
 
 /** ESLint disabled */

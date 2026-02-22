@@ -47,7 +47,7 @@ export class RouteExecuteRepository {
         user,
         locale,
         logger,
-        platform: Platform.AI,
+        platform: Platform.MCP,
       });
 
       if (!result.success) {

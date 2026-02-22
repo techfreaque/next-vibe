@@ -19,17 +19,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../../i18n";
 import { FilesWriteContainer } from "./widget";
 
 export const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["ssh", "files", "write"],
-  title: "app.api.ssh.files.write.post.title",
-  description: "app.api.ssh.files.write.post.description",
+  title: "files.write.post.title",
+  description: "files.write.post.description",
   icon: "file",
-  category: "app.api.ssh.category",
+  category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["app.api.ssh.type"],
+  tags: ["type"],
 
   fields: customWidgetObject({
     render: FilesWriteContainer,
@@ -38,92 +40,87 @@ export const { POST } = createEndpoint({
       connectionId: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.ssh.files.write.post.fields.connectionId.label",
-        description:
-          "app.api.ssh.files.write.post.fields.connectionId.description",
-        placeholder:
-          "app.api.ssh.files.write.post.fields.connectionId.placeholder",
+        label: "files.write.post.fields.connectionId.label",
+        description: "files.write.post.fields.connectionId.description",
+        placeholder: "files.write.post.fields.connectionId.placeholder",
         schema: z.string().uuid().optional(),
       }),
       path: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.ssh.files.write.post.fields.path.label",
-        description: "app.api.ssh.files.write.post.fields.path.description",
-        placeholder: "app.api.ssh.files.write.post.fields.path.placeholder",
+        label: "files.write.post.fields.path.label",
+        description: "files.write.post.fields.path.description",
+        placeholder: "files.write.post.fields.path.placeholder",
         schema: z.string().min(1),
       }),
       content: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.ssh.files.write.post.fields.content.label",
-        description: "app.api.ssh.files.write.post.fields.content.description",
-        placeholder: "app.api.ssh.files.write.post.fields.content.placeholder",
+        label: "files.write.post.fields.content.label",
+        description: "files.write.post.fields.content.description",
+        placeholder: "files.write.post.fields.content.placeholder",
         schema: z.string(),
       }),
       createDirs: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.ssh.files.write.post.fields.createDirs.label",
-        description:
-          "app.api.ssh.files.write.post.fields.createDirs.description",
+        label: "files.write.post.fields.createDirs.label",
+        description: "files.write.post.fields.createDirs.description",
         schema: z.boolean().optional(),
       }),
       ok: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.files.write.post.response.ok.title",
+        content: "files.write.post.response.ok.title",
         schema: z.boolean(),
       }),
       bytesWritten: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.files.write.post.response.bytesWritten.title",
+        content: "files.write.post.response.bytesWritten.title",
         schema: z.number(),
       }),
     },
   }),
 
   successTypes: {
-    title: "app.api.ssh.files.write.post.success.title",
-    description: "app.api.ssh.files.write.post.success.description",
+    title: "files.write.post.success.title",
+    description: "files.write.post.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.ssh.files.write.post.errors.validation.title",
-      description: "app.api.ssh.files.write.post.errors.validation.description",
+      title: "files.write.post.errors.validation.title",
+      description: "files.write.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.ssh.files.write.post.errors.unauthorized.title",
-      description:
-        "app.api.ssh.files.write.post.errors.unauthorized.description",
+      title: "files.write.post.errors.unauthorized.title",
+      description: "files.write.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.ssh.files.write.post.errors.forbidden.title",
-      description: "app.api.ssh.files.write.post.errors.forbidden.description",
+      title: "files.write.post.errors.forbidden.title",
+      description: "files.write.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.ssh.files.write.post.errors.server.title",
-      description: "app.api.ssh.files.write.post.errors.server.description",
+      title: "files.write.post.errors.server.title",
+      description: "files.write.post.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.ssh.files.write.post.errors.notFound.title",
-      description: "app.api.ssh.files.write.post.errors.notFound.description",
+      title: "files.write.post.errors.notFound.title",
+      description: "files.write.post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.ssh.files.write.post.errors.unknown.title",
-      description: "app.api.ssh.files.write.post.errors.unknown.description",
+      title: "files.write.post.errors.unknown.title",
+      description: "files.write.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.ssh.files.write.post.errors.unsavedChanges.title",
-      description:
-        "app.api.ssh.files.write.post.errors.unsavedChanges.description",
+      title: "files.write.post.errors.unsavedChanges.title",
+      description: "files.write.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.ssh.files.write.post.errors.conflict.title",
-      description: "app.api.ssh.files.write.post.errors.conflict.description",
+      title: "files.write.post.errors.conflict.title",
+      description: "files.write.post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.ssh.files.write.post.errors.network.title",
-      description: "app.api.ssh.files.write.post.errors.network.description",
+      title: "files.write.post.errors.network.title",
+      description: "files.write.post.errors.network.description",
     },
   },
 

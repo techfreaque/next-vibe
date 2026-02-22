@@ -76,7 +76,7 @@ export const translations = {
       cliAuthBypass: "CLI Auth Bypass",
       aiToolOff: "AI Tool Disabled",
       webOff: "Web Disabled",
-      mcpOn: "MCP Enabled",
+      mcpVisible: "MCP Visible",
       productionOff: "Production Disabled",
       remoteSkill: "Remote Skill",
     },

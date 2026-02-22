@@ -7,7 +7,10 @@ import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ArrayWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
-import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+import {
+  useInkWidgetShowLabels,
+  useInkWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
@@ -25,12 +28,13 @@ export function TagsFieldWidgetInk<
   TagsFieldWidgetConfig<TKey, ArrayWidgetSchema, TUsage>
 >): JSX.Element {
   const t = useInkWidgetTranslation();
+  const showLabels = useInkWidgetShowLabels();
   const tags = field.value;
   const displayValue = tags?.length ? tags.join(", ") : "—";
 
   return (
     <Box flexDirection="column" marginBottom={1}>
-      {field.label && (
+      {showLabels && field.label && (
         <Box marginBottom={0}>
           <Text bold>
             {t(field.label)}

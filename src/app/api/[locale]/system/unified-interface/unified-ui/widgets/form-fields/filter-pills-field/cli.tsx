@@ -6,7 +6,10 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+import {
+  useInkWidgetShowLabels,
+  useInkWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { EnumWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type { InkWidgetProps } from "../../_shared/cli-types";
@@ -25,6 +28,7 @@ export function FilterPillsFieldWidgetInk<
   FilterPillsFieldWidgetConfig<TKey, EnumWidgetSchema, TUsage>
 >): JSX.Element {
   const t = useInkWidgetTranslation();
+  const showLabels = useInkWidgetShowLabels();
 
   // Find selected option
   const selectedOption = field.options.find(
@@ -39,7 +43,7 @@ export function FilterPillsFieldWidgetInk<
 
   return (
     <Box flexDirection="column" marginBottom={1}>
-      {field.label && (
+      {showLabels && field.label && (
         <Box marginBottom={0}>
           <Text bold>
             {t(field.label)}

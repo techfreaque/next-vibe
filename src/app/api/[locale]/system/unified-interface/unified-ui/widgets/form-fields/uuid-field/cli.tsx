@@ -11,6 +11,7 @@ import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-inter
 import {
   useInkWidgetForm,
   useInkWidgetResponse,
+  useInkWidgetShowLabels,
   useInkWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
@@ -34,6 +35,7 @@ export function UuidFieldWidgetInk<
   const t = useInkWidgetTranslation();
   const form = useInkWidgetForm();
   const response = useInkWidgetResponse();
+  const showLabels = useInkWidgetShowLabels();
   const [inputValue, setInputValue] = useState(field.value ? field.value : "");
 
   // Response mode - just display the value
@@ -41,7 +43,7 @@ export function UuidFieldWidgetInk<
     const displayValue = field.value ? field.value : "—";
     return (
       <Box flexDirection="column">
-        {field.label && (
+        {showLabels && field.label && (
           <Text bold>
             {t(field.label)}
             {!field.schema.isOptional() && <Text color="blue"> *</Text>}

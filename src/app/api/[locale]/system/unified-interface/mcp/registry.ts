@@ -17,6 +17,7 @@ import { simpleT } from "@/i18n/core/shared";
 
 import { definitionLoader } from "../shared/endpoints/definition/loader";
 import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
+import { permissionsRegistry } from "../shared/endpoints/permissions/registry";
 import { RouteExecutionExecutor } from "../shared/endpoints/route/executor";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
@@ -94,11 +95,17 @@ export class MCPRegistry implements IMCPRegistry {
   getTools(user: JwtPayloadType, logger: EndpointLogger): MCPToolMetadata[] {
     this.ensureInitialized(logger);
 
-    // Get serialized tools from shared registry (already filtered by user)
-    const serialized = definitionsRegistry.getSerializedToolsForUser(
+    // Get full execution-set tools for this user on MCP platform
+    const allMcpTools = definitionsRegistry.getSerializedToolsForUser(
       Platform.MCP,
       user,
       this.locale,
+    );
+
+    // MCP native tool listing is opt-in: only expose tools marked MCP_VISIBLE
+    const serialized = allMcpTools.filter(
+      (tool) =>
+        permissionsRegistry.checkMcpDiscoveryAccess(tool.allowedRoles).allowed,
     );
 
     // Convert to MCP tool metadata format

@@ -14,17 +14,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../../i18n";
 import { SessionCloseContainer } from "./widget";
 
 export const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["ssh", "session", "close"],
-  title: "app.api.ssh.session.close.post.title",
-  description: "app.api.ssh.session.close.post.description",
+  title: "session.close.post.title",
+  description: "session.close.post.description",
   icon: "terminal",
-  category: "app.api.ssh.category",
+  category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["app.api.ssh.type"],
+  tags: ["type"],
 
   fields: customWidgetObject({
     render: SessionCloseContainer,
@@ -33,63 +35,58 @@ export const { POST } = createEndpoint({
       sessionId: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.ssh.session.close.post.fields.sessionId.label",
-        description:
-          "app.api.ssh.session.close.post.fields.sessionId.description",
+        label: "session.close.post.fields.sessionId.label",
+        description: "session.close.post.fields.sessionId.description",
         schema: z.string(),
       }),
       ok: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.session.close.post.response.ok.title",
+        content: "session.close.post.response.ok.title",
         schema: z.boolean(),
       }),
     },
   }),
 
   successTypes: {
-    title: "app.api.ssh.session.close.post.success.title",
-    description: "app.api.ssh.session.close.post.success.description",
+    title: "session.close.post.success.title",
+    description: "session.close.post.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.ssh.session.close.post.errors.validation.title",
-      description:
-        "app.api.ssh.session.close.post.errors.validation.description",
+      title: "session.close.post.errors.validation.title",
+      description: "session.close.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.ssh.session.close.post.errors.unauthorized.title",
-      description:
-        "app.api.ssh.session.close.post.errors.unauthorized.description",
+      title: "session.close.post.errors.unauthorized.title",
+      description: "session.close.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.ssh.session.close.post.errors.forbidden.title",
-      description:
-        "app.api.ssh.session.close.post.errors.forbidden.description",
+      title: "session.close.post.errors.forbidden.title",
+      description: "session.close.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.ssh.session.close.post.errors.server.title",
-      description: "app.api.ssh.session.close.post.errors.server.description",
+      title: "session.close.post.errors.server.title",
+      description: "session.close.post.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.ssh.session.close.post.errors.notFound.title",
-      description: "app.api.ssh.session.close.post.errors.notFound.description",
+      title: "session.close.post.errors.notFound.title",
+      description: "session.close.post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.ssh.session.close.post.errors.unknown.title",
-      description: "app.api.ssh.session.close.post.errors.unknown.description",
+      title: "session.close.post.errors.unknown.title",
+      description: "session.close.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.ssh.session.close.post.errors.unsavedChanges.title",
-      description:
-        "app.api.ssh.session.close.post.errors.unsavedChanges.description",
+      title: "session.close.post.errors.unsavedChanges.title",
+      description: "session.close.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.ssh.session.close.post.errors.conflict.title",
-      description: "app.api.ssh.session.close.post.errors.conflict.description",
+      title: "session.close.post.errors.conflict.title",
+      description: "session.close.post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.ssh.session.close.post.errors.network.title",
-      description: "app.api.ssh.session.close.post.errors.network.description",
+      title: "session.close.post.errors.network.title",
+      description: "session.close.post.errors.network.description",
     },
   },
   examples: {

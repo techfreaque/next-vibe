@@ -13,6 +13,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { createEndpointLogger } from "../shared/logger/endpoint";
+import { Platform } from "../shared/types/platform";
 import { type EnvironmentResult, loadEnvironment } from "./runtime/environment";
 import {
   ErrorHandler,
@@ -49,6 +50,7 @@ interface CliOptions {
   debug?: boolean;
   interactive?: boolean;
   dryRun?: boolean;
+  platform?: Platform;
 }
 
 /**
@@ -60,7 +62,10 @@ const DEFAULT_OUTPUT = "pretty" as const;
 
 import { env } from "@/config/env";
 
-import { RouteDelegationHandler } from "./runtime/route-executor";
+import {
+  type CliCompatiblePlatform,
+  RouteDelegationHandler,
+} from "./runtime/route-executor";
 
 const program = new Command();
 
@@ -119,6 +124,10 @@ program
     earlyT("app.api.system.unifiedInterface.cli.vibe.help.dryRun"),
     false,
   )
+  .option(
+    "--platform <platform>", // eslint-disable-line i18next/no-literal-string
+    `Override detected platform. Valid values: ${Object.values(Platform).join(", ")}`, // eslint-disable-line i18next/no-literal-string
+  )
   .allowUnknownOption() // Allow dynamic CLI arguments
   .action(
     async (
@@ -137,6 +146,18 @@ program
           process.chdir(projectRoot);
         }
       }
+
+      // Resolve effective platform: CLI arg override (if valid CliCompatiblePlatform) else auto-detected
+      const cliCompatibleValues: CliCompatiblePlatform[] = [
+        Platform.CLI,
+        Platform.CLI_PACKAGE,
+        Platform.MCP,
+      ];
+      const platformOverride = options.platform
+        ? (cliCompatibleValues.find((v) => v === options.platform) ?? null)
+        : null;
+      const effectivePlatform: CliCompatiblePlatform =
+        platformOverride ?? cliPlatform;
 
       const debug = options.debug || options.verbose;
       const logger = createEndpointLogger(
@@ -179,7 +200,7 @@ program
                 namedArgs: {},
               },
               locale: options.locale,
-              platform: cliPlatform,
+              platform: effectivePlatform,
               output: options.output ?? DEFAULT_OUTPUT,
               verbose: debug ?? false,
               interactive: options.interactive ?? false,
@@ -259,7 +280,7 @@ program
               rawTokens,
             },
             locale: options.locale,
-            platform: cliPlatform,
+            platform: effectivePlatform,
             output: options.output ?? DEFAULT_OUTPUT,
             verbose: debug ?? false,
             interactive: options.interactive ?? false,

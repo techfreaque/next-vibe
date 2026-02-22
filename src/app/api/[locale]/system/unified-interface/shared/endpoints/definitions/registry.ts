@@ -87,7 +87,8 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
             continue;
           }
 
-          // Check platform access (no user required, just platform markers)
+          // Check platform access (execution set — opt-out per platform).
+          // MCP_VISIBLE discovery filtering is handled separately in getSerializedToolsForUser.
           if (definition.allowedRoles) {
             const access = permissionsRegistry.checkPlatformAccess(
               definition.allowedRoles,
@@ -254,7 +255,10 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
   }
 
   /**
-   * Get serialized tools for a user (convenience method)
+   * Get serialized tools for a user (convenience method).
+   * Returns the full execution set for the platform (all tools the user can actually call).
+   * Callers that need discovery-filtered lists (e.g. MCP native tool listing) must apply
+   * their own additional filter — see MCPRegistry.getTools() for MCP_VISIBLE filtering.
    */
   getSerializedToolsForUser(
     platform: Platform,
@@ -262,13 +266,7 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
     locale: CountryLanguage,
   ): SerializableToolMetadata[] {
     const filteredEndpoints = this.getEndpointsForUser(platform, user);
-
-    const serializableTools = this.serializeEndpoints(
-      filteredEndpoints,
-      locale,
-    );
-
-    return serializableTools;
+    return this.serializeEndpoints(filteredEndpoints, locale);
   }
 }
 

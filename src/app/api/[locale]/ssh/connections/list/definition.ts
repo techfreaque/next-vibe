@@ -17,17 +17,19 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SshAuthType, SshAuthTypeDB } from "../../enum";
+import { scopedTranslation } from "../../i18n";
 import { ConnectionsListContainer } from "./widget";
 
 export const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["ssh", "connections", "list"],
-  title: "app.api.ssh.connections.list.get.title",
-  description: "app.api.ssh.connections.list.get.description",
+  title: "connections.list.get.title",
+  description: "connections.list.get.description",
   icon: "server",
-  category: "app.api.ssh.category",
+  category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["app.api.ssh.type"],
+  tags: ["type"],
 
   fields: customWidgetObject({
     render: ConnectionsListContainer,
@@ -35,7 +37,7 @@ export const { GET } = createEndpoint({
     children: {
       connections: responseField({
         type: WidgetType.TEXT,
-        content: "app.api.ssh.connections.list.get.response.connections.title",
+        content: "connections.list.get.response.connections.title",
         schema: z.array(
           z.object({
             id: z.string(),
@@ -55,53 +57,45 @@ export const { GET } = createEndpoint({
   }),
 
   successTypes: {
-    title: "app.api.ssh.connections.list.get.success.title",
-    description: "app.api.ssh.connections.list.get.success.description",
+    title: "connections.list.get.success.title",
+    description: "connections.list.get.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.ssh.connections.list.get.errors.validation.title",
-      description:
-        "app.api.ssh.connections.list.get.errors.validation.description",
+      title: "connections.list.get.errors.validation.title",
+      description: "connections.list.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.ssh.connections.list.get.errors.unauthorized.title",
-      description:
-        "app.api.ssh.connections.list.get.errors.unauthorized.description",
+      title: "connections.list.get.errors.unauthorized.title",
+      description: "connections.list.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.ssh.connections.list.get.errors.forbidden.title",
-      description:
-        "app.api.ssh.connections.list.get.errors.forbidden.description",
+      title: "connections.list.get.errors.forbidden.title",
+      description: "connections.list.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.ssh.connections.list.get.errors.server.title",
-      description: "app.api.ssh.connections.list.get.errors.server.description",
+      title: "connections.list.get.errors.server.title",
+      description: "connections.list.get.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.ssh.connections.list.get.errors.notFound.title",
-      description:
-        "app.api.ssh.connections.list.get.errors.notFound.description",
+      title: "connections.list.get.errors.notFound.title",
+      description: "connections.list.get.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.ssh.connections.list.get.errors.unknown.title",
-      description:
-        "app.api.ssh.connections.list.get.errors.unknown.description",
+      title: "connections.list.get.errors.unknown.title",
+      description: "connections.list.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.ssh.connections.list.get.errors.unsavedChanges.title",
-      description:
-        "app.api.ssh.connections.list.get.errors.unsavedChanges.description",
+      title: "connections.list.get.errors.unsavedChanges.title",
+      description: "connections.list.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.ssh.connections.list.get.errors.conflict.title",
-      description:
-        "app.api.ssh.connections.list.get.errors.conflict.description",
+      title: "connections.list.get.errors.conflict.title",
+      description: "connections.list.get.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.ssh.connections.list.get.errors.network.title",
-      description:
-        "app.api.ssh.connections.list.get.errors.network.description",
+      title: "connections.list.get.errors.network.title",
+      description: "connections.list.get.errors.network.description",
     },
   },
 

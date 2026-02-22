@@ -192,13 +192,21 @@ export async function createAndSendUserMessage(
     // activeTools = permission layer (null = all tools allowed)
     // visibleTools = visibility layer (tools loaded into AI SDK context window)
     // Both stored in settings in the same format as ai-stream expects
-    const activeToolsPayload = settings.activeTools;
-    const toolsPayload =
+    const activeToolsPayload =
+      settings.activeTools?.map((t) => ({
+        toolId: t.toolId,
+        requiresConfirmation: t.requiresConfirmation ?? false,
+      })) ?? null;
+    const toolsPayload = (
       settings.visibleTools ??
       DEFAULT_TOOL_IDS.map((id) => ({
         toolId: id,
         requiresConfirmation: false,
-      }));
+      }))
+    ).map((t) => ({
+      toolId: t.toolId,
+      requiresConfirmation: t.requiresConfirmation ?? false,
+    }));
 
     // Start AI stream (same for all operations)
     await aiStream.startStream(

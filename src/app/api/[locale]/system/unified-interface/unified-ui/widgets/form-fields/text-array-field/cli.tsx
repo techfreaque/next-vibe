@@ -6,7 +6,10 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type { ArrayWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
-import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+import {
+  useInkWidgetShowLabels,
+  useInkWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { InkWidgetProps } from "../../_shared/cli-types";
@@ -25,12 +28,13 @@ export function TextArrayFieldWidgetInk<
   TextArrayFieldWidgetConfig<TKey, ArrayWidgetSchema, TUsage>
 >): JSX.Element {
   const t = useInkWidgetTranslation();
+  const showLabels = useInkWidgetShowLabels();
   const items = field.value;
   const displayValue = items?.length ? items.join(", ") : "—";
 
   return (
     <Box flexDirection="column" marginBottom={1}>
-      {field.label && (
+      {showLabels && field.label && (
         <Box marginBottom={0}>
           <Text bold>
             {t(field.label)}
