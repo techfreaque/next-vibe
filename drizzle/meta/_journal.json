@@ -191,13 +191,6 @@
       "when": 1771720507643,
       "tag": "20260222003507_bent_network",
       "breakpoints": true
-    },
-    {
-      "idx": 27,
-      "version": "7",
-      "when": 1771761600000,
-      "tag": "20260222120000_compact_trigger_settings",
-      "breakpoints": true
     }
   ]
 }
