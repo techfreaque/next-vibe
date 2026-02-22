@@ -24,8 +24,14 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "next-vibe-ui/ui/collapsible";
-import { Div } from "next-vibe-ui/ui/div";
-import { ChevronDown, ChevronRight, Loader2 } from "next-vibe-ui/ui/icons";
+import { Div, type DivMouseEvent } from "next-vibe-ui/ui/div";
+import {
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Copy,
+  Loader2,
+} from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
@@ -287,6 +293,19 @@ export function ToolCallRenderer({
   const [wasWaitingForConfirmation, setWasWaitingForConfirmation] = useState(
     isWaitingForConfirmation,
   );
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyJson = (e: DivMouseEvent): void => {
+    e.stopPropagation();
+    const payload = toolCall.result ?? toolCall.error;
+    const text =
+      typeof payload === "string" ? payload : JSON.stringify(payload, null, 2);
+    void navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      return undefined;
+    });
+  };
 
   // Update isOpen when waitingForConfirmation changes
   useEffect(() => {
@@ -376,6 +395,19 @@ export function ToolCallRenderer({
 
             {/* Status Badge */}
             <Div className="flex items-center gap-2">
+              {/* Copy JSON button — only when expanded and result/error is available */}
+              {isOpen && (hasResult || hasError) && (
+                <Div
+                  className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer"
+                  onClick={handleCopyJson}
+                >
+                  {copied ? (
+                    <Check className="h-3 w-3" />
+                  ) : (
+                    <Copy className="h-3 w-3" />
+                  )}
+                </Div>
+              )}
               {hasError && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">
                   {t(

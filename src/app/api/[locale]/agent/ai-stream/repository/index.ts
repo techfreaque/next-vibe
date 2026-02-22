@@ -177,6 +177,7 @@ export class AiStreamRepository {
       provider,
       encoder,
       streamAbortController,
+      effectiveCompactTrigger,
     } = setupResult.data;
 
     // Captured ref so headless path can read lastAiMessageId after runStream completes
@@ -229,6 +230,7 @@ export class AiStreamRepository {
               tools,
               model: data.model,
               logger,
+              compactTrigger: effectiveCompactTrigger,
             });
 
           logger.info("[Compacting] Check result", {

@@ -467,6 +467,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
             .where(
               and(
                 isNotNull(cronTasksTable.userId),
+                isNotNull(cronTasksTable.routeId),
                 eq(cronTasksTable.enabled, true),
               ),
             );

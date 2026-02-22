@@ -104,6 +104,13 @@ const { GET } = createEndpoint({
           )
           .nullable(),
       }),
+
+      // Auto-compacting token threshold (null = use global default COMPACT_TRIGGER)
+      compactTrigger: responseField({
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.number().int().nullable(),
+      }),
     },
   ),
 
@@ -173,6 +180,7 @@ const { GET } = createEndpoint({
         viewMode: ViewMode.LINEAR,
         activeTools: null,
         visibleTools: null,
+        compactTrigger: null,
       },
     },
   },
@@ -278,6 +286,15 @@ const { POST } = createEndpoint({
           )
           .nullable()
           .optional(),
+      }),
+
+      // Auto-compacting token threshold (null = use global default COMPACT_TRIGGER)
+      compactTrigger: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "app.api.agent.chat.settings.post.compactTrigger.label" as const,
+        columns: 6,
+        schema: z.number().int().min(1000).max(200000).nullable().optional(),
       }),
     },
   ),

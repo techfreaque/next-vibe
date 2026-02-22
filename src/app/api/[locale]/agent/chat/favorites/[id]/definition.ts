@@ -567,6 +567,18 @@ const { PATCH } = createEndpoint({
         fieldType: FieldDataType.OBJECT,
         schema: modelSelectionSchemaSimple.nullable(),
       }),
+
+      // Auto-compacting token threshold (null = fall through to character/settings default)
+      compactTrigger: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.agent.chat.favorites.id.patch.compactTrigger.label" as const,
+        description:
+          "app.api.agent.chat.favorites.id.patch.compactTrigger.description" as const,
+        columns: 6,
+        schema: z.number().int().min(1000).max(200000).nullable().optional(),
+      }),
     },
   }),
 
@@ -796,6 +808,13 @@ const { GET } = createEndpoint({
         fieldType: FieldDataType.OBJECT,
         schema: modelSelectionSchemaSimple.nullable().optional(),
       }),
+
+      // Auto-compacting token threshold (null = fall through to character/settings default)
+      compactTrigger: responseField({
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.number().int().nullable(),
+      }),
     },
   }),
 
@@ -910,6 +929,7 @@ const { GET } = createEndpoint({
             max: SpeedLevel.THOROUGH,
           },
         },
+        compactTrigger: null,
       },
     },
     urlPathParams: {

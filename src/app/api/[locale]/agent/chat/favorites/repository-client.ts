@@ -351,6 +351,7 @@ export class ChatFavoritesRepositoryClient {
         characterModelSelection: {
           selectionType: ModelSelectionType.FILTERS,
         },
+        compactTrigger: null,
       };
     }
 
@@ -366,6 +367,7 @@ export class ChatFavoritesRepositoryClient {
       characterModelSelection: character.modelSelection ?? {
         selectionType: ModelSelectionType.FILTERS,
       },
+      compactTrigger: null,
     };
   }
 

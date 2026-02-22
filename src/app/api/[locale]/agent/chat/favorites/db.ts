@@ -53,6 +53,9 @@ export const chatFavorites = pgTable("chat_favorites", {
   position: integer("position").notNull(),
   color: text("color"),
 
+  // Auto-compacting token threshold (null = fall through to character/settings default)
+  compactTrigger: integer("compact_trigger"),
+
   // Usage stats
   useCount: integer("use_count").default(0).notNull(),
   lastUsedAt: timestamp("last_used_at"),

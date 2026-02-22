@@ -21,6 +21,7 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import { endpointToToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
 import { chatSettings } from "./db";
 import type {
   ChatSettingsGetResponseOutput,
@@ -121,6 +122,7 @@ export class ChatSettingsRepository {
             toolId: t.toolId,
             requiresConfirmation: t.requiresConfirmation ?? false,
           })) ?? null,
+        compactTrigger: setting.compactTrigger ?? defaults.compactTrigger,
       };
 
       return success(result);
@@ -215,6 +217,15 @@ export class ChatSettingsRepository {
                   : undefined,
             activeTools: activeToolsToStore,
             visibleTools: visibleToolsToStore,
+            compactTrigger:
+              data.compactTrigger !== undefined &&
+              data.compactTrigger !== null &&
+              data.compactTrigger !== COMPACT_TRIGGER
+                ? data.compactTrigger
+                : data.compactTrigger === COMPACT_TRIGGER ||
+                    data.compactTrigger === null
+                  ? null
+                  : undefined,
           })
           .where(eq(chatSettings.userId, userId))
           .returning();
@@ -254,6 +265,12 @@ export class ChatSettingsRepository {
                 : null,
             activeTools: activeToolsToStore ?? null,
             visibleTools: visibleToolsToStore ?? null,
+            compactTrigger:
+              data.compactTrigger !== undefined &&
+              data.compactTrigger !== null &&
+              data.compactTrigger !== COMPACT_TRIGGER
+                ? data.compactTrigger
+                : null,
           })
           .returning();
       }

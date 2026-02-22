@@ -162,7 +162,9 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
     requests: Record<string, CliRequestData> | undefined,
     urlPathParams: Record<string, CliRequestData> | undefined,
   ): Record<string, CliRequestData> | undefined {
-    if (!requests && !urlPathParams) {return undefined;}
+    if (!requests && !urlPathParams) {
+      return undefined;
+    }
     const keys = new Set([
       ...Object.keys(requests ?? {}),
       ...Object.keys(urlPathParams ?? {}),

@@ -309,6 +309,18 @@ const { POST } = createEndpoint({
         schema: modelSelectionSchemaSimple.nullable(),
       }),
 
+      // Auto-compacting token threshold (null = use global/settings default)
+      compactTrigger: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label:
+          "app.api.agent.chat.characters.post.compactTrigger.label" as const,
+        description:
+          "app.api.agent.chat.characters.post.compactTrigger.description" as const,
+        columns: 6,
+        schema: z.number().int().min(1000).max(200000).nullable().optional(),
+      }),
+
       // === RESPONSE ===
       id: responseField({
         schema: z.string(),

@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -191,13 +191,46 @@ export async function createUserMessage(params: {
       ? { attachments: params.attachments }
       : undefined;
 
+  // Verify parent exists — the client may reference an optimistic message that was never
+  // committed (e.g. stream interrupted mid-flight). Fall back to the actual last committed
+  // message in the thread so the conversation stays connected.
+  let resolvedParentId = params.parentId;
+  let resolvedDepth = params.depth;
+  if (resolvedParentId) {
+    const [parent] = await db
+      .select({ id: chatMessages.id, depth: chatMessages.depth })
+      .from(chatMessages)
+      .where(eq(chatMessages.id, resolvedParentId))
+      .limit(1);
+    if (!parent) {
+      // Parent wasn't committed — find the actual last message in this thread
+      const [lastCommitted] = await db
+        .select({ id: chatMessages.id, depth: chatMessages.depth })
+        .from(chatMessages)
+        .where(eq(chatMessages.threadId, params.threadId))
+        .orderBy(desc(chatMessages.createdAt))
+        .limit(1);
+      params.logger.warn(
+        "createUserMessage: parent not committed (interrupted stream?), using last committed message",
+        {
+          requestedParentId: resolvedParentId,
+          resolvedParentId: lastCommitted?.id ?? null,
+          messageId: params.messageId,
+          threadId: params.threadId,
+        },
+      );
+      resolvedParentId = lastCommitted?.id ?? null;
+      resolvedDepth = lastCommitted ? lastCommitted.depth + 1 : 0;
+    }
+  }
+
   await db.insert(chatMessages).values({
     id: params.messageId,
     threadId: params.threadId,
     role: params.role,
     content: params.content,
-    parentId: params.parentId,
-    depth: params.depth,
+    parentId: resolvedParentId,
+    depth: resolvedDepth,
     authorId: params.userId ?? null,
     isAI: false,
     metadata,

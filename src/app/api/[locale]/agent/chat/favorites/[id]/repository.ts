@@ -139,6 +139,7 @@ export class SingleFavoriteRepository {
         voice,
         modelSelection,
         characterModelSelection,
+        compactTrigger: favorite.compactTrigger ?? null,
       });
     } catch (error) {
       logger.error("Failed to fetch favorite", parseError(error));
@@ -232,6 +233,7 @@ export class SingleFavoriteRepository {
           customIcon: customIconToStore,
           voice: voiceToStore,
           modelSelection: modelSelectionToStore,
+          compactTrigger: data.compactTrigger ?? null,
           updatedAt: new Date(),
         })
         .where(

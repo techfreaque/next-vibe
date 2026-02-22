@@ -11,6 +11,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "../../../user/auth/types";
+import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
 import { defaultModel, type ModelId } from "../../models/models";
 import type { TtsVoiceValue } from "../../text-to-speech/enum";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
@@ -81,6 +82,7 @@ export class ChatSettingsRepositoryClient {
       viewMode: ViewMode.LINEAR,
       activeTools: null,
       visibleTools: null,
+      compactTrigger: COMPACT_TRIGGER,
     };
   }
 
@@ -122,6 +124,7 @@ export class ChatSettingsRepositoryClient {
           "visibleTools" in overrides
             ? overrides.visibleTools
             : defaults.visibleTools,
+        compactTrigger: overrides.compactTrigger ?? defaults.compactTrigger,
       };
     } catch {
       return this.getDefaults();
@@ -170,6 +173,9 @@ export class ChatSettingsRepositoryClient {
     ) {
       overrides.visibleTools = settings.visibleTools;
     }
+    if (settings.compactTrigger !== defaults.compactTrigger) {
+      overrides.compactTrigger = settings.compactTrigger;
+    }
 
     if (Object.keys(overrides).length === 0) {
       localStorage.removeItem(STORAGE_KEY);
@@ -206,6 +212,10 @@ export class ChatSettingsRepositoryClient {
         updates.visibleTools !== undefined
           ? updates.visibleTools
           : current.visibleTools,
+      compactTrigger:
+        updates.compactTrigger !== undefined
+          ? updates.compactTrigger
+          : current.compactTrigger,
     };
 
     this.saveLocalSettings(updated);

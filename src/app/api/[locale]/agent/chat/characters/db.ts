@@ -4,7 +4,14 @@
  */
 
 import { relations } from "drizzle-orm";
-import { jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/components/types";
@@ -53,6 +60,9 @@ export const customCharacters = pgTable("custom_characters", {
   ownershipType: text("ownership_type")
     .$type<typeof CharacterOwnershipTypeValue>()
     .notNull(),
+
+  // Auto-compacting token threshold (null = use global/settings default)
+  compactTrigger: integer("compact_trigger"),
 
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),

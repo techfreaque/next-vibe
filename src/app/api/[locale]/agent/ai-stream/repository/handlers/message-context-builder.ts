@@ -670,6 +670,8 @@ export class MessageContextBuilder {
     tools: Parameters<typeof streamText>[0]["tools"];
     model: ModelId;
     logger: EndpointLogger;
+    /** Per-user compact trigger override (cascade resolved in stream-setup). Falls back to COMPACT_TRIGGER. */
+    compactTrigger?: number;
   }): Promise<CompactingCheckResult> {
     const {
       threadId,
@@ -685,6 +687,7 @@ export class MessageContextBuilder {
       tools,
       model,
       logger,
+      compactTrigger,
     } = params;
 
     // Step 1: Get branch messages (server DB or incognito storage)
@@ -802,13 +805,15 @@ export class MessageContextBuilder {
     const modelContextLimit = Math.floor(
       modelConfig.contextWindow * COMPACT_TRIGGER_PERCENTAGE,
     );
-    const effectiveTrigger = Math.min(COMPACT_TRIGGER, modelContextLimit);
+    const absoluteTrigger = compactTrigger ?? COMPACT_TRIGGER;
+    const effectiveTrigger = Math.min(absoluteTrigger, modelContextLimit);
 
     const shouldCompact = totalTokens >= effectiveTrigger;
 
     logger.info("[Compacting] Token calculation", {
       totalTokens,
-      compactTriggerAbsolute: COMPACT_TRIGGER,
+      compactTriggerAbsolute: absoluteTrigger,
+      compactTriggerOverride: compactTrigger ?? null,
       compactTriggerPercentage: COMPACT_TRIGGER_PERCENTAGE,
       modelContextWindow: modelConfig.contextWindow,
       modelContextLimit,

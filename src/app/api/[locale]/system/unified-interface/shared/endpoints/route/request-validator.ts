@@ -100,6 +100,9 @@ function deepParseJsonStrings(value: WidgetData): WidgetData {
   if (Array.isArray(value)) {
     return value.map(deepParseJsonStrings);
   }
+  if (value instanceof File || value instanceof Blob) {
+    return value;
+  }
   if (value !== null && typeof value === "object") {
     const result: Record<string, WidgetData> = {};
     for (const [k, v] of Object.entries(value)) {

@@ -47,6 +47,9 @@ export const chatSettings = pgTable("chat_settings", {
   activeTools: jsonb("active_tools").$type<ToolConfigItem[] | null>(),
   visibleTools: jsonb("visible_tools").$type<ToolConfigItem[] | null>(),
 
+  // Auto-compacting token threshold (null = use global default COMPACT_TRIGGER)
+  compactTrigger: jsonb("compact_trigger").$type<number>(),
+
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

@@ -6,6 +6,7 @@
 import "server-only";
 
 import type { ModelMessage } from "ai";
+import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import {
   ErrorResponseTypes,
@@ -21,14 +22,18 @@ import {
   getModelById,
   type ModelOption,
 } from "@/app/api/[locale]/agent/models/models";
+import { db } from "@/app/api/[locale]/system/db";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
+import { customCharacters } from "../../chat/characters/db";
 import type { ToolCall } from "../../chat/db";
 import type { ChatMessageRole } from "../../chat/enum";
+import { chatFavorites } from "../../chat/favorites/db";
+import { chatSettings } from "../../chat/settings/db";
 import { calculateMessageDepth } from "../../chat/threads/[threadId]/messages/repository";
 import { ensureThread } from "../../chat/threads/repository";
 import {
@@ -37,6 +42,7 @@ import {
 } from "../../text-to-speech/enum";
 import { type AiStreamPostRequestOutput } from "../definition";
 import { AbortControllerSetup } from "./core/abort-controller-setup";
+import { COMPACT_TRIGGER } from "./core/constants";
 import { CreditValidatorHandler } from "./core/credit-validator-handler";
 import { ProviderFactory as ProviderFactoryClass } from "./core/provider-factory";
 import { ToolsSetupHandler } from "./core/tools-setup-handler";
@@ -116,6 +122,8 @@ export interface StreamSetupResult {
   toolsConfig: Map<string, { requiresConfirmation: boolean }>;
   /** Set of tool names the model is allowed to execute (permission layer). null = all allowed. */
   activeToolNames: Set<string> | null;
+  /** Effective compact trigger token threshold (cascade: favorite → character → settings → global) */
+  effectiveCompactTrigger: number;
   /** Provider for AI streaming */
   provider: ReturnType<typeof ProviderFactoryClass.getProviderForModel>;
   /** Text encoder for SSE stream */
@@ -373,6 +381,68 @@ export async function setupAiStream(params: {
     ? { attachments: userMessageResult.data.attachmentMetadata }
     : undefined;
 
+  // Resolve effective compact trigger: favorite → character → settings → global default
+  const effectiveCompactTrigger = await (async (): Promise<number> => {
+    if (userId) {
+      // 1. Check active favorite compactTrigger (look up activeFavoriteId from settings)
+      const [settings] = await db
+        .select({
+          compactTrigger: chatSettings.compactTrigger,
+          activeFavoriteId: chatSettings.activeFavoriteId,
+        })
+        .from(chatSettings)
+        .where(eq(chatSettings.userId, userId))
+        .limit(1);
+
+      if (settings?.activeFavoriteId) {
+        const [fav] = await db
+          .select({ compactTrigger: chatFavorites.compactTrigger })
+          .from(chatFavorites)
+          .where(eq(chatFavorites.id, settings.activeFavoriteId))
+          .limit(1);
+        if (fav?.compactTrigger !== null && fav?.compactTrigger !== undefined) {
+          return fav.compactTrigger;
+        }
+      }
+
+      // 2. Check character compactTrigger (custom characters only — UUIDs)
+      if (data.character) {
+        // Only query DB for UUIDs (custom characters); default/config characters have no DB row
+        const uuidPattern =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (uuidPattern.test(data.character)) {
+          const [char] = await db
+            .select({ compactTrigger: customCharacters.compactTrigger })
+            .from(customCharacters)
+            .where(eq(customCharacters.id, data.character))
+            .limit(1);
+          if (
+            char?.compactTrigger !== null &&
+            char?.compactTrigger !== undefined
+          ) {
+            return char.compactTrigger;
+          }
+        }
+      }
+
+      // 3. Use settings compactTrigger
+      if (
+        settings?.compactTrigger !== null &&
+        settings?.compactTrigger !== undefined
+      ) {
+        return settings.compactTrigger;
+      }
+    }
+    // 4. Fall back to global constant
+    return COMPACT_TRIGGER;
+  })();
+
+  logger.debug("[Setup] Effective compact trigger resolved", {
+    effectiveCompactTrigger,
+    character: data.character,
+    userId,
+  });
+
   // Build complete system prompt from character and formatting instructions
   const systemPrompt = await buildSystemPrompt({
     characterId: data.character,
@@ -502,6 +572,7 @@ export async function setupAiStream(params: {
       provider,
       encoder,
       streamAbortController,
+      effectiveCompactTrigger,
     },
   };
 }

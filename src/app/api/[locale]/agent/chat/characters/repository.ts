@@ -262,6 +262,7 @@ export class CharactersRepository {
           systemPrompt: defaultCharacter.systemPrompt,
           modelSelection: defaultCharacter.modelSelection,
           characterOwnership: CharacterOwnershipType.SYSTEM,
+          compactTrigger: null,
         });
       }
 
@@ -279,6 +280,7 @@ export class CharactersRepository {
           systemPrompt: null,
           modelSelection: NO_CHARACTER.modelSelection,
           characterOwnership: CharacterOwnershipType.SYSTEM,
+          compactTrigger: null,
         });
       }
 
@@ -329,6 +331,7 @@ export class CharactersRepository {
         systemPrompt: customCharacter.systemPrompt,
         modelSelection: customCharacter.modelSelection,
         characterOwnership: customCharacter.ownershipType,
+        compactTrigger: customCharacter.compactTrigger ?? null,
       });
     } catch (error) {
       logger.error("Failed to get character by ID", parseError(error));
@@ -378,6 +381,7 @@ export class CharactersRepository {
           ownershipType: data.isPublic
             ? CharacterOwnershipType.PUBLIC
             : CharacterOwnershipType.USER,
+          compactTrigger: data.compactTrigger ?? null,
         })
         .returning();
 
@@ -442,6 +446,7 @@ export class CharactersRepository {
             ownershipType: data.isPublic
               ? CharacterOwnershipType.PUBLIC
               : CharacterOwnershipType.USER,
+            compactTrigger: data.compactTrigger ?? null,
           })
           .returning();
 

@@ -181,10 +181,18 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
               });
             });
 
-          // Give the task runner a moment to initialize before proceeding
-          await new Promise<void>((resolve) => {
-            setTimeout(resolve, 500);
-          });
+          // Poll until running or timeout (imports + seed can take several seconds)
+          const pollStart = Date.now();
+          const POLL_TIMEOUT_MS = 10_000;
+          const POLL_INTERVAL_MS = 200;
+          while (
+            !unifiedTaskRunnerRepository.isRunning &&
+            Date.now() - pollStart < POLL_TIMEOUT_MS
+          ) {
+            await new Promise<void>((resolve) => {
+              setTimeout(resolve, POLL_INTERVAL_MS);
+            });
+          }
 
           const status = unifiedTaskRunnerRepository.getStatus();
           if (status.running) {

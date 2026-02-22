@@ -14,6 +14,7 @@ import { OpenAIChatLanguageModel } from "@ai-sdk/openai/internal";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
+import { processStreamingResponseWithToolCalls } from "./shared/streaming-tool-call-processor";
 import {
   convertDeveloperToSystemMessages,
   convertToolMessagesToUserMessages,
@@ -84,11 +85,25 @@ export function createUncensoredAI(logger: EndpointLogger): {
       return response;
     }
 
-    // Get the complete JSON response
-    const jsonResponse = (await response.json()) as OpenAIResponse;
-
     // Check if this is a streaming request
     const isStreamRequest = parsedBody.stream === true;
+
+    // If the API returns SSE directly (native streaming), process with tool call detection
+    const contentType = response.headers.get("content-type") ?? "";
+    if (isStreamRequest && contentType.includes("text/event-stream")) {
+      logger.debug(
+        "Uncensored AI: API returned native SSE stream, processing with tool call detection",
+      );
+      return processStreamingResponseWithToolCalls(
+        response,
+        logger,
+        "UncensoredAI",
+        false,
+      );
+    }
+
+    // Get the complete JSON response (legacy non-streaming API behavior)
+    const jsonResponse = (await response.json()) as OpenAIResponse;
 
     if (!isStreamRequest) {
       // Non-streaming request - return the JSON as-is
@@ -99,7 +114,7 @@ export function createUncensoredAI(logger: EndpointLogger): {
       });
     }
 
-    // For non-streaming, convert JSON response to SSE streaming format
+    // For streaming request with JSON response, convert to SSE format
     return createStreamingResponse(jsonResponse, logger);
   };
 
