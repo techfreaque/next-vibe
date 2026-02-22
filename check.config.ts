@@ -720,7 +720,6 @@ const config = (): CheckConfig => {
   // --------------------------------------------------------
   const eslint: CheckConfig["eslint"] = {
     enabled: !vibeCheck.skipEslint,
-    parallel: false, // Set to false for sequential execution (passes folders instead of files)
     configPath: ".tmp/eslint.config.mjs",
     cachePath: ".tmp/eslint-cache",
     lintableExtensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"],

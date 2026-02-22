@@ -12,6 +12,7 @@ import { useMemo, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils/utils";
 import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
+import type { ApiMutationOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
   NavigationStackProvider,
@@ -25,6 +26,28 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { EndpointRenderer, type SubmitButtonConfig } from "./EndpointRenderer";
+
+/**
+ * Extracts mutation options from an endpoint, stripping onSuccess
+ * (navigation stack handles its own onSuccess logic).
+ * Returns ApiMutationOptions<unknown, unknown, unknown> to avoid type narrowing issues
+ * when accessing options through the erased CreateApiEndpointAny generic.
+ */
+function extractMutationOptions(
+  endpoint: CreateApiEndpointAny,
+): ApiMutationOptions<WidgetData, WidgetData, WidgetData> | undefined {
+  const opts = endpoint.options?.mutationOptions as
+    | ApiMutationOptions<WidgetData, WidgetData, WidgetData>
+    | undefined;
+  if (!opts) {
+    return undefined;
+  }
+  const { onError, invalidateQueries } = opts;
+  if (!onError && !invalidateQueries) {
+    return undefined;
+  }
+  return { onError, invalidateQueries };
+}
 
 /**
  * Props for EndpointsPage component
@@ -817,14 +840,7 @@ function StackEntryLayer({
             create: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.data,
-              mutationOptions: entry.endpoint.options?.mutationOptions
-                ? (() => {
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const { onSuccess, ...rest } =
-                      entry.endpoint.options.mutationOptions;
-                    return Object.keys(rest).length > 0 ? rest : undefined;
-                  })()
-                : undefined,
+              mutationOptions: extractMutationOptions(entry.endpoint),
             },
           }}
           submitButton={submitButton}
@@ -859,14 +875,7 @@ function StackEntryLayer({
             update: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.data,
-              mutationOptions: entry.endpoint.options?.mutationOptions
-                ? (() => {
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const { onSuccess, ...rest } =
-                      entry.endpoint.options.mutationOptions;
-                    return Object.keys(rest).length > 0 ? rest : undefined;
-                  })()
-                : undefined,
+              mutationOptions: extractMutationOptions(entry.endpoint),
             },
           }}
           submitButton={submitButton}
@@ -898,14 +907,7 @@ function StackEntryLayer({
             update: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.data,
-              mutationOptions: entry.endpoint.options?.mutationOptions
-                ? (() => {
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const { onSuccess, ...rest } =
-                      entry.endpoint.options.mutationOptions;
-                    return Object.keys(rest).length > 0 ? rest : undefined;
-                  })()
-                : undefined,
+              mutationOptions: extractMutationOptions(entry.endpoint),
             },
           }}
           submitButton={submitButton}
@@ -936,14 +938,7 @@ function StackEntryLayer({
             delete: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.urlPathParams,
-              mutationOptions: entry.endpoint.options?.mutationOptions
-                ? (() => {
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const { onSuccess, ...rest } =
-                      entry.endpoint.options.mutationOptions;
-                    return Object.keys(rest).length > 0 ? rest : undefined;
-                  })()
-                : undefined,
+              mutationOptions: extractMutationOptions(entry.endpoint),
             },
           }}
           debug={debug}

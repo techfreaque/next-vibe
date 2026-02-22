@@ -395,6 +395,8 @@ export class AiStreamRepository {
             messages,
             compactingCheck.modelContextWindow,
             logger,
+            systemPrompt,
+            tools,
           );
           if (truncated.length !== messages.length) {
             messages.length = 0;
