@@ -1,6 +1,122 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  run: {
+    post: {
+      title: "KI-Agent ausführen",
+      description:
+        "Vorausrufe ausführen, dann einen KI-Prompt headless ausführen und die Antwort zurückgeben.",
+      container: {
+        title: "KI-Agent-Ausführung",
+        description: "Vorausrufe und Prompt konfigurieren",
+      },
+      fields: {
+        model: { label: "Modell", description: "KI-Modell für die Antwort" },
+        character: {
+          label: "Charakter",
+          description: "Charakter-Persona",
+          placeholder: "default",
+        },
+        prompt: {
+          label: "Prompt",
+          description: "Benutzerprompt für die KI",
+          placeholder: "Prompt eingeben...",
+        },
+        instructions: {
+          label: "Zusätzliche Anweisungen",
+          description: "Optionale Systemanweisungen",
+          placeholder: "Prägnant sein. Max. ein Absatz.",
+        },
+        preCalls: {
+          label: "Vorausrufe",
+          description: "Routen, die vor dem KI-Prompt ausgeführt werden",
+          routeId: {
+            label: "Routen-ID",
+            description: "Endpunkt-Alias oder vollständiger Pfad",
+            placeholder: "agent_chat_characters_GET",
+          },
+          args: { label: "Argumente", description: "Flache Argumente" },
+        },
+        activeTools: {
+          label: "Aktive Tools",
+          description: "Tools, die die KI ausführen darf",
+          toolId: { label: "Tool-ID", description: "Tool-Bezeichner" },
+          requiresConfirmation: {
+            label: "Bestätigung erforderlich",
+            description: "Ob Bestätigung nötig ist",
+          },
+        },
+        tools: {
+          label: "Sichtbare Tools",
+          description: "Tools im KI-Kontext",
+          toolId: { label: "Tool-ID", description: "Tool-Bezeichner" },
+          requiresConfirmation: {
+            label: "Bestätigung erforderlich",
+            description: "Ob Bestätigung nötig ist",
+          },
+        },
+        maxTurns: { label: "Max. Runden", description: "Maximale Tool-Runden" },
+        appendThreadId: {
+          label: "Thread-ID (anhängen)",
+          description: "Bestehenden Thread fortsetzen",
+          placeholder: "uuid",
+        },
+        rootFolderId: {
+          label: "Stammordner",
+          description: "Speicherort für den Thread",
+          placeholder: "cron",
+        },
+        subFolderId: {
+          label: "Unterordner-ID",
+          description: "Optionaler Unterordner",
+          placeholder: "uuid",
+        },
+      },
+      response: {
+        text: "Antworttext des Assistenten",
+        promptTokens: "Anzahl der Prompt-Token",
+        completionTokens: "Anzahl der Completion-Token",
+        threadId: "Thread-ID",
+        lastAiMessageId: "ID der letzten KI-Nachricht",
+        threadTitle: "Thread-Titel",
+        threadCreatedAt: "Erstellungszeitpunkt des Threads",
+        preCallResults: "Ergebnisse der Vorausrufe",
+      },
+      errors: {
+        validation: {
+          title: "Validierungsfehler",
+          description: "Ungültige Parameter",
+        },
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich",
+        },
+        forbidden: { title: "Verboten", description: "Zugriff verweigert" },
+        notFound: {
+          title: "Nicht gefunden",
+          description: "Route nicht gefunden",
+        },
+        internal: {
+          title: "Serverfehler",
+          description: "Interner Serverfehler",
+        },
+        network: { title: "Netzwerkfehler", description: "Netzwerkfehler" },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Unerwarteter Fehler",
+        },
+        unsaved: {
+          title: "Nicht gespeichert",
+          description: "Nicht gespeicherte Änderungen",
+        },
+        conflict: { title: "Konflikt", description: "Datenkonflikt" },
+      },
+      success: {
+        title: "KI-Ausführung abgeschlossen",
+        description: "Erfolgreich abgeschlossen",
+      },
+    },
+  },
   post: {
     title: "KI-Stream-Chat",
     description: "Streamen Sie KI-gestützte Chat-Antworten mit OpenAI GPT-4o",

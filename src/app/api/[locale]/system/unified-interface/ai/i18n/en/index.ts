@@ -1,4 +1,66 @@
 export const translations = {
+  executeTool: {
+    post: {
+      title: "Execute Tool",
+      description:
+        "Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication — this endpoint is a universal dispatcher for MCP, AI agents, and automation.",
+      container: {
+        title: "Tool Execution",
+        description: "Route name and input parameters",
+      },
+      fields: {
+        toolName: {
+          label: "Tool Name",
+          description:
+            "The registered tool name or alias to execute (e.g. 'agent_chat_characters_GET'). Use system_help_GET to discover available tools.",
+          placeholder: "agent_chat_characters_GET",
+        },
+        input: {
+          label: "Input",
+          description:
+            "Input parameters for the tool as a JSON object. URL path params (e.g. id) are automatically extracted from this object.",
+        },
+      },
+      response: {
+        result:
+          "The result data returned by the target route. On failure this field is absent — the response itself will be an error.",
+      },
+      errors: {
+        validation: {
+          title: "Validation Error",
+          description: "toolName or input parameters are invalid",
+        },
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required to call this endpoint",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "Access denied",
+        },
+        notFound: {
+          title: "Tool Not Found",
+          description: "No registered tool matches the given toolName",
+        },
+        server: {
+          title: "Execution Error",
+          description: "The target route encountered a server error",
+        },
+        network: {
+          title: "Network Error",
+          description: "Network error during tool execution",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred during execution",
+        },
+      },
+      success: {
+        title: "Tool Executed",
+        description: "The tool was executed successfully",
+      },
+    },
+  },
   tools: {
     // Translations moved to system/help/get — see system/help/i18n/en/index.ts
     get: {

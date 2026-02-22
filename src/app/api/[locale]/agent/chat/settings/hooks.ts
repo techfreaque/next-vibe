@@ -41,6 +41,7 @@ interface UseChatSettingsReturn {
     activeTools: ChatSettingsUpdateRequestOutput["activeTools"],
     visibleTools: ChatSettingsUpdateRequestOutput["visibleTools"],
   ) => void;
+  setCompactTrigger: (value: number | null) => void;
 }
 
 /**
@@ -131,6 +132,9 @@ export function useChatSettings(
       if (updates.visibleTools !== undefined) {
         endpoint.create?.setValue("visibleTools", updates.visibleTools);
       }
+      if (updates.compactTrigger !== undefined) {
+        endpoint.create?.setValue("compactTrigger", updates.compactTrigger);
+      }
       // Submit through endpoint (endpoint handles API vs localStorage based on config)
       await endpoint.create?.onSubmit();
     },
@@ -161,6 +165,13 @@ export function useChatSettings(
     [updateSettings],
   );
 
+  const setCompactTrigger = useCallback(
+    (value: number | null) => {
+      void updateSettings({ compactTrigger: value });
+    },
+    [updateSettings],
+  );
+
   const setActiveFavorite = useCallback(
     (
       favoriteId: string,
@@ -187,5 +198,6 @@ export function useChatSettings(
     setTTSAutoplay,
     setViewMode,
     setTools,
+    setCompactTrigger,
   };
 }

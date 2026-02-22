@@ -388,6 +388,19 @@ export class AiStreamRepository {
             });
           }
 
+          // Hard-truncate safety net: drop oldest non-system messages if we are
+          // still over the model's context window (e.g. compacting wasn't enough,
+          // or a single message is enormous).
+          const truncated = MessageContextBuilder.truncateToContextWindow(
+            messages,
+            compactingCheck.modelContextWindow,
+            logger,
+          );
+          if (truncated.length !== messages.length) {
+            messages.length = 0;
+            messages.push(...truncated);
+          }
+
           logger.info(
             "[AI Stream] Calling StreamExecutionHandler.executeStream",
             {

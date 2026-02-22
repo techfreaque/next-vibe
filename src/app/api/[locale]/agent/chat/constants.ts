@@ -14,6 +14,7 @@ import {
 } from "./memories/[id]/definition";
 import { MEMORY_ADD_ALIAS } from "./memories/create/definition";
 import { MEMORY_LIST_ALIAS } from "./memories/definition";
+import { EXECUTE_TOOL_ALIAS } from "../../system/unified-interface/ai/execute-tool/definition";
 
 /**
  * Storage keys for localStorage persistence
@@ -39,7 +40,7 @@ export const CHAT_CONSTANTS = {
 /**
  * Agent message content length limit
  */
-export const AGENT_MESSAGE_LENGTH = 40000;
+export const AGENT_MESSAGE_LENGTH = 40000; // TODO find a better way and also better error
 
 /**
  * Default AI tools enabled for new chats
@@ -47,6 +48,7 @@ export const AGENT_MESSAGE_LENGTH = 40000;
  */
 export const DEFAULT_TOOL_IDS = [
   aliasToPathMap[TOOL_HELP_ALIAS],
+  aliasToPathMap[EXECUTE_TOOL_ALIAS],
   aliasToPathMap[SEARCH_ALIAS],
   aliasToPathMap[FETCH_URL_ALIAS],
   aliasToPathMap[MEMORY_LIST_ALIAS],

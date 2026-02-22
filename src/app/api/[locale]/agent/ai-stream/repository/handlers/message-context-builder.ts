@@ -25,7 +25,11 @@ import { MessageConverter } from "./message-converter";
  */
 export interface CompactingCheckResult {
   shouldCompact: boolean;
+  /** True when totalTokens already exceeds the model's hard context window (emergency). */
+  isEmergencyCompact: boolean;
   totalTokens: number;
+  /** Model's hard context window (tokens). */
+  modelContextWindow: number;
   branchMessages: ChatMessage[]; // All messages from parent up to (including) last compacting
   messagesToCompact: ChatMessage[]; // Messages after last compacting that need compacting
   currentUserMessage: ChatMessage | null;
@@ -808,7 +812,13 @@ export class MessageContextBuilder {
     const absoluteTrigger = compactTrigger ?? COMPACT_TRIGGER;
     const effectiveTrigger = Math.min(absoluteTrigger, modelContextLimit);
 
-    const shouldCompact = totalTokens >= effectiveTrigger;
+    // Emergency threshold: if we're already at/above 85% of the hard context window,
+    // force compacting regardless of the user's effectiveTrigger setting.
+    // This prevents the "238K tokens to a 131K model" class of API errors.
+    const emergencyThreshold = Math.floor(modelConfig.contextWindow * 0.85);
+    const isEmergencyCompact = totalTokens >= emergencyThreshold;
+
+    const shouldCompact = isEmergencyCompact || totalTokens >= effectiveTrigger;
 
     logger.info("[Compacting] Token calculation", {
       totalTokens,
@@ -818,6 +828,8 @@ export class MessageContextBuilder {
       modelContextWindow: modelConfig.contextWindow,
       modelContextLimit,
       effectiveTrigger,
+      emergencyThreshold,
+      isEmergencyCompact,
       shouldCompact,
       messagesToCompactCount: messagesToCompact.length,
       lastCompactingMessageId: lastCompactingMessage?.id ?? null,
@@ -833,7 +845,9 @@ export class MessageContextBuilder {
 
     return {
       shouldCompact,
+      isEmergencyCompact,
       totalTokens,
+      modelContextWindow: modelConfig.contextWindow,
       branchMessages,
       messagesToCompact,
       currentUserMessage,
@@ -934,5 +948,121 @@ export class MessageContextBuilder {
     });
 
     return messages.filter(Boolean);
+  }
+
+  /**
+   * Estimate token count for a ModelMessage[] array.
+   * Uses char/4 heuristic — good enough for truncation decisions.
+   */
+  static estimateModelMessageTokens(msgs: ModelMessage[]): number {
+    return msgs.reduce((sum, m) => {
+      if (typeof m.content === "string") {
+        return sum + Math.ceil(m.content.length / 4);
+      }
+      if (Array.isArray(m.content)) {
+        return (
+          sum +
+          Math.ceil(
+            m.content
+              .map((part) =>
+                typeof part === "object" && "text" in part
+                  ? (part as { text: string }).text
+                  : JSON.stringify(part),
+              )
+              .join("").length / 4,
+          )
+        );
+      }
+      return sum;
+    }, 0);
+  }
+
+  /**
+   * Hard-truncate a ModelMessage[] to fit within modelContextWindow.
+   *
+   * Strategy:
+   * - System messages (role === "system") are always kept.
+   * - The most recent user message is always kept.
+   * - Oldest non-system messages are dropped first until the estimated
+   *   token count fits inside (modelContextWindow - reservedOutputTokens).
+   *
+   * This is a last-resort safety net — compacting should have prevented
+   * overflow, but a single enormous conversation turn can still exceed limits.
+   */
+  static truncateToContextWindow(
+    messages: ModelMessage[],
+    modelContextWindow: number,
+    logger: EndpointLogger,
+    /** Tokens to reserve for model output. Default 2048 is conservative but safe. */
+    reservedOutputTokens = 2048,
+  ): ModelMessage[] {
+    const limit = modelContextWindow - reservedOutputTokens;
+
+    const currentTokens =
+      MessageContextBuilder.estimateModelMessageTokens(messages);
+    if (currentTokens <= limit) {
+      return messages;
+    }
+
+    logger.warn("[Truncation] Messages exceed context window — truncating", {
+      estimatedTokens: currentTokens,
+      limit,
+      modelContextWindow,
+      reservedOutputTokens,
+      messageCount: messages.length,
+    });
+
+    // Partition: system messages + last user message are protected
+    const systemIndices = new Set<number>();
+    let lastUserIndex = -1;
+    for (let i = 0; i < messages.length; i++) {
+      if (messages[i]?.role === "system") {
+        systemIndices.add(i);
+      } else if (messages[i]?.role === "user") {
+        lastUserIndex = i;
+      }
+    }
+    if (lastUserIndex >= 0) {
+      systemIndices.add(lastUserIndex);
+    }
+
+    // Build mutable list of droppable indices (oldest non-system first)
+    const droppable: number[] = [];
+    for (let i = 0; i < messages.length; i++) {
+      if (!systemIndices.has(i)) {
+        droppable.push(i);
+      }
+    }
+
+    const dropped = new Set<number>();
+    let tokens = currentTokens;
+
+    for (const idx of droppable) {
+      if (tokens <= limit) {
+        break;
+      }
+      const msg = messages[idx];
+      if (!msg) {
+        continue;
+      }
+      const msgTokens = MessageContextBuilder.estimateModelMessageTokens([msg]);
+      dropped.add(idx);
+      tokens -= msgTokens;
+    }
+
+    const truncated: ModelMessage[] = [];
+    for (let i = 0; i < messages.length; i++) {
+      if (!dropped.has(i) && messages[i]) {
+        truncated.push(messages[i] as ModelMessage);
+      }
+    }
+
+    logger.warn("[Truncation] Truncation complete", {
+      droppedCount: dropped.size,
+      remainingCount: truncated.length,
+      estimatedTokensAfter: tokens,
+    });
+
+    return truncated;
   }
 }

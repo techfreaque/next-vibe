@@ -1,4 +1,153 @@
 export const translations = {
+  run: {
+    post: {
+      title: "Run AI Agent",
+      description:
+        "Execute pre-calls to gather data, then run a headless AI prompt and return the assistant's response. Ideal for automating tasks, summarising results, or chaining tool outputs into an AI answer.",
+      container: {
+        title: "AI Agent Run",
+        description: "Configure pre-calls and prompt for headless AI execution",
+      },
+      fields: {
+        model: {
+          label: "Model",
+          description: "AI model to use for generating the response",
+        },
+        character: {
+          label: "Character",
+          description: "Character persona to use (e.g. 'default')",
+          placeholder: "default",
+        },
+        prompt: {
+          label: "Prompt",
+          description: "The user prompt to send to the AI",
+          placeholder: "Enter your prompt...",
+        },
+        instructions: {
+          label: "Extra Instructions",
+          description: "Optional extra system instructions for this run",
+          placeholder: "Be concise. One paragraph max.",
+        },
+        preCalls: {
+          label: "Pre-Calls",
+          description:
+            "Routes to execute before the AI prompt. Results are injected as context.",
+          routeId: {
+            label: "Route ID",
+            description:
+              "Endpoint alias or full path (e.g. agent_chat_characters_GET)",
+            placeholder: "agent_chat_characters_GET",
+          },
+          args: {
+            label: "Arguments",
+            description:
+              "Merged flat args (urlPathParams + data) for this route",
+          },
+        },
+        activeTools: {
+          label: "Active Tools",
+          description:
+            "Tools the AI is allowed to execute. Leave empty to allow all tools.",
+          toolId: {
+            label: "Tool ID",
+            description: "Tool identifier",
+          },
+          requiresConfirmation: {
+            label: "Requires Confirmation",
+            description:
+              "Whether this tool requires user confirmation before execution",
+          },
+        },
+        tools: {
+          label: "Visible Tools",
+          description: "Tools loaded into the AI context window",
+          toolId: {
+            label: "Tool ID",
+            description: "Tool identifier",
+          },
+          requiresConfirmation: {
+            label: "Requires Confirmation",
+            description:
+              "Whether this tool requires user confirmation before execution",
+          },
+        },
+        maxTurns: {
+          label: "Max Turns",
+          description: "Maximum number of tool-calling turns before stopping",
+        },
+        appendThreadId: {
+          label: "Thread ID (append)",
+          description:
+            "Continue an existing thread by ID. Omit to start a new one.",
+          placeholder: "uuid",
+        },
+        rootFolderId: {
+          label: "Root Folder",
+          description:
+            "Where to store the thread. Use 'incognito' for no persistence, 'cron' (default) for persisted.",
+          placeholder: "cron",
+        },
+        subFolderId: {
+          label: "Sub Folder ID",
+          description: "Optional sub-folder UUID within the root folder",
+          placeholder: "uuid",
+        },
+      },
+      response: {
+        text: "Assistant response text (think-tags stripped)",
+        promptTokens: "Number of prompt tokens used",
+        completionTokens: "Number of completion tokens generated",
+        threadId:
+          "Thread ID where the conversation was stored (null if incognito)",
+        lastAiMessageId: "ID of the final assistant message",
+        threadTitle: "Auto-generated thread title",
+        threadCreatedAt: "Thread creation timestamp (ISO 8601)",
+        preCallResults: "Results from pre-call route executions",
+      },
+      errors: {
+        validation: {
+          title: "Validation Error",
+          description: "Invalid parameters provided",
+        },
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "Access denied",
+        },
+        notFound: {
+          title: "Not Found",
+          description: "Route or resource not found",
+        },
+        internal: {
+          title: "Server Error",
+          description: "Internal server error during AI run",
+        },
+        network: {
+          title: "Network Error",
+          description: "Network error during AI run",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred",
+        },
+        unsaved: {
+          title: "Unsaved Changes",
+          description: "Unsaved changes conflict",
+        },
+        conflict: {
+          title: "Conflict",
+          description: "Data conflict occurred",
+        },
+      },
+      success: {
+        title: "AI Run Complete",
+        description: "The AI agent completed successfully",
+      },
+    },
+  },
   route: {
     debug: {
       userObject: "AI Stream Route: User object",

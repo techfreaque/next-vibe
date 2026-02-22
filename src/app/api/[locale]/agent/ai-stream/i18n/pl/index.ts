@@ -1,6 +1,128 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  run: {
+    post: {
+      title: "Uruchom agenta AI",
+      description:
+        "Wykonaj wywołania wstępne, a następnie uruchom headless prompt AI i zwróć odpowiedź.",
+      container: {
+        title: "Uruchomienie agenta AI",
+        description: "Konfiguracja wywołań wstępnych i promptu",
+      },
+      fields: {
+        model: {
+          label: "Model",
+          description: "Model AI do generowania odpowiedzi",
+        },
+        character: {
+          label: "Charakter",
+          description: "Persona charakteru",
+          placeholder: "default",
+        },
+        prompt: {
+          label: "Prompt",
+          description: "Prompt użytkownika do AI",
+          placeholder: "Wpisz prompt...",
+        },
+        instructions: {
+          label: "Dodatkowe instrukcje",
+          description: "Opcjonalne instrukcje systemowe",
+          placeholder: "Bądź zwięzły. Maksymalnie jeden akapit.",
+        },
+        preCalls: {
+          label: "Wywołania wstępne",
+          description: "Trasy wykonywane przed promptem AI",
+          routeId: {
+            label: "ID trasy",
+            description: "Alias endpointu lub pełna ścieżka",
+            placeholder: "agent_chat_characters_GET",
+          },
+          args: { label: "Argumenty", description: "Płaskie argumenty" },
+        },
+        activeTools: {
+          label: "Aktywne narzędzia",
+          description: "Narzędzia, które AI może wykonać",
+          toolId: {
+            label: "ID narzędzia",
+            description: "Identyfikator narzędzia",
+          },
+          requiresConfirmation: {
+            label: "Wymaga potwierdzenia",
+            description: "Czy wymagane jest potwierdzenie",
+          },
+        },
+        tools: {
+          label: "Widoczne narzędzia",
+          description: "Narzędzia w kontekście AI",
+          toolId: {
+            label: "ID narzędzia",
+            description: "Identyfikator narzędzia",
+          },
+          requiresConfirmation: {
+            label: "Wymaga potwierdzenia",
+            description: "Czy wymagane jest potwierdzenie",
+          },
+        },
+        maxTurns: {
+          label: "Maks. tury",
+          description: "Maksymalna liczba tur narzędzi",
+        },
+        appendThreadId: {
+          label: "ID wątku (dołącz)",
+          description: "Kontynuuj istniejący wątek",
+          placeholder: "uuid",
+        },
+        rootFolderId: {
+          label: "Folder główny",
+          description: "Miejsce przechowywania wątku",
+          placeholder: "cron",
+        },
+        subFolderId: {
+          label: "ID podfolderu",
+          description: "Opcjonalny podfolder",
+          placeholder: "uuid",
+        },
+      },
+      response: {
+        text: "Tekst odpowiedzi asystenta",
+        promptTokens: "Liczba tokenów promptu",
+        completionTokens: "Liczba tokenów odpowiedzi",
+        threadId: "ID wątku",
+        lastAiMessageId: "ID ostatniej wiadomości AI",
+        threadTitle: "Tytuł wątku",
+        threadCreatedAt: "Czas utworzenia wątku",
+        preCallResults: "Wyniki wywołań wstępnych",
+      },
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe parametry",
+        },
+        unauthorized: {
+          title: "Nieautoryzowany",
+          description: "Wymagane uwierzytelnienie",
+        },
+        forbidden: { title: "Zabronione", description: "Odmowa dostępu" },
+        notFound: {
+          title: "Nie znaleziono",
+          description: "Trasa nie znaleziona",
+        },
+        internal: {
+          title: "Błąd serwera",
+          description: "Wewnętrzny błąd serwera",
+        },
+        network: { title: "Błąd sieci", description: "Błąd sieci" },
+        unknown: { title: "Nieznany błąd", description: "Nieoczekiwany błąd" },
+        unsaved: { title: "Niezapisane", description: "Niezapisane zmiany" },
+        conflict: { title: "Konflikt", description: "Konflikt danych" },
+      },
+      success: {
+        title: "Wykonanie AI zakończone",
+        description: "Zakończono pomyślnie",
+      },
+    },
+  },
   post: {
     title: "Czat strumieniowy AI",
     description:

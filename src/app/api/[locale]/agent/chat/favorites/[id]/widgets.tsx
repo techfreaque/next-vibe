@@ -19,6 +19,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { CompactTriggerEdit } from "@/app/api/[locale]/agent/chat/_shared/compact-trigger-widget";
 import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/config";
 import { ModelSelector } from "@/app/api/[locale]/agent/models/components/model-selector";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
@@ -374,6 +375,30 @@ export function FavoriteEditContainer({
               locale={locale}
             />
           )}
+
+          {/* Context Memory Budget — per-slot override */}
+          {form && (
+            <CompactTriggerEdit
+              value={form.watch("compactTrigger") ?? null}
+              onChange={(v) =>
+                form.setValue("compactTrigger", v, { shouldDirty: true })
+              }
+              modelSelection={favoriteModelSelection ?? null}
+              /* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */
+              label="Override for this slot"
+            />
+          )}
+
+          {/* Context Memory Budget — global fallback default */}
+          <CompactTriggerEdit
+            value={settingsOps.settings?.compactTrigger ?? null}
+            onChange={(v) => {
+              void settingsOps.setCompactTrigger(v);
+            }}
+            modelSelection={favoriteModelSelection ?? null}
+            /* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */
+            label="My default (fallback)"
+          />
         </Div>
       </Div>
     </Div>

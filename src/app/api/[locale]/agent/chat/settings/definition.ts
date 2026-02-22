@@ -289,10 +289,12 @@ const { POST } = createEndpoint({
       }),
 
       // Auto-compacting token threshold (null = use global default COMPACT_TRIGGER)
+      // Hidden from default widget — rendered via CompactTriggerEdit in custom UI
       compactTrigger: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "app.api.agent.chat.settings.post.compactTrigger.label" as const,
+        hidden: true,
         columns: 6,
         schema: z.number().int().min(1000).max(200000).nullable().optional(),
       }),

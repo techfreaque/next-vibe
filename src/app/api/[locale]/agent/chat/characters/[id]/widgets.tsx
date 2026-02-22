@@ -23,6 +23,7 @@ import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Span } from "next-vibe-ui/ui/span";
 import { useState } from "react";
 
+import { CompactTriggerEdit } from "@/app/api/[locale]/agent/chat/_shared/compact-trigger-widget";
 import { ModelSelector } from "@/app/api/[locale]/agent/models/components/model-selector";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { cn } from "@/app/api/[locale]/shared/utils";
@@ -197,6 +198,17 @@ export function CharacterEditContainer({
               }
               t={t}
               locale={locale}
+            />
+          )}
+
+          {/* Context Memory Budget */}
+          {form && (
+            <CompactTriggerEdit
+              value={form.watch("compactTrigger") ?? null}
+              onChange={(v) =>
+                form.setValue("compactTrigger", v, { shouldDirty: true })
+              }
+              modelSelection={form.watch("modelSelection") ?? null}
             />
           )}
         </Div>

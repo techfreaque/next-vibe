@@ -88,6 +88,12 @@ export class StreamExecutionHandler {
         ]
       : undefined;
 
+    // Context window guard for tool loops: abort when real token usage from
+    // the API approaches the model's hard context limit. This prevents
+    // "238K tokens to a 131K model" errors that occur when tool call results
+    // accumulate across many steps. We abort at 90% to leave headroom.
+    const contextGuardThreshold = Math.floor(modelConfig.contextWindow * 0.9);
+
     const streamResult = aiStreamText({
       model: provider.chat(modelConfig.openRouterModel),
       messages,
@@ -98,8 +104,25 @@ export class StreamExecutionHandler {
         ? {
             tools,
             stopWhen: stepCountIs(MAX_TOOL_CALLS),
-            onStepFinish: (): void => {
-              // Tool arguments are already sent via tool-call stream events
+            onStepFinish: (stepResult): void => {
+              // Tool arguments are already sent via tool-call stream events.
+              // Additionally: check real input token usage and abort if we are
+              // approaching the model's context window.
+              const inputTokens = stepResult.usage.inputTokens ?? 0;
+              if (inputTokens > 0 && inputTokens >= contextGuardThreshold) {
+                logger.warn(
+                  "[ToolLoop] Context window guard triggered — aborting tool loop",
+                  {
+                    inputTokens,
+                    contextGuardThreshold,
+                    modelContextWindow: modelConfig.contextWindow,
+                    model,
+                  },
+                );
+                streamAbortController.abort(
+                  new Error("context-window-guard: tool loop aborted"),
+                );
+              }
             },
           }
         : {}),
