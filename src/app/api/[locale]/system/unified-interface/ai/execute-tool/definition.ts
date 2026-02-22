@@ -16,18 +16,19 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
+import { ExecuteToolWidget } from "./widget";
 
 export const EXECUTE_TOOL_ALIAS = "execute-tool" as const;
 
@@ -59,18 +60,10 @@ const { POST } = createEndpoint({
     UserRole.MCP_VISIBLE,
   ] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.unifiedInterface.ai.executeTool.post.container.title" as const,
-      description:
-        "app.api.system.unifiedInterface.ai.executeTool.post.container.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: customWidgetObject({
+    render: ExecuteToolWidget,
+    usage: { request: "data", response: true } as const,
+    children: {
       // ── Request fields ────────────────────────────────────────────────────
       toolName: requestField({
         type: WidgetType.FORM_FIELD,
@@ -106,7 +99,7 @@ const { POST } = createEndpoint({
         schema: z.unknown().optional(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {

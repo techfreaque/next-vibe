@@ -13,7 +13,7 @@
 import type {
   Task,
   TaskRegistry,
-} from "../unified-interface/tasks/unified-runner/types";
+ } from "../unified-interface/tasks/unified-runner/types";
 
 import { tasks as taskModule0 } from "../unified-interface/tasks/task-sync/task";
 import { tasks as taskModule1 } from "../unified-interface/tasks/db-health/task";
@@ -73,7 +73,13 @@ export const taskRegistry: TaskRegistry = {
   allTasks,
   tasksByCategory,
   tasksByName,
-};
+ };
 
-export { allTasks, cronTasks, taskRunners, tasksByCategory, tasksByName };
+export {
+  allTasks,
+  cronTasks,
+  taskRunners,
+  tasksByCategory,
+  tasksByName,
+ };
 export default allTasks;
