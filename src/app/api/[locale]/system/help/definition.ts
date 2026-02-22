@@ -42,7 +42,16 @@ const aiToolMetadataSchema = z.object({
   // Only present in detail mode (toolName param)
   parameters: z.record(z.string(), z.unknown()).optional(),
   // Only present in detail mode (toolName param)
-  examples: z.record(z.string(), z.unknown()).optional(),
+  examples: z
+    .object({
+      inputs: z
+        .record(z.string(), z.record(z.string(), z.unknown()))
+        .optional(),
+      responses: z
+        .record(z.string(), z.record(z.string(), z.unknown()))
+        .optional(),
+    })
+    .optional(),
 });
 
 const { GET } = createEndpoint({

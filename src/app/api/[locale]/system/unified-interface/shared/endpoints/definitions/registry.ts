@@ -28,8 +28,12 @@ export interface SerializableToolMetadata {
   allowedRoles: UserRoleValue[];
   aliases?: string[];
   requiresConfirmation?: boolean;
-  /** Raw examples from the endpoint definition (requests + responses keyed by example name) */
-  examples?: CliRequestData;
+  /** Raw examples from the endpoint definition (requests + urlPathParams merged, responses keyed by example name) */
+  examples?: {
+    /** Merged request data + url path params — what the caller passes as flat args */
+    inputs?: Record<string, CliRequestData>;
+    responses?: Record<string, CliRequestData>;
+  };
 }
 
 export interface IDefinitionsRegistry {
@@ -151,6 +155,29 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
   }
 
   /**
+   * Merge requests + urlPathParams example maps into a single flat inputs map.
+   * Keys present in both are merged (urlPathParams wins on collision).
+   */
+  private static mergeExampleInputs(
+    requests: Record<string, CliRequestData> | undefined,
+    urlPathParams: Record<string, CliRequestData> | undefined,
+  ): Record<string, CliRequestData> | undefined {
+    if (!requests && !urlPathParams) {return undefined;}
+    const keys = new Set([
+      ...Object.keys(requests ?? {}),
+      ...Object.keys(urlPathParams ?? {}),
+    ]);
+    const merged: Record<string, CliRequestData> = {};
+    for (const key of keys) {
+      merged[key] = {
+        ...(requests?.[key] ?? {}),
+        ...(urlPathParams?.[key] ?? {}),
+      };
+    }
+    return merged;
+  }
+
+  /**
    * Serialize endpoints to tool metadata format
    */
   private serializeEndpoints(
@@ -206,7 +233,19 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
         aliases: definition.aliases ? [...definition.aliases] : undefined,
         requiresConfirmation: definition.requiresConfirmation,
         examples: definition.examples
-          ? (definition.examples as CliRequestData)
+          ? {
+              inputs: DefinitionsRegistry.mergeExampleInputs(
+                definition.examples.requests as
+                  | Record<string, CliRequestData>
+                  | undefined,
+                definition.examples.urlPathParams as
+                  | Record<string, CliRequestData>
+                  | undefined,
+              ),
+              responses: definition.examples.responses as
+                | Record<string, CliRequestData>
+                | undefined,
+            }
           : undefined,
       };
     });
